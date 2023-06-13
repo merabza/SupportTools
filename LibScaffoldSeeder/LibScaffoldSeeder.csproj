@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\DbContextAnalyzer\DbContextAnalyzer.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\LibSeedCodeCreator\LibSeedCodeCreator.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\CompressionManagement\CompressionManagement.csproj" />
+    <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
+    <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+</Project>

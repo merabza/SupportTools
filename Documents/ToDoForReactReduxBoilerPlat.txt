@@ -1,0 +1,47 @@
+git clone git@bitbucket.org:mzakalashvili/ganmarteba.ge.shared.git ganmarteba.ge.shared
+Copy Production base DictElectron To Guria
+
+1. გაკეთდა edit.ganmarteba.ge.support ფოლდერი თავისი შიგთავსით grammar.ge.support ანალოგიით
+1.1. "grammar.ge"-ს ადგილას ყველა ფაილში ჩაიწერა "edit.ganmarteba.ge"
+1.2. "GeoModel"-ს ადგილას ყველა ფაილში ჩაიწერა "edit.ganmarteba.ge"
+
+2. გაკეთდა D:\1WorkSecurity\edit.ganmarteba.ge\prepareReactClient.ps1 ანალოგით D:\1WorkSecurity\grammar.ge\prepareReactClient.ps1
+2.1. "grammar.ge"-ს ადგილას ყველა ფაილში ჩაიწერა "edit.ganmarteba.ge"
+2.2. "GeoModel"-ს ადგილას ყველა ფაილში ჩაიწერა "edit.ganmarteba.ge"
+
+
+3. BitBucket-ზე შეიქმნა ახალი რეპოზიტორიები:
+ 3.1. git clone git@bitbucket.org:mzakalashvili/edit.ganmarteba.ge.support.git edit.ganmarteba.ge.support
+ 3.2. git clone git@bitbucket.org:mzakalashvili/edit.ganmarteba.ge.server.git edit.ganmarteba.ge.server
+ 3.3. git clone git@bitbucket.org:mzakalashvili/edit.ganmarteba.ge.client.mainfiles.git edit.ganmarteba.ge.client.mainfiles
+ 3.4. git clone git@bitbucket.org:mzakalashvili/edit.ganmarteba.ge.client.git project
+ 
+4. Program.cs ფაილში დარეგისტრირდა შემდეგი ცვლილებები
+ 4.0. დაემატა 
+   using SystemToolsShared;
+   using Serilog;
+
+ 4.1. დაემატა  private static readonly string Key = "D5E152E9-198D-41A6-A0B3-A96D1065E177" + Environment.MachineName.Capitalize();
+ 4.2. მთლიანად შეიცვალა Main მეთოდი
+ 4.3. დაემატა IsWindows მეთოდი
+
+   
+5. სოლუშენში დაემატა 
+ 5.1. ფოლდერი SystemTools
+ 5.2. პროექტი SystemToolsShared
+ 
+6. მთავარ პროექტში დაემატა
+ 6.1. რეფერნსი პროექტზე  SystemToolsShared
+ 6.2. პაკეტები (Microsoft.AspNetCore.SpaServices.Extensions პაკეტი უკვე იყო)
+  Microsoft.AspNetCore.Authentication.JwtBearer
+  Microsoft.Extensions.Hosting.WindowsServices
+  Serilog.AspNetCore
+  Serilog.Settings.Configuration
+  Serilog.Sinks.Console
+  Serilog.Sinks.File
+ 6.3. ახალი ფაილი
+  StatProgramAttr.cs  
+  appsettings.json (პორტის ნომერი შევცვალე 5009-ზე)
+  
+  
+ 

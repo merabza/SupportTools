@@ -1,0 +1,96 @@
+
+using CliShared;
+
+namespace DbContextAnalyzer.Models
+{
+    public class SeederParameters : IParameters
+    {
+
+        public string JsonFolderName { get; set; }
+        public string SecretDataFolder { get; set; }
+        public string LogFolder { get; set; }
+        public string LogFileName { get; set; }
+        public string ConnectionStringSeed { get; set; }
+
+        public bool CheckBeforeSave()
+        {
+            return true;
+        }
+
+    }
+
+}
+
+{
+    "JsonFolderName":  "D:\\1WorkScaffoldSeeders\\GeoModel\\GeoModelScaffoldSeeder\\GeoModelScaffoldSeeder\\GeoModelDataSeeding\\Json",
+    "SecretDataFolder":  "D:\\1WorkSecurity\\grammar.ge",
+    "LogFolder":  "D:\\Logs",
+    "ConnectionStringSeed":  "Server=192.168.10.20;Database=GeoModelDevelopment;Trusted_Connection=False;MultipleActiveResultSets=true;User Id=sa;Password=20NaikusZaitoo49;Application Name=SeedGeoModel"
+}
+
+
+using CliShared;
+
+namespace DbContextAnalyzer.Models
+{
+    public class GetJsonParameters : IParameters
+    {
+        public string JsonFolderName { get; set; }
+        public string LogFolder { get; set; }
+        public string LogFileName { get; set; }
+        public string ConnectionStringProd { get; set; }
+
+        public bool CheckBeforeSave()
+        {
+            return true;
+        }
+
+    }
+
+}
+
+{
+    "JsonFolderName":  "D:\\1WorkScaffoldSeeders\\GeoModel\\GeoModelScaffoldSeeder\\GeoModelScaffoldSeeder\\GeoModelDataSeeding\\Json",
+    "LogFolder":  "D:\\Logs",
+    "ConnectionStringProd":  "Server=192.168.10.20;Database=GeoModelProdCopy;Trusted_Connection=False;MultipleActiveResultSets=true;User Id=sa;Password=20NaikusZaitoo49;Application Name=GeoModelScaffold"
+}
+
+
+using CliShared;
+
+namespace DbContextAnalyzer.Models
+{
+
+    public class CreateProjectSeederCodeParameters : IParameters
+    {
+        public string ProjectPrefix { get; set; }
+        public string ProjectPrefixShort { get; set; }
+        public string LogFolder { get; set; }
+        public string LogFileName { get; set; }
+        public string ConnectionStringProd { get; set; }
+        public string GetJsonProjectPlacePath { get; set; }
+        public string GetJsonProjectNamespace { get; set; }
+        public string DataSeedingProjectPlacePath { get; set; }
+        public string DataSeedingProjectNamespace { get; set; }
+        public string ExcludesRulesParametersFilePath { get; set; }
+
+        public bool CheckBeforeSave()
+        {
+            return true;
+        }
+
+    }
+
+}
+
+{
+    "ProjectPrefix":  "GeoModel",
+    "ProjectPrefixShort":  "Gm",
+    "LogFolder":  "D:\\Logs",
+    "ConnectionStringProd":  "Server=192.168.10.20;Database=GeoModelProdCopy;Trusted_Connection=False;MultipleActiveResultSets=true;User Id=sa;Password=20NaikusZaitoo49;Application Name=GeoModelScaffold",
+    "GetJsonProjectPlacePath":  "D:\\1WorkScaffoldSeeders\\GeoModel\\GeoModelScaffoldSeeder\\GeoModelScaffoldSeeder\\GetJsonFromGeoModelDb",
+    "GetJsonProjectNamespace":  "GetJsonFromGeoModelDb",
+    "DataSeedingProjectPlacePath":  "D:\\1WorkScaffoldSeeders\\GeoModel\\GeoModelScaffoldSeeder\\GeoModelScaffoldSeeder\\GeoModelDataSeeding",
+    "DataSeedingProjectNamespace":  "GeoModelDataSeeding",
+    "ExcludesRulesParametersFilePath":  "D:\\1Work\\ScaffoldGeoModel\\ExcludesRules.json"
+}

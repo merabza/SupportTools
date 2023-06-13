@@ -1,0 +1,87 @@
+Project => edit.ganmarteba.ge
+   k. Copy Production base DictElectron To Guria
+
+3. Use App Task Parameters File. (D:\1WorkSecurity\edit.ganmarteba.ge\CopyProductionbaseDictElectronToGuria.json)
+   
+   
+Project => grammar.ge
+   l. Copy Base Test // D:\1WorkSecurity\BaseCopier\CopyProductionbaseGeoModelToTbilisi.json
+   m. Copy Developer Guria Base To Production Ubunserv Base // D:\1WorkSecurity\grammar.ge\CopyDeveloperGuriaBaseToProductionUbunservBase.json
+   n. Copy Production base GeoModel To Guria Developer server // D:\1WorkSecurity\grammar.ge\CopyProductionbaseGeoModelToGuria.json
+   o. Correct New GeoModelDevelopment Database // D:\1WorkSecurity\grammar.ge\CorrectNewGeoModelDevelopmentDatabase.json
+
+
+
+4 აგვისტო 2021
++-1. ბაზიანი ახალი პროექტის შექმნისას Db პროექტში უნდა დაემატოს  Models ფოლდერი ერთი მაინც ნიმუშის ბაზის ცხრილის მოდელით
++-2. ბაზის კონტექსტის კლასში დაემატოს სატესტო ცხრილის აღწერილობა
++-3. მთავარ გამშვებ პროექტზე რეფერენსით უნდა იყოს მიერთებული მიგრაციის პროექტი
++-4. ბაზის პროექტში უნდა დაემატოს DesignTimeDbContextFactory კლასი
++-5. მთავარ პროექტში დაემატოს {ProjectName}DesignTimeDbContextFactory
++-6. ვტომატურად შეიქმნას DatabaseMigration.bat ფაილი
++-7. ვტომატურად შეიქმნას DropDatabse.bat ფაილი
++-8. {ProjectName}Runner სჯობია გადავიდეს Do{ProjectName} პროექტში
++-9. ბაზიან შემთხვევაში {ProjectName}Runner-ის კონსტრუქტორს უნდა გადაეწოდოს  I{ProjectName}RepositoryCreatorFabric. შესაბამისად {ProjectName}TasksEditor-ის კონსტრუქტორსაც უნდა გადაეწოდოს I{ProjectName}RepositoryCreatorFabric
+
+
+23 მაისი 2021
+1. ReCreateDatabase.ps1-ის მაგივრად გასაკეთებელია კონსოლ აპლიკაცია, სადაც გარდა ამ ფაილში არსებული კოდისა, უნდა დაემატოს პირველი მიგრაციის შემდგომ მეორე მიგრაციის დამატება (გამოყენებული იქნება სტორედ პროცედურების, ფუნქციების და ისეთი რამეების დასამატებლად, რაც ბაზის კონტექსტში აღწერას არ ექვემდებარება). ამის საჭიროება დადგა იმის გამო, რომ განმარეტებების ლექსიკონის ბაზაში არის ფუნქციები და საჭირო მათი დამატება ბაზაში.
+
+https://dotnetthoughts.net/creating-stored-procs-in-efcore-migrations/
+
+
+
+$projectDbContext => GeoModelDbContext
+
+$projects[$SeedProjectDb] => D:\1WorkScaffoldSeeders\GeoModel\GeoModelScaffoldSeeder\GeoModelScaffoldSeeder\SeedGeoModelDb\SeedGeoModelDb.csproj
+
+$projects[$projectDbMigration] => D:\1WorkScaffoldSeeders\GeoModel\GeoModelScaffoldSeeder\GeoModelScaffoldSeeder\GeoModelDbMigration\GeoModelDbMigration.csproj
+
+---$projectName$CreateProjectType => GeoModelScaffoldSeeder
+---$projectName$CreateProjectType => GeoModelScaffoldSeeder
+---$dbMigrationProjectName = $mainDbProjectName$Migration => GeoModelDbMigration
+---$Migrations =. "Migrations"
+
+$migrationCsFiles => $ScaffoldSeedersMainFolderPath\$projectName\$projectName$CreateProjectType\$projectName$CreateProjectType\$mainDbProjectName$Migration\$Migrations\*.cs => D:\1WorkScaffoldSeeders\GeoModel\GeoModelScaffoldSeeder\GeoModelScaffoldSeeder\GeoModelDbMigration\Migrations\*.cs
+
+
+
+
+
+
+1 აპრილი 2021
+1. New App Task მენიუს გამოყენებისას ყველაფერი სწორად მიდის, უბრალოდ ბოლოს პროგრამა იხურება
+
+22 მარტი 2021
++1. CopyBaseParametersEditor პარამეტრების რედაქტორში ბაზის სახელის არჩევა უნდა მოხდეს მითითებულ სერვერზე არსებული ბაზების სახელებიდან. ეს წესი უნდა ამუშავდეს როგორც სწარო ბაზისათვის, ისე მიზნის ბაზისათვის
+2. ყოველი ატვირთვის მერე უნდა მოხდეს ზედმეტი ფაილების წაშლა ჭკვიანი სქემის მიხედვით
+
+
+
+17 მარტი 2021
+
+1. ყველა პროექტში რომელიც ინსტალირდება როგორც სერვისი უნდა იყოს TestController, რომელიც არის TestTools პროექტში ServerCarcassProjects რეპოზიტორიაში
+
+2. ეხლა სერვერის შესახებ ინფორმაციის შეყვანისას საინსტალაციო ვებაგენტის ინფორმაციის შეყვანისას თან შემყავს შესამოწმებელი ვებაგენტი. სინამდვილეში შემოწმება უნდა მოხდეს პროექტის შესაბამისი დაინსტალირებული სერვისის საშუალებით. ამიტომ შესამოწმებელი ვებაგენტის შესახებ ინფორმაცია უნდა შევიდეს პროექტის ქვეშ სერვერთან ერთად. 
+
+2ა. (ეს იდეა ჯერჯერობით არ მომწონს და რეალიზებას არ ვაპირებ) (თუმცა შეიძლება ისეც გაკეთდეს, რომ ვებაგენტი იღებდეს ინფორმაციას პროექტისაგან და მერე ვებაგენტი აბრუნებდეს ვერსიას. ასეთ შემთხვევაში TestController ყველა პროექტში საჭირო არ იქნება, თუმცა ვებაგენტნმა უნდა იცოდეს სად დააინსტალირა პროექტი და როგორ ამოიღოს პარამეტრების ვერსიის შესახებ ინფორმაცია და რომელი ფაილიდან აიღოს პროგრამის ვერსია.)
+
++3. runtime პარამეტრის არჩევა უნდა მოხდეს სიიდან. მომავალში შესაძლებელი უნდა იყოს runtime პარამეტრების სია გაიფილტროს ოპერაციული სისტემით
+
+
+
+
+16 მარტი 2021
+1. შეიძლება დასამატებელი გახდეს პარამეტრების რედაქტირებისას შეტანილი ინფორმაციის ვალიდაცია .
+
+იმ ამოცანებისათვის, რომელთაც თავისი პარამეტრების ფაილი ექნებათ:
+2. შესაძლებელი უნდა იყოს ამოცანის ძირითადი ველების დარედაქტირება
+3. შესაძლებელი უნდა იყოს შევცვალოთ ამოცანა ისე, რომ პარამეტრების ფაილის გადავინახვა მოხდეს სხვაგან (შევუცვალოთ გზა)
+4. შესაძლებელი უნდა იყოს შევცვალოთ ამოცანის ინსტრუმენტი.
+5. ყოველი ახალი არქივის ან დროებითი ფაილის შექმნისას უნდა მოხდეს ჭკვიანი სქემის მიხედვით ძველი ფაილების წაშლა
+6. ბაზის დამაკოპირებელი ამოცანა შევცვალოთ ისე, რომ თუ გაცვლის საცავი და მიზნის საცავი ერთიდაიგივეა, მოქაჩვა აღარ მოხდეს.
+7. ბაზის დამაკოპირებელი ამოცანაში, წყაროს ბაზის არჩევისას, დაემატოს შესაძლებლობა, ბაზის სახელის არჩევა მოხდეს არსებული ბაზების სახელებიდან.
+8. ბაზის დამაკოპირებელი ამოცანაში, მიზნის ბაზის არჩევისას, დაემატოს შესაძლებლობა, ბაზის სახელის არჩევა მოხდეს არსებული ბაზების სახელებიდან. თუმცა შესაძლებელი უნდა იყოს არარსებული ახალი ბაზის სახელის შეყვანაც.
+9. შესამოწმებელია პროგრამის ვერსიების მოძრაობა სხვადასხვა ინსტალაციების პროცესების გაშვებისას.
+
+

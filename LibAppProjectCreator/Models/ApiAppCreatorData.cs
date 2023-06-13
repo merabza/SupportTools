@@ -1,0 +1,187 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using SupportToolsData;
+using SupportToolsData.Models;
+using SystemToolsShared;
+
+namespace LibAppProjectCreator.Models;
+
+public sealed class ApiAppCreatorData
+{
+    private ApiAppCreatorData(string tempPath, string projectTempPath, string? dbPartPath, string reactClientPath,
+        AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
+        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
+        string? reactTemplateName, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
+        ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate masterDataLoadersProjectData)
+    {
+        AppCreatorBaseData = appCreatorBaseData;
+        MainProjectData = mainProjectData;
+        UseReact = useReact;
+        UseCarcass = useCarcass;
+        TempPath = tempPath;
+        ProjectTempPath = projectTempPath;
+        DbPartPath = dbPartPath;
+        ReactClientPath = reactClientPath;
+        UseDatabase = useDatabase;
+        UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
+        UseIdentity = useIdentity;
+        UseBackgroundTasks = useBackgroundTasks;
+        ReactTemplateName = reactTemplateName;
+        DatabaseProjectData = databaseProjectData;
+        DbMigrationProjectData = dbMigrationProjectData;
+        LibProjectRepositoriesProjectData = libProjectRepositoriesProjectData;
+        MasterDataLoadersProjectData = masterDataLoadersProjectData;
+    }
+
+    public bool UseReact { get; set; }
+    public bool UseCarcass { get; set; }
+    public bool UseDatabase { get; set; }
+    public bool UseDbPartFolderForDatabaseProjects { get; }
+    public bool UseIdentity { get; set; }
+    public bool UseBackgroundTasks { get; set; }
+    public string? ReactTemplateName { get; }
+    public string ReactClientPath { get; }
+    public string TempPath { get; }
+    public string ProjectTempPath { get; }
+    public string? DbPartPath { get; }
+    public AppCreatorBaseData AppCreatorBaseData { get; }
+    public ProjectForCreate MainProjectData { get; }
+    public ProjectForCreate LibProjectRepositoriesProjectData { get; }
+    public ProjectForCreate MasterDataLoadersProjectData { get; }
+    public ProjectForCreate DatabaseProjectData { get; }
+    public ProjectForCreate DbMigrationProjectData { get; }
+
+
+    public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger,
+        AppCreatorBaseData appCreatorBaseData, AppProjectCreatorData par, TemplateModel template)
+    {
+        if (template.UseCarcass && !template.UseDatabase)
+        {
+            StShared.WriteErrorLine("Use Carcass without database is not allowed", true, logger);
+            return null;
+        }
+
+        if (template.UseCarcass && !template.UseIdentity)
+        {
+            StShared.WriteErrorLine("Use Carcass without Identity is not allowed", true, logger);
+            return null;
+        }
+
+        if (template.UseReact && string.IsNullOrWhiteSpace(template.ReactTemplateName))
+        {
+            StShared.WriteErrorLine("if Use React, ReactTemplateName must be specified", true, logger);
+            return null;
+        }
+
+        if (par.TempFolderPath is null)
+        {
+            StShared.WriteErrorLine("Temp folder does not specified", true, logger);
+            return null;
+        }
+
+        //დროებით ფოლდერი არ უნდა ემთხვეოდეს სამუშაო ფოლდერს
+        if (FileStat.NormalizePath(par.WorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
+        {
+            StShared.WriteErrorLine($"Work and Temp Folders are same {par.TempFolderPath}.", true, logger);
+            return null;
+        }
+
+        //დროებით ფოლდერი არ უნდა ემთხვეოდეს საიდუმლოებების ფოლდერს
+        if (FileStat.NormalizePath(par.SecurityWorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
+        {
+            StShared.WriteErrorLine($"Security and Temp Folders are same {par.TempFolderPath}.", true, logger);
+            return null;
+        }
+
+        //დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის სამუშაო ფოლდერს
+        if (FileStat.NormalizePath(appCreatorBaseData.WorkPath) == FileStat.NormalizePath(par.TempFolderPath))
+        {
+            StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
+                logger);
+            return null;
+        }
+
+        //დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის საიდუმლოებების ფოლდერს
+        if (FileStat.NormalizePath(appCreatorBaseData.SecurityPath) == FileStat.NormalizePath(par.TempFolderPath))
+        {
+            StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
+                logger);
+            return null;
+        }
+
+        //შევამოწმოთ და თუ არ არსებობს შევქმნათ დროებითი სამუშაოებისათვის განკუთვნილი ფოლდერი
+        if (!StShared.CreateFolder(par.TempFolderPath, true))
+        {
+            StShared.WriteErrorLine($"Cannot create temp Folder {par.TempFolderPath}", true, logger);
+            return null;
+        }
+
+        //შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
+        var projectTempPath = Path.Combine(par.TempFolderPath, par.ProjectName.ToLower());
+        ////foldersForCreate.Add(tempPath);
+        //if (!FileStat.CheckRequiredFolder(true, projectTempPath, false))
+        //    return null;
+
+        var projectFolders = new List<string>
+        {
+            "Properties",
+            "Models",
+            "Installers"
+        };
+
+        if (template.UseReact)
+        {
+            projectFolders.Add("Pages");
+            projectFolders.Add("ClientApp");
+            //projectFolders.Add("ClientApp/public");
+        }
+
+        //მთავარი პროექტი
+        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, par.ProjectName, par.ProjectName,
+            EDotnetProjectType.Web, template.UseHttps ? "" : "--no-https", "Program", projectFolders.ToArray(),
+            template.UseReact);
+
+        //დავიანგარიშოთ კლიენტის ფოლდერის სრული გზა
+        var reactClientPath = Path.Combine(mainProjectData.ProjectFullPath, "ClientApp");
+        //შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
+        //AppCreatorBaseData.CheckRequiredFolder(reactClientPath, false);
+
+
+        var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"Lib{par.ProjectName}Repositories", Array.Empty<string>());
+
+        var databaseProjectFolders = new List<string>
+        {
+            "Models",
+            "Installers"
+        };
+
+        if (template.UseCarcass)
+            databaseProjectFolders.Add("QueryModels");
+
+        var dbPartFolderName = $"{par.ProjectName}DbPart";
+
+        var dbPartPath = template.UseDbPartFolderForDatabaseProjects
+            ? Path.Combine(appCreatorBaseData.WorkPath, dbPartFolderName)
+            : appCreatorBaseData.SolutionPath;
+
+        var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
+
+        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{par.ProjectName}Db",
+            databaseProjectFolders.ToArray(), dbPartSolutionFolderName);
+
+        var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"{par.ProjectName}DbMigration", new[] { "Migrations" });
+
+        var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"{par.ProjectName}MasterDataLoaders", new[] { "Installers" });
+
+        return new ApiAppCreatorData(par.TempFolderPath, projectTempPath, dbPartPath, reactClientPath,
+            appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass, template.UseDatabase,
+            template.UseDbPartFolderForDatabaseProjects, template.UseIdentity, template.UseBackgroundTasks,
+            template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
+            masterDataLoadersProjectData);
+    }
+}

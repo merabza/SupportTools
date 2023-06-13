@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <Version>1.0.1</Version>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>012c3f9f-778f-48be-a567-a23b18cdbc84</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppCliTools\CliParametersApiClientsDbEdit\CliParametersApiClientsDbEdit.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\CliParametersEdit\CliParametersEdit.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\LibMenuInput\LibMenuInput.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
+    <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
+    <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
+    <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />
+    <ProjectReference Include="..\LibScaffoldSeeder\LibScaffoldSeeder.csproj" />
+    <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ProgramManipulations\" />
+  </ItemGroup>
+
+</Project>

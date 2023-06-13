@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SupportFilesCreators\**" />
+    <EmbeddedResource Remove="SupportFilesCreators\**" />
+    <None Remove="SupportFilesCreators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
+    <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
+    <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
+    <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CodeCreators\React\" />
+  </ItemGroup>
+
+</Project>

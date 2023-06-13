@@ -1,0 +1,56 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
+using CliParameters.FieldEditors;
+using CliParameters.MenuCommands;
+using LibDataInput;
+using LibMenuInput;
+using LibParameters;
+using SupportToolsData.Models;
+
+namespace SupportTools.FieldEditors;
+
+public sealed class GitProjectNameFieldEditor : FieldEditor<string>
+{
+    private readonly string _gitProjectNamesParameterName;
+    private readonly IParametersManager _parametersManager;
+    private readonly string _projectExtension;
+
+    public GitProjectNameFieldEditor(string propertyName, string gitProjectNamesParameterName, string projectExtension,
+        IParametersManager parametersManager) : base(propertyName)
+    {
+        _parametersManager = parametersManager;
+        _projectExtension = projectExtension;
+        _gitProjectNamesParameterName = gitProjectNamesParameterName;
+    }
+
+    public override void UpdateField(string? recordName, object recordForUpdate)
+    {
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        var currentGitProjectName = GetValue(recordForUpdate);
+
+        var projectGitNames = GetValue<List<string>?>(recordForUpdate, _gitProjectNamesParameterName);
+
+        var gitProjectNamesMenuSet = new CliMenuSet();
+
+        var keys = parameters.GitProjects
+            .Where(x => projectGitNames is not null && x.Value.GitName is not null &&
+                        x.Value.ProjectExtension == _projectExtension && projectGitNames.Contains(x.Value.GitName))
+            .Select(x => x.Key).OrderBy(x => x).ToList();
+
+        if (keys.Count < 1)
+            throw new DataInputEscapeException("List is empty");
+
+
+        foreach (var listItem in keys)
+            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatus(listItem), listItem);
+
+        var index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
+
+        if (index < 0 || index >= keys.Count)
+            throw new DataInputException("Selected invalid ID. ");
+
+        SetValue(recordForUpdate, keys[index]);
+    }
+}

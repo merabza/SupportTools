@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "SupportTools": {
+            "commandName": "Project",
+            "commandLineArgs": "--use \"D:\\1WorkSecurity\\SupportTools\\SupportTools.json\""
+        }
+    }
+}

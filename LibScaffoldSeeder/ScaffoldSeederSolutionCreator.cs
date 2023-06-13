@@ -1,0 +1,262 @@
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using DbContextAnalyzer.CodeCreators;
+using LibAppProjectCreator.AppCreators;
+using LibAppProjectCreator.CodeCreators;
+using LibAppProjectCreator.Models;
+using LibScaffoldSeeder.Domain;
+using LibScaffoldSeeder.Models;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SupportToolsData.Models;
+using SystemToolsShared;
+
+namespace LibScaffoldSeeder;
+
+public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
+{
+    private readonly ScaffoldSeederCreatorParameters _par;
+    private readonly ScaffoldSeederCreatorData _scaffoldSeederCreatorData;
+
+    //private ProjectForCreate _databaseScaffoldClassLibProject;
+    //private ProjectForCreate _dataSeedingClassLibProject;
+    //private ProjectForCreate _createProjectSeederCodeProject;
+    //private ProjectForCreate _getJsonFromProjectDbProject;
+    //private ProjectForCreate _dbMigrationProject;
+    //private ProjectForCreate _seedDbProject;
+
+    //public ProjectForCreate SeedDbProject => _seedDbProject;
+    //public ProjectForCreate GetJsonFromProjectDbProject => _getJsonFromProjectDbProject;
+    //public ProjectForCreate CreateProjectSeederCodeProject => _createProjectSeederCodeProject;
+    //public ProjectForCreate MigrationProject => _dbMigrationProject;
+    //public ProjectForCreate DatabaseScaffoldClassLibProject => _databaseScaffoldClassLibProject;
+    //private string DbMigrationProjectName => $"{_scaffoldSeederCreatorParameters.MainDatabaseProjectName}Migration";
+
+
+    public ScaffoldSeederSolutionCreator(ILogger logger,
+        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, AppProjectCreatorData appCreatorParameters,
+        GitProjects gitProjects, GitRepos gitRepos, ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(
+        logger,
+        appCreatorParameters, gitProjects, gitRepos, scaffoldSeederAppCreatorData.AppCreatorBaseData)
+    {
+        _par = scaffoldSeederCreatorParameters;
+        _scaffoldSeederCreatorData = scaffoldSeederAppCreatorData;
+    }
+
+    protected override void PrepareProjectsData()
+    {
+        //სკაფოლდინგის ბიბლიოთეკა
+        AddProject(_scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);
+
+        //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
+        AddProject(_scaffoldSeederCreatorData.DataSeedingClassLibProject);
+
+        //სიდერის კოდის შემქმნელი აპლიკაცია
+        AddProject(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject);
+
+        //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
+        AddProject(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject);
+
+        //მიგრაციის პროექტი ბიბლიოთეკა
+        AddProject(_scaffoldSeederCreatorData.DbMigrationProject);
+
+        //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
+        AddProject(_scaffoldSeederCreatorData.SeedDbProject);
+
+        //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
+        //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია
+        AddProject(_scaffoldSeederCreatorData.FakeHostWebApiProject);
+    }
+
+    //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
+    protected override bool PrepareSpecific()
+    {
+        if (string.IsNullOrWhiteSpace(_par.MainDatabaseProjectName))
+        {
+            StShared.WriteErrorLine($"{nameof(ProjectModel.DbContextProjectName).Humanize()} not specified", true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.NewDataSeedingClassLibProjectName))
+        {
+            StShared.WriteErrorLine(
+                $"{nameof(ProjectModel.NewDataSeedingClassLibProjectName).Humanize()} not specified", true);
+            return false;
+        }
+
+
+        var mainDatabaseProject =
+            GitProjects.GetGitProjectByKey(_par.MainDatabaseProjectName);
+        var newDataSeedingClassLibProject =
+            GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
+
+
+        //სკაფოლდინგის ბიბლიოთეკა
+        AddPackage(_scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject,
+            NuGetPackages.MicrosoftEntityFrameworkCoreSqlServer); //, "5"
+
+        //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
+        AddPackage(_scaffoldSeederCreatorData.DataSeedingClassLibProject,
+            NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassDb);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassDataSeeding);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassIdentity);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassRepositories);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, mainDatabaseProject);
+
+        //სიდერის კოდის შემქმნელი აპლიკაცია
+        AddPackage(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
+            NuGetPackages.MicrosoftEntityFrameworkCoreDesign); //, "5"
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.CliParameters);
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
+            _scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);
+
+        //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
+        AddPackage(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject,
+            NuGetPackages.MicrosoftExtensionsLoggingAbstractions); //, "5"
+        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.CliParameters);
+        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject,
+            _scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);
+
+        //მიგრაციის პროექტი ბიბლიოთეკა
+        AddReference(_scaffoldSeederCreatorData.DbMigrationProject, mainDatabaseProject);
+
+        //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
+        AddPackage(_scaffoldSeederCreatorData.SeedDbProject, NuGetPackages.MicrosoftEntityFrameworkCoreDesign); //, "5"
+        AddPackage(_scaffoldSeederCreatorData.SeedDbProject, NuGetPackages.MicrosoftExtensionsConfigurationUserSecrets);
+
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.CliParameters);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.CarcassDataSeeding);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, mainDatabaseProject);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DataSeedingClassLibProject);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DbMigrationProject);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, newDataSeedingClassLibProject);
+
+
+        //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
+        //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია
+        AddPackage(_scaffoldSeederCreatorData.FakeHostWebApiProject, NuGetPackages.MicrosoftEntityFrameworkCoreDesign);
+
+        AddReference(_scaffoldSeederCreatorData.FakeHostWebApiProject, _scaffoldSeederCreatorData.DbMigrationProject);
+
+        return true;
+    }
+
+    protected override bool MakeAdditionalFiles()
+    {
+        //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
+        Console.WriteLine("Creating Empty Console Program.cs...");
+        var emptyConsoleProgramClassCreator = new EmptyConsoleProgramClassCreator(Logger,
+            _scaffoldSeederCreatorData.CreateProjectSeederCodeProject.ProjectFullPath, "Program.cs");
+        emptyConsoleProgramClassCreator.CreateFileStructure();
+
+
+        var fakeHosProjectPath = _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFullPath;
+        //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
+        Console.WriteLine("Creating Fake Host Program.cs...");
+        var fakeHostProgramClassCreator =
+            new FakeHostConsoleProgramClassCreator(Logger, fakeHosProjectPath, "Program.cs");
+        fakeHostProgramClassCreator.CreateFileStructure();
+
+        var scaffoldSeederFolderName = $"{_par.ScaffoldSeederProjectName}ScaffoldSeeder";
+        var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
+        var projectWorkFolderPath = Path.Combine(_par.ScaffoldSeedersWorkFolder, _par.ScaffoldSeederProjectName);
+        var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
+        var jsonExt = ".json";
+
+        var parametersFileName = Path.Combine(solutionSecurityFolderPath,
+            $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{jsonExt}");
+
+        var connectionStringParameterName = "ConnectionStringSeed";
+        var projectDesignTimeDbContextFactoryCreator =
+            new FakeProjectDesignTimeDbContextFactoryCreator(Logger, fakeHosProjectPath, _par.MainDatabaseProjectName,
+                _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName, _par.ProjectDbContextClassName,
+                connectionStringParameterName, parametersFileName);
+
+        projectDesignTimeDbContextFactoryCreator.CreateFileStructure();
+
+
+        var fakeHostProjectParameters = new FakeHostProjectParametersDomain(_par.DevDatabaseDataProvider,
+            $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={_par.SeedDbProjectName}");
+
+        //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
+        var paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
+
+        //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
+        File.WriteAllText(parametersFileName, paramsJsonText);
+
+
+        var migrationSqlFilesFolder = _par.MigrationSqlFilesFolder;
+        //თუ მიგრაციის sql ფაილების ფოლდერი მითითებულია პარამეტრებში, ეს ფოლდერი არსებობს და შეიცავს ერთს მაინც *.sql ფაილს,
+        if (string.IsNullOrWhiteSpace(migrationSqlFilesFolder) || !Directory.Exists(migrationSqlFilesFolder))
+            return true;
+        var sqlDir = new DirectoryInfo(migrationSqlFilesFolder);
+        var sqlFiles = sqlDir.GetFiles("*.sql");
+        if (!sqlFiles.Any())
+            return true;
+        var projectPath = Path.Combine(SolutionPath, _scaffoldSeederCreatorData.DbMigrationProject.ProjectName);
+        var projectFileFullName = Path.Combine(projectPath,
+            $"{_scaffoldSeederCreatorData.DbMigrationProject.ProjectName}.csproj");
+        var migrationProjectSqlFilesFolderPath = Path.Combine(projectPath, "Sql");
+
+        //მაშინ მიგრაციის პროექტის ფოლდერში დაემატოს Sql ფოლდერი და მასში დაკოპირდეს *.sql ფაილები migrationSqlFilesFolder ფოლდერიდან
+        //მიგრაციის პროექტის ფაილში <ItemGroup>-ის შიგნით თითოეული *.sql ფაილისთვის უნდა გაკეთდეს ასეთი ჩანაწერი
+        //  <ItemGroup>
+        //    <EmbeddedResource Include="Sql\Sp_GetAllbatchesByStatus.sql" />
+        //  </ItemGroup>
+        foreach (var sqlFile in sqlFiles)
+        {
+            var newFile = sqlFile.CopyTo(Path.Combine(migrationProjectSqlFilesFolderPath, sqlFile.Name));
+            if (!RegisterEmbeddedResource(projectFileFullName, newFile.Name))
+            {
+                StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
+                return false;
+            }
+        }
+
+        //
+        return true;
+    }
+
+
+    private bool RegisterEmbeddedResource(string projectFileFullName, string sqlFileName)
+    {
+        var projectXml = XElement.Load(projectFileFullName);
+
+        var firstItemGroup = projectXml.Descendants("ItemGroup").FirstOrDefault();
+        if (firstItemGroup == null) projectXml.Add(new XElement("ItemGroup"));
+        firstItemGroup = projectXml.Descendants("ItemGroup").FirstOrDefault();
+        if (firstItemGroup == null)
+        {
+            StShared.WriteErrorLine("ItemGroup does not created", true);
+            return false;
+        }
+
+        firstItemGroup.Add(new XElement("EmbeddedResource", new XAttribute("Include", $"Sql\\{sqlFileName}")));
+
+        projectXml.Save(projectFileFullName);
+
+        return true;
+    }
+
+
+    //FIXME სოლუშენის აწყობის შემდეგ გასაკეთებელი საქმეები
+    //1.  უნდა გაეშვას სკაფოლდინგის პროცესი, რომელიც რეალური ბაზის ასლიდან დაამზადებს მონაცემთა ბაზის კონტექსტს (DbContext)
+    //#dotnet ef dbcontext scaffold "$ConnectionStringProd" Microsoft.EntityFrameworkCore.SqlServer --startup-project "..\$CreateProjectSeederCodeProjectName\$CreateProjectSeederCodeProjectName.csproj" --context $DbScContextName --context-dir . --output-dir $modelsFolderName -f
+    //dotnet ef dbcontext scaffold "$ConnectionStringProd" Microsoft.EntityFrameworkCore.SqlServer --startup-project $projects[$CreateProjectSeederCodeProjectName] --context $DbScContextName --context-dir . --output-dir $modelsFolderName -f --no-pluralize
+
+    //1a. #ზედმეტი OnConfigured მეთოდის წაშლა ახლად დაგენერირებული DbContext კლასიდან
+    //Write-Host "300 remove OnConfigured method from generated DbContext"
+    //RemoveOnConfigured "$DbScContextName.cs"
+
+    //2. შეიქმნას კონსოლ აპლიკაციების პარამეტრების ფაილები, რომლებიც უნდა ჩაიწეროს სპეციალურა დშემნილ პარამეტრების .sec ფოლდერში
+
+    //3. _seedDbProject-ისთვის dotnet user-secrets init არ ვიცი რამდენად საჭიროა.
+
+    //4. 
+}
