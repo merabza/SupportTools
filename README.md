@@ -4,8 +4,7 @@ Support Tools
 
 ### How to get set up? ###
 
-mkdir SupportTools
-
+mkdir SupportTools  
 cd SupportTools
 
 git clone git@github.com:merabza/AppCliTools.git AppCliTools
