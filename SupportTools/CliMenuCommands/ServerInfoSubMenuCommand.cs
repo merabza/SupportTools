@@ -32,7 +32,7 @@ public sealed class ServerInfoSubMenuCommand : CliMenuCommand
     public override CliMenuSet GetSubmenu()
     {
         ServerInfoCruder serverInfoCruder = new(_logger, _parametersManager, _projectName);
-        var serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName, $"Project => {_projectName} => ");
+        var serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName);//, $"Project => {_projectName} => ");
 
         return serverSubMenuSet;
     }

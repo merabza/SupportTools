@@ -4,6 +4,7 @@ using System.Linq;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
+using CliParameters.MenuCommands;
 using LibAppProjectCreator.Git;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -87,10 +88,17 @@ public sealed class GitCruder : ParCruder
         }
     }
 
-    public override string? GetStatusFor(string name)
+    public override string GetStatusFor(string name)
     {
         var git = (GitDataModel?)GetItemByName(name);
-        return git?.GitProjectAddress;
+        if ( git is null )
+            return "ERROR: Git address Not found";
+        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var projects = parameters.Projects;
+
+        var usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name));
+
+        return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }
 
     protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
@@ -104,6 +112,18 @@ public sealed class GitCruder : ParCruder
 
         UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordName, ParametersManager);
         itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
+
+        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var projects = parameters.Projects;
+
+        foreach (var projectKvp in projects)
+        {
+            if (projectKvp.Value.GitProjectNames.Contains(recordName))
+            {
+                var itemSubMenuCommand = new InfoCommand(projectKvp.Key);
+                itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
+            }
+        }
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
