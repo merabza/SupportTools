@@ -2,7 +2,7 @@
 Support Tools
 
 
-### How to get set up? ###
+### To get clone with all parts ###
 
 mkdir SupportTools  
 cd SupportTools  
