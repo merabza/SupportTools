@@ -1,5 +1,4 @@
-﻿using System;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator.Git;
 using LibAppProjectCreator.Models;
 using LibDataInput;
@@ -7,6 +6,8 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -36,8 +37,24 @@ public sealed class SyncGitCliMenuCommand : CliMenuCommand
             var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
             var project = parameters.GetProject(_projectName);
+            if (project is null)
+            {
+                StShared.WriteErrorLine(
+                    $"Git Project with name {_projectName} does not exists", true);
+                return;
+            }
 
-            if (!(project?.GitProjectNames.Contains(_gitProjectName) ?? false))
+            var result = parameters.GetGitProjectNames(_projectName, _gitCol);
+            if (result.IsNone)
+            {
+                StShared.WriteErrorLine(
+                    $"Git Project with name {_projectName} does not exists", true);
+                return;
+            }
+
+            var gitProjectNames = (List<string>)result;
+
+            if (!gitProjectNames.Contains(_gitProjectName))
             {
                 StShared.WriteErrorLine($"Git Project with name {_gitProjectName} does not exists", true, _logger);
                 return;

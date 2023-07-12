@@ -1,10 +1,10 @@
-﻿using System;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
+using System;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -35,26 +35,22 @@ public sealed class GitProjectSubMenuCommand : CliMenuCommand
     public override CliMenuSet GetSubmenu()
     {
         //git-ის პროექტის მენიუს შექმნა
-        CliMenuSet gitProjectSubMenuSet = new($"Project => {_projectName}, Git Project => {_gitProjectName}");
+        CliMenuSet gitProjectSubMenuSet = new(_gitProjectName);
 
-        if (_gitCol == EGitCol.Main)
-        {
-            //გიტის პროექტის წაშლა ამ პროექტიდან
-            DeleteGitProjectCliMenuCommand deleteGitProjectCommand =
-                new(_parametersManager, _projectName, _gitProjectName);
-            gitProjectSubMenuSet.AddMenuItem(deleteGitProjectCommand);
+        //გიტის პროექტის წაშლა ამ პროექტიდან
+        DeleteGitProjectCliMenuCommand deleteGitProjectCommand =
+            new(_parametersManager, _projectName, _gitProjectName, _gitCol);
+        gitProjectSubMenuSet.AddMenuItem(deleteGitProjectCommand);
 
-            //პროექტის პარამეტრი
-            //GitCruder gitCruder = new(_logger, _parametersManager);
-            //EditItemAllFieldsInSequenceCommand editCommand = new(gitCruder, _gitProjectName);
-            //gitProjectSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
+        //პროექტის პარამეტრი
+        //GitCruder gitCruder = new(_logger, _parametersManager);
+        //EditItemAllFieldsInSequenceCommand editCommand = new(gitCruder, _gitProjectName);
+        //gitProjectSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
 
-            //gitCruder.FillDetailsSubMenu(gitProjectSubMenuSet, _gitProjectName);
-        }
+        //gitCruder.FillDetailsSubMenu(gitProjectSubMenuSet, _gitProjectName);
 
         gitProjectSubMenuSet.AddMenuItem(new SyncGitCliMenuCommand(_logger, _parametersManager, _projectName,
-            _gitProjectName,
-            _gitCol));
+            _gitProjectName, _gitCol));
 
         //პროექტის მენიუში დაბრუნება
         var key = ConsoleKey.Escape.Value().ToLower();

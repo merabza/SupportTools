@@ -9,11 +9,14 @@ public sealed class Clones
 
     private Clones()
     {
-        AppCliTools = new GitDataDomain("git@bitbucket.org:mzakalashvili/appclitools.git", "AppCliTools");
-        DatabaseTools = new GitDataDomain("git@bitbucket.org:mzakalashvili/databasetools.git", "DatabaseTools");
-        ServerCarcassProjects = new GitDataDomain("git@bitbucket.org:mzakalashvili/servercarcassprojects2.git",
-            "ServerCarcassProjects");
-        SystemTools = new GitDataDomain("git@bitbucket.org:mzakalashvili/systemtools.git", "SystemTools");
+        AppCliTools = new GitDataDomain("git@github.com:merabza/AppCliTools.git", "AppCliTools");
+        BackendCarcass = new GitDataDomain("git@github.com:merabza/BackendCarcass.git", "BackendCarcass");
+        DatabaseTools = new GitDataDomain("git@github.com:merabza/DatabaseTools.git", "DatabaseTools");
+        ParametersManagement =
+            new GitDataDomain("git@github.com:merabza/ParametersManagement.git", "ParametersManagement");
+        SystemTools = new GitDataDomain("git@github.com:merabza/SystemTools.git", "SystemTools");
+        ToolsManagement = new GitDataDomain("git@github.com:merabza/ToolsManagement.git", "ToolsManagement");
+        WebSystemTools = new GitDataDomain("git@github.com:merabza/WebSystemTools.git", "WebSystemTools");
     }
 
     public static Clones Instance
@@ -32,7 +35,10 @@ public sealed class Clones
     }
 
     public GitDataDomain AppCliTools { get; } //ბრძანებათა სტრიქონთან სამუშაო პროექტები
+    public GitDataDomain BackendCarcass { get; } //სერვერის კარკასის პროექტები
     public GitDataDomain DatabaseTools { get; } //მონაცემთა ბაზებთან სამუშაო პროექტები
+    public GitDataDomain ParametersManagement { get; } //პარამეტრებთან სამუშაო პროექტები
     public GitDataDomain SystemTools { get; } //სერთო სისტემური ინსტრუმენტების ნაკრები
-    public GitDataDomain ServerCarcassProjects { get; } //სერვერის კარკასის პროექტები
+    public GitDataDomain ToolsManagement { get; } //ინსტრუმენტებთან სამუშაო პროექტები
+    public GitDataDomain WebSystemTools { get; } //ინსტალერების ნაკრები
 }

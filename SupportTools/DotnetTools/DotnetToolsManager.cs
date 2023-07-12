@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SupportTools.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SupportTools.Models;
 using SystemToolsShared;
 
 namespace SupportTools.DotnetTools;
@@ -23,7 +23,7 @@ public sealed class DotnetToolsManager
             //ეს არის ინსტრუმენტი, რომელიც ამოწმებს სოლუშენში არსებული პროექტებში პაკეტების ვერსიებს და თუ განახლებაა საჭიროა გვეხმარება განახლებაში
             //რადგან შესაძლებელია dotnet list package --outdated ბრძანების გამოყენება, შეიძლება ის რასაც ეს ინსტრუმენტი აკეთებს, პირდაპირ გააკეთოს ჩვენმა პროგრამამ
             //საჭიროა გაირჩეს json-ი, რომელსაც აბრუნებს ეს ბრძანება და კიდევ რა ჯობია სოლუშენზე გავაკეთოთ, თუ სათითაოდ პროექტებზე.
-            { ENecessaryTools.DotnetOutdatedTool, "dotnet-outdated-tool" },
+            { ENecessaryTools.DotnetOutdatedTool, "dotnet-outdated-tool" },//ამის გამოყენება ხდება შემდეგნაირად dotnet outdated და განახლების გაშვებისთვის dotnet outdated -u
             //ეს არის რეშარპერის ინსტრუმენტი, რომელიც აანალიზებს კოდს და ასწორებს ფორმატს და ზოგიერთ სხვა რამეს
             { ENecessaryTools.JetbrainsReSharperGlobalTools, "jetbrains.resharper.globaltools" }
         };

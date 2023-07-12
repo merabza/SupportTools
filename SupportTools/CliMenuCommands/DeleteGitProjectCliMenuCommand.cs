@@ -1,9 +1,10 @@
-﻿using System;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -11,17 +12,19 @@ namespace SupportTools.CliMenuCommands;
 public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 {
     private readonly string _gitProjectName;
+    private readonly EGitCol _gitCol;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
     public DeleteGitProjectCliMenuCommand(ParametersManager parametersManager, string projectName,
-        string gitProjectName) :
+        string gitProjectName, EGitCol gitCol) :
         base(
             "Delete Git Project", gitProjectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitProjectName = gitProjectName;
+        _gitCol = gitCol;
     }
 
     protected override void RunAction()
@@ -30,7 +33,15 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
         {
             var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-            var gitProjectNames = parameters.GetGitProjectNames(_projectName, EGitCol.Main);
+            var result = parameters.GetGitProjectNames(_projectName, _gitCol);
+            if (result.IsNone)
+            {
+                StShared.WriteErrorLine(
+                    $"Git Project with name {_projectName} does not exists", true);
+                return;
+            }
+
+            var gitProjectNames = (List<string>)result;
 
             if (!gitProjectNames.Contains(_gitProjectName))
             {

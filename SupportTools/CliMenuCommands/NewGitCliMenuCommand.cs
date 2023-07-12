@@ -1,11 +1,12 @@
-﻿using System;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
+using SupportToolsData;
 using SupportToolsData.Models;
+using System;
+using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -15,14 +16,16 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
+    private readonly EGitCol _gitCol;
 
     //ახალი პროექტის შექმნის ამოცანა
-    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) : base(
+    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
         "Add Git Project")
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
+        _gitCol = gitCol;
     }
 
     protected override void RunAction()
@@ -49,8 +52,15 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
                 return;
             }
 
+            var gitProjectNames = _gitCol switch
+            {
+                EGitCol.Main => project.GitProjectNames,
+                EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
             //გადავამოწმოთ ხომ არ არსებობს იგივე სახელით სხვა პროექტი.
-            if (project.GitProjectNames.Any(a => a == newGitName))
+            if (gitProjectNames.Any(a => a == newGitName))
             {
                 StShared.WriteErrorLine(
                     $"Git Project with Name {newGitName} in project {_projectName} is already exists. cannot create Server with this name. ",
@@ -58,8 +68,19 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
                 return;
             }
 
-            //პროექტის დამატება პროექტების სიაში
-            project.GitProjectNames.Add(newGitName);
+            //switch (_gitCol)
+            //{
+            //    //პროექტის დამატება პროექტების სიაში
+            //    case EGitCol.Main:
+            //        project.GitProjectNames.Add(newGitName);
+            //        break;
+            //    case EGitCol.ScaffoldSeed:
+            //        project.ScaffoldSeederGitProjectNames.Add(newGitName);
+            //        break;
+            //    default:
+            //        throw new ArgumentOutOfRangeException();
+            //}
+            gitProjectNames.Add(newGitName);
 
             //ცვლილებების შენახვა
             _parametersManager.Save(parameters, "Add Git Project Finished");

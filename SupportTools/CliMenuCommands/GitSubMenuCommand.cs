@@ -1,12 +1,14 @@
-﻿using System;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -36,7 +38,7 @@ public sealed class GitSubMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubmenu()
     {
-        CliMenuSet gitSubMenuSet = new($"Project => {_projectName} => Git");
+        CliMenuSet gitSubMenuSet = new($"GitProjects");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -54,18 +56,27 @@ public sealed class GitSubMenuCommand : CliMenuCommand
             //გიტების ინფორმაციაზე დაყრდნობით კლონირების ფაილის შექმნა
             gitSubMenuSet.AddMenuItem(new SaveGitsCloneFileCliMenuCommand(_logger, _parametersManager, _projectName));
             //მომავალში სასურველი იქნება ბრენჩების შექმნის ათვისება და pull Request-ების ათვისება.
-
-            //მენიუს ელემენტი, რომლის საშუალებითაც შესაძლებელია პროექტში გიტის ჩაგდება
-            NewGitCliMenuCommand newGitCommand = new(_logger, _parametersManager, _projectName);
-            gitSubMenuSet.AddMenuItem(newGitCommand);
         }
+
+        //მენიუს ელემენტი, რომლის საშუალებითაც შესაძლებელია პროექტში გიტის ჩაგდება
+        NewGitCliMenuCommand newGitCommand = new(_logger, _parametersManager, _projectName, _gitCol);
+        gitSubMenuSet.AddMenuItem(newGitCommand);
 
         //იმ გიტების ჩამონათვალი, რომლებიც ამ პროექტში შედიან
         //თითოეულზე უნდა შეიძლებოდეს ქვემენიუში შესვლა, რომელიც საშუალებას მოგვცემს გიტის ეს კონკრეტული ნაწილი ამოვშალოთ პროექტიდან
         //ასევე შესაძელებელი უნდა იყოს გიტის დასინქრონიზება და ძირითადი ბრძანებების გაშვება
         //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
 
-        var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
+
+        var result = parameters.GetGitProjectNames(_projectName, _gitCol);
+        if (result.IsNone)
+        {
+            StShared.WriteErrorLine(
+                $"Git Project with name {_projectName} does not exists", true);
+            return gitSubMenuSet;
+        }
+
+        var gitProjectNames = (List<string>)result;
         foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
             gitSubMenuSet.AddMenuItem(
                 new GitProjectSubMenuCommand(_logger, _parametersManager, _projectName, gitProjectName, _gitCol),

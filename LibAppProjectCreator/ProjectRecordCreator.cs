@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using CliParametersDataEdit.Models;
+﻿using CliParametersDataEdit.Models;
 using DbTools;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
@@ -8,6 +6,8 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System.Collections.Generic;
+using System.IO;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator;
@@ -239,11 +239,14 @@ internal sealed class ProjectRecordCreator
             RedundantFileNames = new List<string> { appSettingsFileName },
             GitProjectNames = new List<string>
             {
-                "ServerCarcassProjects", "SystemTools", "WebSystemTools", $"{_newProjectName}",
+                "BackendCarcass", "SystemTools", "WebSystemTools", $"{_newProjectName}",
                 $"{_newProjectName}ClientApp", "ReactAppCarcass", dbPartProjectsFolderName
             },
             ScaffoldSeederGitProjectNames = new List<string>
-                { "SystemTools", "ServerCarcassProjects", "WebSystemTools", dbPartProjectsFolderName, "AppCliTools" },
+            {
+                "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools", "ToolsManagement", "WebSystemTools",
+                dbPartProjectsFolderName
+            },
             AllowToolsList = new List<ETools>
                 { ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase, ETools.SeedData },
             ServerInfos = new Dictionary<string, ServerInfoModel>

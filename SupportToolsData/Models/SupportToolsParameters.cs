@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Installer.Domain;
+﻿using Installer.Domain;
 using Installer.Models;
+using LanguageExt;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibFileParameters.Interfaces;
 using LibFileParameters.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace SupportToolsData.Models;
 
@@ -61,16 +62,16 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return project?.ServerInfos ?? new Dictionary<string, ServerInfoModel>();
     }
 
-    public List<string> GetGitProjectNames(string projectName, EGitCol gitCol)
+    public Option<List<string>> GetGitProjectNames(string projectName, EGitCol gitCol)
     {
         var project = GetProject(projectName);
         if (project is null)
-            return new List<string>();
+            return null;
         return gitCol switch
         {
             EGitCol.Main => project.GitProjectNames,
             EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => new List<string>()
+            _ => null
         };
     }
 
