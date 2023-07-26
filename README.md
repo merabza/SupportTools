@@ -1,8 +1,8 @@
 # SupportTools
+
 Support Tools
 
-
-### To get clone with all parts ###
+### To get clone with all parts
 
 mkdir SupportTools  
 cd SupportTools  
@@ -15,4 +15,4 @@ git clone git@github.com:merabza/DatabaseTools.git DatabaseTools
 git clone git@github.com:merabza/ParametersManagement.git ParametersManagement  
 git clone git@github.com:merabza/ToolsManagement.git ToolsManagement  
 git clone git@github.com:merabza/BackendCarcass.git BackendCarcass  
-cd ..  
+cd ..
