@@ -216,14 +216,11 @@ public static class ToolCommandFabric
                 {
                     var programServiceUpdaterParameters =
                         ServiceUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverName);
-                    if (programServiceUpdaterParameters is null)
-                    {
-                        StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
-                        return null;
-                    }
-
-                    return new ServiceUpdater(logger, true, programServiceUpdaterParameters,
-                        parametersManager);
+                    if (programServiceUpdaterParameters is not null)
+                        return new ServiceUpdater(logger, true, programServiceUpdaterParameters,
+                            parametersManager);
+                    StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
+                    return null;
                 }
 
                 var programUpdaterParameters =

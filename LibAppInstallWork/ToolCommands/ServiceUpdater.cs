@@ -28,7 +28,7 @@ public sealed class ServiceUpdater : ToolCommand
     {
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
 
-        //1. შევქმნათ საინსტალაციო პაკეტი და ავტვორთოთ ფაილსაცავში
+        //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters =
             ProgramServiceUpdaterParameters.ProgramPublisherParameters;
 

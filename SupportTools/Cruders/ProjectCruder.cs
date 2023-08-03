@@ -15,8 +15,8 @@ namespace SupportTools.Cruders;
 
 public sealed class ProjectCruder : ParCruder
 {
-    private const string csprojExtension = ".csproj";
-    private const string esprojExtension = ".esproj";
+    private const string CsProjExtension = ".csproj";
+    private const string EsProjExtension = ".esproj";
 
     public ProjectCruder(ILogger logger, ParametersManager parametersManager) : base(parametersManager, "Project",
         "Projects")
@@ -31,9 +31,9 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileName)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectSecurityFolderPath)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.MainProjectName),
-            nameof(ProjectModel.GitProjectNames), csprojExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.SpaProjectName),
-            nameof(ProjectModel.GitProjectNames), esprojExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), EsProjExtension, parametersManager));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
         FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
@@ -44,9 +44,9 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ScaffoldSeederProjectName)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.DbContextProjectName),
-            nameof(ProjectModel.GitProjectNames), csprojExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.NewDataSeedingClassLibProjectName),
-            nameof(ProjectModel.GitProjectNames), csprojExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));
