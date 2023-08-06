@@ -70,7 +70,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     return true;
                 }
 
-                if (_appSettingsVersion != version)
+                if ("\"" + _appSettingsVersion + "\"" != version)
                 {
                     Logger.LogWarning(
                         $"Current Parameters version is {version}, but must be {_appSettingsVersion}");
@@ -89,7 +89,7 @@ public sealed class CheckParametersVersionAction : ToolAction
             return false;
         }
 
-        if (_appSettingsVersion != version)
+        if ("\"" + _appSettingsVersion + "\"" != version)
         {
             Logger.LogError($"Current parameters version is {version}, but must be {_appSettingsVersion}");
             return false;
