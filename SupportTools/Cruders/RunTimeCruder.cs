@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
+using SupportTools.CliMenuCommands;
 using SupportTools.Models;
 using SupportToolsData.Models;
 
@@ -64,5 +66,11 @@ public sealed class RunTimeCruder : ParCruder
     protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
     {
         return new RunTimeData();
+    }
+
+    protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
+    {
+        GenerateStandardRunTimesCommand generateCommand = new(ParametersManager);
+        cruderSubMenuSet.AddMenuItem(generateCommand, "Generate standard RunTimes...");
     }
 }
