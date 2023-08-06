@@ -66,7 +66,7 @@ public sealed class ServerInfoCruder : ParCruder
         return itemDataDict.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ServerInfoModel newServer)
             throw new Exception("newServer is null in ServerInfoCruder.UpdateRecordWithKey");
@@ -75,10 +75,10 @@ public sealed class ServerInfoCruder : ParCruder
         if (crudersDictionary is null)
             throw new Exception("crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
 
-        crudersDictionary[recordName] = newServer;
+        crudersDictionary[recordKey] = newServer;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ServerInfoModel newServer)
             throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
@@ -86,7 +86,7 @@ public sealed class ServerInfoCruder : ParCruder
         var project = parameters.GetProject(_projectName);
         if (project == null)
             throw new Exception($"Project with name {_projectName} not found");
-        project.ServerInfos.Add(recordName, newServer);
+        project.ServerInfos.Add(recordKey, newServer);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -98,7 +98,7 @@ public sealed class ServerInfoCruder : ParCruder
         project.ServerInfos.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
         return new ServerInfoModel();
     }
@@ -107,19 +107,19 @@ public sealed class ServerInfoCruder : ParCruder
     {
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordName)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordName);
+        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
 
         //დასაშვები ინსტრუმენტების არჩევა
         itemSubMenuSet.AddMenuItem(
-            new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordName),
+            new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey),
             "Select Allow tools...");
 
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var server = parameters.GetServerByProject(_projectName, recordName);
+        var server = parameters.GetServerByProject(_projectName, recordKey);
         var project = parameters.GetProject(_projectName);
 
         if (server == null || project == null)
@@ -127,7 +127,7 @@ public sealed class ServerInfoCruder : ParCruder
         foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ??
                      new List<ETools>()))
             itemSubMenuSet.AddMenuItem(
-                new ToolTaskCliMenuCommand(_logger, tool, _projectName, recordName, ParametersManager),
+                new ToolTaskCliMenuCommand(_logger, tool, _projectName, recordKey, ParametersManager),
                 tool.ToString());
     }
 }

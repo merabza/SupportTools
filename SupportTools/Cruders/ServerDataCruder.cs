@@ -41,20 +41,20 @@ public sealed class ServerDataCruder : ParCruder
         return servers.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ServerDataModel newServer)
             throw new Exception("newServer is null in ServerDataCruder.UpdateRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Servers[recordName] = newServer;
+        parameters.Servers[recordKey] = newServer;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ServerDataModel newServer)
             throw new Exception("newServer is null in ServerDataCruder.AddRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Servers.Add(recordName, newServer);
+        parameters.Servers.Add(recordKey, newServer);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -64,7 +64,7 @@ public sealed class ServerDataCruder : ParCruder
         servers.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
         return new ServerDataModel();
     }

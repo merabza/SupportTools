@@ -13,10 +13,8 @@ namespace LibAppInstallWork.Models;
 public sealed class ProgramPublisherParameters : IParameters
 {
     private ProgramPublisherParameters(string runtime, string projectName, string mainProjectFileName,
-        string serverName,
-        string workFolder, string uploadTempExtension, string dateMask, FileStorageData fileStorageForExchange,
-        SmartSchema smartSchemaForExchange, SmartSchema smartSchemaForLocal,
-        //AppSettingsEncoderParameters appSettingsEncoderParameters, 
+        string serverName, string workFolder, string uploadTempExtension, string dateMask,
+        FileStorageData fileStorageForExchange, SmartSchema smartSchemaForExchange, SmartSchema smartSchemaForLocal,
         List<string> redundantFileNames)
     {
         Runtime = runtime;
@@ -29,7 +27,6 @@ public sealed class ProgramPublisherParameters : IParameters
         FileStorageForExchange = fileStorageForExchange;
         SmartSchemaForExchange = smartSchemaForExchange;
         SmartSchemaForLocal = smartSchemaForLocal;
-        //AppSettingsEncoderParameters = appSettingsEncoderParameters;
         RedundantFileNames = redundantFileNames;
     }
 
@@ -45,7 +42,6 @@ public sealed class ProgramPublisherParameters : IParameters
 
     public SmartSchema SmartSchemaForLocal { get; }
 
-    //public AppSettingsEncoderParameters AppSettingsEncoderParameters { get; }
     public List<string> RedundantFileNames { get; }
 
     public bool CheckBeforeSave()
@@ -58,26 +54,11 @@ public sealed class ProgramPublisherParameters : IParameters
     {
         try
         {
-            //CheckVersionParameters? checkVersionParameters =
-            //    CheckVersionParameters.Create(supportToolsParameters, projectName, serverName);
-            //if (checkVersionParameters is null)
-            //    return null;
-
             var project = supportToolsParameters.GetProjectRequired(projectName);
 
-            //if (!project.IsService)
-            //{
-            //    StShared.WriteErrorLine($"Project {projectName} is not service", true);
-            //    return null;
-            //}
-
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
-            var server = supportToolsParameters.GetServerDataRequired(serverName);
 
-            //AppSettingsEncoderParameters? appSettingsEncoderParameters =
-            //    AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverName);
-            //if (appSettingsEncoderParameters == null)
-            //    return null;
+            var server = supportToolsParameters.GetServerDataRequired(serverName);
 
             var mainProjectFileName = project.MainProjectFileName(gitProjects);
             if (mainProjectFileName == null)
@@ -134,12 +115,10 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var programPublisherParameters = new ProgramPublisherParameters(server.Runtime,
-                projectName, mainProjectFileName, serverName, supportToolsParameters.PublisherWorkFolder,
+            var programPublisherParameters = new ProgramPublisherParameters(server.Runtime, projectName,
+                mainProjectFileName, serverName, supportToolsParameters.PublisherWorkFolder,
                 supportToolsParameters.GetUploadTempExtension(), parametersFileDateMask, fileStorageForUpload,
-                smartSchemaForExchange, smartSchemaForLocal,
-                //appSettingsEncoderParameters,
-                project.RedundantFileNames);
+                smartSchemaForExchange, smartSchemaForLocal, project.RedundantFileNames);
 
             return programPublisherParameters;
         }

@@ -11,7 +11,7 @@ public sealed class RedundantFileNameCruder : ParCruder
     private readonly string _projectName;
 
     public RedundantFileNameCruder(IParametersManager parametersManager, string projectName) : base(parametersManager,
-        "Redundant File Name", "Redundant File Names", true, false)
+        "Redundant File Name", "Redundant File Names", false, false)
     {
         _projectName = projectName;
     }
@@ -26,12 +26,12 @@ public sealed class RedundantFileNameCruder : ParCruder
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
-        return GetRedundantFileNames().ToDictionary(k => k, v => (ItemData)new TextItemData(v));
+        return GetRedundantFileNames().ToDictionary(k => k, v => (ItemData)new TextItemData { Text = v });
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
-        return new TextItemData("");
+        return new TextItemData();
     }
 
     public override bool ContainsRecordWithKey(string recordKey)
@@ -46,7 +46,7 @@ public sealed class RedundantFileNameCruder : ParCruder
         redundantFileNames.Remove(recordKey);
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
@@ -54,6 +54,6 @@ public sealed class RedundantFileNameCruder : ParCruder
             return;
         var project = projects[_projectName];
 
-        project.RedundantFileNames.Add(recordName);
+        project.RedundantFileNames.Add(recordKey);
     }
 }

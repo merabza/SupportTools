@@ -13,7 +13,7 @@ namespace SupportTools.Cruders;
 
 public sealed class TemplateCruder : ParCruder
 {
-    public TemplateCruder(ILogger logger, ParametersManager parametersManager) : base(parametersManager,
+    public TemplateCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
         "Project Creator Template", "Project Creator Templates")
     {
         FieldEditors.Add(new EnumFieldEditor<ESupportProjectType>(nameof(TemplateModel.SupportProjectType),
@@ -48,22 +48,22 @@ public sealed class TemplateCruder : ParCruder
         return projectTemplates?.ContainsKey(recordKey) ?? false;
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         var newProject = (TemplateModel)newRecord;
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         if (parameters.AppProjectCreatorAllParameters is null)
             throw new Exception(
                 "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
-        parameters.AppProjectCreatorAllParameters.Templates[recordName] = newProject;
+        parameters.AppProjectCreatorAllParameters.Templates[recordKey] = newProject;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         var newProject = (TemplateModel)newRecord;
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         parameters.AppProjectCreatorAllParameters ??= new AppProjectCreatorAllParameters();
-        parameters.AppProjectCreatorAllParameters.Templates.Add(recordName, newProject);
+        parameters.AppProjectCreatorAllParameters.Templates.Add(recordKey, newProject);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -77,7 +77,7 @@ public sealed class TemplateCruder : ParCruder
         projectTemplates.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
         return new TemplateModel();
     }

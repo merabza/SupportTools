@@ -6,7 +6,6 @@ using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
 using SupportTools.CliMenuCommands;
-using SupportTools.Models;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -15,7 +14,7 @@ public sealed class RunTimeCruder : ParCruder
 {
     public RunTimeCruder(IParametersManager parametersManager) : base(parametersManager, "RunTime", "RunTimes")
     {
-        FieldEditors.Add(new TextFieldEditor(nameof(RunTimeData.Description)));
+        FieldEditors.Add(new TextFieldEditor(nameof(TextItemData.Text)));
     }
 
     private Dictionary<string, string> GetRunTimes()
@@ -27,7 +26,7 @@ public sealed class RunTimeCruder : ParCruder
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         var runTimes = GetRunTimes();
-        return runTimes.ToDictionary(k => k.Key, v => (ItemData)new RunTimeData { Description = v.Value });
+        return runTimes.ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
     }
 
     public override bool ContainsRecordWithKey(string recordKey)
@@ -36,24 +35,24 @@ public sealed class RunTimeCruder : ParCruder
         return runTimes.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not RunTimeData newRunTime)
+        if (newRecord is not TextItemData newRunTime)
             throw new Exception("newRunTime is null in RunTimeCruder.UpdateRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newRunTime.Description))
-            throw new Exception("newRunTime.Description is empty in RunTimeCruder.UpdateRecordWithKey");
+        if (string.IsNullOrWhiteSpace(newRunTime.Text))
+            throw new Exception("newRunTime.Text is empty in RunTimeCruder.UpdateRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.RunTimes[recordName] = newRunTime.Description;
+        parameters.RunTimes[recordKey] = newRunTime.Text;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not RunTimeData newRunTime)
+        if (newRecord is not TextItemData newRunTime)
             throw new Exception("newRunTime is null in RunTimeCruder.AddRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newRunTime.Description))
-            throw new Exception("newRunTime.Description is empty in RunTimeCruder.AddRecordWithKey");
+        if (string.IsNullOrWhiteSpace(newRunTime.Text))
+            throw new Exception("newRunTime.Text is empty in RunTimeCruder.AddRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.RunTimes.Add(recordName, newRunTime.Description);
+        parameters.RunTimes.Add(recordKey, newRunTime.Text);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -63,9 +62,9 @@ public sealed class RunTimeCruder : ParCruder
         runTimes.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
-        return new RunTimeData();
+        return new TextItemData();
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

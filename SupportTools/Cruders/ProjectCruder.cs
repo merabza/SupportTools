@@ -74,22 +74,22 @@ public sealed class ProjectCruder : ParCruder
         return projects.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ProjectModel newProject)
             throw new Exception("newProject is null in ProjectCruder.UpdateRecordWithKey");
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Projects[recordName] = newProject;
+        parameters.Projects[recordKey] = newProject;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not ProjectModel newProject)
             throw new Exception("newProject is null in ProjectCruder.AddRecordWithKey");
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Projects.Add(recordName, newProject);
+        parameters.Projects.Add(recordKey, newProject);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -99,25 +99,25 @@ public sealed class ProjectCruder : ParCruder
         projects.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
         return new ProjectModel();
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordName)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordName);
+        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
-        var project = projects[recordName];
+        var project = projects[recordKey];
 
-        RedundantFileNameCruder detailsCruder = new(ParametersManager, recordName);
-        NewItemCommand newItemCommand = new(detailsCruder, recordName, $"Create New {detailsCruder.CrudName}");
+        RedundantFileNameCruder detailsCruder = new(ParametersManager, recordKey);
+        NewItemCommand newItemCommand = new(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
         itemSubMenuSet.AddMenuItem(newItemCommand);
 
         foreach (var detailListCommand in project.RedundantFileNames.Select(mask =>
-                     new ItemSubMenuCommand(detailsCruder, mask, recordName, true)))
+                     new ItemSubMenuCommand(detailsCruder, mask, recordKey, true)))
             itemSubMenuSet.AddMenuItem(detailListCommand);
     }
 }

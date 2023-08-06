@@ -38,22 +38,22 @@ public sealed class GitCruder : ParCruder
         return gits.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not GitDataModel newGit)
             throw new Exception("newGit is null in GitCruder.UpdateRecordWithKey");
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Gits[recordName] = newGit;
+        parameters.Gits[recordKey] = newGit;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
         if (newRecord is not GitDataModel newGit)
             throw new Exception("newGit is null in GitCruder.AddRecordWithKey");
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Gits.Add(recordName, newGit);
+        parameters.Gits.Add(recordKey, newGit);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
@@ -91,7 +91,7 @@ public sealed class GitCruder : ParCruder
     public override string GetStatusFor(string name)
     {
         var git = (GitDataModel?)GetItemByName(name);
-        if ( git is null )
+        if (git is null)
             return "ERROR: Git address Not found";
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
@@ -101,16 +101,16 @@ public sealed class GitCruder : ParCruder
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
         return new GitDataModel();
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordName)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordName);
+        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
-        UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordName, ParametersManager);
+        UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
         itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
@@ -118,7 +118,7 @@ public sealed class GitCruder : ParCruder
 
         foreach (var projectKvp in projects)
         {
-            if (projectKvp.Value.GitProjectNames.Contains(recordName))
+            if (projectKvp.Value.GitProjectNames.Contains(recordKey))
             {
                 var itemSubMenuCommand = new InfoCommand(projectKvp.Key);
                 itemSubMenuSet.AddMenuItem(itemSubMenuCommand);

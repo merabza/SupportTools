@@ -16,13 +16,13 @@ public sealed class ReactAppTypeCruder : ParCruder
     private readonly ILogger _logger;
 
     public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
-        "React App Type", "React App Types", true, false)
+        "React App Type", "React App Types")
     {
         _logger = logger;
-        FieldEditors.Add(new OptionalTextFieldEditor(nameof(OptionalTextItemData.Text), "TemplateName"));
+        FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), "TemplateName"));
     }
 
-    private Dictionary<string, string?> GetReactAppTemplateNames()
+    private Dictionary<string, string> GetReactAppTemplateNames()
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         return parameters.ReactAppTemplates;
@@ -32,12 +32,12 @@ public sealed class ReactAppTypeCruder : ParCruder
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         return GetReactAppTemplateNames()
-            .ToDictionary(k => k.Key, v => (ItemData)new OptionalTextItemData { Text = v.Value });
+            .ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
     }
 
-    protected override ItemData CreateNewItem(string recordName, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
     {
-        return new OptionalTextItemData();
+        return new TextItemData();
     }
 
     public override bool ContainsRecordWithKey(string recordKey)
@@ -52,20 +52,24 @@ public sealed class ReactAppTypeCruder : ParCruder
         reactAppTemplateNames.Remove(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordName, ItemData newRecord)
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not OptionalTextItemData newReactAppType)
+        if (newRecord is not TextItemData newReactAppType)
             throw new Exception("newReactAppType is null in ReactAppTypeCruder.UpdateRecordWithKey");
+        if (string.IsNullOrWhiteSpace(newReactAppType.Text))
+            throw new Exception("newReactAppType.Description is empty in EnvironmentCruder.UpdateRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.ReactAppTemplates[recordName] = newReactAppType.Text;
+        parameters.ReactAppTemplates[recordKey] = newReactAppType.Text;
     }
 
-    protected override void AddRecordWithKey(string recordName, ItemData newRecord)
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not OptionalTextItemData newReactAppType)
+        if (newRecord is not TextItemData newReactAppType)
             throw new Exception("newReactAppType is null in ReactAppTypeCruder.AddRecordWithKey");
+        if (string.IsNullOrWhiteSpace(newReactAppType.Text))
+            throw new Exception("newEnvironment.Description is empty in EnvironmentCruder.AddRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.ReactAppTemplates.Add(recordName, newReactAppType.Text);
+        parameters.ReactAppTemplates.Add(recordKey, newReactAppType.Text);
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
@@ -76,19 +80,19 @@ public sealed class ReactAppTypeCruder : ParCruder
             "Recreate All React App files By Templates...");
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordName)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordName);
+        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
         var reactAppTemplateNames = GetReactAppTemplateNames();
-        if (!reactAppTemplateNames.ContainsKey(recordName))
+        if (!reactAppTemplateNames.ContainsKey(recordKey))
             return;
 
-        //UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordName, ParametersManager);
+        //UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
         //itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
         ReCreateReactAppByTemplateNameCommand reCreateReactCommand =
-            new(_logger, ParametersManager, recordName, reactAppTemplateNames[recordName]);
+            new(_logger, ParametersManager, recordKey, reactAppTemplateNames[recordKey]);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand, "Recreate React App files By Template...");
     }
 }

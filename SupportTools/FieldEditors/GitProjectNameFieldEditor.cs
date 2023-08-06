@@ -24,7 +24,7 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         _gitProjectNamesParameterName = gitProjectNamesParameterName;
     }
 
-    public override void UpdateField(string? recordName, object recordForUpdate)
+    public override void UpdateField(string? recordKey, object recordForUpdate)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

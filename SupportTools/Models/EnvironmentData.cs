@@ -1,13 +1,14 @@
-﻿using LibParameters;
+﻿//using LibParameters;
 
-namespace SupportTools.Models;
+//namespace SupportTools.Models;
 
-public sealed class EnvironmentData : ItemData
-{
-    public string? Description { get; set; }
+//public sealed class EnvironmentData : ItemData
+//{
+//    public string? Description { get; set; }
 
-    public override string? GetItemName()
-    {
-        return Description;
-    }
-}
+//    public override string? GetItemName()
+//    {
+//        return Description;
+//    }
+//}
+

@@ -40,39 +40,35 @@ public sealed class ProgramUpdaterParameters : IParameters
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
 
-        var serverInfo = project.GetServerInfoRequired(serverName);
+        //var serverInfo = project.GetServerInfoRequired(serverName);
 
         var programPublisherParameters =
             ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverName);
         if (programPublisherParameters == null)
             return null;
 
-        var programArchiveDateMask =
-            project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
+        var programArchiveDateMask = project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
         if (string.IsNullOrWhiteSpace(programArchiveDateMask))
         {
             StShared.WriteErrorLine("programArchiveDateMask does not specified", true);
             return null;
         }
 
-        var programArchiveExtension =
-            project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
+        var programArchiveExtension = project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
         if (string.IsNullOrWhiteSpace(programArchiveExtension))
         {
             StShared.WriteErrorLine("programArchiveExtension does not specified", true);
             return null;
         }
 
-        var parametersFileDateMask =
-            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension =
-            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);
@@ -88,8 +84,7 @@ public sealed class ProgramUpdaterParameters : IParameters
         var fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var installerBaseParameters =
-            InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
+        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
@@ -97,9 +92,9 @@ public sealed class ProgramUpdaterParameters : IParameters
             return null;
         }
 
-        var programParameters = new ProgramUpdaterParameters(installerBaseParameters,
-            programPublisherParameters, programArchiveDateMask, programArchiveExtension, parametersFileDateMask,
-            parametersFileExtension, fileStorageForUpload);
+        var programParameters = new ProgramUpdaterParameters(installerBaseParameters, programPublisherParameters,
+            programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension,
+            fileStorageForUpload);
         return programParameters;
     }
 }

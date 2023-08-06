@@ -37,7 +37,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ServerDataModel> Servers { get; init; } = new();
     public Dictionary<string, string> RunTimes { get; init; } = new();
     public Dictionary<string, GitDataModel> Gits { get; init; } = new();
-    public Dictionary<string, string?> ReactAppTemplates { get; init; } = new();
+    public Dictionary<string, string> ReactAppTemplates { get; init; } = new();
     public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = new();
     public Dictionary<string, ApiClientSettings> ApiClients { get; set; } = new();
     public Dictionary<string, ArchiverData> Archivers { get; set; } = new();

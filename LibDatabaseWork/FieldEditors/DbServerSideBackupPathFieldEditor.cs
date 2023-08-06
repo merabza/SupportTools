@@ -21,7 +21,7 @@ public sealed class DbServerSideBackupPathFieldEditor : FieldEditor<string>
         _databaseConnectionNamePropertyName = databaseConnectionNamePropertyName;
     }
 
-    public override void UpdateField(string? recordName, object recordForUpdate) //, object currentRecord
+    public override void UpdateField(string? recordKey, object recordForUpdate) //, object currentRecord
     {
         var databaseWebAgentName = GetValue<string>(recordForUpdate, _databaseWebAgentNamePropertyName);
         var databaseConnectionName = GetValue<string>(recordForUpdate, _databaseConnectionNamePropertyName);

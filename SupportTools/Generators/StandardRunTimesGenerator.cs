@@ -10,8 +10,8 @@ public static class StandardRunTimesGenerator
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
         //თუ არ არსებობს დაემატოს ჭკვიანი სქემები: DailyStandard, Reduce, Hourly
-        parameters.Environments.TryAdd("linux-x64",
+        parameters.RunTimes.TryAdd("linux-x64",
             "Most desktop distributions like CentOS, Debian, Fedora, Ubuntu, and derivatives");
-        parameters.Environments.TryAdd("win10-x64", "Windows 10 x64");
+        parameters.RunTimes.TryAdd("win10-x64", "Windows 10 x64");
     }
 }

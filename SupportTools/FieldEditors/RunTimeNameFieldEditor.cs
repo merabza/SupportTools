@@ -14,7 +14,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordName, object recordForUpdate)
+    public override void UpdateField(string? recordKey, object recordForUpdate)
     {
         var currentRunTimeName = GetValue(recordForUpdate);
 
