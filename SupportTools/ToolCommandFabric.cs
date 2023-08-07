@@ -225,13 +225,10 @@ public static class ToolCommandFabric
 
                 var programUpdaterParameters =
                     ProgramUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverName);
-                if (programUpdaterParameters is null)
-                {
-                    StShared.WriteErrorLine("programUpdaterParameters is null", true);
-                    return null;
-                }
-
-                return new ProgramUpdater(logger, true, programUpdaterParameters, parametersManager);
+                if (programUpdaterParameters is not null)
+                    return new ProgramUpdater(logger, true, programUpdaterParameters, parametersManager);
+                StShared.WriteErrorLine("programUpdaterParameters is null", true);
+                return null;
 
             case ETools.ProgRemover: //  Remove, //პროგრამის წაშლა
                 var serviceStartStopParameters =
