@@ -99,7 +99,7 @@ public sealed class ProjectCruder : ParCruder
         projects.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new ProjectModel();
     }

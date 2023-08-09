@@ -64,7 +64,7 @@ public sealed class ServerDataCruder : ParCruder
         servers.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new ServerDataModel();
     }

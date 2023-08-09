@@ -21,7 +21,7 @@ public sealed class ServerInfoCruder : ParCruder
     private readonly string _projectName;
 
     public ServerInfoCruder(ILogger logger, ParametersManager parametersManager, string projectName) : base(
-        parametersManager, "Server", "Servers")
+        parametersManager, "Server", "Servers", true)
     {
         _logger = logger;
         _projectName = projectName;
@@ -36,6 +36,8 @@ public sealed class ServerInfoCruder : ParCruder
             return;
 
         WebAgentClientFabric webAgentClientFabric = new();
+        FieldEditors.Add(new ServerDataNameFieldEditor(logger, nameof(ServerInfoModel.ServerName), ParametersManager));
+        FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerInfoModel.WebAgentNameForCheck),
             ParametersManager, webAgentClientFabric));
         FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
@@ -98,7 +100,7 @@ public sealed class ServerInfoCruder : ParCruder
         project.ServerInfos.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new ServerInfoModel();
     }
