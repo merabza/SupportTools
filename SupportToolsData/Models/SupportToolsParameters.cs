@@ -81,8 +81,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         var apiClientSettings = GetWebAgent(webAgentKey);
         if (apiClientSettings is null)
             throw new InvalidOperationException($"ApiClient with name {webAgentKey} does not exists");
-        //if (string.IsNullOrWhiteSpace(apiClientSettings.ApiKey))
-        //    throw new InvalidOperationException($"ApiKey does not specified for ApiClient with name {webAgentKey}");
         if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
             throw new InvalidOperationException($"Server does not specified for ApiClient with name {webAgentKey}");
         return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);

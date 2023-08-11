@@ -1,6 +1,7 @@
 ﻿using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
 
 namespace LibAppInstallWork.Actions;
 
@@ -14,13 +15,14 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
     private readonly string _keysJsonFileName;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
-    private readonly string _serverName;
+    private readonly ServerInfoModel _serverInfo;
     private readonly string _sourceJsonFileName;
     private readonly SmartSchema _uploadSmartSchema;
 
     public EncodeParametersAndUploadAction(ILogger logger, bool useConsole, string keysJsonFileName,
         string sourceJsonFileName, string encodedJsonFileName, string keyPart1, string keyPart2, string projectName,
-        string serverName, string dateMask, string parametersFileExtension, FileStorageData exchangeFileStorage,
+        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension,
+        FileStorageData exchangeFileStorage,
         SmartSchema uploadSmartSchema) : base(logger, useConsole, "Encode Parameters And Upload")
     {
         _keysJsonFileName = keysJsonFileName;
@@ -29,7 +31,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         _keyPart1 = keyPart1;
         _keyPart2 = keyPart2;
         _projectName = projectName;
-        _serverName = serverName;
+        _serverInfo = serverInfo;
         _dateMask = dateMask;
         _parametersFileExtension = parametersFileExtension;
         _uploadSmartSchema = uploadSmartSchema;
@@ -66,7 +68,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
 
         var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(Logger, UseConsole, _projectName,
-            _serverName, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
+            _serverInfo, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
             _uploadSmartSchema);
         return uploadParametersToExchangeAction.Run();
     }

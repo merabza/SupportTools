@@ -8,22 +8,20 @@ namespace LibAppInstallWork.Models;
 
 public sealed class ProgramInstallerParameters : IParameters
 {
-    private ProgramInstallerParameters(string projectName, string serverName, string? serviceName,
+    private ProgramInstallerParameters(string projectName, ServerInfoModel serverInfo, string? serviceName,
         InstallerBaseParameters installerBaseParameters, string serviceUserName, string appSettingsJsonSourceFileName,
         string encodedJsonFileName, ProxySettingsBase proxySettings, FileStorageData fileStorageForExchange,
         ApiClientSettingsDomain webAgentForCheck, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension)
     {
         ProjectName = projectName;
-        ServerName = serverName;
+        ServerInfo = serverInfo;
         ServiceName = serviceName;
         InstallerBaseParameters = installerBaseParameters;
         ServiceUserName = serviceUserName;
         AppSettingsJsonSourceFileName = appSettingsJsonSourceFileName;
         EncodedJsonFileName = encodedJsonFileName;
         ProxySettings = proxySettings;
-        //ServerSidePort = serverSidePort;
-        //ApiVersionId = apiVersionId;
         FileStorageForExchange = fileStorageForExchange;
         WebAgentForCheck = webAgentForCheck;
         ProgramArchiveDateMask = programArchiveDateMask;
@@ -33,7 +31,7 @@ public sealed class ProgramInstallerParameters : IParameters
     }
 
     public string ProjectName { get; }
-    public string ServerName { get; }
+    public ServerInfoModel ServerInfo { get; }
     public string? ServiceName { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
 
@@ -50,8 +48,6 @@ public sealed class ProgramInstallerParameters : IParameters
     public string EncodedJsonFileName { get; }
 
     public ProxySettingsBase ProxySettings { get; }
-    //public int ServerSidePort { get; }
-    //public string ApiVersionId { get; }
 
     public FileStorageData FileStorageForExchange { get; }
 
@@ -61,18 +57,8 @@ public sealed class ProgramInstallerParameters : IParameters
     }
 
     public static ProgramInstallerParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
-        string serverName)
+        ServerInfoModel serverInfo)
     {
-        //CheckVersionParameters? checkVersionParameters =
-        //    CheckVersionParameters.Create(supportToolsParameters, projectName, serverName);
-        //if (checkVersionParameters is null)
-        //    return null;
-
-        //ServiceStartStopParameters? serviceStartStopParameters =
-        //    ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverName);
-        //if (serviceStartStopParameters is null)
-        //    return null;
-
         var project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (!project.IsService)
@@ -81,19 +67,18 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var serverInfo = project.GetServerInfoRequired(serverName);
-
         if (string.IsNullOrWhiteSpace(serverInfo.ServiceUserName))
         {
             StShared.WriteErrorLine(
-                $"ServiceUserName does not specified for server {serverName} and project {projectName}", true);
+                $"ServiceUserName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
+                true);
             return null;
         }
 
         if (serverInfo.AppSettingsJsonSourceFileName is null)
         {
             StShared.WriteErrorLine(
-                $"AppSettingsJsonSourceFileName does not specified for project {projectName} and server {serverName}",
+                $"AppSettingsJsonSourceFileName does not specified for project {projectName} and server {serverInfo.GetItemKey()}",
                 true);
             return null;
         }
@@ -101,7 +86,7 @@ public sealed class ProgramInstallerParameters : IParameters
         if (serverInfo.AppSettingsEncodedJsonFileName is null)
         {
             StShared.WriteErrorLine(
-                $"AppSettingsEncodedJsonFileName does not specified for project {projectName} and server {serverName}",
+                $"AppSettingsEncodedJsonFileName does not specified for project {projectName} and server {serverInfo.GetItemKey()}",
                 true);
             return null;
         }
@@ -147,19 +132,13 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-        //{
-        //    StShared.WriteErrorLine(
-        //        $"ApiVersionId does not specified for server {serverName} and project {projectName}", true);
-        //    return null;
-        //}
-
         var installerBaseParameters =
-            InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
+            InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
-                $"installerBaseParameters does not created for project {projectName} and server {serverName}", true);
+                $"installerBaseParameters does not created for project {projectName} and server {serverInfo.GetItemKey()}",
+                true);
             return null;
         }
 
@@ -167,7 +146,7 @@ public sealed class ProgramInstallerParameters : IParameters
         if (string.IsNullOrWhiteSpace(webAgentNameForCheck))
         {
             StShared.WriteErrorLine(
-                $"webAgentNameForCheck does not specified for Project {projectName} and server {serverName}",
+                $"webAgentNameForCheck does not specified for Project {projectName} and server {serverInfo.GetItemKey()}",
                 true);
             return null;
         }
@@ -175,17 +154,15 @@ public sealed class ProgramInstallerParameters : IParameters
         var webAgentForCheck = supportToolsParameters.GetWebAgentRequired(webAgentNameForCheck);
 
         var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
-            serverName);
+            serverInfo);
 
         if (proxySettings is null)
             return null;
 
-        var progInstallerParameters = new ProgramInstallerParameters(projectName, serverName,
-            project.ServiceName, installerBaseParameters, serverInfo.ServiceUserName,
-            serverInfo.AppSettingsJsonSourceFileName, serverInfo.AppSettingsEncodedJsonFileName,
-            proxySettings, fileStorageForDownload,
-            webAgentForCheck, programArchiveDateMask, programArchiveExtension,
-            parametersFileDateMask, parametersFileExtension);
+        var progInstallerParameters = new ProgramInstallerParameters(projectName, serverInfo, project.ServiceName,
+            installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
+            serverInfo.AppSettingsEncodedJsonFileName, proxySettings, fileStorageForDownload, webAgentForCheck,
+            programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension);
         return progInstallerParameters;
     }
 }

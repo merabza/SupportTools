@@ -3,6 +3,7 @@ using FileManagersMain;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
 
 namespace LibAppInstallWork.Actions;
 
@@ -13,15 +14,16 @@ public sealed class UploadParametersToExchangeAction : ToolAction
     private readonly string _parametersContent;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
-    private readonly string _serverName;
+    private readonly ServerInfoModel _serverInfo;
     private readonly SmartSchema _uploadSmartSchema;
 
-    public UploadParametersToExchangeAction(ILogger logger, bool useConsole, string projectName, string serverName,
-        string dateMask, string parametersFileExtension, string parametersContent, FileStorageData exchangeFileStorage,
-        SmartSchema uploadSmartSchema) : base(logger, useConsole, "Upload Parameters To Exchange File Storage")
+    public UploadParametersToExchangeAction(ILogger logger, bool useConsole, string projectName,
+        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension, string parametersContent,
+        FileStorageData exchangeFileStorage, SmartSchema uploadSmartSchema) : base(logger, useConsole,
+        "Upload Parameters To Exchange File Storage")
     {
         _projectName = projectName;
-        _serverName = serverName;
+        _serverInfo = serverInfo;
         _dateMask = dateMask;
         _parametersFileExtension = parametersFileExtension;
         _parametersContent = parametersContent;
@@ -36,13 +38,12 @@ public sealed class UploadParametersToExchangeAction : ToolAction
 
     protected override bool RunAction()
     {
-        var serverName = _serverName; //.Capitalize();
         var datePart = DateTime.Now.ToString(_dateMask);
+        var prefix = $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-";
         //ასატვირთი ფაილის სახელის შექმნა
-        var uploadFileName = $"{serverName}-{_projectName}-{datePart}{_parametersFileExtension}";
+        var uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
 
-        var exchangeFileManager =
-            FileManagersFabric.CreateFileManager(true, Logger, null, _exchangeFileStorage, true);
+        var exchangeFileManager = FileManagersFabric.CreateFileManager(true, Logger, null, _exchangeFileStorage, true);
 
         if (exchangeFileManager == null)
         {
@@ -63,9 +64,7 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //ზედმეტად ფაილი შეიძლება ჩაითვალოს, თუ ფაილების რაოდენობა მეტი იქნება მაქსიმუმზე
         //წაიშლება უძველესი ფაილები, მანამ სანამ რაოდენობა არ გაუტოლდება მაქსიმუმს
         //SmartSchema? uploadSmartSchema = _smartSchemas.GetSmartSchemaByKey(_uploadSmartSchemaName);
-        exchangeFileManager.RemoveRedundantFiles($"{serverName}-{_projectName}-", _dateMask,
-            _parametersFileExtension,
-            _uploadSmartSchema);
+        exchangeFileManager.RemoveRedundantFiles(prefix, _dateMask, _parametersFileExtension, _uploadSmartSchema);
 
         return true;
     }

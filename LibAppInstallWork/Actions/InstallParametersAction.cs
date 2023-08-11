@@ -14,11 +14,12 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
+    private readonly string _environmentName;
     private readonly string? _serviceName;
 
     public InstallParametersAction(ILogger logger, bool useConsole, string parametersFileDateMask,
         string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
-        FileStorageData fileStorageForUpload, string projectName, string? serviceName,
+        FileStorageData fileStorageForUpload, string projectName, string environmentName, string? serviceName,
         string appSettingsEncodedJsonFileName) : base(logger, useConsole, "Install Parameters")
     {
         _installerBaseParameters = installerBaseParameters;
@@ -26,6 +27,7 @@ public sealed class InstallParametersAction : ToolAction
         _parametersFileExtension = parametersFileExtension;
         _fileStorageForUpload = fileStorageForUpload;
         _projectName = projectName;
+        _environmentName = environmentName;
         _serviceName = serviceName;
         _appSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
     }
@@ -43,18 +45,19 @@ public sealed class InstallParametersAction : ToolAction
                 _installerBaseParameters);
         if (agentClient is null)
         {
-            Logger.LogError($"agentClient cannot be created. project {_projectName} does not updated");
+            Logger.LogError(
+                $"agentClient cannot be created. project {_projectName}/{_environmentName} does not updated");
             return false;
         }
 
-        Logger.LogInformation($"Updating app settings for project {_projectName} by web agent...");
+        Logger.LogInformation($"Updating app settings for project {_projectName}/{_environmentName} by web agent...");
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
-        if (agentClient.UpdateAppParametersFile(_projectName, _serviceName,
+        if (agentClient.UpdateAppParametersFile(_projectName, _environmentName, _serviceName,
                 Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension))
             return true;
 
-        Logger.LogError($"project {_projectName} does not updated");
+        Logger.LogError($"project {_projectName}/{_environmentName} does not updated");
         return false;
     }
 }

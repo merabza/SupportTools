@@ -26,7 +26,7 @@ public sealed class ApplicationSettingsEncoder : ToolCommand
         var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger, UseConsole,
             AppsetenParameters.AppSetEnKeysJsonFileName, AppsetenParameters.AppSettingsJsonSourceFileName,
             AppsetenParameters.AppSettingsEncodedJsonFileName, AppsetenParameters.KeyPart1, AppsetenParameters.KeyPart2,
-            AppsetenParameters.ProjectName, AppsetenParameters.ServerName, AppsetenParameters.DateMask,
+            AppsetenParameters.ProjectName, AppsetenParameters.ServerInfo, AppsetenParameters.DateMask,
             AppsetenParameters.ParametersFileExtension, AppsetenParameters.FileStorageForExchange,
             AppsetenParameters.ExchangeSmartSchema);
         return encodeParametersAndUploadAction.Run();

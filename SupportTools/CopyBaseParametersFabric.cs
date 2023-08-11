@@ -15,7 +15,7 @@ namespace SupportTools;
 public static class CopyBaseParametersFabric
 {
     public static CopyBaseParameters? CreateCopyBaseParameters(ILogger logger, bool fromProductionToDeveloper,
-        SupportToolsParameters supportToolsParameters, string projectName, string serverName)
+        SupportToolsParameters supportToolsParameters, string projectName, ServerInfoModel serverInfo)
     {
         //შევამოწმოთ პროექტის პარამეტრები
         var project = supportToolsParameters.GetProject(projectName);
@@ -26,24 +26,18 @@ public static class CopyBaseParametersFabric
         }
 
         //შევამოწმოთ სერვერის პარამეტრები
-        var server = supportToolsParameters.GetServerData(serverName);
+        var server = supportToolsParameters.GetServerData(serverInfo.ServerName);
         if (server is null)
         {
-            StShared.WriteErrorLine($"Server with name {serverName} not found", true);
-            return null;
-        }
-
-        var serverInfo = project.GetServerInfo(serverName);
-        if (serverInfo is null)
-        {
-            StShared.WriteErrorLine($"Server with name {serverName} for Project {projectName} not found", true);
+            StShared.WriteErrorLine($"Server with name {serverInfo.ServerName} not found", true);
             return null;
         }
 
         var dep = serverInfo.DatabasesExchangeParameters;
         if (dep is null)
         {
-            StShared.WriteErrorLine($"Server with name {serverName} for Project {projectName} not found", true);
+            StShared.WriteErrorLine($"Server with name {serverInfo.GetItemKey()} for Project {projectName} not found",
+                true);
             return null;
         }
 
@@ -57,7 +51,8 @@ public static class CopyBaseParametersFabric
         if (string.IsNullOrWhiteSpace(localPath))
         {
             StShared.WriteErrorLine(
-                $"localPath does not specified in DatabasesExchangeParameters for server with name {serverName}", true);
+                $"localPath does not specified in DatabasesExchangeParameters for server with name {serverInfo.GetItemKey()}",
+                true);
             return null;
         }
 

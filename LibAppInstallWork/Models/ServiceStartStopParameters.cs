@@ -19,8 +19,6 @@ public sealed class ServiceStartStopParameters : IParameters
         WebAgentForInstall = webAgentForInstall;
         InstallFolder = installFolder;
         ProxySettings = proxySettings;
-        //ServerSidePort = serverSidePort;
-        //ApiVersionId = apiVersionId;
         WebAgentForCheck = webAgentForCheck;
     }
 
@@ -31,8 +29,6 @@ public sealed class ServiceStartStopParameters : IParameters
     public ProxySettingsBase ProxySettings { get; }
 
     public ApiClientSettingsDomain WebAgentForCheck { get; }
-    //public int ServerSidePort { get; }
-    //public string ApiVersionId { get; }
 
     public bool CheckBeforeSave()
     {
@@ -40,12 +36,11 @@ public sealed class ServiceStartStopParameters : IParameters
     }
 
     public static ServiceStartStopParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
-        string serverName, bool checkService = true)
+        ServerInfoModel serverInfo, bool checkService = true)
     {
         try
         {
-            var checkVersionParameters =
-                CheckVersionParameters.Create(supportToolsParameters, projectName, serverName);
+            var checkVersionParameters = CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
             if (checkVersionParameters is null)
                 return null;
 
@@ -60,20 +55,12 @@ public sealed class ServiceStartStopParameters : IParameters
             if (string.IsNullOrWhiteSpace(project.ServiceName))
             {
                 StShared.WriteErrorLine(
-                    $"Service Name does not specified for Project {projectName} and server {serverName}", true);
+                    $"Service Name does not specified for Project {projectName} and server {serverInfo.ServerName}",
+                    true);
                 return null;
             }
 
-            var serverInfo = project.GetServerInfoRequired(serverName);
-
-            //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-            //{
-            //    StShared.WriteErrorLine(
-            //        $"serverInfo.ApiVersionId does not specified for Project {projectName} and server {serverName}", true);
-            //    return null;
-            //}
-
-            var server = supportToolsParameters.GetServerDataRequired(serverName);
+            var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             ApiClientSettingsDomain? webAgentForInstall = null;
             string? installFolder = null;
@@ -84,19 +71,12 @@ public sealed class ServiceStartStopParameters : IParameters
                 if (string.IsNullOrWhiteSpace(webAgentNameForInstall))
                 {
                     StShared.WriteErrorLine(
-                        $"webAgentNameForCheck does not specified for Project {projectName} and server {serverName}",
+                        $"webAgentNameForCheck does not specified for Project {projectName} and server {serverInfo.ServerName}",
                         true);
                     return null;
                 }
 
                 webAgentForInstall = supportToolsParameters.GetWebAgentRequired(webAgentNameForInstall);
-
-                //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-                //{
-                //    StShared.WriteErrorLine(
-                //        $"ApiVersionId does not specified for Project {projectName} and server {serverName}", true);
-                //    return null;
-                //}
             }
             else
             {
@@ -104,14 +84,14 @@ public sealed class ServiceStartStopParameters : IParameters
                 if (string.IsNullOrWhiteSpace(installFolder))
                 {
                     StShared.WriteErrorLine(
-                        $"Server {serverName} is local, but installFolder does not specified is Parameters", true);
+                        $"Server {serverInfo.ServerName} is local, but installFolder does not specified is Parameters",
+                        true);
                     return null;
                 }
             }
 
             var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId,
-                projectName,
-                serverName);
+                projectName, serverInfo);
 
             if (proxySettings is null)
                 return null;

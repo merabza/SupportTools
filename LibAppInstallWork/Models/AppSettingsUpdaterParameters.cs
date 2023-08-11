@@ -10,12 +10,13 @@ namespace LibAppInstallWork.Models;
 
 public sealed class AppSettingsUpdaterParameters : IParameters
 {
-    private AppSettingsUpdaterParameters(string projectName, string? serviceName,
+    private AppSettingsUpdaterParameters(string projectName, string environmentName, string? serviceName,
         InstallerBaseParameters installerBaseParameters, ProxySettingsBase proxySettings,
         AppSettingsEncoderParameters appSettingsEncoderParameters, ApiClientSettingsDomain webAgentForCheck,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForUpload)
     {
         ProjectName = projectName;
+        EnvironmentName = environmentName;
         ServiceName = serviceName;
         InstallerBaseParameters = installerBaseParameters;
         ProxySettings = proxySettings;
@@ -27,6 +28,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
     }
 
     public string ProjectName { get; }
+    public string EnvironmentName { get; }
     public string? ServiceName { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public ProxySettingsBase ProxySettings { get; }
@@ -43,19 +45,19 @@ public sealed class AppSettingsUpdaterParameters : IParameters
 
 
     public static AppSettingsUpdaterParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName)
+        string projectName, ServerInfoModel serverInfo)
     {
-        var checkVersionParameters =
-            CheckVersionParameters.Create(supportToolsParameters, projectName, serverName);
+        var checkVersionParameters = CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (checkVersionParameters is null)
             return null;
 
         var serviceStartStopParameters =
-            ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverName);
+            ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceStartStopParameters is null)
             return null;
 
         var project = supportToolsParameters.GetProjectRequired(projectName);
+        var environmentName = serverInfo.EnvironmentName;
 
         if (!project.IsService)
         {
@@ -63,10 +65,8 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        var serverInfo = project.GetServerInfoRequired(serverName);
-
         var appSettingsEncoderParameters =
-            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverName);
+            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (appSettingsEncoderParameters == null)
             return null;
 
@@ -104,35 +104,28 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-        //{
-        //    StShared.WriteErrorLine(
-        //        $"ApiVersionId does not specified for server {serverName} and project {projectName}", true);
-        //    return null;
-        //}
-
         var fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
 
-        var installerBaseParameters =
-            InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
+        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
-                $"installerBaseParameters does not created for project {projectName} and server {serverName}", true);
+                $"installerBaseParameters does not created for project {projectName}/{environmentName} and server {serverInfo.ServerName}",
+                true);
             return null;
         }
 
         var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
-            serverName);
+            serverInfo);
 
         if (proxySettings is null)
             return null;
 
-        var appSettingsUpdaterParameters = new AppSettingsUpdaterParameters(projectName,
-            project.ServiceName, installerBaseParameters, proxySettings,
-            appSettingsEncoderParameters, checkVersionParameters.WebAgentForCheck, parametersFileDateMask,
-            parametersFileExtension, fileStorageForUpload);
+        var appSettingsUpdaterParameters = new AppSettingsUpdaterParameters(projectName, environmentName,
+            project.ServiceName, installerBaseParameters, proxySettings, appSettingsEncoderParameters,
+            checkVersionParameters.WebAgentForCheck, parametersFileDateMask, parametersFileExtension,
+            fileStorageForUpload);
         return appSettingsUpdaterParameters;
     }
 }

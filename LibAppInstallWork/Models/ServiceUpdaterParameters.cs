@@ -21,8 +21,6 @@ public sealed class ServiceUpdaterParameters : IParameters
         ProgramPublisherParameters = progPublisherParameters;
         CheckVersionParameters = checkVersionParameters;
         ProxySettings = proxySettings;
-        //ServerSidePort = serverSidePort;
-        //ApiVersionId = apiVersionId;
         AppSettingsEncoderParameters = appSettingsEncoderParameters;
         ProgramArchiveDateMask = programArchiveDateMask;
         ProgramArchiveExtension = programArchiveExtension;
@@ -36,11 +34,7 @@ public sealed class ServiceUpdaterParameters : IParameters
     public ProgramPublisherParameters ProgramPublisherParameters { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public CheckVersionParameters CheckVersionParameters { get; }
-
     public ProxySettingsBase ProxySettings { get; }
-
-    //public int ServerSidePort { get; }
-    //public string ApiVersionId { get; }
     public AppSettingsEncoderParameters AppSettingsEncoderParameters { get; }
     public FileStorageData FileStorageForDownload { get; }
     public string ProgramArchiveDateMask { get; }
@@ -56,15 +50,14 @@ public sealed class ServiceUpdaterParameters : IParameters
     }
 
     public static ServiceUpdaterParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName)
+        string projectName, ServerInfoModel serverInfo)
     {
-        var checkVersionParameters =
-            CheckVersionParameters.Create(supportToolsParameters, projectName, serverName);
+        var checkVersionParameters = CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (checkVersionParameters is null)
             return null;
 
         var serviceStartStopParameters =
-            ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverName);
+            ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceStartStopParameters is null)
             return null;
 
@@ -76,22 +69,21 @@ public sealed class ServiceUpdaterParameters : IParameters
             return null;
         }
 
-        var serverInfo = project.GetServerInfoRequired(serverName);
-
         var progPublisherParameters =
-            ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverName);
+            ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
         if (progPublisherParameters == null)
             return null;
 
         var appSettingsEncoderParameters =
-            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverName);
+            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (appSettingsEncoderParameters == null)
             return null;
 
         if (string.IsNullOrWhiteSpace(serverInfo.ServiceUserName))
         {
             StShared.WriteErrorLine(
-                $"ServiceUserName does not specified for server {serverName} and project {projectName}", true);
+                $"ServiceUserName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
+                true);
             return null;
         }
 
@@ -139,27 +131,20 @@ public sealed class ServiceUpdaterParameters : IParameters
             return null;
         }
 
-        //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-        //{
-        //    StShared.WriteErrorLine(
-        //        $"ApiVersionId does not specified for server {serverName} and project {projectName}", true);
-        //    return null;
-        //}
-
         var fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var installerBaseParameters =
-            InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
+        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
-                $"installerBaseParameters does not created for project {projectName} and server {serverName}", true);
+                $"installerBaseParameters does not created for project {projectName} and server {serverInfo.GetItemKey()}",
+                true);
             return null;
         }
 
         var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
-            serverName);
+            serverInfo);
 
         if (proxySettings is null)
             return null;

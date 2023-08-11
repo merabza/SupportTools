@@ -9,6 +9,7 @@ using FileManagersMain;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace LibAppInstallWork.Actions;
@@ -21,20 +22,20 @@ public sealed class CreatePackageAndUpload : ToolAction
     private readonly string _projectName;
     private readonly List<string> _redundantFileNames;
     private readonly string _runtime;
-    private readonly string _serverName;
+    private readonly ServerInfoModel _serverInfo;
     private readonly SmartSchema _smartSchemaForLocal;
     private readonly SmartSchema _uploadSmartSchema;
     private readonly string _uploadTempExtension;
     private readonly string _workFolder;
 
     public CreatePackageAndUpload(ILogger logger, bool useConsole, string projectName, string mainProjectFileName,
-        string serverName, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
+        ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
         SmartSchema uploadSmartSchema) : base(logger, useConsole, "Program Publisher")
     {
         _projectName = projectName;
         _mainProjectFileName = mainProjectFileName;
-        _serverName = serverName;
+        _serverInfo = serverInfo;
         _workFolder = workFolder;
         _dateMask = dateMask;
         _runtime = runtime;
@@ -80,10 +81,12 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         var datePart = DateTime.Now.ToString(_dateMask);
         //სახელის შექმნა output ფოლდერისათვის
-        var outputFolderName = $"{_serverName}-{_projectName}-{_runtime}-{datePart}";
+        var outputFolderName =
+            $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-{datePart}";
         var outputFolderPath = Path.Combine(_workFolder, outputFolderName);
         //სახელის შექმნა ZIP ფაილისათვის
-        var zipFileName = $"{_serverName}-{_projectName}-{_runtime}-{datePart}{archiveFileExtension}";
+        var zipFileName =
+            $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-{datePart}{archiveFileExtension}";
         var zipFileFullName = Path.Combine(_workFolder, zipFileName);
 
         //შევამოწმოთ შემთხვევით ხომ არ არსებობს output ფოლდერი
@@ -190,7 +193,8 @@ public sealed class CreatePackageAndUpload : ToolAction
         //ამ სიიდან ზედმეტი ფაილების დადგენა და წაშლა
         //ზედმეტად ფაილი შეიძლება ჩაითვალოს, თუ ფაილების რაოდენობა მეტი იქნება მაქსიმუმზე
         //წაიშლება უძველესი ფაილები, მანამ სანამ რაოდენობა არ გაუტოლდება მაქსიმუმს
-        exchangeFileManager.RemoveRedundantFiles($"{_serverName}-{_projectName}-{_runtime}-", _dateMask,
+        exchangeFileManager.RemoveRedundantFiles(
+            $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _uploadSmartSchema);
 
         Logger.LogInformation($"Deleting {zipFileFullName} file...");
@@ -200,7 +204,8 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         var workFileManager = FileManagersFabric.CreateFileManager(true, Logger, _workFolder);
 
-        workFileManager?.RemoveRedundantFiles($"{_serverName}-{_projectName}-{_runtime}-", _dateMask,
+        workFileManager?.RemoveRedundantFiles(
+            $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _smartSchemaForLocal);
 
         return true;

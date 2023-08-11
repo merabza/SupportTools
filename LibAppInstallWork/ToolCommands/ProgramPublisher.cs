@@ -28,10 +28,10 @@ public sealed class ProgramPublisher : ToolCommand
 
     protected override bool RunAction()
     {
-        //1. შევქმნათ საინსტალაციო პაკეტი და ავტვორთოთ ფაილსაცავში
+        //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
             ProgramPublisherParameters.ProjectName, ProgramPublisherParameters.MainProjectFileName,
-            ProgramPublisherParameters.ServerName, ProgramPublisherParameters.WorkFolder,
+            ProgramPublisherParameters.ServerInfo, ProgramPublisherParameters.WorkFolder,
             ProgramPublisherParameters.DateMask, ProgramPublisherParameters.Runtime,
             ProgramPublisherParameters.RedundantFileNames, ProgramPublisherParameters.UploadTempExtension,
             ProgramPublisherParameters.FileStorageForExchange, ProgramPublisherParameters.SmartSchemaForLocal,

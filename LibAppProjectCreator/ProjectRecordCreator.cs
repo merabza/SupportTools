@@ -20,7 +20,6 @@ internal sealed class ProjectRecordCreator
     private readonly string _newProjectShortName;
 
     private readonly IParametersManager _parametersManager;
-    //private readonly string _productionServerName;
 
     public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, string newProjectName,
         string newProjectShortName, string newProjectKeyGuidPart)
@@ -30,7 +29,6 @@ internal sealed class ProjectRecordCreator
         _newProjectName = newProjectName;
         _newProjectShortName = newProjectShortName;
         _newProjectKeyGuidPart = newProjectKeyGuidPart;
-        //_productionServerName = productionServerName;
     }
 
     public bool Create()
@@ -244,7 +242,8 @@ internal sealed class ProjectRecordCreator
             },
             ScaffoldSeederGitProjectNames = new List<string>
             {
-                "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools", "ToolsManagement", "WebSystemTools",
+                "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools",
+                "ToolsManagement", "WebSystemTools",
                 dbPartProjectsFolderName
             },
             AllowToolsList = new List<ETools>

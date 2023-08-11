@@ -129,7 +129,7 @@ public sealed class ServerInfoCruder : ParCruder
         foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ??
                      new List<ETools>()))
             itemSubMenuSet.AddMenuItem(
-                new ToolTaskCliMenuCommand(_logger, tool, _projectName, recordKey, ParametersManager),
+                new ToolTaskCliMenuCommand(_logger, tool, _projectName, server, ParametersManager),
                 tool.ToString());
     }
 }

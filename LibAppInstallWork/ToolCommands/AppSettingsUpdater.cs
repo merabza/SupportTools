@@ -39,7 +39,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
             appSettingsEncoderParameters.KeyPart2, appSettingsEncoderParameters.ProjectName,
-            appSettingsEncoderParameters.ServerName, appSettingsEncoderParameters.DateMask,
+            appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
             appSettingsEncoderParameters.ParametersFileExtension, appSettingsEncoderParameters.FileStorageForExchange,
             appSettingsEncoderParameters.ExchangeSmartSchema);
         var result = encodeParametersAndUploadAction.Run();
@@ -56,7 +56,8 @@ public sealed class AppSettingsUpdater : ToolCommand
         var installParametersAction = new InstallParametersAction(Logger, UseConsole,
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
-            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.ServiceName,
+            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
+            AppSettingsUpdaterParameters.ServiceName,
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
 
         if (!installParametersAction.Run())

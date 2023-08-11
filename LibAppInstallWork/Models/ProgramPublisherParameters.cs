@@ -13,14 +13,14 @@ namespace LibAppInstallWork.Models;
 public sealed class ProgramPublisherParameters : IParameters
 {
     private ProgramPublisherParameters(string runtime, string projectName, string mainProjectFileName,
-        string serverName, string workFolder, string uploadTempExtension, string dateMask,
+        ServerInfoModel serverInfo, string workFolder, string uploadTempExtension, string dateMask,
         FileStorageData fileStorageForExchange, SmartSchema smartSchemaForExchange, SmartSchema smartSchemaForLocal,
         List<string> redundantFileNames)
     {
         Runtime = runtime;
         ProjectName = projectName;
         MainProjectFileName = mainProjectFileName;
-        ServerName = serverName;
+        ServerInfo = serverInfo;
         WorkFolder = workFolder;
         UploadTempExtension = uploadTempExtension;
         DateMask = dateMask;
@@ -33,7 +33,7 @@ public sealed class ProgramPublisherParameters : IParameters
     public string Runtime { get; }
     public string ProjectName { get; }
     public string MainProjectFileName { get; }
-    public string ServerName { get; }
+    public ServerInfoModel ServerInfo { get; }
     public string WorkFolder { get; }
     public string UploadTempExtension { get; }
     public string DateMask { get; }
@@ -50,7 +50,7 @@ public sealed class ProgramPublisherParameters : IParameters
     }
 
     public static ProgramPublisherParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName)
+        string projectName, ServerInfoModel serverInfo)
     {
         try
         {
@@ -58,7 +58,7 @@ public sealed class ProgramPublisherParameters : IParameters
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
-            var server = supportToolsParameters.GetServerDataRequired(serverName);
+            var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             var mainProjectFileName = project.MainProjectFileName(gitProjects);
             if (mainProjectFileName == null)
@@ -97,7 +97,7 @@ public sealed class ProgramPublisherParameters : IParameters
 
             if (string.IsNullOrWhiteSpace(server.Runtime))
             {
-                StShared.WriteErrorLine($"server.Runtime does not specified for server {serverName}", true);
+                StShared.WriteErrorLine($"server.Runtime does not specified for server {serverInfo.ServerName}", true);
                 return null;
             }
 
@@ -116,7 +116,7 @@ public sealed class ProgramPublisherParameters : IParameters
             }
 
             var programPublisherParameters = new ProgramPublisherParameters(server.Runtime, projectName,
-                mainProjectFileName, serverName, supportToolsParameters.PublisherWorkFolder,
+                mainProjectFileName, serverInfo, supportToolsParameters.PublisherWorkFolder,
                 supportToolsParameters.GetUploadTempExtension(), parametersFileDateMask, fileStorageForUpload,
                 smartSchemaForExchange, smartSchemaForLocal, project.RedundantFileNames);
 

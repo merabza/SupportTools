@@ -8,7 +8,8 @@ namespace LibAppInstallWork.Models;
 public sealed class AppSettingsEncoderParameters : IParameters
 {
     private AppSettingsEncoderParameters(string appSettingsJsonSourceFileName, string appSetEnKeysJsonFileName,
-        string appSettingsEncodedJsonFileName, string keyPart1, string keyPart2, string projectName, string serverName,
+        string appSettingsEncodedJsonFileName, string keyPart1, string keyPart2, string projectName,
+        ServerInfoModel serverInfo,
         string dateMask, string parametersFileExtension, FileStorageData fileStorageForExchange,
         SmartSchema exchangeSmartSchema)
     {
@@ -18,7 +19,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
         KeyPart1 = keyPart1;
         KeyPart2 = keyPart2;
         ProjectName = projectName;
-        ServerName = serverName;
+        ServerInfo = serverInfo;
         DateMask = dateMask;
         ParametersFileExtension = parametersFileExtension;
         FileStorageForExchange = fileStorageForExchange;
@@ -31,7 +32,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
     public string KeyPart1 { get; }
     public string KeyPart2 { get; }
     public string ProjectName { get; }
-    public string ServerName { get; }
+    public ServerInfoModel ServerInfo { get; }
     public string DateMask { get; }
     public string ParametersFileExtension { get; }
     public FileStorageData FileStorageForExchange { get; }
@@ -43,7 +44,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
     }
 
     public static AppSettingsEncoderParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName)
+        string projectName, ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
 
@@ -52,8 +53,6 @@ public sealed class AppSettingsEncoderParameters : IParameters
             StShared.WriteErrorLine($"Project {projectName} is not service", true);
             return null;
         }
-
-        var serverInfo = project.GetServerInfoRequired(serverName);
 
         var publisherDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(publisherDateMask))
@@ -85,7 +84,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
         if (string.IsNullOrWhiteSpace(serverInfo.AppSettingsJsonSourceFileName))
         {
             StShared.WriteErrorLine(
-                $"AppSettingsJsonSourceFileName does not specified for server {serverName} and project {projectName}",
+                $"AppSettingsJsonSourceFileName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
                 true);
             return null;
         }
@@ -93,7 +92,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
         if (string.IsNullOrWhiteSpace(serverInfo.AppSettingsEncodedJsonFileName))
         {
             StShared.WriteErrorLine(
-                $"AppSettingsEncodedJsonFileName does not specified for server {serverName} and project {projectName}",
+                $"AppSettingsEncodedJsonFileName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
                 true);
             return null;
         }
@@ -116,10 +115,10 @@ public sealed class AppSettingsEncoderParameters : IParameters
         var fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var appSettingsEncoderParameters = new AppSettingsEncoderParameters(
-            serverInfo.AppSettingsJsonSourceFileName, project.AppSetEnKeysJsonFileName,
-            serverInfo.AppSettingsEncodedJsonFileName, project.KeyGuidPart, serverName, projectName, serverName,
-            publisherDateMask, parametersFileExtension, fileStorageForUpload, smartSchemaForExchange);
+        var appSettingsEncoderParameters = new AppSettingsEncoderParameters(serverInfo.AppSettingsJsonSourceFileName,
+            project.AppSetEnKeysJsonFileName, serverInfo.AppSettingsEncodedJsonFileName, project.KeyGuidPart,
+            serverInfo.ServerName, projectName, serverInfo, publisherDateMask, parametersFileExtension,
+            fileStorageForUpload, smartSchemaForExchange);
 
         return appSettingsEncoderParameters;
     }

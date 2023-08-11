@@ -36,14 +36,12 @@ public sealed class ProgramUpdaterParameters : IParameters
     }
 
     public static ProgramUpdaterParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName)
+        string projectName, ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
 
-        //var serverInfo = project.GetServerInfoRequired(serverName);
-
         var programPublisherParameters =
-            ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverName);
+            ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
         if (programPublisherParameters == null)
             return null;
 
@@ -84,11 +82,12 @@ public sealed class ProgramUpdaterParameters : IParameters
         var fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverName);
+        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
-                $"installerBaseParameters does not created for project {projectName} and server {serverName}", true);
+                $"installerBaseParameters does not created for project {projectName} and server {serverInfo.GetItemKey()}",
+                true);
             return null;
         }
 

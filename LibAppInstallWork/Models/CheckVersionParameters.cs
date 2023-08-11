@@ -29,7 +29,7 @@ public sealed class CheckVersionParameters : IParameters
     }
 
     public static CheckVersionParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, string serverName, bool checkService = true)
+        string projectName, ServerInfoModel serverInfo, bool checkService = true)
     {
         try
         {
@@ -41,43 +41,19 @@ public sealed class CheckVersionParameters : IParameters
                 return null;
             }
 
-            var serverInfo = project.GetServerInfoRequired(serverName);
-
-            //if (string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-            //{
-            //    StShared.WriteErrorLine(
-            //        $"serverInfo.ApiVersionId does not specified for Project {projectName} and server {serverName}",
-            //        true);
-            //    return null;
-            //}
-
             var webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
             if (string.IsNullOrWhiteSpace(webAgentNameForCheck))
             {
                 StShared.WriteErrorLine(
-                    $"webAgentNameForCheck does not specified for Project {projectName} and server {serverName}",
+                    $"webAgentNameForCheck does not specified for Project {projectName} and server {serverInfo.GetItemKey()}",
                     true);
                 return null;
             }
 
-            //if (serverInfo.ServerSidePort > 0 && string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-            //{
-            //    StShared.WriteErrorLine(
-            //        $"ServerSidePort is {serverInfo.ServerSidePort} and Project ApiVersionId does not specified for project {projectName} and server {serverName}",
-            //        true);
-            //    return null;
-            //}
-
-            //if (serverInfo.ServerSidePort == 0 && !string.IsNullOrWhiteSpace(serverInfo.ApiVersionId))
-            //    StShared.WriteWarningLine(
-            //        $"ServerSidePort is 0 and Project ApiVersionId is specified for project {projectName} and server {serverName}. ApiVersionId wil be ignored.",
-            //        true);
-
             var webAgentForCheck = supportToolsParameters.GetWebAgentRequired(webAgentNameForCheck);
 
             var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId,
-                projectName,
-                serverName);
+                projectName, serverInfo);
 
             if (proxySettings is null)
                 return null;

@@ -27,13 +27,14 @@ public sealed class ProgramUpdater : ToolCommand
     protected override bool RunAction()
     {
         var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
+        var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters = ProgramUpdaterParameters.ProgramPublisherParameters;
 
         var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
             programPublisherParameters.ProjectName, programPublisherParameters.MainProjectFileName,
-            programPublisherParameters.ServerName, programPublisherParameters.WorkFolder,
+            programPublisherParameters.ServerInfo, programPublisherParameters.WorkFolder,
             programPublisherParameters.DateMask, programPublisherParameters.Runtime,
             programPublisherParameters.RedundantFileNames, programPublisherParameters.UploadTempExtension,
             programPublisherParameters.FileStorageForExchange, programPublisherParameters.SmartSchemaForLocal,
@@ -47,7 +48,7 @@ public sealed class ProgramUpdater : ToolCommand
             ProgramUpdaterParameters.InstallerBaseParameters, ProgramUpdaterParameters.ProgramArchiveDateMask,
             ProgramUpdaterParameters.ProgramArchiveExtension, ProgramUpdaterParameters.ParametersFileDateMask,
             ProgramUpdaterParameters.ParametersFileExtension, ProgramUpdaterParameters.FileStorageForDownload,
-            projectName);
+            projectName, environmentName);
 
         if (installProgramAction.Run())
             return true;

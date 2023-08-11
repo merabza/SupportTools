@@ -27,6 +27,7 @@ public sealed class ServiceUpdater : ToolCommand
     protected override bool RunAction()
     {
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
+        var environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters =
@@ -34,7 +35,7 @@ public sealed class ServiceUpdater : ToolCommand
 
         var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
             programPublisherParameters.ProjectName, programPublisherParameters.MainProjectFileName,
-            programPublisherParameters.ServerName, programPublisherParameters.WorkFolder,
+            programPublisherParameters.ServerInfo, programPublisherParameters.WorkFolder,
             programPublisherParameters.DateMask, programPublisherParameters.Runtime,
             programPublisherParameters.RedundantFileNames, programPublisherParameters.UploadTempExtension,
             programPublisherParameters.FileStorageForExchange, programPublisherParameters.SmartSchemaForLocal,
@@ -56,7 +57,7 @@ public sealed class ServiceUpdater : ToolCommand
                 appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
                 appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
                 appSettingsEncoderParameters.KeyPart2, appSettingsEncoderParameters.ProjectName,
-                appSettingsEncoderParameters.ServerName, appSettingsEncoderParameters.DateMask,
+                appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
                 appSettingsEncoderParameters.ParametersFileExtension,
                 appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
             if (!encodeParametersAndUploadAction.Run() && ProgramServiceUpdaterParameters.IsService)
@@ -71,12 +72,12 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.ProgramArchiveExtension,
             ProgramServiceUpdaterParameters.ParametersFileDateMask,
             ProgramServiceUpdaterParameters.ParametersFileExtension,
-            ProgramServiceUpdaterParameters.FileStorageForDownload, projectName,
+            ProgramServiceUpdaterParameters.FileStorageForDownload, projectName, environmentName,
             ProgramServiceUpdaterParameters.ServiceName, ProgramServiceUpdaterParameters.ServiceUserName,
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
         if (!installProgramAction.Run())
         {
-            Logger.LogError($"project {projectName} not updated");
+            Logger.LogError($"project {projectName}/{environmentName} was not updated");
             return false;
         }
 
@@ -88,7 +89,7 @@ public sealed class ServiceUpdater : ToolCommand
 
         if (!checkProgramVersionAction.Run())
         {
-            Logger.LogError($"project {projectName} version check failed");
+            Logger.LogError($"project {projectName}/{environmentName} version check failed");
             return false;
         }
 
@@ -104,7 +105,7 @@ public sealed class ServiceUpdater : ToolCommand
                 return true;
         }
 
-        Logger.LogError($"project {projectName} parameters file check failed");
+        Logger.LogError($"project {projectName}/{environmentName} parameters file check failed");
         return false;
     }
 }

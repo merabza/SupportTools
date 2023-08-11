@@ -16,14 +16,16 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string _programArchiveDateMask;
     private readonly string _programArchiveExtension;
     private readonly string _projectName;
+    private readonly string _environmentName;
     private readonly string? _serviceName;
     private readonly string _serviceUserName;
 
 
     public InstallServiceAction(ILogger logger, bool useConsole, InstallerBaseParameters installerBaseParameters,
         string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
-        string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName, string? serviceName,
-        string serviceUserName, string encodedJsonFileName) : base(logger, useConsole, "Install service")
+        string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
+        string environmentName, string? serviceName, string serviceUserName, string encodedJsonFileName) : base(logger,
+        useConsole, "Install service")
     {
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;
@@ -32,6 +34,7 @@ public sealed class InstallServiceAction : ToolAction
         _parametersFileExtension = parametersFileExtension;
         _fileStorageForDownload = fileStorageForDownload;
         _projectName = projectName;
+        _environmentName = environmentName;
         _serviceName = serviceName;
         _serviceUserName = serviceUserName;
         _encodedJsonFileName = encodedJsonFileName;
@@ -53,21 +56,22 @@ public sealed class InstallServiceAction : ToolAction
 
         if (agentClient is null)
         {
-            Logger.LogError($"agentClient does not created. project {_projectName} does not updated");
+            Logger.LogError(
+                $"agentClient does not created. project {_projectName}/{_environmentName} does not updated");
             return false;
         }
 
-        Logger.LogInformation($"Installing {_projectName} by web agent...");
+        Logger.LogInformation($"Installing {_projectName}/{_environmentName} by web agent...");
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        InstallingProgramVersion = agentClient.InstallService(_projectName, _serviceName, _serviceUserName,
-            Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
+        InstallingProgramVersion = agentClient.InstallService(_projectName, _environmentName, _serviceName,
+            _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
             _parametersFileDateMask, _parametersFileExtension);
 
         if (InstallingProgramVersion != null)
             return true;
 
-        Logger.LogError($"project {_projectName} does not updated");
+        Logger.LogError($"project {_projectName}/{_environmentName} does not updated");
         return false;
     }
 }

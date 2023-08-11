@@ -3,6 +3,7 @@ using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -11,12 +12,12 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
 {
     private readonly IToolCommand? _toolCommand;
 
-    public ToolTaskCliMenuCommand(ILogger logger, ETools tool, string projectName, string? serverName,
+    public ToolTaskCliMenuCommand(ILogger logger, ETools tool, string projectName, ServerInfoModel? serverInfo,
         IParametersManager parametersManager) : base(null, null, true)
     {
-        _toolCommand = string.IsNullOrWhiteSpace(serverName)
+        _toolCommand = serverInfo is null
             ? ToolCommandFabric.Create(logger, tool, parametersManager, projectName)
-            : ToolCommandFabric.Create(logger, tool, parametersManager, projectName, serverName);
+            : ToolCommandFabric.Create(logger, tool, parametersManager, projectName, serverInfo);
     }
 
     protected override string? GetActionDescription()

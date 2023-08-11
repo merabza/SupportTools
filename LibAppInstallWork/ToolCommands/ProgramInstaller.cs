@@ -35,8 +35,9 @@ public sealed class ProgramInstaller : ToolCommand
         {
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
             var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, true,
-                Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerName,
-                Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension);
+                Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,
+                Parameters.ServerInfo.EnvironmentName, Parameters.ParametersFileDateMask,
+                Parameters.ParametersFileExtension);
             var result = getLatestParametersFileBodyAction.Run();
 
             appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
@@ -52,11 +53,12 @@ public sealed class ProgramInstaller : ToolCommand
         var projectName = Parameters.ProjectName;
         var installProgramAction = new InstallServiceAction(Logger, UseConsole, Parameters.InstallerBaseParameters,
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
-            Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName, Parameters.ServiceName,
-            Parameters.ServiceUserName, Parameters.EncodedJsonFileName);
+            Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
+            Parameters.ServerInfo.EnvironmentName, Parameters.ServiceName, Parameters.ServiceUserName,
+            Parameters.EncodedJsonFileName);
         if (!installProgramAction.Run())
         {
-            Logger.LogError($"project {projectName} not updated");
+            Logger.LogError($"project {projectName}/{Parameters.ServerInfo.EnvironmentName} was not updated");
             return false;
         }
 
@@ -67,7 +69,8 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.ProxySettings, installingProgramVersion);
         if (!checkProgramVersionAction.Run())
         {
-            Logger.LogError($"project {projectName} parameters file check failed");
+            Logger.LogError(
+                $"project {projectName}/{Parameters.ServerInfo.EnvironmentName} parameters file check failed");
             return false;
         }
 
@@ -82,7 +85,7 @@ public sealed class ProgramInstaller : ToolCommand
         }
 
 
-        Logger.LogError($"project {projectName} parameters file check failed");
+        Logger.LogError($"project {projectName}/{Parameters.ServerInfo.EnvironmentName} parameters file check failed");
         return false;
     }
 }
