@@ -142,13 +142,13 @@ public sealed class CreatePackageAndUpload : ToolAction
             ((int)(DateTime.Now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
         AssemblyVersion = string.Join('.', assemblyVersionNumbers);
 
-        Logger.LogInformation($"dotnet publishing with assemblyVersion {AssemblyVersion} ...");
+        Logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
 
         //მთავარი პროექტის შექმნა
         if (!StShared.RunProcess(true, Logger, "dotnet",
                 $"publish --configuration Release --runtime {_runtime} --self-contained --output {outputFolderPath} {_mainProjectFileName} /p:AssemblyVersion={AssemblyVersion}"))
         {
-            Logger.LogError($"Cannot publish project {_projectName}");
+            Logger.LogError("Cannot publish project {_projectName}", _projectName);
             return false;
         }
 
@@ -163,22 +163,23 @@ public sealed class CreatePackageAndUpload : ToolAction
             var di = new DirectoryInfo(outputFolderPath);
             foreach (var file in di.GetFiles(fileName))
             {
-                Logger.LogInformation($"Delete {file.Name}");
+                var fName = file.Name;
+                Logger.LogInformation("Delete {fName}", fName);
                 file.Delete();
             }
         }
         //}
 
 
-        Logger.LogInformation($"Archiving {zipFileFullName}...");
+        Logger.LogInformation("Archiving {zipFileFullName}...", zipFileFullName);
         //შექმნილი output ფოლდერიდან ZIP ფაილის შექმნა, იმავე სამუშაო ფოლდერში
         ZipFile.CreateFromDirectory(outputFolderPath, zipFileFullName, CompressionLevel.Optimal, false);
 
-        Logger.LogInformation($"Removing folder {outputFolderPath}...");
+        Logger.LogInformation("Removing folder {outputFolderPath}...", outputFolderPath);
         //output ფოლდერის წაშლა
         Directory.Delete(outputFolderPath, true);
 
-        Logger.LogInformation($"Uploading {zipFileFullName}...");
+        Logger.LogInformation("Uploading {zipFileFullName}...", zipFileFullName);
         //ZIP ფაილის ატვირთვა FTP-ზე
         var exchangeFileManager =
             FileManagersFabric.CreateFileManager(true, Logger, _workFolder, _exchangeFileStorage);
@@ -191,7 +192,7 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         if (!exchangeFileManager.UploadFile(zipFileName, _uploadTempExtension))
         {
-            Logger.LogError($"cannot upload file {zipFileName}");
+            Logger.LogError("cannot upload file {zipFileName}", zipFileName);
             return false;
         }
 
@@ -209,7 +210,7 @@ public sealed class CreatePackageAndUpload : ToolAction
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _uploadSmartSchema);
 
-        Logger.LogInformation($"Deleting {zipFileFullName} file...");
+        Logger.LogInformation("Deleting {zipFileFullName} file...", zipFileFullName);
         //წაიშალოს ლოკალური ფაილი
         File.Delete(zipFileFullName);
 

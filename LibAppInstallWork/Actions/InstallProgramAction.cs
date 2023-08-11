@@ -48,12 +48,13 @@ public sealed class InstallProgramAction : ToolAction
 
         if (agentClient is null)
         {
-            Logger.LogError(
-                $"agentClient does not created. project {_projectName}/{_environmentName} does not updated");
+            Logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
+                _projectName, _environmentName);
             return false;
         }
 
-        Logger.LogInformation($"Installing {_projectName}/{_environmentName} by web agent...");
+        Logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
+            _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         _installingProgramVersion = agentClient.InstallProgram(_projectName, _environmentName, _programArchiveDateMask,
@@ -62,7 +63,7 @@ public sealed class InstallProgramAction : ToolAction
         if (_installingProgramVersion != null)
             return true;
 
-        Logger.LogError($"project {_projectName}/{_environmentName} does not updated");
+        Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;
     }
 }

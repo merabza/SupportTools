@@ -30,19 +30,19 @@ public sealed class ProgramInstaller : ToolCommand
     protected override bool RunAction()
     {
         string? appSettingsVersion = null;
+
+        if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.EnvironmentName))
+        {
+            Logger.LogError("Environment name is not specified");
+            return false;
+        }
+
         if (!string.IsNullOrWhiteSpace(Parameters.AppSettingsJsonSourceFileName) ||
             !string.IsNullOrWhiteSpace(Parameters.EncodedJsonFileName))
         {
             if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
             {
                 Logger.LogError("Server name is not specified");
-                return false;
-            }
-
-
-            if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.EnvironmentName))
-            {
-                Logger.LogError("Environment name is not specified");
                 return false;
             }
 
@@ -64,6 +64,7 @@ public sealed class ProgramInstaller : ToolCommand
 
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var projectName = Parameters.ProjectName;
+        var environmentName = Parameters.ServerInfo.EnvironmentName;
         var installProgramAction = new InstallServiceAction(Logger, UseConsole, Parameters.InstallerBaseParameters,
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
@@ -71,7 +72,7 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.EncodedJsonFileName);
         if (!installProgramAction.Run())
         {
-            Logger.LogError($"project {projectName}/{Parameters.ServerInfo.EnvironmentName} was not updated");
+            Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
         }
 
@@ -82,8 +83,8 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.ProxySettings, installingProgramVersion);
         if (!checkProgramVersionAction.Run())
         {
-            Logger.LogError(
-                $"project {projectName}/{Parameters.ServerInfo.EnvironmentName} parameters file check failed");
+            Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+                environmentName);
             return false;
         }
 
@@ -98,7 +99,8 @@ public sealed class ProgramInstaller : ToolCommand
         }
 
 
-        Logger.LogError($"project {projectName}/{Parameters.ServerInfo.EnvironmentName} parameters file check failed");
+        Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+            environmentName);
         return false;
     }
 }

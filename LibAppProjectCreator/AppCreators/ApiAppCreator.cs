@@ -20,12 +20,12 @@ namespace LibAppProjectCreator.AppCreators;
 public sealed class ApiAppCreator : AppCreatorBase
 {
     private readonly ApiAppCreatorData _apiAppCreatorData;
-    private readonly Dictionary<string, string?> _reactAppTemplates;
+    private readonly Dictionary<string, string> _reactAppTemplates;
 
     private readonly string _workFolder;
 
     public ApiAppCreator(ILogger logger, AppProjectCreatorData par, GitProjects gitProjects, GitRepos gitRepos,
-        ApiAppCreatorData apiAppCreatorData, string workFolder, Dictionary<string, string?> reactAppTemplates) : base(
+        ApiAppCreatorData apiAppCreatorData, string workFolder, Dictionary<string, string> reactAppTemplates) : base(
         logger, par, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData)
     {
         _apiAppCreatorData = apiAppCreatorData;
@@ -320,7 +320,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     //    projectBackgroundTasksQueueInstallerClassCreator.CreateFileStructure();
     //}
 
-    private void MakeFilesWhenUseIdentity(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
+    private static void MakeFilesWhenUseIdentity(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
         //Console.WriteLine("Creating IdentityInstaller.cs...");

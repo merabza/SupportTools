@@ -44,7 +44,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             return false;
         }
 
-
+        var projectName = AppSettingsInstallerParameters.ProjectName;
         //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
         GetLatestParametersFileBodyAction getLatestParametersFileBodyAction = new(Logger, true,
             AppSettingsInstallerParameters.FileStorageForDownload, AppSettingsInstallerParameters.ProjectName,
@@ -69,8 +69,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.ServiceName, AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName);
         if (!installParametersAction.Run())
         {
-            Logger.LogError(
-                $"project {AppSettingsInstallerParameters.ProjectName} parameters file is not updated");
+            Logger.LogError("project {projectName} parameters file is not updated", projectName);
             return false;
         }
 
@@ -83,7 +82,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         if (checkParametersVersionAction.Run())
             return true;
 
-        Logger.LogError($"project {AppSettingsInstallerParameters.ProjectName} parameters file check failed");
+        Logger.LogError("project {projectName} parameters file check failed", projectName);
         return false;
     }
 }

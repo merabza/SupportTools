@@ -12,7 +12,7 @@ public static class AppCreatorFabric
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, AppProjectCreatorData par, TemplateModel template,
         GitProjects gitProjects, GitRepos gitRepos, bool forTest, string workFolder,
-        Dictionary<string, string?> reactAppTemplates)
+        Dictionary<string, string> reactAppTemplates)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par, forTest);
 

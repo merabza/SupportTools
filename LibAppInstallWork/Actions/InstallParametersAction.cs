@@ -45,19 +45,20 @@ public sealed class InstallParametersAction : ToolAction
                 _installerBaseParameters);
         if (agentClient is null)
         {
-            Logger.LogError(
-                $"agentClient cannot be created. project {_projectName}/{_environmentName} does not updated");
+            Logger.LogError("agentClient cannot be created. project {_projectName}/{_environmentName} does not updated",
+                _projectName, _environmentName);
             return false;
         }
 
-        Logger.LogInformation($"Updating app settings for project {_projectName}/{_environmentName} by web agent...");
+        Logger.LogInformation("Updating app settings for project {_projectName}/{_environmentName} by web agent...",
+            _projectName, _environmentName);
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
         if (agentClient.UpdateAppParametersFile(_projectName, _environmentName, _serviceName,
                 Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension))
             return true;
 
-        Logger.LogError($"project {_projectName}/{_environmentName} does not updated");
+        Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;
     }
 }

@@ -66,7 +66,7 @@ public sealed class UploadParametersToExchangeAction : ToolAction
 
         if (!exchangeFileManager.UploadContentToTextFile(_parametersContent, uploadFileName))
         {
-            Logger.LogError($"cannot upload parameters content to file {uploadFileName}");
+            Logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
             return false;
         }
 

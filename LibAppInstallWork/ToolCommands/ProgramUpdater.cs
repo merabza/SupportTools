@@ -29,6 +29,12 @@ public sealed class ProgramUpdater : ToolCommand
         var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
+        if (string.IsNullOrEmpty(environmentName))
+        {
+            Logger.LogError("Environment {environmentName} is empty", environmentName);
+            return false;
+        }
+
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters = ProgramUpdaterParameters.ProgramPublisherParameters;
 
@@ -53,7 +59,7 @@ public sealed class ProgramUpdater : ToolCommand
         if (installProgramAction.Run())
             return true;
 
-        Logger.LogError($"project {projectName} not updated");
+        Logger.LogError("project {projectName} not updated", projectName);
         return false;
     }
 }

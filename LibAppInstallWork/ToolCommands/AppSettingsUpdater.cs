@@ -60,9 +60,10 @@ public sealed class AppSettingsUpdater : ToolCommand
             AppSettingsUpdaterParameters.ServiceName,
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
 
+        var projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!installParametersAction.Run())
         {
-            Logger.LogError($"project {AppSettingsUpdaterParameters.ProjectName} parameters file is not updated");
+            Logger.LogError("project {projectName} parameters file is not updated", projectName);
             return false;
         }
 
@@ -73,7 +74,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         if (checkParametersVersionAction.Run())
             return true;
 
-        Logger.LogError($"project {AppSettingsUpdaterParameters.ProjectName} parameters file check failed");
+        Logger.LogError("project {projectName} parameters file check failed", projectName);
         return false;
     }
 }

@@ -29,6 +29,12 @@ public sealed class ServiceUpdater : ToolCommand
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
+        if (string.IsNullOrEmpty(environmentName))
+        {
+            Logger.LogError("Environment {environmentName} is empty", environmentName);
+            return false;
+        }
+
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters =
             ProgramServiceUpdaterParameters.ProgramPublisherParameters;
@@ -77,7 +83,7 @@ public sealed class ServiceUpdater : ToolCommand
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
         if (!installProgramAction.Run())
         {
-            Logger.LogError($"project {projectName}/{environmentName} was not updated");
+            Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
         }
 
@@ -89,7 +95,8 @@ public sealed class ServiceUpdater : ToolCommand
 
         if (!checkProgramVersionAction.Run())
         {
-            Logger.LogError($"project {projectName}/{environmentName} version check failed");
+            Logger.LogError("project {projectName}/{environmentName} version check failed", projectName,
+                environmentName);
             return false;
         }
 
@@ -105,7 +112,8 @@ public sealed class ServiceUpdater : ToolCommand
                 return true;
         }
 
-        Logger.LogError($"project {projectName}/{environmentName} parameters file check failed");
+        Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+            environmentName);
         return false;
     }
 }
