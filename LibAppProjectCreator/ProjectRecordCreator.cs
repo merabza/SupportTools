@@ -113,7 +113,6 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-
         if (string.IsNullOrWhiteSpace(supportToolsParameters.AppProjectCreatorAllParameters.ProductionServerName))
         {
             StShared.WriteErrorLine(
@@ -122,6 +121,16 @@ internal sealed class ProjectRecordCreator
         }
 
         var productionServerName = supportToolsParameters.AppProjectCreatorAllParameters.ProductionServerName;
+
+        if (string.IsNullOrWhiteSpace(supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName))
+        {
+            StShared.WriteErrorLine(
+                "supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName is empty", true,
+                _logger);
+            return false;
+        }
+
+        var productionEnvironmentName = supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName;
 
         var serverData = supportToolsParameters.GetServerData(productionServerName);
 
@@ -192,6 +201,61 @@ internal sealed class ProjectRecordCreator
         var productionBaseName = $"{_newProjectName}Prod";
         var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
 
+
+        var serverInfo = new ServerInfoModel
+        {
+            ServerName = productionServerName,
+            EnvironmentName = productionEnvironmentName,
+            WebAgentNameForCheck = productionServerWebAgentName, ApiVersionId = "1",
+            AppSettingsJsonSourceFileName = Path.Combine(securityFolder, _newProjectName,
+                productionServerName, appSettingsFileName),
+            AppSettingsEncodedJsonFileName = Path.Combine(securityFolder, _newProjectName,
+                productionServerName, $"appsettingsEncoded{jsonExtension}"),
+            ServiceUserName = serverData.FilesUserName,
+            //AllowToolsList = new List<ETools> {ETools.ProgramUpdater}
+            DatabasesExchangeParameters = new DatabasesExchangeParameters
+            {
+                ProductionDbWebAgentName = productionServerWebAgentName,
+                ProductionDbBackupParameters = new DatabaseBackupParametersModel
+                {
+                    BackupNamePrefix = $"{productionServerName}_",
+                    DateMask = "yyyyMMddHHmmss",
+                    BackupFileExtension = ".bak",
+                    BackupNameMiddlePart = "_FullDb_",
+                    Compress = true,
+                    Verify = true,
+                    BackupType = EBackupType.Full
+                },
+                CurrentProductionBaseName = productionBaseName,
+                NewProductionBaseName = productionBaseName,
+                ProductionSmartSchemaName = smartSchemaName,
+                ProductionFileStorageName = databaseExchangeFileStorageName,
+                DownloadTempExtension = ".down!",
+                UploadTempExtension = ".up!",
+                ExchangeFileStorageName = databaseExchangeFileStorageName,
+                ExchangeSmartSchemaName = smartSchemaName,
+                LocalPath = tempLocalPath,
+                LocalSmartSchemaName = smartSchemaName,
+                DeveloperFileStorageName = databaseExchangeFileStorageName,
+                DeveloperDbConnectionName = developerDbConnectionName,
+                DeveloperDbBackupParameters = new DatabaseBackupParametersModel
+                {
+                    BackupNamePrefix = $"{developerDbConnectionName}_",
+                    DateMask = "yyyyMMddHHmmss",
+                    BackupFileExtension = ".bak",
+                    BackupNameMiddlePart = "_FullDb_",
+                    Compress = true,
+                    Verify = true,
+                    BackupType = EBackupType.Full
+                },
+                DeveloperDbServerSideBackupPath = tempLocalPath,
+                ProductionBaseCopyNameForDeveloperServer = $"{_newProjectName}ProdCopy",
+                DeveloperBaseName = $"{_newProjectName}Development",
+                DeveloperSmartSchemaName = smartSchemaName
+            }
+        };
+
+
         var newProject = new ProjectModel
         {
             ServiceName = _newProjectName,
@@ -251,57 +315,7 @@ internal sealed class ProjectRecordCreator
             ServerInfos = new Dictionary<string, ServerInfoModel>
             {
                 {
-                    productionServerName,
-                    new ServerInfoModel
-                    {
-                        WebAgentNameForCheck = productionServerWebAgentName, ApiVersionId = "1",
-                        AppSettingsJsonSourceFileName = Path.Combine(securityFolder, _newProjectName,
-                            productionServerName, appSettingsFileName),
-                        AppSettingsEncodedJsonFileName = Path.Combine(securityFolder, _newProjectName,
-                            productionServerName, $"appsettingsEncoded{jsonExtension}"),
-                        ServiceUserName = serverData.FilesUserName,
-                        //AllowToolsList = new List<ETools> {ETools.ProgramUpdater}
-                        DatabasesExchangeParameters = new DatabasesExchangeParameters
-                        {
-                            ProductionDbWebAgentName = productionServerWebAgentName,
-                            ProductionDbBackupParameters = new DatabaseBackupParametersModel
-                            {
-                                BackupNamePrefix = $"{productionServerName}_",
-                                DateMask = "yyyyMMddHHmmss",
-                                BackupFileExtension = ".bak",
-                                BackupNameMiddlePart = "_FullDb_",
-                                Compress = true,
-                                Verify = true,
-                                BackupType = EBackupType.Full
-                            },
-                            CurrentProductionBaseName = productionBaseName,
-                            NewProductionBaseName = productionBaseName,
-                            ProductionSmartSchemaName = smartSchemaName,
-                            ProductionFileStorageName = databaseExchangeFileStorageName,
-                            DownloadTempExtension = ".down!",
-                            UploadTempExtension = ".up!",
-                            ExchangeFileStorageName = databaseExchangeFileStorageName,
-                            ExchangeSmartSchemaName = smartSchemaName,
-                            LocalPath = tempLocalPath,
-                            LocalSmartSchemaName = smartSchemaName,
-                            DeveloperFileStorageName = databaseExchangeFileStorageName,
-                            DeveloperDbConnectionName = developerDbConnectionName,
-                            DeveloperDbBackupParameters = new DatabaseBackupParametersModel
-                            {
-                                BackupNamePrefix = $"{developerDbConnectionName}_",
-                                DateMask = "yyyyMMddHHmmss",
-                                BackupFileExtension = ".bak",
-                                BackupNameMiddlePart = "_FullDb_",
-                                Compress = true,
-                                Verify = true,
-                                BackupType = EBackupType.Full
-                            },
-                            DeveloperDbServerSideBackupPath = tempLocalPath,
-                            ProductionBaseCopyNameForDeveloperServer = $"{_newProjectName}ProdCopy",
-                            DeveloperBaseName = $"{_newProjectName}Development",
-                            DeveloperSmartSchemaName = smartSchemaName
-                        }
-                    }
+                    serverInfo.GetItemKey(), serverInfo
                 }
             }
         };

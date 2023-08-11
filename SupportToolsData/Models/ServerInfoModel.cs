@@ -5,8 +5,8 @@ namespace SupportToolsData.Models;
 
 public sealed class ServerInfoModel : ItemData
 {
-    public string ServerName { get; set; }
-    public string EnvironmentName { get; set; }
+    public string? ServerName { get; set; }
+    public string? EnvironmentName { get; set; }
     public string? WebAgentNameForCheck { get; set; }
     public int ServerSidePort { get; set; }
     public string? ApiVersionId { get; set; }
@@ -20,5 +20,4 @@ public sealed class ServerInfoModel : ItemData
     {
         return $"{ServerName}/{EnvironmentName}";
     }
-
 }

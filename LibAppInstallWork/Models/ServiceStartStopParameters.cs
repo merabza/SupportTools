@@ -60,6 +60,12 @@ public sealed class ServiceStartStopParameters : IParameters
                 return null;
             }
 
+            if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+            {
+                StShared.WriteErrorLine("Server name is not specified", true);
+                return null;
+            }
+
             var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             ApiClientSettingsDomain? webAgentForInstall = null;

@@ -58,6 +58,21 @@ public sealed class AppSettingsUpdaterParameters : IParameters
 
         var project = supportToolsParameters.GetProjectRequired(projectName);
         var environmentName = serverInfo.EnvironmentName;
+        var serverName = serverInfo.ServerName;
+
+
+        if (string.IsNullOrWhiteSpace(serverName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(environmentName))
+        {
+            StShared.WriteErrorLine("Environment Name is not specified", true);
+            return null;
+        }
+
 
         if (!project.IsService)
         {
@@ -111,7 +126,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
-                $"installerBaseParameters does not created for project {projectName}/{environmentName} and server {serverInfo.ServerName}",
+                $"installerBaseParameters does not created for project {projectName}/{environmentName} and server {serverName}",
                 true);
             return null;
         }

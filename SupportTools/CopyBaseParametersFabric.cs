@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using DatabaseApiClients;
+using DbTools.Models;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
+using Serilog.Core;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -22,6 +24,12 @@ public static class CopyBaseParametersFabric
         if (project == null)
         {
             StShared.WriteErrorLine($"Project with name {projectName} not found", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
             return null;
         }
 

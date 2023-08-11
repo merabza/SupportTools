@@ -58,6 +58,12 @@ public sealed class ProgramPublisherParameters : IParameters
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
+            if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+            {
+                StShared.WriteErrorLine("Server name is not specified", true);
+                return null;
+            }
+
             var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             var mainProjectFileName = project.MainProjectFileName(gitProjects);

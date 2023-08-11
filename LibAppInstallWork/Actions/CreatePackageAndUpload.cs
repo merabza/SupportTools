@@ -55,21 +55,33 @@ public sealed class CreatePackageAndUpload : ToolAction
 
     protected override bool RunAction()
     {
+        if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
+        {
+            Logger.LogError("Server name is not specified");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
+        {
+            Logger.LogError("Environment Name is not specified");
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(_mainProjectFileName))
         {
-            Logger.LogError("Project file name not specified");
+            Logger.LogError("Project file name is not specified");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(_projectName))
         {
-            Logger.LogError("Project name not specified");
+            Logger.LogError("Project name is not specified");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(_workFolder))
         {
-            Logger.LogError("Work Folder name not specified");
+            Logger.LogError("Work Folder name is not specified");
             return false;
         }
 

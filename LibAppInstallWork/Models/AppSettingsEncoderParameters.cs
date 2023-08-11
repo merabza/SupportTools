@@ -1,4 +1,5 @@
-﻿using LibFileParameters.Models;
+﻿using DbTools.Models;
+using LibFileParameters.Models;
 using LibParameters;
 using SupportToolsData.Models;
 using SystemToolsShared;
@@ -51,6 +52,18 @@ public sealed class AppSettingsEncoderParameters : IParameters
         if (!project.IsService)
         {
             StShared.WriteErrorLine($"Project {projectName} is not service", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.EnvironmentName))
+        {
+            StShared.WriteErrorLine("Environment Name is not specified", true);
             return null;
         }
 

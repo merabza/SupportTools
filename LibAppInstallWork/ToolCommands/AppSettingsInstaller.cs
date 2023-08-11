@@ -1,9 +1,11 @@
 ﻿using CliParameters;
+using DbTools.Models;
 using Installer.Actions;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -29,6 +31,20 @@ public sealed class AppSettingsInstaller : ToolCommand
 
     protected override bool RunAction()
     {
+        if (string.IsNullOrWhiteSpace(AppSettingsInstallerParameters.ServerInfo.ServerName))
+        {
+            Logger.LogError("Server name is not specified");
+            return false;
+        }
+
+
+        if (string.IsNullOrWhiteSpace(AppSettingsInstallerParameters.ServerInfo.EnvironmentName))
+        {
+            Logger.LogError("Environment name is not specified");
+            return false;
+        }
+
+
         //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
         GetLatestParametersFileBodyAction getLatestParametersFileBodyAction = new(Logger, true,
             AppSettingsInstallerParameters.FileStorageForDownload, AppSettingsInstallerParameters.ProjectName,

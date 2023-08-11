@@ -9,6 +9,7 @@ public sealed class AppProjectCreatorAllParameters : IParameters
     public string? FakeHostProjectName { get; set; }
     public string? ProjectsFolderPathReal { get; set; }
     public string? ProductionServerName { get; set; }
+    public string? ProductionEnvironmentName { get; set; }
     public string? SecretsFolderPathReal { get; set; }
     public string? DeveloperDbConnectionName { get; set; }
     public string? DatabaseExchangeFileStorageName { get; set; }

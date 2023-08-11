@@ -1,4 +1,5 @@
-﻿using Installer.Domain;
+﻿using DbTools.Models;
+using Installer.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -20,6 +21,12 @@ public sealed class InstallerBaseParameters
         ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
+
+        if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
+            return null;
+        }
 
         var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
         ApiClientSettingsDomain? webAgentForInstall = null;

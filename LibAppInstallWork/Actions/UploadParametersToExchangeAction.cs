@@ -38,6 +38,19 @@ public sealed class UploadParametersToExchangeAction : ToolAction
 
     protected override bool RunAction()
     {
+        if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
+        {
+            Logger.LogError("Server name is not specified");
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
+        {
+            Logger.LogError("Environment Name is not specified");
+            return false;
+        }
+
+
         var datePart = DateTime.Now.ToString(_dateMask);
         var prefix = $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-";
         //ასატვირთი ფაილის სახელის შექმნა

@@ -33,6 +33,19 @@ public sealed class ProgramInstaller : ToolCommand
         if (!string.IsNullOrWhiteSpace(Parameters.AppSettingsJsonSourceFileName) ||
             !string.IsNullOrWhiteSpace(Parameters.EncodedJsonFileName))
         {
+            if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
+            {
+                Logger.LogError("Server name is not specified");
+                return false;
+            }
+
+
+            if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.EnvironmentName))
+            {
+                Logger.LogError("Environment name is not specified");
+                return false;
+            }
+
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
             var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, true,
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,
