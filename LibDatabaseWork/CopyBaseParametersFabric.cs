@@ -1,18 +1,16 @@
 ﻿using System;
 using System.IO;
 using DatabaseApiClients;
-using DbTools.Models;
 using FileManagersMain;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
-namespace SupportTools;
+namespace LibDatabaseWork;
 
 public static class CopyBaseParametersFabric
 {

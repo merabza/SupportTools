@@ -49,7 +49,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     protected override bool RunAction()
     {
-        //თუ არ არსებობს შეიქმნას დროებითი ფოლდერი სამუშაო ფოლდერის პროქქტის ფოლდერში. მაგალითად D:\1WorkScaffoldSeeders\GeoModel\Temp
+        //თუ არ არსებობს შეიქმნას დროებითი ფოლდერი სამუშაო ფოლდერის პროექტის ფოლდერში. მაგალითად D:\1WorkScaffoldSeeders\GeoModel\Temp
         const string tempFolderName = "Temp";
         var scaffoldSeederFolderName = $"{Parameters.ScaffoldSeederProjectName}ScaffoldSeeder";
         var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
