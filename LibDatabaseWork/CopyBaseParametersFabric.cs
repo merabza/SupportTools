@@ -42,7 +42,8 @@ public static class CopyBaseParametersFabric
         var dep = serverInfo.DatabasesExchangeParameters;
         if (dep is null)
         {
-            StShared.WriteErrorLine($"Server with name {serverInfo.GetItemKey()} for Project {projectName} not found",
+            StShared.WriteErrorLine(
+                $"DatabasesExchangeParameters is null for Server with name {serverInfo.GetItemKey()} for Project {projectName} not found",
                 true);
             return null;
         }

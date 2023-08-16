@@ -83,6 +83,14 @@ public class ServiceInstallScriptCreator : ToolCommand
             return false;
         }
 
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.ServiceUserName))
+        {
+            StShared.WriteErrorLine(
+                $"ServiceUserName is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(_par.ServerInfo.EnvironmentName))
         {
             StShared.WriteErrorLine(
@@ -161,7 +169,7 @@ public class ServiceInstallScriptCreator : ToolCommand
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             serverData.Runtime, _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder,
             serverData.ServerSideDeployFolder, _par.Project.ServiceName, sf.Name,
-            serverData.FilesUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
+            _par.ServerInfo.ServiceUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
         return createInstallScript.Run();
     }
 }
