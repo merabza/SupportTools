@@ -1,6 +1,5 @@
 ﻿using LibFileParameters.Models;
 using LibParameters;
-using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -8,8 +7,8 @@ namespace SupportTools.ToolCommandParameters;
 
 public class InstallScriptCreatorParameters : IParameters
 {
-    public static InstallScriptCreatorParameters? Create(ILogger logger,
-        SupportToolsParameters supportToolsParameters, string projectName, ServerInfoModel serverInfo)
+    public static InstallScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
 

@@ -186,7 +186,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.InstallScriptCreator:
                 var installScriptCreatorParameters =
-                    InstallScriptCreatorParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
+                    InstallScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (installScriptCreatorParameters is not null)
                     return new InstallScriptCreator(logger, true, installScriptCreatorParameters, parametersManager);
                 StShared.WriteErrorLine("installScriptCreatorParameters is not created", true);
