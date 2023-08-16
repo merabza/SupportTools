@@ -10,4 +10,6 @@ public sealed class ServerDataModel : ItemData
     public string? FilesUserName { get; set; }
     public string? FilesUsersGroupName { get; set; }
     public string? Runtime { get; set; }
+    public string? ServerSideDownloadFolder { get; set; }
+    public string? ServerSideDeployFolder { get; set; }
 }

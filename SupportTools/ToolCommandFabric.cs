@@ -187,17 +187,9 @@ public static class ToolCommandFabric
             case ETools.InstallScriptCreator:
                 var installScriptCreatorParameters =
                     InstallScriptCreatorParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
-                if (installScriptCreatorParameters is null)
-                {
-                    StShared.WriteErrorLine("installScriptCreatorParameters does not created", true);
-                    return null;
-                }
-
-                if (installScriptCreatorParameters != null)
-                    return new InstallScriptCreator(logger, true, installScriptCreatorParameters,
-                        parametersManager);
-
-                StShared.WriteErrorLine("installScriptParametersForPublish does not created", true);
+                if (installScriptCreatorParameters is not null)
+                    return new InstallScriptCreator(logger, true, installScriptCreatorParameters, parametersManager);
+                StShared.WriteErrorLine("installScriptCreatorParameters is not created", true);
                 return null;
             case ETools.ProdBaseToDevCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var copyBaseParametersProdToDev =

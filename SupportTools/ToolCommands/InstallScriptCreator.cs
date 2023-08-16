@@ -3,6 +3,11 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Actions;
 using SupportTools.ToolCommandParameters;
+using System;
+using System.IO;
+using LibMenuInput;
+using SystemToolsShared;
+using SupportToolsData.Models;
 
 namespace SupportTools.ToolCommands;
 
@@ -11,12 +16,6 @@ public class InstallScriptCreator : ToolCommand
     private readonly InstallScriptCreatorParameters _par;
     private const string ActionName = "Creating Install Script";
     private const string ActionDescription = "Creating Install Script";
-
-    //public InstallScriptCreator(ILogger logger, bool useConsole,
-    //    ParametersManager parametersManager) : base(logger, useConsole, ActionName,
-    //    parametersManager, ActionDescription)
-    //{
-    //}
 
     public InstallScriptCreator(ILogger logger, bool useConsole, InstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
@@ -36,31 +35,133 @@ public class InstallScriptCreator : ToolCommand
             return false;
         }
 
+        var fileStoragePath = _par.FileStorageForExchange.FileStoragePath;
+        if (!_par.FileStorageForExchange.IsFtp())
+        {
+            Logger.LogError("File Storage {fileStoragePath} is not ftp file storage", fileStoragePath);
+            return false;
+        }
 
-        /*
-         *
-, string scriptFileName, 
-        int portNumber,
-        string ftpSiteAddress, 
-        string ftpSiteUserName, 
-        string ftpSitePassword, 
-        string ftpSiteDirectory,
-        string projectName, 
-        string runTime, 
-        string environmentName, 
-        string serverSideDownloadFolder,
-        string serverSideDeployFolder, 
-        string serviceName, 
-        string settingsFileName, 
-        string serverSideServiceUserName,
-        int ftpSiteLsFileOffset         *
-         */
+        if (!Uri.TryCreate(fileStoragePath, UriKind.Absolute, out var uri))
+        {
+            Logger.LogError("Invalid File Storage Path {fileStoragePath}", fileStoragePath);
+            return false;
+        }
+
+        var hostName = uri.Host;
+        var startPath = uri.AbsolutePath;
+        var port = uri.Port;
+
+        var ftpSiteAddress = (port == 21) ? hostName : $"\"{hostName} {port}\"";
+
+        var userName = _par.FileStorageForExchange.UserName;
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            Logger.LogError("User Name is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            return false;
+        }
+
+        var password = _par.FileStorageForExchange.Password;
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            Logger.LogError("Password is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            return false;
+        }
 
 
-        var createInstallScript = new CreateInstallScript(Logger, UseConsole, _par.ScriptFileName,
-            _par.ServerInfo.ServerSidePort, _par.FileStorageForExchange.FileStoragePath,
-            _par.FileStorageForExchange.UserName, _par.FileStorageForExchange.Password, "/", _par.ProjectName, "",
-            _par.ServerInfo.EnvironmentName, "", "", "", "", "", 72);
+        if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
+        {
+            Logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.ServerName))
+        {
+            StShared.WriteErrorLine(
+                $"ServerName is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.EnvironmentName))
+        {
+            StShared.WriteErrorLine(
+                $"EnvironmentName is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName))
+        {
+            StShared.WriteErrorLine(
+                $"App Settings Encoded Json File Name is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
+        var securityFolder = _par.SecurityFolder;
+        string? defCloneFile = null;
+        if (securityFolder is not null)
+            defCloneFile = Path.Combine(securityFolder, _par.ProjectName, _par.ServerInfo.ServerName,
+                _par.ServerInfo.EnvironmentName, $"{_par.ProjectName}Install.sh");
+        var scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
+        if (scriptFileNameForSave is null)
+        {
+            StShared.WriteErrorLine($"file name for Generate is not specified", true);
+            return false;
+        }
+
+        if (ParametersManager is null)
+        {
+            StShared.WriteErrorLine("ParametersManager is null", true);
+            return false;
+        }
+
+        var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
+
+        if (string.IsNullOrWhiteSpace(serverData.Runtime))
+        {
+            StShared.WriteErrorLine($"serverData.Runtime is not specified for server {_par.ServerInfo.ServerName}",
+                true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverData.ServerSideDownloadFolder))
+        {
+            StShared.WriteErrorLine(
+                $"serverData.ServerSideDownloadFolder is not specified for server {_par.ServerInfo.ServerName}", true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverData.ServerSideDeployFolder))
+        {
+            StShared.WriteErrorLine(
+                $"serverData.ServerSideDeployFolder is not specified for server {_par.ServerInfo.ServerName}", true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverData.FilesUserName))
+        {
+            StShared.WriteErrorLine(
+                $"serverData.FilesUserName is not specified for server {_par.ServerInfo.ServerName}", true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.Project.ServiceName))
+        {
+            StShared.WriteErrorLine($"Project.ServiceName is not specified for server {_par.ProjectName}", true);
+            return false;
+        }
+
+        var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
+
+
+        var createInstallScript = new CreateInstallScript(Logger, UseConsole, scriptFileNameForSave,
+            _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
+            serverData.Runtime, _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder,
+            serverData.ServerSideDeployFolder, _par.Project.ServiceName, sf.Name,
+            serverData.FilesUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
         return createInstallScript.Run();
     }
 }

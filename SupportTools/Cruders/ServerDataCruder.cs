@@ -26,6 +26,8 @@ public sealed class ServerDataCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUserName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUsersGroupName)));
         FieldEditors.Add(new RunTimeNameFieldEditor(nameof(ServerDataModel.Runtime), ParametersManager));
+        FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.ServerSideDownloadFolder)));
+        FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.ServerSideDeployFolder)));
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()

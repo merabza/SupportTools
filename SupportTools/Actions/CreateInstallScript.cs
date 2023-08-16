@@ -2,6 +2,7 @@
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportTools.ToolCommands;
+using SystemToolsShared;
 
 namespace SupportTools.Actions;
 
@@ -76,7 +77,9 @@ public class CreateInstallScript : ToolAction
 dotnetRunner=$(which dotnet 2>&1)
 
 result=$(hostname)
-myHostname=${result^}
+echo result is $result
+
+myHostname=${result%%.*}
 
 ftpSite={{_ftpSiteAddress}}
 user={{_ftpSiteUserName}}
@@ -99,85 +102,73 @@ mainDllFileName=$projectInstallFullPath/$projectName.dll
 LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
 
 echo downloadFilePrefix is $downloadFilePrefix
+echo downloadSettingsFilePrefixis $downloadSettingsFilePrefix
 
-if [ ! -e $dotnetRunner ]; then
+
+if [ ! -e $dotnetRunner ]
+then
   echo "dotnet runner $dotnetRunner does not exists"
   dotnetRunner=$(which dotnet 2>&1)
   echo "dotnet runner will use $dotnetRunner"
 fi
 
-if [ ! -e unzipRunner ]; then
-  echo "dotnet runner unzipRunner does not exists"
-  unzipRunner=$(which dotnet 2>&1)
-  echo "dotnet runner will use unzipRunner"
-fi
+
 
 echo The Argument ftpSite is $ftpSite
 if [ -z "$ftpSite" ]; then
   echo "ftpSite not specified, process finished!"
   exit 1
 fi
-
 echo The Argument user is $user
 if [ -z "$user" ]; then
   echo "user not specified, process finished!"
   exit 1
 fi
-
 echo The Argument pass is $pass
 if [ -z "$pass" ]; then
   echo "pass not specified, process finished!"
   exit 1
 fi
-
 echo The Argument directory is $directory
 if [ -z "$directory" ]; then
   echo "directory not specified, process finished!"
   exit 1
 fi
-
 echo The Argument projectName is $projectName
 if [ -z "$projectName" ]; then
   echo "projectName not specified, process finished!"
   exit 1
 fi
-
 echo The Argument runTime is $runTime
 if [ -z "$runTime" ]; then
   echo "runTime not specified, process finished!"
   exit 1
 fi
-
 echo The Argument downloadFilePrefix is $downloadFilePrefix
 if [ -z "$downloadFilePrefix" ]; then
   echo "downloadFilePrefix not specified, process finished!"
   exit 1
 fi
-
 echo The Argument downloadFolder is $downloadFolder
 if [ -z "$downloadFolder" ]; then
   echo "downloadFolder not specified, process finished!"
   exit 1
 fi
-
 echo The Argument deployFolder is $deployFolder
 if [ -z "$deployFolder" ]; then
   echo "deployFolder not specified, process finished!"
   exit 1
 fi
-
 echo The Argument ServiceName is $ServiceName
 if [ -z "$ServiceName" ]; then
   echo "ServiceName not specified, process finished!"
   exit 1
 fi
-
 echo The Argument SettingsFileName is $SettingsFileName
 if [ -z "$SettingsFileName" ]; then
   echo "SettingsFileName not specified, process finished!"
   exit 1
 fi
-
 echo The Argument userName is $userName
 if [ -z "$userName" ]; then
   echo "userName not specified, process finished!"
@@ -230,6 +221,8 @@ for f in $files_to_get; do
   fi
 done
 
+echo "zipfilename=$zipfilename"
+
 if [ -z "$zipfilename" ]; then
   echo "zip file with mask not found. process finished!"
   exit 1
@@ -243,7 +236,11 @@ cmd="get $zipfilename $downloadzipfilename
 
 echo cmd is $cmd
 
+
+
+
 rm $downloadzipfilename
+
 
 # go back and get the file(s)
 ftp -n $ftpSite <<fin 
@@ -277,6 +274,8 @@ for f in $files_to_get; do
   fi
 done
 
+echo "latestSettingsJsonFileName=$latestSettingsJsonFileName"
+
 if [ -z "$latestSettingsJsonFileName" ]; then
   echo "Settings json file with mask not found. process finished!"
   exit 2
@@ -303,28 +302,6 @@ binary
 $cmd
 quit
 fin
-
-#cp $SettingsFileName $expandedFolderName
-
-#echo Fix ClientApp permissions
-#sudo chmod g+x $expandedFolderName/publish/ClientApp
-#sudo chmod u+x $expandedFolderName/publish/ClientApp
-
-#sudo chmod g+x $expandedFolderName/publish/ClientApp/build/static
-#sudo chmod u+x $expandedFolderName/publish/ClientApp/build/static
-
-#echo check and create deploy folder $deployFolder
-#mkdir -p $deployFolder/wwwroot
-
-#echo remove current wwwroot
-#sudo rm -rf $deployFolder/wwwroot/*
-
-#echo move wwwroot
-#sudo mv  -v $expandedFolderName/publish/wwwroot/* $deployFolder/wwwroot/ > /dev/null 2>&1
-#rmdir $expandedFolderName/publish/wwwroot
-
-#cd $deployFolder/wwwroot
-#npm install
 
 if (( $(ps -ef | grep -v grep | grep $ServiceName | wc -l) > 0 )) 
 then
@@ -362,26 +339,11 @@ fin
 
 fi
 
-#echo remove old files except wwwroot
-#cd $deployFolder
-#find -maxdepth 1 ! -name wwwroot ! -name . -exec sudo rm -rv {} \; > /dev/null 2>&1
-
 echo remove old files
 rm -rf $projectInstallFullPath/*
 
 echo move files
 sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
-# > /dev/null 2>&1
-
-#echo copy settings
-#sudo cp $SettingsFileName $deployFolder/ > /dev/null 2>&1
-
-#echo Fix ClientApp permissions
-#sudo chmod g+x $deployFolder/ClientApp
-#sudo chmod u+x $deployFolder/ClientApp
-
-#sudo chmod g+x $deployFolder/ClientApp/build/static
-#sudo chmod u+x $deployFolder/ClientApp/build/static
 
 sudo systemctl enable $ServiceName.service
 
@@ -399,9 +361,15 @@ echo sudo journalctl -fu $ServiceName.service
 
 exit 0
 
-""";
 
-        File.WriteAllText(_scriptFileName, code);
-        return true;
+""";
+        if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
+        {
+            File.WriteAllText(_scriptFileName, code);
+            return true;
+        }
+
+        StShared.WriteErrorLine("File did not created", true);
+        return false;
     }
 }
