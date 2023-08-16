@@ -27,9 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Actions\" />
-    <Folder Include="ToolCommandParameters\" />
-    <Folder Include="ToolCommands\" />
     <Folder Include="ProgramManipulations\" />
   </ItemGroup>
 

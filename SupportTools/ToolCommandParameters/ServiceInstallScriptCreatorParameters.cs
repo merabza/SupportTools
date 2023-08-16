@@ -5,9 +5,9 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolCommandParameters;
 
-public class InstallScriptCreatorParameters : IParameters
+public class ServiceInstallScriptCreatorParameters : IParameters
 {
-    public static InstallScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
+    public static ServiceInstallScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
@@ -27,11 +27,11 @@ public class InstallScriptCreatorParameters : IParameters
         var fileStorageForDownload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        return new InstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName, project,
+        return new ServiceInstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName, project,
             serverInfo, fileStorageForDownload);
     }
 
-    private InstallScriptCreatorParameters(string? securityFolder, string projectName, ProjectModel project,
+    private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName, ProjectModel project,
         ServerInfoModel serverInfo, FileStorageData fileStorageForExchange)
     {
         SecurityFolder = securityFolder;

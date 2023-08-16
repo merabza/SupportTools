@@ -1,0 +1,84 @@
+﻿using CliParameters;
+using LibParameters;
+using Microsoft.Extensions.Logging;
+using SupportTools.ToolCommandParameters;
+using System.IO;
+using LibMenuInput;
+using SupportTools.Actions;
+using SystemToolsShared;
+using SupportToolsData.Models;
+
+namespace SupportTools.ToolCommands;
+
+public class ServiceRemoveScriptCreator : ToolCommand
+{
+    private readonly ServiceRemoveScriptCreatorParameters _par;
+    private const string ActionName = "Creating Service Remove Script";
+    private const string ActionDescription = "Creating Service Remove Script";
+
+    public ServiceRemoveScriptCreator(ILogger logger, bool useConsole, ServiceRemoveScriptCreatorParameters par,
+        IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
+        ActionDescription)
+    {
+        _par = par;
+    }
+
+
+    protected override bool RunAction()
+    {
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.ServerName))
+        {
+            StShared.WriteErrorLine(
+                $"ServerName is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.ServerInfo.EnvironmentName))
+        {
+            StShared.WriteErrorLine(
+                $"EnvironmentName is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+                true);
+            return false;
+        }
+
+        var securityFolder = _par.SecurityFolder;
+        string? defCloneFile = null;
+        if (securityFolder is not null)
+            defCloneFile = Path.Combine(securityFolder, _par.ProjectName, _par.ServerInfo.ServerName,
+                _par.ServerInfo.EnvironmentName, $"{_par.ProjectName}Remove.sh");
+        var scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
+        if (scriptFileNameForSave is null)
+        {
+            StShared.WriteErrorLine("file name for Generate is not specified", true);
+            return false;
+        }
+
+        if (ParametersManager is null)
+        {
+            StShared.WriteErrorLine("ParametersManager is null", true);
+            return false;
+        }
+
+        var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
+
+        if (string.IsNullOrWhiteSpace(serverData.ServerSideDeployFolder))
+        {
+            StShared.WriteErrorLine(
+                $"serverData.ServerSideDeployFolder is not specified for server {_par.ServerInfo.ServerName}", true);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_par.Project.ServiceName))
+        {
+            StShared.WriteErrorLine($"Project.ServiceName is not specified for server {_par.ProjectName}", true);
+            return false;
+        }
+
+        var createRemoveScript = new CreateServiceRemoveScript(Logger, UseConsole, scriptFileNameForSave,
+            _par.ProjectName, _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder,
+            _par.Project.ServiceName);
+        return createRemoveScript.Run();
+    }
+}

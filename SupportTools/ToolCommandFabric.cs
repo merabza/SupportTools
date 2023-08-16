@@ -37,12 +37,13 @@ public static class ToolCommandFabric
         ETools.AppSettingsInstaller,
         ETools.AppSettingsUpdater,
         ETools.DevBaseToProdCopier,
-        ETools.InstallScriptCreator,
         ETools.ProdBaseToDevCopier,
         ETools.ProgPublisher,
         ETools.ProgramInstaller,
         ETools.ProgramUpdater,
         ETools.ProgRemover,
+        ETools.ServiceInstallScriptCreator,
+        ETools.ServiceRemoveScriptCreator,
         ETools.ServiceStarter,
         ETools.ServiceStopper,
         ETools.VersionChecker,
@@ -126,7 +127,6 @@ public static class ToolCommandFabric
                     return new DataSeeder(logger, true, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);
                 return null;
-            case ETools.InstallScriptCreator:
             case ETools.AppSettingsEncoder:
             case ETools.AppSettingsInstaller:
             case ETools.AppSettingsUpdater:
@@ -134,6 +134,8 @@ public static class ToolCommandFabric
             case ETools.ProgramInstaller:
             case ETools.ProgramUpdater:
             case ETools.ProgRemover:
+            case ETools.ServiceInstallScriptCreator:
+            case ETools.ServiceRemoveScriptCreator:
             case ETools.ServiceStarter:
             case ETools.ServiceStopper:
             case ETools.VersionChecker:
@@ -183,13 +185,6 @@ public static class ToolCommandFabric
                 if (copyBaseParametersDevToProd is not null)
                     return new BaseCopier(logger, true, copyBaseParametersDevToProd, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
-                return null;
-            case ETools.InstallScriptCreator:
-                var installScriptCreatorParameters =
-                    InstallScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
-                if (installScriptCreatorParameters is not null)
-                    return new InstallScriptCreator(logger, true, installScriptCreatorParameters, parametersManager);
-                StShared.WriteErrorLine("installScriptCreatorParameters is not created", true);
                 return null;
             case ETools.ProdBaseToDevCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var copyBaseParametersProdToDev =
@@ -265,6 +260,22 @@ public static class ToolCommandFabric
                 if (serviceStartStopParameters is not null)
                     return new ProgramRemover(logger, true, serviceStartStopParameters, parametersManager);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
+                return null;
+            case ETools.ServiceInstallScriptCreator:
+                var serviceInstallScriptCreatorParameters =
+                    ServiceInstallScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
+                if (serviceInstallScriptCreatorParameters is not null)
+                    return new ServiceInstallScriptCreator(logger, true, serviceInstallScriptCreatorParameters,
+                        parametersManager);
+                StShared.WriteErrorLine("ServiceInstallScriptCreatorParameters is not created", true);
+                return null;
+            case ETools.ServiceRemoveScriptCreator:
+                var serviceRemoveScriptCreatorParameters =
+                    ServiceRemoveScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
+                if (serviceRemoveScriptCreatorParameters is not null)
+                    return new ServiceRemoveScriptCreator(logger, true, serviceRemoveScriptCreatorParameters,
+                        parametersManager);
+                StShared.WriteErrorLine("ServiceRemoveScriptCreatorParameters is not created", true);
                 return null;
             case ETools.ServiceStarter: //სერვისის გამშვები სერვერის მხარეს
                 var serviceStartParameters =

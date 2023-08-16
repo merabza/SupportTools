@@ -10,24 +10,39 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ToolTaskCliMenuCommand : CliMenuCommand
 {
-    private readonly IToolCommand? _toolCommand;
+    private readonly ILogger _logger;
+    private readonly ETools _tool;
+    private readonly string _projectName;
+    private readonly ServerInfoModel? _serverInfo;
+    private readonly IParametersManager _parametersManager;
+    private IToolCommand? _toolCommand;
 
     public ToolTaskCliMenuCommand(ILogger logger, ETools tool, string projectName, ServerInfoModel? serverInfo,
         IParametersManager parametersManager) : base(null, null, true)
     {
-        _toolCommand = serverInfo is null
-            ? ToolCommandFabric.Create(logger, tool, parametersManager, projectName)
-            : ToolCommandFabric.Create(logger, tool, parametersManager, projectName, serverInfo);
+        _logger = logger;
+        _tool = tool;
+        _projectName = projectName;
+        _serverInfo = serverInfo;
+        _parametersManager = parametersManager;
+    }
+
+    private IToolCommand? MemoCreateToolCommand()
+    {
+        return _toolCommand ??= _serverInfo is null
+            ? ToolCommandFabric.Create(_logger, _tool, _parametersManager, _projectName)
+            : ToolCommandFabric.Create(_logger, _tool, _parametersManager, _projectName, _serverInfo);
     }
 
     protected override string? GetActionDescription()
     {
-        return _toolCommand?.Description;
+        return MemoCreateToolCommand()?.Description;
     }
 
     protected override void RunAction()
     {
-        if (_toolCommand?.Par == null)
+        var toolCommand = MemoCreateToolCommand();
+        if (toolCommand?.Par == null)
         {
             Console.WriteLine("Parameters not loaded. Tool not started.");
             StShared.Pause();
@@ -40,7 +55,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
         Console.WriteLine("Tools is running...");
         Console.WriteLine("---");
 
-        _toolCommand.Run();
+        toolCommand.Run();
 
         Console.WriteLine("---");
 

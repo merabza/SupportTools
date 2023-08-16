@@ -11,13 +11,13 @@ using SupportToolsData.Models;
 
 namespace SupportTools.ToolCommands;
 
-public class InstallScriptCreator : ToolCommand
+public class ServiceInstallScriptCreator : ToolCommand
 {
-    private readonly InstallScriptCreatorParameters _par;
-    private const string ActionName = "Creating Install Script";
-    private const string ActionDescription = "Creating Install Script";
+    private readonly ServiceInstallScriptCreatorParameters _par;
+    private const string ActionName = "Creating Service Install Script";
+    private const string ActionDescription = "Creating Service Install Script";
 
-    public InstallScriptCreator(ILogger logger, bool useConsole, InstallScriptCreatorParameters par,
+    public ServiceInstallScriptCreator(ILogger logger, bool useConsole, ServiceInstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
         ActionDescription)
     {
@@ -157,7 +157,7 @@ public class InstallScriptCreator : ToolCommand
         var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
 
 
-        var createInstallScript = new CreateInstallScript(Logger, UseConsole, scriptFileNameForSave,
+        var createInstallScript = new CreateServiceInstallScript(Logger, UseConsole, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             serverData.Runtime, _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder,
             serverData.ServerSideDeployFolder, _par.Project.ServiceName, sf.Name,

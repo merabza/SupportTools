@@ -6,7 +6,7 @@ using SystemToolsShared;
 
 namespace SupportTools.Actions;
 
-public class CreateInstallScript : ToolAction
+public class CreateServiceInstallScript : ToolAction
 {
     private readonly string _scriptFileName;
     private readonly int _portNumber;
@@ -24,11 +24,11 @@ public class CreateInstallScript : ToolAction
     private readonly string _serverSideServiceUserName;
     private readonly int _ftpSiteLsFileOffset;
 
-    public CreateInstallScript(ILogger logger, bool useConsole, string scriptFileName, int portNumber,
+    public CreateServiceInstallScript(ILogger logger, bool useConsole, string scriptFileName, int portNumber,
         string ftpSiteAddress, string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory,
         string projectName, string runTime, string environmentName, string serverSideDownloadFolder,
         string serverSideDeployFolder, string serviceName, string settingsFileName, string serverSideServiceUserName,
-        int ftpSiteLsFileOffset) : base(logger, useConsole, nameof(InstallScriptCreator))
+        int ftpSiteLsFileOffset) : base(logger, useConsole, nameof(ServiceInstallScriptCreator))
     {
         _scriptFileName = scriptFileName;
         _portNumber = portNumber;
@@ -54,13 +54,13 @@ public class CreateInstallScript : ToolAction
 
     protected override bool RunAction()
     {
-        //var sb = new StringBuilder();
+        var sf = new FileInfo(_scriptFileName);
 
         var code =
             $$"""
 #!/bin/bash
 
-# FirstWebAgentLinuxInstall.sh
+# {{sf.Name}}
 
 #The following steps are required for this script to work on the server
 #1. Unzip must be installed
@@ -92,7 +92,7 @@ downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
 downloadSettingsFilePrefix="$myHostname-$environmentName-$projectName-"
 downloadFolder={{_serverSideDownloadFolder}}
 deployFolder={{_serverSideDeployFolder}}
-ServiceName={{_serviceName}}
+ServiceName={{_serviceName}}{{_environmentName}}
 SettingsFileName={{_settingsFileName}}
 userName={{_serverSideServiceUserName}}
 
