@@ -9,7 +9,7 @@ public sealed class GitProjects
 {
     private readonly Dictionary<string, GitProjectDataDomain> _gitProjects;
 
-    public GitProjects(Dictionary<string, GitProjectDataDomain> gitProjects)
+    private GitProjects(Dictionary<string, GitProjectDataDomain> gitProjects)
     {
         _gitProjects = gitProjects;
     }
@@ -42,24 +42,24 @@ public sealed class GitProjects
     public static GitProjects Create(ILogger logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
         Dictionary<string, GitProjectDataDomain> gitProjects = new();
-        foreach (var kvp in gitPrs)
+        foreach (var (key, value) in gitPrs)
         {
-            if (string.IsNullOrWhiteSpace(kvp.Value.GitName))
+            if (string.IsNullOrWhiteSpace(value.GitName))
             {
-                logger.LogError("GitName is empty for Git Project with key {0})", kvp.Key);
+                logger.LogError("GitName is empty for Git Project with key {key})", key);
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(kvp.Value.ProjectRelativePath))
+            if (string.IsNullOrWhiteSpace(value.ProjectRelativePath))
             {
-                logger.LogError("ProjectRelativePath is empty for Git Project with key {0})", kvp.Key);
+                logger.LogError("ProjectRelativePath is empty for Git Project with key {key})", key);
                 continue;
             }
 
-            var dependsOnProjectNames = kvp.Value.DependsOnProjectNames;
+            var dependsOnProjectNames = value.DependsOnProjectNames;
 
-            gitProjects.Add(kvp.Key,
-                new GitProjectDataDomain(kvp.Value.GitName, kvp.Value.ProjectRelativePath,
+            gitProjects.Add(key,
+                new GitProjectDataDomain(value.GitName, value.ProjectRelativePath,
                     dependsOnProjectNames));
         }
 
@@ -68,13 +68,13 @@ public sealed class GitProjects
 
     public GitProjectDataDomain GetGitProjectByKey(string key)
     {
-        if (_gitProjects.ContainsKey(key))
-            return _gitProjects[key];
+        if (_gitProjects.TryGetValue(key, out var byKey))
+            return byKey;
         throw new Exception($"GitProject With Key {key} does not found");
     }
 
     public GitProjectDataDomain? GetGitProjectIfExistsByKey(string key)
     {
-        return _gitProjects.ContainsKey(key) ? _gitProjects[key] : null;
+        return _gitProjects.TryGetValue(key, out var project) ? project : null;
     }
 }

@@ -36,12 +36,12 @@ public static class ToolCommandFabric
         ETools.AppSettingsEncoder,
         ETools.AppSettingsInstaller,
         ETools.AppSettingsUpdater,
-        ETools.DevBaseToProdCopier,
-        ETools.ProdBaseToDevCopier,
+        ETools.LocalBaseToServerCopier,
         ETools.ProgPublisher,
         ETools.ProgramInstaller,
         ETools.ProgramUpdater,
         ETools.ProgRemover,
+        ETools.ServerBaseToLocalCopier,
         ETools.ServiceInstallScriptCreator,
         ETools.ServiceRemoveScriptCreator,
         ETools.ServiceStarter,
@@ -130,17 +130,17 @@ public static class ToolCommandFabric
             case ETools.AppSettingsEncoder:
             case ETools.AppSettingsInstaller:
             case ETools.AppSettingsUpdater:
+            case ETools.LocalBaseToServerCopier:
             case ETools.ProgPublisher:
             case ETools.ProgramInstaller:
             case ETools.ProgramUpdater:
             case ETools.ProgRemover:
+            case ETools.ServerBaseToLocalCopier:
             case ETools.ServiceInstallScriptCreator:
             case ETools.ServiceRemoveScriptCreator:
             case ETools.ServiceStarter:
             case ETools.ServiceStopper:
             case ETools.VersionChecker:
-            case ETools.ProdBaseToDevCopier:
-            case ETools.DevBaseToProdCopier:
             default:
                 StShared.WriteErrorLine("Command tool does not created", true, logger);
                 return null;
@@ -178,21 +178,13 @@ public static class ToolCommandFabric
                     return new AppSettingsUpdater(logger, true, appSettingsUpdaterParameters, parametersManager);
                 StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
                 return null;
-            case ETools.DevBaseToProdCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+            case ETools.LocalBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var copyBaseParametersDevToProd =
                     CopyBaseParametersFabric.CreateCopyBaseParameters(logger, false, supportToolsParameters,
                         projectName, serverInfo);
                 if (copyBaseParametersDevToProd is not null)
                     return new BaseCopier(logger, true, copyBaseParametersDevToProd, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
-                return null;
-            case ETools.ProdBaseToDevCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
-                var copyBaseParametersProdToDev =
-                    CopyBaseParametersFabric.CreateCopyBaseParameters(logger, true, supportToolsParameters, projectName,
-                        serverInfo);
-                if (copyBaseParametersProdToDev is not null)
-                    return new BaseCopier(logger, true, copyBaseParametersProdToDev, parametersManager);
-                StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);
                 return null;
             case ETools.ProgPublisher: //  Publish, //პროგრამის საინსტალაციო პაკეტის გამზადება
                 //+(CreatePackage=>UploadPackage=>EncodeParameters=>UploadParameters)
@@ -260,6 +252,14 @@ public static class ToolCommandFabric
                 if (serviceStartStopParameters is not null)
                     return new ProgramRemover(logger, true, serviceStartStopParameters, parametersManager);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
+                return null;
+            case ETools.ServerBaseToLocalCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+                var copyBaseParametersProdToDev =
+                    CopyBaseParametersFabric.CreateCopyBaseParameters(logger, true, supportToolsParameters, projectName,
+                        serverInfo);
+                if (copyBaseParametersProdToDev is not null)
+                    return new BaseCopier(logger, true, copyBaseParametersProdToDev, parametersManager);
+                StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);
                 return null;
             case ETools.ServiceInstallScriptCreator:
                 var serviceInstallScriptCreatorParameters =
