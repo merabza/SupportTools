@@ -84,9 +84,10 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
 
         //სერვერების ჩამონათვალი
         if (project?.ServerInfos != null)
-            foreach (var kvp in project.ServerInfos.OrderBy(o => o.Key))
+            foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 projectSubMenuSet.AddMenuItem(
-                    new ServerInfoSubMenuCommand(_logger, _parametersManager, _projectName, kvp.Key), kvp.Key);
+                    new ServerInfoSubMenuCommand(_logger, _parametersManager, _projectName, kvp.Key),
+                    kvp.Value.GetItemKey());
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

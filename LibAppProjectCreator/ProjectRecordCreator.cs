@@ -136,7 +136,7 @@ internal sealed class ProjectRecordCreator
 
         if (serverData is null)
         {
-            StShared.WriteErrorLine($"server with name {productionServerName} does not exists", true, _logger);
+            StShared.WriteErrorLine($"server with name {productionServerName} is not exists 1", true, _logger);
             return false;
         }
 

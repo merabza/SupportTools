@@ -47,7 +47,7 @@ public sealed class ProjectModel : ItemData
     public ServerInfoModel GetServerInfoRequired(string serverName)
     {
         return GetServerInfo(serverName) ??
-               throw new InvalidOperationException($"Server with name {serverName} does not exists in project");
+               throw new InvalidOperationException($"Server with name {serverName} is not exists in project");
     }
 
     public ServerInfoModel? GetServerInfo(string serverName)

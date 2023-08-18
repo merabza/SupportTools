@@ -35,7 +35,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 
             if (server is null)
             {
-                StShared.WriteErrorLine($"Server with name {_serverName} does not exists", true);
+                StShared.WriteErrorLine($"Server with name {_serverName} is not exists 2", true);
                 return;
             }
 

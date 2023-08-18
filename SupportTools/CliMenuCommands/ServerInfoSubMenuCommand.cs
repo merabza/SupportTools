@@ -14,8 +14,7 @@ public sealed class ServerInfoSubMenuCommand : CliMenuCommand
     private readonly string _serverName;
 
     public ServerInfoSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        string serverName) : base(
-        serverName)
+        string serverName) : base(serverName)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -32,7 +31,7 @@ public sealed class ServerInfoSubMenuCommand : CliMenuCommand
     public override CliMenuSet GetSubmenu()
     {
         ServerInfoCruder serverInfoCruder = new(_logger, _parametersManager, _projectName);
-        var serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName);//, $"Project => {_projectName} => ");
+        var serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName); //, $"Project => {_projectName} => ");
 
         return serverSubMenuSet;
     }

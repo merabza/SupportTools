@@ -126,7 +126,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public ServerDataModel GetServerDataRequired(string serverName)
     {
         return GetServerData(serverName) ??
-               throw new InvalidOperationException($"server with name {serverName} does not found");
+               throw new InvalidOperationException($"server with name {serverName} is not found");
     }
 
     public ServerDataModel? GetServerData(string serverName)
@@ -137,7 +137,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public ProjectModel GetProjectRequired(string projectName)
     {
         return GetProject(projectName) ??
-               throw new InvalidOperationException($"project with name {projectName} does not found");
+               throw new InvalidOperationException($"project with name {projectName} is not found");
     }
 
     public ProjectModel? GetProject(string projectName)
