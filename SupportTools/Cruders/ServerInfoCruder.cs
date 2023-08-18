@@ -44,7 +44,6 @@ public sealed class ServerInfoCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
-        //FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.InstallScriptFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
         FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger,
             nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
@@ -87,7 +86,7 @@ public sealed class ServerInfoCruder : ParCruder
             throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var project = parameters.GetProject(_projectName);
-        if (project == null)
+        if (project is null)
             throw new Exception($"Project with name {_projectName} not found");
         project.ServerInfos.Add(recordKey, newServer);
     }
@@ -116,8 +115,7 @@ public sealed class ServerInfoCruder : ParCruder
 
 
         //დასაშვები ინსტრუმენტების არჩევა
-        itemSubMenuSet.AddMenuItem(
-            new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey),
+        itemSubMenuSet.AddMenuItem(new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey),
             "Select Allow tools...");
 
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
@@ -130,7 +128,6 @@ public sealed class ServerInfoCruder : ParCruder
         foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ??
                      new List<ETools>()))
             itemSubMenuSet.AddMenuItem(
-                new ToolTaskCliMenuCommand(_logger, tool, _projectName, server, ParametersManager),
-                tool.ToString());
+                new ToolTaskCliMenuCommand(_logger, tool, _projectName, server, ParametersManager), tool.ToString());
     }
 }
