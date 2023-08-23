@@ -1,13 +1,13 @@
-﻿using Installer.Domain;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Installer.Domain;
 using Installer.Models;
 using LanguageExt;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibFileParameters.Interfaces;
 using LibFileParameters.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace SupportToolsData.Models;
 
@@ -39,11 +39,11 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, GitDataModel> Gits { get; init; } = new();
     public Dictionary<string, string> ReactAppTemplates { get; init; } = new();
     public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = new();
+    public Dictionary<string, string> Environments { get; set; } = new();
     public Dictionary<string, ApiClientSettings> ApiClients { get; set; } = new();
     public Dictionary<string, ArchiverData> Archivers { get; set; } = new();
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; set; } = new();
     public Dictionary<string, FileStorageData> FileStorages { get; set; } = new();
-    public Dictionary<string, string> Environments { get; set; } = new();
 
     public bool CheckBeforeSave()
     {

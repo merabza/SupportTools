@@ -1,5 +1,4 @@
-﻿using DbTools.Models;
-using Installer.Domain;
+﻿using Installer.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 

@@ -1,25 +1,26 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using CliMenu;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class NewGitCliMenuCommand : CliMenuCommand
 {
+    private readonly EGitCol _gitCol;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
-    private readonly EGitCol _gitCol;
 
     //ახალი პროექტის შექმნის ამოცანა
-    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
+    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+        EGitCol gitCol) : base(
         "Add Git Project")
     {
         _logger = logger;

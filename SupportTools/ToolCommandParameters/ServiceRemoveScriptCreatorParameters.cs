@@ -6,19 +6,6 @@ namespace SupportTools.ToolCommandParameters;
 
 public class ServiceRemoveScriptCreatorParameters : IParameters
 {
-    public static ServiceRemoveScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, ServerInfoModel serverInfo)
-    {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
-
-        if (project.IsService)
-            return new ServiceRemoveScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,
-                serverInfo, project);
-
-        StShared.WriteErrorLine($"Project {projectName} is not service", true);
-        return null;
-    }
-
     private ServiceRemoveScriptCreatorParameters(string? securityFolder, string projectName, ServerInfoModel serverInfo,
         ProjectModel project)
     {
@@ -36,5 +23,18 @@ public class ServiceRemoveScriptCreatorParameters : IParameters
     public bool CheckBeforeSave()
     {
         return true;
+    }
+
+    public static ServiceRemoveScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo)
+    {
+        var project = supportToolsParameters.GetProjectRequired(projectName);
+
+        if (project.IsService)
+            return new ServiceRemoveScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,
+                serverInfo, project);
+
+        StShared.WriteErrorLine($"Project {projectName} is not service", true);
+        return null;
     }
 }

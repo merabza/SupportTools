@@ -1,21 +1,21 @@
-﻿using CliParameters;
+﻿using System;
+using System.IO;
+using CliParameters;
+using LibMenuInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Actions;
 using SupportTools.ToolCommandParameters;
-using System;
-using System.IO;
-using LibMenuInput;
-using SystemToolsShared;
 using SupportToolsData.Models;
+using SystemToolsShared;
 
 namespace SupportTools.ToolCommands;
 
 public class ServiceInstallScriptCreator : ToolCommand
 {
-    private readonly ServiceInstallScriptCreatorParameters _par;
     private const string ActionName = "Creating Service Install Script";
     private const string ActionDescription = "Creating Service Install Script";
+    private readonly ServiceInstallScriptCreatorParameters _par;
 
     public ServiceInstallScriptCreator(ILogger logger, bool useConsole, ServiceInstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
@@ -52,7 +52,7 @@ public class ServiceInstallScriptCreator : ToolCommand
         var startPath = uri.AbsolutePath;
         var port = uri.Port;
 
-        var ftpSiteAddress = (port == 21) ? hostName : $"\"{hostName} {port}\"";
+        var ftpSiteAddress = port == 21 ? hostName : $"\"{hostName} {port}\"";
 
         var userName = _par.FileStorageForExchange.UserName;
         if (string.IsNullOrWhiteSpace(userName))
@@ -115,7 +115,7 @@ public class ServiceInstallScriptCreator : ToolCommand
         var scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
         if (scriptFileNameForSave is null)
         {
-            StShared.WriteErrorLine($"file name for Generate is not specified", true);
+            StShared.WriteErrorLine("file name for Generate is not specified", true);
             return false;
         }
 

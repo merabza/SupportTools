@@ -27,7 +27,7 @@ public sealed class EnvironmentCruder : ParCruder
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         var environments = GetEnvironments();
-        return environments.ToDictionary(k => k.Key, v => (ItemData)new TextItemData() { Text = v.Value });
+        return environments.ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
     }
 
     public override bool ContainsRecordWithKey(string recordKey)

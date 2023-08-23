@@ -7,6 +7,27 @@ namespace SupportTools.ToolCommandParameters;
 
 public class ServiceInstallScriptCreatorParameters : IParameters
 {
+    private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName, ProjectModel project,
+        ServerInfoModel serverInfo, FileStorageData fileStorageForExchange)
+    {
+        SecurityFolder = securityFolder;
+        ProjectName = projectName;
+        Project = project;
+        ServerInfo = serverInfo;
+        FileStorageForExchange = fileStorageForExchange;
+    }
+
+    public string? SecurityFolder { get; }
+    public string ProjectName { get; }
+    public ProjectModel Project { get; }
+    public ServerInfoModel ServerInfo { get; }
+    public FileStorageData FileStorageForExchange { get; }
+
+    public bool CheckBeforeSave()
+    {
+        return true;
+    }
+
     public static ServiceInstallScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
@@ -29,26 +50,5 @@ public class ServiceInstallScriptCreatorParameters : IParameters
 
         return new ServiceInstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName, project,
             serverInfo, fileStorageForDownload);
-    }
-
-    private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName, ProjectModel project,
-        ServerInfoModel serverInfo, FileStorageData fileStorageForExchange)
-    {
-        SecurityFolder = securityFolder;
-        ProjectName = projectName;
-        Project = project;
-        ServerInfo = serverInfo;
-        FileStorageForExchange = fileStorageForExchange;
-    }
-
-    public string? SecurityFolder { get; }
-    public string ProjectName { get; }
-    public ProjectModel Project { get; }
-    public ServerInfoModel ServerInfo { get; }
-    public FileStorageData FileStorageForExchange { get; }
-
-    public bool CheckBeforeSave()
-    {
-        return true;
     }
 }

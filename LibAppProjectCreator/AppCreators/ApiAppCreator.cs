@@ -1,4 +1,6 @@
-﻿using CodeTools;
+﻿using System;
+using System.Collections.Generic;
+using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
@@ -11,8 +13,6 @@ using LibAppProjectCreator.React;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;

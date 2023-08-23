@@ -28,7 +28,7 @@ public static class ToolCommandFabric
         ETools.JsonFromProjectDbProjectGetter,
         ETools.RecreateDevDatabase,
         ETools.ScaffoldSeederCreator,
-        ETools.SeedData,
+        ETools.SeedData
     };
 
     public static readonly ETools[] ToolsByProjectsAndServers =
@@ -46,7 +46,7 @@ public static class ToolCommandFabric
         ETools.ServiceRemoveScriptCreator,
         ETools.ServiceStarter,
         ETools.ServiceStopper,
-        ETools.VersionChecker,
+        ETools.VersionChecker
     };
 
     public static IToolCommand? Create(ILogger logger, ETools tool, IParametersManager parametersManager,

@@ -4,7 +4,6 @@ using System.Linq;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
-using CliParameters.MenuCommands;
 using LibAppProjectCreator.Git;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -117,13 +116,11 @@ public sealed class GitCruder : ParCruder
         var projects = parameters.Projects;
 
         foreach (var projectKvp in projects)
-        {
             if (projectKvp.Value.GitProjectNames.Contains(recordKey))
             {
                 var itemSubMenuCommand = new InfoCommand(projectKvp.Key);
                 itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
             }
-        }
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

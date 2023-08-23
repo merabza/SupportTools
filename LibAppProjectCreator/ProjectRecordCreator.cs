@@ -1,4 +1,6 @@
-﻿using CliParametersDataEdit.Models;
+﻿using System.Collections.Generic;
+using System.IO;
+using CliParametersDataEdit.Models;
 using DbTools;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
@@ -6,8 +8,6 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System.Collections.Generic;
-using System.IO;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator;

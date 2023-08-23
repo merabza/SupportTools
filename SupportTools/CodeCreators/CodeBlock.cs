@@ -6,8 +6,8 @@ namespace SupportTools.CodeCreators;
 
 public sealed class SshCodeBlock : CodeBlockBase, ICodeItem
 {
-    private readonly string _openDelimiter;
     private readonly string _closeDelimiter;
+    private readonly string _openDelimiter;
 
     public SshCodeBlock(string blockHeader, string openDelimiter, string closeDelimiter, params object?[] codeList) :
         base(codeList)

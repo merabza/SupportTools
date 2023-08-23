@@ -1,13 +1,13 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -38,7 +38,7 @@ public sealed class GitSubMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubmenu()
     {
-        CliMenuSet gitSubMenuSet = new($"GitProjects");
+        CliMenuSet gitSubMenuSet = new("GitProjects");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

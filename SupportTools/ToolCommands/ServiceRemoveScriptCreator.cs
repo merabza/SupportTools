@@ -1,20 +1,20 @@
-﻿using CliParameters;
+﻿using System.IO;
+using CliParameters;
+using LibMenuInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportTools.ToolCommandParameters;
-using System.IO;
-using LibMenuInput;
 using SupportTools.Actions;
-using SystemToolsShared;
+using SupportTools.ToolCommandParameters;
 using SupportToolsData.Models;
+using SystemToolsShared;
 
 namespace SupportTools.ToolCommands;
 
 public class ServiceRemoveScriptCreator : ToolCommand
 {
-    private readonly ServiceRemoveScriptCreatorParameters _par;
     private const string ActionName = "Creating Service Remove Script";
     private const string ActionDescription = "Creating Service Remove Script";
+    private readonly ServiceRemoveScriptCreatorParameters _par;
 
     public ServiceRemoveScriptCreator(ILogger logger, bool useConsole, ServiceRemoveScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,

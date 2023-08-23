@@ -7,6 +7,7 @@ namespace LibAppInstallWork.Actions;
 
 public sealed class InstallProgramAction : ToolAction
 {
+    private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly string _parametersFileDateMask;
@@ -14,7 +15,6 @@ public sealed class InstallProgramAction : ToolAction
     private readonly string _programArchiveDateMask;
     private readonly string _programArchiveExtension;
     private readonly string _projectName;
-    private readonly string _environmentName;
 
     private string? _installingProgramVersion;
 

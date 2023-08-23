@@ -18,7 +18,6 @@
     <ProjectReference Include="..\..\AppCliTools\CliParametersEdit\CliParametersEdit.csproj" />
     <ProjectReference Include="..\..\AppCliTools\LibMenuInput\LibMenuInput.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />

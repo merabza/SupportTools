@@ -1,4 +1,6 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using CliMenu;
 using LibAppProjectCreator.Git;
 using LibAppProjectCreator.Models;
 using LibDataInput;
@@ -6,8 +8,6 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;

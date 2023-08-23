@@ -10,9 +10,9 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ProgramPublisher : ToolCommand
 {
-    private readonly ProgramPublisherParameters _parameters;
     private const string ActionName = "Publishing App";
     private const string ActionDescription = "Publishing App";
+    private readonly ProgramPublisherParameters _parameters;
 
     public ProgramPublisher(ILogger logger, bool useConsole, ProgramPublisherParameters parameters,
         IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,

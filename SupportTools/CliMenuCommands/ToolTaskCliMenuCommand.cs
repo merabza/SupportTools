@@ -11,10 +11,10 @@ namespace SupportTools.CliMenuCommands;
 public sealed class ToolTaskCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
-    private readonly ETools _tool;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel? _serverInfo;
-    private readonly IParametersManager _parametersManager;
+    private readonly ETools _tool;
     private IToolCommand? _toolCommand;
 
     public ToolTaskCliMenuCommand(ILogger logger, ETools tool, string projectName, ServerInfoModel? serverInfo,

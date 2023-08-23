@@ -8,21 +8,21 @@ namespace SupportTools.Actions;
 
 public class CreateServiceInstallScript : ToolAction
 {
-    private readonly string _scriptFileName;
-    private readonly int _portNumber;
+    private readonly string _environmentName;
     private readonly string _ftpSiteAddress;
-    private readonly string _ftpSiteUserName;
-    private readonly string _ftpSitePassword;
     private readonly string _ftpSiteDirectory;
+    private readonly int _ftpSiteLsFileOffset;
+    private readonly string _ftpSitePassword;
+    private readonly string _ftpSiteUserName;
+    private readonly int _portNumber;
     private readonly string _projectName;
     private readonly string _runTime;
-    private readonly string _environmentName;
-    private readonly string _serverSideDownloadFolder;
+    private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
+    private readonly string _serverSideDownloadFolder;
+    private readonly string _serverSideServiceUserName;
     private readonly string _serviceName;
     private readonly string _settingsFileName;
-    private readonly string _serverSideServiceUserName;
-    private readonly int _ftpSiteLsFileOffset;
 
     public CreateServiceInstallScript(ILogger logger, bool useConsole, string scriptFileName, int portNumber,
         string ftpSiteAddress, string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory,
@@ -58,311 +58,311 @@ public class CreateServiceInstallScript : ToolAction
 
         var code =
             $$"""
-#!/bin/bash
-
-# {{sf.Name}}
-
-#The following steps are required for this script to work on the server
-#1. Unzip must be installed
-#sudo apt install unzip
-#2. dotnet must be installed
-#sudo snap install dotnet-sdk --classic
-#3. run which dotnet command to understand where dotnet is
-#which dotnet
-#4. Open {{_portNumber}} Port for WebAgent
-#sudo iptables -A INPUT -p tcp --dport {{_portNumber}} -j ACCEPT
-#5. Open 5032 Port for WebAgentInstaller
-#sudo iptables -A INPUT -p tcp --dport 5032 -j ACCEPT
-
-dotnetRunner=$(which dotnet 2>&1)
-
-result=$(hostname)
-echo result is $result
-
-myHostname=${result%%.*}
-
-ftpSite={{_ftpSiteAddress}}
-user={{_ftpSiteUserName}}
-pass={{_ftpSitePassword}}
-directory={{_ftpSiteDirectory}}
-projectName={{_projectName}}
-runTime={{_runTime}}
-environmentName={{_environmentName}}
-downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
-downloadSettingsFilePrefix="$myHostname-$environmentName-$projectName-"
-downloadFolder={{_serverSideDownloadFolder}}
-deployFolder={{_serverSideDeployFolder}}
-ServiceName={{_serviceName}}{{_environmentName}}
-SettingsFileName={{_settingsFileName}}
-userName={{_serverSideServiceUserName}}
-
-projectInstallFullPath=$deployFolder/$projectName/$environmentName
-mainDllFileName=$projectInstallFullPath/$projectName.dll
-
-LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
-
-echo downloadFilePrefix is $downloadFilePrefix
-echo downloadSettingsFilePrefixis $downloadSettingsFilePrefix
-
-
-if [ ! -e $dotnetRunner ]
-then
-  echo "dotnet runner $dotnetRunner does not exists"
-  dotnetRunner=$(which dotnet 2>&1)
-  echo "dotnet runner will use $dotnetRunner"
-fi
-
-
-
-echo The Argument ftpSite is $ftpSite
-if [ -z "$ftpSite" ]; then
-  echo "ftpSite not specified, process finished!"
-  exit 1
-fi
-echo The Argument user is $user
-if [ -z "$user" ]; then
-  echo "user not specified, process finished!"
-  exit 1
-fi
-echo The Argument pass is $pass
-if [ -z "$pass" ]; then
-  echo "pass not specified, process finished!"
-  exit 1
-fi
-echo The Argument directory is $directory
-if [ -z "$directory" ]; then
-  echo "directory not specified, process finished!"
-  exit 1
-fi
-echo The Argument projectName is $projectName
-if [ -z "$projectName" ]; then
-  echo "projectName not specified, process finished!"
-  exit 1
-fi
-echo The Argument runTime is $runTime
-if [ -z "$runTime" ]; then
-  echo "runTime not specified, process finished!"
-  exit 1
-fi
-echo The Argument downloadFilePrefix is $downloadFilePrefix
-if [ -z "$downloadFilePrefix" ]; then
-  echo "downloadFilePrefix not specified, process finished!"
-  exit 1
-fi
-echo The Argument downloadFolder is $downloadFolder
-if [ -z "$downloadFolder" ]; then
-  echo "downloadFolder not specified, process finished!"
-  exit 1
-fi
-echo The Argument deployFolder is $deployFolder
-if [ -z "$deployFolder" ]; then
-  echo "deployFolder not specified, process finished!"
-  exit 1
-fi
-echo The Argument ServiceName is $ServiceName
-if [ -z "$ServiceName" ]; then
-  echo "ServiceName not specified, process finished!"
-  exit 1
-fi
-echo The Argument SettingsFileName is $SettingsFileName
-if [ -z "$SettingsFileName" ]; then
-  echo "SettingsFileName not specified, process finished!"
-  exit 1
-fi
-echo The Argument userName is $userName
-if [ -z "$userName" ]; then
-  echo "userName not specified, process finished!"
-  exit 1
-fi
+              #!/bin/bash
+
+              # {{sf.Name}}
+
+              #The following steps are required for this script to work on the server
+              #1. Unzip must be installed
+              #sudo apt install unzip
+              #2. dotnet must be installed
+              #sudo snap install dotnet-sdk --classic
+              #3. run which dotnet command to understand where dotnet is
+              #which dotnet
+              #4. Open {{_portNumber}} Port for WebAgent
+              #sudo iptables -A INPUT -p tcp --dport {{_portNumber}} -j ACCEPT
+              #5. Open 5032 Port for WebAgentInstaller
+              #sudo iptables -A INPUT -p tcp --dport 5032 -j ACCEPT
+
+              dotnetRunner=$(which dotnet 2>&1)
+
+              result=$(hostname)
+              echo result is $result
+
+              myHostname=${result%%.*}
+
+              ftpSite={{_ftpSiteAddress}}
+              user={{_ftpSiteUserName}}
+              pass={{_ftpSitePassword}}
+              directory={{_ftpSiteDirectory}}
+              projectName={{_projectName}}
+              runTime={{_runTime}}
+              environmentName={{_environmentName}}
+              downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
+              downloadSettingsFilePrefix="$myHostname-$environmentName-$projectName-"
+              downloadFolder={{_serverSideDownloadFolder}}
+              deployFolder={{_serverSideDeployFolder}}
+              ServiceName={{_serviceName}}{{_environmentName}}
+              SettingsFileName={{_settingsFileName}}
+              userName={{_serverSideServiceUserName}}
+
+              projectInstallFullPath=$deployFolder/$projectName/$environmentName
+              mainDllFileName=$projectInstallFullPath/$projectName.dll
+
+              LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
+
+              echo downloadFilePrefix is $downloadFilePrefix
+              echo downloadSettingsFilePrefixis $downloadSettingsFilePrefix
+
+
+              if [ ! -e $dotnetRunner ]
+              then
+                echo "dotnet runner $dotnetRunner does not exists"
+                dotnetRunner=$(which dotnet 2>&1)
+                echo "dotnet runner will use $dotnetRunner"
+              fi
+
+
+
+              echo The Argument ftpSite is $ftpSite
+              if [ -z "$ftpSite" ]; then
+                echo "ftpSite not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument user is $user
+              if [ -z "$user" ]; then
+                echo "user not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument pass is $pass
+              if [ -z "$pass" ]; then
+                echo "pass not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument directory is $directory
+              if [ -z "$directory" ]; then
+                echo "directory not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument projectName is $projectName
+              if [ -z "$projectName" ]; then
+                echo "projectName not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument runTime is $runTime
+              if [ -z "$runTime" ]; then
+                echo "runTime not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument downloadFilePrefix is $downloadFilePrefix
+              if [ -z "$downloadFilePrefix" ]; then
+                echo "downloadFilePrefix not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument downloadFolder is $downloadFolder
+              if [ -z "$downloadFolder" ]; then
+                echo "downloadFolder not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument deployFolder is $deployFolder
+              if [ -z "$deployFolder" ]; then
+                echo "deployFolder not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument ServiceName is $ServiceName
+              if [ -z "$ServiceName" ]; then
+                echo "ServiceName not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument SettingsFileName is $SettingsFileName
+              if [ -z "$SettingsFileName" ]; then
+                echo "SettingsFileName not specified, process finished!"
+                exit 1
+              fi
+              echo The Argument userName is $userName
+              if [ -z "$userName" ]; then
+                echo "userName not specified, process finished!"
+                exit 1
+              fi
 
-echo make $downloadFolder
-mkdir -p $downloadFolder
+              echo make $downloadFolder
+              mkdir -p $downloadFolder
 
-echo make $projectInstallFullPath
-mkdir -p $projectInstallFullPath
-#rm $downloadFolder
+              echo make $projectInstallFullPath
+              mkdir -p $projectInstallFullPath
+              #rm $downloadFolder
 
-echo remove old directory_listing if it exists
-rm -f directory_listing
+              echo remove old directory_listing if it exists
+              rm -f directory_listing
 
-echo Try to get ftp files list to directory_listing
-# get listing from directory sorted by modification date
-ftp -n $ftpSite > directory_listing <<fin 
-quote USER $user
-quote PASS $pass
-passive
-cd $directory
-ls -lt
-quit
-fin
+              echo Try to get ftp files list to directory_listing
+              # get listing from directory sorted by modification date
+              ftp -n $ftpSite > directory_listing <<fin
+              quote USER $user
+              quote PASS $pass
+              passive
+              cd $directory
+              ls -lt
+              quit
+              fin
 
-echo parse the filenames from the directory listing
-files_to_get=`cut -c $LS_FILE_OFFSET- < directory_listing`
+              echo parse the filenames from the directory listing
+              files_to_get=`cut -c $LS_FILE_OFFSET- < directory_listing`
 
-echo remove directory_listing
-#rm -f directory_listing
+              echo remove directory_listing
+              #rm -f directory_listing
 
-#echo files_to_get is $files_to_get
+              #echo files_to_get is $files_to_get
 
-if [ -z "$files_to_get" ]; then
-  echo "file not found. process finished!"
-  exit 1
-fi
+              if [ -z "$files_to_get" ]; then
+                echo "file not found. process finished!"
+                exit 1
+              fi
 
-zipfilename=""
+              zipfilename=""
 
-# make a set of get commands from the filename(s)
-for f in $files_to_get; do
-  #echo f is $f
-  if [[ $f == "$downloadFilePrefix"*.zip ]]; then
-    if [[ $f > $zipfilename ]]; then
-      zipfilename=$f
-    fi
-  fi
-done
+              # make a set of get commands from the filename(s)
+              for f in $files_to_get; do
+                #echo f is $f
+                if [[ $f == "$downloadFilePrefix"*.zip ]]; then
+                  if [[ $f > $zipfilename ]]; then
+                    zipfilename=$f
+                  fi
+                fi
+              done
 
-echo "zipfilename=$zipfilename"
+              echo "zipfilename=$zipfilename"
 
-if [ -z "$zipfilename" ]; then
-  echo "zip file with mask not found. process finished!"
-  exit 1
-fi
+              if [ -z "$zipfilename" ]; then
+                echo "zip file with mask not found. process finished!"
+                exit 1
+              fi
 
-downloadzipfilename=$downloadFolder/$zipfilename
+              downloadzipfilename=$downloadFolder/$zipfilename
 
 
-cmd="get $zipfilename $downloadzipfilename
-"
+              cmd="get $zipfilename $downloadzipfilename
+              "
 
-echo cmd is $cmd
+              echo cmd is $cmd
+
+
 
 
+              rm $downloadzipfilename
 
 
-rm $downloadzipfilename
+              # go back and get the file(s)
+              ftp -n $ftpSite <<fin
+              quote USER $user
+              quote PASS $pass
+              passive
+              cd $directory
+              binary
+              $cmd
+              quit
+              fin
 
+              expandedFolderName=${downloadzipfilename%.*}
+              echo expandedFolderName is $expandedFolderName
 
-# go back and get the file(s)
-ftp -n $ftpSite <<fin 
-quote USER $user
-quote PASS $pass
-passive
-cd $directory
-binary
-$cmd
-quit
-fin
+              rm -rf $expandedFolderName
 
-expandedFolderName=${downloadzipfilename%.*}
-echo expandedFolderName is $expandedFolderName
+              unzip -q $downloadzipfilename -d $expandedFolderName
 
-rm -rf $expandedFolderName
 
-unzip -q $downloadzipfilename -d $expandedFolderName
+              #Get latest settings json file
 
+              latestSettingsJsonFileName=""
 
-#Get latest settings json file
+              for f in $files_to_get; do
+                #echo f is $f
+                if [[ $f == "$downloadSettingsFilePrefix"*.json ]]; then
+                  if [[ $f > $latestSettingsJsonFileName ]]; then
+                    latestSettingsJsonFileName=$f
+                  fi
+                fi
+              done
 
-latestSettingsJsonFileName=""
+              echo "latestSettingsJsonFileName=$latestSettingsJsonFileName"
 
-for f in $files_to_get; do
-  #echo f is $f
-  if [[ $f == "$downloadSettingsFilePrefix"*.json ]]; then
-    if [[ $f > $latestSettingsJsonFileName ]]; then
-      latestSettingsJsonFileName=$f
-    fi
-  fi
-done
+              if [ -z "$latestSettingsJsonFileName" ]; then
+                echo "Settings json file with mask not found. process finished!"
+                exit 2
+              fi
 
-echo "latestSettingsJsonFileName=$latestSettingsJsonFileName"
+              downloadzSettingsJsonFileName=$expandedFolderName/$SettingsFileName
 
-if [ -z "$latestSettingsJsonFileName" ]; then
-  echo "Settings json file with mask not found. process finished!"
-  exit 2
-fi
+              cmd="get $latestSettingsJsonFileName $downloadzSettingsJsonFileName
+              "
 
-downloadzSettingsJsonFileName=$expandedFolderName/$SettingsFileName
+              echo cmd is $cmd
 
-cmd="get $latestSettingsJsonFileName $downloadzSettingsJsonFileName
-"
 
-echo cmd is $cmd
+              #rm $downloadzSettingsJsonFileName
 
 
-#rm $downloadzSettingsJsonFileName
+              # go back and get the file(s)
+              ftp -n $ftpSite <<fin
+              quote USER $user
+              quote PASS $pass
+              passive
+              cd $directory
+              binary
+              $cmd
+              quit
+              fin
 
+              if (( $(ps -ef | grep -v grep | grep $ServiceName | wc -l) > 0 ))
+              then
+                echo Stop Service...
+                sudo systemctl stop $ServiceName.service
+              fi
 
-# go back and get the file(s)
-ftp -n $ftpSite <<fin 
-quote USER $user
-quote PASS $pass
-passive
-cd $directory
-binary
-$cmd
-quit
-fin
+              serviceConfigFileName=/etc/systemd/system/$ServiceName.service
+              echo serviceConfigFileName is $serviceConfigFileName
 
-if (( $(ps -ef | grep -v grep | grep $ServiceName | wc -l) > 0 )) 
-then
-  echo Stop Service...
-  sudo systemctl stop $ServiceName.service
-fi  
+              rm $serviceConfigFileName
 
-serviceConfigFileName=/etc/systemd/system/$ServiceName.service
-echo serviceConfigFileName is $serviceConfigFileName
+              if [ ! -e $serviceConfigFileName ]; then
+                echo Servise configfile $serviceConfigFileName does not exists
+              
+                cat >$serviceConfigFileName <<fin
+              [Unit]
+              Description=$projectName service
 
-rm $serviceConfigFileName
+              [Service]
+              WorkingDirectory=$projectInstallFullPath
+              ExecStart=$dotnetRunner $mainDllFileName
+              Restart=always
+              # Restart service after 10 seconds if the dotnet service crashes:
+              RestartSec=10
+              KillSignal=SIGINT
+              SyslogIdentifier=$projectName
+              User=$userName
+              Environment=ASPNETCORE_ENVIRONMENT=Production
+              Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
-if [ ! -e $serviceConfigFileName ]; then
-  echo Servise configfile $serviceConfigFileName does not exists
+              [Install]
+              WantedBy=multi-user.target
+              fin
 
-  cat >$serviceConfigFileName <<fin
-[Unit]
-Description=$projectName service
+              fi
 
-[Service]
-WorkingDirectory=$projectInstallFullPath
-ExecStart=$dotnetRunner $mainDllFileName
-Restart=always
-# Restart service after 10 seconds if the dotnet service crashes:
-RestartSec=10
-KillSignal=SIGINT
-SyslogIdentifier=$projectName
-User=$userName
-Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+              echo remove old files
+              rm -rf $projectInstallFullPath/*
 
-[Install]
-WantedBy=multi-user.target
-fin
+              echo move files
+              sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
 
-fi
+              sudo systemctl enable $ServiceName.service
 
-echo remove old files
-rm -rf $projectInstallFullPath/*
+              sudo systemctl start $ServiceName.service
+              sudo systemctl status $ServiceName.service
 
-echo move files
-sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
+              echo Remove Archive...
+              rm $downloadzipfilename
 
-sudo systemctl enable $ServiceName.service
+              echo remove extracted folder...
+              rm -rf $expandedFolderName
 
-sudo systemctl start $ServiceName.service
-sudo systemctl status $ServiceName.service
+              echo for logs
+              echo sudo journalctl -fu $ServiceName.service
 
-echo Remove Archive...
-rm $downloadzipfilename
+              exit 0
 
-echo remove extracted folder...
-rm -rf $expandedFolderName
 
-echo for logs
-echo sudo journalctl -fu $ServiceName.service
-
-exit 0
-
-
-""";
+              """;
         if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
         {
             File.WriteAllText(_scriptFileName, code);

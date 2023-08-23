@@ -1,18 +1,18 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using CliMenu;
 using LibDataInput;
 using LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 {
-    private readonly string _gitProjectName;
     private readonly EGitCol _gitCol;
+    private readonly string _gitProjectName;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 

@@ -67,7 +67,7 @@ public sealed class GitProjectsUpdater
         /*
 
 //https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
-//https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
+//https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command
 
          */
 
