@@ -29,7 +29,7 @@ public static class AgentClientsFabricExt
                 installerBaseParameters.WebAgentForInstall.ApiKey);
         if (installerBaseParameters.LocalInstallerSettings is not null)
             return new LocalAgentWithFileStorage(logger, false, fileStorageForUpload,
-                installerBaseParameters.LocalInstallerSettings);
+                installerBaseParameters.LocalInstallerSettings, null, null);
         logger.LogError("Both ApiClient Settings and Installer Settings are not specified");
         return null;
     }
@@ -46,7 +46,7 @@ public static class AgentClientsFabricExt
         if (programUpdaterWebAgent is not null)
             return new WebAgentClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey);
         if (!string.IsNullOrWhiteSpace(installFolder))
-            return new LocalAgent(logger, false, installFolder);
+            return new LocalAgent(logger, false, installFolder, null, null);
         logger.LogError("Both ApiClient Settings and install Folder are not specified");
         return null;
     }
