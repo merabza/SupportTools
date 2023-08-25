@@ -29,20 +29,21 @@ public sealed class ProgramRemover : ToolCommand
 
     protected override bool RunAction()
     {
+        var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
         var agentClient =
             AgentClientsFabricExt.CreateAgentClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
         if (agentClient is null)
         {
-            Logger.LogError($"agentClient does not created, Project {_parameters.ProjectName} can not removed");
+            Logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
             return false;
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (agentClient.RemoveProjectAndService(_parameters.ProjectName, _parameters.ServiceName))
+        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName).Result)
             return true;
 
-        Logger.LogError($"Project {_parameters.ProjectName} can not removed");
+        Logger.LogError("Project {projectName} can not removed", projectName);
         return false;
     }
 }
