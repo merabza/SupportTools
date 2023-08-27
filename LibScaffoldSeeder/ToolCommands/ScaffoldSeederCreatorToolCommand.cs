@@ -23,6 +23,8 @@ namespace LibScaffoldSeeder.ToolCommands;
 
 public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 {
+    private readonly bool _useConsole;
+
     private const string ActionDescription = @"This action will do steps:
 
 1. Create Scaffold Seeder Solution
@@ -35,9 +37,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 ";
 
     public ScaffoldSeederCreatorToolCommand(ILogger logger, bool useConsole, ScaffoldSeederCreatorParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, "Scaffold Seeder Creator", parameters,
+        IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters,
         parametersManager, ActionDescription)
     {
+        _useConsole = useConsole;
     }
 
     private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
@@ -308,8 +311,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                 getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName);
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
-        var jsonFromProjectDbProjectGetter = new JsonFromProjectDbProjectGetter(Logger, UseConsole,
-            jsonFromProjectDbProjectGetterParameters, ParametersManager);
+        var jsonFromProjectDbProjectGetter =
+            new JsonFromProjectDbProjectGetter(Logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
         return jsonFromProjectDbProjectGetter.Run();
     }
 
@@ -389,7 +392,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     private bool CompressFolder(string sourceFolderFullPath, string localPath)
     {
         const string backupFileNameSuffix = ".zip";
-        var archiver = ArchiverFabric.CreateArchiverByType(UseConsole, Logger, EArchiveType.ZipClass, null, null,
+        var archiver = ArchiverFabric.CreateArchiverByType(_useConsole, Logger, EArchiveType.ZipClass, null, null,
             backupFileNameSuffix);
 
         if (archiver is null)
@@ -418,7 +421,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         File.Move(tempFileName, backupFileFullName);
 
-        var localFileManager = FileManagersFabric.CreateFileManager(UseConsole, Logger, localPath);
+        var localFileManager = FileManagersFabric.CreateFileManager(_useConsole, Logger, localPath);
         //წაიშალოს ადრე შექმნილი დაძველებული ფაილები
 
         if (localFileManager is null)

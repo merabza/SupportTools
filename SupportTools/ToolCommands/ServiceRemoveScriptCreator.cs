@@ -16,9 +16,8 @@ public class ServiceRemoveScriptCreator : ToolCommand
     private const string ActionDescription = "Creating Service Remove Script";
     private readonly ServiceRemoveScriptCreatorParameters _par;
 
-    public ServiceRemoveScriptCreator(ILogger logger, bool useConsole, ServiceRemoveScriptCreatorParameters par,
-        IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
-        ActionDescription)
+    public ServiceRemoveScriptCreator(ILogger logger, ServiceRemoveScriptCreatorParameters par,
+        IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
         _par = par;
     }
@@ -76,9 +75,8 @@ public class ServiceRemoveScriptCreator : ToolCommand
             return false;
         }
 
-        var createRemoveScript = new CreateServiceRemoveScript(Logger, UseConsole, scriptFileNameForSave,
-            _par.ProjectName, _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder,
-            _par.Project.ServiceName);
+        var createRemoveScript = new CreateServiceRemoveScript(Logger, scriptFileNameForSave, _par.ProjectName,
+            _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder, _par.Project.ServiceName);
         return createRemoveScript.Run();
     }
 }

@@ -17,9 +17,8 @@ public class ServiceInstallScriptCreator : ToolCommand
     private const string ActionDescription = "Creating Service Install Script";
     private readonly ServiceInstallScriptCreatorParameters _par;
 
-    public ServiceInstallScriptCreator(ILogger logger, bool useConsole, ServiceInstallScriptCreatorParameters par,
-        IParametersManager? parametersManager) : base(logger, useConsole, ActionName, par, parametersManager,
-        ActionDescription)
+    public ServiceInstallScriptCreator(ILogger logger, ServiceInstallScriptCreatorParameters par,
+        IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
         _par = par;
     }
@@ -165,11 +164,11 @@ public class ServiceInstallScriptCreator : ToolCommand
         var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
 
 
-        var createInstallScript = new CreateServiceInstallScript(Logger, UseConsole, scriptFileNameForSave,
+        var createInstallScript = new CreateServiceInstallScript(Logger, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             serverData.Runtime, _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder,
-            serverData.ServerSideDeployFolder, _par.Project.ServiceName, sf.Name,
-            _par.ServerInfo.ServiceUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
+            serverData.ServerSideDeployFolder, _par.Project.ServiceName, sf.Name, _par.ServerInfo.ServiceUserName,
+            _par.FileStorageForExchange.FtpSiteLsFileOffset);
         return createInstallScript.Run();
     }
 }

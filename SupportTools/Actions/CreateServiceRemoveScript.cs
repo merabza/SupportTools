@@ -14,9 +14,9 @@ public class CreateServiceRemoveScript : ToolAction
     private readonly string _serverSideDeployFolder;
     private readonly string _serviceName;
 
-    public CreateServiceRemoveScript(ILogger logger, bool useConsole, string scriptFileName, string projectName,
-        string environmentName, string serverSideDeployFolder, string serviceName) : base(logger, useConsole,
-        nameof(ServiceRemoveScriptCreator))
+    public CreateServiceRemoveScript(ILogger logger, string scriptFileName, string projectName, string environmentName,
+        string serverSideDeployFolder, string serviceName) : base(logger, nameof(ServiceRemoveScriptCreator), null,
+        null)
     {
         _scriptFileName = scriptFileName;
         _projectName = projectName;

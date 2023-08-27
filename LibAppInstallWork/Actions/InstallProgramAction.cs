@@ -19,10 +19,10 @@ public sealed class InstallProgramAction : ToolAction
     private string? _installingProgramVersion;
 
 
-    public InstallProgramAction(ILogger logger, bool useConsole, InstallerBaseParameters installerBaseParameters,
+    public InstallProgramAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
         string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
         string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
-        string environmentName) : base(logger, useConsole, "Install service")
+        string environmentName) : base(logger, "Install service", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;

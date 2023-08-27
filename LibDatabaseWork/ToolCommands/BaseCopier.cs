@@ -12,9 +12,8 @@ public sealed class BaseCopier : ToolCommand
     private const string ActionName = "Copy Database";
     private const string ActionDescription = "Copy Database";
 
-    public BaseCopier(ILogger logger, bool useConsole, CopyBaseParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public BaseCopier(ILogger logger, CopyBaseParameters parameters, IParametersManager parametersManager) : base(
+        logger, ActionName, parameters, parametersManager, ActionDescription)
     {
     }
 

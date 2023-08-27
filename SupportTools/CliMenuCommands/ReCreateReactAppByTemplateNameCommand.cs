@@ -18,7 +18,7 @@ public sealed class ReCreateReactAppByTemplateNameCommand : CliMenuCommand
     {
         var parameters = (IParametersWithSmartSchemas)parametersManager.Parameters;
 
-        _command = new ReCreateReactAppFilesByTemplateNameToolCommand(logger, true, reactAppName, reactTemplateName,
+        _command = new ReCreateReactAppFilesByTemplateNameToolCommand(logger, reactAppName, reactTemplateName,
             parameters, parametersManager);
     }
 

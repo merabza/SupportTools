@@ -12,10 +12,10 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
     private const string ActionDescription = "Get Json From Project DbProject";
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public JsonFromProjectDbProjectGetter(ILogger logger, bool useConsole,
+    public JsonFromProjectDbProjectGetter(ILogger logger,
         JsonFromProjectDbProjectGetterParameters jsonFromProjectDbProjectGetterParameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName,
-        jsonFromProjectDbProjectGetterParameters, parametersManager, ActionDescription)
+        IParametersManager parametersManager) : base(logger, ActionName, jsonFromProjectDbProjectGetterParameters,
+        parametersManager, ActionDescription)
     {
     }
 
@@ -30,13 +30,11 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName))
-        {
-            Logger.LogError("GetJsonFromScaffoldDbProjectParametersFileFullName not specified");
-            return false;
-        }
+        if (!string.IsNullOrWhiteSpace(CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName))
+            return true;
 
-        return true;
+        Logger.LogError("GetJsonFromScaffoldDbProjectParametersFileFullName not specified");
+        return false;
     }
 
     protected override bool RunAction()

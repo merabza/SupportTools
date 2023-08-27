@@ -14,9 +14,8 @@ public sealed class ProgramPublisher : ToolCommand
     private const string ActionDescription = "Publishing App";
     private readonly ProgramPublisherParameters _parameters;
 
-    public ProgramPublisher(ILogger logger, bool useConsole, ProgramPublisherParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public ProgramPublisher(ILogger logger, ProgramPublisherParameters parameters, IParametersManager parametersManager)
+        : base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _parameters = parameters;
     }
@@ -24,13 +23,10 @@ public sealed class ProgramPublisher : ToolCommand
     protected override bool RunAction()
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
-            _parameters.ProjectName, _parameters.MainProjectFileName,
-            _parameters.ServerInfo, _parameters.WorkFolder,
-            _parameters.DateMask, _parameters.Runtime,
-            _parameters.RedundantFileNames, _parameters.UploadTempExtension,
-            _parameters.FileStorageForExchange, _parameters.SmartSchemaForLocal,
-            _parameters.SmartSchemaForExchange);
+        var createPackageAndUpload = new CreatePackageAndUpload(Logger, _parameters.ProjectName,
+            _parameters.MainProjectFileName, _parameters.ServerInfo, _parameters.WorkFolder, _parameters.DateMask,
+            _parameters.Runtime, _parameters.RedundantFileNames, _parameters.UploadTempExtension,
+            _parameters.FileStorageForExchange, _parameters.SmartSchemaForLocal, _parameters.SmartSchemaForExchange);
         return createPackageAndUpload.Run();
     }
 }

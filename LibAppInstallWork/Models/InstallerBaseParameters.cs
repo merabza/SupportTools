@@ -46,8 +46,8 @@ public sealed class InstallerBaseParameters
         }
         else
         {
-            localInstallerSettingsDomain =
-                LocalInstallerSettingsDomain.Create(null, true, supportToolsParameters.LocalInstallerSettings);
+            localInstallerSettingsDomain = LocalInstallerSettingsDomain.Create(null, true,
+                supportToolsParameters.LocalInstallerSettings, null, null);
 
             if (localInstallerSettingsDomain is not null)
                 return new InstallerBaseParameters(webAgentForInstall, localInstallerSettingsDomain);

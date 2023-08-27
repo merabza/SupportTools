@@ -28,10 +28,10 @@ public sealed class CreatePackageAndUpload : ToolAction
     private readonly string _uploadTempExtension;
     private readonly string _workFolder;
 
-    public CreatePackageAndUpload(ILogger logger, bool useConsole, string projectName, string mainProjectFileName,
+    public CreatePackageAndUpload(ILogger logger, string projectName, string mainProjectFileName,
         ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
-        SmartSchema uploadSmartSchema) : base(logger, useConsole, "Program Publisher")
+        SmartSchema uploadSmartSchema) : base(logger, "Program Publisher", null, null)
     {
         _projectName = projectName;
         _mainProjectFileName = mainProjectFileName;

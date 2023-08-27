@@ -11,8 +11,8 @@ public sealed class GitSyncAll : ToolAction
     private readonly IEnumerable<GitDataDomain> _gitDataModel;
     private readonly string _gitsFolder;
 
-    public GitSyncAll(ILogger logger, string gitsFolder, IEnumerable<GitDataDomain> gitDataModel) : base(logger, true,
-        "Git Sync All")
+    public GitSyncAll(ILogger logger, string gitsFolder, IEnumerable<GitDataDomain> gitDataModel) : base(logger,
+        "Git Sync All", null, null)
     {
         _gitsFolder = gitsFolder;
         _gitDataModel = gitDataModel;

@@ -32,7 +32,7 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
         try
         {
             ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
-                new(_logger, true, Name!, _parametersManager.Parameters, _parametersManager);
+                new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
             reCreateAllReactAppsByTemplatesToolCommand.Run();
 
             StShared.Pause();

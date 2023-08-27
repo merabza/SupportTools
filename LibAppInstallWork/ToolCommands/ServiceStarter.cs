@@ -14,27 +14,25 @@ public sealed class ServiceStarter : ToolCommand
     private const string ActionDescription = "Starting Service";
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStarter(ILogger logger, bool useConsole, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public ServiceStarter(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
+        base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _parameters = parameters;
     }
 
     protected override bool CheckValidate()
     {
-        if (string.IsNullOrWhiteSpace(_parameters.ServiceName))
-        {
-            Logger.LogError("Service Name not specified");
-            return false;
-        }
+        if (!string.IsNullOrWhiteSpace(_parameters.ServiceName))
+            return true;
 
-        return true;
+        Logger.LogError("Service Name not specified");
+        return false;
     }
 
     protected override bool RunAction()
     {
-        Logger.LogInformation($"Try to start service {_parameters.ServiceName}...");
+        var serviceName = _parameters.ServiceName;
+        Logger.LogInformation("Try to start service {serviceName}...", serviceName);
 
         //კლიენტის შექმნა
         var agentClient =
@@ -42,31 +40,31 @@ public sealed class ServiceStarter : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError($"agentClient does not created. Service {_parameters.ServiceName} can not started");
+            Logger.LogError("agentClient does not created. Service {serviceName} can not started", serviceName);
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
         if (!agentClient.StartService(_parameters.ServiceName))
         {
-            Logger.LogError($"Service {_parameters.ServiceName} can not started");
+            Logger.LogError("Service {serviceName} can not started", serviceName);
             return false;
         }
 
         Logger.LogInformation("Service Started");
 
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(Logger, UseConsole,
-            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+        CheckParametersVersionAction checkParametersVersionAction =
+            new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!checkParametersVersionAction.Run())
-            Logger.LogError($"Service {_parameters.ServiceName} parameters file check failed");
+            Logger.LogError("Service {serviceName} parameters file check failed", serviceName);
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია ServiceStartParameters.ServiceName, 
-        CheckProgramVersionAction checkProgramVersionAction = new(Logger, UseConsole, _parameters.WebAgentForCheck,
-            _parameters.ProxySettings, null, 1);
+        CheckProgramVersionAction checkProgramVersionAction =
+            new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!checkProgramVersionAction.Run())
-            Logger.LogError($"Service {_parameters.ServiceName} version check failed");
+            Logger.LogError("Service {serviceName} version check failed", serviceName);
 
         return true;
     }

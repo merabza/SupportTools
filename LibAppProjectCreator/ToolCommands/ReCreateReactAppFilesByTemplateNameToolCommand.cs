@@ -11,8 +11,8 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
     private readonly string _reactAppName;
     private readonly string? _reactTemplateName;
 
-    public ReCreateReactAppFilesByTemplateNameToolCommand(ILogger logger, bool useConsole, string reactAppName,
-        string? reactTemplateName, IParameters par, IParametersManager? parametersManager) : base(logger, useConsole,
+    public ReCreateReactAppFilesByTemplateNameToolCommand(ILogger logger, string reactAppName,
+        string? reactTemplateName, IParameters par, IParametersManager? parametersManager) : base(logger,
         "Recreate React app Files", par, parametersManager)
     {
         _reactAppName = reactAppName;

@@ -12,9 +12,8 @@ public sealed class ServiceStopper : ToolCommand
     private const string ActionName = "Stop Service";
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStopper(ILogger logger, bool useConsole, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        "Stop Service")
+    public ServiceStopper(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
+        base(logger, ActionName, parameters, parametersManager, "Stop Service")
     {
         _parameters = parameters;
     }

@@ -8,10 +8,10 @@ namespace LibDatabaseWork.ToolCommands;
 
 public /*open*/ class MigrationToolCommand : ToolCommand
 {
-    protected MigrationToolCommand(ILogger logger, bool useConsole, string actionName,
+    protected MigrationToolCommand(ILogger logger, string actionName,
         DatabaseMigrationParameters databaseMigrationParameters, IParametersManager? parametersManager,
-        string? actionDescription = null) : base(logger, useConsole, actionName, databaseMigrationParameters,
-        parametersManager, actionDescription)
+        string? actionDescription = null) : base(logger, actionName, databaseMigrationParameters, parametersManager,
+        actionDescription)
     {
     }
 

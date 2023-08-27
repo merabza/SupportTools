@@ -17,10 +17,9 @@ public sealed class UploadParametersToExchangeAction : ToolAction
     private readonly ServerInfoModel _serverInfo;
     private readonly SmartSchema _uploadSmartSchema;
 
-    public UploadParametersToExchangeAction(ILogger logger, bool useConsole, string projectName,
-        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension, string parametersContent,
-        FileStorageData exchangeFileStorage, SmartSchema uploadSmartSchema) : base(logger, useConsole,
-        "Upload Parameters To Exchange File Storage")
+    public UploadParametersToExchangeAction(ILogger logger, string projectName, ServerInfoModel serverInfo,
+        string dateMask, string parametersFileExtension, string parametersContent, FileStorageData exchangeFileStorage,
+        SmartSchema uploadSmartSchema) : base(logger, "Upload Parameters To Exchange File Storage", null, null)
     {
         _projectName = projectName;
         _serverInfo = serverInfo;

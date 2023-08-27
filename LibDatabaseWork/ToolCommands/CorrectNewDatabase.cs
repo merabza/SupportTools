@@ -18,9 +18,9 @@ public sealed class CorrectNewDatabase : ToolCommand
     private const string ActionDescription = "Correct new Database";
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public CorrectNewDatabase(ILogger logger, bool useConsole, CorrectNewDbParameters correctNewDbParameters,
-        IParametersManager? parametersManager) : base(logger, useConsole, ActionName, correctNewDbParameters,
-        parametersManager, ActionDescription)
+    public CorrectNewDatabase(ILogger logger, CorrectNewDbParameters correctNewDbParameters,
+        IParametersManager? parametersManager) : base(logger, ActionName, correctNewDbParameters, parametersManager,
+        ActionDescription)
     {
     }
 
@@ -30,9 +30,7 @@ public sealed class CorrectNewDatabase : ToolCommand
     {
         var dbKit = ManagerFactory.GetKit(EDataProvider.Sql);
         var dbm = DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString);
-        if (dbm is null)
-            throw new Exception("Cannot create DbManager");
-        return dbm;
+        return dbm ?? throw new Exception("Cannot create DbManager");
     }
 
     protected override bool CheckValidate()

@@ -8,9 +8,8 @@ namespace LibAppProjectCreator.ToolCommands;
 
 public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
 {
-    public ReCreateAllReactAppsByTemplatesToolCommand(ILogger logger, bool useConsole, string actionName,
-        IParameters par, IParametersManager? parametersManager) : base(logger, useConsole, actionName, par,
-        parametersManager)
+    public ReCreateAllReactAppsByTemplatesToolCommand(ILogger logger, string actionName, IParameters par,
+        IParametersManager? parametersManager) : base(logger, actionName, par, parametersManager)
     {
     }
 
@@ -29,8 +28,9 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
         {
             Console.WriteLine("Start create React App: {0}", kvp.Key);
 
-            var command = new ReCreateReactAppFilesByTemplateNameToolCommand(Logger, true, kvp.Key, kvp.Value,
-                parameters, ParametersManager);
+            var command =
+                new ReCreateReactAppFilesByTemplateNameToolCommand(Logger, kvp.Key, kvp.Value, parameters,
+                    ParametersManager);
 
             command.Run();
 

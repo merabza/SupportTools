@@ -102,7 +102,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
         }
 
         var localInstallerSettingsDomain =
-            LocalInstallerSettingsDomain.Create(null, true, supportToolsParameters.LocalInstallerSettings);
+            LocalInstallerSettingsDomain.Create(null, true, supportToolsParameters.LocalInstallerSettings, null, null);
 
         if (localInstallerSettingsDomain is null)
         {

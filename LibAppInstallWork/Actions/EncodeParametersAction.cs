@@ -19,8 +19,8 @@ public sealed class EncodeParametersAction : ToolAction
     private readonly string _keysJsonFileName;
     private readonly string _sourceJsonFileName;
 
-    public EncodeParametersAction(ILogger logger, bool useConsole, string keysJsonFileName, string sourceJsonFileName,
-        string encodedJsonFileName, string keyPart1, string keyPart2) : base(logger, useConsole, "Encode Parameters")
+    public EncodeParametersAction(ILogger logger, string keysJsonFileName, string sourceJsonFileName,
+        string encodedJsonFileName, string keyPart1, string keyPart2) : base(logger, "Encode Parameters", null, null)
     {
         _sourceJsonFileName = sourceJsonFileName;
         _encodedJsonFileName = encodedJsonFileName;

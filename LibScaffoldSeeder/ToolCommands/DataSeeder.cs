@@ -9,8 +9,8 @@ public sealed class DataSeeder : ToolCommand
 {
     private readonly DataSeederParameters _parameters;
 
-    public DataSeeder(ILogger logger, bool useConsole, DataSeederParameters parameters) : base(logger, useConsole,
-        "Data Seeder", parameters, null, "Seeds data from existing Json files")
+    public DataSeeder(ILogger logger, DataSeederParameters parameters) : base(logger, "Data Seeder", parameters, null,
+        "Seeds data from existing Json files")
     {
         _parameters = parameters;
     }
@@ -23,13 +23,11 @@ public sealed class DataSeeder : ToolCommand
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_parameters.SeedProjectParametersFilePath))
-        {
-            Logger.LogError("Seed Project Parameters File Path does not specified");
-            return false;
-        }
+        if (!string.IsNullOrWhiteSpace(_parameters.SeedProjectParametersFilePath))
+            return true;
 
-        return true;
+        Logger.LogError("Seed Project Parameters File Path does not specified");
+        return false;
     }
 
     protected override bool RunAction()

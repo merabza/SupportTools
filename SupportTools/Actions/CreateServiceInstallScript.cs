@@ -24,11 +24,11 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _serviceName;
     private readonly string _settingsFileName;
 
-    public CreateServiceInstallScript(ILogger logger, bool useConsole, string scriptFileName, int portNumber,
-        string ftpSiteAddress, string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory,
-        string projectName, string runTime, string environmentName, string serverSideDownloadFolder,
-        string serverSideDeployFolder, string serviceName, string settingsFileName, string serverSideServiceUserName,
-        int ftpSiteLsFileOffset) : base(logger, useConsole, nameof(ServiceInstallScriptCreator))
+    public CreateServiceInstallScript(ILogger logger, string scriptFileName, int portNumber, string ftpSiteAddress,
+        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName, string runTime,
+        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string serviceName,
+        string settingsFileName, string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
+        nameof(ServiceInstallScriptCreator), null, null)
     {
         _scriptFileName = scriptFileName;
         _portNumber = portNumber;

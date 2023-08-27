@@ -21,11 +21,11 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string _serviceUserName;
 
 
-    public InstallServiceAction(ILogger logger, bool useConsole, InstallerBaseParameters installerBaseParameters,
+    public InstallServiceAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
         string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
         string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
         string environmentName, string? serviceName, string serviceUserName, string encodedJsonFileName) : base(logger,
-        useConsole, "Install service")
+        "Install service", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;

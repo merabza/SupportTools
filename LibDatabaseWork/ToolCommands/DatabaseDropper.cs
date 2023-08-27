@@ -18,8 +18,8 @@ public sealed class DatabaseDropper : MigrationToolCommand
     //}
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public DatabaseDropper(ILogger logger, bool useConsole, DatabaseMigrationParameters databaseMigrationParameters,
-        IParametersManager? parametersManager) : base(logger, useConsole, ActionName, databaseMigrationParameters,
+    public DatabaseDropper(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
+        IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
         parametersManager, ActionDescription)
     {
     }

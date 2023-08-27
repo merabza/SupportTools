@@ -19,8 +19,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     private readonly string _templateName;
     private readonly ETestOrReal _testOrReal;
 
-    public AppProjectCreatorByTemplateToolAction(ILogger logger, bool useConsole, IParametersManager parametersManager,
-        string templateName, ETestOrReal testOrReal) : base(logger, useConsole, ActionName)
+    public AppProjectCreatorByTemplateToolAction(ILogger logger, IParametersManager parametersManager,
+        string templateName, ETestOrReal testOrReal) : base(logger, ActionName, null, null)
     {
         _parametersManager = parametersManager;
         _templateName = templateName;
@@ -126,31 +126,29 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         if (!appCreator.PrepareParametersAndCreateApp())
             return false;
 
-        if (_testOrReal == ETestOrReal.Real)
+        if (_testOrReal != ETestOrReal.Real)
+            return true;
+
+        var existingProject = supportToolsParameters.GetProject(projectName);
+
+        if (existingProject is not null)
         {
-            var existingProject = supportToolsParameters.GetProject(projectName);
-
-            if (existingProject is not null)
-            {
-                StShared.ConsoleWriteInformationLine(
-                    $"project with name {projectName} already exists and cannot be updated", true, Logger);
-                return true;
-            }
-
-            if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
-                return true;
-
-            var projectRecordCreator =
-                new ProjectRecordCreator(Logger, _parametersManager, projectName, projectShortName, "");
-
-            if (!projectRecordCreator.Create())
-            {
-                StShared.ConsoleWriteInformationLine(
-                    $"code for project with name {projectName} created, but record create failed", true, Logger);
-                return true;
-            }
+            StShared.ConsoleWriteInformationLine(
+                $"project with name {projectName} already exists and cannot be updated", true, Logger);
+            return true;
         }
 
+        if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
+            return true;
+
+        var projectRecordCreator =
+            new ProjectRecordCreator(Logger, _parametersManager, projectName, projectShortName, "");
+
+        if (projectRecordCreator.Create())
+            return true;
+
+        StShared.ConsoleWriteInformationLine(
+            $"code for project with name {projectName} created, but record create failed", true, Logger);
         return true;
     }
 }

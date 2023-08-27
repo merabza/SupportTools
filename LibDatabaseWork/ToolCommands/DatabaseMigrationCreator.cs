@@ -14,9 +14,9 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
     private const string ActionDescription = "Database Migration Initial";
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public DatabaseMigrationCreator(ILogger logger, bool useConsole,
-        DatabaseMigrationParameters databaseMigrationParameters, IParametersManager? parametersManager) : base(logger,
-        useConsole, ActionName, databaseMigrationParameters, parametersManager, ActionDescription)
+    public DatabaseMigrationCreator(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
+        IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
+        parametersManager, ActionDescription)
     {
     }
 

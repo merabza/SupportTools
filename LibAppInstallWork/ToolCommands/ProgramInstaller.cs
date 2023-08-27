@@ -11,13 +11,15 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ProgramInstaller : ToolCommand
 {
+    private readonly bool _useConsole;
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
 
     public ProgramInstaller(ILogger logger, bool useConsole, IParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters,
+        IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription)
     {
+        _useConsole = useConsole;
     }
 
     private ProgramInstallerParameters Parameters => (ProgramInstallerParameters)Par;
@@ -47,10 +49,10 @@ public sealed class ProgramInstaller : ToolCommand
             }
 
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
-            var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, true,
+            var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, _useConsole,
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,
                 Parameters.ServerInfo.EnvironmentName, Parameters.ParametersFileDateMask,
-                Parameters.ParametersFileExtension);
+                Parameters.ParametersFileExtension, null, null);
             var result = getLatestParametersFileBodyAction.Run();
 
             appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
@@ -65,7 +67,7 @@ public sealed class ProgramInstaller : ToolCommand
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var projectName = Parameters.ProjectName;
         var environmentName = Parameters.ServerInfo.EnvironmentName;
-        var installProgramAction = new InstallServiceAction(Logger, UseConsole, Parameters.InstallerBaseParameters,
+        var installProgramAction = new InstallServiceAction(Logger, Parameters.InstallerBaseParameters,
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
             Parameters.ServerInfo.EnvironmentName, Parameters.ServiceName, Parameters.ServiceUserName,
@@ -79,7 +81,7 @@ public sealed class ProgramInstaller : ToolCommand
         var installingProgramVersion = installProgramAction.InstallingProgramVersion;
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(Logger, UseConsole, Parameters.WebAgentForCheck,
+        var checkProgramVersionAction = new CheckProgramVersionAction(Logger, Parameters.WebAgentForCheck,
             Parameters.ProxySettings, installingProgramVersion);
         if (!checkProgramVersionAction.Run())
         {
@@ -91,8 +93,8 @@ public sealed class ProgramInstaller : ToolCommand
         if (appSettingsVersion != null)
         {
             //4. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
-            var checkParametersVersionAction = new CheckParametersVersionAction(Logger, UseConsole,
-                Parameters.WebAgentForCheck, Parameters.ProxySettings, appSettingsVersion);
+            var checkParametersVersionAction = new CheckParametersVersionAction(Logger, Parameters.WebAgentForCheck,
+                Parameters.ProxySettings, appSettingsVersion);
 
             if (checkParametersVersionAction.Run())
                 return true;

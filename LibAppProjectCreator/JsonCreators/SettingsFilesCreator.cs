@@ -77,7 +77,7 @@ public sealed class SettingsFilesCreator
 
         var encodedJsonFileName =
             Path.Combine(_projectFullPath, "appsettingsEncoded.json");
-        var encodeParametersAction = new EncodeParametersAction(_logger, true, keysJsonFileName, sourceJsonFileName,
+        var encodeParametersAction = new EncodeParametersAction(_logger, keysJsonFileName, sourceJsonFileName,
             encodedJsonFileName, _keyPart1, keyPart2);
         if (encodeParametersAction.Run()) return true;
         _logger.LogError("Cannot encode parameters");

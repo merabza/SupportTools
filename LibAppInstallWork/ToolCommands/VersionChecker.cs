@@ -13,9 +13,8 @@ public sealed class VersionChecker : ToolCommand
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
 
-    public VersionChecker(ILogger logger, bool useConsole, CheckVersionParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public VersionChecker(ILogger logger, CheckVersionParameters parameters, IParametersManager parametersManager) :
+        base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
     }
 
@@ -28,19 +27,20 @@ public sealed class VersionChecker : ToolCommand
 
     protected override bool RunAction()
     {
+        var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(Logger, UseConsole,
-            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1);
+        CheckParametersVersionAction checkParametersVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
+            CheckVersionParameters.ProxySettings, null, 1);
         if (!checkParametersVersionAction.Run())
-            Logger.LogError($"project {CheckVersionParameters.ProjectName} parameters file check failed");
+            Logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
-        CheckProgramVersionAction checkProgramVersionAction = new(Logger, UseConsole,
-            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1);
+        CheckProgramVersionAction checkProgramVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
+            CheckVersionParameters.ProxySettings, null, 1);
         if (!checkProgramVersionAction.Run())
-            Logger.LogError($"project {CheckVersionParameters.ProjectName} version check failed");
+            Logger.LogError("project {projectName} version check failed", projectName);
         //return false;
 
         return true;

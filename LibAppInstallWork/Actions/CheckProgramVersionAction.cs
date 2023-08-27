@@ -17,9 +17,9 @@ public sealed class CheckProgramVersionAction : ToolAction
 
     private readonly ApiClientSettingsDomain _webAgentForCheck;
 
-    public CheckProgramVersionAction(ILogger logger, bool useConsole, ApiClientSettingsDomain webAgentForCheck,
+    public CheckProgramVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
         ProxySettingsBase proxySettings, string? installingProgramVersion, int maxTryCount = 10) : base(logger,
-        useConsole, "Check Program Version")
+        "Check Program Version", null, null)
     {
         _webAgentForCheck = webAgentForCheck;
         _proxySettings = proxySettings;

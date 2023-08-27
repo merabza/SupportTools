@@ -32,7 +32,7 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
         try
         {
             CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
-                new(_logger, true, Name!, _parametersManager);
+                new(_logger, Name!, _parametersManager);
             createAllTemplateTestProjectsToolCommand.Run();
 
             StShared.Pause();

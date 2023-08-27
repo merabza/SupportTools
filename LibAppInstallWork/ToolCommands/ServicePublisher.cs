@@ -14,9 +14,9 @@ public sealed class ServicePublisher : ToolCommand
     private const string ActionDescription = "Publishing Service";
     private readonly AppSettingsEncoderParameters _appSettingsEncoderParameters;
 
-    public ServicePublisher(ILogger logger, bool useConsole, ProgramPublisherParameters parameters,
+    public ServicePublisher(ILogger logger, ProgramPublisherParameters parameters,
         AppSettingsEncoderParameters appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
-        base(logger, useConsole, ActionName, parameters, parametersManager, ActionDescription)
+        base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _appSettingsEncoderParameters = appSettingsEncoderParametersForPublish;
     }
@@ -31,20 +31,19 @@ public sealed class ServicePublisher : ToolCommand
     protected override bool RunAction()
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
-            ProgramPublisherParameters.ProjectName, ProgramPublisherParameters.MainProjectFileName,
-            ProgramPublisherParameters.ServerInfo, ProgramPublisherParameters.WorkFolder,
-            ProgramPublisherParameters.DateMask, ProgramPublisherParameters.Runtime,
-            ProgramPublisherParameters.RedundantFileNames, ProgramPublisherParameters.UploadTempExtension,
-            ProgramPublisherParameters.FileStorageForExchange, ProgramPublisherParameters.SmartSchemaForLocal,
-            ProgramPublisherParameters.SmartSchemaForExchange);
+        var createPackageAndUpload = new CreatePackageAndUpload(Logger, ProgramPublisherParameters.ProjectName,
+            ProgramPublisherParameters.MainProjectFileName, ProgramPublisherParameters.ServerInfo,
+            ProgramPublisherParameters.WorkFolder, ProgramPublisherParameters.DateMask,
+            ProgramPublisherParameters.Runtime, ProgramPublisherParameters.RedundantFileNames,
+            ProgramPublisherParameters.UploadTempExtension, ProgramPublisherParameters.FileStorageForExchange,
+            ProgramPublisherParameters.SmartSchemaForLocal, ProgramPublisherParameters.SmartSchemaForExchange);
         if (!createPackageAndUpload.Run())
             return false;
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         //AppSettingsEncoderParameters appSettingsEncoderParameters =
         //    ProgramPublisherParameters.AppSettingsEncoderParameters;
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger, UseConsole,
+        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
             _appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
             _appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
             _appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, _appSettingsEncoderParameters.KeyPart1,

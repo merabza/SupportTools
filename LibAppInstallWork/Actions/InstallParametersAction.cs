@@ -17,10 +17,10 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _projectName;
     private readonly string? _serviceName;
 
-    public InstallParametersAction(ILogger logger, bool useConsole, string parametersFileDateMask,
-        string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
-        FileStorageData fileStorageForUpload, string projectName, string environmentName, string? serviceName,
-        string appSettingsEncodedJsonFileName) : base(logger, useConsole, "Install Parameters")
+    public InstallParametersAction(ILogger logger, string parametersFileDateMask, string parametersFileExtension,
+        InstallerBaseParameters installerBaseParameters, FileStorageData fileStorageForUpload, string projectName,
+        string environmentName, string? serviceName, string appSettingsEncodedJsonFileName) : base(logger,
+        "Install Parameters", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
         _parametersFileDateMask = parametersFileDateMask;

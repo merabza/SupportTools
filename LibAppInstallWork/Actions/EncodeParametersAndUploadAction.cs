@@ -19,11 +19,10 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
     private readonly string _sourceJsonFileName;
     private readonly SmartSchema _uploadSmartSchema;
 
-    public EncodeParametersAndUploadAction(ILogger logger, bool useConsole, string keysJsonFileName,
-        string sourceJsonFileName, string encodedJsonFileName, string keyPart1, string keyPart2, string projectName,
-        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension,
-        FileStorageData exchangeFileStorage,
-        SmartSchema uploadSmartSchema) : base(logger, useConsole, "Encode Parameters And Upload")
+    public EncodeParametersAndUploadAction(ILogger logger, string keysJsonFileName, string sourceJsonFileName,
+        string encodedJsonFileName, string keyPart1, string keyPart2, string projectName, ServerInfoModel serverInfo,
+        string dateMask, string parametersFileExtension, FileStorageData exchangeFileStorage,
+        SmartSchema uploadSmartSchema) : base(logger, "Encode Parameters And Upload", null, null)
     {
         _keysJsonFileName = keysJsonFileName;
         _sourceJsonFileName = sourceJsonFileName;
@@ -49,8 +48,8 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
     protected override bool RunAction()
     {
-        var encodeParametersAction = new EncodeParametersAction(Logger, UseConsole, _keysJsonFileName,
-            _sourceJsonFileName, _encodedJsonFileName, _keyPart1, _keyPart2);
+        var encodeParametersAction = new EncodeParametersAction(Logger, _keysJsonFileName, _sourceJsonFileName,
+            _encodedJsonFileName, _keyPart1, _keyPart2);
         if (!encodeParametersAction.Run())
         {
             Logger.LogError("Cannot encode parameters");
@@ -67,7 +66,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         }
 
 
-        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(Logger, UseConsole, _projectName,
+        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(Logger, _projectName,
             _serverInfo, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
             _uploadSmartSchema);
         return uploadParametersToExchangeAction.Run();

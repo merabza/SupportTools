@@ -9,15 +9,17 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class AppSettingsInstaller : ToolCommand
 {
+    private readonly bool _useConsole;
     private const string ActionName = "Install Application Settings";
 
     private const string ActionDescription =
         "This tool will Download latest parameters file from exchange server, then will update parameters file, and check if parameters updated";
 
     public AppSettingsInstaller(ILogger logger, bool useConsole, AppSettingsInstallerParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters,
+        IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription)
     {
+        _useConsole = useConsole;
     }
 
     private AppSettingsInstallerParameters AppSettingsInstallerParameters => (AppSettingsInstallerParameters)Par;
@@ -44,12 +46,12 @@ public sealed class AppSettingsInstaller : ToolCommand
 
         var projectName = AppSettingsInstallerParameters.ProjectName;
         //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
-        GetLatestParametersFileBodyAction getLatestParametersFileBodyAction = new(Logger, true,
+        GetLatestParametersFileBodyAction getLatestParametersFileBodyAction = new(Logger, _useConsole,
             AppSettingsInstallerParameters.FileStorageForDownload, AppSettingsInstallerParameters.ProjectName,
             AppSettingsInstallerParameters.ServerInfo.ServerName,
             AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
             AppSettingsInstallerParameters.ParametersFileDateMask,
-            AppSettingsInstallerParameters.ParametersFileExtension);
+            AppSettingsInstallerParameters.ParametersFileExtension, null, null);
         var result = getLatestParametersFileBodyAction.Run();
         var appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
         if (!result || string.IsNullOrWhiteSpace(appSettingsVersion))
@@ -59,7 +61,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        InstallParametersAction installParametersAction = new(Logger, UseConsole,
+        InstallParametersAction installParametersAction = new(Logger,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
@@ -73,7 +75,7 @@ public sealed class AppSettingsInstaller : ToolCommand
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
         //, AppSettingsInstallerParameters.ProjectName
-        CheckParametersVersionAction checkParametersVersionAction = new(Logger, UseConsole,
+        CheckParametersVersionAction checkParametersVersionAction = new(Logger,
             AppSettingsInstallerParameters.WebAgentForCheck, AppSettingsInstallerParameters.ProxySettings,
             appSettingsVersion);
 

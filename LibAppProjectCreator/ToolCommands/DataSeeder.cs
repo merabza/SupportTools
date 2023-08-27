@@ -9,8 +9,8 @@ public sealed class JetBrainsCleanupCodeRunner : ToolCommand
 {
     private readonly JetBrainsCleanupCodeRunnerParameters _parameters;
 
-    public JetBrainsCleanupCodeRunner(ILogger logger, bool useConsole, JetBrainsCleanupCodeRunnerParameters parameters)
-        : base(logger, useConsole, "jb CleanupCode", parameters, null, "Jet Brains Cleanup Code Runner")
+    public JetBrainsCleanupCodeRunner(ILogger logger, JetBrainsCleanupCodeRunnerParameters parameters) : base(logger,
+        "jb CleanupCode", parameters, null, "Jet Brains Cleanup Code Runner")
     {
         _parameters = parameters;
     }

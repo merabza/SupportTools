@@ -11,9 +11,8 @@ public sealed class ProgramRemover : ToolCommand
     private const string ActionDescription = "Remove App";
     private readonly ServiceStartStopParameters _parameters;
 
-    public ProgramRemover(ILogger logger, bool useConsole, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public ProgramRemover(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
+        base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _parameters = parameters;
     }

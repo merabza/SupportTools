@@ -18,9 +18,9 @@ public sealed class CheckParametersVersionAction : ToolAction
 
     private readonly ApiClientSettingsDomain _webAgentForCheck;
 
-    public CheckParametersVersionAction(ILogger logger, bool useConsole, ApiClientSettingsDomain webAgentForCheck,
-        ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger, useConsole,
-        "Check Parameters Version")
+    public CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
+        ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger,
+        "Check Parameters Version", null, null)
     {
         _webAgentForCheck = webAgentForCheck;
         _appSettingsVersion = appSettingsVersion;

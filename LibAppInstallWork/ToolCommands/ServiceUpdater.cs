@@ -11,8 +11,8 @@ public sealed class ServiceUpdater : ToolCommand
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
 
-    public ServiceUpdater(ILogger logger, bool useConsole, ServiceUpdaterParameters programServiceUpdaterParameters,
-        IParametersManager parametersManager) : base(logger, useConsole, ActionName, programServiceUpdaterParameters,
+    public ServiceUpdater(ILogger logger, ServiceUpdaterParameters programServiceUpdaterParameters,
+        IParametersManager parametersManager) : base(logger, ActionName, programServiceUpdaterParameters,
         parametersManager, ActionDescription)
     {
     }
@@ -39,13 +39,12 @@ public sealed class ServiceUpdater : ToolCommand
         var programPublisherParameters =
             ProgramServiceUpdaterParameters.ProgramPublisherParameters;
 
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, UseConsole,
-            programPublisherParameters.ProjectName, programPublisherParameters.MainProjectFileName,
-            programPublisherParameters.ServerInfo, programPublisherParameters.WorkFolder,
-            programPublisherParameters.DateMask, programPublisherParameters.Runtime,
-            programPublisherParameters.RedundantFileNames, programPublisherParameters.UploadTempExtension,
-            programPublisherParameters.FileStorageForExchange, programPublisherParameters.SmartSchemaForLocal,
-            programPublisherParameters.SmartSchemaForExchange);
+        var createPackageAndUpload = new CreatePackageAndUpload(Logger, programPublisherParameters.ProjectName,
+            programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
+            programPublisherParameters.WorkFolder, programPublisherParameters.DateMask,
+            programPublisherParameters.Runtime, programPublisherParameters.RedundantFileNames,
+            programPublisherParameters.UploadTempExtension, programPublisherParameters.FileStorageForExchange,
+            programPublisherParameters.SmartSchemaForLocal, programPublisherParameters.SmartSchemaForExchange);
 
         if (!createPackageAndUpload.Run())
             return false;
@@ -58,7 +57,7 @@ public sealed class ServiceUpdater : ToolCommand
         var installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
         if (installParameters)
         {
-            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger, UseConsole,
+            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
                 appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
                 appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
                 appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
@@ -72,7 +71,7 @@ public sealed class ServiceUpdater : ToolCommand
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallServiceAction(Logger, UseConsole,
+        var installProgramAction = new InstallServiceAction(Logger,
             ProgramServiceUpdaterParameters.InstallerBaseParameters,
             ProgramServiceUpdaterParameters.ProgramArchiveDateMask,
             ProgramServiceUpdaterParameters.ProgramArchiveExtension,
@@ -89,7 +88,7 @@ public sealed class ServiceUpdater : ToolCommand
 
         //string installingProgramVersion = installProgramAction.InstallingProgramVersion;
         //4. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(Logger, UseConsole,
+        var checkProgramVersionAction = new CheckProgramVersionAction(Logger,
             ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
             ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion);
 
@@ -104,7 +103,7 @@ public sealed class ServiceUpdater : ToolCommand
         {
             //5. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
             //, projectName
-            var checkParametersVersionAction = new CheckParametersVersionAction(Logger, UseConsole,
+            var checkParametersVersionAction = new CheckParametersVersionAction(Logger,
                 ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
                 ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion);
 

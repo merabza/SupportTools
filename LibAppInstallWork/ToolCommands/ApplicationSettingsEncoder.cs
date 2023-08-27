@@ -8,9 +8,8 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ApplicationSettingsEncoder : ToolCommand
 {
-    public ApplicationSettingsEncoder(ILogger logger, bool useConsole, AppSettingsEncoderParameters appsetenParameters,
-        IParametersManager parametersManager) : base(logger, useConsole, "Encode Settings", appsetenParameters,
-        parametersManager)
+    public ApplicationSettingsEncoder(ILogger logger, AppSettingsEncoderParameters appsetenParameters,
+        IParametersManager parametersManager) : base(logger, "Encode Settings", appsetenParameters, parametersManager)
     {
     }
 
@@ -23,7 +22,7 @@ public sealed class ApplicationSettingsEncoder : ToolCommand
 
     protected override bool RunAction()
     {
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger, UseConsole,
+        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
             AppsetenParameters.AppSetEnKeysJsonFileName, AppsetenParameters.AppSettingsJsonSourceFileName,
             AppsetenParameters.AppSettingsEncodedJsonFileName, AppsetenParameters.KeyPart1, AppsetenParameters.KeyPart2,
             AppsetenParameters.ProjectName, AppsetenParameters.ServerInfo, AppsetenParameters.DateMask,

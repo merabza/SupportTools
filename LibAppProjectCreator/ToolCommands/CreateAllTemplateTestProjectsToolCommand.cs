@@ -9,8 +9,8 @@ namespace LibAppProjectCreator.ToolCommands;
 
 public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
 {
-    public CreateAllTemplateTestProjectsToolCommand(ILogger logger, bool useConsole, string actionName,
-        ParametersManager parametersManager) : base(logger, useConsole, actionName, parametersManager)
+    public CreateAllTemplateTestProjectsToolCommand(ILogger logger, string actionName,
+        ParametersManager parametersManager) : base(logger, actionName, parametersManager)
     {
     }
 
@@ -32,7 +32,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
             Console.WriteLine("Start create test Project: {0}", kvp.Key);
 
             AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate =
-                new(Logger, true, ParametersManager, kvp.Key, ETestOrReal.Test);
+                new(Logger, ParametersManager, kvp.Key, ETestOrReal.Test);
 
             appProjectCreatorByTemplate.Run();
 

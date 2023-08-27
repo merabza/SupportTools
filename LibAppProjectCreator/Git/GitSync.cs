@@ -15,7 +15,7 @@ public sealed class GitSync : ToolAction
     private readonly string _gitsFolder;
 
     public GitSync(ILogger logger, string gitsFolder, GitDataDomain gitData, string? commitMessage = null,
-        bool askCommitMessage = true) : base(logger, true, "Git Sync")
+        bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
     {
         _gitsFolder = gitsFolder;
         _gitData = gitData;
