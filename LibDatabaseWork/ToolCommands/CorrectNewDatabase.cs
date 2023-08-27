@@ -46,22 +46,25 @@ public sealed class CorrectNewDatabase : ToolCommand
     {
         var constraintsForCorrect = CorrectBitConstraints();
 
-        Logger.LogInformation($"Correction needs {constraintsForCorrect.Count} constraints");
+        var constraintsForCorrectCount = constraintsForCorrect.Count;
+        Logger.LogInformation("Correction needs {constraintsForCorrectCount} constraints", constraintsForCorrectCount);
 
         foreach (var constraintDataModel in constraintsForCorrect)
         {
-            Logger.LogInformation($"Correcting table {constraintDataModel.TableName}");
+            var tableName = constraintDataModel.TableName;
+            Logger.LogInformation("Correcting table {tableName}", tableName);
 
             if (!DeleteConstraint(constraintDataModel))
             {
-                Logger.LogError($"Cannot Delete constraint {constraintDataModel.DefaultConstraintName}");
+                var defaultConstraintName = constraintDataModel.DefaultConstraintName;
+                Logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
                 return false;
             }
 
             if (CreateConstraint(constraintDataModel))
                 continue;
 
-            Logger.LogError($"Cannot Create constraint for table {constraintDataModel.TableName}");
+            Logger.LogError("Cannot Create constraint for table {tableName}", tableName);
             return false;
         }
 
@@ -95,7 +98,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, null);
+            Logger.LogError(ex, "Error when execute command {strCommand}", strCommand);
         }
         finally
         {

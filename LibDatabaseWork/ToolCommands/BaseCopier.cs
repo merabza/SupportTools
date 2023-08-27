@@ -12,7 +12,7 @@ public sealed class BaseCopier : ToolCommand
     private const string ActionName = "Copy Database";
     private const string ActionDescription = "Copy Database";
 
-    public BaseCopier(ILogger logger, CopyBaseParameters parameters, IParametersManager parametersManager) : base(
+    public BaseCopier(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(
         logger, ActionName, parameters, parametersManager, ActionDescription)
     {
     }
@@ -48,13 +48,16 @@ public sealed class BaseCopier : ToolCommand
         var backupFileParametersForSource = agentClientForSource
             .CreateBackup(CopyBaseParameters.SourceDbBackupParameters, CopyBaseParameters.SourceDatabaseName).Result;
 
-        //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფისირდა, ვჩერდებით.
+        //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
         if (backupFileParametersForSource == null)
         {
             Logger.LogError("Backup not created");
             return false;
         }
 
+        var fileName = backupFileParametersForSource.Name;
+        var prefix = backupFileParametersForSource.Prefix;
+        var suffix = backupFileParametersForSource.Suffix;
         //თუ წყაროს ფაილსაცავი ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
         //   მაშინ მოქაჩვა საჭირო აღარ არის
         if (!CopyBaseParameters.NeedDownloadFromSource)
@@ -64,26 +67,26 @@ public sealed class BaseCopier : ToolCommand
 
         else
         {
-            Logger.LogInformation($"Download File {backupFileParametersForSource.Name}");
+            Logger.LogInformation("Download File {fileName}", fileName);
 
             //წყაროდან ლოკალურ ფოლდერში მოქაჩვა
-            if (!CopyBaseParameters.SourceFileManager.DownloadFile(backupFileParametersForSource.Name,
+            if (!CopyBaseParameters.SourceFileManager.DownloadFile(fileName,
                     CopyBaseParameters.DownloadTempExtension))
             {
-                Logger.LogError($"Can not Download File {backupFileParametersForSource.Name}");
+                Logger.LogError("Can not Download File {fileName}", fileName);
                 return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for source");
 
-            CopyBaseParameters.SourceFileManager.RemoveRedundantFiles(backupFileParametersForSource.Prefix,
-                backupFileParametersForSource.DateMask, backupFileParametersForSource.Suffix,
+            CopyBaseParameters.SourceFileManager.RemoveRedundantFiles(prefix,
+                backupFileParametersForSource.DateMask, suffix,
                 CopyBaseParameters.SourceSmartSchema);
         }
 
         Logger.LogInformation("Remove Redundant Files for local");
-        CopyBaseParameters.LocalFileManager.RemoveRedundantFiles(backupFileParametersForSource.Prefix,
-            backupFileParametersForSource.DateMask, backupFileParametersForSource.Suffix,
+        CopyBaseParameters.LocalFileManager.RemoveRedundantFiles(prefix,
+            backupFileParametersForSource.DateMask, suffix,
             CopyBaseParameters.LocalSmartSchema);
 
         //თუ მიზნის ფაილსაცავი ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს ან თუ წყაროს და მიზნის ფაილსაცავები ემთხვევა
@@ -91,47 +94,47 @@ public sealed class BaseCopier : ToolCommand
 
         if (CopyBaseParameters.NeedUploadToDestination)
         {
-            Logger.LogInformation($"Upload File {backupFileParametersForSource.Name} to Destination");
+            Logger.LogInformation("Upload File {fileName} to Destination", fileName);
 
-            if (!CopyBaseParameters.DestinationFileManager.UploadFile(backupFileParametersForSource.Name,
+            if (!CopyBaseParameters.DestinationFileManager.UploadFile(fileName,
                     CopyBaseParameters.UploadTempExtension))
             {
-                Logger.LogError($"Can not Upload File {backupFileParametersForSource.Name}");
+                Logger.LogError("Can not Upload File {fileName}", fileName);
                 return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for destination");
 
-            CopyBaseParameters.DestinationFileManager.RemoveRedundantFiles(backupFileParametersForSource.Prefix,
-                backupFileParametersForSource.DateMask, backupFileParametersForSource.Suffix,
+            CopyBaseParameters.DestinationFileManager.RemoveRedundantFiles(prefix,
+                backupFileParametersForSource.DateMask, suffix,
                 CopyBaseParameters.DestinationSmartSchema);
         }
 
         //ან თუ გაცვლის ფაილსაცავი არ გვაქვს, ან ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
         //   მაშინ მოქაჩვა საჭირო აღარ არის
-        if (CopyBaseParameters.NeedDownloadFromExchange && CopyBaseParameters.ExchangeFileManager is not null)
+        if (CopyBaseParameters is { NeedDownloadFromExchange: true, ExchangeFileManager: not null })
         {
-            Logger.LogInformation($"Upload File {backupFileParametersForSource.Name} to Exchange");
+            Logger.LogInformation("Upload File {fileName} to Exchange", fileName);
 
-            if (!CopyBaseParameters.ExchangeFileManager.UploadFile(backupFileParametersForSource.Name,
-                    CopyBaseParameters.UploadTempExtension))
+            if (!CopyBaseParameters.ExchangeFileManager.UploadFile(fileName, CopyBaseParameters.UploadTempExtension))
             {
-                Logger.LogError($"Can not Upload File {backupFileParametersForSource.Name}");
+                Logger.LogError("Can not Upload File {fileName}", fileName);
                 return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for exchange");
 
 
-            CopyBaseParameters.ExchangeFileManager.RemoveRedundantFiles(backupFileParametersForSource.Prefix,
-                backupFileParametersForSource.DateMask, backupFileParametersForSource.Suffix,
+            CopyBaseParameters.ExchangeFileManager.RemoveRedundantFiles(prefix,
+                backupFileParametersForSource.DateMask, suffix,
                 CopyBaseParameters.ExchangeSmartSchema);
         }
 
-        Logger.LogInformation($"Check if Destination base {CopyBaseParameters.DestinationDatabaseName} exists");
+        var destinationDatabaseName = CopyBaseParameters.DestinationDatabaseName;
+        Logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
-        var result = agentClientForDestination.IsDatabaseExists(CopyBaseParameters.DestinationDatabaseName).Result;
+        var result = agentClientForDestination.IsDatabaseExists(destinationDatabaseName).Result;
         if (result.IsT1)
         {
             foreach (var err in result.AsT1) StShared.WriteErrorLine($"Error from server: {err.ErrorMessage}", true);
@@ -140,16 +143,16 @@ public sealed class BaseCopier : ToolCommand
 
         if (result.AsT0)
         {
-            Logger.LogInformation(
-                $"Create Backup for Destination base {CopyBaseParameters.DestinationDatabaseName}");
+            Logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
+                destinationDatabaseName);
 
             var backupFileParametersForDestination = agentClientForDestination
-                .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters,
-                    CopyBaseParameters.DestinationDatabaseName).Result;
+                .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName).Result;
 
             if (backupFileParametersForDestination == null)
             {
-                Logger.LogError($"{GetActionDescription()} - finished with errors");
+                var actionDescription = GetActionDescription();
+                Logger.LogError("{actionDescription} - finished with errors", actionDescription);
                 return false;
             }
 
@@ -162,14 +165,15 @@ public sealed class BaseCopier : ToolCommand
             //თუ მიზნის ფაილსაცავი ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
             //   მაშინ მოქაჩვა საჭირო აღარ არის
 
+            var destinationFileName = backupFileParametersForDestination.Name;
             if (CopyBaseParameters.NeedDownloadFromDestination)
             {
-                Logger.LogInformation($"Download File {backupFileParametersForDestination.Name} from Destination");
+                Logger.LogInformation("Download File {destinationFileName} from Destination", destinationFileName);
 
-                if (!CopyBaseParameters.DestinationFileManager.DownloadFile(backupFileParametersForDestination.Name,
+                if (!CopyBaseParameters.DestinationFileManager.DownloadFile(destinationFileName,
                         CopyBaseParameters.DownloadTempExtension))
                 {
-                    Logger.LogError($"Can not Download File {backupFileParametersForDestination.Name}");
+                    Logger.LogError("Can not Download File {destinationFileName}", destinationFileName);
                     return false;
                 }
 
@@ -179,15 +183,14 @@ public sealed class BaseCopier : ToolCommand
                     CopyBaseParameters.LocalSmartSchema);
             }
 
-            if (CopyBaseParameters.NeedUploadDestinationToExchange &&
-                CopyBaseParameters.ExchangeFileManager is not null)
+            if (CopyBaseParameters is { NeedUploadDestinationToExchange: true, ExchangeFileManager: not null })
             {
-                Logger.LogInformation($"Upload File {backupFileParametersForDestination.Name} to Exchange");
+                Logger.LogInformation("Upload File {destinationFileName} to Exchange", destinationFileName);
 
-                if (!CopyBaseParameters.ExchangeFileManager.UploadFile(backupFileParametersForDestination.Name,
+                if (!CopyBaseParameters.ExchangeFileManager.UploadFile(destinationFileName,
                         CopyBaseParameters.UploadTempExtension))
                 {
-                    Logger.LogError($"Can not Upload File {backupFileParametersForDestination.Name}");
+                    Logger.LogError("Can not Upload File {destinationFileName}", destinationFileName);
                     return false;
                 }
 
@@ -199,12 +202,10 @@ public sealed class BaseCopier : ToolCommand
         }
 
         //მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
-        Logger.LogInformation($"Restoring database {CopyBaseParameters.DestinationDatabaseName}");
+        Logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
-        var success = agentClientForDestination
-            .RestoreDatabaseFromBackup(backupFileParametersForSource, CopyBaseParameters.DestinationDatabaseName,
-                CopyBaseParameters.LocalPath)
-            .Result;
+        var success = agentClientForDestination.RestoreDatabaseFromBackup(backupFileParametersForSource,
+            destinationDatabaseName, CopyBaseParameters.LocalPath).Result;
 
         if (success)
             return true;
