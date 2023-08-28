@@ -66,7 +66,7 @@ public static class CopyBaseParametersFabric
         //1. თუ ლოკალური ფოლდერი არ არსებობს, შეიქმნას
         if (!Directory.Exists(localPath))
         {
-            logger.LogInformation($"Creating local folder {localPath}");
+            logger.LogInformation("Creating local folder {localPath}", localPath);
             Directory.CreateDirectory(localPath);
         }
 

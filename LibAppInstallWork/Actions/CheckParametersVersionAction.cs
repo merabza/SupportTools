@@ -55,7 +55,7 @@ public sealed class CheckParametersVersionAction : ToolAction
             tryCount++;
             try
             {
-                Logger.LogInformation($"Try to get parameters Version {tryCount}...");
+                Logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
 
                 version = _proxySettings is ProxySettings proxySettings
                     ? webAgentClientForVersion
@@ -66,36 +66,39 @@ public sealed class CheckParametersVersionAction : ToolAction
 
                 if (_appSettingsVersion == null)
                 {
-                    Logger.LogInformation($"{ProjectName} is running on parameters version {version}");
+                    Logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
+                        version);
                     return true;
                 }
 
                 if ("\"" + _appSettingsVersion + "\"" != version)
                 {
-                    Logger.LogWarning(
-                        $"Current Parameters version is {version}, but must be {_appSettingsVersion}");
+                    Logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
+                        version, _appSettingsVersion);
                     getVersionSuccess = false;
                 }
             }
             catch
             {
-                Logger.LogWarning($"could not get Parameters version for project {ProjectName} on try {tryCount}");
+                Logger.LogWarning("could not get Parameters version for project {ProjectName} on try {tryCount}",
+                    ProjectName, tryCount);
             }
         }
 
         if (!getVersionSuccess)
         {
-            Logger.LogError($"could not get parameters version for project {ProjectName}");
+            Logger.LogError("could not get parameters version for project {ProjectName}", ProjectName);
             return false;
         }
 
         if ("\"" + _appSettingsVersion + "\"" != version)
         {
-            Logger.LogError($"Current parameters version is {version}, but must be {_appSettingsVersion}");
+            Logger.LogError("Current parameters version is {version}, but must be {_appSettingsVersion}", version,
+                _appSettingsVersion);
             return false;
         }
 
-        Logger.LogInformation($"{ProjectName} now is running on parameters version {version}");
+        Logger.LogInformation("{ProjectName} now is running on parameters version {version}", ProjectName, version);
         return true;
     }
 }

@@ -67,7 +67,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (!File.Exists(_keysJsonFileName))
         {
-            Logger.LogError($"keys file {_keysJsonFileName} does not exists");
+            Logger.LogError("keys file {_keysJsonFileName} does not exists", _keysJsonFileName);
             return null;
         }
 
@@ -121,13 +121,10 @@ public sealed class EncodeParametersAction : ToolAction
             }
         }
 
-        //if (appSetEnKeysList != null)
-        //{
         foreach (var dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
                      .Where(w => w.keys.Length != 0).Where(w => !Enc(appSetJObject, encKey, w.keys))
                      .Select(w => w.dataKey))
-            Logger.LogWarning($"cannot found dataKey {dataKey}");
-        //}
+            Logger.LogWarning("cannot found dataKey {dataKey}", dataKey);
 
         AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
@@ -135,7 +132,7 @@ public sealed class EncodeParametersAction : ToolAction
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);
     }
 
-    private bool Enc(JToken val, string encKey)
+    private static bool Enc(JToken val, string encKey)
     {
         if (val.Type != JTokenType.String)
             return val.All(v => Enc(v, encKey));
@@ -145,7 +142,7 @@ public sealed class EncodeParametersAction : ToolAction
         return true;
     }
 
-    private bool Enc(JToken val, string encKey, string[] keys, int k = 0)
+    private static bool Enc(JToken val, string encKey, string[] keys, int k = 0)
     {
         if (k == keys.Length)
             return Enc(val, encKey);

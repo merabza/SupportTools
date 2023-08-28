@@ -25,9 +25,10 @@ public sealed class ServiceStopper : ToolCommand
 
     protected override bool RunAction()
     {
-        Logger.LogInformation($"Try to stop service {_parameters.ServiceName}...");
+        var serviceName = _parameters.ServiceName;
+        Logger.LogInformation("Try to stop service {serviceName}...", serviceName);
 
-        if (string.IsNullOrWhiteSpace(_parameters.ServiceName))
+        if (string.IsNullOrWhiteSpace(serviceName))
         {
             Logger.LogError("Service Name not specified");
             return false;
@@ -39,15 +40,15 @@ public sealed class ServiceStopper : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError($"agentClient does not created. Service {_parameters.ServiceName} can not be stopped");
+            Logger.LogError("agentClient does not created. Service {serviceName} can not be stopped", serviceName);
             return false;
         }
 
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        if (!agentClient.StopService(_parameters.ServiceName))
+        if (!agentClient.StopService(serviceName))
         {
-            Logger.LogError($"Service {_parameters.ServiceName} can not be stopped");
+            Logger.LogError("Service {serviceName} can not be stopped", serviceName);
             return false;
         }
 

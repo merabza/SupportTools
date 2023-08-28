@@ -54,7 +54,7 @@ public sealed class CheckProgramVersionAction : ToolAction
             tryCount++;
             try
             {
-                Logger.LogInformation($"Try to get Version {tryCount}...");
+                Logger.LogInformation("Try to get Version {tryCount}...", tryCount);
 
                 version = _proxySettings is ProxySettings proxySettings
                     ? webAgentClientForVersion
@@ -63,14 +63,15 @@ public sealed class CheckProgramVersionAction : ToolAction
 
                 if (_installingProgramVersion == null)
                 {
-                    Logger.LogInformation($"Project is running on version {version}");
+                    Logger.LogInformation("Project is running on version {version}", version);
                     return true;
                 }
 
 
                 if ("\"" + _installingProgramVersion + "\"" != version)
                 {
-                    Logger.LogWarning($"Current version is {version}, but must be {_installingProgramVersion}");
+                    Logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,
+                        _installingProgramVersion);
                     getVersionSuccess = false;
                 }
 
@@ -92,11 +93,12 @@ public sealed class CheckProgramVersionAction : ToolAction
 
         if ("\"" + _installingProgramVersion + "\"" != version)
         {
-            Logger.LogError($"Current version is {version}, but must be {_installingProgramVersion}");
+            Logger.LogError("Current version is {version}, but must be {_installingProgramVersion}", version,
+                _installingProgramVersion);
             return false;
         }
 
-        Logger.LogInformation($"Project now is running on version {version}");
+        Logger.LogInformation("Project now is running on version {version}", version);
 
         return true;
     }

@@ -42,7 +42,8 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
             return false;
         }
 
-        Logger.LogInformation($"Delete Migrations{Path.DirectorySeparatorChar}*.cs files");
+        var directorySeparatorChar = Path.DirectorySeparatorChar;
+        Logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
         foreach (var csFile in migrationsFolder.GetFiles("*.cs")) csFile.Delete();
 
         Logger.LogInformation("Create Initial Migration");
