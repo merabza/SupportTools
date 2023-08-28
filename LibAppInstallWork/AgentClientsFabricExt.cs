@@ -11,7 +11,8 @@ public static class AgentClientsFabricExt
     public static IAgentClient CreateWebAgentClient(ILogger logger,
         ApiClientSettingsDomain programUpdaterWebAgentSettings)
     {
-        return new WebAgentClient(logger, programUpdaterWebAgentSettings.Server, programUpdaterWebAgentSettings.ApiKey);
+        return new WebAgentClient(logger, programUpdaterWebAgentSettings.Server, programUpdaterWebAgentSettings.ApiKey,
+            null, null);
     }
 
     public static IAgentClientWithFileStorage? CreateAgentClientWithFileStorage(ILogger logger,
@@ -26,7 +27,7 @@ public static class AgentClientsFabricExt
 
         if (installerBaseParameters.WebAgentForInstall is not null)
             return new WebAgentClientWithFileStorage(logger, installerBaseParameters.WebAgentForInstall.Server,
-                installerBaseParameters.WebAgentForInstall.ApiKey);
+                installerBaseParameters.WebAgentForInstall.ApiKey, null, null);
         if (installerBaseParameters.LocalInstallerSettings is not null)
             return new LocalAgentWithFileStorage(logger, false, fileStorageForUpload,
                 installerBaseParameters.LocalInstallerSettings, null, null);
@@ -44,7 +45,7 @@ public static class AgentClientsFabricExt
         }
 
         if (programUpdaterWebAgent is not null)
-            return new WebAgentClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey);
+            return new WebAgentClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null, null);
         if (!string.IsNullOrWhiteSpace(installFolder))
             return new LocalAgent(logger, false, installFolder, null, null);
         logger.LogError("Both ApiClient Settings and install Folder are not specified");
