@@ -111,7 +111,7 @@ public static class CopyBaseParametersFabric
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
         var (exchangeFileStorage, exchangeFileManager) =
             FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                exchangeFileStorageName, fileStorages);
+                exchangeFileStorageName, fileStorages, null, null);
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromProductionToDeveloper
@@ -120,7 +120,7 @@ public static class CopyBaseParametersFabric
 
         var (sourceFileStorage, sourceFileManager) =
             FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                sourceFileStorageName, fileStorages);
+                sourceFileStorageName, fileStorages, null, null);
 
         if (sourceFileManager == null)
         {
@@ -141,7 +141,7 @@ public static class CopyBaseParametersFabric
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
         var (destinationFileStorage, destinationFileManager) =
             FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                destinationFileStorageName, fileStorages);
+                destinationFileStorageName, fileStorages, null, null);
 
         if (destinationFileStorage == null)
         {
@@ -168,8 +168,8 @@ public static class CopyBaseParametersFabric
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true,
-            logger, sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections);
+        var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
+            sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections, null, null);
 
         if (agentClientForSource is null)
         {
@@ -177,9 +177,8 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var agentClientForDestination =
-            DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger, destinationDbWebAgentName,
-                apiClients, destinationDbConnectionName, databaseServerConnections);
+        var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
+            destinationDbWebAgentName, apiClients, destinationDbConnectionName, databaseServerConnections, null, null);
 
         if (agentClientForDestination is null)
         {
@@ -243,7 +242,7 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var needDownloadFromSource = !FileStorageData.IsSameToLocal(sourceFileStorage, localPath);
+        var needDownloadFromSource = !FileStorageData.IsSameToLocal(sourceFileStorage, localPath, null, null);
 
         SmartSchemas smartSchemas = new(supportToolsParameters.SmartSchemas);
 
@@ -260,7 +259,7 @@ public static class CopyBaseParametersFabric
             ? null
             : smartSchemas.GetSmartSchemaByKey(localSmartSchemaName);
 
-        var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
+        var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath, null, null) &&
                                       sourceFileStorageName != destinationFileStorageName;
 
         var destinationSmartSchemaName =
@@ -270,7 +269,7 @@ public static class CopyBaseParametersFabric
             : smartSchemas.GetSmartSchemaByKey(destinationSmartSchemaName);
 
         var needDownloadFromExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-                                       !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
+                                       !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath, null, null) &&
                                        exchangeFileStorageName != sourceFileStorageName;
 
         var exchangeSmartSchemaName = dep.ExchangeSmartSchemaName;
@@ -279,10 +278,11 @@ public static class CopyBaseParametersFabric
             ? null
             : smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
 
-        var needDownloadFromDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath);
+        var needDownloadFromDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath, null, null);
 
         var needUploadDestinationToExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-                                              !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
+                                              !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath, null,
+                                                  null) &&
                                               exchangeFileStorageName != destinationFileStorageName;
 
         return new CopyBaseParameters(agentClientForSource, agentClientForDestination, exchangeFileManager,
