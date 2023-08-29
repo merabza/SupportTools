@@ -58,7 +58,7 @@ public sealed class InstallProgramAction : ToolAction
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         _installingProgramVersion = agentClient.InstallProgram(_projectName, _environmentName, _programArchiveDateMask,
-            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension);
+            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension).Result;
 
         if (_installingProgramVersion != null)
             return true;

@@ -45,7 +45,7 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        if (!agentClient.StartService(_parameters.ServiceName))
+        if (!agentClient.StartService(_parameters.ServiceName).Result)
         {
             Logger.LogError("Service {serviceName} can not started", serviceName);
             return false;

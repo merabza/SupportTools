@@ -46,7 +46,7 @@ public sealed class ServiceStopper : ToolCommand
 
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        if (!agentClient.StopService(serviceName))
+        if (!agentClient.StopService(serviceName).Result)
         {
             Logger.LogError("Service {serviceName} can not be stopped", serviceName);
             return false;

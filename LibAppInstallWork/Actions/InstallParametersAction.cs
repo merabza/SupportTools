@@ -55,7 +55,8 @@ public sealed class InstallParametersAction : ToolAction
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
         if (agentClient.UpdateAppParametersFile(_projectName, _environmentName, _serviceName,
-                Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension))
+                Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension)
+            .Result)
             return true;
 
         Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);

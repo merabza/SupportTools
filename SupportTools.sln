@@ -111,6 +111,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentProjectsApiContract
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentMessagesContracts", "..\WebAgentContracts\WebAgentMessagesContracts\WebAgentMessagesContracts.csproj", "{1465E96F-3FC0-470B-A960-246BCC595670}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRClient", "..\SystemTools\SignalRClient\SignalRClient.csproj", "{6B2ED882-66B1-434A-BFCF-51D0F435AB77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -301,6 +303,10 @@ Global
 		{1465E96F-3FC0-470B-A960-246BCC595670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1465E96F-3FC0-470B-A960-246BCC595670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1465E96F-3FC0-470B-A960-246BCC595670}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B2ED882-66B1-434A-BFCF-51D0F435AB77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B2ED882-66B1-434A-BFCF-51D0F435AB77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B2ED882-66B1-434A-BFCF-51D0F435AB77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B2ED882-66B1-434A-BFCF-51D0F435AB77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -346,6 +352,7 @@ Global
 		{ABBC2944-8DC0-4BAD-A88E-AD97B39BA3B8} = {DAF78034-D0C2-4E88-8EE3-F219EC254BEC}
 		{25A443B2-111F-4BBF-B250-1437F744E32C} = {DAF78034-D0C2-4E88-8EE3-F219EC254BEC}
 		{1465E96F-3FC0-470B-A960-246BCC595670} = {DAF78034-D0C2-4E88-8EE3-F219EC254BEC}
+		{6B2ED882-66B1-434A-BFCF-51D0F435AB77} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6088D4D5-9C94-40A5-A44F-E146E1810790}
