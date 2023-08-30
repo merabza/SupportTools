@@ -20,7 +20,7 @@ public static class ProjectsAgentClientsFabric
 
         if (installerBaseParameters.WebAgentForInstall is not null)
             return new ProjectsApiClientWithFileStorage(logger, installerBaseParameters.WebAgentForInstall.Server,
-                installerBaseParameters.WebAgentForInstall.ApiKey, null, null);
+                installerBaseParameters.WebAgentForInstall.ApiKey);
         if (installerBaseParameters.LocalInstallerSettings is not null)
             return new ProjectsLocalAgentWithFileStorage(logger, false, fileStorageForUpload,
                 installerBaseParameters.LocalInstallerSettings, null, null);
@@ -39,8 +39,7 @@ public static class ProjectsAgentClientsFabric
         }
 
         if (programUpdaterWebAgent is not null)
-            return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null,
-                null);
+            return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey);
         if (!string.IsNullOrWhiteSpace(installFolder))
             return new ProjectsLocalAgent(logger, false, installFolder, null, null);
         logger.LogError("Both ApiClient Settings and install Folder are not specified");

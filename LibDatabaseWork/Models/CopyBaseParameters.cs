@@ -8,8 +8,8 @@ namespace LibDatabaseWork.Models;
 
 public sealed class CopyBaseParameters : IParameters
 {
-    public CopyBaseParameters(DatabaseManagementClient agentClientForSource,
-        DatabaseManagementClient agentClientForDestination, FileManager? exchangeFileManager,
+    public CopyBaseParameters(IDatabaseApiClient agentClientForSource,
+        IDatabaseApiClient agentClientForDestination, FileManager? exchangeFileManager,
         FileManager sourceFileManager, FileManager destinationFileManager, FileManager localFileManager,
         DatabaseBackupParametersDomain sourceDbBackupParameters,
         DatabaseBackupParametersDomain destinationDbBackupParameters, bool needDownloadFromSource,
@@ -42,8 +42,8 @@ public sealed class CopyBaseParameters : IParameters
         LocalPath = localPath;
     }
 
-    public DatabaseManagementClient AgentClientForSource { get; }
-    public DatabaseManagementClient AgentClientForDestination { get; }
+    public IDatabaseApiClient AgentClientForSource { get; }
+    public IDatabaseApiClient AgentClientForDestination { get; }
     public FileManager? ExchangeFileManager { get; }
     public FileManager SourceFileManager { get; }
     public FileManager DestinationFileManager { get; }

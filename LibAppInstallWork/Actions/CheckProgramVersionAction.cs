@@ -53,8 +53,8 @@ public sealed class CheckProgramVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
-                        _webAgentForCheck.ApiKey, null, null);
+                    var proxyApiClient =
+                        new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
                     version = proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId)
                         .Result;
                 }
