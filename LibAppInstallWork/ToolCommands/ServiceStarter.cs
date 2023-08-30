@@ -36,7 +36,8 @@ public sealed class ServiceStarter : ToolCommand
 
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabricExt.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            ProjectsAgentClientsFabric.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall,
+                _parameters.InstallFolder);
 
         if (agentClient is null)
         {

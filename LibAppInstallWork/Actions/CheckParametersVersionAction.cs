@@ -35,12 +35,6 @@ public sealed class CheckParametersVersionAction : ToolAction
 
     protected override bool RunAction()
     {
-        //კლიენტის შექმნა ვერსიის შესამოწმებლად
-        var agentClientForVersion = ProjectsAgentClientsFabricExt.CreateWebAgentClient(Logger, _webAgentForCheck);
-
-        if (agentClientForVersion is not ProjectsApiClient webAgentClientForVersion)
-            return false;
-
         var getVersionSuccess = false;
         var version = "";
         var tryCount = 0;
@@ -57,10 +51,20 @@ public sealed class CheckParametersVersionAction : ToolAction
             {
                 Logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
 
-                version = _proxySettings is ProxySettings proxySettings
-                    ? webAgentClientForVersion
-                        .GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId).Result
-                    : webAgentClientForVersion.GetAppSettingsVersion().Result ?? "";
+                if (_proxySettings is ProxySettings proxySettings)
+                {
+                    //კლიენტის შექმნა ვერსიის შესამოწმებლად
+                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                        _webAgentForCheck.ApiKey, null, null);
+                    version = proxyApiClient
+                        .GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId).Result;
+                }
+                else
+                {
+                    //კლიენტის შექმნა ვერსიის შესამოწმებლად
+                    var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    version = testApiClient.GetAppSettingsVersion().Result ?? "";
+                }
 
                 getVersionSuccess = true;
 

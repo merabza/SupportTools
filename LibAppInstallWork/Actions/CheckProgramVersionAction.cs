@@ -34,7 +34,6 @@ public sealed class CheckProgramVersionAction : ToolAction
 
     protected override bool RunAction()
     {
-
         var getVersionSuccess = false;
         var version = "";
         var tryCount = 0;
@@ -54,9 +53,9 @@ public sealed class CheckProgramVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new ProjectsVersionApiClient(Logger, _webAgentForCheck.Server,
+                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, null, null);
-                    version = testApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId)
+                    version = proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId)
                         .Result;
                 }
                 else

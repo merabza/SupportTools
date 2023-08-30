@@ -6,15 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork;
 
-public static class ProjectsAgentClientsFabricExt
+public static class ProjectsAgentClientsFabric
 {
-    public static IProjectsApiClient CreateWebAgentClient(ILogger logger,
-        ApiClientSettingsDomain programUpdaterWebAgentSettings)
-    {
-        return new ProjectsApiClient(logger, programUpdaterWebAgentSettings.Server, programUpdaterWebAgentSettings.ApiKey,
-            null, null);
-    }
-
     public static IIProjectsApiClientWithFileStorage? CreateProjectsApiClientWithFileStorage(ILogger logger,
         FileStorageData fileStorageForUpload, InstallerBaseParameters installerBaseParameters)
     {
@@ -26,16 +19,17 @@ public static class ProjectsAgentClientsFabricExt
         }
 
         if (installerBaseParameters.WebAgentForInstall is not null)
-            return new WebAgentClientWithFileStorage(logger, installerBaseParameters.WebAgentForInstall.Server,
+            return new ProjectsApiClientWithFileStorage(logger, installerBaseParameters.WebAgentForInstall.Server,
                 installerBaseParameters.WebAgentForInstall.ApiKey, null, null);
         if (installerBaseParameters.LocalInstallerSettings is not null)
-            return new LocalAgentWithFileStorage(logger, false, fileStorageForUpload,
+            return new ProjectsLocalAgentWithFileStorage(logger, false, fileStorageForUpload,
                 installerBaseParameters.LocalInstallerSettings, null, null);
         logger.LogError("Both ApiClient Settings and Installer Settings are not specified");
         return null;
     }
 
-    public static IProjectsApiClient? CreateProjectsApiClient(ILogger logger, ApiClientSettingsDomain? programUpdaterWebAgent,
+    public static IProjectsApiClient? CreateProjectsApiClient(ILogger logger,
+        ApiClientSettingsDomain? programUpdaterWebAgent,
         string? installFolder)
     {
         if (programUpdaterWebAgent is not null && installFolder is not null)
@@ -45,7 +39,8 @@ public static class ProjectsAgentClientsFabricExt
         }
 
         if (programUpdaterWebAgent is not null)
-            return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null, null);
+            return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null,
+                null);
         if (!string.IsNullOrWhiteSpace(installFolder))
             return new ProjectsLocalAgent(logger, false, installFolder, null, null);
         logger.LogError("Both ApiClient Settings and install Folder are not specified");
