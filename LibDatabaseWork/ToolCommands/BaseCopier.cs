@@ -137,7 +137,8 @@ public sealed class BaseCopier : ToolCommand
         var result = agentClientForDestination.IsDatabaseExists(destinationDatabaseName).Result;
         if (result.IsT1)
         {
-            foreach (var err in result.AsT1) StShared.WriteErrorLine($"Error from server: {err.ErrorMessage}", true);
+            foreach (var err in result.AsT1)
+                StShared.WriteErrorLine($"Error from server: {err.ErrorMessage}", true);
             return false;
         }
 
