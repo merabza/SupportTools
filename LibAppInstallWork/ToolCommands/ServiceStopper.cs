@@ -36,7 +36,7 @@ public sealed class ServiceStopper : ToolCommand
 
         //კლიენტის შექმნა
         var agentClient =
-            AgentClientsFabricExt.CreateAgentClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            ProjectsAgentClientsFabricExt.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
 
         if (agentClient is null)
         {

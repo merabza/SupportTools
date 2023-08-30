@@ -4,7 +4,6 @@ using System.Linq;
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
-using Installer.AgentClients;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
@@ -17,12 +16,11 @@ public sealed class ServerDataCruder : ParCruder
     public ServerDataCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager, "Server",
         "Servers")
     {
-        WebAgentClientFabric webAgentClientFabric = new();
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerDataModel.IsLocal), true));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerDataModel.WebAgentName), ParametersManager,
-            webAgentClientFabric, true));
+            true));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerDataModel.WebAgentInstallerName),
-            ParametersManager, webAgentClientFabric, true));
+            ParametersManager, true));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUserName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUsersGroupName)));
         FieldEditors.Add(new RunTimeNameFieldEditor(nameof(ServerDataModel.Runtime), ParametersManager));

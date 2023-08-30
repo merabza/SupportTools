@@ -36,9 +36,9 @@ public sealed class CheckParametersVersionAction : ToolAction
     protected override bool RunAction()
     {
         //კლიენტის შექმნა ვერსიის შესამოწმებლად
-        var agentClientForVersion = AgentClientsFabricExt.CreateWebAgentClient(Logger, _webAgentForCheck);
+        var agentClientForVersion = ProjectsAgentClientsFabricExt.CreateWebAgentClient(Logger, _webAgentForCheck);
 
-        if (agentClientForVersion is not WebAgentClient webAgentClientForVersion)
+        if (agentClientForVersion is not ProjectsApiClient webAgentClientForVersion)
             return false;
 
         var getVersionSuccess = false;

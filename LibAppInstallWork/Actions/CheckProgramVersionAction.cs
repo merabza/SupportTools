@@ -34,11 +34,6 @@ public sealed class CheckProgramVersionAction : ToolAction
 
     protected override bool RunAction()
     {
-        //კლიენტის შექმნა ვერსიის შესამოწმებლად
-        var agentClientForVersion = AgentClientsFabricExt.CreateWebAgentClient(Logger, _webAgentForCheck);
-
-        if (agentClientForVersion is not WebAgentClient webAgentClientForVersion)
-            return false;
 
         var getVersionSuccess = false;
         var version = "";
@@ -56,10 +51,20 @@ public sealed class CheckProgramVersionAction : ToolAction
             {
                 Logger.LogInformation("Try to get Version {tryCount}...", tryCount);
 
-                version = _proxySettings is ProxySettings proxySettings
-                    ? webAgentClientForVersion
-                        .GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId).Result
-                    : webAgentClientForVersion.GetVersion().Result ?? "";
+                if (_proxySettings is ProxySettings proxySettings)
+                {
+                    //კლიენტის შექმნა ვერსიის შესამოწმებლად
+                    var testApiClient = new ProjectsVersionApiClient(Logger, _webAgentForCheck.Server,
+                        _webAgentForCheck.ApiKey, null, null);
+                    version = testApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId)
+                        .Result;
+                }
+                else
+                {
+                    //კლიენტის შექმნა ვერსიის შესამოწმებლად
+                    var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    version = testApiClient.GetVersion().Result ?? "";
+                }
 
                 if (_installingProgramVersion == null)
                 {

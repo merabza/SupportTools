@@ -6,16 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork;
 
-public static class AgentClientsFabricExt
+public static class ProjectsAgentClientsFabricExt
 {
-    public static IAgentClient CreateWebAgentClient(ILogger logger,
+    public static IProjectsApiClient CreateWebAgentClient(ILogger logger,
         ApiClientSettingsDomain programUpdaterWebAgentSettings)
     {
-        return new WebAgentClient(logger, programUpdaterWebAgentSettings.Server, programUpdaterWebAgentSettings.ApiKey,
+        return new ProjectsApiClient(logger, programUpdaterWebAgentSettings.Server, programUpdaterWebAgentSettings.ApiKey,
             null, null);
     }
 
-    public static IAgentClientWithFileStorage? CreateAgentClientWithFileStorage(ILogger logger,
+    public static IIProjectsApiClientWithFileStorage? CreateProjectsApiClientWithFileStorage(ILogger logger,
         FileStorageData fileStorageForUpload, InstallerBaseParameters installerBaseParameters)
     {
         if (installerBaseParameters.WebAgentForInstall is not null &&
@@ -35,7 +35,7 @@ public static class AgentClientsFabricExt
         return null;
     }
 
-    public static IAgentClient? CreateAgentClient(ILogger logger, ApiClientSettingsDomain? programUpdaterWebAgent,
+    public static IProjectsApiClient? CreateProjectsApiClient(ILogger logger, ApiClientSettingsDomain? programUpdaterWebAgent,
         string? installFolder)
     {
         if (programUpdaterWebAgent is not null && installFolder is not null)
@@ -45,9 +45,9 @@ public static class AgentClientsFabricExt
         }
 
         if (programUpdaterWebAgent is not null)
-            return new WebAgentClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null, null);
+            return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey, null, null);
         if (!string.IsNullOrWhiteSpace(installFolder))
-            return new LocalAgent(logger, false, installFolder, null, null);
+            return new ProjectsLocalAgent(logger, false, installFolder, null, null);
         logger.LogError("Both ApiClient Settings and install Folder are not specified");
         return null;
     }

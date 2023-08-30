@@ -31,7 +31,7 @@ public sealed class ProgramRemover : ToolCommand
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
         var agentClient =
-            AgentClientsFabricExt.CreateAgentClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            ProjectsAgentClientsFabricExt.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall, _parameters.InstallFolder);
         if (agentClient is null)
         {
             Logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);

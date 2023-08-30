@@ -41,7 +41,7 @@ public sealed class InstallParametersAction : ToolAction
     {
         //კლიენტის შექმნა
         var agentClient =
-            AgentClientsFabricExt.CreateAgentClientWithFileStorage(Logger, _fileStorageForUpload,
+            ProjectsAgentClientsFabricExt.CreateProjectsApiClientWithFileStorage(Logger, _fileStorageForUpload,
                 _installerBaseParameters);
         if (agentClient is null)
         {

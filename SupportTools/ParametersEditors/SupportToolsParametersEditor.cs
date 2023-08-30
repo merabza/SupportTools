@@ -3,7 +3,6 @@ using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
 using CliParametersEdit.FieldEditors;
-using Installer.AgentClients;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
@@ -17,7 +16,6 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters,
         parametersManager)
     {
-        var webAgentClientFabric = new WebAgentClientFabric();
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.SecurityFolder)));
@@ -39,8 +37,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger,
             nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
-        FieldEditors.Add(new ApiClientsFieldEditor(logger, nameof(SupportToolsParameters.ApiClients),
-            parametersManager, webAgentClientFabric));
+        FieldEditors.Add(
+            new ApiClientsFieldEditor(logger, nameof(SupportToolsParameters.ApiClients), parametersManager));
         FieldEditors.Add(new GitsFieldEditor(logger, nameof(SupportToolsParameters.Gits), parametersManager));
         FieldEditors.Add(new ReactAppTemplatesFieldEditor(logger, nameof(SupportToolsParameters.ReactAppTemplates),
             parametersManager));

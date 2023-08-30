@@ -4,7 +4,6 @@ using CliParametersApiClientsDbEdit;
 using CliParametersApiClientsEdit.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
 using CliParametersEdit.FieldEditors;
-using Installer.AgentClients;
 using LibDatabaseWork.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -15,17 +14,16 @@ namespace SupportTools;
 public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
 {
     public ServerDatabasesExchangeParametersEditor(ILogger logger, IParametersManager parametersManager,
-        ParametersManager listsParametersManager) : base("Databases Exchange Parameters", parametersManager)
+        IParametersManager listsParametersManager) : base("Databases Exchange Parameters", parametersManager)
     {
-        WebAgentClientFabric webAgentClientFabric = new();
 
         //პროდაქშენ სერვერის მხარე
         FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.ProductionDbConnectionName), listsParametersManager, true));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger,
-            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), listsParametersManager, webAgentClientFabric,
+            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), listsParametersManager,
             true));
-        //ბეკაპირების პარამეტრები პროდაქშენ სერვერის მხარეს
+        //ბექაპირების პარამეტრები პროდაქშენ სერვერის მხარეს
         FieldEditors.Add(new DatabaseBackupParametersFieldEditor(
             nameof(DatabasesExchangeParameters.ProductionDbBackupParameters), listsParametersManager));
 
@@ -39,7 +37,7 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         //შესაძლებელია ახალი სახელის მითითება, თუ პროდაქშენ ბაზა ჯერ არ არსებობს
         FieldEditors.Add(new DatabaseNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.CurrentProductionBaseName),
-            listsParametersManager, webAgentClientFabric,
+            listsParametersManager,
             nameof(DatabasesExchangeParameters.ProductionDbConnectionName),
             nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), true));
 
@@ -50,7 +48,7 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         //ხოლო ახალი პროდაქშენ ბაზისათვის მზად არის ახალი პროგრამა.
         //მას მერე, რაც საჭიროება აღარ იქნება, CurrentProductionBaseName და ProductionBaseName სახელები ერთმანეთს უნდა დაემთხვას.
         FieldEditors.Add(new DatabaseNameFieldEditor(logger, nameof(DatabasesExchangeParameters.NewProductionBaseName),
-            listsParametersManager, webAgentClientFabric,
+            listsParametersManager,
             nameof(DatabasesExchangeParameters.ProductionDbConnectionName),
             nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), true));
 
@@ -84,9 +82,9 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.DeveloperDbConnectionName), listsParametersManager, true));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger,
-            nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), listsParametersManager, webAgentClientFabric,
+            nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), listsParametersManager,
             true));
-        //ბეკაპირების პარამეტრები დეველოპერ სერვერის მხარეს
+        //ბექაპირების პარამეტრები დეველოპერ სერვერის მხარეს
         FieldEditors.Add(new DatabaseBackupParametersFieldEditor(
             nameof(DatabasesExchangeParameters.DeveloperDbBackupParameters), listsParametersManager));
 
@@ -100,12 +98,12 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         //აქ დამატებით შეიძლება ახალი, ჯერ არ არსებული, ბაზის სახელის მითითება
         FieldEditors.Add(new DatabaseNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.ProductionBaseCopyNameForDeveloperServer), listsParametersManager,
-            webAgentClientFabric, nameof(DatabasesExchangeParameters.DeveloperDbConnectionName),
+            nameof(DatabasesExchangeParameters.DeveloperDbConnectionName),
             nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), true));
         //დეველოპერ ბაზის სახელის არჩევა ხდება დეველოპერ სერვერზე არსებული ბაზების სახელებიდან
         //აქ დამატებით შეიძლება ახალი, ჯერ არ არსებული, ბაზის სახელის მითითება
         FieldEditors.Add(new DatabaseNameFieldEditor(logger, nameof(DatabasesExchangeParameters.DeveloperBaseName),
-            listsParametersManager, webAgentClientFabric, nameof(DatabasesExchangeParameters.DeveloperDbConnectionName),
+            listsParametersManager, nameof(DatabasesExchangeParameters.DeveloperDbConnectionName),
             nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), true));
 
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს დეველოპერ ბაზის სერვერის მხარეს)

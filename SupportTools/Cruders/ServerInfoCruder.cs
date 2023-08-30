@@ -5,7 +5,6 @@ using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
-using Installer.AgentClients;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
@@ -35,11 +34,10 @@ public sealed class ServerInfoCruder : ParCruder
         if (!project.IsService)
             return;
 
-        WebAgentClientFabric webAgentClientFabric = new();
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, nameof(ServerInfoModel.ServerName), ParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerInfoModel.WebAgentNameForCheck),
-            ParametersManager, webAgentClientFabric));
+            ParametersManager));
         FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
