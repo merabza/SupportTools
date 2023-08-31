@@ -3,7 +3,6 @@ using CliParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -134,15 +133,7 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
-        var result = agentClientForDestination.IsDatabaseExists(destinationDatabaseName).Result;
-        if (result.IsT1)
-        {
-            foreach (var err in result.AsT1)
-                StShared.WriteErrorLine($"Error from server: {err.ErrorMessage}", true);
-            return false;
-        }
-
-        if (result.AsT0)
+        if (agentClientForDestination.IsDatabaseExists(destinationDatabaseName).Result)
         {
             Logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
                 destinationDatabaseName);
