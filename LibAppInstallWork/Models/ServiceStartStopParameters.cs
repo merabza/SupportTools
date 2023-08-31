@@ -10,12 +10,13 @@ namespace LibAppInstallWork.Models;
 
 public sealed class ServiceStartStopParameters : IParameters
 {
-    private ServiceStartStopParameters(string projectName, string serviceName,
+    private ServiceStartStopParameters(string projectName, string serviceName, string environmentName,
         ApiClientSettingsDomain? webAgentForInstall, string? installFolder, ProxySettingsBase proxySettings,
         ApiClientSettingsDomain webAgentForCheck)
     {
         ProjectName = projectName;
         ServiceName = serviceName;
+        EnvironmentName = environmentName;
         WebAgentForInstall = webAgentForInstall;
         InstallFolder = installFolder;
         ProxySettings = proxySettings;
@@ -24,6 +25,8 @@ public sealed class ServiceStartStopParameters : IParameters
 
     public string ProjectName { get; }
     public string ServiceName { get; }
+    public string EnvironmentName { get; }
+
     public ApiClientSettingsDomain? WebAgentForInstall { get; }
     public string? InstallFolder { get; }
     public ProxySettingsBase ProxySettings { get; }
@@ -66,6 +69,12 @@ public sealed class ServiceStartStopParameters : IParameters
                 return null;
             }
 
+            if (string.IsNullOrWhiteSpace(serverInfo.EnvironmentName))
+            {
+                StShared.WriteErrorLine("Environment name is not specified", true);
+                return null;
+            }
+
             var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             ApiClientSettingsDomain? webAgentForInstall = null;
@@ -99,11 +108,10 @@ public sealed class ServiceStartStopParameters : IParameters
             var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId,
                 projectName, serverInfo);
 
-            if (proxySettings is null)
-                return null;
-
-            return new ServiceStartStopParameters(projectName, project.ServiceName, webAgentForInstall, installFolder,
-                proxySettings, checkVersionParameters.WebAgentForCheck);
+            return proxySettings is null
+                ? null
+                : new ServiceStartStopParameters(projectName, project.ServiceName, serverInfo.EnvironmentName,
+                    webAgentForInstall, installFolder, proxySettings, checkVersionParameters.WebAgentForCheck);
         }
         catch (Exception e)
         {

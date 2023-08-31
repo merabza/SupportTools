@@ -32,7 +32,15 @@ public sealed class ServiceStarter : ToolCommand
     protected override bool RunAction()
     {
         var serviceName = _parameters.ServiceName;
-        Logger.LogInformation("Try to start service {serviceName}...", serviceName);
+        var environmentName = _parameters.EnvironmentName;
+
+        Logger.LogInformation("Try to start service {serviceName}/{environmentName}...", serviceName, environmentName);
+
+        if (string.IsNullOrWhiteSpace(serviceName))
+        {
+            Logger.LogError("Service Name not specified");
+            return false;
+        }
 
         //კლიენტის შექმნა
         var agentClient =
@@ -41,14 +49,15 @@ public sealed class ServiceStarter : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {serviceName} can not started", serviceName);
+            Logger.LogError("agentClient does not created. Service {serviceName}/{environmentName} can not started",
+                serviceName, environmentName);
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        if (!agentClient.StartService(_parameters.ServiceName).Result)
+        if (!agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName).Result)
         {
-            Logger.LogError("Service {serviceName} can not started", serviceName);
+            Logger.LogError("Service {serviceName}/{environmentName} can not started", serviceName, environmentName);
             return false;
         }
 
@@ -58,14 +67,16 @@ public sealed class ServiceStarter : ToolCommand
         CheckParametersVersionAction checkParametersVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!checkParametersVersionAction.Run())
-            Logger.LogError("Service {serviceName} parameters file check failed", serviceName);
+            Logger.LogError("Service {serviceName}/{environmentName} parameters file check failed", serviceName,
+                environmentName);
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია ServiceStartParameters.ServiceName, 
         CheckProgramVersionAction checkProgramVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!checkProgramVersionAction.Run())
-            Logger.LogError("Service {serviceName} version check failed", serviceName);
+            Logger.LogError("Service {serviceName}/{environmentName} version check failed", serviceName,
+                environmentName);
 
         return true;
     }

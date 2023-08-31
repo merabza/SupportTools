@@ -40,7 +40,8 @@ public sealed class ProgramRemover : ToolCommand
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName).Result)
+        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName)
+            .Result)
             return true;
 
         Logger.LogError("Project {projectName} can not removed", projectName);

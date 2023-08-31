@@ -10,23 +10,30 @@ namespace LibAppInstallWork.ToolCommands;
 public sealed class ServiceStopper : ToolCommand
 {
     private const string ActionName = "Stop Service";
+    private const string ActionDescription = "Stop Service";
     private readonly ServiceStartStopParameters _parameters;
 
     public ServiceStopper(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
-        base(logger, ActionName, parameters, parametersManager, "Stop Service")
+        base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _parameters = parameters;
     }
 
     protected override bool CheckValidate()
     {
-        return true;
+        if (!string.IsNullOrWhiteSpace(_parameters.ServiceName))
+            return true;
+
+        Logger.LogError("Service Name not specified");
+        return false;
     }
 
     protected override bool RunAction()
     {
         var serviceName = _parameters.ServiceName;
-        Logger.LogInformation("Try to stop service {serviceName}...", serviceName);
+        var environmentName = _parameters.EnvironmentName;
+
+        Logger.LogInformation("Try to stop service {serviceName}/{environmentName}...", serviceName, environmentName);
 
         if (string.IsNullOrWhiteSpace(serviceName))
         {
@@ -41,15 +48,15 @@ public sealed class ServiceStopper : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {serviceName} can not be stopped", serviceName);
+            Logger.LogError("agentClient does not created. Service {serviceName}/{environmentName} can not be stopped",
+                serviceName, environmentName);
             return false;
         }
 
-
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        if (!agentClient.StopService(serviceName).Result)
+        if (!agentClient.StopService(serviceName, environmentName).Result)
         {
-            Logger.LogError("Service {serviceName} can not be stopped", serviceName);
+            Logger.LogError("Service {serviceName}/{environmentName} can not be stopped", serviceName, environmentName);
             return false;
         }
 
