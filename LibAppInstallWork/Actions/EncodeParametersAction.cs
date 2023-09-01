@@ -128,6 +128,11 @@ public sealed class EncodeParametersAction : ToolAction
 
         AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
+        if (string.IsNullOrWhiteSpace(appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Value<string>()))
+            StShared.WriteWarningLine(
+                $"AppSettingsVersion did not defined. If you continue, we can not check installed AppSettingsVersion. Please add to {_sourceJsonFileName} file VersionInfo:AppSettingsVersion",
+                true, Logger, true);
+
         appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);
     }

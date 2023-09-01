@@ -71,10 +71,9 @@ public sealed class ServerInfoCruder : ParCruder
         if (newRecord is not ServerInfoModel newServer)
             throw new Exception("newServer is null in ServerInfoCruder.UpdateRecordWithKey");
 
-        var crudersDictionary = GetCrudersDictionary();
-        if (crudersDictionary is null)
-            throw new Exception("crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
-
+        var crudersDictionary = GetCrudersDictionary() ??
+                                throw new Exception(
+                                    "crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
         crudersDictionary[recordKey] = newServer;
     }
 
@@ -83,18 +82,16 @@ public sealed class ServerInfoCruder : ParCruder
         if (newRecord is not ServerInfoModel newServer)
             throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
-        if (project is null)
-            throw new Exception($"Project with name {_projectName} not found");
+        var project = parameters.GetProject(_projectName) ??
+                      throw new Exception($"Project with name {_projectName} not found");
         project.ServerInfos.Add(recordKey, newServer);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
-        if (project == null)
-            throw new Exception($"Project with name {_projectName} not found");
+        var project = parameters.GetProject(_projectName) ??
+                      throw new Exception($"Project with name {_projectName} not found");
         project.ServerInfos.Remove(recordKey);
     }
 
