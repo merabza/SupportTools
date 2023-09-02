@@ -3,7 +3,6 @@ using System.Linq;
 using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
-using Microsoft.Extensions.Logging;
 using SupportTools.DotnetTools;
 using SupportTools.MenuCommands;
 
@@ -11,11 +10,8 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
-
-    public DotnetToolsSubMenuCommand(ILogger logger) : base("Dotnet Tools")
+    public DotnetToolsSubMenuCommand() : base("Dotnet Tools")
     {
-        _logger = logger;
         MenuAction = EMenuAction.LoadSubMenu;
     }
 
@@ -42,7 +38,6 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
         var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCommand();
         dotnetToolsSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
 
-
         //დაინსტალირებული ინსტრუმენტების სიის დადგენა
         var dotnetToolsInstalled = DotnetToolsManager.Instance.DotnetTools;
 
@@ -53,12 +48,10 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
         //var dotnetToolCommand = new DotnetToolCliMenuCommand();
         //dotnetToolsSubMenuSet.AddMenuItem(dotnetToolCommand);
 
-
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
         dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null),
             key.Length);
-
 
         return dotnetToolsSubMenuSet;
     }

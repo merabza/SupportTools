@@ -15,7 +15,7 @@ public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataMode
     private readonly ParametersManager _parametersManager;
 
     public GitsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
-        propertyName, null, true)
+        propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

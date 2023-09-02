@@ -34,6 +34,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForExchange),
             parametersManager));
+        //---
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger,
             nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));

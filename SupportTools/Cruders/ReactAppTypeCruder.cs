@@ -19,7 +19,7 @@ public sealed class ReactAppTypeCruder : ParCruder
         "React App Type", "React App Types")
     {
         _logger = logger;
-        FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), "TemplateName"));
+        FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), true, "TemplateName"));
     }
 
     private Dictionary<string, string> GetReactAppTemplateNames()

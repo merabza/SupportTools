@@ -38,7 +38,7 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(new ParametersEditorListCommand(supportToolsParametersEditor),
             "Support Tools Parameters Editor");
 
-        DotnetToolsSubMenuCommand dotnetToolsSubMenuCommand = new(_logger);
+        DotnetToolsSubMenuCommand dotnetToolsSubMenuCommand = new();
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ

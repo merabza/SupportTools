@@ -11,8 +11,8 @@ public sealed class RunTimesFieldEditor : FieldEditor<Dictionary<string, string>
 {
     private readonly ParametersManager _parametersManager;
 
-    public RunTimesFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, null,
-        true)
+    public RunTimesFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, false,
+        null, true)
     {
         _parametersManager = parametersManager;
     }

@@ -13,7 +13,7 @@ public sealed class DatabasesExchangeParametersFieldEditor : FieldEditor<Databas
     private readonly ParametersManager _parametersManager;
 
     public DatabasesExchangeParametersFieldEditor(ILogger logger, string databasesExchangeParametersName,
-        ParametersManager parametersManager) : base(databasesExchangeParametersName, null, true)
+        ParametersManager parametersManager) : base(databasesExchangeParametersName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

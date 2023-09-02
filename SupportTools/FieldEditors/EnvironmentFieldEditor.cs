@@ -11,8 +11,8 @@ public sealed class EnvironmentFieldEditor : FieldEditor<Dictionary<string, stri
 {
     private readonly ParametersManager _parametersManager;
 
-    public EnvironmentFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, null,
-        true)
+    public EnvironmentFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, false,
+        null, true)
     {
         _parametersManager = parametersManager;
     }

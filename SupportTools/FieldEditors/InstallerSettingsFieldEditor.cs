@@ -13,7 +13,7 @@ public sealed class InstallerSettingsFieldEditor : FieldEditor<InstallerSettings
     private readonly ParametersManager _parametersManager;
 
     public InstallerSettingsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) :
-        base(propertyName, null, true)
+        base(propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

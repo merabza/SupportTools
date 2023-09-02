@@ -14,7 +14,7 @@ public sealed class ReactAppTemplatesFieldEditor : FieldEditor<Dictionary<string
     private readonly ParametersManager _parametersManager;
 
     public ReactAppTemplatesFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) :
-        base(propertyName, null, true)
+        base(propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

@@ -15,7 +15,7 @@ public sealed class ServersFieldEditor : FieldEditor<Dictionary<string, ServerDa
     private readonly ParametersManager _parametersManager;
 
     public ServersFieldEditor(string propertyName, ILogger logger, ParametersManager parametersManager) : base(
-        propertyName, null, true)
+        propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

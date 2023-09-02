@@ -17,7 +17,7 @@ public sealed class GitCruder : ParCruder
 {
     private readonly ILogger _logger;
 
-    public GitCruder(ILogger logger, ParametersManager parametersManager) : base(parametersManager, "Git", "Gits")
+    public GitCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager, "Git", "Gits")
     {
         _logger = logger;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));

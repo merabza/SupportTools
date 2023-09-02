@@ -8,6 +8,7 @@ using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibFileParameters.Interfaces;
 using LibFileParameters.Models;
+using SystemToolsShared;
 
 namespace SupportToolsData.Models;
 
@@ -158,13 +159,24 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         var project = GetProject(projectName);
         if (project is null)
             return null;
-        return gitCol switch
+        switch (gitCol)
         {
-            EGitCol.Main => project.ProjectFolderName,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederProjectName == null
-                ? null
-                : GetProjectScaffoldSeederPath(project.ScaffoldSeederProjectName),
-            _ => null
-        };
+            case EGitCol.Main:
+                if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
+                    return project.ProjectFolderName;
+
+                StShared.WriteErrorLine("ProjectFolderName must be specified", true);
+                return null;
+
+            case EGitCol.ScaffoldSeed:
+                if (project.ScaffoldSeederProjectName != null)
+                    return GetProjectScaffoldSeederPath(project.ScaffoldSeederProjectName);
+
+                StShared.WriteErrorLine("ScaffoldSeederProjectName must be specified", true);
+                return null;
+
+            default:
+                return null;
+        }
     }
 }
