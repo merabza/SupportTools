@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:04:08
 
+using System.Threading;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
@@ -54,7 +55,7 @@ public sealed class ServiceStopper : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        if (!agentClient.StopService(serviceName, environmentName).Result)
+        if (!agentClient.StopService(serviceName, environmentName, CancellationToken.None).Result)
         {
             Logger.LogError("Service {serviceName}/{environmentName} can not be stopped", serviceName, environmentName);
             return false;

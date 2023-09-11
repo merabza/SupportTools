@@ -1,4 +1,5 @@
-﻿using LibAppInstallWork.Models;
+﻿using System.Threading;
+using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -58,7 +59,7 @@ public sealed class InstallProgramAction : ToolAction
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         _installingProgramVersion = agentClient.InstallProgram(_projectName, _environmentName, _programArchiveDateMask,
-            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension).Result;
+            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, CancellationToken.None).Result;
 
         if (_installingProgramVersion != null)
             return true;

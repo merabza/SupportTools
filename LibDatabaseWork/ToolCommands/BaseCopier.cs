@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CliParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
@@ -45,7 +46,8 @@ public sealed class BaseCopier : ToolCommand
 
         //ბექაპის დამზადება წყაროს მხარეს
         var backupFileParametersForSource = agentClientForSource
-            .CreateBackup(CopyBaseParameters.SourceDbBackupParameters, CopyBaseParameters.SourceDatabaseName).Result;
+            .CreateBackup(CopyBaseParameters.SourceDbBackupParameters, CopyBaseParameters.SourceDatabaseName,
+                CancellationToken.None).Result;
 
         //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
         if (backupFileParametersForSource == null)
@@ -133,13 +135,14 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
-        if (agentClientForDestination.IsDatabaseExists(destinationDatabaseName).Result)
+        if (agentClientForDestination.IsDatabaseExists(destinationDatabaseName, CancellationToken.None).Result)
         {
             Logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
                 destinationDatabaseName);
 
             var backupFileParametersForDestination = agentClientForDestination
-                .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName).Result;
+                .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName,
+                    CancellationToken.None).Result;
 
             if (backupFileParametersForDestination == null)
             {
@@ -197,7 +200,7 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
         var success = agentClientForDestination.RestoreDatabaseFromBackup(backupFileParametersForSource,
-            destinationDatabaseName, CopyBaseParameters.LocalPath).Result;
+            destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath).Result;
 
         if (success)
             return true;

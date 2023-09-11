@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
+using System.Threading;
 using CliParameters;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
@@ -55,7 +56,8 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        if (!agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName).Result)
+        if (!agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName, CancellationToken.None)
+                .Result)
         {
             Logger.LogError("Service {serviceName}/{environmentName} can not started", serviceName, environmentName);
             return false;

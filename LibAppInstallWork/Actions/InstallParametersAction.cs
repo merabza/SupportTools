@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
@@ -55,7 +56,8 @@ public sealed class InstallParametersAction : ToolAction
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
         if (agentClient.UpdateAppParametersFile(_projectName, _environmentName, _serviceName,
-                Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension)
+                Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
+                CancellationToken.None)
             .Result)
             return true;
 

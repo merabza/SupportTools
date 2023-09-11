@@ -1,3 +1,4 @@
+using System.Threading;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
@@ -40,7 +41,8 @@ public sealed class ProgramRemover : ToolCommand
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName)
+        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
+                CancellationToken.None)
             .Result)
             return true;
 

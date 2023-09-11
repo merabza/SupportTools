@@ -57,13 +57,14 @@ public sealed class CheckParametersVersionAction : ToolAction
                     var proxyApiClient =
                         new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
                     version = proxyApiClient
-                        .GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId).Result;
+                        .GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId,
+                            CancellationToken.None).Result;
                 }
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
-                    version = testApiClient.GetAppSettingsVersion().Result ?? "";
+                    version = testApiClient.GetAppSettingsVersion(CancellationToken.None).Result ?? "";
                 }
 
                 getVersionSuccess = true;
