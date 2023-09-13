@@ -9,6 +9,7 @@ namespace SupportToolsData.Models;
 public sealed class ProjectModel : ItemData
 {
     public string? ServiceName { get; set; }
+    public string? ProjectDescription { get; set; }
     public bool UseAlternativeWebAgent { get; set; }
     public string? ProjectFolderName { get; set; }
     public string? SolutionFileName { get; set; }

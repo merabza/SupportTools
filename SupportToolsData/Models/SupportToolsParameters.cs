@@ -22,6 +22,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? SecurityFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }
     public string? PublisherWorkFolder { get; set; }
+    public string? ServiceDescriptionSignature { get; set; }
     public string? UploadTempExtension { get; set; }
     public string? ProgramArchiveDateMask { get; set; }
     public string? ProgramArchiveExtension { get; set; }

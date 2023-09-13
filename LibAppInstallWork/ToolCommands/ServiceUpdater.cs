@@ -79,7 +79,9 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.ParametersFileExtension,
             ProgramServiceUpdaterParameters.FileStorageForDownload, projectName, environmentName,
             ProgramServiceUpdaterParameters.ServiceName, ProgramServiceUpdaterParameters.ServiceUserName,
-            appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
+            appSettingsEncoderParameters.AppSettingsEncodedJsonFileName,
+            ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
+            ProgramServiceUpdaterParameters.ProjectDescription);
         if (!installProgramAction.Run())
         {
             Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);

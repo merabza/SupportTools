@@ -13,7 +13,7 @@ public sealed class ServiceUpdaterParameters : IParameters
         CheckVersionParameters checkVersionParameters, ProxySettingsBase proxySettings,
         AppSettingsEncoderParameters appSettingsEncoderParameters, string programArchiveDateMask,
         string programArchiveExtension, string parametersFileDateMask, string parametersFileExtension,
-        FileStorageData fileStorageForDownload)
+        FileStorageData fileStorageForDownload, string? serviceDescriptionSignature, string? projectDescription)
     {
         ServiceUserName = serviceUserName;
         ServiceName = serviceName;
@@ -27,6 +27,8 @@ public sealed class ServiceUpdaterParameters : IParameters
         ParametersFileDateMask = parametersFileDateMask;
         ParametersFileExtension = parametersFileExtension;
         FileStorageForDownload = fileStorageForDownload;
+        ServiceDescriptionSignature = serviceDescriptionSignature;
+        ProjectDescription = projectDescription;
     }
 
     public string ServiceUserName { get; }
@@ -41,6 +43,9 @@ public sealed class ServiceUpdaterParameters : IParameters
     public string ProgramArchiveExtension { get; }
     public string ParametersFileDateMask { get; }
     public string ParametersFileExtension { get; }
+    public string? ServiceDescriptionSignature { get; }
+    public string? ProjectDescription { get; }
+
 
     public bool IsService => !string.IsNullOrWhiteSpace(ServiceName);
 
@@ -149,11 +154,11 @@ public sealed class ServiceUpdaterParameters : IParameters
         if (proxySettings is null)
             return null;
 
-        var programServiceUpdaterParameters = new ServiceUpdaterParameters(
-            serverInfo.ServiceUserName,
+        var programServiceUpdaterParameters = new ServiceUpdaterParameters(serverInfo.ServiceUserName,
             project.ServiceName, installerBaseParameters, progPublisherParameters, checkVersionParameters,
-            proxySettings, appSettingsEncoderParameters, programArchiveDateMask,
-            programArchiveExtension, parametersFileDateMask, parametersFileExtension, fileStorageForUpload);
+            proxySettings, appSettingsEncoderParameters, programArchiveDateMask, programArchiveExtension,
+            parametersFileDateMask, parametersFileExtension, fileStorageForUpload,
+            supportToolsParameters.ServiceDescriptionSignature, project.ProjectDescription);
         return programServiceUpdaterParameters;
     }
 }

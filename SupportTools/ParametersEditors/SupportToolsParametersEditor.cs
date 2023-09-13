@@ -21,6 +21,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.SecurityFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.ScaffoldSeedersWorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.PublisherWorkFolder)));
+
+        FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ServiceDescriptionSignature)));
+
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.UploadTempExtension),
             SupportToolsParameters.DefaultUploadFileTempExtension));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ProgramArchiveDateMask)));

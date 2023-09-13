@@ -16,6 +16,8 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _ftpSiteUserName;
     private readonly int _portNumber;
     private readonly string _projectName;
+    private readonly string? _serviceDescriptionSignature;
+    private readonly string? _projectDescription;
     private readonly string _runTime;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
@@ -25,10 +27,11 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _settingsFileName;
 
     public CreateServiceInstallScript(ILogger logger, string scriptFileName, int portNumber, string ftpSiteAddress,
-        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName, string runTime,
-        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string serviceName,
-        string settingsFileName, string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
-        nameof(ServiceInstallScriptCreator), null, null)
+        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
+        string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
+        string serverSideDownloadFolder, string serverSideDeployFolder, string serviceName, string settingsFileName,
+        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreator),
+        null, null)
     {
         _scriptFileName = scriptFileName;
         _portNumber = portNumber;
@@ -37,6 +40,8 @@ public class CreateServiceInstallScript : ToolAction
         _ftpSitePassword = ftpSitePassword;
         _ftpSiteDirectory = ftpSiteDirectory;
         _projectName = projectName;
+        _serviceDescriptionSignature = serviceDescriptionSignature;
+        _projectDescription = projectDescription;
         _runTime = runTime;
         _environmentName = environmentName;
         _serverSideDownloadFolder = serverSideDownloadFolder;
@@ -86,6 +91,8 @@ public class CreateServiceInstallScript : ToolAction
               pass={{_ftpSitePassword}}
               directory={{_ftpSiteDirectory}}
               projectName={{_projectName}}
+              ServiceDescriptionSignature={{_serviceDescriptionSignature}}
+              ProjectDescription={{_projectDescription}}
               runTime={{_runTime}}
               environmentName={{_environmentName}}
               downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
@@ -101,8 +108,8 @@ public class CreateServiceInstallScript : ToolAction
 
               LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
 
-              echo downloadFilePrefix is $downloadFilePrefix
-              echo downloadSettingsFilePrefixis $downloadSettingsFilePrefix
+              echo download File Prefix is $downloadFilePrefix
+              echo download Settings File Prefix is $downloadSettingsFilePrefix
 
 
               if [ ! -e $dotnetRunner ]
@@ -196,7 +203,7 @@ public class CreateServiceInstallScript : ToolAction
               quit
               fin
 
-              echo parse the filenames from the directory listing
+              echo parse the file names from the directory listing
               files_to_get=`cut -c $LS_FILE_OFFSET- < directory_listing`
 
               echo remove directory_listing
@@ -281,15 +288,15 @@ public class CreateServiceInstallScript : ToolAction
                 exit 2
               fi
 
-              downloadzSettingsJsonFileName=$expandedFolderName/$SettingsFileName
+              downloadSettingsJsonFileName=$expandedFolderName/$SettingsFileName
 
-              cmd="get $latestSettingsJsonFileName $downloadzSettingsJsonFileName
+              cmd="get $latestSettingsJsonFileName $downloadSettingsJsonFileName
               "
 
               echo cmd is $cmd
 
 
-              #rm $downloadzSettingsJsonFileName
+              #rm $downloadSettingsJsonFileName
 
 
               # go back and get the file(s)
@@ -315,11 +322,11 @@ public class CreateServiceInstallScript : ToolAction
               rm $serviceConfigFileName
 
               if [ ! -e $serviceConfigFileName ]; then
-                echo Servise configfile $serviceConfigFileName does not exists
+                echo Service config file $serviceConfigFileName does not exists
               
                 cat >$serviceConfigFileName <<fin
               [Unit]
-              Description=$projectName service
+              Description=$projectName service $serviceDescriptionSignature $ProjectDescription
 
               [Service]
               WorkingDirectory=$projectInstallFullPath

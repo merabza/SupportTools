@@ -12,7 +12,8 @@ public sealed class ProgramInstallerParameters : IParameters
         InstallerBaseParameters installerBaseParameters, string serviceUserName, string appSettingsJsonSourceFileName,
         string encodedJsonFileName, ProxySettingsBase proxySettings, FileStorageData fileStorageForExchange,
         ApiClientSettingsDomain webAgentForCheck, string programArchiveDateMask, string programArchiveExtension,
-        string parametersFileDateMask, string parametersFileExtension)
+        string parametersFileDateMask, string parametersFileExtension, string? serviceDescriptionSignature,
+        string? projectDescription)
     {
         ProjectName = projectName;
         ServerInfo = serverInfo;
@@ -28,6 +29,8 @@ public sealed class ProgramInstallerParameters : IParameters
         ProgramArchiveExtension = programArchiveExtension;
         ParametersFileDateMask = parametersFileDateMask;
         ParametersFileExtension = parametersFileExtension;
+        ServiceDescriptionSignature = serviceDescriptionSignature;
+        ProjectDescription = projectDescription;
     }
 
     public string ProjectName { get; }
@@ -46,6 +49,9 @@ public sealed class ProgramInstallerParameters : IParameters
 
     public string ServiceUserName { get; }
     public string EncodedJsonFileName { get; }
+
+    public string? ServiceDescriptionSignature { get; }
+    public string? ProjectDescription { get; }
 
     public ProxySettingsBase ProxySettings { get; }
 
@@ -162,7 +168,8 @@ public sealed class ProgramInstallerParameters : IParameters
         var progInstallerParameters = new ProgramInstallerParameters(projectName, serverInfo, project.ServiceName,
             installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
             serverInfo.AppSettingsEncodedJsonFileName, proxySettings, fileStorageForDownload, webAgentForCheck,
-            programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension);
+            programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension,
+            supportToolsParameters.ServiceDescriptionSignature, project.ProjectDescription);
         return progInstallerParameters;
     }
 }

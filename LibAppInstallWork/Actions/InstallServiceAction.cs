@@ -20,12 +20,15 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string _projectName;
     private readonly string? _serviceName;
     private readonly string _serviceUserName;
+    private readonly string? _serviceDescriptionSignature;
+    private readonly string? _projectDescription;
 
 
     public InstallServiceAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
         string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
         string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
-        string environmentName, string? serviceName, string serviceUserName, string encodedJsonFileName) : base(logger,
+        string environmentName, string? serviceName, string serviceUserName, string encodedJsonFileName,
+        string? serviceDescriptionSignature, string? projectDescription) : base(logger,
         "Install service", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
@@ -39,6 +42,8 @@ public sealed class InstallServiceAction : ToolAction
         _serviceName = serviceName;
         _serviceUserName = serviceUserName;
         _encodedJsonFileName = encodedJsonFileName;
+        _serviceDescriptionSignature = serviceDescriptionSignature;
+        _projectDescription = projectDescription;
     }
 
     public string? InstallingProgramVersion { get; private set; }
@@ -69,7 +74,8 @@ public sealed class InstallServiceAction : ToolAction
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         InstallingProgramVersion = agentClient.InstallService(_projectName, _environmentName, _serviceName,
             _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
-            _parametersFileDateMask, _parametersFileExtension, CancellationToken.None).Result;
+            _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
+            CancellationToken.None).Result;
 
         if (InstallingProgramVersion != null)
             return true;

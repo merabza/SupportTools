@@ -71,7 +71,7 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
             Parameters.ServerInfo.EnvironmentName, Parameters.ServiceName, Parameters.ServiceUserName,
-            Parameters.EncodedJsonFileName);
+            Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
         if (!installProgramAction.Run())
         {
             Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
