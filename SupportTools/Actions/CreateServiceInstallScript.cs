@@ -92,19 +92,19 @@ public class CreateServiceInstallScript : ToolAction
               directory={{_ftpSiteDirectory}}
               projectName={{_projectName}}
               ServiceDescriptionSignature={{_serviceDescriptionSignature}}
-              ProjectDescription={{_projectDescription}}
+              ProjectDescription="{{_projectDescription}}"
               runTime={{_runTime}}
               environmentName={{_environmentName}}
               downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
               downloadSettingsFilePrefix="$myHostname-$environmentName-$projectName-"
               downloadFolder={{_serverSideDownloadFolder}}
               deployFolder={{_serverSideDeployFolder}}
-              ServiceName={{_serviceName}}{{_environmentName}}
               SettingsFileName={{_settingsFileName}}
               userName={{_serverSideServiceUserName}}
 
               projectInstallFullPath=$deployFolder/$projectName/$environmentName
               mainDllFileName=$projectInstallFullPath/$projectName.dll
+              serviceEnvName=$projectName$environmentName
 
               LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
 
@@ -164,11 +164,6 @@ public class CreateServiceInstallScript : ToolAction
               echo The Argument deployFolder is $deployFolder
               if [ -z "$deployFolder" ]; then
                 echo "deployFolder not specified, process finished!"
-                exit 1
-              fi
-              echo The Argument ServiceName is $ServiceName
-              if [ -z "$ServiceName" ]; then
-                echo "ServiceName not specified, process finished!"
                 exit 1
               fi
               echo The Argument SettingsFileName is $SettingsFileName
@@ -310,13 +305,13 @@ public class CreateServiceInstallScript : ToolAction
               quit
               fin
 
-              if (( $(ps -ef | grep -v grep | grep $ServiceName | wc -l) > 0 ))
+              if (( $(ps -ef | grep -v grep | grep $serviceEnvName | wc -l) > 0 ))
               then
                 echo Stop Service...
-                sudo systemctl stop $ServiceName.service
+                sudo systemctl stop $serviceEnvName.service
               fi
 
-              serviceConfigFileName=/etc/systemd/system/$ServiceName.service
+              serviceConfigFileName=/etc/systemd/system/$serviceEnvName.service
               echo serviceConfigFileName is $serviceConfigFileName
 
               rm $serviceConfigFileName
@@ -352,10 +347,10 @@ public class CreateServiceInstallScript : ToolAction
               echo move files
               sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
 
-              sudo systemctl enable $ServiceName.service
+              sudo systemctl enable $serviceEnvName.service
 
-              sudo systemctl start $ServiceName.service
-              sudo systemctl status $ServiceName.service
+              sudo systemctl start $serviceEnvName.service
+              sudo systemctl status $serviceEnvName.service
 
               echo Remove Archive...
               rm $downloadzipfilename
@@ -364,7 +359,7 @@ public class CreateServiceInstallScript : ToolAction
               rm -rf $expandedFolderName
 
               echo for logs
-              echo sudo journalctl -fu $ServiceName.service
+              echo sudo journalctl -fu $serviceEnvName.service
 
               exit 0
 
