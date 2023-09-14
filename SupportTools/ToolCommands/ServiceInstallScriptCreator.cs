@@ -168,7 +168,8 @@ public class ServiceInstallScriptCreator : ToolCommand
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,
-            _par.Project.ServiceName, sf.Name, _par.ServerInfo.ServiceUserName,
+            //_par.Project.ServiceName, 
+            sf.Name, _par.ServerInfo.ServiceUserName,
             _par.FileStorageForExchange.FtpSiteLsFileOffset);
         return createInstallScript.Run();
     }
