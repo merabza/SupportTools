@@ -78,6 +78,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                     Logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,
                         _installingProgramVersion);
                     getVersionSuccess = false;
+                    break;
                 }
 
                 //აქ თუ მოვედით, ყველაფერი კარგად არის
