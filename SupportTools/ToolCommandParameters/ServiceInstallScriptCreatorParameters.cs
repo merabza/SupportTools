@@ -7,18 +7,22 @@ namespace SupportTools.ToolCommandParameters;
 
 public class ServiceInstallScriptCreatorParameters : IParameters
 {
-    private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName, ProjectModel project,
+    private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName,
+        string? serviceDescriptionSignature, ProjectModel project,
         ServerInfoModel serverInfo, FileStorageData fileStorageForExchange)
     {
         SecurityFolder = securityFolder;
         ProjectName = projectName;
         Project = project;
+        ServiceDescriptionSignature = serviceDescriptionSignature;
         ServerInfo = serverInfo;
         FileStorageForExchange = fileStorageForExchange;
     }
 
     public string? SecurityFolder { get; }
     public string ProjectName { get; }
+    public string? ServiceDescriptionSignature { get; }
+
     public ProjectModel Project { get; }
     public ServerInfoModel ServerInfo { get; }
     public FileStorageData FileStorageForExchange { get; }
@@ -48,7 +52,7 @@ public class ServiceInstallScriptCreatorParameters : IParameters
         var fileStorageForDownload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        return new ServiceInstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName, project,
-            serverInfo, fileStorageForDownload);
+        return new ServiceInstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,
+            supportToolsParameters.ServiceDescriptionSignature, project, serverInfo, fileStorageForDownload);
     }
 }

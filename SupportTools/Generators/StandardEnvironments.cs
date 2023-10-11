@@ -11,7 +11,7 @@ public static class StandardEnvironmentsGenerator
 
         //თუ არ არსებობს დაემატოს ჭკვიანი სქემები: DailyStandard, Reduce, Hourly
         parameters.Environments.TryAdd("Prod", "Production");
-        parameters.Environments.TryAdd("Pre", "PreProduction");
+        parameters.Environments.TryAdd("Stage", "PreProduction");
         parameters.Environments.TryAdd("Test", "Test");
         parameters.Environments.TryAdd("Dev", "Development");
     }

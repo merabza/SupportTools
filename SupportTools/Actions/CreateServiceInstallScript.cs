@@ -16,19 +16,26 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _ftpSiteUserName;
     private readonly int _portNumber;
     private readonly string _projectName;
+    private readonly string? _serviceDescriptionSignature;
+    private readonly string? _projectDescription;
     private readonly string _runTime;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;
+
     private readonly string _serverSideServiceUserName;
-    private readonly string _serviceName;
+
+    //private readonly string _serviceName;
     private readonly string _settingsFileName;
 
     public CreateServiceInstallScript(ILogger logger, string scriptFileName, int portNumber, string ftpSiteAddress,
-        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName, string runTime,
-        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string serviceName,
-        string settingsFileName, string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
-        nameof(ServiceInstallScriptCreator), null, null)
+        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
+        string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
+        string serverSideDownloadFolder, string serverSideDeployFolder,
+        //string serviceName, 
+        string settingsFileName,
+        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreator),
+        null, null)
     {
         _scriptFileName = scriptFileName;
         _portNumber = portNumber;
@@ -37,11 +44,13 @@ public class CreateServiceInstallScript : ToolAction
         _ftpSitePassword = ftpSitePassword;
         _ftpSiteDirectory = ftpSiteDirectory;
         _projectName = projectName;
+        _serviceDescriptionSignature = serviceDescriptionSignature;
+        _projectDescription = projectDescription;
         _runTime = runTime;
         _environmentName = environmentName;
         _serverSideDownloadFolder = serverSideDownloadFolder;
         _serverSideDeployFolder = serverSideDeployFolder;
-        _serviceName = serviceName;
+        //_serviceName = serviceName;
         _settingsFileName = settingsFileName;
         _serverSideServiceUserName = serverSideServiceUserName;
         _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
@@ -86,23 +95,25 @@ public class CreateServiceInstallScript : ToolAction
               pass={{_ftpSitePassword}}
               directory={{_ftpSiteDirectory}}
               projectName={{_projectName}}
+              ServiceDescriptionSignature={{_serviceDescriptionSignature}}
+              ProjectDescription="{{_projectDescription}}"
               runTime={{_runTime}}
               environmentName={{_environmentName}}
               downloadFilePrefix="$myHostname-$environmentName-$projectName-$runTime-"
               downloadSettingsFilePrefix="$myHostname-$environmentName-$projectName-"
               downloadFolder={{_serverSideDownloadFolder}}
               deployFolder={{_serverSideDeployFolder}}
-              ServiceName={{_serviceName}}{{_environmentName}}
               SettingsFileName={{_settingsFileName}}
               userName={{_serverSideServiceUserName}}
 
               projectInstallFullPath=$deployFolder/$projectName/$environmentName
               mainDllFileName=$projectInstallFullPath/$projectName.dll
+              serviceEnvName=$projectName$environmentName
 
               LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
 
-              echo downloadFilePrefix is $downloadFilePrefix
-              echo downloadSettingsFilePrefixis $downloadSettingsFilePrefix
+              echo download File Prefix is $downloadFilePrefix
+              echo download Settings File Prefix is $downloadSettingsFilePrefix
 
 
               if [ ! -e $dotnetRunner ]
@@ -159,11 +170,6 @@ public class CreateServiceInstallScript : ToolAction
                 echo "deployFolder not specified, process finished!"
                 exit 1
               fi
-              echo The Argument ServiceName is $ServiceName
-              if [ -z "$ServiceName" ]; then
-                echo "ServiceName not specified, process finished!"
-                exit 1
-              fi
               echo The Argument SettingsFileName is $SettingsFileName
               if [ -z "$SettingsFileName" ]; then
                 echo "SettingsFileName not specified, process finished!"
@@ -196,7 +202,7 @@ public class CreateServiceInstallScript : ToolAction
               quit
               fin
 
-              echo parse the filenames from the directory listing
+              echo parse the file names from the directory listing
               files_to_get=`cut -c $LS_FILE_OFFSET- < directory_listing`
 
               echo remove directory_listing
@@ -281,15 +287,15 @@ public class CreateServiceInstallScript : ToolAction
                 exit 2
               fi
 
-              downloadzSettingsJsonFileName=$expandedFolderName/$SettingsFileName
+              downloadSettingsJsonFileName=$expandedFolderName/$SettingsFileName
 
-              cmd="get $latestSettingsJsonFileName $downloadzSettingsJsonFileName
+              cmd="get $latestSettingsJsonFileName $downloadSettingsJsonFileName
               "
 
               echo cmd is $cmd
 
 
-              #rm $downloadzSettingsJsonFileName
+              #rm $downloadSettingsJsonFileName
 
 
               # go back and get the file(s)
@@ -303,23 +309,23 @@ public class CreateServiceInstallScript : ToolAction
               quit
               fin
 
-              if (( $(ps -ef | grep -v grep | grep $ServiceName | wc -l) > 0 ))
+              if (( $(ps -ef | grep -v grep | grep $serviceEnvName | wc -l) > 0 ))
               then
                 echo Stop Service...
-                sudo systemctl stop $ServiceName.service
+                sudo systemctl stop $serviceEnvName.service
               fi
 
-              serviceConfigFileName=/etc/systemd/system/$ServiceName.service
+              serviceConfigFileName=/etc/systemd/system/$serviceEnvName.service
               echo serviceConfigFileName is $serviceConfigFileName
 
               rm $serviceConfigFileName
 
               if [ ! -e $serviceConfigFileName ]; then
-                echo Servise configfile $serviceConfigFileName does not exists
+                echo Service config file $serviceConfigFileName does not exists
               
                 cat >$serviceConfigFileName <<fin
               [Unit]
-              Description=$projectName service
+              Description=$projectName service $serviceDescriptionSignature $ProjectDescription
 
               [Service]
               WorkingDirectory=$projectInstallFullPath
@@ -345,10 +351,10 @@ public class CreateServiceInstallScript : ToolAction
               echo move files
               sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
 
-              sudo systemctl enable $ServiceName.service
+              sudo systemctl enable $serviceEnvName.service
 
-              sudo systemctl start $ServiceName.service
-              sudo systemctl status $ServiceName.service
+              sudo systemctl start $serviceEnvName.service
+              sudo systemctl status $serviceEnvName.service
 
               echo Remove Archive...
               rm $downloadzipfilename
@@ -357,7 +363,7 @@ public class CreateServiceInstallScript : ToolAction
               rm -rf $expandedFolderName
 
               echo for logs
-              echo sudo journalctl -fu $ServiceName.service
+              echo sudo journalctl -fu $serviceEnvName.service
 
               exit 0
 

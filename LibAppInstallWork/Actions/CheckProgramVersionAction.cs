@@ -73,11 +73,12 @@ public sealed class CheckProgramVersionAction : ToolAction
                 }
 
 
-                if ("\"" + _installingProgramVersion + "\"" != version)
+                if (_installingProgramVersion != version)
                 {
                     Logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,
                         _installingProgramVersion);
                     getVersionSuccess = false;
+                    break;
                 }
 
                 //აქ თუ მოვედით, ყველაფერი კარგად არის
@@ -96,7 +97,7 @@ public sealed class CheckProgramVersionAction : ToolAction
             return false;
         }
 
-        if ("\"" + _installingProgramVersion + "\"" != version)
+        if (_installingProgramVersion != version)
         {
             Logger.LogError("Current version is {version}, but must be {_installingProgramVersion}", version,
                 _installingProgramVersion);
