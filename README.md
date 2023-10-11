@@ -1,4 +1,4 @@
-# SupportTools
+# SupportTools #
 
 Support Tools
 პროექტის დანიშნულებაა გაუშვას სხვადასხვა დანიშნულების სკრიპტები. აპლიკაცია მუშაობს ტერმინალში, შესაბამისად შესაძლებელია სერვერზე გაშვება, ნებისმიერ ოპერაციულ სისტემაში, სადაც ეშვება dotnet.
@@ -24,25 +24,25 @@ Support Tools
 15. დეველოპერ ბაზის დაკოპირება პროდაქშენში.
 16. შაბლონების მიხედვით ახალი პროექტების შექმნა.
 
-### განვითარება
+## განვითარება ##
 
 პროექტი ვითარდება სხვადასხვა მიმართულებით, საჭიროების მიხედვით. იგეგმება გიტის ბრენჩებთან მუშაობუს საშუალების დამატება. pull request-ების შექმნითა და ჩამერჯვით. იგეგმება გიტთან მეტი ინტეგრაცია. პროექტების შემქმნელის, ბაზოს ანალიზატორისა და ბაზაში ინფორმაციის ჩამყრელის შემდგომი განვითარება.
 
-### დაკავშირებული პროექტები
+## დაკავშირებული პროექტები ##
 
-Support Tools იყენებს https://github.com/merabza/WebAgent და https://github.com/merabza/WebAgentInstaller პროექტებს, რომლებიც გამოიყენება როგორც Support Tools-ის დამხმარე პროექტები, მოშორებულ სერვერზე ცვლილებების განსახორციელებლად, ან საჭირო ინფორმაციის წამოსაღებად. WebAgentInstaller გამოიყენება WebAgent-ის გასაახლებად მხოლოდ. ყველა ის ფუნქციონალი რაც გააჩნია WebAgent-ს, ასევე გააჩნია Support Tools-აც, ოღონდ მას შეუძლია მხოლოდ იმ კომპიუტერზე ზემოქმედება, რომელზეც გაშვებულია. WebAgent-ი კი გამოიყენება მოშორებულ სერვერზე ზემოქმედებისათვის.
+Support Tools იყენებს <https://github.com/merabza/WebAgent> და <https://github.com/merabza/WebAgentInstaller> პროექტებს, რომლებიც გამოიყენება როგორც Support Tools-ის დამხმარე პროექტები, მოშორებულ სერვერზე ცვლილებების განსახორციელებლად, ან საჭირო ინფორმაციის წამოსაღებად. WebAgentInstaller გამოიყენება WebAgent-ის გასაახლებად მხოლოდ. ყველა ის ფუნქციონალი რაც გააჩნია WebAgent-ს, ასევე გააჩნია Support Tools-აც, ოღონდ მას შეუძლია მხოლოდ იმ კომპიუტერზე ზემოქმედება, რომელზეც გაშვებულია. WebAgent-ი კი გამოიყენება მოშორებულ სერვერზე ზემოქმედებისათვის.
 
-### To get clone with all parts ყველა ნაწილის დასაკოპირებლად უნდა გამოიყენოთ სკრიპტი.
+## To get clone with all parts ყველა ნაწილის დასაკოპირებლად უნდა გამოიყენოთ სკრიპტი ##
 
 mkdir SupportTools  
 cd SupportTools  
-git clone git@github.com:merabza/AppCliTools.git AppCliTools  
-git clone git@github.com:merabza/ConnectionTools.git ConnectionTools  
-git clone git@github.com:merabza/SupportTools.git SupportTools  
-git clone git@github.com:merabza/SystemTools.git SystemTools  
-git clone git@github.com:merabza/WebAgentContracts.git WebAgentContracts  
-git clone git@github.com:merabza/DatabaseTools.git DatabaseTools  
-git clone git@github.com:merabza/ParametersManagement.git ParametersManagement  
-git clone git@github.com:merabza/ToolsManagement.git ToolsManagement  
-git clone git@github.com:merabza/BackendCarcass.git BackendCarcass  
+git clone <git@github.com>:merabza/AppCliTools.git AppCliTools  
+git clone <git@github.com>:merabza/ConnectionTools.git ConnectionTools  
+git clone <git@github.com>:merabza/SupportTools.git SupportTools  
+git clone <git@github.com>:merabza/SystemTools.git SystemTools  
+git clone <git@github.com>:merabza/WebAgentContracts.git WebAgentContracts  
+git clone <git@github.com>:merabza/DatabaseTools.git DatabaseTools  
+git clone <git@github.com>:merabza/ParametersManagement.git ParametersManagement  
+git clone <git@github.com>:merabza/ToolsManagement.git ToolsManagement  
+git clone <git@github.com>:merabza/BackendCarcass.git BackendCarcass  
 cd ..
