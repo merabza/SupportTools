@@ -35,7 +35,15 @@ public class ServiceInstallScriptCreator : ToolCommand
         }
 
         var fileStoragePath = _par.FileStorageForExchange.FileStoragePath;
-        if (!_par.FileStorageForExchange.IsFtp())
+
+        var isFtp = _par.FileStorageForExchange.IsFtp();
+        if (isFtp is null)
+        {
+            Logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not", fileStoragePath);
+            return false;
+        }
+
+        if (!isFtp.Value)
         {
             Logger.LogError("File Storage {fileStoragePath} is not ftp file storage", fileStoragePath);
             return false;
