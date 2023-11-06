@@ -18,8 +18,8 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
 
     private readonly string _projectName;
 
-    public ProjectSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) : base(
-        projectName)
+    public ProjectSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
+        base(projectName)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -34,21 +34,21 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubmenu()
     {
-        CliMenuSet projectSubMenuSet = new($"Project => {_projectName}");
+        var projectSubMenuSet = new CliMenuSet($"Project => {_projectName}");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //პროექტის წაშლა
-        DeleteProjectCliMenuCommand deleteProjectCommand = new(_parametersManager, _projectName);
+        var deleteProjectCommand = new DeleteProjectCliMenuCommand(_parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(deleteProjectCommand);
 
         //პროექტის ექსპორტი
-        ExportProjectCliMenuCommand exportProjectCommand = new(_parametersManager, _projectName);
+        var exportProjectCommand = new ExportProjectCliMenuCommand(_parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(exportProjectCommand);
 
         //პროექტის პარამეტრი
-        ProjectCruder projectCruder = new(_logger, _parametersManager);
-        EditItemAllFieldsInSequenceCommand editCommand = new(projectCruder, _projectName);
+        var projectCruder = new ProjectCruder(_logger, _parametersManager);
+        var editCommand = new EditItemAllFieldsInSequenceCommand(projectCruder, _projectName);
         projectSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
@@ -69,17 +69,16 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName),
                 "Select Allow tools...");
 
-
             foreach (var tool in ToolCommandFabric.ToolsByProjects.Intersect(project.AllowToolsList))
                 projectSubMenuSet.AddMenuItem(
                     new ToolTaskCliMenuCommand(_logger, tool, _projectName, null, _parametersManager), tool.ToString());
         }
 
-        ServerInfoCruder serverInfoCruder = new(_logger, _parametersManager, _projectName);
+        var serverInfoCruder = new ServerInfoCruder(_logger, _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
-        NewItemCommand newItemCommand =
-            new(serverInfoCruder, serverInfoCruder.CrudNamePlural, $"New {serverInfoCruder.CrudName}");
+        var newItemCommand = new NewItemCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
+            $"New {serverInfoCruder.CrudName}");
         projectSubMenuSet.AddMenuItem(newItemCommand);
 
         //სერვერების ჩამონათვალი

@@ -115,12 +115,10 @@ public sealed class GitCruder : ParCruder
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
 
-        foreach (var projectKvp in projects)
-            if (projectKvp.Value.GitProjectNames.Contains(recordKey))
-            {
-                var itemSubMenuCommand = new InfoCommand(projectKvp.Key);
-                itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
-            }
+        foreach (var itemSubMenuCommand in projects
+                     .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(recordKey))
+                     .Select(projectKvp => new InfoCommand(projectKvp.Key, "/Main Menu/")))
+            itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

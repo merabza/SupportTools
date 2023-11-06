@@ -30,29 +30,29 @@ public sealed class SupportTools : CliAppLoop
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //მთავარი მენიუს ჩატვირთვა
-        CliMenuSet mainMenuSet = new("Main Menu");
+        var mainMenuSet = new CliMenuSet("Main Menu");
         AddChangeMenu(mainMenuSet);
 
         //პარამეტრების რედაქტორი
-        SupportToolsParametersEditor supportToolsParametersEditor = new(_logger, parameters, _parametersManager);
+        var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, parameters, _parametersManager);
         mainMenuSet.AddMenuItem(new ParametersEditorListCommand(supportToolsParametersEditor),
             "Support Tools Parameters Editor");
 
-        DotnetToolsSubMenuCommand dotnetToolsSubMenuCommand = new();
+        var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCommand();
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
         mainMenuSet.AddMenuItem(new ProjectCreatorSubMenuCommand(_logger, _parametersManager));
 
-        ProjectCruder projectCruder = new(_logger, _parametersManager);
+        var projectCruder = new ProjectCruder(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
-        NewItemCommand newItemCommand =
-            new(projectCruder, projectCruder.CrudNamePlural, $"New {projectCruder.CrudName}");
+        var newItemCommand =
+            new NewItemCommand(projectCruder, projectCruder.CrudNamePlural, $"New {projectCruder.CrudName}");
         mainMenuSet.AddMenuItem(newItemCommand);
 
         //პროექტის დაიმპორტება
-        ImportProjectCliMenuCommand importProjectCommand = new(_parametersManager);
+        var importProjectCommand = new ImportProjectCliMenuCommand(_parametersManager);
         mainMenuSet.AddMenuItem(importProjectCommand);
 
         //პროექტების ჩამონათვალი
