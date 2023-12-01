@@ -4,29 +4,22 @@ using Installer.Domain;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+// ReSharper disable ReplaceWithPrimaryConstructorParameter
 
 namespace LibAppInstallWork.Actions;
 
-public sealed class CheckParametersVersionAction : ToolAction
+public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
+    ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : ToolAction(logger,
+    "Check Parameters Version", null, null)
 {
     private const string ProjectName = "";
 
-    private readonly string? _appSettingsVersion;
-    private readonly int _maxTryCount;
+    private readonly string? _appSettingsVersion = appSettingsVersion;
+    private readonly int _maxTryCount = maxTryCount;
 
-    private readonly ProxySettingsBase _proxySettings;
+    private readonly ProxySettingsBase _proxySettings = proxySettings;
 
-    private readonly ApiClientSettingsDomain _webAgentForCheck;
-
-    public CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
-        ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger,
-        "Check Parameters Version", null, null)
-    {
-        _webAgentForCheck = webAgentForCheck;
-        _appSettingsVersion = appSettingsVersion;
-        _maxTryCount = maxTryCount;
-        _proxySettings = proxySettings;
-    }
+    private readonly ApiClientSettingsDomain _webAgentForCheck = webAgentForCheck;
 
     protected override bool CheckValidate()
     {
