@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="CodeCreators\React\" />
+    <Folder Include="FolderProcessors\" />
   </ItemGroup>
 
   <ItemGroup>

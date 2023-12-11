@@ -75,6 +75,8 @@ public abstract class DoubleAppCreator
             return false;
         }
 
+        CopyAndRepaceFilesAndFolders
+
 
         return true;
     }
