@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using FileManagersMain;
+using LibAppProjectCreator.FolderProcessors;
 using LibAppProjectCreator.Models;
+using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
 
@@ -26,7 +28,7 @@ public abstract class DoubleAppCreator
     public bool CreateDoubleApp()
     {
         _mainAppCreator = CreateMainAppCreator();
-        if ( _mainAppCreator is null )
+        if (_mainAppCreator is null)
             return false;
 
         var solutionPathExists = Directory.Exists(_mainAppCreator.SolutionPath);
@@ -36,19 +38,19 @@ public abstract class DoubleAppCreator
                 : ECreateAppVersions.DoAll))
             return false;
 
-        if ( ! solutionPathExists )
+        if (!solutionPathExists)
             return true;
 
         var tempAppCreator = CreateTempAppCreator();
-        if ( tempAppCreator is null )
+        if (tempAppCreator is null)
             return false;
 
         if (!tempAppCreator.PrepareParametersAndCreateApp(ECreateAppVersions.WithoutSolutionGitInit))
             return false;
 
-        if ( ! SyncSolution(tempAppCreator.SolutionPath, _mainAppCreator.SolutionPath) )
+        if (!SyncSolution(tempAppCreator.SolutionPath, _mainAppCreator.SolutionPath))
             return false;
-        
+
 
         return true;
     }
@@ -75,8 +77,21 @@ public abstract class DoubleAppCreator
             return false;
         }
 
-        CopyAndRepaceFilesAndFolders
+        var excludeSet = new ExcludeSet { FolderFileMasks = new() { ".git", ".vs", ".gitignore" } };
 
+        if (!sourceFileManager.IsFolderEmpty(null))
+        {
+            var copyAndReplaceFilesAndFolders =
+                new CopyAndReplaceFilesAndFolders(sourceFileManager, destinationFileManager, excludeSet);
+            copyAndReplaceFilesAndFolders.Run();
+        }
+
+        if (!destinationFileManager.IsFolderEmpty(null))
+        {
+
+            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, destinationFileManager, excludeSet);
+            deleteRedundantFiles.Run();
+        }
 
         return true;
     }
