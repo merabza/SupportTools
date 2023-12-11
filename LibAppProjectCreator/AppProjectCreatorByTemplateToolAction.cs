@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator;
 
@@ -70,7 +71,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         string? projectsFolderPath;
         string? secretsFolderPath;
-        string? tempFolderPath;
+        //string? tempFolderPath;
         string projectName;
         string projectShortName;
         var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
@@ -79,14 +80,14 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             case ETestOrReal.Test:
                 projectsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Projects");
                 secretsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Security");
-                tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "Temp");
+                //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "Temp");
                 projectName = templateModel.TestProjectName;
                 projectShortName = templateModel.TestProjectShortName;
                 break;
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
                 secretsFolderPath = parameters.SecretsFolderPathReal;
-                tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "TempReal");
+                //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "TempReal");
                 projectName = Inputer.InputTextRequired("New project name", "");
                 projectShortName = Inputer.InputTextRequired("New project short name", "");
                 break;
@@ -97,7 +98,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         projectName = projectName.ToNormalClassName();
 
         var par = AppProjectCreatorData.Create(Logger, projectName, projectShortName, templateModel.SupportProjectType,
-            projectName, projectsFolderPath, secretsFolderPath, supportToolsParameters.LogFolder, tempFolderPath,
+            projectName, projectsFolderPath, secretsFolderPath, supportToolsParameters.LogFolder,
             parameters.IndentSize);
 
         if (par is null)
@@ -114,8 +115,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         var appCreator = AppCreatorFabric.CreateAppCreator(Logger, par, templateModel,
             GitProjects.Create(Logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(Logger, supportToolsParameters.Gits, null, null), _testOrReal == ETestOrReal.Test,
-            supportToolsParameters.WorkFolder, supportToolsParameters.ReactAppTemplates);
+            GitRepos.Create(Logger, supportToolsParameters.Gits, null, null), supportToolsParameters.WorkFolder,
+            supportToolsParameters.ReactAppTemplates);
 
         if (appCreator is null)
         {

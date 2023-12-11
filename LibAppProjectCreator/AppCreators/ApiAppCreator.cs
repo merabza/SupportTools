@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CodeTools;
+﻿using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
@@ -13,21 +11,29 @@ using LibAppProjectCreator.React;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
 using SystemToolsShared;
+
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
 
 public sealed class ApiAppCreator : AppCreatorBase
 {
+    private readonly string _projectShortName;
     private readonly ApiAppCreatorData _apiAppCreatorData;
     private readonly Dictionary<string, string> _reactAppTemplates;
 
     private readonly string _workFolder;
 
-    public ApiAppCreator(ILogger logger, AppProjectCreatorData par, GitProjects gitProjects, GitRepos gitRepos,
-        ApiAppCreatorData apiAppCreatorData, string workFolder, Dictionary<string, string> reactAppTemplates) : base(
-        logger, par, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData)
+    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
+        GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData, string workFolder,
+        Dictionary<string, string> reactAppTemplates) : base(logger, projectName, indentSize, gitProjects, gitRepos,
+        apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
+        apiAppCreatorData.AppCreatorBaseData.SolutionPath)
     {
+        _projectShortName = projectShortName;
         _apiAppCreatorData = apiAppCreatorData;
         _workFolder = workFolder;
         _reactAppTemplates = reactAppTemplates;
@@ -36,7 +42,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     protected override void PrepareFoldersForCheckAndClear()
     {
         base.PrepareFoldersForCheckAndClear();
-        FoldersForCheckAndClear.Add(_apiAppCreatorData.ProjectTempPath);
+        //FoldersForCheckAndClear.Add(_apiAppCreatorData.ProjectTempPath);
         if (!string.IsNullOrWhiteSpace(_apiAppCreatorData.DbPartPath))
             FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
     }
@@ -44,7 +50,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     protected override void PrepareFoldersForCreate()
     {
         base.PrepareFoldersForCreate();
-        FoldersForCreate.Add(_apiAppCreatorData.TempPath);
+        //FoldersForCreate.Add(_apiAppCreatorData.TempPath);
         FoldersForCreate.Add(_apiAppCreatorData.ReactClientPath);
     }
 
@@ -144,7 +150,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
-            Par.ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
+            ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
             _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseBackgroundTasks,
             "Program.cs");
         programClassCreator.CreateFileStructure();
@@ -234,7 +240,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    "SerilogLoggerInstaller.cs");
         //serilogLoggerInstallerClassCreator.CreateFileStructure();
         Console.WriteLine("Creating LoggerProperties...");
-        var loggerSettingsCreator = new LoggerSettingsCreator(Par.ProjectName, appSettingsJsonJObject,
+        var loggerSettingsCreator = new LoggerSettingsCreator(ProjectName, appSettingsJsonJObject,
             userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
         loggerSettingsCreator.Run();
 
@@ -258,8 +264,8 @@ public sealed class ApiAppCreator : AppCreatorBase
                 return false;
             }
 
-            var createReactApp = new CreateReactClientApp(Logger, _apiAppCreatorData.TempPath,
-                _apiAppCreatorData.ReactClientPath, Par.ProjectName, _apiAppCreatorData.ReactTemplateName, _workFolder,
+            var createReactApp = new CreateReactClientApp(Logger,
+                _apiAppCreatorData.ReactClientPath, ProjectName, _apiAppCreatorData.ReactTemplateName, _workFolder,
                 _reactAppTemplates);
             if (!createReactApp.Run())
                 return false;
@@ -276,13 +282,13 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating launchSettings.json...");
         var apiAppLaunchSettingsJsonCreator = new ApiAppLaunchSettingsJsonCreator(_apiAppCreatorData.UseReact,
-            Par.ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
+            ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
         if (!apiAppLaunchSettingsJsonCreator.Create())
             return false;
 
         Console.WriteLine("Creating main project .gitignore...");
         var mainProjectGitIgnoreCreator =
-            new MainProjectGitIgnoreCreator(Logger, SolutionPath, Par.ProjectName, ".gitignore");
+            new MainProjectGitIgnoreCreator(Logger, SolutionPath, ProjectName, ".gitignore");
         mainProjectGitIgnoreCreator.CreateFileStructure();
 
         return true;
@@ -299,7 +305,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating _ViewImports.cshtml...");
         var viewImportsPageCreator =
-            new ViewImportsPageCreator(Logger, pagesPath, Par.ProjectName, "_ViewImports.cshtml");
+            new ViewImportsPageCreator(Logger, pagesPath, ProjectName, "_ViewImports.cshtml");
         viewImportsPageCreator.CreateFileStructure();
 
         Console.WriteLine("Creating Error.cshtml...");
@@ -307,7 +313,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         errorPageCreator.CreateFileStructure();
 
         Console.WriteLine("Creating Error.cshtml.cs...");
-        var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, Par.ProjectName, "Error.cshtml.cs");
+        var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "Error.cshtml.cs");
         errorModelClassCreator.CreateFileStructure();
     }
 
@@ -337,44 +343,44 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseCarcassAndUseDatabase()
     {
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები
-        var masterDataRepositoryClassFileName = $"{Par.ProjectShortName}MasterDataRepository.cs";
+        var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
         Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
         var testModelClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, Par.ProjectName, Par.ProjectShortName,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             masterDataRepositoryClassFileName);
         testModelClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestQuery.cs...");
         var testQueryClassCreator = new TestQueryClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], Par.ProjectName,
+            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName,
             "TestQuery.cs");
         testQueryClassCreator.CreateFileStructure();
 
-        var mdLoaderCreatorInterfaceFileName = $"I{Par.ProjectShortName.Capitalize()}MdLoaderCreator.cs";
+        var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName.Capitalize()}MdLoaderCreator.cs";
         Console.WriteLine($"Creating {mdLoaderCreatorInterfaceFileName}...");
         var mdLoaderCreatorInterfaceCreator = new MdLoaderCreatorInterfaceCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, Par.ProjectName, Par.ProjectShortName,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             mdLoaderCreatorInterfaceFileName);
         mdLoaderCreatorInterfaceCreator.CreateFileStructure();
 
-        var masterDataRepoManagerClassFileName = $"{Par.ProjectShortName}MasterDataRepoManager.cs";
+        var masterDataRepoManagerClassFileName = $"{_projectShortName}MasterDataRepoManager.cs";
         Console.WriteLine($"Creating {masterDataRepoManagerClassFileName}...");
         var masterDataRepoManagerClassCreator = new MasterDataRepoManagerClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, Par.ProjectName, Par.ProjectShortName,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             masterDataRepoManagerClassFileName);
         masterDataRepoManagerClassCreator.CreateFileStructure();
 
-        var testMdLoaderCreatorClassFileName = $"Test{Par.ProjectShortName.Capitalize()}MdLoaderCreator.cs";
+        var testMdLoaderCreatorClassFileName = $"Test{_projectShortName.Capitalize()}MdLoaderCreator.cs";
         Console.WriteLine($"Creating {testMdLoaderCreatorClassFileName}...");
         var testMdLoaderCreatorClassCreator = new TestMdLoaderCreatorClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, Par.ProjectName, Par.ProjectShortName,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             testMdLoaderCreatorClassFileName);
         testMdLoaderCreatorClassCreator.CreateFileStructure();
 
-        var testMdLoaderClassFileName = $"Test{Par.ProjectShortName.Capitalize()}MdLoader.cs";
+        var testMdLoaderClassFileName = $"Test{_projectShortName.Capitalize()}MdLoader.cs";
         Console.WriteLine($"Creating {testMdLoaderClassFileName}...");
         var testMdLoaderClassCreator = new TestMdLoaderClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, Par.ProjectName, Par.ProjectShortName,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             testMdLoaderClassFileName);
         testMdLoaderClassCreator.CreateFileStructure();
     }
@@ -386,7 +392,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating DatabaseInstaller.cs...");
         var databaseInstallerClassCreator = new DatabaseInstallerClassCreator(Logger, databaseProjectInstallersPath,
-            Par.ProjectName, appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys,
+            ProjectName, appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys,
             _apiAppCreatorData.UseCarcass, "DatabaseInstaller.cs");
         databaseInstallerClassCreator.CreateFileStructure();
 
@@ -399,56 +405,56 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         //---===libProjectRepositories პროექტის ფაილები===---
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი ინტერფეისი
-        Console.WriteLine($"Creating I{Par.ProjectName}RepositoryCreatorFabric.cs...");
+        Console.WriteLine($"Creating I{ProjectName}RepositoryCreatorFabric.cs...");
         var repositoryCreatorFabricInterfaceCreator =
             new RepositoryCreatorFabricInterfaceCreator(Logger,
                 _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                Par.ProjectName,
-                $"I{Par.ProjectName}RepositoryCreatorFabric.cs");
+                ProjectName,
+                $"I{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricInterfaceCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი
-        Console.WriteLine($"Creating {Par.ProjectName}RepositoryCreatorFabric.cs...");
+        Console.WriteLine($"Creating {ProjectName}RepositoryCreatorFabric.cs...");
         var repositoryCreatorFabricCreator =
             new RepositoryCreatorFabricCreator(Logger,
                 _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                Par.ProjectName,
-                $"{Par.ProjectName}RepositoryCreatorFabric.cs");
+                ProjectName,
+                $"{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორია
-        Console.WriteLine($"Creating I{Par.ProjectName}Repository.cs...");
+        Console.WriteLine($"Creating I{ProjectName}Repository.cs...");
         var repositoryInterfaceCreator = new RepositoryInterfaceCreator(Logger,
-            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, Par.ProjectName,
-            $"I{Par.ProjectName}Repository.cs");
+            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"I{ProjectName}Repository.cs");
         repositoryInterfaceCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორია
-        Console.WriteLine($"Creating {Par.ProjectName}Repository.cs...");
+        Console.WriteLine($"Creating {ProjectName}Repository.cs...");
         var repositoryClassCreator = new RepositoryClassCreator(Logger,
-            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, Par.ProjectName,
-            $"{Par.ProjectName}Repository.cs");
+            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"{ProjectName}Repository.cs");
         repositoryClassCreator.CreateFileStructure();
 
         //---===ბაზის კონტექსტის პროექტის ფაილები===---
-        Console.WriteLine($"Creating {Par.ProjectName}DbContext.cs...");
+        Console.WriteLine($"Creating {ProjectName}DbContext.cs...");
         CodeCreator dbContextClassCreator = _apiAppCreatorData.UseCarcass
             ? new DbContextForCarcassClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath,
-                Par.ProjectName, $"{Par.ProjectName}DbContext.cs")
+                ProjectName, $"{ProjectName}DbContext.cs")
             : new DbContextClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath,
-                Par.ProjectName, $"{Par.ProjectName}DbContext.cs");
+                ProjectName, $"{ProjectName}DbContext.cs");
         dbContextClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating DesignTimeDbContextFactory.cs...");
         var designTimeDbContextFactoryClassCreator =
             new DesignTimeDbContextFactoryClassCreator(Logger,
-                _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, Par.ProjectName,
+                _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName,
                 "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestModel.cs...");
         var testModelClassCreator = new TestModelClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], Par.ProjectName,
+            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
             _apiAppCreatorData.UseCarcass, "TestModel.cs");
         testModelClassCreator.CreateFileStructure();
     }
@@ -459,7 +465,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating RepositoriesInstaller.cs...");
         var repositoriesInstallerClassCreator = new RepositoriesInstallerClassCreator(Logger, installersPath,
-            Par.ProjectName, Par.ProjectShortName, "RepositoriesInstaller.cs");
+            ProjectName, _projectShortName, "RepositoriesInstaller.cs");
         repositoriesInstallerClassCreator.CreateFileStructure();
     }
 
@@ -468,7 +474,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //შეიქმნას პარამეტრების მოდელის კლასი StatProgramAttr.cs
         Console.WriteLine("Creating AppSettings.cs...");
         var appSettingsClassCreator =
-            new AppSettingsClassCreator(Logger, modelsPath, Par.ProjectName, "AppSettings.cs");
+            new AppSettingsClassCreator(Logger, modelsPath, ProjectName, "AppSettings.cs");
         appSettingsClassCreator.CreateFileStructure();
     }
 

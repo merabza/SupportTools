@@ -50,8 +50,7 @@ public sealed class ConsoleAppCreatorData
                                                       throw new InvalidOperationException("Uninitialized property: " +
                                                           nameof(DbMigrationProjectData));
 
-    public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData,
-        AppProjectCreatorData par, TemplateModel template)
+    public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName, TemplateModel template)
     {
         var projectFolders = new List<string>
         {
@@ -62,8 +61,8 @@ public sealed class ConsoleAppCreatorData
             projectFolders.Add("MenuCommands");
 
         //მთავარი პროექტი
-        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, par.ProjectName,
-            par.ProjectName, EDotnetProjectType.Console, "", "Program", projectFolders.ToArray());
+        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName,
+            projectName, EDotnetProjectType.Console, "", "Program", projectFolders.ToArray());
 
         if (!template.UseDatabase)
             return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, null, null, null, null,
@@ -71,15 +70,15 @@ public sealed class ConsoleAppCreatorData
 
         var libProjectRepositoriesProjectData =
             ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-                $"Lib{par.ProjectName}Repositories",
+                $"Lib{projectName}Repositories",
                 Array.Empty<string>());
         var doProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"Do{par.ProjectName}", new[] { "Models" });
+            $"Do{projectName}", new[] { "Models" });
         var databaseProjectData = ProjectForCreate.CreateClassLibProject(
             appCreatorBaseData.SolutionPath,
-            $"{par.ProjectName}Db", new[] { "Models" });
+            $"{projectName}Db", new[] { "Models" });
         var dbMigrationProjectData =
-            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"{par.ProjectName}DbMigration",
+            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"{projectName}DbMigration",
                 new[] { "Migrations" });
 
         return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, libProjectRepositoriesProjectData,

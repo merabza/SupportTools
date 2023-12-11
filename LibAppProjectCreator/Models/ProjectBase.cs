@@ -1,4 +1,5 @@
-﻿namespace LibAppProjectCreator.Models;
+﻿// ReSharper disable ConvertToPrimaryConstructor
+namespace LibAppProjectCreator.Models;
 
 public /*open*/ class ProjectBase
 {

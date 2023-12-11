@@ -12,18 +12,17 @@ public sealed class CreateReactClientApp
     private readonly string _destinationFolderPath;
     private readonly ILogger _logger;
     private readonly string _projectName;
-    private readonly Dictionary<string, string?> _reactAppTemplates;
+    private readonly Dictionary<string, string> _reactAppTemplates;
     private readonly string _reactTemplateFolderName;
 
     //private readonly IParametersManager? _parametersManager;
-    private readonly string _tempFolderPath;
+    //private readonly string _tempFolderPath;
     private readonly string _workFolder;
 
-    public CreateReactClientApp(ILogger logger, string tempFolderPath, string destinationFolderPath, string projectName,
-        string reactTemplateName, string workFolder, Dictionary<string, string?> reactAppTemplates)
+    public CreateReactClientApp(ILogger logger, string destinationFolderPath, string projectName,
+        string reactTemplateName, string workFolder, Dictionary<string, string> reactAppTemplates)
     {
         _logger = logger;
-        _tempFolderPath = tempFolderPath;
         _destinationFolderPath = destinationFolderPath;
         _projectName = projectName;
         _reactTemplateFolderName = reactTemplateName.ToLower();
@@ -140,10 +139,10 @@ public sealed class CreateReactClientApp
         if (false)
         {
             //1. public ფოლდერი გადავიტანოთ მთლიანად
-            var tempProjectClientFolderPath = Path.Combine(_tempFolderPath, _projectName);
-            var publicPathFromTemp = Path.Combine(tempProjectClientFolderPath, "public");
+            //var tempProjectClientFolderPath = Path.Combine(_tempFolderPath, _projectName);
+            //var publicPathFromTemp = Path.Combine(tempProjectClientFolderPath, "public");
             var publicPath = Path.Combine(_destinationFolderPath, "public");
-            Directory.Move(publicPathFromTemp, publicPath);
+            //Directory.Move(publicPathFromTemp, publicPath);
 
             //2. {destinationFolderPath}/src ფოლდერში GIT უნდა მოვქაჩოთ carcass
             //  git clone git@bitbucket.org:mzakalashvili/dncreactcarcass.git carcass
@@ -183,43 +182,40 @@ public sealed class CreateReactClientApp
             //4. {tempFolderPath}/{projectName}/.gitignore -> {destinationFolderPath}/src/project/.gitignore
             //File.Move(Path.Combine(tempProjectClientFolderPath, ".gitignore"), srcProjectPath, true);
             const string gitignore = ".gitignore";
-            File.Copy(Path.Combine(tempProjectClientFolderPath, gitignore),
-                Path.Combine(srcProjectPath, gitignore));
+            //File.Copy(Path.Combine(tempProjectClientFolderPath, gitignore),Path.Combine(srcProjectPath, gitignore));
 
             //5. {tempFolderPath}/{projectName}/src/App.css -> {destinationFolderPath}/src/project/App.css
-            var tempSrcPath = Path.Combine(tempProjectClientFolderPath, "src");
+            //var tempSrcPath = Path.Combine(tempProjectClientFolderPath, "src");
             const string appCss = "App.css";
-            File.Copy(Path.Combine(tempSrcPath, appCss), Path.Combine(srcProjectPath, appCss));
+            //File.Copy(Path.Combine(tempSrcPath, appCss), Path.Combine(srcProjectPath, appCss));
 
             //6. {tempFolderPath}/{projectName}/src/App.test.js -> {destinationFolderPath}/src/project/App.test.js
             const string appTestJs = "App.test.js";
-            File.Copy(Path.Combine(tempSrcPath, appTestJs), Path.Combine(srcProjectPath, appTestJs));
+            //File.Copy(Path.Combine(tempSrcPath, appTestJs), Path.Combine(srcProjectPath, appTestJs));
 
             //7. {tempFolderPath}/{projectName}/src/logo.svg -> {destinationFolderPath}/src/project/logo.svg
             const string logoSvg = "logo.svg";
-            File.Copy(Path.Combine(tempSrcPath, logoSvg), Path.Combine(srcProjectPath, logoSvg));
+            //File.Copy(Path.Combine(tempSrcPath, logoSvg), Path.Combine(srcProjectPath, logoSvg));
 
             //8. {tempFolderPath}/{projectName}/src/index.css -> {destinationFolderPath}/src/index.css
             const string indexCss = "index.css";
-            File.Copy(Path.Combine(tempSrcPath, indexCss), Path.Combine(srcPath, indexCss));
+            //File.Copy(Path.Combine(tempSrcPath, indexCss), Path.Combine(srcPath, indexCss));
 
             //10. {tempFolderPath}/{projectName}/src/reportWebVitals.js -> {destinationFolderPath}/src/reportWebVitals.js
             const string reportWebVitalsJs = "reportWebVitals.js";
-            File.Copy(Path.Combine(tempSrcPath, reportWebVitalsJs), Path.Combine(srcPath, reportWebVitalsJs));
+            //File.Copy(Path.Combine(tempSrcPath, reportWebVitalsJs), Path.Combine(srcPath, reportWebVitalsJs));
 
             //11. {tempFolderPath}/{projectName}/src/setupTests.js -> {destinationFolderPath}/src/setupTests.js
             const string setupTestsJs = "setupTests.js";
-            File.Copy(Path.Combine(tempSrcPath, setupTestsJs), Path.Combine(srcPath, setupTestsJs));
+            //File.Copy(Path.Combine(tempSrcPath, setupTestsJs), Path.Combine(srcPath, setupTestsJs));
 
             //12. {tempFolderPath}/{projectName}/package.json -> {destinationFolderPath}/package.json
             const string packageJson = "package.json";
-            File.Copy(Path.Combine(tempProjectClientFolderPath, packageJson),
-                Path.Combine(_destinationFolderPath, packageJson));
+            //File.Copy(Path.Combine(tempProjectClientFolderPath, packageJson),Path.Combine(_destinationFolderPath, packageJson));
 
             //13. {tempFolderPath}/{projectName}/README.md -> {destinationFolderPath}/README.md
             const string readMeMd = "README.md";
-            File.Copy(Path.Combine(tempProjectClientFolderPath, readMeMd),
-                Path.Combine(_destinationFolderPath, readMeMd));
+            //File.Copy(Path.Combine(tempProjectClientFolderPath, readMeMd), Path.Combine(_destinationFolderPath, readMeMd));
 
             //14. D:\1WorkDotnetCore\GeoModel\grammar.ge.client\src\project\App.js-ის ანალოგიით შეიქმნას {destinationFolderPath}/src/project/App.js
             AppJsCreator appJsCreator = new(srcProjectPath, "App.js");

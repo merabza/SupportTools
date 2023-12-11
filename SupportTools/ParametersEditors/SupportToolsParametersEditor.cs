@@ -18,6 +18,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
     {
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
+        FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.TempFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.SecurityFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.ScaffoldSeedersWorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.PublisherWorkFolder)));

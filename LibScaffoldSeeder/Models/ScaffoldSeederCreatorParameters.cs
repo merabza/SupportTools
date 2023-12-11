@@ -11,7 +11,7 @@ namespace LibScaffoldSeeder.Models;
 
 public sealed class ScaffoldSeederCreatorParameters : IParameters
 {
-    private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string projectName,
+    private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder, string projectName,
         string scaffoldSeederProjectName, string projectSecurityFolderPath, string projectShortPrefix,
         string mainDatabaseProjectName, string projectDbContextClassName, EDataProvider devDatabaseDataProvider,
         string devDatabaseConnectionString, EDataProvider prodCopyDatabaseDataProvider,
@@ -21,6 +21,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     {
         LogFolder = logFolder;
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
+        TempFolder = tempFolder;
         ProjectName = projectName;
         ScaffoldSeederProjectName = scaffoldSeederProjectName;
         ProjectSecurityFolderPath = projectSecurityFolderPath;
@@ -42,6 +43,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
     public string LogFolder { get; }
     public string ScaffoldSeedersWorkFolder { get; }
+    public string TempFolder { get; }
     public string ProjectName { get; }
     public string ScaffoldSeederProjectName { get; }
     public string ProjectSecurityFolderPath { get; }
@@ -97,6 +99,13 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
             {
                 StShared.WriteErrorLine("ScaffoldSeedersWorkFolder does not specified in parameters", true);
+                return null;
+            }
+
+
+            if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
+            {
+                StShared.WriteErrorLine("TempFolder does not specified in parameters", true);
                 return null;
             }
 
@@ -189,7 +198,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
-                supportToolsParameters.ScaffoldSeedersWorkFolder, projectName, project.ScaffoldSeederProjectName,
+                supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName, project.ScaffoldSeederProjectName,
                 project.ProjectSecurityFolderPath, project.ProjectShortPrefix, project.DbContextProjectName,
                 project.DbContextName, project.DevDatabaseConnectionParameters.DataProvider,
                 project.DevDatabaseConnectionParameters.ConnectionString,

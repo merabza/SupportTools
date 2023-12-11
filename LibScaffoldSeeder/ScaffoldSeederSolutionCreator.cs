@@ -5,8 +5,6 @@ using System.Xml.Linq;
 using DbContextAnalyzer.CodeCreators;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.CodeCreators;
-using LibAppProjectCreator.Models;
-using LibScaffoldSeeder.Domain;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -20,26 +18,14 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     private readonly ScaffoldSeederCreatorParameters _par;
     private readonly ScaffoldSeederCreatorData _scaffoldSeederCreatorData;
 
-    //private ProjectForCreate _databaseScaffoldClassLibProject;
-    //private ProjectForCreate _dataSeedingClassLibProject;
-    //private ProjectForCreate _createProjectSeederCodeProject;
-    //private ProjectForCreate _getJsonFromProjectDbProject;
-    //private ProjectForCreate _dbMigrationProject;
-    //private ProjectForCreate _seedDbProject;
-
-    //public ProjectForCreate SeedDbProject => _seedDbProject;
-    //public ProjectForCreate GetJsonFromProjectDbProject => _getJsonFromProjectDbProject;
-    //public ProjectForCreate CreateProjectSeederCodeProject => _createProjectSeederCodeProject;
-    //public ProjectForCreate MigrationProject => _dbMigrationProject;
-    //public ProjectForCreate DatabaseScaffoldClassLibProject => _databaseScaffoldClassLibProject;
-    //private string DbMigrationProjectName => $"{_scaffoldSeederCreatorParameters.MainDatabaseProjectName}Migration";
-
-
     public ScaffoldSeederSolutionCreator(ILogger logger,
-        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, AppProjectCreatorData appCreatorParameters,
-        GitProjects gitProjects, GitRepos gitRepos, ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(
-        logger,
-        appCreatorParameters, gitProjects, gitRepos, scaffoldSeederAppCreatorData.AppCreatorBaseData)
+        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, string projectName, int indentSize,
+        ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(logger, projectName, indentSize,
+        scaffoldSeederCreatorParameters.GitProjects, scaffoldSeederCreatorParameters.GitRepos,
+        scaffoldSeederAppCreatorData.AppCreatorBaseData.WorkPath,
+        scaffoldSeederAppCreatorData.AppCreatorBaseData.SecurityPath,
+        scaffoldSeederAppCreatorData.AppCreatorBaseData.SolutionPath)
+    // ReSharper disable once ConvertToPrimaryConstructor
     {
         _par = scaffoldSeederCreatorParameters;
         _scaffoldSeederCreatorData = scaffoldSeederAppCreatorData;
@@ -163,16 +149,16 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             new FakeHostConsoleProgramClassCreator(Logger, fakeHosProjectPath, "Program.cs");
         fakeHostProgramClassCreator.CreateFileStructure();
 
-        var scaffoldSeederFolderName = $"{_par.ScaffoldSeederProjectName}ScaffoldSeeder";
-        var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
-        var projectWorkFolderPath = Path.Combine(_par.ScaffoldSeedersWorkFolder, _par.ScaffoldSeederProjectName);
-        var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
-        var jsonExt = ".json";
+        //var scaffoldSeederFolderName = $"{_par.ScaffoldSeederProjectName}ScaffoldSeeder";
+        //var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
+        //var projectWorkFolderPath = Path.Combine(_par.ScaffoldSeedersWorkFolder, _par.ScaffoldSeederProjectName);
+        //var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
+        const string jsonExt = ".json";
 
-        var parametersFileName = Path.Combine(solutionSecurityFolderPath,
+        var parametersFileName = Path.Combine(_par.ProjectSecurityFolderPath,
             $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{jsonExt}");
 
-        var connectionStringParameterName = "ConnectionStringSeed";
+        const string connectionStringParameterName = "ConnectionStringSeed";
         var projectDesignTimeDbContextFactoryCreator =
             new FakeProjectDesignTimeDbContextFactoryCreator(Logger, fakeHosProjectPath, _par.MainDatabaseProjectName,
                 _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName, _par.ProjectDbContextClassName,
@@ -197,7 +183,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             return true;
         var sqlDir = new DirectoryInfo(migrationSqlFilesFolder);
         var sqlFiles = sqlDir.GetFiles("*.sql");
-        if (!sqlFiles.Any())
+        if (sqlFiles.Length == 0)
             return true;
         var projectPath = Path.Combine(SolutionPath, _scaffoldSeederCreatorData.DbMigrationProject.ProjectName);
         var projectFileFullName = Path.Combine(projectPath,
@@ -212,11 +198,10 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         foreach (var sqlFile in sqlFiles)
         {
             var newFile = sqlFile.CopyTo(Path.Combine(migrationProjectSqlFilesFolderPath, sqlFile.Name));
-            if (!RegisterEmbeddedResource(projectFileFullName, newFile.Name))
-            {
-                StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
-                return false;
-            }
+            if (RegisterEmbeddedResource(projectFileFullName, newFile.Name)) 
+                continue;
+            StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
+            return false;
         }
 
         //
@@ -254,7 +239,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     //Write-Host "300 remove OnConfigured method from generated DbContext"
     //RemoveOnConfigured "$DbScContextName.cs"
 
-    //2. შეიქმნას კონსოლ აპლიკაციების პარამეტრების ფაილები, რომლებიც უნდა ჩაიწეროს სპეციალურა დშემნილ პარამეტრების .sec ფოლდერში
+    //2. შეიქმნას კონსოლ აპლიკაციების პარამეტრების ფაილები, რომლებიც უნდა ჩაიწეროს სპეციალურად შექმნილ პარამეტრების .sec ფოლდერში
 
     //3. _seedDbProject-ისთვის dotnet user-secrets init არ ვიცი რამდენად საჭიროა.
 

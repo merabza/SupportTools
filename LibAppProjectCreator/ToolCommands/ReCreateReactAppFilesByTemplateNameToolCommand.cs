@@ -3,6 +3,7 @@ using LibAppProjectCreator.React;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.ToolCommands;
 

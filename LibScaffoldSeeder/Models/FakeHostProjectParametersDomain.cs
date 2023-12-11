@@ -1,6 +1,7 @@
 ﻿using DbTools;
+// ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibScaffoldSeeder.Domain;
+namespace LibScaffoldSeeder.Models;
 
 public sealed class FakeHostProjectParametersDomain
 {

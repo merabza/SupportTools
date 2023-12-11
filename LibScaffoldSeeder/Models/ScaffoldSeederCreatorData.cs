@@ -33,11 +33,11 @@ public sealed class ScaffoldSeederCreatorData
     public ProjectForCreate SeedDbProject { get; }
     public ProjectForCreate FakeHostWebApiProject { get; }
 
-    public static ScaffoldSeederCreatorData Create(AppCreatorBaseData appCreatorBaseData,
-        AppProjectCreatorData par, ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters)
+    public static ScaffoldSeederCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
+        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters)
     {
         //სკაფოლდინგის ბიბლიოთეკა
-        var databaseScaffoldClassLibProjectName = $"{par.ProjectName}DbSc";
+        var databaseScaffoldClassLibProjectName = $"{projectName}DbSc";
         var databaseScaffoldClassLibProject =
             ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, databaseScaffoldClassLibProjectName,
                 Array.Empty<string>());

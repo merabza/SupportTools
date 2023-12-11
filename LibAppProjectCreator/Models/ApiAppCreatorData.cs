@@ -10,7 +10,7 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(string tempPath, string projectTempPath, string? dbPartPath, string reactClientPath,
+    private ApiAppCreatorData(string? dbPartPath, string reactClientPath,
         AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
         bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
         string? reactTemplateName, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
@@ -20,8 +20,6 @@ public sealed class ApiAppCreatorData
         MainProjectData = mainProjectData;
         UseReact = useReact;
         UseCarcass = useCarcass;
-        TempPath = tempPath;
-        ProjectTempPath = projectTempPath;
         DbPartPath = dbPartPath;
         ReactClientPath = reactClientPath;
         UseDatabase = useDatabase;
@@ -43,8 +41,6 @@ public sealed class ApiAppCreatorData
     public bool UseBackgroundTasks { get; set; }
     public string? ReactTemplateName { get; }
     public string ReactClientPath { get; }
-    public string TempPath { get; }
-    public string ProjectTempPath { get; }
     public string? DbPartPath { get; }
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
@@ -55,7 +51,7 @@ public sealed class ApiAppCreatorData
 
 
     public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger,
-        AppCreatorBaseData appCreatorBaseData, AppProjectCreatorData par, TemplateModel template)
+        AppCreatorBaseData appCreatorBaseData, string projectName, TemplateModel template)
     {
         if (template.UseCarcass && !template.UseDatabase)
         {
@@ -75,51 +71,51 @@ public sealed class ApiAppCreatorData
             return null;
         }
 
-        if (par.TempFolderPath is null)
-        {
-            StShared.WriteErrorLine("Temp folder does not specified", true, logger);
-            return null;
-        }
+        //if (par.TempFolderPath is null)
+        //{
+        //    StShared.WriteErrorLine("Temp folder does not specified", true, logger);
+        //    return null;
+        //}
 
-        //დროებით ფოლდერი არ უნდა ემთხვეოდეს სამუშაო ფოლდერს
-        if (FileStat.NormalizePath(par.WorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
-        {
-            StShared.WriteErrorLine($"Work and Temp Folders are same {par.TempFolderPath}.", true, logger);
-            return null;
-        }
+        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს სამუშაო ფოლდერს
+        //if (FileStat.NormalizePath(par.WorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
+        //{
+        //    StShared.WriteErrorLine($"Work and Temp Folders are same {par.TempFolderPath}.", true, logger);
+        //    return null;
+        //}
 
-        //დროებით ფოლდერი არ უნდა ემთხვეოდეს საიდუმლოებების ფოლდერს
-        if (FileStat.NormalizePath(par.SecurityWorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
-        {
-            StShared.WriteErrorLine($"Security and Temp Folders are same {par.TempFolderPath}.", true, logger);
-            return null;
-        }
+        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს საიდუმლოებების ფოლდერს
+        //if (FileStat.NormalizePath(par.SecurityWorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
+        //{
+        //    StShared.WriteErrorLine($"Security and Temp Folders are same {par.TempFolderPath}.", true, logger);
+        //    return null;
+        //}
 
-        //დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის სამუშაო ფოლდერს
-        if (FileStat.NormalizePath(appCreatorBaseData.WorkPath) == FileStat.NormalizePath(par.TempFolderPath))
-        {
-            StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
-                logger);
-            return null;
-        }
+        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის სამუშაო ფოლდერს
+        //if (FileStat.NormalizePath(appCreatorBaseData.WorkPath) == FileStat.NormalizePath(par.TempFolderPath))
+        //{
+        //    StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
+        //        logger);
+        //    return null;
+        //}
 
-        //დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის საიდუმლოებების ფოლდერს
-        if (FileStat.NormalizePath(appCreatorBaseData.SecurityPath) == FileStat.NormalizePath(par.TempFolderPath))
-        {
-            StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
-                logger);
-            return null;
-        }
+        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის საიდუმლოებების ფოლდერს
+        //if (FileStat.NormalizePath(appCreatorBaseData.SecurityPath) == FileStat.NormalizePath(par.TempFolderPath))
+        //{
+        //    StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
+        //        logger);
+        //    return null;
+        //}
 
-        //შევამოწმოთ და თუ არ არსებობს შევქმნათ დროებითი სამუშაოებისათვის განკუთვნილი ფოლდერი
-        if (!StShared.CreateFolder(par.TempFolderPath, true))
-        {
-            StShared.WriteErrorLine($"Cannot create temp Folder {par.TempFolderPath}", true, logger);
-            return null;
-        }
+        ////შევამოწმოთ და თუ არ არსებობს შევქმნათ დროებითი სამუშაოებისათვის განკუთვნილი ფოლდერი
+        //if (!StShared.CreateFolder(par.TempFolderPath, true))
+        //{
+        //    StShared.WriteErrorLine($"Cannot create temp Folder {par.TempFolderPath}", true, logger);
+        //    return null;
+        //}
 
-        //შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
-        var projectTempPath = Path.Combine(par.TempFolderPath, par.ProjectName.ToLower());
+        ////შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
+        //var projectTempPath = Path.Combine(par.TempFolderPath, par.ProjectName.ToLower());
         ////foldersForCreate.Add(tempPath);
         //if (!FileStat.CheckRequiredFolder(true, projectTempPath, false))
         //    return null;
@@ -139,7 +135,7 @@ public sealed class ApiAppCreatorData
         }
 
         //მთავარი პროექტი
-        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, par.ProjectName, par.ProjectName,
+        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
             EDotnetProjectType.Web, template.UseHttps ? "" : "--no-https", "Program", projectFolders.ToArray(),
             template.UseReact);
 
@@ -150,7 +146,7 @@ public sealed class ApiAppCreatorData
 
 
         var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"Lib{par.ProjectName}Repositories", Array.Empty<string>());
+            $"Lib{projectName}Repositories", Array.Empty<string>());
 
         var databaseProjectFolders = new List<string>
         {
@@ -161,7 +157,7 @@ public sealed class ApiAppCreatorData
         if (template.UseCarcass)
             databaseProjectFolders.Add("QueryModels");
 
-        var dbPartFolderName = $"{par.ProjectName}DbPart";
+        var dbPartFolderName = $"{projectName}DbPart";
 
         var dbPartPath = template.UseDbPartFolderForDatabaseProjects
             ? Path.Combine(appCreatorBaseData.WorkPath, dbPartFolderName)
@@ -169,16 +165,16 @@ public sealed class ApiAppCreatorData
 
         var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
 
-        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{par.ProjectName}Db",
+        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{projectName}Db",
             databaseProjectFolders.ToArray(), dbPartSolutionFolderName);
 
         var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{par.ProjectName}DbMigration", new[] { "Migrations" });
+            $"{projectName}DbMigration", new[] { "Migrations" });
 
         var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{par.ProjectName}MasterDataLoaders", new[] { "Installers" });
+            $"{projectName}MasterDataLoaders", new[] { "Installers" });
 
-        return new ApiAppCreatorData(par.TempFolderPath, projectTempPath, dbPartPath, reactClientPath,
+        return new ApiAppCreatorData(dbPartPath, reactClientPath,
             appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass, template.UseDatabase,
             template.UseDbPartFolderForDatabaseProjects, template.UseIdentity, template.UseBackgroundTasks,
             template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,

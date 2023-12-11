@@ -14,33 +14,43 @@ using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
+public enum ECreateAppVersions
+{
+    OnlySyncGit,
+    DoAll,
+    WithoutSolutionGitInit
+}
+
 public /*open*/ class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;
     protected readonly GitProjects GitProjects;
     protected readonly ILogger Logger;
-    protected readonly AppProjectCreatorData Par;
+    protected readonly string ProjectName;
+
+    private readonly int _indentSize;
+    //protected readonly AppProjectCreatorData Par;
 
 
-    protected AppCreatorBase(ILogger logger, AppProjectCreatorData par, GitProjects gitProjects,
-        GitRepos gitRepos, AppCreatorBaseData appCreatorBaseData)
+    protected AppCreatorBase(ILogger logger, string projectName, int indentSize, GitProjects gitProjects,
+        GitRepos gitRepos, string workPath, string securityPath, string solutionPath)
     {
         Logger = logger;
-        Par = par;
+        ProjectName = projectName;
+        _indentSize = indentSize;
+        //Par = par;
         GitProjects = gitProjects;
         _gitRepos = gitRepos;
-        WorkPath = appCreatorBaseData.WorkPath;
-        SecurityPath = appCreatorBaseData.SecurityPath;
-        SolutionPath = appCreatorBaseData.SolutionPath;
-        ForTest = appCreatorBaseData.ForTest;
+        WorkPath = workPath;
+        SecurityPath = securityPath;
+        SolutionPath = solutionPath;
     }
 
-    protected string WorkPath { get; }
+    private string WorkPath { get; }
 
     protected string SecurityPath { get; }
 
-    protected string SolutionPath { get; }
-    protected bool ForTest { get; }
+    public string SolutionPath { get; }
 
     //შესაქმნელი ფოლდერების სია
     protected List<string> FoldersForCreate { get; } = new();
@@ -91,9 +101,9 @@ public /*open*/ class AppCreatorBase
         FoldersForCreate.Add(SecurityPath);
     }
 
-    public bool PrepareParameters()
+    private bool PrepareParameters()
     {
-        Stats.IndentSize = Par.IndentSize < 1 ? 4 : Par.IndentSize;
+        Stats.IndentSize = _indentSize < 1 ? 4 : _indentSize;
         PrepareFoldersForCheckAndClear();
         PrepareFoldersForCreate();
         PrepareProjectsData();
@@ -102,16 +112,30 @@ public /*open*/ class AppCreatorBase
         return PrepareSpecific();
     }
 
-    public bool PrepareParametersAndCreateApp()
+    public bool PrepareParametersAndCreateApp(ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
     {
-        return PrepareParameters() && CreateApp();
+        //return PrepareParameters() && CreateApp();
+
+
+        if (!PrepareParameters())
+        {
+            StShared.WriteErrorLine("Solution Parameters does not created", true, Logger);
+            return false;
+        }
+
+        if (CreateApp(createAppVersions)) 
+            return true;
+
+        StShared.WriteErrorLine("Scaffold Seeder Solution does not created", true, Logger);
+        return false;
+
     }
 
-    protected void AddGitClone(string createInPath, GitDataDomain gitData)
+    private void AddGitClone(GitDataDomain gitData)
     {
         if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress))
             return;
-        GitClones.Add(new GitCloneDataModel(createInPath, gitData.GitProjectAddress,
+        GitClones.Add(new GitCloneDataModel(gitData.GitProjectAddress,
             gitData.GitProjectFolderName));
     }
 
@@ -145,7 +169,7 @@ public /*open*/ class AppCreatorBase
         //დავამატოთ პროექტების სიაში
         Projects.Add(projectFromGit);
         //დავამატოთ დასაკლონი პროექტების სიაში შესაბამისი გიტის პროექტი
-        AddGitClone(createInPath, gitRepo);
+        AddGitClone(gitRepo);
         //დავაბრუნოთ ახლადშექმნილი პროექტი
         return projectFromGit;
     }
@@ -171,28 +195,30 @@ public /*open*/ class AppCreatorBase
     }
 
     //აპლიკაციის შექმნის პროცესი
-    public bool CreateApp()
+    private bool CreateApp(ECreateAppVersions createAppVersions)
     {
+
+        if (!AppGitsSync())
+            return false;
+
+        if (createAppVersions == ECreateAppVersions.OnlySyncGit)
+            return true;
+
+
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
-        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, !ForTest)))
+        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder)))
             return false;
 
         //შევქმნათ ფოლდერების სიაში არსებული ყველა ფოლდერი
         if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true)))
             return false;
-
-
-        if (!AppGitsSync())
-            return false;
-
         //სოლუშენის შექმნა
-        if (!StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {Par.ProjectName}"))
+        if (!StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {ProjectName}"))
             return false;
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
         {
-            string projPath;
             if (prj is ProjectForCreate projectForCreate)
             {
                 //პროექტების შექმნა
@@ -230,7 +256,7 @@ public /*open*/ class AppCreatorBase
             else if (prj is ProjectFromGit projectFromGit)
 
             {
-                projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName, projectFromGit.ProjectName,
+                var projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName, projectFromGit.ProjectName,
                     $"{projectFromGit.ProjectName}.csproj");
                 if (!StShared.RunProcess(true, Logger, "dotnet",
                         $"sln {SolutionPath} add {(projectFromGit.SolutionFolderName is null ? "" : $"--solution-folder {projectFromGit.SolutionFolderName} ")}{projPath}"))
@@ -255,16 +281,16 @@ public /*open*/ class AppCreatorBase
         if (!StShared.RunProcess(true, Logger, "jb", $"cleanupcode {SolutionPath}"))
             return false;
 
+        if (createAppVersions == ECreateAppVersions.WithoutSolutionGitInit)
+            return true;
+
         if (!StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" init"))
             return false;
 
         if (!StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" add ."))
             return false;
 
-        if (!StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" commit -m \"Initial\""))
-            return false;
-
-        return true;
+        return StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" commit -m \"Initial\"");
     }
 
     private static void AddProjectParametersWithCheck(XElement projectXml, string groupName, string propertyName,
@@ -277,11 +303,10 @@ public /*open*/ class AppCreatorBase
     private static XElement CheckAddProjectGroup(XElement projectXml, string groupName)
     {
         var grpXml = projectXml.Descendants(groupName).SingleOrDefault();
-        if (grpXml is null)
-        {
-            grpXml = new XElement(groupName);
-            projectXml.Add(grpXml);
-        }
+        if (grpXml is not null) 
+            return grpXml;
+        grpXml = new XElement(groupName);
+        projectXml.Add(grpXml);
 
         return grpXml;
     }
@@ -300,7 +325,7 @@ public /*open*/ class AppCreatorBase
         }
     }
 
-    public bool AppGitsSync()
+    private bool AppGitsSync()
     {
         var gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
 

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Newtonsoft.Json.Linq;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.JsonCreators;
 
