@@ -134,8 +134,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         if (existingProject is not null)
         {
-            StShared.ConsoleWriteInformationLine(
-                $"project with name {projectName} already exists and cannot be updated", true, Logger);
+            StShared.ConsoleWriteInformationLine(Logger, true,
+                "project with name {0} already exists and cannot be updated", projectName);
             return true;
         }
 
@@ -148,8 +148,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         if (projectRecordCreator.Create())
             return true;
 
-        StShared.ConsoleWriteInformationLine(
-            $"code for project with name {projectName} created, but record create failed", true, Logger);
+        StShared.ConsoleWriteInformationLine(Logger, true,
+            "code for project with name {0} created, but record create failed", projectName);
         return true;
     }
 }

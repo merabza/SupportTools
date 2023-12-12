@@ -5,6 +5,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
 

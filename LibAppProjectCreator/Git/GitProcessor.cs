@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
 
@@ -141,7 +142,9 @@ fi*/
 
     public bool HaveUnTrackedFiles()
     {
-        return !StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} diff-files --quiet", false);
+        //return !StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} diff-files --quiet", false);
+        var statusCommandOutput = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} status --porcelain --untracked-files");
+        return !string.IsNullOrWhiteSpace(statusCommandOutput);
     }
 
     public bool IsGitInitialized()

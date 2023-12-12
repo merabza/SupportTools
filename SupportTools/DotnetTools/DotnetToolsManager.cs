@@ -15,7 +15,7 @@ public sealed class DotnetToolsManager
     // ReSharper disable once MemberCanBePrivate.Global
     private DotnetToolsManager()
     {
-        StShared.ConsoleWriteInformationLine("Wait...", true);
+        StShared.ConsoleWriteInformationLine(null, true,"Wait...");
         _necessaryToolsNames = new Dictionary<ENecessaryTools, string>
         {
             //ეს არის Entity Framework-ის ინსტრუმენტი, რომელიც გამოიყენება ბაზის მოდელის გაკეთებისას
@@ -93,7 +93,7 @@ public sealed class DotnetToolsManager
 
     public void UpdateAllToolsToLatestVersion()
     {
-        StShared.ConsoleWriteInformationLine("Checking for tools Updates...", true);
+        StShared.ConsoleWriteInformationLine(null, true, "Checking for tools Updates...");
         DotnetTools = CreateListOfDotnetTools();
 
         var atLeastOneUpdatedOrInstalled = false;
@@ -102,20 +102,20 @@ public sealed class DotnetToolsManager
             if (tool.AvailableVersion is null or "N/A" ||
                 tool.Version == tool.AvailableVersion) continue;
             var command = tool.Version == "N/A" ? "install" : "update";
-            StShared.ConsoleWriteInformationLine($"{command}ing {tool.PackageId}...", true);
+            StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, tool.PackageId);
             StShared.RunProcessWithOutput(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
             atLeastOneUpdatedOrInstalled = true;
         }
 
         if (atLeastOneUpdatedOrInstalled)
         {
-            StShared.ConsoleWriteInformationLine("Updating tools List...", true);
+            StShared.ConsoleWriteInformationLine(null, true, "Updating tools List...");
             DotnetTools = CreateListOfDotnetTools();
-            StShared.ConsoleWriteInformationLine("Updating process Finished.", true);
+            StShared.ConsoleWriteInformationLine(null, true, "Updating process Finished.");
         }
         else
         {
-            StShared.ConsoleWriteInformationLine("All tools already are up to date.", true);
+            StShared.ConsoleWriteInformationLine(null, true, "All tools already are up to date.");
         }
 
         StShared.Pause();
