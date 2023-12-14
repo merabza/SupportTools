@@ -77,7 +77,7 @@ public abstract class DoubleAppCreator
             return false;
         }
 
-        var excludeSet = new ExcludeSet { FolderFileMasks = new() { ".git", ".vs", ".gitignore" } };
+        var excludeSet = new ExcludeSet { FolderFileMasks = new() { @"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*" } };
 
         if (!sourceFileManager.IsFolderEmpty(null))
         {
@@ -88,8 +88,8 @@ public abstract class DoubleAppCreator
 
         if (!destinationFileManager.IsFolderEmpty(null))
         {
-
-            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, destinationFileManager, excludeSet);
+            var excludeFolders = new[] { ".git", ".vs", "obj" };
+            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, destinationFileManager, excludeSet, excludeFolders);
             deleteRedundantFiles.Run();
         }
 

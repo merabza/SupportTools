@@ -52,7 +52,11 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     {
 
         var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(Logger, _useConsole, Parameters);
-        scaffoldSeederDoubleAppCreator.CreateDoubleApp();
+        if ( ! scaffoldSeederDoubleAppCreator.CreateDoubleApp() )
+        {
+            StShared.WriteErrorLine("solution does not created", true, Logger);
+            return false;
+        }
 
 
         ////თუ არ არსებობს შეიქმნას რეზერვის ფოლდერი სამუშაო ფოლდერის პროექტის ფოლდერში. მაგალითად D:\1WorkScaffoldSeeders\GeoModel\Reserve
@@ -163,7 +167,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //if (!scaffoldSeederSolutionCreator.PrepareParametersAndCreateApp())
         //    return false;
 
-        return true;
 
         var gitProjectNames = scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
 
@@ -194,10 +197,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             haveToSaveSupportToolsParameters = true;
         }
 
-        if (scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData is null)
+        if (scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData is null)
             return false;
 
-        if (!ScaffoldProdCopyDatabase(scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData))
+        if (!ScaffoldProdCopyDatabase(scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData))
             return false;
 
 
@@ -238,7 +241,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.SeedDbProjectName}");
 
         if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.SeedDbProject.ProjectFullPath))
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, Logger);
             return false;
@@ -246,10 +249,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         //ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
         if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) ||
-            project.SeedProjectFilePath != scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.SeedDbProject
+            project.SeedProjectFilePath != scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
                 .ProjectFileFullName)
         {
-            project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.SeedDbProject
+            project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
                 .ProjectFileFullName;
             haveToSaveSupportToolsParameters = true;
         }
@@ -271,7 +274,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             $"{Parameters.GetJsonFromScaffoldDbProjectName}{jsonExt}");
 
         if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.GetJsonFromProjectDbProject.ProjectFullPath))
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFullPath))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, Logger);
             return false;
@@ -280,10 +283,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //json ფაილების შემქმნელი პროექტის გზა
         if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
             project.GetJsonFromScaffoldDbProjectFileFullName !=
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
+            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
         {
             project.GetJsonFromScaffoldDbProjectFileFullName =
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.GetJsonFromProjectDbProject
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
                     .ProjectFileFullName;
             haveToSaveSupportToolsParameters = true;
         }
@@ -300,9 +303,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         //მიგრაციის პროექტის გზის დაფიქსირება
         if (string.IsNullOrWhiteSpace(project.MigrationProjectFilePath) || project.MigrationProjectFilePath !=
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.DbMigrationProject.ProjectFileFullName)
+            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.DbMigrationProject.ProjectFileFullName)
         {
-            project.MigrationProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData
+            project.MigrationProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
                 .DbMigrationProject.ProjectFileFullName;
             haveToSaveSupportToolsParameters = true;
         }
@@ -310,10 +313,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //FakeHostWebApi პროექტის გზა, რომელიც გამოიყენება მიგრაციის სტარტ პროექტად
         if (string.IsNullOrWhiteSpace(project.MigrationStartupProjectFilePath) ||
             project.MigrationStartupProjectFilePath !=
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFileFullName)
+            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.FakeHostWebApiProject.ProjectFileFullName)
         {
             project.MigrationStartupProjectFilePath =
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFileFullName;
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.FakeHostWebApiProject.ProjectFileFullName;
             haveToSaveSupportToolsParameters = true;
         }
 
@@ -336,7 +339,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             $"{Parameters.CreateProjectSeederCodeProjectName}{jsonExt}");
 
         if (!SaveParameters(createProjectSeederCodeParameters, createProjectSeederCodeParametersFileFullName,
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.CreateProjectSeederCodeProject
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
                     .ProjectFullPath))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, Logger);
@@ -347,12 +350,12 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
 
         if (!StShared.RunProcess(true, Logger, "dotnet",
-                $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}"))
+                $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}"))
             return false;
 
         var jsonFromProjectDbProjectGetterParameters =
             new JsonFromProjectDbProjectGetterParameters(
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederCreatorData.GetJsonFromProjectDbProject
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
                     .ProjectFileFullName,
                 getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName);
 

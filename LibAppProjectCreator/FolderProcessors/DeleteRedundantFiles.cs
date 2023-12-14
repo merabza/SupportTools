@@ -9,24 +9,30 @@ namespace LibAppProjectCreator.FolderProcessors;
 public sealed class DeleteRedundantFiles : FolderProcessor
 {
     private readonly FileManager _sourceFileManager;
+    private readonly string[] _excludeFolders;
 
     public DeleteRedundantFiles(FileManager sourceFileManager, FileManager destinationFileManager,
-        ExcludeSet excludeSet) : base("Delete redundant files", "Delete redundant files after compare two places",
+        ExcludeSet excludeSet, string[] excludeFolders) : base("Delete redundant files", "Delete redundant files after compare two places",
         destinationFileManager, null, true, excludeSet)
     {
         _sourceFileManager = sourceFileManager;
+        _excludeFolders = excludeFolders;
     }
 
-    protected override (bool, bool) ProcessOneFolder(string? afterRootPath, string folderName)
+    protected override (bool, bool, bool) ProcessOneFolder(string? afterRootPath, string folderName)
     {
         //დავადგინოთ ასეთი ფოლდერი გვაქვს თუ არა წყაროში და თუ არ გვაქვს წავშალოთ მიზნის მხარესაც
 
         var folders = _sourceFileManager.GetFolderNames(afterRootPath, null);
 
         if (folders.Contains(folderName))
-            return (true, false);
+            return (true, false, true);
+        if (_excludeFolders.Length > 0 && _excludeFolders.Contains(folderName))
+            return (true, false, false);
+        if (ExcludeSet is not null && ExcludeSet.NeedExclude(FileManager.PathCombine(afterRootPath, folderName)))
+            return (true, false, false);
         var deleted = FileManager.DeleteDirectory(afterRootPath, folderName, true);
-        return deleted ? (true, true) : (false, false);
+        return deleted ? (true, true, true) : (false, false, true);
     }
 
     protected override bool ProcessOneFile(string? afterRootPath, MyFileInfo file)

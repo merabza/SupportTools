@@ -3,6 +3,8 @@ using FileManagersMain;
 using LibFileParameters.Models;
 using System.Collections.Generic;
 using System.IO;
+using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.FolderProcessors;
@@ -29,8 +31,14 @@ public class CopyAndReplaceFilesAndFolders : FolderProcessor
             : afterRootPath.PrepareAfterRootPath(FileManager.DirectorySeparatorChar);
         var preparedDestinationAfterRootPath = CheckDestinationDirs(dirNames);
 
-        File.Copy(FileManager.GetPath(afterRootPath, file.FileName),
-            _destinationFileManager.GetPath(preparedDestinationAfterRootPath, file.FileName));
+        var sourceFileFullPath = FileManager.GetPath(afterRootPath, file.FileName);
+        var destinationFileFullPath = _destinationFileManager.GetPath(preparedDestinationAfterRootPath, file.FileName);
+
+        if (FileStat.FileCompare(sourceFileFullPath, destinationFileFullPath))
+            return true;
+
+        File.Delete(destinationFileFullPath);
+        File.Copy(sourceFileFullPath, destinationFileFullPath);
 
         return true;
     }

@@ -25,8 +25,9 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     private const int IndentSize = 4;
 
     public string SolutionSecurityFolderPath { get; }
-    public ScaffoldSeederCreatorData? ScaffoldSeederCreatorData { get; private set; }
-    public string SolutionFolderPath { get; }
+    //public ScaffoldSeederCreatorData? ScaffoldSeederTempCreatorData { get; private set; }
+    public ScaffoldSeederCreatorData? ScaffoldSeederMainCreatorData { get; private set; }
+    //public string SolutionFolderPath { get; }
 
     //public ScaffoldSeederCreatorData? ScaffoldSeederCreatorData => _scaffoldSeederCreatorData;
 
@@ -44,7 +45,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, _ssParameters.ScaffoldSeederProjectName);
 
         _scaffoldSeederFolderPath = Path.Combine(_projectWorkFolderPath, _scaffoldSeederFolderName);
-        SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
+        //SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
 
     }
 
@@ -78,11 +79,16 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         }
 
         //შეიქმნას სკაფოლდ-სიდერის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
-        ScaffoldSeederCreatorData =
+        var scaffoldSeederCreatorData =
             ScaffoldSeederCreatorData.Create(appCreatorBaseData, _scaffoldSeederFolderName, _ssParameters);
 
+        if (forMain)
+            ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
+        //else
+        //    ScaffoldSeederTempCreatorData = scaffoldSeederCreatorData;
+
         return new ScaffoldSeederSolutionCreator(_logger, _ssParameters, _scaffoldSeederFolderName, IndentSize,
-            ScaffoldSeederCreatorData);
+            scaffoldSeederCreatorData);
     }
 
     protected override AppCreatorBase? CreateMainAppCreator()
