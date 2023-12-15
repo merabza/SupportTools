@@ -12,8 +12,8 @@ public sealed class DeleteRedundantFiles : FolderProcessor
     private readonly string[] _excludeFolders;
 
     public DeleteRedundantFiles(FileManager sourceFileManager, FileManager destinationFileManager,
-        ExcludeSet excludeSet, string[] excludeFolders) : base("Delete redundant files", "Delete redundant files after compare two places",
-        destinationFileManager, null, true, excludeSet)
+        ExcludeSet excludeSet, string[] excludeFolders) : base("Delete redundant files",
+        "Delete redundant files after compare two places", destinationFileManager, null, true, excludeSet, true, true)
     {
         _sourceFileManager = sourceFileManager;
         _excludeFolders = excludeFolders;

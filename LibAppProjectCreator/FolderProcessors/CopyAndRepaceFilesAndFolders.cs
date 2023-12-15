@@ -19,7 +19,7 @@ public class CopyAndReplaceFilesAndFolders : FolderProcessor
     public CopyAndReplaceFilesAndFolders(FileManager sourceFileManager, FileManager destinationFileManager,
         ExcludeSet excludeSet) : base("Copy And Replace files and folders",
         "First part of files synchronization Copy And Replace files from one place to another", sourceFileManager, null,
-        false, excludeSet)
+        false, excludeSet, true, true)
     {
         _destinationFileManager = destinationFileManager;
     }

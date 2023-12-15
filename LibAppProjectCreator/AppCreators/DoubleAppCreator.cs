@@ -41,6 +41,18 @@ public abstract class DoubleAppCreator
         if (!solutionPathExists)
             return true;
 
+        var mainSolutionFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
+
+        if (mainSolutionFileManager == null)
+        {
+            StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}", _useConsole,
+                _logger);
+            return false;
+        }
+
+        var deleteBinObjFolders = new DeleteBinObjFolders(mainSolutionFileManager);
+        deleteBinObjFolders.Run();
+
         var tempAppCreator = CreateTempAppCreator();
         if (tempAppCreator is null)
             return false;
@@ -48,31 +60,21 @@ public abstract class DoubleAppCreator
         if (!tempAppCreator.PrepareParametersAndCreateApp(ECreateAppVersions.WithoutSolutionGitInit))
             return false;
 
-        if (!SyncSolution(tempAppCreator.SolutionPath, _mainAppCreator.SolutionPath))
+        if (!SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager))
             return false;
 
 
         return true;
     }
 
-    private bool SyncSolution(string tempSolutionPath, string mainSolutionPath)
+    private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        var sourceFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, tempSolutionPath);
+        FileManager? sourceFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, tempSolutionPath);
 
         if (sourceFileManager == null)
         {
             StShared.WriteErrorLine($"sourceFileManager does not created for folder {tempSolutionPath}", _useConsole,
-                _logger);
-            return false;
-        }
-
-        //შევქმნათ ლოკალური მიმღები ფაილ მენეჯერი
-        var destinationFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, mainSolutionPath);
-
-        if (destinationFileManager == null)
-        {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {mainSolutionPath}", _useConsole,
                 _logger);
             return false;
         }
@@ -82,14 +84,14 @@ public abstract class DoubleAppCreator
         if (!sourceFileManager.IsFolderEmpty(null))
         {
             var copyAndReplaceFilesAndFolders =
-                new CopyAndReplaceFilesAndFolders(sourceFileManager, destinationFileManager, excludeSet);
+                new CopyAndReplaceFilesAndFolders(sourceFileManager, mainSolutionFileManager, excludeSet);
             copyAndReplaceFilesAndFolders.Run();
         }
 
-        if (!destinationFileManager.IsFolderEmpty(null))
+        if (!mainSolutionFileManager.IsFolderEmpty(null))
         {
             var excludeFolders = new[] { ".git", ".vs", "obj" };
-            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, destinationFileManager, excludeSet, excludeFolders);
+            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
             deleteRedundantFiles.Run();
         }
 

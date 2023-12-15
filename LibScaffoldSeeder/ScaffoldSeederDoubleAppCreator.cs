@@ -25,6 +25,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     private const int IndentSize = 4;
 
     public string SolutionSecurityFolderPath { get; }
+    public string SolutionFolderPath { get; }
     //public ScaffoldSeederCreatorData? ScaffoldSeederTempCreatorData { get; private set; }
     public ScaffoldSeederCreatorData? ScaffoldSeederMainCreatorData { get; private set; }
     //public string SolutionFolderPath { get; }
@@ -45,7 +46,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, _ssParameters.ScaffoldSeederProjectName);
 
         _scaffoldSeederFolderPath = Path.Combine(_projectWorkFolderPath, _scaffoldSeederFolderName);
-        //SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
+        SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
 
     }
 
@@ -197,7 +198,9 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var tempFileName = $"{backupFileFullName}{tempExtension}";
 
 
-        if (!archiver.SourcesToArchive(new[] { sourceFolderFullPath }, tempFileName, Array.Empty<string>()))
+        var excludes = new[] { "*.git*", "*.vs*", "*obj*" };
+
+        if (!archiver.SourcesToArchive(new[] { sourceFolderFullPath }, tempFileName, excludes))
         {
             File.Delete(tempFileName);
             return false;
