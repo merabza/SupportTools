@@ -3,6 +3,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportTools.ToolCommands;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.Actions;
 
@@ -67,7 +68,7 @@ public class CreateServiceInstallScript : ToolAction
 
         var code =
             $$"""
-              #!/bin/bash
+              #! /bin/bash
 
               # {{sf.Name}}
 

@@ -1,5 +1,6 @@
 ﻿using CodeTools;
 using Microsoft.Extensions.Logging;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CodeCreators;
 
@@ -47,7 +48,7 @@ public class SshCodeCreator : CodeCreator
     public override void CreateFileStructure()
     {
         var block = new SshCodeBlock("", "", "",
-            new SshOneLineComment("!/bin/bash"),
+            new SshOneLineComment("! /bin/bash"),
             "",
             new SshOneLineComment(_codeFileName),
             "",

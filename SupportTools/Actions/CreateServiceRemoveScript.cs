@@ -36,7 +36,7 @@ public class CreateServiceRemoveScript : ToolAction
 
         var code =
             $$"""
-              #!/bin/bash
+              #! /bin/bash
 
               # {{sf.Name}}
 
