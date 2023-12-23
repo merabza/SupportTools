@@ -36,7 +36,7 @@ public class CreateServiceRemoveScript : ToolAction
 
         var code =
             $$"""
-              #! /bin/bash
+              #!/bin/bash
 
               # {{sf.Name}}
 
@@ -85,7 +85,7 @@ public class CreateServiceRemoveScript : ToolAction
               """;
         if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
         {
-            File.WriteAllText(_scriptFileName, code);
+            File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
             return true;
         }
 

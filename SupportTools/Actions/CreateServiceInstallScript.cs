@@ -68,7 +68,7 @@ public class CreateServiceInstallScript : ToolAction
 
         var code =
             $$"""
-              #! /bin/bash
+              #!/bin/bash
 
               # {{sf.Name}}
 
@@ -115,7 +115,11 @@ public class CreateServiceInstallScript : ToolAction
 
               echo download File Prefix is $downloadFilePrefix
               echo download Settings File Prefix is $downloadSettingsFilePrefix
-
+              
+              if [ -z "$dotnetRunner" ]; then
+                echo "dotnet runner is not installed!"
+                exit 1
+              fi
 
               if [ ! -e $dotnetRunner ]
               then
@@ -372,7 +376,7 @@ public class CreateServiceInstallScript : ToolAction
               """;
         if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
         {
-            File.WriteAllText(_scriptFileName, code);
+            File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
             return true;
         }
 
