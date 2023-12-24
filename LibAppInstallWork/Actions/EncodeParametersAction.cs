@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using LanguageExt;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -241,7 +243,26 @@ public sealed class EncodeParametersAction : ToolAction
         switch (keys[k])
         {
             case "[]":
-                return val.All(v => Enc(v, encKey, keys, k + 1));
+                var encodedPaths = new List<string>();
+
+                var atLastOneEncoded = true;
+                while (atLastOneEncoded)
+                {
+                    atLastOneEncoded = false;
+                    foreach (var v in val)
+                    {
+                        var path = v.Path;
+                        if ( encodedPaths.Contains(path) )
+                            continue;
+                        if (!Enc(v, encKey, keys, k + 1)) 
+                            return false;
+                        encodedPaths.Add(path);
+                        atLastOneEncoded = true;
+                        break;
+                    }
+                }
+
+                return true;
             case "*":
                 return val.Values().All(p => Enc(p, encKey, keys, k + 1));
         }

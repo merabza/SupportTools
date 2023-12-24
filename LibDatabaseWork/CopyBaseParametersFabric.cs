@@ -242,7 +242,7 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var needDownloadFromSource = !FileStorageData.IsSameToLocal(sourceFileStorage, localPath, null, null);
+        var needDownloadFromSource = !FileStorageData.IsSameToLocal(sourceFileStorage, localPath);
 
         SmartSchemas smartSchemas = new(supportToolsParameters.SmartSchemas);
 
@@ -259,7 +259,7 @@ public static class CopyBaseParametersFabric
             ? null
             : smartSchemas.GetSmartSchemaByKey(localSmartSchemaName);
 
-        var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath, null, null) &&
+        var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
                                       sourceFileStorageName != destinationFileStorageName;
 
         var destinationSmartSchemaName =
@@ -269,7 +269,7 @@ public static class CopyBaseParametersFabric
             : smartSchemas.GetSmartSchemaByKey(destinationSmartSchemaName);
 
         var needDownloadFromExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-                                       !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath, null, null) &&
+                                       !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
                                        exchangeFileStorageName != sourceFileStorageName;
 
         var exchangeSmartSchemaName = dep.ExchangeSmartSchemaName;
@@ -278,11 +278,10 @@ public static class CopyBaseParametersFabric
             ? null
             : smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
 
-        var needDownloadFromDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath, null, null);
+        var needDownloadFromDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath);
 
         var needUploadDestinationToExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-                                              !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath, null,
-                                                  null) &&
+                                              !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
                                               exchangeFileStorageName != destinationFileStorageName;
 
         return new CopyBaseParameters(agentClientForSource, agentClientForDestination, exchangeFileManager,
