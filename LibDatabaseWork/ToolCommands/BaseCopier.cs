@@ -4,6 +4,7 @@ using CliParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using WebAgentProjectsApiContracts.V1.Responses;
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -45,16 +46,18 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Create Backup for source Database");
 
         //ბექაპის დამზადება წყაროს მხარეს
-        var backupFileParametersForSource = agentClientForSource
+        var createBackupResult= agentClientForSource
             .CreateBackup(CopyBaseParameters.SourceDbBackupParameters, CopyBaseParameters.SourceDatabaseName,
                 CancellationToken.None).Result;
 
         //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
-        if (backupFileParametersForSource == null)
+        if (createBackupResult.IsNone)
         {
             Logger.LogError("Backup not created");
             return false;
         }
+
+        var backupFileParametersForSource = (BackupFileParameters)createBackupResult;
 
         var fileName = backupFileParametersForSource.Name;
         var prefix = backupFileParametersForSource.Prefix;
@@ -135,21 +138,34 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
-        if (agentClientForDestination.IsDatabaseExists(destinationDatabaseName, CancellationToken.None).Result)
+        var isDatabaseExistsResult = agentClientForDestination
+            .IsDatabaseExists(destinationDatabaseName, CancellationToken.None).Result;
+
+        if (isDatabaseExistsResult.IsNone)
+        {
+            Logger.LogInformation("The existence of the base could not be determined");
+            return false;
+        }
+
+        var isDatabaseExists = (bool)isDatabaseExistsResult;
+
+        if (isDatabaseExists)
         {
             Logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
                 destinationDatabaseName);
 
-            var backupFileParametersForDestination = agentClientForDestination
+            var createBackupResult2 = agentClientForDestination
                 .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName,
                     CancellationToken.None).Result;
 
-            if (backupFileParametersForDestination == null)
+            if (createBackupResult2.IsNone)
             {
                 var actionDescription = GetActionDescription();
                 Logger.LogError("{actionDescription} - finished with errors", actionDescription);
                 return false;
             }
+
+            var backupFileParametersForDestination = (BackupFileParameters)createBackupResult2;
 
             Logger.LogInformation("Remove Redundant Files for destination");
 
