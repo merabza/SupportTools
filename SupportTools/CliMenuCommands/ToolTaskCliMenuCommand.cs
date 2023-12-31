@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
 using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;
 
@@ -55,7 +57,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
         Console.WriteLine("Tools is running...");
         Console.WriteLine("---");
 
-        toolCommand.Run();
+        toolCommand.Run(CancellationToken.None).Wait();
 
         Console.WriteLine("---");
 

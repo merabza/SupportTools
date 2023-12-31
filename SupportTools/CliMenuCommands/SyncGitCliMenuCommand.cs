@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.Git;
 using LibAppProjectCreator.Models;
@@ -96,7 +97,7 @@ public sealed class SyncGitCliMenuCommand : CliMenuCommand
             }
 
             GitSync gitSync = new(_logger, gitsFolder, gitRepos.Gits[_gitProjectName]);
-            gitSync.Run();
+            gitSync.Run(CancellationToken.None).Wait();
 
             MenuAction = EMenuAction.LevelUp;
             Console.WriteLine("Success");

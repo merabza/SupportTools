@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.ToolCommands;
 
@@ -14,7 +17,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
     {
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;
 
@@ -34,7 +37,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
             AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate =
                 new(Logger, ParametersManager, kvp.Key, ETestOrReal.Test);
 
-            appProjectCreatorByTemplate.Run();
+            await appProjectCreatorByTemplate.Run(cancellationToken);
 
             Console.WriteLine("Finished create test Project: {0}", kvp.Key);
         }

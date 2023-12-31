@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using LibMenuInput;
 using LibParameters;
@@ -23,7 +25,7 @@ public class ServiceRemoveScriptCreator : ToolCommand
     }
 
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_par.ServerInfo.ServerName))
         {
@@ -77,6 +79,6 @@ public class ServiceRemoveScriptCreator : ToolCommand
 
         var createRemoveScript = new CreateServiceRemoveScript(Logger, scriptFileNameForSave, _par.ProjectName,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder, _par.Project.ServiceName);
-        return createRemoveScript.Run();
+        return await createRemoveScript.Run(cancellationToken);
     }
 }

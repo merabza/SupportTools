@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using DbContextAnalyzer.CodeCreators;
 using LibAppProjectCreator.AppCreators;
@@ -133,7 +135,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         return true;
     }
 
-    protected override bool MakeAdditionalFiles()
+    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
     {
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Empty Console Program.cs...");
@@ -174,7 +176,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         var paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
 
         //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
-        File.WriteAllText(parametersFileName, paramsJsonText);
+        await File.WriteAllTextAsync(parametersFileName, paramsJsonText, cancellationToken);
 
 
         var migrationSqlFilesFolder = _par.MigrationSqlFilesFolder;
@@ -195,17 +197,13 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //  <ItemGroup>
         //    <EmbeddedResource Include="Sql\Sp_GetAllbatchesByStatus.sql" />
         //  </ItemGroup>
-        foreach (var sqlFile in sqlFiles)
-        {
-            var newFile = sqlFile.CopyTo(Path.Combine(migrationProjectSqlFilesFolderPath, sqlFile.Name));
-            if (RegisterEmbeddedResource(projectFileFullName, newFile.Name)) 
-                continue;
-            StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
-            return false;
-        }
+        if (sqlFiles.Select(sqlFile => sqlFile.CopyTo(Path.Combine(migrationProjectSqlFilesFolderPath, sqlFile.Name)))
+            .All(newFile => RegisterEmbeddedResource(projectFileFullName, newFile.Name)))
+            return true;
+        StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
+        return false;
 
         //
-        return true;
     }
 
 

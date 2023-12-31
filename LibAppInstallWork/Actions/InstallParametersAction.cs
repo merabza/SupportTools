@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
 
@@ -38,7 +40,7 @@ public sealed class InstallParametersAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
         var agentClient =
@@ -48,7 +50,7 @@ public sealed class InstallParametersAction : ToolAction
         {
             Logger.LogError("agentClient cannot be created. project {_projectName}/{_environmentName} does not updated",
                 _projectName, _environmentName);
-            return false;
+            return Task.FromResult(false);
         }
 
         Logger.LogInformation("Updating app settings for project {_projectName}/{_environmentName} by web agent...",
@@ -59,9 +61,9 @@ public sealed class InstallParametersAction : ToolAction
                 Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
                 CancellationToken.None)
             .Result)
-            return true;
+            return Task.FromResult(true);
 
         Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
-        return false;
+        return Task.FromResult(false);
     }
 }

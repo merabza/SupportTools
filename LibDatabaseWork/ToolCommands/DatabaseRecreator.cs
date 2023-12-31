@@ -1,6 +1,9 @@
 ﻿using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -28,21 +31,21 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //წაიშალოს დეველოპერ ბაზა
         var databaseDropper = new DatabaseDropper(Logger, DatabaseMigrationParameters, ParametersManager);
-        if (!databaseDropper.Run())
+        if (!await databaseDropper.Run(cancellationToken))
             return false;
 
         //შეიქმნას თავიდან (სტორედ პროცედურების გათვალისწინებით)
         var databaseMigrationCreator =
             new DatabaseMigrationCreator(Logger, DatabaseMigrationParameters, ParametersManager);
-        if (!databaseMigrationCreator.Run())
+        if (!await databaseMigrationCreator.Run(cancellationToken))
             return false;
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var correctNewDatabase = new CorrectNewDatabase(Logger, _correctNewDbParameters, ParametersManager);
-        return correctNewDatabase.Run();
+        return await correctNewDatabase.Run(cancellationToken);
     }
 }

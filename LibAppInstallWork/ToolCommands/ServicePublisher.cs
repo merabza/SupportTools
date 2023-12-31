@@ -5,6 +5,9 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -28,7 +31,7 @@ public sealed class ServicePublisher : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var createPackageAndUpload = new CreatePackageAndUpload(Logger, ProgramPublisherParameters.ProjectName,
@@ -37,7 +40,7 @@ public sealed class ServicePublisher : ToolCommand
             ProgramPublisherParameters.Runtime, ProgramPublisherParameters.RedundantFileNames,
             ProgramPublisherParameters.UploadTempExtension, ProgramPublisherParameters.FileStorageForExchange,
             ProgramPublisherParameters.SmartSchemaForLocal, ProgramPublisherParameters.SmartSchemaForExchange);
-        if (!createPackageAndUpload.Run())
+        if (! await createPackageAndUpload.Run(cancellationToken))
             return false;
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
@@ -51,6 +54,6 @@ public sealed class ServicePublisher : ToolCommand
             ProgramPublisherParameters.ServerInfo, ProgramPublisherParameters.DateMask,
             _appSettingsEncoderParameters.ParametersFileExtension, ProgramPublisherParameters.FileStorageForExchange,
             ProgramPublisherParameters.SmartSchemaForExchange);
-        return encodeParametersAndUploadAction.Run();
+        return await encodeParametersAndUploadAction.Run(cancellationToken);
     }
 }

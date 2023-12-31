@@ -3,6 +3,9 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -24,7 +27,7 @@ public sealed class ServiceUpdater : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
@@ -46,7 +49,7 @@ public sealed class ServiceUpdater : ToolCommand
             programPublisherParameters.UploadTempExtension, programPublisherParameters.FileStorageForExchange,
             programPublisherParameters.SmartSchemaForLocal, programPublisherParameters.SmartSchemaForExchange);
 
-        if (!createPackageAndUpload.Run())
+        if (!await createPackageAndUpload.Run(cancellationToken))
             return false;
 
 
@@ -65,7 +68,7 @@ public sealed class ServiceUpdater : ToolCommand
                 appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
                 appSettingsEncoderParameters.ParametersFileExtension,
                 appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
-            if (!encodeParametersAndUploadAction.Run() && ProgramServiceUpdaterParameters.IsService)
+            if (!await encodeParametersAndUploadAction.Run(cancellationToken) && ProgramServiceUpdaterParameters.IsService)
                 return false;
             appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
         }
@@ -82,7 +85,7 @@ public sealed class ServiceUpdater : ToolCommand
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName,
             ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
             ProgramServiceUpdaterParameters.ProjectDescription);
-        if (!installProgramAction.Run())
+        if (!await installProgramAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
@@ -94,7 +97,7 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
             ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion);
 
-        if (!checkProgramVersionAction.Run())
+        if (!await checkProgramVersionAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName}/{environmentName} version check failed", projectName,
                 environmentName);
@@ -109,7 +112,7 @@ public sealed class ServiceUpdater : ToolCommand
                 ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
                 ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion);
 
-            if (checkParametersVersionAction.Run())
+            if (await checkParametersVersionAction.Run(cancellationToken))
                 return true;
         }
 

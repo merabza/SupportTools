@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using LibMenuInput;
 using LibParameters;
@@ -24,7 +26,7 @@ public class ServiceInstallScriptCreator : ToolCommand
     }
 
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var ftpSiteUserName = _par.FileStorageForExchange.UserName;
 
@@ -179,6 +181,6 @@ public class ServiceInstallScriptCreator : ToolCommand
             //_par.Project.ServiceName, 
             sf.Name, _par.ServerInfo.ServiceUserName,
             _par.FileStorageForExchange.FtpSiteLsFileOffset);
-        return createInstallScript.Run();
+        return await createInstallScript.Run(cancellationToken);
     }
 }

@@ -13,6 +13,8 @@ using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -139,7 +141,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         return true;
     }
 
-    protected override bool MakeAdditionalFiles()
+    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
     {
         var appSettingsJsonJObject = new JObject();
         var userSecretJsonJObject = new JObject();
@@ -277,7 +279,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.MainProjectData.ProjectFileFullName, appSettingsJsonJObject,
             forEncodeAppSettingsJsonKeys, userSecretJsonJObject, keyPart1);
 
-        if (!settingsFilesCreator.Run())
+        if (! await settingsFilesCreator.Run(cancellationToken))
             return false;
 
         Console.WriteLine("Creating launchSettings.json...");

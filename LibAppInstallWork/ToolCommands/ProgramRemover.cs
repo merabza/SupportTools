@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
@@ -27,7 +28,7 @@ public sealed class ProgramRemover : ToolCommand
         return false;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
@@ -37,16 +38,16 @@ public sealed class ProgramRemover : ToolCommand
         if (agentClient is null)
         {
             Logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
-            return false;
+            return Task.FromResult(false);
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
         if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
                 CancellationToken.None)
             .Result)
-            return true;
+            return Task.FromResult(true);
 
         Logger.LogError("Project {projectName} can not removed", projectName);
-        return false;
+        return Task.FromResult(false);
     }
 }

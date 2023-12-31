@@ -2,6 +2,9 @@
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
 
@@ -46,11 +49,11 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var encodeParametersAction = new EncodeParametersAction(Logger, _keysJsonFileName, _sourceJsonFileName,
             _encodedJsonFileName, _keyPart1, _keyPart2);
-        if (!encodeParametersAction.Run())
+        if (!await encodeParametersAction.Run(cancellationToken))
         {
             Logger.LogError("Cannot encode parameters");
             return false;
@@ -69,6 +72,6 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(Logger, _projectName,
             _serverInfo, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
             _uploadSmartSchema);
-        return uploadParametersToExchangeAction.Run();
+        return await uploadParametersToExchangeAction.Run(cancellationToken);
     }
 }

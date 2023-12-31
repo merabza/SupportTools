@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
@@ -109,18 +110,16 @@ public static class CopyBaseParametersFabric
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         var exchangeFileStorageName = dep.ExchangeFileStorageName;
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
-        var (exchangeFileStorage, exchangeFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                exchangeFileStorageName, fileStorages, null, null);
+        var (exchangeFileStorage, exchangeFileManager) = FileManagersFabricExt.CreateFileStorageAndFileManager(true,
+            logger, localPath, exchangeFileStorageName, fileStorages, null, null, CancellationToken.None).Result;
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromProductionToDeveloper
             ? dep.ProductionFileStorageName
             : dep.DeveloperFileStorageName;
 
-        var (sourceFileStorage, sourceFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                sourceFileStorageName, fileStorages, null, null);
+        var (sourceFileStorage, sourceFileManager) = FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger,
+            localPath, sourceFileStorageName, fileStorages, null, null, CancellationToken.None).Result;
 
         if (sourceFileManager == null)
         {
@@ -139,9 +138,9 @@ public static class CopyBaseParametersFabric
             fromProductionToDeveloper ? dep.DeveloperFileStorageName : dep.ProductionFileStorageName;
 
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
-        var (destinationFileStorage, destinationFileManager) =
-            FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                destinationFileStorageName, fileStorages, null, null);
+        var (destinationFileStorage, destinationFileManager) = FileManagersFabricExt
+            .CreateFileStorageAndFileManager(true, logger, localPath, destinationFileStorageName, fileStorages, null,
+                null, CancellationToken.None).Result;
 
         if (destinationFileStorage == null)
         {
@@ -169,7 +168,8 @@ public static class CopyBaseParametersFabric
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
         var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
-            sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections, null, null);
+            sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections, null, null,
+            CancellationToken.None).Result;
 
         if (agentClientForSource is null)
         {
@@ -178,7 +178,8 @@ public static class CopyBaseParametersFabric
         }
 
         var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
-            destinationDbWebAgentName, apiClients, destinationDbConnectionName, databaseServerConnections, null, null);
+            destinationDbWebAgentName, apiClients, destinationDbConnectionName, databaseServerConnections, null, null,
+            CancellationToken.None).Result;
 
         if (agentClientForDestination is null)
         {

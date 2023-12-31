@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using LibAppInstallWork;
 using LibAppInstallWork.Actions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.JsonCreators;
 
@@ -33,13 +36,14 @@ public sealed class SettingsFilesCreator
         _keyPart1 = keyPart1;
     }
 
-    public bool Run()
+    public async Task<bool> Run(CancellationToken cancellationToken)
+
     {
         Console.WriteLine("Creating appsettings.json...");
         var sourceJsonFileName =
             Path.Combine(_projectFullPath, "appsettings.json");
 
-        File.WriteAllText(sourceJsonFileName, _appSettingsJsonJObject.ToString());
+        await File.WriteAllTextAsync(sourceJsonFileName, _appSettingsJsonJObject.ToString(), cancellationToken);
 
         if (_forEncodeAppSettingsJsonKeys.Count <= 0)
             return true;
@@ -48,8 +52,7 @@ public sealed class SettingsFilesCreator
         foreach (var jsonKey in _forEncodeAppSettingsJsonKeys)
         {
             keysJArray.Add(new JValue(jsonKey));
-            if (!StShared.RunProcess(true, _logger, "dotnet",
-                    $"user-secrets init --project {_projectFullPath}"))
+            if (StShared.RunProcess(true, _logger, "dotnet", $"user-secrets init --project {_projectFullPath}").IsSome)
                 return false;
             var userSecretContentFileName =
                 UserSecretFileNameDetector.GetFileName(_projectFileFullName);
@@ -60,16 +63,17 @@ public sealed class SettingsFilesCreator
             //    continue;
             //var userSecretDirectoryName = FileStat.CreateFolderIfNotExists(sf.DirectoryName, true, _logger);
             if (FileStat.CreatePrevFolderIfNotExists(userSecretContentFileName, true, _logger))
-                File.WriteAllText(userSecretContentFileName, _userSecretJsonJObject.ToString());
+                await File.WriteAllTextAsync(userSecretContentFileName, _userSecretJsonJObject.ToString(),
+                    cancellationToken);
         }
 
-        var appSetenKeysJObject = new JObject(new JProperty("Keys", keysJArray));
+        var appSetEnKeysJObject = new JObject(new JProperty("Keys", keysJArray));
 
         Console.WriteLine("Creating appsetenkeys.json...");
         var keysJsonFileName =
             Path.Combine(_projectFullPath, "appsetenkeys.json");
-        File.WriteAllText(keysJsonFileName,
-            appSetenKeysJObject.ToString(Formatting.Indented));
+        await File.WriteAllTextAsync(keysJsonFileName,
+            appSetEnKeysJObject.ToString(Formatting.Indented), cancellationToken);
 
 
         Console.WriteLine("Creating appsettingsEncoded.json...");
@@ -79,7 +83,7 @@ public sealed class SettingsFilesCreator
             Path.Combine(_projectFullPath, "appsettingsEncoded.json");
         var encodeParametersAction = new EncodeParametersAction(_logger, keysJsonFileName, sourceJsonFileName,
             encodedJsonFileName, _keyPart1, keyPart2);
-        if (encodeParametersAction.Run()) return true;
+        if (await encodeParametersAction.Run(cancellationToken)) return true;
         _logger.LogError("Cannot encode parameters");
         return false;
     }

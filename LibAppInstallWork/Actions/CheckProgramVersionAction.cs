@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Installer.AgentClients;
 using Installer.Domain;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
+
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
 
@@ -32,7 +36,7 @@ public sealed class CheckProgramVersionAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
         var version = "";
@@ -55,15 +59,25 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var proxyApiClient =
                         new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
-                    version = proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId,
-                            CancellationToken.None)
-                        .Result;
+                    var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId, cancellationToken);
+                    if (getVersionByProxyResult.IsT1)
+                    {
+                        Err.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);
+                        break;
+                    }
+                    version = getVersionByProxyResult.AsT0;
                 }
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
-                    version = testApiClient.GetVersion(CancellationToken.None).Result ?? "";
+                    var getVersionResult = await testApiClient.GetVersion(cancellationToken);
+                    if (getVersionResult.IsT1)
+                    {
+                        Err.PrintErrorsOnConsole(getVersionResult.AsT1);
+                        break;
+                    }
+                    version = getVersionResult.AsT0;
                 }
 
                 if (_installingProgramVersion == null)

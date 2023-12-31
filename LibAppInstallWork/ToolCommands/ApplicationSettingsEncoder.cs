@@ -3,6 +3,8 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -20,7 +22,7 @@ public sealed class ApplicationSettingsEncoder : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
             AppsetenParameters.AppSetEnKeysJsonFileName, AppsetenParameters.AppSettingsJsonSourceFileName,
@@ -28,6 +30,6 @@ public sealed class ApplicationSettingsEncoder : ToolCommand
             AppsetenParameters.ProjectName, AppsetenParameters.ServerInfo, AppsetenParameters.DateMask,
             AppsetenParameters.ParametersFileExtension, AppsetenParameters.FileStorageForExchange,
             AppsetenParameters.ExchangeSmartSchema);
-        return encodeParametersAndUploadAction.Run();
+        return await encodeParametersAndUploadAction.Run(cancellationToken);
     }
 }

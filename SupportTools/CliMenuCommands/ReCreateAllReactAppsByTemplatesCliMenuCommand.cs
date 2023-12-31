@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;
 
@@ -33,7 +35,7 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
         {
             ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
                 new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
-            reCreateAllReactAppsByTemplatesToolCommand.Run();
+            reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Wait();
 
             StShared.Pause();
 

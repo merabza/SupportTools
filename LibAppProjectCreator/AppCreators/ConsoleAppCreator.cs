@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.Database;
 using LibAppProjectCreator.CodeCreators.GitIgnoreCreators;
@@ -102,7 +104,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     }
 
     //პროექტის ტიპზე დამოკიდებული დამატებით საჭირო ფაილების შექმნა
-    protected override bool MakeAdditionalFiles()
+    protected override Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
     {
         ////---===მთავარი პროექტის ფაილები===---
         ////შეიქმნას აპლიკაციის მთავარი პარამეტრების შემნახველი კლასი StatProgramAttr.cs
@@ -149,20 +151,20 @@ public sealed class ConsoleAppCreator : AppCreatorBase
                 _consoleAppCreatorData.MainProjectData.FoldersForCreate["Properties"], ProjectName,
                 SecurityPath);
         if (!launchSettingsJsonCreator.Create())
-            return false;
+            return Task.FromResult(false);
 
         //პარამეტრების json ფაილის შექმნა
         var projectParametersJsonCreator =
             new ProjectParametersJsonCreator(SecurityPath, ProjectName);
         if (!projectParametersJsonCreator.Create())
-            return false;
+            return Task.FromResult(false);
 
         Console.WriteLine("Creating main project .gitignore...");
         var mainProjectGitIgnoreCreator = new MainProjectGitIgnoreCreator(Logger,
             _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, ".gitignore");
         mainProjectGitIgnoreCreator.CreateFileStructure();
 
-        return StShared.RunProcess(true, Logger, "git", $"init {SolutionPath}");
+        return Task.FromResult(StShared.RunProcess(true, Logger, "git", $"init {SolutionPath}").IsNone);
     }
 
     private void MakeFilesWhenNotUseMenu()

@@ -5,6 +5,9 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -28,7 +31,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var appSettingsEncoderParameters =
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
@@ -42,7 +45,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
             appSettingsEncoderParameters.ParametersFileExtension, appSettingsEncoderParameters.FileStorageForExchange,
             appSettingsEncoderParameters.ExchangeSmartSchema);
-        var result = encodeParametersAndUploadAction.Run();
+        var result = await encodeParametersAndUploadAction.Run(cancellationToken);
         var encodedJson = encodeParametersAndUploadAction.EncodedJsonContent;
         var checkForVersion = encodeParametersAndUploadAction.AppSettingsVersion;
 
@@ -61,7 +64,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
 
         var projectName = AppSettingsUpdaterParameters.ProjectName;
-        if (!installParametersAction.Run())
+        if (!await installParametersAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName} parameters file is not updated", projectName);
             return false;
@@ -71,7 +74,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         var checkParametersVersionAction = new CheckParametersVersionAction(Logger,
             AppSettingsUpdaterParameters.WebAgentForCheck, AppSettingsUpdaterParameters.ProxySettings, checkForVersion);
 
-        if (checkParametersVersionAction.Run())
+        if (await checkParametersVersionAction.Run(cancellationToken))
             return true;
 
         Logger.LogError("project {projectName} parameters file check failed", projectName);

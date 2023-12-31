@@ -155,7 +155,7 @@ public sealed class CreateReactClientApp
 
             var srcCarcassPath = Path.Combine(srcPath, "carcass");
             var carcassGitProjectName = "git@bitbucket.org:mzakalashvili/dncreactcarcass.git";
-            if (!StShared.RunProcess(true, _logger, "git", $"clone {carcassGitProjectName} {srcCarcassPath}"))
+            if (StShared.RunProcess(true, _logger, "git", $"clone {carcassGitProjectName} {srcCarcassPath}").IsSome)
             {
                 StShared.WriteErrorLine(
                     $"Error When cloning git {carcassGitProjectName} to folder {srcCarcassPath}",

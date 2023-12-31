@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using FileManagersMain;
 using LibAppProjectCreator.FolderProcessors;
 using LibAppProjectCreator.Models;
@@ -25,7 +27,7 @@ public abstract class DoubleAppCreator
 
     public List<GitCloneDataModel> GitClones => _mainAppCreator?.GitClones ?? new List<GitCloneDataModel>();
 
-    public bool CreateDoubleApp()
+    public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken)
     {
         _mainAppCreator = CreateMainAppCreator();
         if (_mainAppCreator is null)
@@ -33,9 +35,8 @@ public abstract class DoubleAppCreator
 
         var solutionPathExists = Directory.Exists(_mainAppCreator.SolutionPath);
 
-        if (!_mainAppCreator.PrepareParametersAndCreateApp(solutionPathExists
-                ? ECreateAppVersions.OnlySyncGit
-                : ECreateAppVersions.DoAll))
+        if (!await _mainAppCreator.PrepareParametersAndCreateApp(cancellationToken,
+                solutionPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
             return false;
 
         if (!solutionPathExists)
@@ -57,14 +58,10 @@ public abstract class DoubleAppCreator
         if (tempAppCreator is null)
             return false;
 
-        if (!tempAppCreator.PrepareParametersAndCreateApp(ECreateAppVersions.WithoutSolutionGitInit))
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(cancellationToken,ECreateAppVersions.WithoutSolutionGitInit))
             return false;
 
-        if (!SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager))
-            return false;
-
-
-        return true;
+        return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);
     }
 
     private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)

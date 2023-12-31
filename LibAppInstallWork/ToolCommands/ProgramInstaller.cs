@@ -6,6 +6,8 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -29,7 +31,7 @@ public sealed class ProgramInstaller : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         string? appSettingsVersion = null;
 
@@ -53,7 +55,7 @@ public sealed class ProgramInstaller : ToolCommand
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,
                 Parameters.ServerInfo.EnvironmentName, Parameters.ParametersFileDateMask,
                 Parameters.ParametersFileExtension, null, null);
-            var result = getLatestParametersFileBodyAction.Run();
+            var result = await getLatestParametersFileBodyAction.Run(cancellationToken);
 
             appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
 
@@ -72,7 +74,7 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
             Parameters.ServerInfo.EnvironmentName, Parameters.ServiceName, Parameters.ServiceUserName,
             Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
-        if (!installProgramAction.Run())
+        if (!await installProgramAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
@@ -83,7 +85,7 @@ public sealed class ProgramInstaller : ToolCommand
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
         var checkProgramVersionAction = new CheckProgramVersionAction(Logger, Parameters.WebAgentForCheck,
             Parameters.ProxySettings, installingProgramVersion);
-        if (!checkProgramVersionAction.Run())
+        if (!await checkProgramVersionAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
@@ -96,7 +98,7 @@ public sealed class ProgramInstaller : ToolCommand
             var checkParametersVersionAction = new CheckParametersVersionAction(Logger, Parameters.WebAgentForCheck,
                 Parameters.ProxySettings, appSettingsVersion);
 
-            if (checkParametersVersionAction.Run())
+            if (await checkParametersVersionAction.Run(cancellationToken))
                 return true;
         }
 

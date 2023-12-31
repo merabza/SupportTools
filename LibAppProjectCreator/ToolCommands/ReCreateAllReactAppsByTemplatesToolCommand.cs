@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -14,7 +16,7 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
     }
 
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;
 
@@ -32,7 +34,7 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
                 new ReCreateReactAppFilesByTemplateNameToolCommand(Logger, kvp.Key, kvp.Value, parameters,
                     ParametersManager);
 
-            command.Run();
+            await command.Run(cancellationToken);
 
             Console.WriteLine("Finished create React App: {0}", kvp.Key);
         }

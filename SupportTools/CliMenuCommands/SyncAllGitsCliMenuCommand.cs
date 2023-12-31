@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.Git;
 using LibAppProjectCreator.Models;
@@ -84,7 +85,7 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
             GitSyncAll gitSyncAll = new(_logger, gitsFolder,
                 gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value));
 
-            gitSyncAll.Run();
+            gitSyncAll.Run(CancellationToken.None).Wait();
 
             MenuAction = EMenuAction.LevelUp;
             Console.WriteLine("Success");

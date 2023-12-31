@@ -1,11 +1,13 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -30,7 +32,7 @@ public sealed class ServiceStarter : ToolCommand
         return false;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var serviceName = _parameters.ServiceName;
         var environmentName = _parameters.EnvironmentName;
@@ -56,8 +58,9 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        if (!agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName, CancellationToken.None)
-                .Result)
+        var startServiceResult = await agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName,
+            CancellationToken.None);
+        if (startServiceResult.IsSome)
         {
             Logger.LogError("Service {serviceName}/{environmentName} can not started", serviceName, environmentName);
             return false;
@@ -68,7 +71,7 @@ public sealed class ServiceStarter : ToolCommand
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         CheckParametersVersionAction checkParametersVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
-        if (!checkParametersVersionAction.Run())
+        if (!await checkParametersVersionAction.Run(cancellationToken))
             Logger.LogError("Service {serviceName}/{environmentName} parameters file check failed", serviceName,
                 environmentName);
 
@@ -76,7 +79,7 @@ public sealed class ServiceStarter : ToolCommand
         //შევამოწმოთ გაშვებული პროგრამის ვერსია ServiceStartParameters.ServiceName, 
         CheckProgramVersionAction checkProgramVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
-        if (!checkProgramVersionAction.Run())
+        if (!await checkProgramVersionAction.Run(cancellationToken))
             Logger.LogError("Service {serviceName}/{environmentName} version check failed", serviceName,
                 environmentName);
 

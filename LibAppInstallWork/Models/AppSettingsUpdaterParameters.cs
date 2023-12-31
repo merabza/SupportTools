@@ -1,5 +1,6 @@
 //Created by ProjectParametersClassCreator at 1/11/2021 20:04:36
 
+using System.Threading;
 using Installer.Domain;
 using LibFileParameters.Models;
 using LibParameters;
@@ -101,8 +102,8 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        var localInstallerSettingsDomain =
-            LocalInstallerSettingsDomain.Create(null, true, supportToolsParameters.LocalInstallerSettings, null, null);
+        var localInstallerSettingsDomain = LocalInstallerSettingsDomain.Create(null, true,
+            supportToolsParameters.LocalInstallerSettings, null, null, CancellationToken.None).Result;
 
         if (localInstallerSettingsDomain is null)
         {

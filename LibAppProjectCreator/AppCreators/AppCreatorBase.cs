@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using CodeTools;
 using LibAppProjectCreator.Git;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
 
@@ -21,7 +24,7 @@ public enum ECreateAppVersions
     WithoutSolutionGitInit
 }
 
-public /*open*/ class AppCreatorBase
+public abstract class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;
     protected readonly GitProjects GitProjects;
@@ -77,10 +80,7 @@ public /*open*/ class AppCreatorBase
     }
 
     //პროექტის ტიპზე დამოკიდებული დამატებით საჭირო ფაილების შექმნა
-    protected virtual bool MakeAdditionalFiles()
-    {
-        return true;
-    }
+    protected abstract Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken);
 
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected virtual bool PrepareSpecific()
@@ -112,7 +112,8 @@ public /*open*/ class AppCreatorBase
         return PrepareSpecific();
     }
 
-    public bool PrepareParametersAndCreateApp(ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
+    public async Task<bool> PrepareParametersAndCreateApp(CancellationToken cancellationToken,
+        ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
     {
         //return PrepareParameters() && CreateApp();
 
@@ -123,7 +124,7 @@ public /*open*/ class AppCreatorBase
             return false;
         }
 
-        if (CreateApp(createAppVersions)) 
+        if (await CreateApp(createAppVersions, cancellationToken))
             return true;
 
         StShared.WriteErrorLine("Scaffold Seeder Solution does not created", true, Logger);
@@ -195,7 +196,7 @@ public /*open*/ class AppCreatorBase
     }
 
     //აპლიკაციის შექმნის პროცესი
-    private bool CreateApp(ECreateAppVersions createAppVersions)
+    private async Task<bool> CreateApp(ECreateAppVersions createAppVersions, CancellationToken cancellationToken)
     {
 
         if (!AppGitsSync())
@@ -213,7 +214,8 @@ public /*open*/ class AppCreatorBase
         if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true)))
             return false;
         //სოლუშენის შექმნა
-        if (!StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {ProjectName}"))
+        if (StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {ProjectName}")
+            .IsSome)
             return false;
 
         //პროექტების დამატება სოლუშენში
@@ -222,8 +224,9 @@ public /*open*/ class AppCreatorBase
             if (prj is ProjectForCreate projectForCreate)
             {
                 //პროექტების შექმნა
-                if (!StShared.RunProcess(true, Logger, "dotnet",
-                        $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? "" : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}"))
+                if (StShared.RunProcess(true, Logger, "dotnet",
+                        $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? "" : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
+                    .IsSome)
                     return false;
 
                 var projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
@@ -249,8 +252,9 @@ public /*open*/ class AppCreatorBase
 
                 //projPath = Path.Combine(SolutionPath, projectForCreate.ProjectName,
                 //    $"{projectForCreate.ProjectName}.csproj");
-                if (!StShared.RunProcess(true, Logger, "dotnet",
-                        $"sln {SolutionPath} add {(projectForCreate.SolutionFolderName is null ? "" : $"--solution-folder {projectForCreate.SolutionFolderName} ")}{projectForCreate.ProjectFileFullName}"))
+                if (StShared.RunProcess(true, Logger, "dotnet",
+                        $"sln {SolutionPath} add {(projectForCreate.SolutionFolderName is null ? "" : $"--solution-folder {projectForCreate.SolutionFolderName} ")}{projectForCreate.ProjectFileFullName}")
+                    .IsSome)
                     return false;
             }
             else if (prj is ProjectFromGit projectFromGit)
@@ -258,39 +262,39 @@ public /*open*/ class AppCreatorBase
             {
                 var projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName, projectFromGit.ProjectName,
                     $"{projectFromGit.ProjectName}.csproj");
-                if (!StShared.RunProcess(true, Logger, "dotnet",
-                        $"sln {SolutionPath} add {(projectFromGit.SolutionFolderName is null ? "" : $"--solution-folder {projectFromGit.SolutionFolderName} ")}{projPath}"))
+                if (StShared.RunProcess(true, Logger, "dotnet",
+                        $"sln {SolutionPath} add {(projectFromGit.SolutionFolderName is null ? "" : $"--solution-folder {projectFromGit.SolutionFolderName} ")}{projPath}")
+                    .IsSome)
                     return false;
             }
         }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         if (References.Any(refData =>
-                !StShared.RunProcess(true, Logger, "dotnet",
-                    $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}")))
+                StShared.RunProcess(true, Logger, "dotnet",
+                    $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome))
             return false;
 
         //პაკეტების მიერთება პროექტებში, სიის მიხედვით
         if (!Packages.All(packageData => StShared.RunProcess(true, Logger, "dotnet",
-                $"add {packageData.ProjectFilePath} package {packageData.PackageName}{(packageData.Version == null ? "" : $" --version {packageData.Version}")}")))
+                    $"add {packageData.ProjectFilePath} package {packageData.PackageName}{(packageData.Version == null ? "" : $" --version {packageData.Version}")}")
+                .IsNone))
             return false;
 
-        if (!MakeAdditionalFiles())
+        if (!await MakeAdditionalFiles(cancellationToken))
             return false;
 
-        if (!StShared.RunProcess(true, Logger, "jb", $"cleanupcode {SolutionPath}"))
+        if (StShared.RunProcess(true, Logger, "jb", $"cleanupcode {SolutionPath}").IsSome)
             return false;
 
         if (createAppVersions == ECreateAppVersions.WithoutSolutionGitInit)
             return true;
 
-        if (!StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" init"))
+        if (StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" init").IsSome)
             return false;
 
-        if (!StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" add ."))
-            return false;
-
-        return StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" commit -m \"Initial\"");
+        return StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" add .").IsNone && StShared
+            .RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" commit -m \"Initial\"").IsNone;
     }
 
     private static void AddProjectParametersWithCheck(XElement projectXml, string groupName, string propertyName,
@@ -303,7 +307,7 @@ public /*open*/ class AppCreatorBase
     private static XElement CheckAddProjectGroup(XElement projectXml, string groupName)
     {
         var grpXml = projectXml.Descendants(groupName).SingleOrDefault();
-        if (grpXml is not null) 
+        if (grpXml is not null)
             return grpXml;
         grpXml = new XElement(groupName);
         projectXml.Add(grpXml);
@@ -331,8 +335,7 @@ public /*open*/ class AppCreatorBase
 
         var gitSyncAll = new GitSyncAll(Logger, WorkPath,
             _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value));
-        gitSyncAll.Run();
-        return true;
+        return gitSyncAll.Run(CancellationToken.None).Result;
     }
 
     protected void AddProject(ProjectForCreate projectForCreate)

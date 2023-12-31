@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using LibDataInput;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -34,12 +36,12 @@ public sealed class GitSync : ToolAction
         return false;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectFolderName = Path.Combine(_gitsFolder, _gitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, Logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
-            return gitProcessor.Clone(_gitData.GitProjectAddress);
+            return Task.FromResult(gitProcessor.Clone(_gitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
@@ -51,30 +53,60 @@ public sealed class GitSync : ToolAction
         {
             StShared.WriteErrorLine(
                 $"Git project folder exists, but not initialized. folder: {projectFolderName}.", true, Logger);
-            return false;
+            return Task.FromResult(false);
         }
 
-        var remoteOriginUrl = gitProcessor.GetRemoteOriginUrl();
+        var getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
+        if (getRemoteOriginUrlResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+                new Err
+                {
+                    ErrorCode = "GetRemoteOriginUrlError", ErrorMessage = "Error when detecting Remote Origin Url"
+                }));
+            return Task.FromResult(false);
+        }
+
+        var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
         if (remoteOriginUrl != _gitData.GitProjectAddress)
         {
             StShared.WriteErrorLine($"Git is not valid. folder: {projectFolderName}.", true, Logger);
-            return false;
+            return Task.FromResult(false);
         }
 
-        var haveUnTrackedFiles = gitProcessor.HaveUnTrackedFiles();
+        var haveUnTrackedFilesResult = gitProcessor.HaveUnTrackedFiles();
+        if (haveUnTrackedFilesResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
+                new Err
+                {
+                    ErrorCode = "HaveUnTrackedFilesError", ErrorMessage = "Error when detecting UnTracked Files"
+                }));
+            return Task.FromResult(false);
+        }
+
+        var haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
         if (haveUnTrackedFiles)
             if (!gitProcessor.Add())
-                return false;
+                return Task.FromResult(false);
 
-        if (!gitProcessor.NeedCommit())
-            return gitProcessor.SyncRemote();
+        var needCommitResult = gitProcessor.NeedCommit();
+        if (needCommitResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1,
+                new Err { ErrorCode = "NeedCommitError", ErrorMessage = "Error when detecting Need Commit" }));
+            return Task.FromResult(false);
+        }
+
+        if (!needCommitResult.AsT0)
+            return Task.FromResult(gitProcessor.SyncRemote());
 
         if (_askCommitMessage || UsedCommitMessage is null)
             UsedCommitMessage =
                 Inputer.InputTextRequired("Message", UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
-        return gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote();
+        return Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
 
         //მოხდეს ამ Git პროექტის დაკლონვა
     }

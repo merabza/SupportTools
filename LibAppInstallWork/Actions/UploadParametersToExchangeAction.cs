@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Threading;
 using FileManagersMain;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
 
@@ -35,18 +38,18 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
             Logger.LogError("Server name is not specified");
-            return false;
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
             Logger.LogError("Environment Name is not specified");
-            return false;
+            return Task.FromResult(false);
         }
 
 
@@ -60,13 +63,13 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         if (exchangeFileManager == null)
         {
             Logger.LogError("cannot create file manager"); // for {_exchangeFileStorageName}");
-            return false;
+            return Task.FromResult(false);
         }
 
         if (!exchangeFileManager.UploadContentToTextFile(_parametersContent, uploadFileName))
         {
             Logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
-            return false;
+            return Task.FromResult(false);
         }
 
         Logger.LogInformation("Remove redundant files...");
@@ -78,6 +81,6 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //SmartSchema? uploadSmartSchema = _smartSchemas.GetSmartSchemaByKey(_uploadSmartSchemaName);
         exchangeFileManager.RemoveRedundantFiles(prefix, _dateMask, _parametersFileExtension, _uploadSmartSchema);
 
-        return true;
+        return Task.FromResult(true);
     }
 }

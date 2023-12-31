@@ -1,10 +1,12 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:04:08
 
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -29,7 +31,7 @@ public sealed class ServiceStopper : ToolCommand
         return false;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var serviceName = _parameters.ServiceName;
         var environmentName = _parameters.EnvironmentName;
@@ -55,7 +57,8 @@ public sealed class ServiceStopper : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        if (!agentClient.StopService(serviceName, environmentName, CancellationToken.None).Result)
+        var stopServiceResult = await agentClient.StopService(serviceName, environmentName, cancellationToken);
+        if (stopServiceResult.IsSome)
         {
             Logger.LogError("Service {serviceName}/{environmentName} can not be stopped", serviceName, environmentName);
             return false;

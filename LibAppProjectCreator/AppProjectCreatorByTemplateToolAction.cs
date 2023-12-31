@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using LibAppProjectCreator.Models;
 using LibDataInput;
 using LibParameters;
@@ -33,7 +35,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
@@ -124,7 +126,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        if (!appCreator.PrepareParametersAndCreateApp())
+        if (!await appCreator.PrepareParametersAndCreateApp(cancellationToken))
             return false;
 
         if (_testOrReal != ETestOrReal.Real)

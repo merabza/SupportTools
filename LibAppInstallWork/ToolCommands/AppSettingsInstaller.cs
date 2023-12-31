@@ -4,6 +4,9 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -29,7 +32,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(AppSettingsInstallerParameters.ServerInfo.ServerName))
         {
@@ -52,7 +55,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension, null, null);
-        var result = getLatestParametersFileBodyAction.Run();
+        var result = await getLatestParametersFileBodyAction.Run(cancellationToken);
         var appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
         if (!result || string.IsNullOrWhiteSpace(appSettingsVersion))
         {
@@ -67,7 +70,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
             AppSettingsInstallerParameters.ProjectName, AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
             AppSettingsInstallerParameters.ServiceName, AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName);
-        if (!installParametersAction.Run())
+        if (!await installParametersAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName} parameters file is not updated", projectName);
             return false;
@@ -79,7 +82,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.WebAgentForCheck, AppSettingsInstallerParameters.ProxySettings,
             appSettingsVersion);
 
-        if (checkParametersVersionAction.Run())
+        if (await checkParametersVersionAction.Run(cancellationToken))
             return true;
 
         Logger.LogError("project {projectName} parameters file check failed", projectName);

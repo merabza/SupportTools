@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using WebAgentProjectsApiContracts.V1.Responses;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -31,7 +32,7 @@ public sealed class BaseCopier : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         Logger.LogInformation("Create Agent Client for source Database");
 
@@ -51,13 +52,13 @@ public sealed class BaseCopier : ToolCommand
                 CancellationToken.None).Result;
 
         //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
-        if (createBackupResult.IsNone)
+        if (createBackupResult.IsT1)
         {
             Logger.LogError("Backup not created");
-            return false;
+            return Task.FromResult(false);
         }
 
-        var backupFileParametersForSource = (BackupFileParameters)createBackupResult;
+        var backupFileParametersForSource = createBackupResult.AsT0;
 
         var fileName = backupFileParametersForSource.Name;
         var prefix = backupFileParametersForSource.Prefix;
@@ -78,7 +79,7 @@ public sealed class BaseCopier : ToolCommand
                     CopyBaseParameters.DownloadTempExtension))
             {
                 Logger.LogError("Can not Download File {fileName}", fileName);
-                return false;
+                return Task.FromResult(false);
             }
 
             Logger.LogInformation("Remove Redundant Files for source");
@@ -104,7 +105,7 @@ public sealed class BaseCopier : ToolCommand
                     CopyBaseParameters.UploadTempExtension))
             {
                 Logger.LogError("Can not Upload File {fileName}", fileName);
-                return false;
+                return Task.FromResult(false);
             }
 
             Logger.LogInformation("Remove Redundant Files for destination");
@@ -123,7 +124,7 @@ public sealed class BaseCopier : ToolCommand
             if (!CopyBaseParameters.ExchangeFileManager.UploadFile(fileName, CopyBaseParameters.UploadTempExtension))
             {
                 Logger.LogError("Can not Upload File {fileName}", fileName);
-                return false;
+                return Task.FromResult(false);
             }
 
             Logger.LogInformation("Remove Redundant Files for exchange");
@@ -141,13 +142,13 @@ public sealed class BaseCopier : ToolCommand
         var isDatabaseExistsResult = agentClientForDestination
             .IsDatabaseExists(destinationDatabaseName, CancellationToken.None).Result;
 
-        if (isDatabaseExistsResult.IsNone)
+        if (isDatabaseExistsResult.IsT1)
         {
             Logger.LogInformation("The existence of the base could not be determined");
-            return false;
+            return Task.FromResult(false);
         }
 
-        var isDatabaseExists = (bool)isDatabaseExistsResult;
+        var isDatabaseExists = isDatabaseExistsResult.AsT0;
 
         if (isDatabaseExists)
         {
@@ -158,14 +159,14 @@ public sealed class BaseCopier : ToolCommand
                 .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName,
                     CancellationToken.None).Result;
 
-            if (createBackupResult2.IsNone)
+            if (createBackupResult2.IsT1)
             {
                 var actionDescription = GetActionDescription();
                 Logger.LogError("{actionDescription} - finished with errors", actionDescription);
-                return false;
+                return Task.FromResult(false);
             }
 
-            var backupFileParametersForDestination = (BackupFileParameters)createBackupResult2;
+            var backupFileParametersForDestination = createBackupResult2.AsT0;
 
             Logger.LogInformation("Remove Redundant Files for destination");
 
@@ -185,7 +186,7 @@ public sealed class BaseCopier : ToolCommand
                         CopyBaseParameters.DownloadTempExtension))
                 {
                     Logger.LogError("Can not Download File {destinationFileName}", destinationFileName);
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 Logger.LogInformation("Remove Redundant Files for local");
@@ -202,7 +203,7 @@ public sealed class BaseCopier : ToolCommand
                         CopyBaseParameters.UploadTempExtension))
                 {
                     Logger.LogError("Can not Upload File {destinationFileName}", destinationFileName);
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 Logger.LogInformation("Remove Redundant Files for local");
@@ -219,9 +220,9 @@ public sealed class BaseCopier : ToolCommand
             destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath).Result;
 
         if (success)
-            return true;
+            return Task.FromResult(true);
 
         Logger.LogError("something wrong");
-        return false;
+        return Task.FromResult(false);
     }
 }

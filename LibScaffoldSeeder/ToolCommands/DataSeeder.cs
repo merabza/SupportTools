@@ -1,6 +1,8 @@
 ﻿using CliParameters;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
 using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
@@ -30,10 +32,11 @@ public sealed class DataSeeder : ToolCommand
         return false;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
-        return StShared.RunProcess(true, Logger, "dotnet",
-            $"run --project {_parameters.SeedProjectFilePath} --use {_parameters.SeedProjectParametersFilePath}");
+        return Task.FromResult(StShared.RunProcess(true, Logger, "dotnet",
+                $"run --project {_parameters.SeedProjectFilePath} --use {_parameters.SeedProjectParametersFilePath}")
+            .IsNone);
     }
 }

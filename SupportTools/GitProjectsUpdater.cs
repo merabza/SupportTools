@@ -89,14 +89,13 @@ public sealed class GitProjectsUpdater
 
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         //_gitsFolder = Path.Combine(_workFolder, "Gits");
-        if (FileStat.CreateFolderIfNotExists(_gitsFolder, true) == null)
-        {
-            StShared.WriteErrorLine($"does not exists and cannot create work folder {_gitsFolder}", true, _logger);
-            return null;
-        }
+        if (FileStat.CreateFolderIfNotExists(_gitsFolder, true) != null)
+            return Path.Combine(_gitsFolder, git.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
+
+        StShared.WriteErrorLine($"does not exists and cannot create work folder {_gitsFolder}", true, _logger);
+        return null;
 
         //შემოწმდეს Gits ფოლდერში პროექტის ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-        return Path.Combine(_gitsFolder, git.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
     }
 
     private bool UpdateOneGitProject(string projectFolderName, GitDataDomain git)
@@ -107,7 +106,18 @@ public sealed class GitProjectsUpdater
         {
             //თუ ფოლდერი არსებობს, მაშინ დადგინდეს შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
             // თუ ეს ასე არ არის, წაიშალოს ფოლდერი თავისი შიგთავსით
-            var remoteOriginUrl = gitProcessor.GetRemoteOriginUrl();
+
+            var getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
+            if (getRemoteOriginUrlResult.IsT1)
+            {
+                Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+                    new Err
+                    {
+                        ErrorCode = "GetRemoteOriginUrlError", ErrorMessage = "Error when detecting Remote Origin Url"
+                    }));
+                return false;
+            }
+            var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
             if (remoteOriginUrl.Trim(Environment.NewLine.ToCharArray()) != git.GitProjectAddress)
                 Directory.Delete(projectFolderName, true);
@@ -123,7 +133,13 @@ public sealed class GitProjectsUpdater
         else
         {
             //თუ ფოლდერი არსებობს, მოხდეს სტატუსის შემოწმება (იდეაში აქ ცვლილებები არ უნდა მომხდარიყო, მაგრამ მაინც)
-            if (gitProcessor.NeedCommit())
+            var needCommitResult = gitProcessor.NeedCommit();
+            if (needCommitResult.IsT1)
+            {
+                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, new Err{ErrorCode = "", ErrorMessage = ""}));
+                return false;
+            }
+            if (needCommitResult.AsT0)
             {
                 //  თუ აღმოჩნდა რომ ცვლილებები მომხდარა, გამოვიდეს შეტყობინება ცვლილებების გაუქმებისა და თავიდან დაკლონვის შესახებ
                 if (!Inputer.InputBool("Have changes, Restore to server version?", true))
@@ -210,15 +226,12 @@ public sealed class GitProjectsUpdater
 
     private GitProjectDataModel RegisterProject(string projectRelativePath, string gitName)
     {
-        //string projectRelativePath = Path.Combine(_gitsFolder, projectFullPath);
         var projectName = Path.GetFileNameWithoutExtension(projectRelativePath);
         if (!UsedProjectNames.Contains(projectName))
             UsedProjectNames.Add(projectName);
 
-        if (!_supportToolsParameters.GitProjects.ContainsKey(projectName))
-            _supportToolsParameters.GitProjects.Add(projectName,
-                new GitProjectDataModel
-                    { GitName = gitName, ProjectRelativePath = projectRelativePath }); //, ProjectName = projectName
+        _supportToolsParameters.GitProjects.TryAdd(projectName, new GitProjectDataModel
+            { GitName = gitName, ProjectRelativePath = projectRelativePath });
 
         var gitProject = _supportToolsParameters.GitProjects[projectName];
 
@@ -227,9 +240,6 @@ public sealed class GitProjectsUpdater
 
         if (gitProject.ProjectRelativePath != projectRelativePath)
             gitProject.ProjectRelativePath = projectRelativePath;
-
-        //if (gitProject.ProjectName != projectName)
-        //    gitProject.ProjectName = projectName;
 
         return _supportToolsParameters.GitProjects[projectName];
     }

@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using DbTools;
 using DbToolsFabric;
@@ -42,7 +44,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         return false;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var constraintsForCorrect = CorrectBitConstraints();
 
@@ -58,17 +60,17 @@ public sealed class CorrectNewDatabase : ToolCommand
             {
                 var defaultConstraintName = constraintDataModel.DefaultConstraintName;
                 Logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
-                return false;
+                return Task.FromResult(false);
             }
 
             if (CreateConstraint(constraintDataModel))
                 continue;
 
             Logger.LogError("Cannot Create constraint for table {tableName}", tableName);
-            return false;
+            return Task.FromResult(false);
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 
     private bool CreateConstraint(ConstraintDataModel constraintDataModel)

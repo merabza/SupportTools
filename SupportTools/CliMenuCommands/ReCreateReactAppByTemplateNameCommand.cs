@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using LibDataInput;
@@ -32,7 +33,7 @@ public sealed class ReCreateReactAppByTemplateNameCommand : CliMenuCommand
         MenuAction = EMenuAction.Reload;
         try
         {
-            _command.Run();
+            _command.Run(CancellationToken.None).Wait();
             StShared.Pause();
         }
         catch (DataInputEscapeException)

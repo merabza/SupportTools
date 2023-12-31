@@ -3,6 +3,8 @@ using LibAppProjectCreator.React;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System.Threading.Tasks;
+using System.Threading;
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.ToolCommands;
@@ -20,12 +22,12 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         _reactTemplateName = reactTemplateName;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (ParametersManager is null)
         {
             Logger.LogError("ParametersManager is null");
-            return false;
+            return Task.FromResult(false);
         }
 
         var supportToolsParameters = (SupportToolsParameters?)ParametersManager.Parameters;
@@ -34,17 +36,17 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         if (supportToolsParameters is null)
         {
             Logger.LogError("SupportToolsParameters is null");
-            return false;
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
             Logger.LogError("supportToolsParameters.WorkFolder is empty");
-            return false;
+            return Task.FromResult(false);
         }
 
         var reCreateReactAppFiles = new ReCreateReactAppFiles(Logger,
             supportToolsParameters.WorkFolder, _reactAppName.ToLower(), _reactTemplateName);
-        return reCreateReactAppFiles.Run();
+        return Task.FromResult(reCreateReactAppFiles.Run());
     }
 }

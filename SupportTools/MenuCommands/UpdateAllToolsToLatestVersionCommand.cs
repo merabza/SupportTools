@@ -19,7 +19,7 @@ public sealed class UpdateAllToolsToLatestVersionCommand : CliMenuCommand
             MenuAction = EMenuAction.Reload;
             if (!Inputer.InputBool("Are you sure, you want to Update All Tools To Latest Version", true, false))
                 return;
-            DotnetToolsManager.Instance.UpdateAllToolsToLatestVersion();
+            DotnetToolsManager.Instance?.UpdateAllToolsToLatestVersion();
         }
         catch (DataInputEscapeException)
         {

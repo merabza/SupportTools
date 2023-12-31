@@ -39,11 +39,15 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
         dotnetToolsSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
 
         //დაინსტალირებული ინსტრუმენტების სიის დადგენა
-        var dotnetToolsInstalled = DotnetToolsManager.Instance.DotnetTools;
+        var dotnetTools = DotnetToolsManager.Instance;
+        if (dotnetTools is not null)
+        {
+            var dotnetToolsInstalled = dotnetTools.DotnetTools;
 
-        //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
-        foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
-            dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCommand(tool), tool.PackageId);
+            //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
+            foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
+                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCommand(tool), tool.PackageId);
+        }
 
         //var dotnetToolCommand = new DotnetToolCliMenuCommand();
         //dotnetToolsSubMenuSet.AddMenuItem(dotnetToolCommand);

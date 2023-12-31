@@ -5,6 +5,8 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -25,13 +27,13 @@ public sealed class VersionChecker : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         CheckParametersVersionAction checkParametersVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
             CheckVersionParameters.ProxySettings, null, 1);
-        if (!checkParametersVersionAction.Run())
+        if (!await checkParametersVersionAction.Run(cancellationToken))
             Logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
 
@@ -39,7 +41,7 @@ public sealed class VersionChecker : ToolCommand
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
         CheckProgramVersionAction checkProgramVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
             CheckVersionParameters.ProxySettings, null, 1);
-        if (!checkProgramVersionAction.Run())
+        if (!await checkProgramVersionAction.Run(cancellationToken))
             Logger.LogError("project {projectName} version check failed", projectName);
         //return false;
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using LanguageExt;
+using System.Threading.Tasks;
+using System.Threading;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -41,7 +42,7 @@ public sealed class EncodeParametersAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         EncodedJsonContent = CreateEncodedJson();
         var success = false;
@@ -53,7 +54,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (!success)
             Logger.LogWarning("Encoded file does not created");
-        return success;
+        return Task.FromResult(success);
     }
 
 

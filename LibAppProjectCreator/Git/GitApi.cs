@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
 
@@ -16,6 +17,6 @@ public sealed class GitApi
 
     public bool IsGitRemoteAddressValid(string remoteAddress)
     {
-        return StShared.RunProcess(_useConsole, _logger, "git", $"ls-remote {remoteAddress}");
+        return StShared.RunProcess(_useConsole, _logger, "git", $"ls-remote {remoteAddress}").IsNone;
     }
 }

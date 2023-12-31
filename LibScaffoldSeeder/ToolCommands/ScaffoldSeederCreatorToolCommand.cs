@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
@@ -48,11 +50,11 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
 
         var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(Logger, _useConsole, Parameters);
-        if ( ! scaffoldSeederDoubleAppCreator.CreateDoubleApp() )
+        if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {
             StShared.WriteErrorLine("solution does not created", true, Logger);
             return false;
@@ -227,7 +229,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var creatorCreator = new CreatorCreator(Logger, new ParametersManager(null, creatorCreatorParameters));
 
-        if (!creatorCreator.Run())
+        if (!await creatorCreator.Run(CancellationToken.None))
         {
             StShared.WriteErrorLine("Creator code not created", true, Logger);
             return false;
@@ -274,7 +276,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             $"{Parameters.GetJsonFromScaffoldDbProjectName}{jsonExt}");
 
         if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFullPath))
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
+                    .ProjectFullPath))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, Logger);
             return false;
@@ -283,7 +286,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //json ფაილების შემქმნელი პროექტის გზა
         if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
             project.GetJsonFromScaffoldDbProjectFileFullName !=
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
+            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
+                .ProjectFileFullName)
         {
             project.GetJsonFromScaffoldDbProjectFileFullName =
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
@@ -349,8 +353,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (haveToSaveSupportToolsParameters)
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
 
-        if (!StShared.RunProcess(true, Logger, "dotnet",
-                $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}"))
+        if (StShared.RunProcess(true, Logger, "dotnet",
+                $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}")
+            .IsSome)
             return false;
 
         var jsonFromProjectDbProjectGetterParameters =
@@ -362,7 +367,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var jsonFromProjectDbProjectGetter =
             new JsonFromProjectDbProjectGetter(Logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
-        return jsonFromProjectDbProjectGetter.Run();
+        return await jsonFromProjectDbProjectGetter.Run(CancellationToken.None);
     }
 
 
@@ -411,7 +416,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         string databaseScaffoldClassLibProjectFullPath, string providerPackageName, string dbScContextName)
     {
         return StShared.RunProcess(true, Logger, "dotnet",
-            $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring");
+                $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring")
+            .IsNone;
     }
 
 

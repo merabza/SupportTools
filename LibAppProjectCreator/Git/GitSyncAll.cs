@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
 
@@ -23,13 +26,13 @@ public sealed class GitSyncAll : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         string? commitMessage = null;
         foreach (var gitData in _gitDataModel.OrderBy(x => x.GitProjectFolderName))
         {
             var gitSync = new GitSync(Logger, _gitsFolder, gitData, commitMessage, commitMessage == null);
-            gitSync.Run();
+            await gitSync.Run(cancellationToken);
             commitMessage = gitSync.UsedCommitMessage;
         }
 

@@ -3,6 +3,9 @@ using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Threading;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -24,7 +27,7 @@ public sealed class ProgramUpdater : ToolCommand
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
@@ -45,7 +48,7 @@ public sealed class ProgramUpdater : ToolCommand
             programPublisherParameters.UploadTempExtension, programPublisherParameters.FileStorageForExchange,
             programPublisherParameters.SmartSchemaForLocal, programPublisherParameters.SmartSchemaForExchange);
 
-        if (!createPackageAndUpload.Run())
+        if (!await createPackageAndUpload.Run(cancellationToken))
             return false;
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
@@ -54,7 +57,7 @@ public sealed class ProgramUpdater : ToolCommand
             ProgramUpdaterParameters.ParametersFileDateMask, ProgramUpdaterParameters.ParametersFileExtension,
             ProgramUpdaterParameters.FileStorageForDownload, projectName, environmentName);
 
-        if (installProgramAction.Run())
+        if (await installProgramAction.Run(cancellationToken))
             return true;
 
         Logger.LogError("project {projectName} not updated", projectName);

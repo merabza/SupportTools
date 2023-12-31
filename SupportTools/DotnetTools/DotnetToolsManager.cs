@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OneOf;
 using SupportTools.Models;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.DotnetTools;
 
@@ -13,10 +15,16 @@ public sealed class DotnetToolsManager
     private readonly Dictionary<ENecessaryTools, string> _necessaryToolsNames;
 
     // ReSharper disable once MemberCanBePrivate.Global
-    private DotnetToolsManager()
+    public DotnetToolsManager(Dictionary<ENecessaryTools, string> necessaryToolsNames, List<DotnetTool> dotnetTools)
+    {
+        _necessaryToolsNames = necessaryToolsNames;
+        DotnetTools = dotnetTools;
+    }
+
+    private static OneOf<DotnetToolsManager, Err[]> Create()
     {
         StShared.ConsoleWriteInformationLine(null, true,"Wait...");
-        _necessaryToolsNames = new Dictionary<ENecessaryTools, string>
+        var necessaryToolsNames = new Dictionary<ENecessaryTools, string>
         {
             //ეს არის Entity Framework-ის ინსტრუმენტი, რომელიც გამოიყენება ბაზის მოდელის გაკეთებისას
             { ENecessaryTools.DotnetEf, "dotnet-ef" },
@@ -29,13 +37,21 @@ public sealed class DotnetToolsManager
             //ეს არის რეშარპერის ინსტრუმენტი, რომელიც აანალიზებს კოდს და ასწორებს ფორმატს და ზოგიერთ სხვა რამეს
             { ENecessaryTools.JetbrainsReSharperGlobalTools, "jetbrains.resharper.globaltools" }
         };
-        DotnetTools = CreateListOfDotnetTools();
+        var createListOfDotnetToolsResult = CreateListOfDotnetTools(necessaryToolsNames);
+        if (createListOfDotnetToolsResult.IsT1)
+            return Err.RecreateErrors(createListOfDotnetToolsResult.AsT1,
+                new Err
+                {
+                    ErrorCode = "CreateListOfDotnetToolsError", ErrorMessage = "Error when Create List Of Dotnet Tools"
+                });
+        var dotnetTools = createListOfDotnetToolsResult.AsT0;
+        return new DotnetToolsManager(necessaryToolsNames, dotnetTools);
     }
 
 
     public List<DotnetTool> DotnetTools { get; private set; }
 
-    public static DotnetToolsManager Instance
+    public static DotnetToolsManager? Instance
     {
         get
         {
@@ -46,20 +62,39 @@ public sealed class DotnetToolsManager
                 return _instance;
             lock (SyncRoot) //thread safe singleton
             {
-                _instance ??= new DotnetToolsManager();
+                var createResult = Create();
+                if ( createResult.IsT1)
+                {
+                    Err.PrintErrorsOnConsole(createResult.AsT1);
+                    return null;
+                }
+
+                _instance = createResult.AsT0;
             }
 
             return _instance;
         }
     }
 
-    private List<DotnetTool> CreateListOfDotnetTools()
+    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetTools(Dictionary<ENecessaryTools, string> necessaryToolsNames)
     {
-        var listOfTools = CreateListOfDotnetToolsInstalled();
-
-        foreach (var pair in _necessaryToolsNames)
+        var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
+        if (createListOfDotnetToolsInstalledResult.IsT1)
         {
-            var availableVersion = GetAvailableVersionOfTool(pair.Value);
+            return Err.RecreateErrors(createListOfDotnetToolsInstalledResult.AsT1,
+                new Err { ErrorCode = "CreateListOfDotnetToolsInstalledError", ErrorMessage = "Error when Create List Of Dotnet Tools Installed" });
+        }   
+        var listOfTools = createListOfDotnetToolsInstalledResult.AsT0;
+
+        foreach (var pair in necessaryToolsNames)
+        {
+            var getAvailableVersionOfToolResult = GetAvailableVersionOfTool(pair.Value);
+            if (getAvailableVersionOfToolResult.IsT1)
+            {
+                return Err.RecreateErrors(getAvailableVersionOfToolResult.AsT1,
+                    new Err { ErrorCode = "GetAvailableVersionOfToolError", ErrorMessage = "Error when detect Available Version Of Tool" });
+            }   
+            var availableVersion = getAvailableVersionOfToolResult.AsT0;
             var nesTool = listOfTools.FirstOrDefault(tool => tool.PackageId == pair.Value);
             if (nesTool is null)
                 listOfTools.Add(new DotnetTool(pair.Value, "N/A", availableVersion, ""));
@@ -70,18 +105,24 @@ public sealed class DotnetToolsManager
         return listOfTools;
     }
 
-    private static string GetAvailableVersionOfTool(string toolName)
+    private static OneOf<string, Err[]> GetAvailableVersionOfTool(string toolName)
     {
-        var outputResult = StShared.RunProcessWithOutput(false, null, "dotnet", $"tool search {toolName} --take 1");
+        var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", $"tool search {toolName} --take 1");
+        if (processResult.IsT1)
+            return processResult.AsT1;
+        var outputResult = processResult.AsT0.Item1;
         var outputLines = outputResult.Split(Environment.NewLine);
         if (outputLines.Length < 3) return "N/A";
         var lineParts = outputLines[2].Split(" ", StringSplitOptions.RemoveEmptyEntries);
         return lineParts.Length < 2 ? "N/A" : lineParts[1];
     }
 
-    private static List<DotnetTool> CreateListOfDotnetToolsInstalled()
+    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetToolsInstalled()
     {
-        var outputResult = StShared.RunProcessWithOutput(false, null, "dotnet", "tool list --global");
+        var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", "tool list --global");
+        if (processResult.IsT1)
+            return processResult.AsT1;
+        var outputResult = processResult.AsT0.Item1;
         var outputLines = outputResult.Split(Environment.NewLine);
 
         var listOfTools = outputLines.Skip(2).Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
@@ -94,7 +135,13 @@ public sealed class DotnetToolsManager
     public void UpdateAllToolsToLatestVersion()
     {
         StShared.ConsoleWriteInformationLine(null, true, "Checking for tools Updates...");
-        DotnetTools = CreateListOfDotnetTools();
+        var createListOfDotnetToolsResult = CreateListOfDotnetTools(_necessaryToolsNames);
+        if (createListOfDotnetToolsResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
+            return;
+        }
+        DotnetTools = createListOfDotnetToolsResult.AsT0;
 
         var atLeastOneUpdatedOrInstalled = false;
         foreach (var tool in DotnetTools)
@@ -103,14 +150,22 @@ public sealed class DotnetToolsManager
                 tool.Version == tool.AvailableVersion) continue;
             var command = tool.Version == "N/A" ? "install" : "update";
             StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, tool.PackageId);
-            StShared.RunProcessWithOutput(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
+            var dotnetRun = StShared.RunProcess(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
+            if (dotnetRun.IsSome)
+                return;
             atLeastOneUpdatedOrInstalled = true;
         }
 
         if (atLeastOneUpdatedOrInstalled)
         {
             StShared.ConsoleWriteInformationLine(null, true, "Updating tools List...");
-            DotnetTools = CreateListOfDotnetTools();
+            createListOfDotnetToolsResult = CreateListOfDotnetTools(_necessaryToolsNames);
+            if (createListOfDotnetToolsResult.IsT1)
+            {
+                Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
+                return;
+            }
+            DotnetTools = createListOfDotnetToolsResult.AsT0;
             StShared.ConsoleWriteInformationLine(null, true, "Updating process Finished.");
         }
         else

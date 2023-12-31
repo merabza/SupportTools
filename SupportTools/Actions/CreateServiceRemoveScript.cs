@@ -1,8 +1,11 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportTools.ToolCommands;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.Actions;
 
@@ -30,7 +33,7 @@ public class CreateServiceRemoveScript : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var sf = new FileInfo(_scriptFileName);
 
@@ -86,10 +89,10 @@ public class CreateServiceRemoveScript : ToolAction
         if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
         {
             File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
-            return true;
+            return Task.FromResult(true);
         }
 
         StShared.WriteErrorLine("File did not created", true);
-        return false;
+        return Task.FromResult(false);
     }
 }

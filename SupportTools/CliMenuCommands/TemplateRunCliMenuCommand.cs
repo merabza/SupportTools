@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator;
 using LibDataInput;
@@ -38,7 +39,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
 
             MenuAction = EMenuAction.Reload;
 
-            _appProjectCreatorByTemplate.Run();
+            _appProjectCreatorByTemplate.Run(CancellationToken.None).Wait();
 
             Console.WriteLine("---");
 

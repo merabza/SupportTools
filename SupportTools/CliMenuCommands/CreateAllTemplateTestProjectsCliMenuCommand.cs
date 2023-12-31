@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;
 
@@ -33,7 +35,7 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
         {
             CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
                 new(_logger, Name!, _parametersManager);
-            createAllTemplateTestProjectsToolCommand.Run();
+            createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
 
             StShared.Pause();
 

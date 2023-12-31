@@ -1,9 +1,13 @@
 ﻿using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
+
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
 
@@ -53,7 +57,7 @@ public sealed class InstallServiceAction : ToolAction
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
         var agentClient =
@@ -72,10 +76,19 @@ public sealed class InstallServiceAction : ToolAction
             _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        InstallingProgramVersion = agentClient.InstallService(_projectName, _environmentName, _serviceName,
+        var installServiceResult = await agentClient.InstallService(_projectName, _environmentName, _serviceName,
             _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
             _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
-            CancellationToken.None).Result;
+            cancellationToken);
+
+        if ( installServiceResult.IsT1 )
+        {
+            Logger.LogError("Error when Install service project {_projectName}/{_environmentName}", _projectName, _environmentName);
+            Err.PrintErrorsOnConsole(installServiceResult.AsT1);
+            return false;
+        }
+
+        InstallingProgramVersion = installServiceResult.AsT0;
 
         if (InstallingProgramVersion != null)
             return true;

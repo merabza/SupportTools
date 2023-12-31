@@ -1,4 +1,5 @@
-﻿using Installer.Domain;
+﻿using System.Threading;
+using Installer.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -47,7 +48,7 @@ public sealed class InstallerBaseParameters
         else
         {
             localInstallerSettingsDomain = LocalInstallerSettingsDomain.Create(null, true,
-                supportToolsParameters.LocalInstallerSettings, null, null);
+                supportToolsParameters.LocalInstallerSettings, null, null, CancellationToken.None).Result;
 
             if (localInstallerSettingsDomain is not null)
                 return new InstallerBaseParameters(webAgentForInstall, localInstallerSettingsDomain);

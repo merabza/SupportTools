@@ -1,9 +1,12 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using Installer.AgentClients;
 using Installer.Domain;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
+
 // ReSharper disable ReplaceWithPrimaryConstructorParameter
 
 namespace LibAppInstallWork.Actions;
@@ -26,7 +29,7 @@ public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettin
         return true;
     }
 
-    protected override bool RunAction()
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
         var version = "";
@@ -47,17 +50,26 @@ public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettin
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient =
-                        new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
-                    version = proxyApiClient
-                        .GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId,
-                            CancellationToken.None).Result;
+                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
+                    var getAppSettingsVersionByProxyResult = await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId, cancellationToken);
+                    if (getAppSettingsVersionByProxyResult.IsT1)
+                    {
+                        Err.PrintErrorsOnConsole(getAppSettingsVersionByProxyResult.AsT1);
+                        break;
+                    }
+                    version = getAppSettingsVersionByProxyResult.AsT0;
                 }
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
-                    version = testApiClient.GetAppSettingsVersion(CancellationToken.None).Result ?? "";
+                    var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
+                    if (getAppSettingsVersionResult.IsT1)
+                    {
+                        Err.PrintErrorsOnConsole(getAppSettingsVersionResult.AsT1);
+                        break;
+                    }
+                    version = getAppSettingsVersionResult.AsT0;
                 }
 
                 getVersionSuccess = true;
