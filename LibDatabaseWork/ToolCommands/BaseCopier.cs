@@ -5,6 +5,8 @@ using CliParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibDatabaseWork.ToolCommands;
@@ -32,7 +34,7 @@ public sealed class BaseCopier : ToolCommand
         return true;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         Logger.LogInformation("Create Agent Client for source Database");
 
@@ -47,15 +49,14 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Create Backup for source Database");
 
         //ბექაპის დამზადება წყაროს მხარეს
-        var createBackupResult= agentClientForSource
-            .CreateBackup(CopyBaseParameters.SourceDbBackupParameters, CopyBaseParameters.SourceDatabaseName,
-                CancellationToken.None).Result;
+        var createBackupResult = await agentClientForSource.CreateBackup(CopyBaseParameters.SourceDbBackupParameters,
+            CopyBaseParameters.SourceDatabaseName, CancellationToken.None);
 
         //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
         if (createBackupResult.IsT1)
         {
             Logger.LogError("Backup not created");
-            return Task.FromResult(false);
+            return false;
         }
 
         var backupFileParametersForSource = createBackupResult.AsT0;
@@ -79,7 +80,7 @@ public sealed class BaseCopier : ToolCommand
                     CopyBaseParameters.DownloadTempExtension))
             {
                 Logger.LogError("Can not Download File {fileName}", fileName);
-                return Task.FromResult(false);
+                return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for source");
@@ -105,7 +106,7 @@ public sealed class BaseCopier : ToolCommand
                     CopyBaseParameters.UploadTempExtension))
             {
                 Logger.LogError("Can not Upload File {fileName}", fileName);
-                return Task.FromResult(false);
+                return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for destination");
@@ -124,7 +125,7 @@ public sealed class BaseCopier : ToolCommand
             if (!CopyBaseParameters.ExchangeFileManager.UploadFile(fileName, CopyBaseParameters.UploadTempExtension))
             {
                 Logger.LogError("Can not Upload File {fileName}", fileName);
-                return Task.FromResult(false);
+                return false;
             }
 
             Logger.LogInformation("Remove Redundant Files for exchange");
@@ -139,13 +140,13 @@ public sealed class BaseCopier : ToolCommand
         Logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
-        var isDatabaseExistsResult = agentClientForDestination
-            .IsDatabaseExists(destinationDatabaseName, CancellationToken.None).Result;
+        var isDatabaseExistsResult = await agentClientForDestination
+            .IsDatabaseExists(destinationDatabaseName, CancellationToken.None);
 
         if (isDatabaseExistsResult.IsT1)
         {
             Logger.LogInformation("The existence of the base could not be determined");
-            return Task.FromResult(false);
+            return false;
         }
 
         var isDatabaseExists = isDatabaseExistsResult.AsT0;
@@ -155,15 +156,14 @@ public sealed class BaseCopier : ToolCommand
             Logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
                 destinationDatabaseName);
 
-            var createBackupResult2 = agentClientForDestination
-                .CreateBackup(CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName,
-                    CancellationToken.None).Result;
+            var createBackupResult2 = await agentClientForDestination.CreateBackup(
+                CopyBaseParameters.DestinationDbBackupParameters, destinationDatabaseName, CancellationToken.None);
 
             if (createBackupResult2.IsT1)
             {
                 var actionDescription = GetActionDescription();
                 Logger.LogError("{actionDescription} - finished with errors", actionDescription);
-                return Task.FromResult(false);
+                return false;
             }
 
             var backupFileParametersForDestination = createBackupResult2.AsT0;
@@ -186,7 +186,7 @@ public sealed class BaseCopier : ToolCommand
                         CopyBaseParameters.DownloadTempExtension))
                 {
                     Logger.LogError("Can not Download File {destinationFileName}", destinationFileName);
-                    return Task.FromResult(false);
+                    return false;
                 }
 
                 Logger.LogInformation("Remove Redundant Files for local");
@@ -203,7 +203,7 @@ public sealed class BaseCopier : ToolCommand
                         CopyBaseParameters.UploadTempExtension))
                 {
                     Logger.LogError("Can not Upload File {destinationFileName}", destinationFileName);
-                    return Task.FromResult(false);
+                    return false;
                 }
 
                 Logger.LogInformation("Remove Redundant Files for local");
@@ -216,13 +216,15 @@ public sealed class BaseCopier : ToolCommand
         //მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
         Logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
-        var success = agentClientForDestination.RestoreDatabaseFromBackup(backupFileParametersForSource,
-            destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath).Result;
+        var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(backupFileParametersForSource,
+            destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath);
 
-        if (success)
-            return Task.FromResult(true);
+        if (restoreDatabaseFromBackupResult.IsNone) 
+            return true;
 
-        Logger.LogError("something wrong");
-        return Task.FromResult(false);
+        Err.PrintErrorsOnConsole((Err[])restoreDatabaseFromBackupResult);
+        Logger.LogError("something went wrong");
+        return false;
+
     }
 }

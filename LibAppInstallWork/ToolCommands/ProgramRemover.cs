@@ -28,7 +28,7 @@ public sealed class ProgramRemover : ToolCommand
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
@@ -38,16 +38,15 @@ public sealed class ProgramRemover : ToolCommand
         if (agentClient is null)
         {
             Logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
-            return Task.FromResult(false);
+            return false;
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
-                CancellationToken.None)
-            .Result)
-            return Task.FromResult(true);
+        if (await agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
+                CancellationToken.None))
+            return true;
 
         Logger.LogError("Project {projectName} can not removed", projectName);
-        return Task.FromResult(false);
+        return false;
     }
 }
