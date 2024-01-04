@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.ToolCommands;

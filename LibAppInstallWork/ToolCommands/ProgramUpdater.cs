@@ -1,10 +1,11 @@
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;

@@ -1,22 +1,24 @@
-﻿using CliParameters;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using CliParameters;
 using Installer.Actions;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
 
 public sealed class AppSettingsInstaller : ToolCommand
 {
-    private readonly bool _useConsole;
     private const string ActionName = "Install Application Settings";
 
     private const string ActionDescription =
         "This tool will Download latest parameters file from exchange server, then will update parameters file, and check if parameters updated";
+
+    private readonly bool _useConsole;
 
     public AppSettingsInstaller(ILogger logger, bool useConsole, AppSettingsInstallerParameters parameters,
         IParametersManager parametersManager) : base(logger, ActionName, parameters,

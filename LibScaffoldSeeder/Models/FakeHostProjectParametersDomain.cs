@@ -1,4 +1,5 @@
 ﻿using DbTools;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibScaffoldSeeder.Models;

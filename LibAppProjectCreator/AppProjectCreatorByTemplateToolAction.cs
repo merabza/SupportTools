@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using LibAppProjectCreator.Models;
 using LibDataInput;
 using LibParameters;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator;

@@ -1,4 +1,8 @@
-﻿using CodeTools;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
@@ -11,10 +15,6 @@ using LibAppProjectCreator.React;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -23,8 +23,8 @@ namespace LibAppProjectCreator.AppCreators;
 
 public sealed class ApiAppCreator : AppCreatorBase
 {
-    private readonly string _projectShortName;
     private readonly ApiAppCreatorData _apiAppCreatorData;
+    private readonly string _projectShortName;
     private readonly Dictionary<string, string> _reactAppTemplates;
 
     private readonly string _workFolder;
@@ -279,7 +279,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.MainProjectData.ProjectFileFullName, appSettingsJsonJObject,
             forEncodeAppSettingsJsonKeys, userSecretJsonJObject, keyPart1);
 
-        if (! await settingsFilesCreator.Run(cancellationToken))
+        if (!await settingsFilesCreator.Run(cancellationToken))
             return false;
 
         Console.WriteLine("Creating launchSettings.json...");

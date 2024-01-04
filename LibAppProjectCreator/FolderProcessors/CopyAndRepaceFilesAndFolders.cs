@@ -1,8 +1,8 @@
-﻿using ConnectTools;
+﻿using System.Collections.Generic;
+using System.IO;
+using ConnectTools;
 using FileManagersMain;
 using LibFileParameters.Models;
-using System.Collections.Generic;
-using System.IO;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -70,5 +70,4 @@ public class CopyAndReplaceFilesAndFolders : FolderProcessor
     //        _checkedFolderFiles.Add(afterRootPath, _destinationFileManager.GetFilesWithInfo(afterRootPath, null));
     //    return _checkedFolderFiles[afterRootPath];
     //}
-
 }

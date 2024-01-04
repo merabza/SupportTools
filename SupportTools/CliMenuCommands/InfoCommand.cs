@@ -20,5 +20,4 @@ public class InfoCommand : CliMenuCommand
     {
         return $"{_menuUrlPrefix}{Name}";
     }
-
 }

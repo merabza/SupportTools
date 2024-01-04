@@ -6,6 +6,7 @@ using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;

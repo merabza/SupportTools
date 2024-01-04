@@ -21,11 +21,11 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string _parametersFileExtension;
     private readonly string _programArchiveDateMask;
     private readonly string _programArchiveExtension;
+    private readonly string? _projectDescription;
     private readonly string _projectName;
+    private readonly string? _serviceDescriptionSignature;
     private readonly string? _serviceName;
     private readonly string _serviceUserName;
-    private readonly string? _serviceDescriptionSignature;
-    private readonly string? _projectDescription;
 
 
     public InstallServiceAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
@@ -81,9 +81,10 @@ public sealed class InstallServiceAction : ToolAction
             _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
             cancellationToken);
 
-        if ( installServiceResult.IsT1 )
+        if (installServiceResult.IsT1)
         {
-            Logger.LogError("Error when Install service project {_projectName}/{_environmentName}", _projectName, _environmentName);
+            Logger.LogError("Error when Install service project {_projectName}/{_environmentName}", _projectName,
+                _environmentName);
             Err.PrintErrorsOnConsole(installServiceResult.AsT1);
             return false;
         }

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
@@ -27,11 +28,12 @@ public enum ECreateAppVersions
 public abstract class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;
-    protected readonly GitProjects GitProjects;
-    protected readonly ILogger Logger;
-    protected readonly string ProjectName;
 
     private readonly int _indentSize;
+    protected readonly GitProjects GitProjects;
+    protected readonly ILogger Logger;
+
+    protected readonly string ProjectName;
     //protected readonly AppProjectCreatorData Par;
 
 
@@ -129,7 +131,6 @@ public abstract class AppCreatorBase
 
         StShared.WriteErrorLine("Scaffold Seeder Solution does not created", true, Logger);
         return false;
-
     }
 
     private void AddGitClone(GitDataDomain gitData)
@@ -198,7 +199,6 @@ public abstract class AppCreatorBase
     //აპლიკაციის შექმნის პროცესი
     private async Task<bool> CreateApp(ECreateAppVersions createAppVersions, CancellationToken cancellationToken)
     {
-
         if (!AppGitsSync())
             return false;
 
@@ -220,7 +220,6 @@ public abstract class AppCreatorBase
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
-        {
             if (prj is ProjectForCreate projectForCreate)
             {
                 //პროექტების შექმნა
@@ -267,7 +266,6 @@ public abstract class AppCreatorBase
                     .IsSome)
                     return false;
             }
-        }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         if (References.Any(refData =>

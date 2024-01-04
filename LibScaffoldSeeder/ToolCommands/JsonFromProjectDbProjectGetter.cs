@@ -1,9 +1,9 @@
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibParameters;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
 using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;

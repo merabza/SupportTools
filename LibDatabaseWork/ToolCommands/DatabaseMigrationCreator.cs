@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using LibDatabaseWork.CodeCreators;
 using LibDatabaseWork.Models;
 using LibParameters;
@@ -51,15 +51,15 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         Logger.LogInformation("Create Initial Migration");
         //ბაზის მიგრაციის დაწყება
         if (StShared.RunProcess(true, Logger, "dotnet",
-                    $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-                .IsSome)
+                $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+            .IsSome)
             return Task.FromResult(false);
 
         Logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
         if (StShared.RunProcess(true, Logger, "dotnet",
-                    $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-                .IsSome)
+                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+            .IsSome)
             return Task.FromResult(false);
 
         //იმისათვის, რომ ამ კოდმა იმუშავოს, საჭიროა შემდეგი:
@@ -81,8 +81,8 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         Logger.LogInformation("Create sql Migration");
         //ბაზის მიგრაციის დაწყება
         if (StShared.RunProcess(true, Logger, "dotnet",
-                    $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-                .IsSome)
+                $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+            .IsSome)
             return Task.FromResult(false);
 
         var sqlMigrationFile = migrationsFolder.GetFiles("??????????????_Sql.cs").SingleOrDefault();

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
@@ -46,27 +47,32 @@ fi*/
         }
 
         var localResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} rev-parse @");
-        if(localResult.IsT1)
+        if (localResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 1", _useConsole, _logger);
             return GitState.Unknown;
         }
+
         var local = localResult.AsT0.Item1;
 
-        var remoteResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} rev-parse @{{u}}");
-        if(remoteResult.IsT1)
+        var remoteResult =
+            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} rev-parse @{{u}}");
+        if (remoteResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 2", _useConsole, _logger);
             return GitState.Unknown;
         }
+
         var remote = remoteResult.AsT0.Item1;
 
-        var strBaseResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} merge-base @ @{{u}}");
-        if(strBaseResult.IsT1)
+        var strBaseResult =
+            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} merge-base @ @{{u}}");
+        if (strBaseResult.IsT1)
         {
             StShared.WriteErrorLine("git merge-baseError", _useConsole, _logger);
             return GitState.Unknown;
         }
+
         var strBase = strBaseResult.AsT0.Item1;
 
         if (local == remote)
@@ -109,7 +115,8 @@ fi*/
 
     public OneOf<string, Err[]> GetRemoteOriginUrl()
     {
-        var result = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} config --get remote.origin.url");
+        var result = StShared.RunProcessWithOutput(_useConsole, null, "git",
+            $"-C {_projectPath} config --get remote.origin.url");
         if (result.IsT1)
             return result.AsT1;
         return result.AsT0.Item1.Trim(Environment.NewLine.ToCharArray());
@@ -125,7 +132,8 @@ fi*/
 
     public OneOf<bool, Err[]> NeedCommit()
     {
-        var gitStatusOutputResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} status --porcelain");
+        var gitStatusOutputResult =
+            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
             return gitStatusOutputResult.AsT1;
         var gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
@@ -167,7 +175,8 @@ fi*/
     public OneOf<bool, Err[]> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} diff-files --quiet", false);
-        var statusCommandOutputResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} status --porcelain --untracked-files");
+        var statusCommandOutputResult = StShared.RunProcessWithOutput(_useConsole, null, "git",
+            $"-C {_projectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
             return statusCommandOutputResult.AsT1;

@@ -1,12 +1,13 @@
 //Created by ProjectMainClassCreator at 12/22/2020 19:46:17
 
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
@@ -40,7 +41,7 @@ public sealed class ServicePublisher : ToolCommand
             ProgramPublisherParameters.Runtime, ProgramPublisherParameters.RedundantFileNames,
             ProgramPublisherParameters.UploadTempExtension, ProgramPublisherParameters.FileStorageForExchange,
             ProgramPublisherParameters.SmartSchemaForLocal, ProgramPublisherParameters.SmartSchemaForExchange);
-        if (! await createPackageAndUpload.Run(cancellationToken))
+        if (!await createPackageAndUpload.Run(cancellationToken))
             return false;
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში

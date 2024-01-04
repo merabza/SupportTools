@@ -16,7 +16,6 @@ public sealed class DeleteBinObjFolders : FolderProcessor
     public DeleteBinObjFolders(FileManager fileManager) : base("Delete bin obj folders", "Delete bin obj folders",
         fileManager, null, false, new ExcludeSet(), true, false)
     {
-
     }
 
     protected override (bool, bool, bool) ProcessOneFolder(string? afterRootPath, string folderName)
@@ -29,7 +28,6 @@ public sealed class DeleteBinObjFolders : FolderProcessor
 
         var deleted = FileManager.DeleteDirectory(afterRootPath, folderName, true);
         return deleted ? (true, true, true) : (false, false, true);
-
     }
 
     protected override bool ProcessOneFile(string? afterRootPath, MyFileInfo file)

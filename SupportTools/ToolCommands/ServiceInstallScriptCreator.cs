@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibMenuInput;
 using LibParameters;
@@ -41,7 +41,8 @@ public class ServiceInstallScriptCreator : ToolCommand
         var isFtp = _par.FileStorageForExchange.IsFtp();
         if (isFtp is null)
         {
-            Logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not", fileStoragePath);
+            Logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not",
+                fileStoragePath);
             return false;
         }
 

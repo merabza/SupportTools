@@ -2,6 +2,7 @@
 using CodeTools;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.CodeCreators;

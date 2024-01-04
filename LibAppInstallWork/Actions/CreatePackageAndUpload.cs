@@ -4,8 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using FileManagersMain;
 using LibFileParameters.Models;
@@ -13,6 +13,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
@@ -149,7 +150,8 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         //მთავარი პროექტის შექმნა
         if (StShared.RunProcess(true, Logger, "dotnet",
-                $"publish --configuration Release --runtime {_runtime} --self-contained --output {outputFolderPath} {_mainProjectFileName} /p:AssemblyVersion={AssemblyVersion}").IsSome)
+                $"publish --configuration Release --runtime {_runtime} --self-contained --output {outputFolderPath} {_mainProjectFileName} /p:AssemblyVersion={AssemblyVersion}")
+            .IsSome)
         {
             Logger.LogError("Cannot publish project {_projectName}", _projectName);
             return Task.FromResult(false);

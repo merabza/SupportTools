@@ -50,7 +50,8 @@ public sealed class ConsoleAppCreatorData
                                                       throw new InvalidOperationException("Uninitialized property: " +
                                                           nameof(DbMigrationProjectData));
 
-    public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName, TemplateModel template)
+    public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
+        TemplateModel template)
     {
         var projectFolders = new List<string>
         {

@@ -5,6 +5,7 @@ using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
@@ -61,12 +62,14 @@ public sealed class InstallProgramAction : ToolAction
             _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        var installProgramResult = await agentClient.InstallProgram(_projectName, _environmentName, _programArchiveDateMask,
+        var installProgramResult = await agentClient.InstallProgram(_projectName, _environmentName,
+            _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
 
-        if ( installProgramResult.IsT1 )
+        if (installProgramResult.IsT1)
         {
-            Logger.LogError("Error when Install program project {_projectName}/{_environmentName}", _projectName, _environmentName);
+            Logger.LogError("Error when Install program project {_projectName}/{_environmentName}", _projectName,
+                _environmentName);
             Err.PrintErrorsOnConsole(installProgramResult.AsT1);
             return false;
         }

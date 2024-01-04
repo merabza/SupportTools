@@ -1,21 +1,21 @@
 //Created by ProjectMainClassCreator at 12/22/2020 19:46:54
 
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using Installer.Actions;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ProgramInstaller : ToolCommand
 {
-    private readonly bool _useConsole;
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
+    private readonly bool _useConsole;
 
     public ProgramInstaller(ILogger logger, bool useConsole, IParameters parameters,
         IParametersManager parametersManager) : base(logger, ActionName, parameters,

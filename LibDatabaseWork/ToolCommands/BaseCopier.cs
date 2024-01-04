@@ -216,15 +216,15 @@ public sealed class BaseCopier : ToolCommand
         //მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
         Logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
-        var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(backupFileParametersForSource,
+        var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(
+            backupFileParametersForSource,
             destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath);
 
-        if (restoreDatabaseFromBackupResult.IsNone) 
+        if (restoreDatabaseFromBackupResult.IsNone)
             return true;
 
         Err.PrintErrorsOnConsole((Err[])restoreDatabaseFromBackupResult);
         Logger.LogError("something went wrong");
         return false;
-
     }
 }

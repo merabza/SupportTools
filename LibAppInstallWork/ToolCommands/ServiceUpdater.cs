@@ -1,10 +1,11 @@
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;
@@ -68,7 +69,8 @@ public sealed class ServiceUpdater : ToolCommand
                 appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
                 appSettingsEncoderParameters.ParametersFileExtension,
                 appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
-            if (!await encodeParametersAndUploadAction.Run(cancellationToken) && ProgramServiceUpdaterParameters.IsService)
+            if (!await encodeParametersAndUploadAction.Run(cancellationToken) &&
+                ProgramServiceUpdaterParameters.IsService)
                 return false;
             appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
         }

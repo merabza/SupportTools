@@ -16,7 +16,6 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
     public ServerDatabasesExchangeParametersEditor(ILogger logger, IParametersManager parametersManager,
         IParametersManager listsParametersManager) : base("Databases Exchange Parameters", parametersManager)
     {
-
         //პროდაქშენ სერვერის მხარე
         FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.ProductionDbConnectionName), listsParametersManager, true));

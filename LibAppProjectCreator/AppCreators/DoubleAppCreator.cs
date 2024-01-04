@@ -8,6 +8,7 @@ using LibAppProjectCreator.Models;
 using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
@@ -42,11 +43,13 @@ public abstract class DoubleAppCreator
         if (!solutionPathExists)
             return true;
 
-        var mainSolutionFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
+        var mainSolutionFileManager =
+            FileManagersFabric.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
 
         if (mainSolutionFileManager == null)
         {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}", _useConsole,
+            StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}",
+                _useConsole,
                 _logger);
             return false;
         }
@@ -58,7 +61,8 @@ public abstract class DoubleAppCreator
         if (tempAppCreator is null)
             return false;
 
-        if (!await tempAppCreator.PrepareParametersAndCreateApp(cancellationToken,ECreateAppVersions.WithoutSolutionGitInit))
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(cancellationToken,
+                ECreateAppVersions.WithoutSolutionGitInit))
             return false;
 
         return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);
@@ -67,7 +71,7 @@ public abstract class DoubleAppCreator
     private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        FileManager? sourceFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, tempSolutionPath);
+        var sourceFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, tempSolutionPath);
 
         if (sourceFileManager == null)
         {
@@ -76,7 +80,8 @@ public abstract class DoubleAppCreator
             return false;
         }
 
-        var excludeSet = new ExcludeSet { FolderFileMasks = new() { @"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*" } };
+        var excludeSet = new ExcludeSet
+            { FolderFileMasks = new List<string> { @"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*" } };
 
         if (!sourceFileManager.IsFolderEmpty(null))
         {
@@ -88,7 +93,8 @@ public abstract class DoubleAppCreator
         if (!mainSolutionFileManager.IsFolderEmpty(null))
         {
             var excludeFolders = new[] { ".git", ".vs", "obj" };
-            DeleteRedundantFiles deleteRedundantFiles = new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
+            DeleteRedundantFiles deleteRedundantFiles =
+                new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
             deleteRedundantFiles.Run();
         }
 

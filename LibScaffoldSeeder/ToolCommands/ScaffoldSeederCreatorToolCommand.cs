@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
@@ -20,8 +20,6 @@ namespace LibScaffoldSeeder.ToolCommands;
 
 public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 {
-    private readonly bool _useConsole;
-
     private const string ActionDescription = """
                                              This action will do steps:
 
@@ -34,6 +32,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
 
                                              """;
+
+    private readonly bool _useConsole;
 
     public ScaffoldSeederCreatorToolCommand(ILogger logger, bool useConsole, ScaffoldSeederCreatorParameters parameters,
         IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters,
@@ -52,7 +52,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-
         var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(Logger, _useConsole, Parameters);
         if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {

@@ -1,5 +1,6 @@
 ﻿using CodeTools;
 using Microsoft.Extensions.Logging;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CodeCreators;

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using LibDataInput;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;

@@ -2,14 +2,15 @@
 using ConnectTools;
 using FileManagersMain;
 using LibFileParameters.Models;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.FolderProcessors;
 
 public sealed class DeleteRedundantFiles : FolderProcessor
 {
-    private readonly FileManager _sourceFileManager;
     private readonly string[] _excludeFolders;
+    private readonly FileManager _sourceFileManager;
 
     public DeleteRedundantFiles(FileManager sourceFileManager, FileManager destinationFileManager,
         ExcludeSet excludeSet, string[] excludeFolders) : base("Delete redundant files",

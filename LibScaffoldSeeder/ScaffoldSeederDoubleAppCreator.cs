@@ -8,26 +8,22 @@ using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibScaffoldSeeder;
 
 public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 {
-    private readonly ILogger _logger;
-    private readonly bool _useConsole;
-    private readonly ScaffoldSeederCreatorParameters _ssParameters;
-    private readonly string _scaffoldSeederFolderName;
-    private readonly string _projectWorkFolderPath;
-    private readonly string _projectTempFolderPath;
-    private readonly string _scaffoldSeederFolderPath;
-
     private const int IndentSize = 4;
+    private readonly ILogger _logger;
+    private readonly string _projectTempFolderPath;
+    private readonly string _projectWorkFolderPath;
+    private readonly string _scaffoldSeederFolderName;
+    private readonly string _scaffoldSeederFolderPath;
+    private readonly ScaffoldSeederCreatorParameters _ssParameters;
 
-    public string SolutionSecurityFolderPath { get; }
-    public string SolutionFolderPath { get; }
-    //public ScaffoldSeederCreatorData? ScaffoldSeederTempCreatorData { get; private set; }
-    public ScaffoldSeederCreatorData? ScaffoldSeederMainCreatorData { get; private set; }
+    private readonly bool _useConsole;
     //public string SolutionFolderPath { get; }
 
     //public ScaffoldSeederCreatorData? ScaffoldSeederCreatorData => _scaffoldSeederCreatorData;
@@ -47,12 +43,17 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         _scaffoldSeederFolderPath = Path.Combine(_projectWorkFolderPath, _scaffoldSeederFolderName);
         SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
-
     }
+
+    public string SolutionSecurityFolderPath { get; }
+
+    public string SolutionFolderPath { get; }
+
+    //public ScaffoldSeederCreatorData? ScaffoldSeederTempCreatorData { get; private set; }
+    public ScaffoldSeederCreatorData? ScaffoldSeederMainCreatorData { get; private set; }
 
     private ScaffoldSeederSolutionCreator? CreateAppCreator(bool forMain)
     {
-
         //შეიქმნას პროექტის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
         var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, "",
             ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
@@ -152,7 +153,6 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         ///////////////////////////////////////////////////////////////////////////////////
 
         return CreateAppCreator(true);
-
     }
 
     protected override AppCreatorBase? CreateTempAppCreator()
@@ -222,5 +222,4 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         return true;
     }
-
 }

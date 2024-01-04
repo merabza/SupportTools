@@ -1,10 +1,11 @@
 ﻿using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportTools.ToolCommands;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.Actions;
@@ -18,15 +19,15 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _ftpSitePassword;
     private readonly string _ftpSiteUserName;
     private readonly int _portNumber;
-    private readonly string _projectName;
-    private readonly string? _serviceDescriptionSignature;
     private readonly string? _projectDescription;
+    private readonly string _projectName;
     private readonly string _runTime;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;
 
     private readonly string _serverSideServiceUserName;
+    private readonly string? _serviceDescriptionSignature;
 
     //private readonly string _serviceName;
     private readonly string _settingsFileName;
@@ -117,7 +118,7 @@ public class CreateServiceInstallScript : ToolAction
 
               echo download File Prefix is $downloadFilePrefix
               echo download Settings File Prefix is $downloadSettingsFilePrefix
-              
+
               if [ -z "$dotnetRunner" ]; then
                 echo "dotnet runner is not installed!"
                 exit 1

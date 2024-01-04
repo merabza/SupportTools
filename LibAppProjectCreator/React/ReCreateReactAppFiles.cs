@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.React;
@@ -71,13 +72,13 @@ public sealed class ReCreateReactAppFiles
         //თუ არა უბრალოდ ვაინიცირებთ და ვაკომიტებთ
 
         var isInsideWorkTreeResult = StShared.RunProcessWithOutput(true, _logger, "git",
-            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", new[] {128});
+            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", new[] { 128 });
         if (isInsideWorkTreeResult.IsT1)
             return false;
 
         var isInsideWorkTree = isInsideWorkTreeResult.AsT0;
 
-        if ( isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine)
+        if (isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine)
             return true;
 
         if (StShared.RunProcess(true, _logger, "git", $"-C \"{appFolderForDiffFullName}\" init").IsSome)

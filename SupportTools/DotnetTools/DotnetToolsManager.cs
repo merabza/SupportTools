@@ -4,6 +4,7 @@ using System.Linq;
 using OneOf;
 using SupportTools.Models;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.DotnetTools;
@@ -21,9 +22,37 @@ public sealed class DotnetToolsManager
         DotnetTools = dotnetTools;
     }
 
+
+    public List<DotnetTool> DotnetTools { get; private set; }
+
+    public static DotnetToolsManager? Instance
+    {
+        get
+        {
+            //ეს ატრიბუტები სესიაზე არ არის დამოკიდებული და იქმნება პროგრამის გაშვებისთანავე, 
+            //შემდგომში მასში ცვლილებები არ შედის,
+            //მაგრამ შეიძლება პროგრამამ თავისი მუშაობის განმავლობაში რამდენჯერმე გამოიყენოს აქ არსებული ინფორმაცია
+            if (_instance != null)
+                return _instance;
+            lock (SyncRoot) //thread safe singleton
+            {
+                var createResult = Create();
+                if (createResult.IsT1)
+                {
+                    Err.PrintErrorsOnConsole(createResult.AsT1);
+                    return null;
+                }
+
+                _instance = createResult.AsT0;
+            }
+
+            return _instance;
+        }
+    }
+
     private static OneOf<DotnetToolsManager, Err[]> Create()
     {
-        StShared.ConsoleWriteInformationLine(null, true,"Wait...");
+        StShared.ConsoleWriteInformationLine(null, true, "Wait...");
         var necessaryToolsNames = new Dictionary<ENecessaryTools, string>
         {
             //ეს არის Entity Framework-ის ინსტრუმენტი, რომელიც გამოიყენება ბაზის მოდელის გაკეთებისას
@@ -48,52 +77,29 @@ public sealed class DotnetToolsManager
         return new DotnetToolsManager(necessaryToolsNames, dotnetTools);
     }
 
-
-    public List<DotnetTool> DotnetTools { get; private set; }
-
-    public static DotnetToolsManager? Instance
-    {
-        get
-        {
-            //ეს ატრიბუტები სესიაზე არ არის დამოკიდებული და იქმნება პროგრამის გაშვებისთანავე, 
-            //შემდგომში მასში ცვლილებები არ შედის,
-            //მაგრამ შეიძლება პროგრამამ თავისი მუშაობის განმავლობაში რამდენჯერმე გამოიყენოს აქ არსებული ინფორმაცია
-            if (_instance != null)
-                return _instance;
-            lock (SyncRoot) //thread safe singleton
-            {
-                var createResult = Create();
-                if ( createResult.IsT1)
-                {
-                    Err.PrintErrorsOnConsole(createResult.AsT1);
-                    return null;
-                }
-
-                _instance = createResult.AsT0;
-            }
-
-            return _instance;
-        }
-    }
-
-    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetTools(Dictionary<ENecessaryTools, string> necessaryToolsNames)
+    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetTools(
+        Dictionary<ENecessaryTools, string> necessaryToolsNames)
     {
         var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
         if (createListOfDotnetToolsInstalledResult.IsT1)
-        {
             return Err.RecreateErrors(createListOfDotnetToolsInstalledResult.AsT1,
-                new Err { ErrorCode = "CreateListOfDotnetToolsInstalledError", ErrorMessage = "Error when Create List Of Dotnet Tools Installed" });
-        }   
+                new Err
+                {
+                    ErrorCode = "CreateListOfDotnetToolsInstalledError",
+                    ErrorMessage = "Error when Create List Of Dotnet Tools Installed"
+                });
         var listOfTools = createListOfDotnetToolsInstalledResult.AsT0;
 
         foreach (var pair in necessaryToolsNames)
         {
             var getAvailableVersionOfToolResult = GetAvailableVersionOfTool(pair.Value);
             if (getAvailableVersionOfToolResult.IsT1)
-            {
                 return Err.RecreateErrors(getAvailableVersionOfToolResult.AsT1,
-                    new Err { ErrorCode = "GetAvailableVersionOfToolError", ErrorMessage = "Error when detect Available Version Of Tool" });
-            }   
+                    new Err
+                    {
+                        ErrorCode = "GetAvailableVersionOfToolError",
+                        ErrorMessage = "Error when detect Available Version Of Tool"
+                    });
             var availableVersion = getAvailableVersionOfToolResult.AsT0;
             var nesTool = listOfTools.FirstOrDefault(tool => tool.PackageId == pair.Value);
             if (nesTool is null)
@@ -141,6 +147,7 @@ public sealed class DotnetToolsManager
             Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
             return;
         }
+
         DotnetTools = createListOfDotnetToolsResult.AsT0;
 
         var atLeastOneUpdatedOrInstalled = false;
@@ -165,6 +172,7 @@ public sealed class DotnetToolsManager
                 Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
                 return;
             }
+
             DotnetTools = createListOfDotnetToolsResult.AsT0;
             StShared.ConsoleWriteInformationLine(null, true, "Updating process Finished.");
         }

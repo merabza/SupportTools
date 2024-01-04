@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SystemToolsShared;
 using SystemToolsShared.Domain;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;
@@ -157,10 +158,10 @@ public sealed class EncodeParametersAction : ToolAction
 
     //private List<string> RecountKeys(JToken? val, string[] keys, int k = 0)
     //{
-        
+
     //    if (val is null)
     //        return new List<string>();
-        
+
     //    if (k == keys.Length)
     //        return new List<string> { string.Join(":", keys) };
 
@@ -253,9 +254,9 @@ public sealed class EncodeParametersAction : ToolAction
                     foreach (var v in val)
                     {
                         var path = v.Path;
-                        if ( encodedPaths.Contains(path) )
+                        if (encodedPaths.Contains(path))
                             continue;
-                        if (!Enc(v, encKey, keys, k + 1)) 
+                        if (!Enc(v, encKey, keys, k + 1))
                             return false;
                         encodedPaths.Add(path);
                         atLastOneEncoded = true;

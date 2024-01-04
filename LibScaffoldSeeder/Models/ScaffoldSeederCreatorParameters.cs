@@ -11,7 +11,8 @@ namespace LibScaffoldSeeder.Models;
 
 public sealed class ScaffoldSeederCreatorParameters : IParameters
 {
-    private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder, string projectName,
+    private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder,
+        string projectName,
         string scaffoldSeederProjectName, string projectSecurityFolderPath, string projectShortPrefix,
         string mainDatabaseProjectName, string projectDbContextClassName, EDataProvider devDatabaseDataProvider,
         string devDatabaseConnectionString, EDataProvider prodCopyDatabaseDataProvider,
@@ -198,7 +199,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
-                supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName, project.ScaffoldSeederProjectName,
+                supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName,
+                project.ScaffoldSeederProjectName,
                 project.ProjectSecurityFolderPath, project.ProjectShortPrefix, project.DbContextProjectName,
                 project.DbContextName, project.DevDatabaseConnectionParameters.DataProvider,
                 project.DevDatabaseConnectionParameters.ConnectionString,

@@ -6,6 +6,7 @@ using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.ToolCommands;

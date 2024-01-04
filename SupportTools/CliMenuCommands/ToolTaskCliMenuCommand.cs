@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;

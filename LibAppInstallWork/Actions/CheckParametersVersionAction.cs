@@ -11,8 +11,12 @@ using SystemToolsShared;
 
 namespace LibAppInstallWork.Actions;
 
-public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
-    ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : ToolAction(logger,
+public sealed class CheckParametersVersionAction(
+    ILogger logger,
+    ApiClientSettingsDomain webAgentForCheck,
+    ProxySettingsBase proxySettings,
+    string? appSettingsVersion,
+    int maxTryCount = 10) : ToolAction(logger,
     "Check Parameters Version", null, null)
 {
     private const string ProjectName = "";
@@ -50,13 +54,17 @@ public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettin
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
-                    var getAppSettingsVersionByProxyResult = await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId, cancellationToken);
+                    var proxyApiClient =
+                        new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
+                    var getAppSettingsVersionByProxyResult =
+                        await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
+                            proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
                     {
                         Err.PrintErrorsOnConsole(getAppSettingsVersionByProxyResult.AsT1);
                         break;
                     }
+
                     version = getAppSettingsVersionByProxyResult.AsT0;
                 }
                 else
@@ -69,6 +77,7 @@ public sealed class CheckParametersVersionAction(ILogger logger, ApiClientSettin
                         Err.PrintErrorsOnConsole(getAppSettingsVersionResult.AsT1);
                         break;
                     }
+
                     version = getAppSettingsVersionResult.AsT0;
                 }
 

@@ -26,7 +26,8 @@ public static class AppCreatorFabric
         switch (par.ProjectType)
         {
             case ESupportProjectType.Console:
-                var consoleAppWithDatabaseCreatorData = ConsoleAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
+                var consoleAppWithDatabaseCreatorData =
+                    ConsoleAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
                 return new ConsoleAppCreator(logger, par.ProjectName, par.IndentSize, gitProjects, gitRepos,
                     consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:

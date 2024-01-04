@@ -117,6 +117,7 @@ public sealed class GitProjectsUpdater
                     }));
                 return false;
             }
+
             var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
             if (remoteOriginUrl.Trim(Environment.NewLine.ToCharArray()) != git.GitProjectAddress)
@@ -136,9 +137,11 @@ public sealed class GitProjectsUpdater
             var needCommitResult = gitProcessor.NeedCommit();
             if (needCommitResult.IsT1)
             {
-                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, new Err{ErrorCode = "", ErrorMessage = ""}));
+                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1,
+                    new Err { ErrorCode = "", ErrorMessage = "" }));
                 return false;
             }
+
             if (needCommitResult.AsT0)
             {
                 //  თუ აღმოჩნდა რომ ცვლილებები მომხდარა, გამოვიდეს შეტყობინება ცვლილებების გაუქმებისა და თავიდან დაკლონვის შესახებ

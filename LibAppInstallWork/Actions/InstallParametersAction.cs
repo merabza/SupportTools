@@ -5,6 +5,7 @@ using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppInstallWork.Actions;

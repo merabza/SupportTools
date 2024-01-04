@@ -59,12 +59,14 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var proxyApiClient =
                         new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
-                    var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort, proxySettings.ApiVersionId, cancellationToken);
+                    var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
+                        proxySettings.ApiVersionId, cancellationToken);
                     if (getVersionByProxyResult.IsT1)
                     {
                         Err.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);
                         break;
                     }
+
                     version = getVersionByProxyResult.AsT0;
                 }
                 else
@@ -77,6 +79,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                         Err.PrintErrorsOnConsole(getVersionResult.AsT1);
                         break;
                     }
+
                     version = getVersionResult.AsT0;
                 }
 
