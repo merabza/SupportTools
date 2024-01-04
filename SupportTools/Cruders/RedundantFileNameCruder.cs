@@ -10,6 +10,7 @@ public sealed class RedundantFileNameCruder : ParCruder
 {
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public RedundantFileNameCruder(IParametersManager parametersManager, string projectName) : base(parametersManager,
         "Redundant File Name", "Redundant File Names", false, false)
     {
@@ -20,7 +21,7 @@ public sealed class RedundantFileNameCruder : ParCruder
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var project = parameters.GetProject(_projectName);
-        return project?.RedundantFileNames ?? new List<string>();
+        return project?.RedundantFileNames ?? [];
     }
 
 
@@ -50,10 +51,9 @@ public sealed class RedundantFileNameCruder : ParCruder
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
-        if (!projects.ContainsKey(_projectName))
+        if (!projects.TryGetValue(_projectName, out var value))
             return;
-        var project = projects[_projectName];
 
-        project.RedundantFileNames.Add(recordKey);
+        value.RedundantFileNames.Add(recordKey);
     }
 }

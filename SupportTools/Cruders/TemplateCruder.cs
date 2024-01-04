@@ -38,7 +38,7 @@ public sealed class TemplateCruder : ParCruder
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         return parameters.AppProjectCreatorAllParameters?.Templates.ToDictionary(p => p.Key, p => (ItemData)p.Value) ??
-               new Dictionary<string, ItemData>();
+               [];
     }
 
     public override bool ContainsRecordWithKey(string recordKey)

@@ -81,7 +81,7 @@ public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
                 return;
             }
 
-            List<string> usedProjectNames = new();
+            List<string> usedProjectNames = [];
             var gitRepos = GitRepos.Create(_logger, _supportToolsParameters.Gits, null, null);
 
             foreach (var kvp in gitRepos.Gits)
@@ -132,18 +132,17 @@ public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
 
     private bool RegisterDependenciesProjects()
     {
-        foreach (var kvp in _supportToolsParameters.GitProjects)
+        foreach (var (key, project) in _supportToolsParameters.GitProjects)
         {
-            Console.WriteLine($"Dependencies for {kvp.Key}");
+            Console.WriteLine($"Dependencies for {key}");
 
-            var project = kvp.Value;
             if (project.ProjectRelativePath is null)
             {
                 StShared.WriteErrorLine("project.ProjectRelativePath is null", true);
                 return false;
             }
 
-            List<string> dependsOnProjectNames = new();
+            List<string> dependsOnProjectNames = [];
 
             var filePath = Path.Combine(_gitsFolder, project.ProjectRelativePath);
             var projectXml = XElement.Load(filePath);

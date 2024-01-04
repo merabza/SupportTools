@@ -17,6 +17,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CreatorClassCreatorCliMenuCommand(ILogger logger) : base(
         "Create Class Creator")
     {
@@ -52,7 +53,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (classCreatorInfo is null)
                     return;
 
-                ProcessFiles(new List<ClassCreatorInfo> { classCreatorInfo });
+                ProcessFiles([classCreatorInfo]);
 
                 StShared.Pause();
                 return;
@@ -113,7 +114,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
     {
         foreach (var cci in classCreatorInfos)
         {
-            Console.WriteLine($"Analize {cci.SourceFileFullPath}...");
+            Console.WriteLine($"Analyze {cci.SourceFileFullPath}...");
             var fileContent = File.ReadAllText(cci.SourceFileFullPath);
             var lines = fileContent.Split(Environment.NewLine);
             var lineData = lines.Select(LineData.Create).ToList();
@@ -140,7 +141,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 {
                     currentCodeBlock.Add(new CodeExtraLine());
                 }
-                else if (lineData[i].TrimLine.EndsWith(";"))
+                else if (lineData[i].TrimLine.EndsWith(';'))
                 {
                     currentCodeBlock.Add(new CodeCommand(lineData[i].TrimLine[..^1]));
                 }
@@ -175,22 +176,23 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
         }
     }
 
-    private bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
+    private static bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
     {
-        var existsFileNames = new List<string>();
-        foreach (var classCreatorInfo in classCreatorInfos)
-        {
-            var toGenerateFileName =
-                Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName);
-            if (File.Exists(toGenerateFileName))
-                existsFileNames.Add(classCreatorInfo.DestinationCodeFileName);
-        }
+        var existsFileNames = (classCreatorInfos
+            .Select(classCreatorInfo => new
+            {
+                classCreatorInfo,
+                toGenerateFileName =
+                    Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
+            })
+            .Where(x => File.Exists(x.toGenerateFileName))
+            .Select(sx => sx.classCreatorInfo.DestinationCodeFileName)).ToList();
 
         if (existsFileNames.Count <= 0)
             return false;
 
         Console.WriteLine("Destination Files already exists: ");
-        foreach (var fileName in existsFileNames) Console.WriteLine(@$"    {fileName}");
+        foreach (var fileName in existsFileNames) Console.WriteLine($"    {fileName}");
 
         return true;
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CliMenu;
 using LibAppProjectCreator.CodeCreators;
 using LibDataInput;
@@ -15,6 +16,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public BinaryFileCreatorClassCreatorCliMenuCommand(ILogger logger) : base(
         "Create binary file Class Creator")
     {
@@ -50,7 +52,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (classCreatorInfo is null)
                     return;
 
-                ProcessFiles(new List<ClassCreatorInfo> { classCreatorInfo });
+                ProcessFiles([classCreatorInfo]);
 
                 StShared.Pause();
                 return;
@@ -122,16 +124,17 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
         }
     }
 
-    private bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
+    private static bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
     {
-        var existsFileNames = new List<string>();
-        foreach (var classCreatorInfo in classCreatorInfos)
-        {
-            var toGenerateFileName =
-                Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName);
-            if (File.Exists(toGenerateFileName))
-                existsFileNames.Add(classCreatorInfo.DestinationCodeFileName);
-        }
+        var existsFileNames = (classCreatorInfos
+            .Select(classCreatorInfo => new
+            {
+                classCreatorInfo,
+                toGenerateFileName =
+                    Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
+            })
+            .Where(x => File.Exists(x.toGenerateFileName))
+            .Select(sx => sx.classCreatorInfo.DestinationCodeFileName)).ToList();
 
         if (existsFileNames.Count <= 0)
             return false;

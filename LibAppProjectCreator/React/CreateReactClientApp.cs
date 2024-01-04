@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using LibAppProjectCreator.JavaScriptCreators;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.React;
 
@@ -64,7 +64,7 @@ public sealed class CreateReactClientApp
         //  რომელიც შექმნის ReactAppModelsForUse ფოლდერში შესაბამის პროექტს და შემდეგ უკვე იქიდან შესაძლებელი იქნება დაკოპირება.
         //  თუ ამ ნაბიჯის მერეც არ იქნება შესაბამისი ფაილები ReactAppModelsForUse ფოლდერში, მაშინ ვჩერდებით შეცდომის გამოცხადებით
 
-        if (!_reactAppTemplates.ContainsKey(_reactTemplateFolderName))
+        if (!_reactAppTemplates.TryGetValue(_reactTemplateFolderName, out string? value))
         {
             StShared.WriteErrorLine($"{_reactTemplateFolderName} template does not exists in templates dictionary",
                 true,
@@ -72,30 +72,28 @@ public sealed class CreateReactClientApp
             return false;
         }
 
-        var reactTemplateName = _reactAppTemplates[_reactTemplateFolderName];
-
         var forUseDir = GetWorkDirectory("ReactAppModelsForUse");
         if (forUseDir is null) return false;
 
-        string[] excludes = { ".git", "node_modules" };
+        string[] excludes = [".git", "node_modules"];
 
         //თუ ReactAppModelsForUse ფოლდერში შესაბამისი ფაილები ვერ მოიძებნა, მაშინ შესაბამისი ფაილები მოიძებნოს ReactAppModelsForDiff ფოლდერში
-        if (!forUseDir.Exists || (!forUseDir.GetFiles().Any() && !forUseDir.GetDirectories().Any()))
+        if (!forUseDir.Exists || (forUseDir.GetFiles().Length == 0 && forUseDir.GetDirectories().Length == 0))
         {
             var forDiffDir = GetWorkDirectory("ReactAppModelsForDiff");
             if (forDiffDir is null) return false;
             //თუ ReactAppModelsForDiff ფოლდერში შესაბამისი ფაილები ვერ მოიძებნა, მაშინ გაეშვას ReCreateReactAppFilesByTemplateNameToolCommand,
             //  რომელიც შექმნის ReactAppModelsForUse ფოლდერში შესაბამის პროექტს და შემდეგ უკვე იქიდან შესაძლებელი იქნება დაკოპირება.
-            if (!forDiffDir.Exists || (!forDiffDir.GetFiles().Any() && !forDiffDir.GetDirectories().Any()))
+            if (!forDiffDir.Exists || (forDiffDir.GetFiles().Length == 0 && forDiffDir.GetDirectories().Length == 0))
             {
                 var reCreateReactAppFiles =
-                    new ReCreateReactAppFiles(_logger, _workFolder, _reactTemplateFolderName, reactTemplateName);
+                    new ReCreateReactAppFiles(_logger, _workFolder, _reactTemplateFolderName, value);
                 if (!reCreateReactAppFiles.Run())
                     return false;
             }
 
             //თუ ამ ნაბიჯის მერეც არ იქნება შესაბამისი ფაილები ReactAppModelsForUse ფოლდერში, მაშინ ვჩერდებით შეცდომის გამოცხადებით
-            if (!forDiffDir.Exists || (!forDiffDir.GetFiles().Any() && !forDiffDir.GetDirectories().Any()))
+            if (!forDiffDir.Exists || (forDiffDir.GetFiles().Length == 0 && forDiffDir.GetDirectories().Length == 0))
             {
                 StShared.WriteErrorLine($"{forDiffDir.FullName} does not exists",
                     true, _logger);
@@ -106,7 +104,7 @@ public sealed class CreateReactClientApp
             FileStat.CopyFilesAndFolders(forDiffDir.FullName, forUseDir.FullName, excludes, true, _logger);
         }
 
-        if (!forUseDir.Exists || (!forUseDir.GetFiles().Any() && !forUseDir.GetDirectories().Any()))
+        if (!forUseDir.Exists || (forUseDir.GetFiles().Length == 0 && forUseDir.GetDirectories().Length == 0))
         {
             StShared.WriteErrorLine($"{forUseDir.FullName} does not exists",
                 true, _logger);

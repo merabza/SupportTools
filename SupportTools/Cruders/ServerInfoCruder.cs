@@ -9,7 +9,6 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
-using SupportToolsData;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -51,7 +50,7 @@ public sealed class ServerInfoCruder : ParCruder
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var project = parameters.GetProject(_projectName);
-        return project?.ServerInfos ?? new Dictionary<string, ServerInfoModel>();
+        return project?.ServerInfos ?? [];
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -120,8 +119,7 @@ public sealed class ServerInfoCruder : ParCruder
 
         if (server == null || project == null)
             return;
-        foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ??
-                     new List<ETools>()))
+        foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ?? []))
             itemSubMenuSet.AddMenuItem(
                 new ToolTaskCliMenuCommand(_logger, tool, _projectName, server, ParametersManager), tool.ToString());
     }

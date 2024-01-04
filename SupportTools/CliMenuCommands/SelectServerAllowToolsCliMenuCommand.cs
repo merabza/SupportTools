@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CliMenu;
 using LibDataInput;
@@ -17,6 +16,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
     private readonly string _serverName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SelectServerAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
         string serverName)
     {
@@ -48,7 +48,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
             MenuInputer.MultipleInputFromList("Select allow tools", checks);
 
 
-            server.AllowToolsList ??= new List<ETools>();
+            server.AllowToolsList ??= [];
 
             foreach (var kvp in checks)
             {
@@ -64,8 +64,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
                 else
                 {
                     //გამორთული ამოვაკლოთ თუ არსებობს
-                    if (server.AllowToolsList.Contains(tool))
-                        server.AllowToolsList.Remove(tool);
+                    server.AllowToolsList.Remove(tool);
                 }
             }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CliMenu;
@@ -21,6 +20,7 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         EGitCol gitCol) : base("Sync All", null, true)
     {
@@ -62,7 +62,7 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
                 EGitCol.Main => project.GitProjectNames,
                 EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
                 _ => null
-            } ?? new List<string>();
+            } ?? [];
 
             var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
 
@@ -74,7 +74,7 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
             var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 
 
-            if (absentGitRepoNames.Any())
+            if (absentGitRepoNames.Count != 0)
             {
                 foreach (var absentGitRepoName in absentGitRepoNames)
                     StShared.WriteErrorLine(absentGitRepoName, true, null, false);
