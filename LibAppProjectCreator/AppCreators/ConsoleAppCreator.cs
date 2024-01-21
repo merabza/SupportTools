@@ -16,11 +16,11 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 {
     private readonly ConsoleAppCreatorData _consoleAppCreatorData;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ConsoleAppCreator(ILogger logger, string projectName, int indentSize, GitProjects gitProjects,
         GitRepos gitRepos, ConsoleAppCreatorData consoleAppCreatorData) : base(logger, projectName, indentSize,
         gitProjects, gitRepos, consoleAppCreatorData.AppCreatorBaseData.WorkPath,
         consoleAppCreatorData.AppCreatorBaseData.SecurityPath, consoleAppCreatorData.AppCreatorBaseData.SolutionPath)
-    // ReSharper disable once ConvertToPrimaryConstructor
     {
         _consoleAppCreatorData = consoleAppCreatorData;
     }
