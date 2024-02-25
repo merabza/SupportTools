@@ -25,19 +25,14 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;
-
     private readonly string _serverSideServiceUserName;
     private readonly string? _serviceDescriptionSignature;
-
-    //private readonly string _serviceName;
     private readonly string _settingsFileName;
 
     public CreateServiceInstallScript(ILogger logger, string scriptFileName, int portNumber, string ftpSiteAddress,
         string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
         string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
-        string serverSideDownloadFolder, string serverSideDeployFolder,
-        //string serviceName, 
-        string settingsFileName,
+        string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
         string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreator),
         null, null)
     {
@@ -54,7 +49,6 @@ public class CreateServiceInstallScript : ToolAction
         _environmentName = environmentName;
         _serverSideDownloadFolder = serverSideDownloadFolder;
         _serverSideDeployFolder = serverSideDeployFolder;
-        //_serviceName = serviceName;
         _settingsFileName = settingsFileName;
         _serverSideServiceUserName = serverSideServiceUserName;
         _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
