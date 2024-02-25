@@ -1,9 +1,9 @@
 ﻿using System;
+using LibDataInput;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 
-// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.Git;
 
@@ -13,6 +13,7 @@ public sealed class GitProcessor
     private readonly string _projectPath;
     private readonly bool _useConsole;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitProcessor(bool useConsole, ILogger logger, string projectPath)
     {
         _useConsole = useConsole;
@@ -93,8 +94,11 @@ fi*/
             return GitState.NeedToPush;
         }
 
-        StShared.WriteErrorLine("Diverged", _useConsole, _logger);
-        return GitState.Diverged;
+        StShared.WriteErrorLine("Diverged", _useConsole, _logger, false);
+        return !Inputer.InputBool("Your branch and 'origin/master' have diverged, continue with pull for merge?", true,
+            false)
+            ? GitState.Diverged
+            : GitState.NeedToPull;
     }
 
 

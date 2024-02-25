@@ -8,6 +8,7 @@ namespace SupportTools.MenuCommands;
 
 public sealed class UpdateAllToolsToLatestVersionCommand : CliMenuCommand
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateAllToolsToLatestVersionCommand() : base("Update All Tools To Latest Version Command")
     {
     }
@@ -17,7 +18,7 @@ public sealed class UpdateAllToolsToLatestVersionCommand : CliMenuCommand
         try
         {
             MenuAction = EMenuAction.Reload;
-            if (!Inputer.InputBool("Are you sure, you want to Update All Tools To Latest Version", true, false))
+            if (!Inputer.InputBool("Are you sure, you want to Update All Tools To Latest Version?", true, false))
                 return;
             DotnetToolsManager.Instance?.UpdateAllToolsToLatestVersion();
         }
