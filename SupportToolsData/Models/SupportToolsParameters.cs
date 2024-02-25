@@ -63,7 +63,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ServerInfoModel> GetServers(string projectName)
     {
         var project = GetProject(projectName);
-        return project?.ServerInfos ?? new Dictionary<string, ServerInfoModel>();
+        return project?.ServerInfos ?? [];
     }
 
     public Option<List<string>> GetGitProjectNames(string projectName, EGitCol gitCol)
@@ -81,17 +81,18 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public ApiClientSettingsDomain GetWebAgentRequired(string webAgentKey)
     {
-        var apiClientSettings = GetWebAgent(webAgentKey);
-        if (apiClientSettings is null)
-            throw new InvalidOperationException($"ApiClient with name {webAgentKey} does not exists");
+        var apiClientSettings = GetWebAgent(webAgentKey) ??
+                                throw new InvalidOperationException(
+                                    $"ApiClient with name {webAgentKey} does not exists");
         if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
             throw new InvalidOperationException($"Server does not specified for ApiClient with name {webAgentKey}");
         return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
+
     }
 
     private ApiClientSettings? GetWebAgent(string webAgentKey)
     {
-        return !ApiClients.ContainsKey(webAgentKey) ? null : ApiClients[webAgentKey];
+        return ApiClients.GetValueOrDefault(webAgentKey);
     }
 
     public FileStorageData GetFileStorageRequired(string fileStorageName)
@@ -102,7 +103,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     private FileStorageData? GetFileStorage(string fileStorageName)
     {
-        return !FileStorages.ContainsKey(fileStorageName) ? null : FileStorages[fileStorageName];
+        return FileStorages.GetValueOrDefault(fileStorageName);
     }
 
     public SmartSchema GetSmartSchemaRequired(string smartSchemaName)
@@ -113,7 +114,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     private SmartSchema? GetSmartSchema(string smartSchemaName)
     {
-        return !SmartSchemas.ContainsKey(smartSchemaName) ? null : SmartSchemas[smartSchemaName];
+        return SmartSchemas.GetValueOrDefault(smartSchemaName);
     }
 
     public ServerInfoModel? GetServerByProject(string projectName, string serverName)
@@ -121,9 +122,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         if (!Projects.ContainsKey(projectName))
             return null;
         var project = GetProject(projectName);
-        if (project?.ServerInfos == null || !project.ServerInfos.ContainsKey(serverName))
+        if (project?.ServerInfos == null || !project.ServerInfos.TryGetValue(serverName, out var value))
             return null;
-        return project.ServerInfos[serverName];
+        return value;
     }
 
     public ServerDataModel GetServerDataRequired(string serverName)
@@ -134,7 +135,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public ServerDataModel? GetServerData(string serverName)
     {
-        return !Servers.ContainsKey(serverName) ? null : Servers[serverName];
+        return Servers.GetValueOrDefault(serverName);
     }
 
     public ProjectModel GetProjectRequired(string projectName)
@@ -145,7 +146,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public ProjectModel? GetProject(string projectName)
     {
-        return !Projects.ContainsKey(projectName) ? null : Projects[projectName];
+        return Projects.GetValueOrDefault(projectName);
     }
 
     private string? GetProjectScaffoldSeederPath(string scaffoldSeederProjectName)
