@@ -18,6 +18,7 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
 
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
         base(projectName)
     {
