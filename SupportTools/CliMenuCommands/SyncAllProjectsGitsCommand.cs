@@ -17,7 +17,7 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllProjectsGitsCommand(ILogger logger, ParametersManager parametersManager) : base(
-        "Sync All Projects Gits")
+        "Sync All Projects Gits", null, true, EStatusView.Brackets, false, true, logger)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -26,7 +26,7 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
     protected override void RunAction()
     {
         MenuAction = EMenuAction.Reload;
-        bool scaffoldSeedersWorkFolderSpecified = true;
+        var scaffoldSeedersWorkFolderSpecified = true;
 
         try
         {
@@ -41,7 +41,7 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
             foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
             {
                 SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main);
-                if (scaffoldSeedersWorkFolderSpecified) 
+                if (scaffoldSeedersWorkFolderSpecified)
                     SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed);
             }
 
@@ -59,7 +59,7 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
         }
         finally
         {
-                StShared.Pause();
+            StShared.Pause();
         }
     }
 
@@ -68,12 +68,12 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
         switch (gitCol)
         {
             case EGitCol.Main:
-                if (!string.IsNullOrWhiteSpace(project.ProjectFolderName)) 
+                if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
                     break;
                 StShared.WriteErrorLine($"ProjectFolderName is not specified for project {projectName}", true);
                 return;
             case EGitCol.ScaffoldSeed:
-                if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName)) 
+                if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
                     break;
                 StShared.WriteWarningLine($"ScaffoldSeederProjectName is not specified for project {projectName}",
                     true);

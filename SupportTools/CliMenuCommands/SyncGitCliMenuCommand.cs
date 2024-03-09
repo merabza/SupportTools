@@ -21,6 +21,7 @@ public sealed class SyncGitCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SyncGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         string gitProjectName, EGitCol gitCol) : base("Sync")
     {
