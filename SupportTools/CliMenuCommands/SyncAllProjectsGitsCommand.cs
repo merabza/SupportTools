@@ -26,7 +26,7 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
     protected override void RunAction()
     {
         MenuAction = EMenuAction.Reload;
-        bool scaffoldSeedersWorkFolderSpecified = false;
+        bool scaffoldSeedersWorkFolderSpecified = true;
 
         try
         {
