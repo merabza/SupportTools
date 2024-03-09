@@ -57,10 +57,6 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
         {
             StShared.WriteException(e, true);
         }
-        finally
-        {
-            StShared.Pause();
-        }
     }
 
     private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol)
