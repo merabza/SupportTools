@@ -21,6 +21,7 @@ public sealed class GitSubMenuCommand : CliMenuCommand
 
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) :
         base(projectName)
     {

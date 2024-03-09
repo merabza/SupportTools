@@ -16,6 +16,7 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 {
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ImportProjectCliMenuCommand(ParametersManager parametersManager) : base("Import Project")
     {
         _parametersManager = parametersManager;

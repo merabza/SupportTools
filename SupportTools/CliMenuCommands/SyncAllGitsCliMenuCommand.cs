@@ -16,18 +16,20 @@ namespace SupportTools.CliMenuCommands;
 public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
+    private readonly bool _pauseOnFinish;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol) : base("Sync All", null, true)
+        EGitCol gitCol, bool pauseOnFinish = true, bool askRunAction = true) : base("Sync All", null, askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitCol = gitCol;
+        _pauseOnFinish = pauseOnFinish;
     }
 
     protected override void RunAction()
@@ -48,7 +50,6 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
             //    StShared.WriteErrorLine($"ScaffoldSeederProjectName does not specified for Project {_projectName}", true);
             //    return;
             //}
-
             var gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
 
             if (gitsFolder == null)
@@ -103,7 +104,8 @@ public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
         }
         finally
         {
-            StShared.Pause();
+            if (_pauseOnFinish)
+                StShared.Pause();
         }
 
         MenuAction = EMenuAction.Reload;

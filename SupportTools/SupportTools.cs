@@ -19,6 +19,7 @@ public sealed class SupportTools : CliAppLoop
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SupportTools(ILogger logger, ParametersManager parametersManager)
     {
         _logger = logger;
@@ -54,6 +55,10 @@ public sealed class SupportTools : CliAppLoop
         //პროექტის დაიმპორტება
         var importProjectCommand = new ImportProjectCliMenuCommand(_parametersManager);
         mainMenuSet.AddMenuItem(importProjectCommand);
+
+        //ყველა პროექტის git-ის სინქრონიზაცია
+        var syncAllProjectsGits = new SyncAllProjectsGitsCommand(_logger, _parametersManager);
+        mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
         //პროექტების ჩამონათვალი
         foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
