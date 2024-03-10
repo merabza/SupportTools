@@ -65,6 +65,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         //რეფერენსების სიის შედგენა Do პროექტისათვის
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParameters);
+        AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParametersDataEdit);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliToolsData);
         AddReference(_consoleAppCreatorData.DoProjectData,
             _consoleAppCreatorData.DatabaseProjectData);

@@ -56,7 +56,7 @@ public sealed class ProjectParametersClassCreator : CodeCreator
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using LibParameters",
             _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
-            _useDatabase ? new CodeCommand("using DbTools") : new CodeExtraLine(),
+            _useDatabase ? new CodeCommand("using CliParametersDataEdit.Models") : new CodeExtraLine(),
             "",
             $"namespace {_inNamespace}.Models",
             "",
