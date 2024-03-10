@@ -454,11 +454,11 @@ public sealed class ApiAppCreator : AppCreatorBase
                 "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
-        //Console.WriteLine("Creating TestModel.cs...");
-        //var testModelClassCreator = new TestModelClassCreator(Logger,
-        //    _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
-        //    _apiAppCreatorData.UseCarcass, "TestModel.cs");
-        //testModelClassCreator.CreateFileStructure();
+        Console.WriteLine("Creating TestModel.cs...");
+        var testModelClassCreator = new TestModelClassCreator(Logger,
+            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
+            _apiAppCreatorData.UseCarcass, "TestModel.cs");
+        testModelClassCreator.CreateFileStructure();
     }
 
     private void MakeFilesWhenUseCarcass()

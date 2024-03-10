@@ -45,6 +45,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using CliParameters",
             "using LibParameters",
             "using CliParameters.FieldEditors",
             propertiesBlock,

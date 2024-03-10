@@ -56,6 +56,8 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
+            "using System.Collections.Generic",
             "using System.Linq",
             "using LibParameters",
             "using CliParameters.MenuCommands",

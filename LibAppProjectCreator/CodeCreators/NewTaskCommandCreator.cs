@@ -21,6 +21,7 @@ public sealed class NewTaskCommandCreator : CodeCreator
     {
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             "using CliMenu",
             "using LibParameters",
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
