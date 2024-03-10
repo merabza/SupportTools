@@ -25,7 +25,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         var buildMainMenuBlock = new CodeBlock("protected override bool BuildMainMenu()",
             $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
             "",
-            "CliMenuSet mainMenuSet = new (\"Main Menu\")",
+            "var mainMenuSet = new CliMenuSet(\"Main Menu\")",
             "AddChangeMenu(mainMenuSet)",
             "",
             new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
@@ -39,7 +39,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         var taskPart = new FlatCodeBlock(
             "NewTaskCommand newAppTaskCommand = new(_parametersManager)",
             "mainMenuSet.AddMenuItem(newAppTaskCommand)",
-            new CodeBlock("foreach (KeyValuePair<string, TaskModel> kvp in parameters.Tasks.OrderBy(o => o.Key))",
+            new CodeBlock("foreach (var kvp in parameters.Tasks.OrderBy(o => o.Key))",
                 "mainMenuSet.AddMenuItem(new TaskSubMenuCommand(_logger, _parametersManager, kvp.Key))")
         );
 
@@ -47,7 +47,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
 
         var exitPart = new FlatCodeBlock(
             new OneLineComment("გასასვლელი"),
-            "string key = ConsoleKey.Escape.Value().ToLower()",
+            "var key = ConsoleKey.Escape.Value().ToLower()",
             "mainMenuSet.AddMenuItem(key, \"Exit\", new ExitCommand(), key.Length)",
             "",
             "return true");
@@ -57,7 +57,6 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System",
-            "using System.Collections.Generic",
             "using System.Linq",
             "using LibParameters",
             "using CliParameters.MenuCommands",
@@ -68,6 +67,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             $"using {_projectNamespace}.MenuCommands",
             "using Microsoft.Extensions.Logging",
             $"using {_projectNamespace}.Models",
+            _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), "",
             _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(), "",
             $"namespace {_projectNamespace}",
             "",

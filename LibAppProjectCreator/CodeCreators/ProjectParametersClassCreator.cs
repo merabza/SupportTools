@@ -48,12 +48,12 @@ public sealed class ProjectParametersClassCreator : CodeCreator
                     "return false"),
                 "return !Tasks.ContainsKey(newTaskName)"));
             tasksBlock.Add(new CodeBlock("public bool RemoveTask(string taskName)",
-                "return Tasks.TryAdd(newTaskName, task)"));
-            tasksBlock.Add(new CodeBlock("public bool AddTask(string newTaskName, TaskModel task)",
-                new CodeBlock("if (Tasks.ContainsKey(newTaskName))",
+                new CodeBlock("if (!Tasks.ContainsKey(taskName))",
                     "return false"),
-                "Tasks.Add(newTaskName, task)",
+                "Tasks.Remove(taskName)",
                 "return true"));
+            tasksBlock.Add(new CodeBlock("public bool AddTask(string newTaskName, TaskModel task)",
+                "return Tasks.TryAdd(newTaskName, task)"));
         }
 
         var block = new CodeBlock("",
