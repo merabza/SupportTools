@@ -180,17 +180,16 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
     private void MakeFilesWhenUseMenu()
     {
-        var mainProjectModelsPath =
-            _consoleAppCreatorData.MainProjectData.FoldersForCreate["Models"];
+        //var mainProjectModelsPath =
+        //    _consoleAppCreatorData.MainProjectData.FoldersForCreate["Models"];
         var menuCommands = _consoleAppCreatorData.MainProjectData.FoldersForCreate["MenuCommands"];
 
 
         //შეიქმნას პროექტის პარამეტრების რედაქტირების კლასი
         Console.WriteLine($"Creating {ProjectName}ParametersEditor.cs...");
-        var projectParametersEditorClassCreator =
-            new ProjectParametersEditorClassCreator(Logger, mainProjectModelsPath, ProjectName,
-                _consoleAppCreatorData.UseDatabase,
-                $"{ProjectName}ParametersEditor.cs");
+        var projectParametersEditorClassCreator = new ProjectParametersEditorClassCreator(Logger,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, _consoleAppCreatorData.UseDatabase,
+            $"{ProjectName}ParametersEditor.cs");
         projectParametersEditorClassCreator.CreateFileStructure();
 
         //შეიქმნას პროგრამის მთავარი მუშა კლასი
@@ -212,8 +211,8 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         var taskModelCreator = new TaskModelCreator(Logger,
             _consoleAppCreatorData.UseDatabase
                 ? _consoleAppCreatorData.DoProjectData.FoldersForCreate["Models"]
-                : mainProjectModelsPath, ProjectName, _consoleAppCreatorData.UseDatabase,
-            "TaskModel.cs");
+                : _consoleAppCreatorData.MainProjectData.FoldersForCreate["Models"], ProjectName,
+            _consoleAppCreatorData.UseDatabase, "TaskModel.cs");
         taskModelCreator.CreateFileStructure();
 
         //შეიქმნას ამოცანის რედაქტირების ბრძანების კლასი

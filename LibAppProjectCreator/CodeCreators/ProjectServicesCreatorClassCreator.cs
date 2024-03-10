@@ -8,6 +8,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectServicesCreatorClassCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -31,6 +32,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
             "",
             new CodeBlock($"public sealed class {_projectNamespace}ServicesCreator : ServicesCreator",
                 $"private readonly {_projectNamespace}Parameters _par",
+                new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock(
                     $"public {_projectNamespace}ServicesCreator({_projectNamespace}Parameters par) : base(par.LogFolder, null, \"{_projectNamespace}\")",
                     "_par = par"
@@ -38,8 +40,8 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                 new CodeBlock("protected override void ConfigureServices(IServiceCollection services)",
                     "base.ConfigureServices(services)",
                     "",
-                    new CodeBlock("if (!string.IsNullOrEmpty(_par.ConnectionString) )",
-                        $"services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(_par.ConnectionString))"),
+                    new CodeBlock("if (!string.IsNullOrEmpty(_par.DatabaseConnectionParameters?.ConnectionString))",
+                        $"services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(_par.DatabaseConnectionParameters.ConnectionString))"),
                     $"services.AddScoped<I{_projectNamespace}Repository, {_projectNamespace}Repository>()",
                     $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFabric, {_projectNamespace}RepositoryCreatorFabric>()"
                 )));

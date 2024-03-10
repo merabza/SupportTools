@@ -53,17 +53,15 @@ public sealed class ConsoleAppCreatorData
     public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
         TemplateModel template)
     {
-        var projectFolders = new List<string>
-        {
-            "Properties",
-            "Models"
-        };
+        var projectFolders = new List<string> { "Properties" };
+        if (!template.UseDatabase)
+            projectFolders.Add("Models");
         if (template.UseMenu)
             projectFolders.Add("MenuCommands");
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName,
-            projectName, EDotnetProjectType.Console, "", "Program", projectFolders.ToArray());
+            projectName, EDotnetProjectType.Console, "", "Program", [.. projectFolders]);
 
         if (!template.UseDatabase)
             return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, null, null, null, null,
