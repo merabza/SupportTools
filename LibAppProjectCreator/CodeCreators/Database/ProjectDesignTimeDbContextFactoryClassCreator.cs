@@ -8,6 +8,7 @@ public sealed class ProjectDesignTimeDbContextFactoryClassCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectDesignTimeDbContextFactoryClassCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -25,12 +26,13 @@ public sealed class ProjectDesignTimeDbContextFactoryClassCreator : CodeCreator
             $"namespace {_projectNamespace}",
             "",
             new OneLineComment("ეს კლასი საჭიროა იმისათვის, რომ შესაძლებელი გახდეს მიგრაციასთან მუშაობა."),
-            new OneLineComment(
-                "ანუ დეველოპერ ბაზის წაშლა და ახლიდან დაგენერირება, ან მიგრაციაში ცვლილებების გაკეთება"),
+            new OneLineComment("ანუ დეველოპერ ბაზის წაშლა და ახლიდან დაგენერირება, ან მიგრაციაში ცვლილებების გაკეთება"),
+            new OneLineComment(" ReSharper disable once UnusedType.Global"),
             new CodeBlock(
                 $"public sealed class {_projectNamespace}DesignTimeDbContextFactory : DesignTimeDbContextFactory<{_projectNamespace}DbContext>",
+                new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock(
-                    $"public {_projectNamespace}DesignTimeDbContextFactory() : base(\"{_projectNamespace}DbMigration\", \"ConnectionString\", \"D:\\\\1WorkSecurity\\\\{_projectNamespace}\\\\{_projectNamespace}.json\")",
+                    $"public {_projectNamespace}DesignTimeDbContextFactory() : base(\"{_projectNamespace}DbMigration\", \"ConnectionString\", @\"D:\\1WorkSecurity\\{_projectNamespace}\\{_projectNamespace}.json\")",
                     ""
                 )));
         CodeFile.AddRange(block.CodeItems);

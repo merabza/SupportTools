@@ -69,7 +69,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    AddGitClone(WorkPath, Clones.Instance.BackendCarcass);
 
         //AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
-        if (_apiAppCreatorData.UseIdentity && _apiAppCreatorData.UseCarcass)
+        if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
         if (_apiAppCreatorData.UseReact)
         {
@@ -90,7 +90,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WindowsServiceTools);
 
-        if (_apiAppCreatorData.UseCarcass && _apiAppCreatorData.UseIdentity)
+        if (_apiAppCreatorData is { UseCarcass: true, UseIdentity: true })
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcass);
 
         if (_apiAppCreatorData.UseCarcass)
@@ -200,7 +200,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    installersPath, Par.ProjectName, _apiAppCreatorData.UseCarcass, "ControllersInstaller.cs");
         //controllersInstallerClassCreator.CreateFileStructure();
 
-        if (_apiAppCreatorData.UseIdentity && !_apiAppCreatorData.UseCarcass)
+        if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: false })
             MakeFilesWhenUseIdentityAndNotUseCarcass(modelsPath);
 
         if (_apiAppCreatorData.UseCarcass)
@@ -209,7 +209,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseDatabase)
             MakeFilesWhenUseDatabase(appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
 
-        if (_apiAppCreatorData.UseCarcass && _apiAppCreatorData.UseDatabase)
+        if (_apiAppCreatorData is { UseCarcass: true, UseDatabase: true })
             MakeFilesWhenUseCarcassAndUseDatabase();
 
         if (_apiAppCreatorData.UseIdentity)
@@ -454,11 +454,11 @@ public sealed class ApiAppCreator : AppCreatorBase
                 "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
-        Console.WriteLine("Creating TestModel.cs...");
-        var testModelClassCreator = new TestModelClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
-            _apiAppCreatorData.UseCarcass, "TestModel.cs");
-        testModelClassCreator.CreateFileStructure();
+        //Console.WriteLine("Creating TestModel.cs...");
+        //var testModelClassCreator = new TestModelClassCreator(Logger,
+        //    _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
+        //    _apiAppCreatorData.UseCarcass, "TestModel.cs");
+        //testModelClassCreator.CreateFileStructure();
     }
 
     private void MakeFilesWhenUseCarcass()

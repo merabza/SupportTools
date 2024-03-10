@@ -9,6 +9,7 @@ public sealed class EditTaskNameCommandCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useDatabase;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EditTaskNameCommandCreator(ILogger logger, string placePath, string projectNamespace, bool useDatabase,
         string? codeFileName = null) : base(logger,
         placePath, codeFileName)
@@ -21,8 +22,9 @@ public sealed class EditTaskNameCommandCreator : CodeCreator
     {
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             "using CliMenu",
-            "using CliParameters",
+            "using LibParameters",
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             "using LibDataInput",
             "using SystemToolsShared",
@@ -32,20 +34,21 @@ public sealed class EditTaskNameCommandCreator : CodeCreator
             new CodeBlock("public sealed class EditTaskNameCommand : CliMenuCommand",
                 "private readonly ParametersManager _parametersManager",
                 "private readonly string _taskName",
+                new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock(
                     "public EditTaskNameCommand(ParametersManager parametersManager, string taskName) : base(\"Edit Task\",taskName)",
                     "_parametersManager = parametersManager",
                     "_taskName = taskName"),
-                new CodeBlock("public override void Run()",
+                new CodeBlock("protected override void RunAction()",
                     new CodeBlock("try",
-                        $"{_projectNamespace}Parameters parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
-                        "TaskModel? task = parameters.GetTask(_taskName)",
+                        $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
+                        "var task = parameters.GetTask(_taskName)",
                         new CodeBlock("if (task == null)",
                             "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
                             "return"),
                         "",
                         new OneLineComment("ამოცანის სახელის რედაქტირება"),
-                        "string? newTaskName = Inputer.InputText(\"change  Task Name \", _taskName)",
+                        "var newTaskName = Inputer.InputText(\"change  Task Name \", _taskName)",
                         new CodeBlock("if (string.IsNullOrWhiteSpace(newTaskName))",
                             "return"),
                         "",

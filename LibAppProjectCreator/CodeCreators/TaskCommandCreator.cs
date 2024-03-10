@@ -9,6 +9,7 @@ public sealed class TaskCommandCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useDatabase;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public TaskCommandCreator(ILogger logger, string placePath, string projectNamespace, bool useDatabase,
         string? codeFileName = null) : base(logger,
         placePath, codeFileName)
@@ -21,9 +22,10 @@ public sealed class TaskCommandCreator : CodeCreator
     {
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             "using System.Diagnostics",
             "using CliMenu",
-            "using CliParameters",
+            "using LibParameters",
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             "using LibDataInput",
             "using Microsoft.Extensions.Logging",
@@ -31,6 +33,7 @@ public sealed class TaskCommandCreator : CodeCreator
             "",
             $"namespace {_projectNamespace}.MenuCommands",
             "",
+            new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock("public sealed class TaskCommand : CliMenuCommand",
                 "private readonly ILogger _logger",
                 "private readonly IParametersManager _parametersManager",
@@ -41,11 +44,11 @@ public sealed class TaskCommandCreator : CodeCreator
                     "_logger = logger",
                     "_parametersManager = parametersManager",
                     "_taskName = taskName"),
-                new CodeBlock("public override void Run()",
+                new CodeBlock("protected override void RunAction()",
                     new CodeBlock("try",
                         "MenuAction = EMenuAction.Reload",
-                        $"{_projectNamespace}Parameters parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
-                        "TaskModel? task = parameters.GetTask(_taskName)",
+                        $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
+                        "var task = parameters.GetTask(_taskName)",
                         new CodeBlock("if (task == null)",
                             "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
                             "return"),
@@ -53,7 +56,7 @@ public sealed class TaskCommandCreator : CodeCreator
                         $"{_projectNamespace}TaskRunner crawlerRunner = new(_logger, parameters, _taskName, task)",
                         "",
                         new OneLineComment("დავინიშნოთ დრო"),
-                        "Stopwatch watch = Stopwatch.StartNew()",
+                        "var watch = Stopwatch.StartNew()",
                         "Console.WriteLine(\"Crawler is running...\")",
                         "Console.WriteLine(\"-- - \")",
                         " crawlerRunner.Run()",

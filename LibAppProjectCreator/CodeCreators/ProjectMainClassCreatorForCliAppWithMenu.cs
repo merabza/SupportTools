@@ -10,52 +10,38 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
     private readonly string _projectNamespace;
 
     private readonly bool _useDatabase;
-    //private readonly bool _taskWithParameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectMainClassCreatorForCliAppWithMenu(ILogger logger, string placePath, string projectNamespace,
         bool useDatabase, string? codeFileName = null) : base(logger, placePath,
         codeFileName)
     {
         _projectNamespace = projectNamespace;
         _useDatabase = useDatabase;
-        //_taskWithParameters = taskWithParameters;
     }
 
     public override void CreateFileStructure()
     {
         var buildMainMenuBlock = new CodeBlock("protected override bool BuildMainMenu()",
-            $"{_projectNamespace}Parameters parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
+            $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
             "",
             "CliMenuSet mainMenuSet = new (\"Main Menu\")",
             "AddChangeMenu(mainMenuSet)",
             "",
             new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
-            $"{_projectNamespace}ParametersEditor {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
+            $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
             $"mainMenuSet.AddMenuItem(new ParametersEditorListCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
             "",
             new OneLineComment("საჭირო მენიუს ელემენტები"),
             ""
         );
 
-        FlatCodeBlock taskPart;
-        //if (_taskWithParameters) // && ! _useDatabase
-        //{
-        //    //{(_useDatabase ? $", _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : "")}
-        //    taskPart = new FlatCodeBlock(new OneLineComment("ამოცანების განზოგადებული ვარიანტი"),
-        //        $"TasksEditorMenu<ETools> {_projectNamespace.UnCapitalize()}TasksEditor = new TasksEditorMenu<ETools>(_logger, _parametersManager)",
-        //        $"{_projectNamespace.UnCapitalize()}TasksEditor.TaskMenuElements(mainMenuSet)", "");
-        //}
-        //else
-        //{
-        taskPart = new FlatCodeBlock(
+        var taskPart = new FlatCodeBlock(
             "NewTaskCommand newAppTaskCommand = new(_parametersManager)",
             "mainMenuSet.AddMenuItem(newAppTaskCommand)",
-            //,
-            //$"mainMenuSet.AddMenuItem(new TaskCommand(_logger, _parametersManager, new {_projectNamespace}Runner(_logger{(_useDatabase ? $", _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : "")}, parameters)), \"Run\")"
             new CodeBlock("foreach (KeyValuePair<string, TaskModel> kvp in parameters.Tasks.OrderBy(o => o.Key))",
                 "mainMenuSet.AddMenuItem(new TaskSubMenuCommand(_logger, _parametersManager, kvp.Key))")
         );
-        //}
 
         buildMainMenuBlock.AddRange(taskPart.CodeItems);
 
@@ -70,25 +56,27 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters",
+            "using System.Linq",
+            "using LibParameters",
             "using CliParameters.MenuCommands",
             "using CliMenu",
             "using LibDataInput",
             "using CliTools",
             "using CliTools.Commands",
             $"using {_projectNamespace}.MenuCommands",
-            _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(),
             "using Microsoft.Extensions.Logging",
-            //"using SystemToolsShared",
-            //_taskWithParameters ? new CodeCommand("using CliParameters.Tasks") : new CodeExtraLine(),
             $"using {_projectNamespace}.Models",
-            //_useDatabase ? new CodeCommand($"using Do{_projectNamespace}") : new CodeExtraLine(),
             _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(), "",
             $"namespace {_projectNamespace}",
             "",
+            new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock($"public sealed class {_projectNamespace} : CliAppLoop",
                 "private readonly ILogger _logger",
                 "private readonly ParametersManager _parametersManager",
+                _useDatabase
+                    ? new OneLineComment(
+                        "ეს საჭიროა იმ შემთხვევაში, თუ ბაზაში რედაქტორები გვინდა გავაკეთოთ და საჭიროა, რომ ამ მენიუდან მოხდეს გამოძახება")
+                    : new CodeExtraLine(),
                 _useDatabase
                     ? new CodeCommand(
                         $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric")

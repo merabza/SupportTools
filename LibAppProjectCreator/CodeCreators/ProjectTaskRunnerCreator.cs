@@ -9,6 +9,7 @@ public sealed class ProjectTaskRunnerCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useDatabase;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectTaskRunnerCreator(ILogger logger, string placePath, string projectNamespace, bool useDatabase,
         string? codeFileName = null) : base(logger,
         placePath, codeFileName)
@@ -21,6 +22,7 @@ public sealed class ProjectTaskRunnerCreator : CodeCreator
     {
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             "using Microsoft.Extensions.Logging",
             "using SystemToolsShared",

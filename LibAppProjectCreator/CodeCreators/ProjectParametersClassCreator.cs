@@ -12,6 +12,7 @@ public sealed class ProjectParametersClassCreator : CodeCreator
     private readonly bool _useDatabase;
     private readonly bool _useMenu;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersClassCreator(ILogger logger, string placePath, string projectNames, string inNamespace,
         bool useDatabase, bool useMenu, string? codeFileName = null) : base(logger, placePath,
         codeFileName)
@@ -36,10 +37,10 @@ public sealed class ProjectParametersClassCreator : CodeCreator
 
         if (_useMenu)
         {
-            propertiesBlock.Add(new CodeBlock("public Dictionary<string, TaskModel> Tasks", "= new()", true, "get",
+            propertiesBlock.Add(new CodeBlock("public Dictionary<string, TaskModel> Tasks", "= []", true, "get",
                 "set"));
             tasksBlock.Add(new CodeBlock("public TaskModel? GetTask(string taskName)",
-                "return !Tasks.ContainsKey(taskName) ? null : Tasks[taskName]"));
+                "return Tasks.GetValueOrDefault(taskName)"));
             tasksBlock.Add(new CodeBlock("public bool CheckNewTaskNameValid(string oldTaskName, string newTaskName)",
                 new CodeBlock("if (oldTaskName == newTaskName)",
                     "return true"),
@@ -47,10 +48,7 @@ public sealed class ProjectParametersClassCreator : CodeCreator
                     "return false"),
                 "return !Tasks.ContainsKey(newTaskName)"));
             tasksBlock.Add(new CodeBlock("public bool RemoveTask(string taskName)",
-                new CodeBlock("if (!Tasks.ContainsKey(taskName))",
-                    "return false"),
-                "Tasks.Remove(taskName)",
-                "return true"));
+                "return Tasks.TryAdd(newTaskName, task)"));
             tasksBlock.Add(new CodeBlock("public bool AddTask(string newTaskName, TaskModel task)",
                 new CodeBlock("if (Tasks.ContainsKey(newTaskName))",
                     "return false"),
@@ -60,7 +58,8 @@ public sealed class ProjectParametersClassCreator : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters",
+            "using LibParameters",
+            _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
             _useDatabase ? new CodeCommand("using DbTools") : new CodeExtraLine(),
             "",
             $"namespace {_inNamespace}.Models",

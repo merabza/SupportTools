@@ -319,10 +319,10 @@ public sealed class ConsoleAppCreator : AppCreatorBase
                 "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
-        Console.WriteLine("Creating TestModel.cs...");
-        var testModelClassCreator = new TestModelClassCreator(Logger,
-            _consoleAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName, false,
-            "TestModel.cs");
-        testModelClassCreator.CreateFileStructure();
+        //Console.WriteLine("Creating TestModel.cs...");
+        //var testModelClassCreator = new TestModelClassCreator(Logger,
+        //    _consoleAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName, false,
+        //    "TestModel.cs");
+        //testModelClassCreator.CreateFileStructure();
     }
 }

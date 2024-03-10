@@ -13,8 +13,8 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
     private readonly bool _useDatabase;
 
     private readonly bool _useMenu;
-    //private readonly bool _useTaskWithParameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ConsoleProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string? appKey,
         bool useDatabase, bool useMenu, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -22,7 +22,6 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
         _appKey = appKey;
         _useDatabase = useDatabase;
         _useMenu = useMenu;
-        //_useTaskWithParameters = useTaskWithParameters;
     }
 
 
@@ -36,6 +35,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
             "using System",
             "using SystemToolsShared",
             "using CliParameters",
+            "using LibParameters",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : null,
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             $"using {_projectNamespace}",
@@ -53,21 +53,21 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
                 _appKey is null ? null : $"ProgramAttributes.Instance.SetAttribute(\"AppKey\", \"{_appKey}\")",
                 "",
                 //თუ მენიუს გამოყენება არ ხდება, მაშინ დაშიფვრას აზრი არ აქვს, რადგან ასეთ შემთხვევაში საჭირო იქნება ცალკე რედაქტორის და დამშიფრავის არსებობა
-                $"IArgumentsParser argParser = new ArgumentsParser<{parametersClassName}>(args, \"{_projectNamespace}\", {(_useMenu ? "ProgramAttributes.Instance.GetAttribute<string>(\"AppKey\") + Environment.MachineName.Capitalize()" : "null")})",
+                $"var argParser = new ArgumentsParser<{parametersClassName}>(args, \"{_projectNamespace}\", {(_useMenu ? "ProgramAttributes.Instance.GetAttribute<string>(\"AppKey\") + Environment.MachineName.Capitalize()" : "null")})",
                 new CodeBlock("switch (argParser.Analysis())",
                     "case EParseResult.Ok: break",
                     "case EParseResult.Usage: return 1",
                     "case EParseResult.Error: return 2",
                     "default: throw new ArgumentOutOfRangeException()"),
                 "",
-                $"{parametersClassName}? par = ({parametersClassName}?)argParser.Par",
+                $"var par = ({parametersClassName}?)argParser.Par",
                 new CodeBlock("if (par is null)",
                     "StShared.WriteErrorLine(\"ConsoleTestParameters is null\", true)",
                     "return 3"),
                 "",
-                "string? parametersFileName = argParser.ParametersFileName",
-                $"{(_useDatabase ? _projectNamespace : "")}ServicesCreator servicesCreator = new {(_useDatabase ? _projectNamespace : "")}ServicesCreator({(_useDatabase ? "par" : $"par.LogFolder, null, \"{_projectNamespace}\"")})",
-                "ServiceProvider? serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information)",
+                "var parametersFileName = argParser.ParametersFileName",
+                $"var servicesCreator = new {(_useDatabase ? _projectNamespace : "")}ServicesCreator({(_useDatabase ? "par" : $"par.LogFolder, null, \"{_projectNamespace}\"")})",
+                "var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information)",
                 "",
                 new CodeBlock("if (serviceProvider == null)",
                     "StShared.WriteErrorLine(\"Logger not created\", true)",
@@ -81,7 +81,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
                 _useDatabase
                     ? new FlatCodeBlock(
                         new CodeCommand(
-                            $"I{_projectNamespace}RepositoryCreatorFabric? {projectLow}RepositoryCreatorFabric = serviceProvider.GetService<I{_projectNamespace}RepositoryCreatorFabric>()"),
+                            $"var {projectLow}RepositoryCreatorFabric = serviceProvider.GetService<I{_projectNamespace}RepositoryCreatorFabric>()"),
                         new CodeBlock($"if ({projectLow}RepositoryCreatorFabric is null)",
                             $"StShared.WriteErrorLine(\"{projectLow}RepositoryCreatorFabric is null\", true)",
                             "return 6"),
@@ -89,7 +89,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
                     )
                     : null,
                 "",
-                $"{_projectNamespace}.{_projectNamespace} {projectLow} = new {_projectNamespace}.{_projectNamespace}(logger, new ParametersManager(parametersFileName, par){(_useDatabase ? $", {projectLow}RepositoryCreatorFabric" : "")})",
+                $"var {projectLow} = new {_projectNamespace}.{_projectNamespace}(logger, new ParametersManager(parametersFileName, par){(_useDatabase ? $", {projectLow}RepositoryCreatorFabric" : "")})",
                 "",
                 $"return {projectLow}.Run() ? 0 : 1"),
             new CodeBlock("catch (Exception e)",

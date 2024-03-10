@@ -9,6 +9,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useDatabase;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersEditorClassCreator(ILogger logger, string placePath, string projectNamespace,
         bool useDatabase, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -44,7 +45,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters",
+            "using LibParameters",
             "using CliParameters.FieldEditors",
             propertiesBlock,
             "using Microsoft.Extensions.Logging",
@@ -53,7 +54,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
             "",
             new CodeBlock($"public sealed class {_projectNamespace}ParametersEditor : ParametersEditor",
                 new CodeBlock(
-                    $"public {_projectNamespace}ParametersEditor(IParameters parameters, ParametersManager parametersManager, ILogger logger) : base(\"{_projectNamespace} Parameters Editor\", parameters, parametersManager)",
+                    $"public {_projectNamespace}ParametersEditor(IParameters parameters, IParametersManager parametersManager, ILogger logger) : base(\"{_projectNamespace} Parameters Editor\", parameters, parametersManager)",
                     $"FieldEditors.Add(new FolderPathFieldEditor(nameof({_projectNamespace}Parameters.LogFolder)))",
                     fieldEditorsBlock
                 )

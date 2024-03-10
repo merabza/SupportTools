@@ -43,7 +43,7 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
             new OneLineComment("რაც უსაფრთხოების თვალსაზრისით არასწორია"),
             "",
             new CodeBlock(
-                "public sealed class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
+                "public class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
                 "",
                 "private readonly string _assemblyName",
                 "private readonly string _connectionParamName",
@@ -61,22 +61,19 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
                 new CodeBlock("public T CreateDbContext(string[] args)",
                     new OneLineComment(
                         "თუ პარამეტრების json ფაილის სახელი პირდაპირ არ არის გადმოცემული, ვიყენებთ სტანდარტულ სახელს appsettings.json"),
-                    "IConfigurationRoot configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(_parametersJsonFileName ?? \"appsettings.json\", false, true).Build()",
+                    "var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(_parametersJsonFileName ?? \"appsettings.json\", false, true).Build()",
                     new OneLineComment(
                         ".AddEncryptedJsonFile(Path.Combine(pathToContentRoot, \"appsettingsEncoded.json\"), optional: false, reloadOnChange: true, Key,"),
                     new OneLineComment("  Path.Combine(pathToContentRoot, \"appsetenkeys.json\"))"),
                     new OneLineComment(".AddUserSecrets<TSt>()"),
                     new OneLineComment(".AddEnvironmentVariables()"),
-                    "string connectionString = configuration[_connectionParamName]",
+                    "var connectionString = configuration[_connectionParamName]",
                     "Console.WriteLine($\"DesignTimeDbContextFactory CreateDbContext connectionString = {connectionString}\")",
                     "",
                     "var builder = new DbContextOptionsBuilder<T>()",
                     "builder.UseSqlServer(connectionString, b => b.MigrationsAssembly(_assemblyName))",
-                    "object? dbContext = Activator.CreateInstance(typeof(T), builder.Options, true)",
-                    new CodeBlock("if (dbContext is null)",
-                        "throw new Exception(\"dbContext does not created\")"),
-                    "return (T)dbContext" +
-                    ""
+                    "var dbContext = Activator.CreateInstance(typeof(T), builder.Options, true)",
+                    "return dbContext is null ? throw new Exception(\"dbContext does not created\") : (T)dbContext"
                 )
             ));
         CodeFile.AddRange(block.CodeItems);

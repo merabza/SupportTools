@@ -9,6 +9,7 @@ public sealed class TaskModelCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useDatabase;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public TaskModelCreator(ILogger logger, string placePath, string projectNamespace, bool useDatabase,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -20,7 +21,7 @@ public sealed class TaskModelCreator : CodeCreator
     {
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters",
+            "using LibParameters",
             "",
             $"namespace {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             "",
