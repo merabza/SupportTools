@@ -20,12 +20,14 @@ internal sealed class ProjectRecordCreator
     private readonly string _newProjectShortName;
 
     private readonly IParametersManager _parametersManager;
+    private readonly TemplateModel _templateModel;
 
-    public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, string newProjectName,
-        string newProjectShortName, string newProjectKeyGuidPart)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, TemplateModel templateModel, string newProjectName, string newProjectShortName, string newProjectKeyGuidPart)
     {
         _logger = logger;
         _parametersManager = parametersManager;
+        _templateModel = templateModel;
         _newProjectName = newProjectName;
         _newProjectShortName = newProjectShortName;
         _newProjectKeyGuidPart = newProjectKeyGuidPart;
@@ -201,7 +203,106 @@ internal sealed class ProjectRecordCreator
         var productionBaseName = $"{_newProjectName}Prod";
         var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
 
+        var serverInfos = new Dictionary<string, ServerInfoModel>();
 
+        if ( !_templateModel.UseMenu)
+        {
+            var serverInfo = CreateServerInfo(productionServerName, productionEnvironmentName, productionServerWebAgentName,
+                securityFolder, appSettingsFileName, jsonExtension, serverData, productionBaseName, smartSchemaName,
+                databaseExchangeFileStorageName, tempLocalPath, developerDbConnectionName);
+            serverInfos = new Dictionary<string, ServerInfoModel>
+            {
+                {
+                    serverInfo.GetItemKey(), serverInfo
+                }
+            };
+        }
+
+        List<string> gitProjectNames = ["SystemTools", _newProjectName];
+        if (_templateModel.UseMenu)
+        {
+            gitProjectNames.Add("ToolsManagement");
+            gitProjectNames.Add("ParametersManagement");
+            gitProjectNames.Add("AppCliTools");
+        }   
+        if (_templateModel.UseDbPartFolderForDatabaseProjects) 
+            gitProjectNames.Add(dbPartProjectsFolderName);
+        if (_templateModel.UseCarcass) 
+            gitProjectNames.Add("BackendCarcass");
+        if (_templateModel.UseDatabase) 
+            gitProjectNames.Add("DatabaseTools");
+        if (_templateModel.UseReact )
+        {
+            gitProjectNames.Add($"{_newProjectName}ClientApp");
+            gitProjectNames.Add("ReactAppCarcass");
+            gitProjectNames.Add("WebSystemTools");
+        }
+        var newProject = new ProjectModel
+        {
+            ServiceName = _newProjectName,
+            UseAlternativeWebAgent = false,
+            ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
+            SolutionFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
+                $"{_newProjectName}.sln"),
+            ProjectSecurityFolderPath =
+                Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
+                    _newProjectName),
+            MainProjectName = _newProjectName,
+            MigrationStartupProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, fakeHostProjectName,
+                $"{fakeHostProjectName}{csProjectExtension}"),
+            MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
+                $"{dbMigrationProjectName}{csProjectExtension}"),
+            SeedProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, seedProjectName,
+                $"{seedProjectName}{csProjectExtension}"),
+            SeedProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeedSecFolderName, $"{seedProjectName}{csProjectExtension}"),
+            GetJsonFromScaffoldDbProjectFileFullName = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, getJsonProjectName,
+                $"{getJsonProjectName}{csProjectExtension}"),
+            GetJsonFromScaffoldDbProjectParametersFileFullName = Path.Combine(scaffoldSeedersWorkFolder,
+                _newProjectName, scaffoldSeedSecFolderName, $"{getJsonProjectName}{csProjectExtension}"),
+            DbContextName = $"{_newProjectName}DbContext",
+            ProjectShortPrefix = _newProjectShortName,
+            DbContextProjectName = $"{_newProjectName}Db",
+            NewDataSeedingClassLibProjectName = $"{_newProjectName}DbNewDataSeeding",
+            ExcludesRulesParametersFilePath = Path.Combine(projectsFolderPathReal, _newProjectName,
+                dbPartProjectsFolderName, $"ExcludesRules{jsonExtension}"),
+            AppSetEnKeysJsonFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
+                _newProjectName, $"appsetenkeys{jsonExtension}"),
+            KeyGuidPart = _newProjectKeyGuidPart,
+            DevDatabaseConnectionParameters = new DatabaseConnectionParameters
+            {
+                DataProvider = EDataProvider.Sql,
+                ConnectionString =
+                    $"Data Source=(local);Initial Catalog={_newProjectName}ProdCopy;Integrated Security=True;Connect Timeout=15"
+            },
+            RedundantFileNames = [appSettingsFileName],
+            GitProjectNames =gitProjectNames,
+            ScaffoldSeederGitProjectNames =
+            [
+                "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools",
+                "ToolsManagement", "WebSystemTools",
+                dbPartProjectsFolderName
+            ],
+            AllowToolsList = [ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase, ETools.SeedData],
+            ServerInfos = serverInfos
+        };
+
+        supportToolsParameters.Projects.Add(_newProjectName, newProject);
+
+        _parametersManager.Save(supportToolsParameters, $"Project {_newProjectName} saved");
+
+        return true;
+    }
+
+    private ServerInfoModel CreateServerInfo(string productionServerName, string productionEnvironmentName,
+        string productionServerWebAgentName, string securityFolder, string appSettingsFileName, string jsonExtension,
+        ServerDataModel serverData, string productionBaseName, string smartSchemaName,
+        string databaseExchangeFileStorageName, string tempLocalPath, string developerDbConnectionName)
+    {
         var serverInfo = new ServerInfoModel
         {
             ServerName = productionServerName,
@@ -254,76 +355,6 @@ internal sealed class ProjectRecordCreator
                 DeveloperSmartSchemaName = smartSchemaName
             }
         };
-
-
-        var newProject = new ProjectModel
-        {
-            ServiceName = _newProjectName,
-            UseAlternativeWebAgent = false,
-            ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
-            SolutionFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
-                $"{_newProjectName}.sln"),
-            ProjectSecurityFolderPath =
-                Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
-                    _newProjectName),
-            MainProjectName = _newProjectName,
-            MigrationStartupProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, fakeHostProjectName,
-                $"{fakeHostProjectName}{csProjectExtension}"),
-            MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
-                $"{dbMigrationProjectName}{csProjectExtension}"),
-            SeedProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, seedProjectName,
-                $"{seedProjectName}{csProjectExtension}"),
-            SeedProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeedSecFolderName, $"{seedProjectName}{csProjectExtension}"),
-            GetJsonFromScaffoldDbProjectFileFullName = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, getJsonProjectName,
-                $"{getJsonProjectName}{csProjectExtension}"),
-            GetJsonFromScaffoldDbProjectParametersFileFullName = Path.Combine(scaffoldSeedersWorkFolder,
-                _newProjectName, scaffoldSeedSecFolderName, $"{getJsonProjectName}{csProjectExtension}"),
-            DbContextName = $"{_newProjectName}DbContext",
-            ProjectShortPrefix = _newProjectShortName,
-            DbContextProjectName = $"{_newProjectName}Db",
-            NewDataSeedingClassLibProjectName = $"{_newProjectName}DbNewDataSeeding",
-            ExcludesRulesParametersFilePath = Path.Combine(projectsFolderPathReal, _newProjectName,
-                dbPartProjectsFolderName, $"ExcludesRules{jsonExtension}"),
-            AppSetEnKeysJsonFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
-                _newProjectName, $"appsetenkeys{jsonExtension}"),
-            KeyGuidPart = _newProjectKeyGuidPart,
-            DevDatabaseConnectionParameters = new DatabaseConnectionParameters
-            {
-                DataProvider = EDataProvider.Sql,
-                ConnectionString =
-                    $"Data Source=(local);Initial Catalog={_newProjectName}ProdCopy;Integrated Security=True;Connect Timeout=15"
-            },
-            RedundantFileNames = new List<string> { appSettingsFileName },
-            GitProjectNames = new List<string>
-            {
-                "BackendCarcass", "SystemTools", "WebSystemTools", $"{_newProjectName}",
-                $"{_newProjectName}ClientApp", "ReactAppCarcass", dbPartProjectsFolderName
-            },
-            ScaffoldSeederGitProjectNames = new List<string>
-            {
-                "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools",
-                "ToolsManagement", "WebSystemTools",
-                dbPartProjectsFolderName
-            },
-            AllowToolsList = new List<ETools>
-                { ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase, ETools.SeedData },
-            ServerInfos = new Dictionary<string, ServerInfoModel>
-            {
-                {
-                    serverInfo.GetItemKey(), serverInfo
-                }
-            }
-        };
-
-        supportToolsParameters.Projects.Add(_newProjectName, newProject);
-
-        _parametersManager.Save(supportToolsParameters, $"Project {_newProjectName} saved");
-
-        return true;
+        return serverInfo;
     }
 }

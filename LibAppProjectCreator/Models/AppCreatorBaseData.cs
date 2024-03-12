@@ -30,9 +30,19 @@ public sealed class AppCreatorBaseData
         //პროექტის ფოლდერი
         var workPath = Path.Combine(workFolderPath, projectName);
 
+        //შევამოწმოთ და თუ არ არსებობს შევქმნათ სამუშაო ფოლდერი
+        if (!StShared.CreateFolder(securityWorkFolderPath, true))
+        {
+            StShared.WriteErrorLine($"Cannot create security Folder {securityWorkFolderPath}", true, logger);
+            return null;
+        }
+
+        //პროექტის ფოლდერი
+        var securityPath = Path.Combine(securityWorkFolderPath, projectName);
+
         //დავიანგარიშოთ სოლუშენის ფოლდერის სრული გზა
         var solutionPath = Path.Combine(workPath, solutionFolderName);
 
-        return new AppCreatorBaseData(workPath, securityWorkFolderPath, solutionPath);
+        return new AppCreatorBaseData(workPath, securityPath, solutionPath);
     }
 }

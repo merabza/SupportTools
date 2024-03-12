@@ -16,6 +16,7 @@ public sealed class TemplateSubMenuCommand : CliMenuCommand
 
     private readonly string _templateName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateSubMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName) :
         base(templateName)
     {

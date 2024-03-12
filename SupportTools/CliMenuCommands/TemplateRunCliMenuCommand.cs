@@ -14,6 +14,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
 {
     private readonly AppProjectCreatorByTemplateToolAction _appProjectCreatorByTemplate;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateRunCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName,
         ETestOrReal testOrReal)
     {

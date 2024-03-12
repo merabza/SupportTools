@@ -145,8 +145,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
             return true;
 
-        var projectRecordCreator =
-            new ProjectRecordCreator(Logger, _parametersManager, projectName, projectShortName, "");
+        var projectRecordCreator = new ProjectRecordCreator(Logger, _parametersManager, templateModel, projectName, projectShortName, "");
 
         if (projectRecordCreator.Create())
             return true;

@@ -39,9 +39,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForExchange),
             parametersManager));
         //---
-        FieldEditors.Add(new InstallerSettingsFieldEditor(logger,
-            nameof(SupportToolsParameters.LocalInstallerSettings),
+        FieldEditors.Add(new InstallerSettingsFieldEditor(logger, nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
+        //AppProjectCreatorAllParameters
         FieldEditors.Add(
             new ApiClientsFieldEditor(logger, nameof(SupportToolsParameters.ApiClients), parametersManager));
         FieldEditors.Add(new GitsFieldEditor(logger, nameof(SupportToolsParameters.Gits), parametersManager));

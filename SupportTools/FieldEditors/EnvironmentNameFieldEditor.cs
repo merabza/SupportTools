@@ -8,6 +8,7 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
 {
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EnvironmentNameFieldEditor(string propertyName,
         IParametersManager parametersManager) : base(propertyName)
     {

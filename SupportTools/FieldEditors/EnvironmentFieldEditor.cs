@@ -11,6 +11,7 @@ public sealed class EnvironmentFieldEditor : FieldEditor<Dictionary<string, stri
 {
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EnvironmentFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, false,
         null, true)
     {

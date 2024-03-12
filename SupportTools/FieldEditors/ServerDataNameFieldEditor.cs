@@ -10,6 +10,7 @@ public sealed class ServerDataNameFieldEditor : FieldEditor<string>
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServerDataNameFieldEditor(ILogger logger, string propertyName, IParametersManager parametersManager) : base(
         propertyName)
     {

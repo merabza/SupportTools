@@ -17,6 +17,7 @@ public sealed class ProjectCreatorSubMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCommand(ILogger logger, ParametersManager parametersManager) : base("Project Creator")
     {
         _logger = logger;
