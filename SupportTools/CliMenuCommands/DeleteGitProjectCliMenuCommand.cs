@@ -16,6 +16,7 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteGitProjectCliMenuCommand(ParametersManager parametersManager, string projectName,
         string gitProjectName, EGitCol gitCol) :
         base(
@@ -56,6 +57,11 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
                 return;
 
             gitProjectNames.Remove(_gitProjectName);
+            if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
+            {
+                StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}",true);
+                return;
+            }
             _parametersManager.Save(parameters,
                 $"Git Project with Name {_gitProjectName} in project {_projectName} deleted.");
 

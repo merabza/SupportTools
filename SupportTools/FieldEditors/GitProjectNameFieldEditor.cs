@@ -14,12 +14,15 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 {
     private readonly string _gitProjectNamesParameterName;
     private readonly IParametersManager _parametersManager;
+    private readonly bool _useNone;
     private readonly string _projectExtension;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectNameFieldEditor(string propertyName, string gitProjectNamesParameterName, string projectExtension,
-        IParametersManager parametersManager) : base(propertyName)
+        IParametersManager parametersManager, bool useNone = false) : base(propertyName)
     {
         _parametersManager = parametersManager;
+        _useNone = useNone;
         _projectExtension = projectExtension;
         _gitProjectNamesParameterName = gitProjectNamesParameterName;
     }
@@ -43,10 +46,18 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
             throw new DataInputEscapeException("List is empty");
 
 
+        if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", "(None)", new CliMenuCommand(), 1);
+
         foreach (var listItem in keys)
             gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatus(listItem), listItem);
 
         var index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
+
+        if (_useNone && index == -1)
+        {
+            SetValue(recordForUpdate, null);
+            return;
+        }
 
         if (index < 0 || index >= keys.Count)
             throw new DataInputException("Selected invalid ID. ");

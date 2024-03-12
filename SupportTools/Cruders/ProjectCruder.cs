@@ -45,9 +45,9 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ScaffoldSeederProjectName)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.DbContextProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager, true));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.NewDataSeedingClassLibProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
+            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager, true));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));

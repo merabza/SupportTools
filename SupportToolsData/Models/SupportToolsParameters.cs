@@ -66,6 +66,24 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return project?.ServerInfos ?? [];
     }
 
+    public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)
+    {
+        var project = GetProject(projectName);
+        if (project is null)
+            return false;
+        switch (gitCol)
+        {
+            case EGitCol.Main:
+                project.GitProjectNames.Remove(gitName);
+                return true;
+            case EGitCol.ScaffoldSeed:
+                project.ScaffoldSeederGitProjectNames.Remove(gitName);
+                return true;
+        }
+
+        return false;
+    }
+
     public Option<List<string>> GetGitProjectNames(string projectName, EGitCol gitCol)
     {
         var project = GetProject(projectName);

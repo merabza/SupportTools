@@ -76,7 +76,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         string? secretsFolderPath;
         //string? tempFolderPath;
         string projectName;
-        string projectShortName;
+        string? projectShortName;
         var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
         switch (_testOrReal)
         {
@@ -85,14 +85,18 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 secretsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Security");
                 //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "Temp");
                 projectName = templateModel.TestProjectName;
-                projectShortName = templateModel.TestProjectShortName;
+                projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
+                    ? templateModel.TestProjectShortName
+                    : null;
                 break;
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
                 secretsFolderPath = parameters.SecretsFolderPathReal;
                 //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "TempReal");
                 projectName = Inputer.InputTextRequired("New project name", "");
-                projectShortName = Inputer.InputTextRequired("New project short name", "");
+                projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
+                    ? Inputer.InputTextRequired("New project short name", "")
+                    : null;
                 break;
             default:
                 throw new Exception("Unknown Test or Real");
@@ -145,7 +149,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
             return true;
 
-        var projectRecordCreator = new ProjectRecordCreator(Logger, _parametersManager, templateModel, projectName, projectShortName, "");
+        var projectRecordCreator =
+            new ProjectRecordCreator(Logger, _parametersManager, templateModel, projectName, projectShortName, "");
 
         if (projectRecordCreator.Create())
             return true;

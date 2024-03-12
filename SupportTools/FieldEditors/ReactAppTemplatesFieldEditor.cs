@@ -13,6 +13,7 @@ public sealed class ReactAppTemplatesFieldEditor : FieldEditor<Dictionary<string
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReactAppTemplatesFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) :
         base(propertyName, false, null, true)
     {

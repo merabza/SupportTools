@@ -12,6 +12,7 @@ public sealed class DatabasesExchangeParametersFieldEditor : FieldEditor<Databas
 
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DatabasesExchangeParametersFieldEditor(ILogger logger, string databasesExchangeParametersName,
         ParametersManager parametersManager) : base(databasesExchangeParametersName, false, null, true)
     {

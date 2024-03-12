@@ -14,6 +14,7 @@ public sealed class ProjectsFieldEditor : FieldEditor<Dictionary<string, Project
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
         propertyName, false, null, true)
     {

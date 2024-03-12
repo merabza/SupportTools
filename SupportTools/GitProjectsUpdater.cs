@@ -32,7 +32,7 @@ public sealed class GitProjectsUpdater
         _gitRepos = gitRepos;
     }
 
-    public List<string> UsedProjectNames { get; } = new();
+    public List<string> UsedProjectNames { get; } = [];
 
     public static GitProjectsUpdater? Create(ILogger logger, IParametersManager parametersManager)
     {
@@ -198,7 +198,7 @@ public sealed class GitProjectsUpdater
 
         var projectRelativePath = Path.GetRelativePath(_gitsFolder, filePath);
         var project = RegisterProject(projectRelativePath, gitName);
-        List<string> dependsOnProjectNames = new();
+        List<string> dependsOnProjectNames = [];
 
         foreach (var element in projectReferences)
         {
