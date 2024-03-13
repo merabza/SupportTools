@@ -14,8 +14,8 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 {
     private readonly string _gitProjectNamesParameterName;
     private readonly IParametersManager _parametersManager;
-    private readonly bool _useNone;
     private readonly string _projectExtension;
+    private readonly bool _useNone;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectNameFieldEditor(string propertyName, string gitProjectNamesParameterName, string projectExtension,

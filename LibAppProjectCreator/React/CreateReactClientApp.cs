@@ -3,6 +3,7 @@ using System.IO;
 using LibAppProjectCreator.JavaScriptCreators;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+
 // ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.React;
@@ -64,7 +65,7 @@ public sealed class CreateReactClientApp
         //  რომელიც შექმნის ReactAppModelsForUse ფოლდერში შესაბამის პროექტს და შემდეგ უკვე იქიდან შესაძლებელი იქნება დაკოპირება.
         //  თუ ამ ნაბიჯის მერეც არ იქნება შესაბამისი ფაილები ReactAppModelsForUse ფოლდერში, მაშინ ვჩერდებით შეცდომის გამოცხადებით
 
-        if (!_reactAppTemplates.TryGetValue(_reactTemplateFolderName, out string? value))
+        if (!_reactAppTemplates.TryGetValue(_reactTemplateFolderName, out var value))
         {
             StShared.WriteErrorLine($"{_reactTemplateFolderName} template does not exists in templates dictionary",
                 true,

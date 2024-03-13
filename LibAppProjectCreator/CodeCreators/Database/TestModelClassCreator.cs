@@ -25,7 +25,8 @@ public sealed class TestModelClassCreator : CodeCreator
             "",
             $"namespace {_projectNamespace}Db.Models",
             "",
-            new OneLineComment("ეს არის სატესტო მოდელი, რომელიც არის უბრალოდ ნიმუშისათვის და შესაძლებელია წაიშალოს საჭირების შემთხვევაში"),
+            new OneLineComment(
+                "ეს არის სატესტო მოდელი, რომელიც არის უბრალოდ ნიმუშისათვის და შესაძლებელია წაიშალოს საჭირების შემთხვევაში"),
             "",
             new CodeBlock($"public sealed class TestModel{(_useCarcass ? "" : " : ItemData")}",
                 new CodeBlock("public int TestId", true, "get", "set"),

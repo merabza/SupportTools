@@ -49,10 +49,11 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
                         "taskSubMenuSet.AddMenuItem(deleteTaskCommand)",
                         "taskSubMenuSet.AddMenuItem(new EditTaskNameCommand(_parametersManager, Name), \"Edit  task Name\")",
                         "taskSubMenuSet.AddMenuItem(new TaskCommand(_logger, _parametersManager, Name), \"Run this task\")",
-                        new OneLineComment("ეს საჭირო იქნება, თუ ამ მენიუში საჭირო გახდება ამოცანის დამატებითი რედაქტორების შექმნა"),
+                        new OneLineComment(
+                            "ეს საჭირო იქნება, თუ ამ მენიუში საჭირო გახდება ამოცანის დამატებითი რედაქტორების შექმნა"),
                         $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
                         "var task = parameters.GetTask(Name)"
-                        ),
+                    ),
                     "var key = ConsoleKey.Escape.Value().ToLower()",
                     "taskSubMenuSet.AddMenuItem(key, \"Exit to Main menu\", new ExitToMainMenuCommand(null, null), key.Length)",
                     "return taskSubMenuSet")

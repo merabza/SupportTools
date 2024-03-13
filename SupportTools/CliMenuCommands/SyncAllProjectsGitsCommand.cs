@@ -1,11 +1,11 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using CliMenu;
 using LibDataInput;
 using LibParameters;
-using SupportToolsData.Models;
-using System;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -44,8 +44,6 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
                 if (scaffoldSeedersWorkFolderSpecified)
                     SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed);
             }
-
-
         }
         catch (DataInputEscapeException)
         {
@@ -82,5 +80,4 @@ public sealed class SyncAllProjectsGitsCommand : CliMenuCommand
             new SyncAllGitsCliMenuCommand(_logger, _parametersManager, projectName, gitCol, false, false);
         syncAllGitsCliMenuCommandMain.Run();
     }
-
 }

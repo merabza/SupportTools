@@ -29,7 +29,8 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
             listsParametersManager));
         FieldEditors.Add(new ServerDataNameFieldEditor(logger,
             nameof(AppProjectCreatorAllParameters.ProductionServerName), listsParametersManager));
-        FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(AppProjectCreatorAllParameters.ProductionEnvironmentName),
+        FieldEditors.Add(new EnvironmentNameFieldEditor(
+            nameof(AppProjectCreatorAllParameters.ProductionEnvironmentName),
             listsParametersManager));
     }
 }

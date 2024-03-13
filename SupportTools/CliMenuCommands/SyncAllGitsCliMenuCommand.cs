@@ -16,9 +16,9 @@ namespace SupportTools.CliMenuCommands;
 public sealed class SyncAllGitsCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
-    private readonly bool _pauseOnFinish;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
+    private readonly bool _pauseOnFinish;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor

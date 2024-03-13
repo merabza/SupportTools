@@ -105,7 +105,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
             throw new InvalidOperationException($"Server does not specified for ApiClient with name {webAgentKey}");
         return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
-
     }
 
     private ApiClientSettings? GetWebAgent(string webAgentKey)

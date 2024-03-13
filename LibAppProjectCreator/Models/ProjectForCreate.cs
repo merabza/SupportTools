@@ -37,7 +37,8 @@ public sealed class ProjectForCreate : ProjectBase
     {
         var projectPath = Path.Combine(createInPath, projectFolderName);
         var projectFileFullName = Path.Combine(projectPath, $"{projectName}.csproj");
-        var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters, projectPath,
+        var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters,
+            projectPath,
             projectFileFullName, classForDelete, useReact, solutionFolderName);
 
         //FoldersForCreate.Add(projectPath);

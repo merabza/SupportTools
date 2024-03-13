@@ -28,8 +28,9 @@ public sealed class ProjectParametersClassCreator : CodeCreator
     {
         var propertiesBlock = new FlatCodeBlock();
         var tasksBlock = new FlatCodeBlock();
-        if (_useDatabase) 
-            propertiesBlock.Add(new CodeBlock("public DatabaseConnectionParameters? DatabaseConnectionParameters", true, "get", "set"));
+        if (_useDatabase)
+            propertiesBlock.Add(new CodeBlock("public DatabaseConnectionParameters? DatabaseConnectionParameters", true,
+                "get", "set"));
 
         if (_useMenu)
         {
