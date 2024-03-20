@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliParametersDataEdit\CliParametersDataEdit.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibFileParameters\LibFileParameters.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ApiClientsManagement\ApiClientsManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\Installer\Installer.csproj" />
   </ItemGroup>
 

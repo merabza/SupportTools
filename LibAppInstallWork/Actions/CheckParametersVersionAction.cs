@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using ApiClientsManagement;
 using Installer.AgentClients;
-using Installer.Domain;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;

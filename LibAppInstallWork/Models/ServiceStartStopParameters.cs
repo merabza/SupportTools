@@ -1,7 +1,7 @@
 //Created by ProjectParametersClassCreator at 5/10/2021 16:03:33
 
 using System;
-using Installer.Domain;
+using ApiClientsManagement;
 using LibParameters;
 using SupportToolsData.Models;
 using SystemToolsShared;

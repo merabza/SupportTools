@@ -1,5 +1,5 @@
-﻿using Installer.AgentClients;
-using Installer.Domain;
+﻿using ApiClientsManagement;
+using Installer.AgentClients;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;

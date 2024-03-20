@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ApiClientsManagement\ApiClientsManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\Installer\Installer.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />

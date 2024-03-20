@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Installer.Domain;
+using ApiClientsManagement;
 using Installer.Models;
 using LanguageExt;
 using LibApiClientParameters;
