@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,7 @@ public sealed class SyncGroupAllProjectsGitsCommand : CliMenuCommand
 
             //პროექტების ჩამონათვალი
             foreach (var kvp in parameters.Projects
-                         .Where(x => parameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+                         .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
                          .OrderBy(o => o.Key))
             {
                 SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main);

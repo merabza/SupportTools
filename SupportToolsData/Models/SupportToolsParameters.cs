@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Installer.Domain;
 using Installer.Models;
 using LanguageExt;
@@ -37,35 +36,35 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? SmartSchemaNameForLocal { get; set; }
     public InstallerSettings? LocalInstallerSettings { get; set; }
     public AppProjectCreatorAllParameters? AppProjectCreatorAllParameters { get; set; }
-    public Dictionary<string, ProjectModel> Projects { get; init; } = new();
-    public Dictionary<string, ServerDataModel> Servers { get; init; } = new();
-    public Dictionary<string, string> RunTimes { get; init; } = new();
-    public Dictionary<string, GitDataModel> Gits { get; init; } = new();
-    public Dictionary<string, string> ReactAppTemplates { get; init; } = new();
-    public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = new();
-    public Dictionary<string, string> Environments { get; set; } = new();
-    public Dictionary<string, ApiClientSettings> ApiClients { get; set; } = new();
-    public Dictionary<string, ArchiverData> Archivers { get; set; } = new();
-    public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; set; } = new();
-    public Dictionary<string, FileStorageData> FileStorages { get; set; } = new();
+    public Dictionary<string, ProjectModel> Projects { get; init; } = [];
+    public Dictionary<string, ServerDataModel> Servers { get; init; } = [];
+    public Dictionary<string, string> RunTimes { get; init; } = [];
+    public Dictionary<string, GitDataModel> Gits { get; init; } = [];
+    public Dictionary<string, string> ReactAppTemplates { get; init; } = [];
+    public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = [];
+    public Dictionary<string, string> Environments { get; init; } = [];
+    public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
+    public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
+    public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
+    public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
+    public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
     public bool CheckBeforeSave()
     {
         return true;
     }
 
-    public Dictionary<string, SmartSchema> SmartSchemas { get; set; } = new();
 
     public string GetUploadTempExtension()
     {
         return UploadTempExtension ?? DefaultUploadFileTempExtension;
     }
 
-    public Dictionary<string, ServerInfoModel> GetServers(string projectName)
-    {
-        var project = GetProject(projectName);
-        return project?.ServerInfos ?? [];
-    }
+    //public Dictionary<string, ServerInfoModel> GetServers(string projectName)
+    //{
+    //    var project = GetProject(projectName);
+    //    return project?.ServerInfos ?? [];
+    //}
 
     public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)
     {
@@ -201,12 +200,12 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         }
     }
 
-    public List<string> GetProjectGroupNames()
-    {
-        return [.. Projects.Select(x => FixProjectGroupName(x.Value.ProjectGroupName)).Distinct().OrderBy(x => x)];
-    }
+    //public List<string> GetProjectGroupNames()
+    //{
+    //    return [.. Projects.Select(x => FixProjectGroupName(x.Value.ProjectGroupName)).Distinct().OrderBy(x => x)];
+    //}
 
-    public string FixProjectGroupName(string? projectGroupName)
+    public static string FixProjectGroupName(string? projectGroupName)
     {
         return string.IsNullOrWhiteSpace(projectGroupName) ? "__No Group__" : projectGroupName;
     }

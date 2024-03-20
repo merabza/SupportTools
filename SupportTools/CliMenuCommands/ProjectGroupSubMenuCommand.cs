@@ -5,8 +5,6 @@ using CliParameters.MenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportTools.Cruders;
-using SupportToolsData;
 using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
@@ -102,7 +100,7 @@ public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
         
         //პროექტების ჩამონათვალი
         foreach (var kvp in parameters.Projects
-                     .Where(x => parameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+                     .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
                      .OrderBy(o => o.Key))
             projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCommand(_logger, _parametersManager, kvp.Key),
                 kvp.Key);
@@ -121,7 +119,7 @@ public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         return parameters.Projects
-            .Count(x => parameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName).ToString();
+            .Count(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName).ToString();
     }
 
 }
