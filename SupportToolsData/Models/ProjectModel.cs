@@ -8,13 +8,14 @@ namespace SupportToolsData.Models;
 
 public sealed class ProjectModel : ItemData
 {
-    public string? ServiceName { get; set; }
+    public string? ServiceName { get; init; }
+    public string? ProjectGroupName { get; init; }
     public string? ProjectDescription { get; set; }
-    public bool UseAlternativeWebAgent { get; set; }
-    public string? ProjectFolderName { get; set; }
-    public string? SolutionFileName { get; set; }
-    public string? ProjectSecurityFolderPath { get; set; }
-    public string? MainProjectName { get; set; }
+    public bool UseAlternativeWebAgent { get; init; }
+    public string? ProjectFolderName { get; init; }
+    public string? SolutionFileName { get; init; }
+    public string? ProjectSecurityFolderPath { get; init; }
+    public string? MainProjectName { get; init; }
     public string? SpaProjectName { get; set; }
     public string? ProgramArchiveDateMask { get; set; }
     public string? ProgramArchiveExtension { get; set; }
@@ -26,22 +27,22 @@ public sealed class ProjectModel : ItemData
     public string? SeedProjectParametersFilePath { get; set; }
     public string? GetJsonFromScaffoldDbProjectFileFullName { get; set; }
     public string? GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
-    public string? DbContextName { get; set; }
-    public string? ProjectShortPrefix { get; set; }
+    public string? DbContextName { get; init; }
+    public string? ProjectShortPrefix { get; init; }
     public string? ScaffoldSeederProjectName { get; set; }
-    public string? DbContextProjectName { get; set; }
-    public string? NewDataSeedingClassLibProjectName { get; set; }
-    public string? ExcludesRulesParametersFilePath { get; set; }
-    public string? AppSetEnKeysJsonFileName { get; set; }
-    public string? KeyGuidPart { get; set; }
+    public string? DbContextProjectName { get; init; }
+    public string? NewDataSeedingClassLibProjectName { get; init; }
+    public string? ExcludesRulesParametersFilePath { get; init; }
+    public string? AppSetEnKeysJsonFileName { get; init; }
+    public string? KeyGuidPart { get; init; }
     public string? MigrationSqlFilesFolder { get; set; }
-    public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; set; }
+    public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; init; }
     public DatabaseConnectionParameters? ProdCopyDatabaseConnectionParameters { get; set; }
-    public List<string> RedundantFileNames { get; set; } = new();
-    public List<string> GitProjectNames { get; set; } = new();
-    public List<string> ScaffoldSeederGitProjectNames { get; set; } = new();
-    public Dictionary<string, ServerInfoModel> ServerInfos { get; set; } = new();
-    public List<ETools> AllowToolsList { get; set; } = new();
+    public List<string> RedundantFileNames { get; init; } = [];
+    public List<string> GitProjectNames { get; init; } = [];
+    public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];
+    public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
+    public List<ETools> AllowToolsList { get; init; } = [];
 
     public bool IsService => !string.IsNullOrWhiteSpace(ServiceName);
 
@@ -51,9 +52,9 @@ public sealed class ProjectModel : ItemData
                throw new InvalidOperationException($"Server with name {serverName} is not exists in project");
     }
 
-    public ServerInfoModel? GetServerInfo(string serverName)
+    private ServerInfoModel? GetServerInfo(string serverName)
     {
-        return !ServerInfos.ContainsKey(serverName) ? null : ServerInfos[serverName];
+        return ServerInfos.GetValueOrDefault(serverName);
     }
 
     public string? MainProjectFolderRelativePath(GitProjects gitProjects)
@@ -75,10 +76,10 @@ public sealed class ProjectModel : ItemData
             : ProjectFolderRelativePath(SpaProjectName, gitProjects);
     }
 
-    public string? SpaProjectFileName(GitProjects gitProjects)
-    {
-        return string.IsNullOrWhiteSpace(SpaProjectName) ? null : ProjectFileName(SpaProjectName, gitProjects);
-    }
+    //public string? SpaProjectFileName(GitProjects gitProjects)
+    //{
+    //    return string.IsNullOrWhiteSpace(SpaProjectName) ? null : ProjectFileName(SpaProjectName, gitProjects);
+    //}
 
     private string? ProjectFileName(string projectName, GitProjects gitProjects)
     {

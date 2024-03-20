@@ -22,6 +22,7 @@ public sealed class ProjectCruder : ParCruder
         "Projects")
     {
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ServiceName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent), false));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveDateMask)));

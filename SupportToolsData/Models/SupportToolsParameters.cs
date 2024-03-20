@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Installer.Domain;
 using Installer.Models;
 using LanguageExt;
@@ -199,4 +200,15 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
                 return null;
         }
     }
+
+    public List<string> GetProjectGroupNames()
+    {
+        return [.. Projects.Select(x => FixProjectGroupName(x.Value.ProjectGroupName)).Distinct().OrderBy(x => x)];
+    }
+
+    public string FixProjectGroupName(string? projectGroupName)
+    {
+        return string.IsNullOrWhiteSpace(projectGroupName) ? "__No Group__" : projectGroupName;
+    }
+
 }

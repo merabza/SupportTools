@@ -60,9 +60,19 @@ public sealed class SupportTools : CliAppLoop
         var syncAllProjectsGits = new SyncAllProjectsGitsCommand(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
-        //პროექტების ჩამონათვალი
-        foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
-            mainMenuSet.AddMenuItem(new ProjectSubMenuCommand(_logger, _parametersManager, kvp.Key), kvp.Key);
+        //პროექტების ჯგუფების ჩამონათვალი
+        foreach (var projectGroupName in parameters.Projects
+                     .Select(x =>
+                         string.IsNullOrWhiteSpace(x.Value.ProjectGroupName)
+                             ? "__No Group__"
+                             : x.Value.ProjectGroupName).Distinct().OrderBy(x => x))
+            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCommand(_logger, _parametersManager, projectGroupName),
+                projectGroupName);
+        
+
+        ////პროექტების ჩამონათვალი
+        //foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
+        //    mainMenuSet.AddMenuItem(new ProjectSubMenuCommand(_logger, _parametersManager, kvp.Key), kvp.Key);
 
         //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
