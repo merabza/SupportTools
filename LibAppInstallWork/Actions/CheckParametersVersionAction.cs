@@ -54,8 +54,8 @@ public sealed class CheckParametersVersionAction(
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient =
-                        new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server, _webAgentForCheck.ApiKey);
+                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                        _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
                         await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
