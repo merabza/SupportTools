@@ -13,6 +13,7 @@ public sealed class ServerInfoSubMenuCommand : CliMenuCommand
     private readonly string _projectName;
     private readonly string _serverName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfoSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         string serverName) : base(serverName)
     {
