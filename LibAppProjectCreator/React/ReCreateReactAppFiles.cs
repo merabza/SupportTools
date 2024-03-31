@@ -60,7 +60,7 @@ public sealed class ReCreateReactAppFiles
 
         var appFolderForDiffFullName = Path.Combine(reactAppModelsForDiffFolderFullName, appName);
 
-        string[] excludes = { ".git", "node_modules" };
+        string[] excludes = [".git", "node_modules"];
 
         if (Directory.Exists(appFolderForDiffFullName))
             FileStat.ClearFolder(appFolderForDiffFullName, excludes);
@@ -72,7 +72,7 @@ public sealed class ReCreateReactAppFiles
         //თუ არა უბრალოდ ვაინიცირებთ და ვაკომიტებთ
 
         var isInsideWorkTreeResult = StShared.RunProcessWithOutput(true, _logger, "git",
-            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", new[] { 128 });
+            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
         if (isInsideWorkTreeResult.IsT1)
             return false;
 
