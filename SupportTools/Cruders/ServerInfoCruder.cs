@@ -30,18 +30,21 @@ public sealed class ServerInfoCruder : ParCruder
         if (project is null)
             throw new ArgumentNullException(nameof(project));
 
-        if (!project.IsService)
-            return;
+
 
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, nameof(ServerInfoModel.ServerName), ParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerInfoModel.WebAgentNameForCheck),
-            ParametersManager));
-        FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
-        FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
+        if (project.IsService)
+        {
+            FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerInfoModel.WebAgentNameForCheck),
+                ParametersManager));
+            FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
+            FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
+            FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
+        }
+
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
-        FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
         FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger,
             nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
     }
