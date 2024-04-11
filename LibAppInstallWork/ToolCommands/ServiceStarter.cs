@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -66,6 +67,9 @@ public sealed class ServiceStarter : ToolCommand
             Logger.LogError("Service {serviceName}/{environmentName} can not started", serviceName, environmentName);
             return false;
         }
+        
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         Logger.LogInformation("Service Started");
 

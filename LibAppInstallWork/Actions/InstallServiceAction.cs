@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
@@ -52,11 +53,6 @@ public sealed class InstallServiceAction : ToolAction
 
     public string? InstallingProgramVersion { get; private set; }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
@@ -80,6 +76,9 @@ public sealed class InstallServiceAction : ToolAction
             _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
             _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
             cancellationToken);
+        
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         if (installServiceResult.IsT1)
         {

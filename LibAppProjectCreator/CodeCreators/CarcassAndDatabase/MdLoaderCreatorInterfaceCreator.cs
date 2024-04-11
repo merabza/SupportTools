@@ -10,6 +10,7 @@ public sealed class MdLoaderCreatorInterfaceCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly string _projectShortName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public MdLoaderCreatorInterfaceCreator(ILogger logger, string placePath, string projectNamespace,
         string projectShortName,
         string? codeFileName = null) : base(logger, placePath, codeFileName)

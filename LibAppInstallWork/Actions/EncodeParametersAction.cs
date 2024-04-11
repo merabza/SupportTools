@@ -38,11 +38,6 @@ public sealed class EncodeParametersAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         EncodedJsonContent = CreateEncodedJson();

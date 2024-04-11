@@ -4,6 +4,7 @@ using System.Linq;
 using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
@@ -47,7 +48,7 @@ public sealed class GitSubMenuCommand : CliMenuCommand
         //თითოული git ნაწილისათვის შემოწმდეს არის თუ არა რამე დასაკომიტებელი, თუ არის, დაკომიტდეს ავტომატური მესიჯის შემოთავაზებით და ახალი მესიჯის შეყვანის საშუალებით
         //მესიჯის შეყვანის შემდეგ გამოვიდეს შეკითხვა გავრცელდეს თუ არა იგივე მესიჯი სხვა დანარჩენ ცვლილებებზე თუ იქნება.
         //გიტის დაკომიტების მერე გაეშვას პული და ბოლოს პუში
-        gitSubMenuSet.AddMenuItem(new SyncAllGitsCliMenuCommand(_logger, _parametersManager, _projectName, _gitCol));
+        gitSubMenuSet.AddMenuItem(new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, _projectName, _gitCol));
 
         if (_gitCol == EGitCol.Main) //მხოლოდ მთავარი ვარიანტისთვის არის შესაძლებელი ახალი გიტის დამატება ამოკლება
         {

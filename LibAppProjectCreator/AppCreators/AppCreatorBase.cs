@@ -5,10 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CodeTools;
-using LibAppProjectCreator.Git;
 using LibAppProjectCreator.Models;
 using LibAppProjectCreator.ProjectFileXmlModifiers;
 using LibDataInput;
+using LibGitWork;
+using LibGitWork.ToolActions;
+using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
 using SupportToolsData.Models;
@@ -34,7 +36,6 @@ public abstract class AppCreatorBase
     protected readonly ILogger Logger;
 
     protected readonly string ProjectName;
-    //protected readonly AppProjectCreatorData Par;
 
 
     protected AppCreatorBase(ILogger logger, string projectName, int indentSize, GitProjects gitProjects,
@@ -43,7 +44,6 @@ public abstract class AppCreatorBase
         Logger = logger;
         ProjectName = projectName;
         _indentSize = indentSize;
-        //Par = par;
         GitProjects = gitProjects;
         _gitRepos = gitRepos;
         WorkPath = workPath;
@@ -117,9 +117,6 @@ public abstract class AppCreatorBase
     public async Task<bool> PrepareParametersAndCreateApp(CancellationToken cancellationToken,
         ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
     {
-        //return PrepareParameters() && CreateApp();
-
-
         if (!PrepareParameters())
         {
             StShared.WriteErrorLine("Solution Parameters does not created", true, Logger);
@@ -331,8 +328,9 @@ public abstract class AppCreatorBase
     {
         var gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
 
-        var gitSyncAll = new GitSyncAll(Logger, WorkPath,
-            _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value));
+        var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
+            new SyncOneProjectAllGitsParameters(WorkPath,
+                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList()));
         return gitSyncAll.Run(CancellationToken.None).Result;
     }
 

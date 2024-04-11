@@ -35,6 +35,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     private readonly bool _useConsole;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ScaffoldSeederCreatorToolCommand(ILogger logger, bool useConsole, ScaffoldSeederCreatorParameters parameters,
         IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters,
         parametersManager, ActionDescription)
@@ -45,11 +46,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(Logger, _useConsole, Parameters);
@@ -58,116 +54,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             StShared.WriteErrorLine("solution does not created", true, Logger);
             return false;
         }
-
-
-        ////თუ არ არსებობს შეიქმნას რეზერვის ფოლდერი სამუშაო ფოლდერის პროექტის ფოლდერში. მაგალითად D:\1WorkScaffoldSeeders\GeoModel\Reserve
-        //const string reserveFolderName = "Reserve";
-        //var scaffoldSeederFolderName = $"{Parameters.ScaffoldSeederProjectName}ScaffoldSeeder";
-        //var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
-        //var projectWorkFolderPath =
-        //    Path.Combine(Parameters.ScaffoldSeedersWorkFolder, Parameters.ScaffoldSeederProjectName);
-        //var projectTempFolderPath =
-        //    Path.Combine(Parameters.TempFolder, Parameters.ScaffoldSeederProjectName);
-        //var reserveFolderFullName = Path.Combine(projectWorkFolderPath, reserveFolderName);
-
-        //var scaffoldSeederFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederFolderName);
-        //var solutionFolderPath = Path.Combine(scaffoldSeederFolderPath, scaffoldSeederFolderName);
-        //var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
-
-        ////var tempScaffoldSeederFolderPath = Path.Combine(projectTempFolderPath, scaffoldSeederFolderName);
-        ////var tempSolutionFolderPath = Path.Combine(tempScaffoldSeederFolderPath, scaffoldSeederFolderName);
-        //var tempSolutionSecurityFolderPath = Path.Combine(projectTempFolderPath, scaffoldSeederSecurityFolderName);
-
-        //var isExistsProjectWorkFolderPath = Directory.Exists(projectWorkFolderPath);
-        //const int indentSize = 4;
-
-        ///////////////////////////////////////////////////////////////////////////////////
-
-        ////შევამოწმოთ არსებობს თუ არა ამ პროექტისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
-        //var checkedProjectWorkFolderPath = FileStat.CreateFolderIfNotExists(projectWorkFolderPath, true);
-        //if (checkedProjectWorkFolderPath is null)
-        //{
-        //    StShared.WriteErrorLine($"does not exists and can not be created work folder {projectWorkFolderPath}", true,
-        //        Logger);
-        //    return false;
-        //}
-
-        ////შევამოწმოთ არსებობს თუ არა სარეზერვო არქივებისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
-        //var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reserveFolderFullName, true);
-        //if (checkedReserveFolderFullPath is null)
-        //{
-        //    StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}", true,
-        //        Logger);
-        //    return false;
-        //}
-
-        ////შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
-        //if (Directory.Exists(scaffoldSeederFolderPath))
-        //    //თუ ფოლდერი არსებობს შევეცადოთ მის დაარქივებას სარეზერვო ფოლდერში
-        //    if (!CompressFolder(scaffoldSeederFolderPath, checkedReserveFolderFullPath))
-        //    {
-        //        StShared.WriteErrorLine($"{scaffoldSeederFolderPath} does not compressed", true, Logger);
-        //        return false;
-        //    }
-
-        ////შევამოწმოთ არსებობს თუ არა სოლუშენის ფოლდერი
-        ////და თუ არსებობს წავშალოთ 
-        ////ToDo აქ გვაქვს გადასაკეთებელი ისე, რომ ეს ფოლდერი კი არ წაიშალოს,
-        ////არამედ მოხდეს სოლუშენის დროებით ფოლდერში შექმნა და შემდეგ არსებულ ფაილებთან და ფოლდერებთან განსხვავების დადგენა და ამ განსხვავების გადმოტანა დროებითი ფოლდერიდან ამ ფოლდერში
-        //if (Directory.Exists(solutionFolderPath))
-        //    Directory.Delete(solutionFolderPath, true);
-
-        ////შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
-        //if (Directory.Exists(solutionSecurityFolderPath))
-        //{
-        //    if (!CompressFolder(solutionSecurityFolderPath, checkedReserveFolderFullPath))
-        //    {
-        //        StShared.WriteErrorLine($"{solutionSecurityFolderPath} does not compressed", true, Logger);
-        //        return false;
-        //    }
-
-        //    //ToDo აქ გვაქვს გადასაკეთებელი ისე, რომ ეს ფოლდერი კი არ წაიშალოს,
-        //    //არამედ მოხდეს შესაბამისი ფაილებისა და ფოლდერების დროებით ფოლდერში შექმნა და შემდეგ არსებულ ფაილებთან და ფოლდერებთან განსხვავების დადგენა და ამ განსხვავების გადმოტანა დროებითი ფოლდერიდან ამ ფოლდერში
-        //    Directory.Delete(solutionSecurityFolderPath, true);
-        //    //ForceDeleteDirectory(solutionSecurityFolderPath);ამან არ იმუშავა
-        //}
-        ///////////////////////////////////////////////////////////////////////////////////
-        ////შეიქმნას პროექტის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
-        //var appCreatorParameters = AppProjectCreatorData.Create(Logger, scaffoldSeederFolderName, "",
-        //    ESupportProjectType.ScaffoldSeeder, scaffoldSeederFolderName, projectWorkFolderPath,
-        //    solutionSecurityFolderPath, Parameters.LogFolder, indentSize);
-
-        ////შევამოწმოთ შეიქმნა თუ არა პარამეტრები და თუ არა, გამოვიტანოთ შეცდომის შესახებ ინფორმაცია
-        //if (appCreatorParameters is null)
-        //{
-        //    Logger.LogError(
-        //        "AppProjectCreatorData does not created for project {Parameters.ScaffoldSeederProjectName} ScaffoldSeeder",
-        //        Parameters.ScaffoldSeederProjectName);
-        //    return false;
-        //}
-
-        ////შეიქმნას აპლიკაციის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
-        //var appCreatorBaseData = AppCreatorBaseData.Create(Logger, appCreatorParameters.WorkFolderPath,
-        //    scaffoldSeederFolderName, appCreatorParameters.SolutionFolderName,
-        //    appCreatorParameters.SecurityWorkFolderPath);
-
-        //if (appCreatorBaseData is null)
-        //{
-        //    StShared.WriteErrorLine("Error when creating Scaffold Seeder Solution Parameters", true, Logger);
-        //    return false;
-        //}
-
-        ////შეიქმნას სკაფოლდ-სიდერის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
-        //var scaffoldSeederCreatorData =
-        //    ScaffoldSeederCreatorData.Create(appCreatorBaseData, scaffoldSeederFolderName, Parameters);
-
-
-        //var scaffoldSeederSolutionCreator = new ScaffoldSeederSolutionCreator(Logger, Parameters,
-        //    scaffoldSeederFolderName, indentSize, scaffoldSeederCreatorData, !isExistsProjectWorkFolderPath);
-
-        //if (!scaffoldSeederSolutionCreator.PrepareParametersAndCreateApp())
-        //    return false;
-
 
         var gitProjectNames = scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
 

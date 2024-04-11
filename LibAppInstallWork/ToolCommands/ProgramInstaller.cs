@@ -17,6 +17,7 @@ public sealed class ProgramInstaller : ToolCommand
     private const string ActionDescription = "Installing Program";
     private readonly bool _useConsole;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramInstaller(ILogger logger, bool useConsole, IParameters parameters,
         IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription)
@@ -25,11 +26,6 @@ public sealed class ProgramInstaller : ToolCommand
     }
 
     private ProgramInstallerParameters Parameters => (ProgramInstallerParameters)Par;
-
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {

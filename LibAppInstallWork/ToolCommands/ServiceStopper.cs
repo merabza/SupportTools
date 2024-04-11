@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:04:08
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -64,6 +65,9 @@ public sealed class ServiceStopper : ToolCommand
             Logger.LogError("Service {serviceName}/{environmentName} can not be stopped", serviceName, environmentName);
             return false;
         }
+        
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         Logger.LogInformation("Service Stopped");
         return true;

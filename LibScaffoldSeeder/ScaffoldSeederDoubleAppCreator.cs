@@ -58,7 +58,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, "",
             ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
             forMain ? _projectWorkFolderPath : _projectTempFolderPath,
-            SolutionSecurityFolderPath, _ssParameters.LogFolder, IndentSize);
+            SolutionSecurityFolderPath, IndentSize);
 
         //შევამოწმოთ შეიქმნა თუ არა პარამეტრები და თუ არა, გამოვიტანოთ შეცდომის შესახებ ინფორმაცია
         if (appCreatorParameters is null)
@@ -129,26 +129,16 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
                 return null;
             }
 
-        ////შევამოწმოთ არსებობს თუ არა სოლუშენის ფოლდერი
-        ////და თუ არსებობს წავშალოთ 
-        ////ToDo აქ გვაქვს გადასაკეთებელი ისე, რომ ეს ფოლდერი კი არ წაიშალოს,
-        ////არამედ მოხდეს სოლუშენის დროებით ფოლდერში შექმნა და შემდეგ არსებულ ფაილებთან და ფოლდერებთან განსხვავების დადგენა და ამ განსხვავების გადმოტანა დროებითი ფოლდერიდან ამ ფოლდერში
-        //if (Directory.Exists(SolutionFolderPath))
-        //    Directory.Delete(SolutionFolderPath, true);
-
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
         if (Directory.Exists(SolutionSecurityFolderPath))
         {
             if (!CompressFolder(SolutionSecurityFolderPath, checkedReserveFolderFullPath))
             {
-                StShared.WriteErrorLine($"{SolutionSecurityFolderPath} does not compressed", true, _logger);
+                StShared.WriteErrorLine($"{SolutionSecurityFolderPath} is not compressed", true, _logger);
                 return null;
             }
 
-            //ToDo აქ გვაქვს გადასაკეთებელი ისე, რომ ეს ფოლდერი კი არ წაიშალოს,
-            //არამედ მოხდეს შესაბამისი ფაილებისა და ფოლდერების დროებით ფოლდერში შექმნა და შემდეგ არსებულ ფაილებთან და ფოლდერებთან განსხვავების დადგენა და ამ განსხვავების გადმოტანა დროებითი ფოლდერიდან ამ ფოლდერში
             Directory.Delete(SolutionSecurityFolderPath, true);
-            //ForceDeleteDirectory(solutionSecurityFolderPath);ამან არ იმუშავა
         }
         ///////////////////////////////////////////////////////////////////////////////////
 
@@ -200,7 +190,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         var excludes = new[] { "*.git*", "*.vs*", "*obj*" };
 
-        if (!archiver.SourcesToArchive(new[] { sourceFolderFullPath }, tempFileName, excludes))
+        if (!archiver.SourcesToArchive([sourceFolderFullPath], tempFileName, excludes))
         {
             File.Delete(tempFileName);
             return false;

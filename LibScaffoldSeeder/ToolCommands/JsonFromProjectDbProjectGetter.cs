@@ -14,6 +14,7 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
     private const string ActionDescription = "Get Json From Project DbProject";
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JsonFromProjectDbProjectGetter(ILogger logger,
         JsonFromProjectDbProjectGetterParameters jsonFromProjectDbProjectGetterParameters,
         IParametersManager parametersManager) : base(logger, ActionName, jsonFromProjectDbProjectGetterParameters,

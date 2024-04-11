@@ -54,11 +54,6 @@ public class CreateServiceInstallScript : ToolAction
         _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var sf = new FileInfo(_scriptFileName);

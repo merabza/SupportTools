@@ -15,17 +15,13 @@ public sealed class VersionChecker : ToolCommand
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public VersionChecker(ILogger logger, CheckVersionParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
     }
 
     private CheckVersionParameters CheckVersionParameters => (CheckVersionParameters)Par;
-
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {

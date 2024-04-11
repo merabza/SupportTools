@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
+using LibGitWork;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -18,7 +19,6 @@ public static class AppCreatorFabric
 
         if (appCreatorBaseData is null)
         {
-            //logger.LogError("appCreatorBaseData does not created for project {projectName}", projectName);
             logger.LogError("appCreatorBaseData does not created");
             return null;
         }
@@ -33,12 +33,18 @@ public static class AppCreatorFabric
             case ESupportProjectType.Api:
                 var apiAppCreatorData =
                     ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData, par.ProjectName, template);
+                if (par.ProjectShortName is null)
+                {
+                    logger.LogError("ProjectShortName is not specified");
+                    return null;
+
+                }
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, par.ProjectShortName, par.ProjectName, par.IndentSize, gitProjects,
                         gitRepos,
                         apiAppCreatorData, workFolder,
                         reactAppTemplates);
-                logger.LogError("apiAppCreatorData does not created");
+                logger.LogError("apiAppCreatorData is not created");
                 return null;
 
             case ESupportProjectType.ScaffoldSeeder:

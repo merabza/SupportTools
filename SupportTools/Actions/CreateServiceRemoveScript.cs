@@ -29,25 +29,20 @@ public class CreateServiceRemoveScript : ToolAction
         _serviceName = serviceName;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var sf = new FileInfo(_scriptFileName);
 
         var code =
-            $$"""
+            $"""
               #!/bin/bash
 
-              # {{sf.Name}}
+              # {sf.Name}
 
-              deployFolder={{_serverSideDeployFolder}}
-              projectName={{_projectName}}
-              ServiceName={{_serviceName}}{{_environmentName}}
-              environmentName={{_environmentName}}
+              deployFolder={_serverSideDeployFolder}
+              projectName={_projectName}
+              ServiceName={_serviceName}{_environmentName}
+              environmentName={_environmentName}
 
               projectInstallFullPath=$deployFolder/$projectName/$environmentName
               ServiceConfigurationFileName=/etc/systemd/system/$ServiceName.service

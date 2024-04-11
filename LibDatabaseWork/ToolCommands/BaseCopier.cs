@@ -29,11 +29,6 @@ public sealed class BaseCopier : ToolCommand
             $"Copy Database from {CopyBaseParameters.SourceDatabaseName} to {CopyBaseParameters.DestinationDatabaseName}";
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         Logger.LogInformation("Create Agent Client for source Database");

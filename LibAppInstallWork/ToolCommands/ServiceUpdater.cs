@@ -23,11 +23,6 @@ public sealed class ServiceUpdater : ToolCommand
 
     private ServiceUpdaterParameters ProgramServiceUpdaterParameters => (ServiceUpdaterParameters)Par;
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;

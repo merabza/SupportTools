@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
@@ -36,11 +37,6 @@ public sealed class InstallParametersAction : ToolAction
         _appSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
@@ -61,6 +57,9 @@ public sealed class InstallParametersAction : ToolAction
         var updateAppParametersFileResult = await agentClient.UpdateAppParametersFile(_projectName, _environmentName,
             _serviceName, Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask,
             _parametersFileExtension, CancellationToken.None);
+
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         if (updateAppParametersFileResult.IsNone)
             return true;

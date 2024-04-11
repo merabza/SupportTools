@@ -20,6 +20,7 @@ public sealed class CorrectNewDatabase : ToolCommand
     private const string ActionDescription = "Correct new Database";
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CorrectNewDatabase(ILogger logger, CorrectNewDbParameters correctNewDbParameters,
         IParametersManager? parametersManager) : base(logger, ActionName, correctNewDbParameters, parametersManager,
         ActionDescription)
@@ -31,7 +32,8 @@ public sealed class CorrectNewDatabase : ToolCommand
     private DbManager GetDbManager()
     {
         var dbKit = ManagerFactory.GetKit(EDataProvider.Sql);
-        var dbm = DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString);
+        // ReSharper disable once using
+        using var dbm = DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString);
         return dbm ?? throw new Exception("Cannot create DbManager");
     }
 
@@ -86,9 +88,10 @@ public sealed class CorrectNewDatabase : ToolCommand
     }
 
 
-    public bool ExecuteCommand(string strCommand)
+    private bool ExecuteCommand(string strCommand)
     {
-        var dbm = GetDbManager();
+        // ReSharper disable once using
+        using var dbm = GetDbManager();
 
         var success = false;
 
@@ -113,18 +116,22 @@ public sealed class CorrectNewDatabase : ToolCommand
 
     private List<ConstraintDataModel> CorrectBitConstraints()
     {
-        var dbm = GetDbManager();
+        // ReSharper disable once using
+        using var dbm = GetDbManager();
         try
         {
-            var query = @"SELECT t.Name as tableName, c.Name as columnName, dc.Name as defaultConstraintName
-FROM sys.tables t
-INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id
-INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id
-INNER JOIN sys.types tt ON c.user_type_id = tt.user_type_id
-WHERE tt.name = N'bit'
-  AND dc.definition = N'(CONVERT([bit],(0)))'";
+            const string query = """
+                                 SELECT t.Name as tableName, c.Name as columnName, dc.Name as defaultConstraintName
+                                 FROM sys.tables t
+                                 INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id
+                                 INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id
+                                 INNER JOIN sys.types tt ON c.user_type_id = tt.user_type_id
+                                 WHERE tt.name = N'bit'
+                                   AND dc.definition = N'(CONVERT([bit],(0)))'
+                                 """;
             dbm.Open();
-            var reader = dbm.ExecuteReader(query);
+            // ReSharper disable once using
+            using var reader = dbm.ExecuteReader(query);
             var fileNames = new List<ConstraintDataModel>();
             while (reader.Read())
                 fileNames.Add(new ConstraintDataModel((string)reader["tableName"],
@@ -142,6 +149,6 @@ WHERE tt.name = N'bit'
             dbm.Close();
         }
 
-        return new List<ConstraintDataModel>();
+        return [];
     }
 }

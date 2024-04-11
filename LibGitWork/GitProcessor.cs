@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
 
-namespace LibAppProjectCreator.Git;
+namespace LibGitWork;
 
 public sealed class GitProcessor
 {

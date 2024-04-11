@@ -31,11 +31,6 @@ public sealed class CheckProgramVersionAction : ToolAction
         _maxTryCount = maxTryCount;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
@@ -57,7 +52,9 @@ public sealed class CheckProgramVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    // ReSharper disable once using
+                    // ReSharper disable once DisposableConstructor
+                    using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                         proxySettings.ApiVersionId, cancellationToken);
@@ -72,7 +69,9 @@ public sealed class CheckProgramVersionAction : ToolAction
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    // ReSharper disable once using
+                    // ReSharper disable once DisposableConstructor
+                    using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
                     var getVersionResult = await testApiClient.GetVersion(cancellationToken);
                     if (getVersionResult.IsT1)
                     {

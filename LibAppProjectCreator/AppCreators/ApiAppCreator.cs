@@ -12,24 +12,24 @@ using LibAppProjectCreator.CodeCreators.PagesCreators;
 using LibAppProjectCreator.JsonCreators;
 using LibAppProjectCreator.Models;
 using LibAppProjectCreator.React;
+using LibGitWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
 using SystemToolsShared;
-
-// ReSharper disable ConvertToPrimaryConstructor
 
 namespace LibAppProjectCreator.AppCreators;
 
 public sealed class ApiAppCreator : AppCreatorBase
 {
     private readonly ApiAppCreatorData _apiAppCreatorData;
-    private readonly string? _projectShortName;
+    private readonly string _projectShortName;
     private readonly Dictionary<string, string> _reactAppTemplates;
 
     private readonly string _workFolder;
 
-    public ApiAppCreator(ILogger logger, string? projectShortName, string projectName, int indentSize,
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
         GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData, string workFolder,
         Dictionary<string, string> reactAppTemplates) : base(logger, projectName, indentSize, gitProjects, gitRepos,
         apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
@@ -348,7 +348,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
         Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
         var testModelClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName!,
+            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             masterDataRepositoryClassFileName);
         testModelClassCreator.CreateFileStructure();
 
@@ -358,7 +358,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             "TestQuery.cs");
         testQueryClassCreator.CreateFileStructure();
 
-        var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName!.Capitalize()}MdLoaderCreator.cs";
+        var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName.Capitalize()}MdLoaderCreator.cs";
         Console.WriteLine($"Creating {mdLoaderCreatorInterfaceFileName}...");
         var mdLoaderCreatorInterfaceCreator = new MdLoaderCreatorInterfaceCreator(Logger,
             _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
@@ -467,7 +467,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating RepositoriesInstaller.cs...");
         var repositoriesInstallerClassCreator = new RepositoriesInstallerClassCreator(Logger, installersPath,
-            ProjectName, _projectShortName!, "RepositoriesInstaller.cs");
+            ProjectName, _projectShortName, "RepositoriesInstaller.cs");
         repositoriesInstallerClassCreator.CreateFileStructure();
     }
 

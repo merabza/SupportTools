@@ -21,6 +21,7 @@
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />
+    <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibScaffoldSeeder\LibScaffoldSeeder.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

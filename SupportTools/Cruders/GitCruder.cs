@@ -4,7 +4,7 @@ using System.Linq;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
-using LibAppProjectCreator.Git;
+using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;

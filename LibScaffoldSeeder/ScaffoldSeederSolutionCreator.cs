@@ -20,6 +20,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     private readonly ScaffoldSeederCreatorParameters _par;
     private readonly ScaffoldSeederCreatorData _scaffoldSeederCreatorData;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ScaffoldSeederSolutionCreator(ILogger logger,
         ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, string projectName, int indentSize,
         ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(logger, projectName, indentSize,

@@ -1,7 +1,7 @@
 ﻿using System;
 using DbTools;
-using LibAppProjectCreator.Models;
 using LibFileParameters.Models;
+using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
@@ -56,10 +56,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public EDataProvider ProdCopyDatabaseDataProvider { get; }
     public string ProdCopyDatabaseConnectionString { get; }
     public string NewDataSeedingClassLibProjectName { get; }
-
     public SmartSchema SmartSchemaForLocal { get; }
-
-    //public SmartSchemas SmartSchemas { get; set; }
     public GitProjects GitProjects { get; }
     public GitRepos GitRepos { get; }
     public string ExcludesRulesParametersFilePath { get; }
@@ -67,10 +64,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public string CreateProjectSeederCodeProjectName => $"Create{ScaffoldSeederProjectName}SeederCode";
     public string GetJsonFromScaffoldDbProjectName => $"GetJsonFromScaffold{MainDatabaseProjectName}";
     public string SeedDbProjectName => $"Seed{MainDatabaseProjectName}";
-
-    //public string FakeHostProjectName => "FakeHost";
     public string FakeHostProjectName { get; }
-
     public string DataSeedingClassLibProjectName => $"{MainDatabaseProjectName}DataSeeding";
     public string DbMigrationProjectName => $"{MainDatabaseProjectName}Migration";
 
@@ -83,12 +77,6 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public static ScaffoldSeederCreatorParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
         string projectName)
     {
-        //SettingsGetter settingsGetter = new SettingsGetter(supportToolsParameters, projectName, null);
-        //if (!settingsGetter.Run(false, false, false, true, false))
-        //    return null;
-
-        //ProjectModel project = settingsGetter.Project;
-
         try
         {
             if (string.IsNullOrWhiteSpace(supportToolsParameters.LogFolder))
@@ -190,12 +178,6 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                     true);
                 return null;
             }
-
-            //if (string.IsNullOrWhiteSpace(project.MigrationSqlFilesFolder))
-            //{
-            //    StShared.WriteErrorLine($"MigrationSqlFilesFolder does not specified for Project {projectName}", true);
-            //    return null;
-            //}
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,

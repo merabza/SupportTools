@@ -34,11 +34,6 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         _uploadSmartSchema = uploadSmartSchema;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))

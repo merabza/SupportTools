@@ -10,17 +10,13 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ApplicationSettingsEncoder : ToolCommand
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ApplicationSettingsEncoder(ILogger logger, AppSettingsEncoderParameters appsetenParameters,
         IParametersManager parametersManager) : base(logger, "Encode Settings", appsetenParameters, parametersManager)
     {
     }
 
     private AppSettingsEncoderParameters AppsetenParameters => (AppSettingsEncoderParameters)Par;
-
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {

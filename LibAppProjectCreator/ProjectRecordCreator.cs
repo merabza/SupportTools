@@ -17,14 +17,14 @@ internal sealed class ProjectRecordCreator
     private readonly ILogger _logger;
     private readonly string _newProjectKeyGuidPart;
     private readonly string _newProjectName;
-    private readonly string _newProjectShortName;
+    private readonly string? _newProjectShortName;
 
     private readonly IParametersManager _parametersManager;
     private readonly TemplateModel _templateModel;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, TemplateModel templateModel,
-        string newProjectName, string newProjectShortName, string newProjectKeyGuidPart)
+        string newProjectName, string? newProjectShortName, string newProjectKeyGuidPart)
     {
         _logger = logger;
         _parametersManager = parametersManager;

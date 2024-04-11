@@ -8,6 +8,7 @@ namespace LibDatabaseWork.Models;
 
 public sealed class CopyBaseParameters : IParameters
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CopyBaseParameters(IDatabaseApiClient agentClientForSource,
         IDatabaseApiClient agentClientForDestination, FileManager? exchangeFileManager,
         FileManager sourceFileManager, FileManager destinationFileManager, FileManager localFileManager,

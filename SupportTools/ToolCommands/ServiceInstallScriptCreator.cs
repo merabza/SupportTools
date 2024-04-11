@@ -19,6 +19,7 @@ public class ServiceInstallScriptCreator : ToolCommand
     private const string ActionDescription = "Creating Service Install Script";
     private readonly ServiceInstallScriptCreatorParameters _par;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServiceInstallScriptCreator(ILogger logger, ServiceInstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {

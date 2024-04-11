@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -13,6 +14,7 @@ public sealed class ProgramRemover : ToolCommand
     private const string ActionDescription = "Remove App";
     private readonly ServiceStartStopParameters _parameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramRemover(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
@@ -45,6 +47,9 @@ public sealed class ProgramRemover : ToolCommand
         if (await agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
                 CancellationToken.None))
             return true;
+
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         Logger.LogError("Project {projectName} can not removed", projectName);
         return false;

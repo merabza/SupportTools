@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using LibAppProjectCreator.Git;
-using LibAppProjectCreator.Models;
 using LibDataInput;
+using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Domain;
@@ -164,9 +163,11 @@ public sealed class GitProjectsUpdater
             }
             //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
 
-            if (gitProcessor.GetGitState() == GitState.NeedToPull)
-                if (!gitProcessor.Pull())
-                    return false;
+            if (gitProcessor.GetGitState() != GitState.NeedToPull) 
+                return true;
+
+            if (!gitProcessor.Pull())
+                return false;
         }
 
         return true;

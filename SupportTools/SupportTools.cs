@@ -5,6 +5,7 @@ using CliParameters.MenuCommands;
 using CliTools;
 using CliTools.Commands;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
@@ -57,7 +58,7 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(importProjectCommand);
 
         //ყველა პროექტის git-ის სინქრონიზაცია
-        var syncAllProjectsGits = new SyncAllProjectsGitsCommand(_logger, _parametersManager);
+        var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
         //პროექტების ჯგუფების ჩამონათვალი

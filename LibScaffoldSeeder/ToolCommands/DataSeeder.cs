@@ -11,6 +11,7 @@ public sealed class DataSeeder : ToolCommand
 {
     private readonly DataSeederParameters _parameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DataSeeder(ILogger logger, DataSeederParameters parameters) : base(logger, "Data Seeder", parameters, null,
         "Seeds data from existing Json files")
     {

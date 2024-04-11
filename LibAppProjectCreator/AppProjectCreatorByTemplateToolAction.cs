@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppProjectCreator.Models;
 using LibDataInput;
+using LibGitWork;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -29,11 +30,6 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         _parametersManager = parametersManager;
         _templateName = templateName;
         _testOrReal = testOrReal;
-    }
-
-    protected override bool CheckValidate()
-    {
-        return true;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
@@ -105,8 +101,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         projectName = projectName.ToNormalClassName();
 
         var par = AppProjectCreatorData.Create(Logger, projectName, projectShortName, templateModel.SupportProjectType,
-            projectName, projectsFolderPath, secretsFolderPath, supportToolsParameters.LogFolder,
-            parameters.IndentSize);
+            projectName, projectsFolderPath, secretsFolderPath, parameters.IndentSize);
 
         if (par is null)
         {

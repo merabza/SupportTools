@@ -23,11 +23,6 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
         _parametersManager = parametersManager;
     }
 
-    protected override string GetActionDescription()
-    {
-        return Name!;
-    }
-
     protected override void RunAction()
     {
         MenuAction = EMenuAction.Reload;

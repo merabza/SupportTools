@@ -3,35 +3,53 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDataInput;
+using LibGitWork.ToolCommandParameters;
+using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SupportToolsData.Domain;
+using SupportToolsData;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppProjectCreator.Git;
+namespace LibGitWork.ToolActions;
 
-public sealed class GitSync : ToolAction
+public sealed class GitSyncToolAction : ToolAction
 {
+    private readonly GitSyncParameters _gitSyncParameters;
     private readonly bool _askCommitMessage;
-    private readonly GitDataDomain _gitData;
-    private readonly string _gitsFolder;
 
-    public GitSync(ILogger logger, string gitsFolder, GitDataDomain gitData, string? commitMessage = null,
+    public GitSyncToolAction(ILogger logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
         bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
     {
-        _gitsFolder = gitsFolder;
-        _gitData = gitData;
+        _gitSyncParameters = gitSyncParameters;
         _askCommitMessage = askCommitMessage;
         UsedCommitMessage = commitMessage;
     }
+
+    public static GitSyncToolAction? Create(ILogger logger, ParametersManager parametersManager,
+        string projectName, EGitCol gitCol, string gitProjectName)
+    {
+        var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
+        var gitSyncParameters =
+            GitSyncParameters.Create(logger, supportToolsParameters, projectName, gitCol, gitProjectName);
+        
+        if (gitSyncParameters is not null) 
+            return new GitSyncToolAction(logger, gitSyncParameters);
+        
+        StShared.WriteErrorLine("GitSyncParameters is not created", true);
+        return null;
+
+    }
+
+
 
     public string? UsedCommitMessage { get; private set; }
 
     protected override bool CheckValidate()
     {
-        if (!string.IsNullOrWhiteSpace(_gitsFolder))
+        if (!string.IsNullOrWhiteSpace(_gitSyncParameters.GitsFolder))
             return true;
         StShared.WriteErrorLine("Project Folder Name not found.", true);
         return false;
@@ -39,10 +57,10 @@ public sealed class GitSync : ToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var projectFolderName = Path.Combine(_gitsFolder, _gitData.GitProjectFolderName);
+        var projectFolderName = Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, Logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
-            return Task.FromResult(gitProcessor.Clone(_gitData.GitProjectAddress));
+            return Task.FromResult(gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
@@ -70,7 +88,7 @@ public sealed class GitSync : ToolAction
 
         var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
-        if (remoteOriginUrl != _gitData.GitProjectAddress)
+        if (remoteOriginUrl != _gitSyncParameters.GitData.GitProjectAddress)
         {
             StShared.WriteErrorLine($"Git is not valid. folder: {projectFolderName}.", true, Logger);
             return Task.FromResult(false);
@@ -109,6 +127,5 @@ public sealed class GitSync : ToolAction
 
         return Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
 
-        //მოხდეს ამ Git პროექტის დაკლონვა
     }
 }

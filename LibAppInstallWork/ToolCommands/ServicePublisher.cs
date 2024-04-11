@@ -27,11 +27,6 @@ public sealed class ServicePublisher : ToolCommand
 
     private ProgramPublisherParameters ProgramPublisherParameters => (ProgramPublisherParameters)Par;
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში

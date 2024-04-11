@@ -20,7 +20,7 @@ namespace SupportTools;
 public static class ToolCommandFabric
 {
     public static readonly ETools[] ToolsByProjects =
-    {
+    [
         ETools.CorrectNewDatabase,
         ETools.CreateDevDatabaseByMigration,
         ETools.DropDevDatabase,
@@ -29,10 +29,10 @@ public static class ToolCommandFabric
         ETools.RecreateDevDatabase,
         ETools.ScaffoldSeederCreator,
         ETools.SeedData
-    };
+    ];
 
     public static readonly ETools[] ToolsByProjectsAndServers =
-    {
+    [
         ETools.AppSettingsEncoder,
         ETools.AppSettingsInstaller,
         ETools.AppSettingsUpdater,
@@ -47,7 +47,7 @@ public static class ToolCommandFabric
         ETools.ServiceStarter,
         ETools.ServiceStopper,
         ETools.VersionChecker
-    };
+    ];
 
     public static IToolCommand? Create(ILogger logger, ETools tool, IParametersManager parametersManager,
         string projectName)

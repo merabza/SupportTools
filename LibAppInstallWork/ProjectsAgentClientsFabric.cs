@@ -19,6 +19,8 @@ public static class ProjectsAgentClientsFabric
         }
 
         if (installerBaseParameters.WebAgentForInstall is not null)
+            //+
+            // ReSharper disable once DisposableConstructor
             return new ProjectsApiClientWithFileStorage(logger, installerBaseParameters.WebAgentForInstall.Server,
                 installerBaseParameters.WebAgentForInstall.ApiKey,
                 installerBaseParameters.WebAgentForInstall.WithMessaging);
@@ -40,6 +42,8 @@ public static class ProjectsAgentClientsFabric
         }
 
         if (programUpdaterWebAgent is not null)
+            //+
+            // ReSharper disable once DisposableConstructor
             return new ProjectsApiClient(logger, programUpdaterWebAgent.Server, programUpdaterWebAgent.ApiKey,
                 programUpdaterWebAgent.WithMessaging);
         if (!string.IsNullOrWhiteSpace(installFolder))

@@ -11,15 +11,11 @@ public sealed class JetBrainsCleanupCodeRunner : ToolCommand
 {
     private readonly JetBrainsCleanupCodeRunnerParameters _parameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JetBrainsCleanupCodeRunner(ILogger logger, JetBrainsCleanupCodeRunnerParameters parameters) : base(logger,
         "jb CleanupCode", parameters, null, "Jet Brains Cleanup Code Runner")
     {
         _parameters = parameters;
-    }
-
-    protected override bool CheckValidate()
-    {
-        return true;
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)

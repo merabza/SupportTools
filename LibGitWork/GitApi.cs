@@ -3,7 +3,7 @@ using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppProjectCreator.Git;
+namespace LibGitWork;
 
 public sealed class GitApi
 {

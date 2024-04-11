@@ -15,7 +15,7 @@ try
     //პროგრამის ატრიბუტების დაყენება 
     ProgramAttributes.Instance.SetAttribute("AppName", "Support Tools");
 
-    IArgumentsParser argParser = new ArgumentsParser<SupportToolsParameters>(args, "SupportTools", null);
+    var argParser = new ArgumentsParser<SupportToolsParameters>(args, "SupportTools", null);
     switch (argParser.Analysis())
     {
         case EParseResult.Ok: break;
@@ -34,19 +34,20 @@ try
 
     var parametersFileName = argParser.ParametersFileName;
     ServicesCreator servicesCreator = new(par.LogFolder, null, "SupportTools");
-    var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information);
-
-    if (serviceProvider == null)
+    using (var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information))
     {
-        Console.WriteLine("Logger not created");
-        return 8;
-    }
+        if (serviceProvider == null)
+        {
+            Console.WriteLine("Logger not created");
+            return 8;
+        }
 
-    logger = serviceProvider.GetService<ILogger<Program>>();
-    if (logger is null)
-    {
-        StShared.WriteErrorLine("logger is null", true);
-        return 3;
+        logger = serviceProvider.GetService<ILogger<Program>>();
+        if (logger is null)
+        {
+            StShared.WriteErrorLine("logger is null", true);
+            return 3;
+        }
     }
 
     SupportTools.SupportTools supportTools = new(logger, new ParametersManager(parametersFileName, par));

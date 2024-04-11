@@ -52,11 +52,6 @@ public sealed class CreatePackageAndUpload : ToolAction
 
     public string? AssemblyVersion { get; private set; }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))

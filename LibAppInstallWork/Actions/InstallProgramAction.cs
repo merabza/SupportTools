@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
@@ -39,11 +40,6 @@ public sealed class InstallProgramAction : ToolAction
         _environmentName = environmentName;
     }
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
@@ -65,6 +61,10 @@ public sealed class InstallProgramAction : ToolAction
         var installProgramResult = await agentClient.InstallProgram(_projectName, _environmentName,
             _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
+
+                
+        if (agentClient is IDisposable disposable)
+            disposable.Dispose();
 
         if (installProgramResult.IsT1)
         {

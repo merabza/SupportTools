@@ -2,6 +2,7 @@
 using System.Linq;
 using CliMenu;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
@@ -81,7 +82,7 @@ public sealed class SyncGroupAllProjectsGitsCommand : CliMenuCommand
         }
 
         var syncAllGitsCliMenuCommandMain =
-            new SyncAllGitsCliMenuCommand(_logger, _parametersManager, projectName, gitCol, false, false);
+            new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, projectName, gitCol, false);
         syncAllGitsCliMenuCommandMain.Run();
     }
 

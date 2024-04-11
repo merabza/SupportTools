@@ -27,11 +27,6 @@ public sealed class AppSettingsUpdater : ToolCommand
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var appSettingsEncoderParameters =

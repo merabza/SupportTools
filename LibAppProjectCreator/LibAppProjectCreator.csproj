@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
+    <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 

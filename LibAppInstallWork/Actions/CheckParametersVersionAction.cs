@@ -28,11 +28,6 @@ public sealed class CheckParametersVersionAction(
 
     private readonly ApiClientSettingsDomain _webAgentForCheck = webAgentForCheck;
 
-    protected override bool CheckValidate()
-    {
-        return true;
-    }
-
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
@@ -54,7 +49,9 @@ public sealed class CheckParametersVersionAction(
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    // ReSharper disable once using
+                    // ReSharper disable once DisposableConstructor
+                    using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
                         await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
@@ -70,7 +67,9 @@ public sealed class CheckParametersVersionAction(
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    // ReSharper disable once using
+                    // ReSharper disable once DisposableConstructor
+                    using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                     {

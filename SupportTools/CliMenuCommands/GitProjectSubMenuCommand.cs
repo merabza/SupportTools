@@ -2,6 +2,7 @@
 using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
@@ -50,7 +51,7 @@ public sealed class GitProjectSubMenuCommand : CliMenuCommand
 
         //gitCruder.FillDetailsSubMenu(gitProjectSubMenuSet, _gitProjectName);
 
-        gitProjectSubMenuSet.AddMenuItem(new SyncGitCliMenuCommand(_logger, _parametersManager, _projectName,
+        gitProjectSubMenuSet.AddMenuItem(new GitSyncCliMenuCommand(_logger, _parametersManager, _projectName,
             _gitProjectName, _gitCol));
 
         //პროექტის მენიუში დაბრუნება

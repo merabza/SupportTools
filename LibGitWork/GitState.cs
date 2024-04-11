@@ -1,4 +1,4 @@
-﻿namespace LibAppProjectCreator.Git;
+﻿namespace LibGitWork;
 
 public enum GitState
 {

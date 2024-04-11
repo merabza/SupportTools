@@ -5,7 +5,7 @@ using SupportToolsData.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
-namespace LibAppProjectCreator.Models;
+namespace LibGitWork;
 
 public sealed class GitRepos
 {
@@ -20,7 +20,7 @@ public sealed class GitRepos
     public static GitRepos Create(ILogger logger, Dictionary<string, GitDataModel> gitRepos,
         string? mainProjectFolderRelativePath, string? spaProjectFolderRelativePath)
     {
-        Dictionary<string, GitDataDomain> gits = new();
+        Dictionary<string, GitDataDomain> gits = [];
         foreach (var kvp in gitRepos)
         {
             if (string.IsNullOrWhiteSpace(kvp.Value.GitProjectAddress))
@@ -62,6 +62,6 @@ public sealed class GitRepos
 
     public GitDataDomain? GetGitRepoByKey(string key)
     {
-        return Gits.ContainsKey(key) ? Gits[key] : null;
+        return Gits.GetValueOrDefault(key);
     }
 }
