@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsData;
 using SystemToolsShared;
+using System.Collections.Generic;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -25,11 +26,11 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     }
 
     public static SyncOneProjectAllGitsToolAction? Create(ILogger logger, ParametersManager parametersManager,
-        string projectName, EGitCol gitCol)
+        string projectName, EGitCol gitCol, List<string>? changedGitProjects, EGitCollect? gitCollect)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var gitSyncAllParameters =
-            SyncOneProjectAllGitsParameters.Create(logger, supportToolsParameters, projectName, gitCol);
+        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(logger, supportToolsParameters, projectName,
+            gitCol, changedGitProjects, gitCollect);
 
 
         if (gitSyncAllParameters is not null)
@@ -45,10 +46,14 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         string? commitMessage = null;
         foreach (var gitData in _syncOneProjectAllGitsParameters.GitData.OrderBy(x => x.GitProjectFolderName))
         {
+            if (_syncOneProjectAllGitsParameters is { GitCollect: EGitCollect.Usage, ChangedGitProjects: not null } &&
+                !_syncOneProjectAllGitsParameters.ChangedGitProjects.Contains(gitData.GitProjectFolderName))
+                continue;
             var gitSync = new GitSyncToolAction(Logger, new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder),
                 commitMessage, commitMessage == null);
             await gitSync.Run(cancellationToken);
             commitMessage = gitSync.UsedCommitMessage;
+            _syncOneProjectAllGitsParameters.ChangedGitProjects?.Add(gitData.GitProjectFolderName);
         }
 
         return true;

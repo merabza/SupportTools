@@ -24,7 +24,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommand : CliMenuCommand
         MenuAction = EMenuAction.Reload;
 
         var syncOneProjectAllGitsToolAction =
-            SyncAllProjectsAllGitsToolAction.Create(_logger, _parametersManager);
+            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null);
         syncOneProjectAllGitsToolAction.Run(CancellationToken.None).Wait();
 
         //StShared.Pause();

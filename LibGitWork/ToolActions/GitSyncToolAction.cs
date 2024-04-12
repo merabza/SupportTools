@@ -19,6 +19,9 @@ public sealed class GitSyncToolAction : ToolAction
 {
     private readonly GitSyncParameters _gitSyncParameters;
     private readonly bool _askCommitMessage;
+    public bool Changed { get; private set; }
+    public string? UsedCommitMessage { get; private set; }
+
 
     public GitSyncToolAction(ILogger logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
         bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
@@ -45,7 +48,6 @@ public sealed class GitSyncToolAction : ToolAction
 
 
 
-    public string? UsedCommitMessage { get; private set; }
 
     protected override bool CheckValidate()
     {
@@ -125,7 +127,10 @@ public sealed class GitSyncToolAction : ToolAction
             UsedCommitMessage =
                 Inputer.InputTextRequired("Message", UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
-        return Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
+        // ReSharper disable once using
+        var result = Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
+        Changed = true;
+        return result;
 
     }
 }

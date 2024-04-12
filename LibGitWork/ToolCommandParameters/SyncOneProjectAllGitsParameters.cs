@@ -12,13 +12,17 @@ namespace LibGitWork.ToolCommandParameters;
 public class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsParameters(string gitsFolder, List<GitDataDomain> gitData)
+    public SyncOneProjectAllGitsParameters(string gitsFolder, List<GitDataDomain> gitData, List<string>? changedGitProjects, EGitCollect? gitCollect)
     {
         GitData = gitData;
+        ChangedGitProjects = changedGitProjects;
+        GitCollect = gitCollect;
         GitsFolder = gitsFolder;
     }
 
     public List<GitDataDomain> GitData { get; }
+    public List<string>? ChangedGitProjects { get; }
+    public EGitCollect? GitCollect { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()
@@ -28,7 +32,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
 
     public static SyncOneProjectAllGitsParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, EGitCol gitCol)
+        string projectName, EGitCol gitCol, List<string>? changedGitProjects, EGitCollect? gitCollect)
     {
 
         var project = supportToolsParameters.GetProject(projectName);
@@ -71,7 +75,8 @@ public class SyncOneProjectAllGitsParameters : IParameters
         }
 
         return new SyncOneProjectAllGitsParameters(gitsFolder,
-            gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList());
+            gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), changedGitProjects,
+            gitCollect);
 
     }
 }

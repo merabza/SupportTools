@@ -28,7 +28,7 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
         MenuAction = EMenuAction.Reload;
 
         var syncOneGroupAllProjectsGitsToolAction =
-            SyncOneGroupAllProjectsGitsToolAction.Create(_logger, _parametersManager, _projectGroupName);
+            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, _projectGroupName);
         syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Wait();
 
     }

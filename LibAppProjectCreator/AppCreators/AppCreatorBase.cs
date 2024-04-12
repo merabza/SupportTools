@@ -330,7 +330,7 @@ public abstract class AppCreatorBase
 
         var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
             new SyncOneProjectAllGitsParameters(WorkPath,
-                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList()));
+                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), null, null));
         return gitSyncAll.Run(CancellationToken.None).Result;
     }
 
