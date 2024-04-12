@@ -10,6 +10,7 @@ public sealed class ServerDatabasesExchangeParametersManager : IParametersManage
     private readonly IParametersManager _parentParametersManager;
     private readonly object _record;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServerDatabasesExchangeParametersManager(IParameters parameters,
         IParametersManager parentParametersManager, FieldEditor<DatabasesExchangeParameters> fieldEditor,
         object record)
