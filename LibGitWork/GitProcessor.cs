@@ -190,7 +190,7 @@ fi*/
 
     public bool IsGitInitialized()
     {
-        return StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} rev-parse").IsNone;
+        return StShared.RunProcess(false, _logger, "git", $"-C {_projectPath} rev-parse").IsNone;
     }
 
     private bool Push()
