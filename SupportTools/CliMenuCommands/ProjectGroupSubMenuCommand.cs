@@ -3,6 +3,7 @@ using System.Linq;
 using CliMenu;
 using CliParameters.MenuCommands;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
@@ -58,7 +59,7 @@ public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
 
         
         //ყველა პროექტის git-ის სინქრონიზაცია
-        var syncGroupAllProjectsGits = new SyncGroupAllProjectsGitsCommand(_logger, _parametersManager, _projectGroupName);
+        var syncGroupAllProjectsGits = new SyncOneGroupAllProjectsGitsCliMenuCommand(_logger, _parametersManager, _projectGroupName);
         projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGits);
 
 

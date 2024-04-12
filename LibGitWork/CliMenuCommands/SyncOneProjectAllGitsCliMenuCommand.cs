@@ -4,7 +4,6 @@ using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
-using SystemToolsShared;
 
 namespace LibGitWork.CliMenuCommands;
 
@@ -32,7 +31,7 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
         var syncOneProjectAllGitsToolAction =
             SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, _projectName, _gitCol);
         syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
-        StShared.Pause();
+        //StShared.Pause();
 
     }
 }

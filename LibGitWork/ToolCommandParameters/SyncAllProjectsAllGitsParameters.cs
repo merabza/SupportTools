@@ -11,7 +11,8 @@ public class SyncAllProjectsAllGitsParameters : IParameters
     public string? ScaffoldSeedersWorkFolder { get; }
     public Dictionary<string, ProjectModel> Projects { get; }
 
-    private SyncAllProjectsAllGitsParameters(string? scaffoldSeedersWorkFolder, Dictionary<string, ProjectModel> projects)
+    private SyncAllProjectsAllGitsParameters(string? scaffoldSeedersWorkFolder,
+        Dictionary<string, ProjectModel> projects)
     {
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
         Projects = projects;
@@ -30,10 +31,8 @@ public class SyncAllProjectsAllGitsParameters : IParameters
             StShared.WriteWarningLine("ScaffoldSeedersWorkFolder is not specified", true);
         }
 
-        return new SyncAllProjectsAllGitsParameters(supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.Projects);
+        return new SyncAllProjectsAllGitsParameters(supportToolsParameters.ScaffoldSeedersWorkFolder,
+            supportToolsParameters.Projects);
 
     }
-
-
-
 }
