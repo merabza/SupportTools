@@ -50,6 +50,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
         var changedGitProjects = new List<string>();
         foreach (var gitCollect in Enum.GetValues<EGitCollect>())
         {
+            Console.WriteLine($"---==={gitCollect}===---");
             //პროექტების ჩამონათვალი
             foreach (var kvp in projectsListOrdered)
             {
@@ -57,6 +58,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
                 if (_syncMultipleProjectsGitsParameters.ScaffoldSeedersWorkFolder is not null)
                     SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects, gitCollect);
             }
+            Console.WriteLine("---===---------===---");
         }
 
         return Task.FromResult(true);

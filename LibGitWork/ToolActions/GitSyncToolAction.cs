@@ -120,6 +120,8 @@ public sealed class GitSyncToolAction : ToolAction
             return Task.FromResult(false);
         }
 
+        Changed = needCommitResult.AsT0;
+
         if (!needCommitResult.AsT0)
             return Task.FromResult(gitProcessor.SyncRemote());
 
@@ -129,7 +131,7 @@ public sealed class GitSyncToolAction : ToolAction
 
         // ReSharper disable once using
         var result = Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
-        Changed = true;
+        
         return result;
 
     }

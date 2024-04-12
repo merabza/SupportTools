@@ -53,7 +53,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
                 commitMessage, commitMessage == null);
             await gitSync.Run(cancellationToken);
             commitMessage = gitSync.UsedCommitMessage;
-            _syncOneProjectAllGitsParameters.ChangedGitProjects?.Add(gitData.GitProjectFolderName);
+            if ( gitSync.Changed)
+                _syncOneProjectAllGitsParameters.ChangedGitProjects?.Add(gitData.GitProjectFolderName);
         }
 
         return true;
