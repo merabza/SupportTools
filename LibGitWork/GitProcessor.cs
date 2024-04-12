@@ -40,13 +40,13 @@ else
 echo "Diverged"
 fi*/
         //"git remote update"
-        if (StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} remote update").IsSome)
+        if (StShared.RunProcess(false, null, "git", $"-C {_projectPath} remote update").IsSome)
         {
             StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
             return GitState.Unknown;
         }
 
-        var localResult = StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} rev-parse @");
+        var localResult = StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} rev-parse @");
         if (localResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 1", _useConsole, _logger);
@@ -56,7 +56,7 @@ fi*/
         var local = localResult.AsT0.Item1;
 
         var remoteResult =
-            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} rev-parse @{{u}}");
+            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} rev-parse @{{u}}");
         if (remoteResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 2", _useConsole, _logger);
@@ -66,7 +66,7 @@ fi*/
         var remote = remoteResult.AsT0.Item1;
 
         var strBaseResult =
-            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} merge-base @ @{{u}}");
+            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} merge-base @ @{{u}}");
         if (strBaseResult.IsT1)
         {
             StShared.WriteErrorLine("git merge-baseError", _useConsole, _logger);
@@ -118,7 +118,7 @@ fi*/
 
     public OneOf<string, Err[]> GetRemoteOriginUrl()
     {
-        var result = StShared.RunProcessWithOutput(_useConsole, null, "git",
+        var result = StShared.RunProcessWithOutput(false, null, "git",
             $"-C {_projectPath} config --get remote.origin.url");
         if (result.IsT1)
             return result.AsT1;
@@ -136,7 +136,7 @@ fi*/
     public OneOf<bool, Err[]> NeedCommit()
     {
         var gitStatusOutputResult =
-            StShared.RunProcessWithOutput(_useConsole, null, "git", $"-C {_projectPath} status --porcelain");
+            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
             return gitStatusOutputResult.AsT1;
         var gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
