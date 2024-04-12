@@ -178,7 +178,7 @@ fi*/
     public OneOf<bool, Err[]> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} diff-files --quiet", false);
-        var statusCommandOutputResult = StShared.RunProcessWithOutput(_useConsole, null, "git",
+        var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, "git",
             $"-C {_projectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
