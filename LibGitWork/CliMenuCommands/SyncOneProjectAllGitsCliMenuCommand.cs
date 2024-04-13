@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using CliMenu;
-using LanguageExt;
 using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
