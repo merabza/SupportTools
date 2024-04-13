@@ -20,7 +20,8 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
     private readonly SyncMultipleProjectsGitsParameters _syncMultipleProjectsGitsParameters;
 
     private SyncMultipleProjectsGitsToolAction(ILogger logger, ParametersManager parametersManager,
-        SyncMultipleProjectsGitsParameters syncMultipleProjectsGitsParameters) : base(logger, "Sync One Group All Projects Gits",
+        SyncMultipleProjectsGitsParameters syncMultipleProjectsGitsParameters) : base(logger,
+        "Sync One Group All Projects Gits",
         null, null)
     {
         _logger = logger;
@@ -29,17 +30,19 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
     }
 
 
-    public static SyncMultipleProjectsGitsToolAction Create(ILogger logger, ParametersManager parametersManager, string? projectGroupName)
+    public static SyncMultipleProjectsGitsToolAction Create(ILogger logger, ParametersManager parametersManager,
+        string? projectGroupName)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var syncMultipleProjectsGitsParameters = SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName);
+        var syncMultipleProjectsGitsParameters =
+            SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName);
 
         return new SyncMultipleProjectsGitsToolAction(logger, parametersManager, syncMultipleProjectsGitsParameters);
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var projectsList= _syncMultipleProjectsGitsParameters.ProjectGroupName is null
+        var projectsList = _syncMultipleProjectsGitsParameters.ProjectGroupName is null
             ? _syncMultipleProjectsGitsParameters.Projects
             : _syncMultipleProjectsGitsParameters.Projects.Where(x =>
                 SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
@@ -47,23 +50,37 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
 
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
-        var changedGitProjects = new List<string>();
-        foreach (var gitCollect in Enum.GetValues<EGitCollect>())
+        var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
         {
-            Console.WriteLine($"---==={gitCollect}===---");
+            [EGitCollect.Collect] = [],
+            [EGitCollect.Usage] = []
+        };
+        var loopNom = 0;
+        var gitCollectUsage = EGitCollect.Collect;
+        while (gitCollectUsage == EGitCollect.Collect || changedGitProjects[EGitCollect.Collect].Count > 0)
+        {
+            changedGitProjects[EGitCollect.Collect] = [];
+            Console.WriteLine($"---=== {gitCollectUsage} {(loopNom==0?"":loopNom)} ===---");
             //პროექტების ჩამონათვალი
             foreach (var kvp in projectsListOrdered)
             {
-                SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main, changedGitProjects, gitCollect);
+                SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main, changedGitProjects, loopNom == 0);
                 if (_syncMultipleProjectsGitsParameters.ScaffoldSeedersWorkFolder is not null)
-                    SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects, gitCollect);
+                    SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects, loopNom == 0);
             }
+
             Console.WriteLine("---===---------===---");
+
+            gitCollectUsage = EGitCollect.Usage;
+            loopNom++;
+            changedGitProjects[EGitCollect.Usage] = changedGitProjects[EGitCollect.Collect];
         }
 
         return Task.FromResult(true);
     }
-    private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol, List<string> changedGitProjects, EGitCollect gitCollect)
+
+    private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,
+        Dictionary<EGitCollect, Dictionary<string, List<string>>> changedGitProjects, bool isFirstSync)
     {
         switch (gitCol)
         {
@@ -82,7 +99,8 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
                 throw new ArgumentOutOfRangeException(nameof(gitCol), gitCol, null);
         }
 
-        var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, gitCol, changedGitProjects, gitCollect);
+        var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
+            projectName, gitCol, changedGitProjects, isFirstSync);
         syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None).Wait();
     }
 }

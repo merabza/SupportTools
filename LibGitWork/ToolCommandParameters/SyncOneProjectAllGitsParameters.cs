@@ -12,18 +12,21 @@ namespace LibGitWork.ToolCommandParameters;
 public class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsParameters(string gitsFolder, List<GitDataDomain> gitData, List<string>? changedGitProjects, EGitCollect? gitCollect)
+    public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData,
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
     {
+        ProjectName = projectName;
         GitData = gitData;
         ChangedGitProjects = changedGitProjects;
-        GitCollect = gitCollect;
+        IsFirstSync = isFirstSync;
         GitsFolder = gitsFolder;
     }
 
+    public string? ProjectName { get; }
     public List<GitDataDomain> GitData { get; }
-    public List<string>? ChangedGitProjects { get; }
-    public EGitCollect? GitCollect { get; }
+    public Dictionary<EGitCollect, Dictionary<string, List<string>>>? ChangedGitProjects { get; }
     public string GitsFolder { get; }
+    public bool IsFirstSync { get; }
 
     public bool CheckBeforeSave()
     {
@@ -32,7 +35,8 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
 
     public static SyncOneProjectAllGitsParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, EGitCol gitCol, List<string>? changedGitProjects, EGitCollect? gitCollect)
+        string projectName, EGitCol gitCol,
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
     {
 
         var project = supportToolsParameters.GetProject(projectName);
@@ -74,9 +78,9 @@ public class SyncOneProjectAllGitsParameters : IParameters
             StShared.WriteErrorLine("Gits with this names are absent", true);
         }
 
-        return new SyncOneProjectAllGitsParameters(gitsFolder,
+        return new SyncOneProjectAllGitsParameters(projectName, gitsFolder,
             gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), changedGitProjects,
-            gitCollect);
+            isFirstSync);
 
     }
 }

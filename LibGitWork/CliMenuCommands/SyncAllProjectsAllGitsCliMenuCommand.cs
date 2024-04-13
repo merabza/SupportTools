@@ -13,7 +13,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllProjectsAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
-        "Sync All Projects Gits", null, true)
+        "Sync All Projects All Gits", null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
