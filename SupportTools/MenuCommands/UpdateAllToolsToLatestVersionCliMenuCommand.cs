@@ -6,10 +6,10 @@ using SystemToolsShared;
 
 namespace SupportTools.MenuCommands;
 
-public sealed class UpdateAllToolsToLatestVersionCommand : CliMenuCommand
+public sealed class UpdateAllToolsToLatestVersionCliMenuCommand : CliMenuCommand
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UpdateAllToolsToLatestVersionCommand() : base("Update All Tools To Latest Version Command")
+    public UpdateAllToolsToLatestVersionCliMenuCommand() : base("Update All Tools To Latest Version")
     {
     }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -11,7 +11,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class ProjectSubMenuCommand : CliMenuCommand
+public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -19,7 +19,7 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
+    public ProjectSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
         base(projectName)
     {
         _logger = logger;
@@ -49,12 +49,12 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
 
         //პროექტის პარამეტრი
         var projectCruder = new ProjectCruder(_logger, _parametersManager);
-        var editCommand = new EditItemAllFieldsInSequenceCommand(projectCruder, _projectName);
+        var editCommand = new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _projectName);
         projectSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
-        projectSubMenuSet.AddMenuItem(new GitSubMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main),
+        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main),
             "Git");
 
         var project = parameters.GetProject(_projectName);
@@ -63,7 +63,7 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
         {
             if (!string.IsNullOrWhiteSpace(project.SeedProjectFilePath))
                 projectSubMenuSet.AddMenuItem(
-                    new GitSubMenuCommand(_logger, _parametersManager, _projectName, EGitCol.ScaffoldSeed),
+                    new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.ScaffoldSeed),
                     "Git ScaffoldSeeder projects");
 
             //დასაშვები ინსტრუმენტების არჩევა
@@ -78,7 +78,7 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
         var serverInfoCruder = new ServerInfoCruder(_logger, _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
-        var newItemCommand = new NewItemCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
+        var newItemCommand = new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
             $"New {serverInfoCruder.CrudName}");
         projectSubMenuSet.AddMenuItem(newItemCommand);
 
@@ -86,12 +86,12 @@ public sealed class ProjectSubMenuCommand : CliMenuCommand
         if (project?.ServerInfos != null)
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 projectSubMenuSet.AddMenuItem(
-                    new ServerInfoSubMenuCommand(_logger, _parametersManager, _projectName, kvp.Key),
+                    new ServerInfoSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, kvp.Key),
                     kvp.Value.GetItemKey());
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null), key.Length);
+        projectSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
 
         return projectSubMenuSet;
     }

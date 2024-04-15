@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CliMenu;
+using CliParameters.CliMenuCommands;
 using CliParameters.FieldEditors;
-using CliParameters.MenuCommands;
 using LibDataInput;
 using LibMenuInput;
 using LibParameters;
@@ -49,7 +49,7 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", "(None)", new CliMenuCommand(), 1);
 
         foreach (var listItem in keys)
-            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatus(listItem), listItem);
+            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem), listItem);
 
         var index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
 

@@ -5,7 +5,7 @@ using SupportTools.Cruders;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class ServerInfoSubMenuCommand : CliMenuCommand
+public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -14,7 +14,7 @@ public sealed class ServerInfoSubMenuCommand : CliMenuCommand
     private readonly string _serverName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerInfoSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+    public ServerInfoSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         string serverName) : base(serverName)
     {
         _logger = logger;

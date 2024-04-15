@@ -8,11 +8,12 @@ using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class GenerateStandardEnvironmentsCommand : CliMenuCommand
+public sealed class GenerateStandardRunTimesCliMenuCommand : CliMenuCommand
 {
     private readonly IParametersManager _parametersManager;
 
-    public GenerateStandardEnvironmentsCommand(IParametersManager parametersManager)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public GenerateStandardRunTimesCliMenuCommand(IParametersManager parametersManager)
     {
         _parametersManager = parametersManager;
     }
@@ -23,13 +24,13 @@ public sealed class GenerateStandardEnvironmentsCommand : CliMenuCommand
         var parameters = (IParametersWithSmartSchemas)_parametersManager.Parameters;
         try
         {
-            if (!Inputer.InputBool("This process will change Environments, are you sure?", false, false))
+            if (!Inputer.InputBool("This process will change RunTimes, are you sure?", false, false))
                 return;
 
-            StandardEnvironmentsGenerator.Generate(_parametersManager);
+            StandardRunTimesGenerator.Generate(_parametersManager);
 
             //შენახვა
-            _parametersManager.Save(parameters, "Environments generated success");
+            _parametersManager.Save(parameters, "RunTimes generated success");
         }
         catch (DataInputEscapeException)
         {

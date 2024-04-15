@@ -1,16 +1,17 @@
 ﻿using System;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using SupportTools.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public class DotnetToolSubMenuCommand : CliMenuCommand
+public class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly DotnetTool _tool;
 
-    public DotnetToolSubMenuCommand(DotnetTool tool)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public DotnetToolSubMenuCliMenuCommand(DotnetTool tool)
     {
         _tool = tool;
     }
@@ -35,7 +36,7 @@ public class DotnetToolSubMenuCommand : CliMenuCommand
         //               "Run REAL Project by this Dotnet Tool");
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null), key.Length);
+        dotnetToolSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
         return dotnetToolSubMenuSet;
     }
 

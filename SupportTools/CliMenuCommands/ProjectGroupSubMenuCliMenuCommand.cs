@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
@@ -10,7 +10,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
+public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -18,7 +18,7 @@ public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
     private readonly string _projectGroupName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectGroupName) :
+    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectGroupName) :
         base(projectGroupName)
     {
         _logger = logger;
@@ -103,14 +103,14 @@ public sealed class ProjectGroupSubMenuCommand : CliMenuCommand
         foreach (var kvp in parameters.Projects
                      .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
                      .OrderBy(o => o.Key))
-            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCommand(_logger, _parametersManager, kvp.Key),
+            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
                 kvp.Key);
 
 
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectGroupSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null), key.Length);
+        projectGroupSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
 
         return projectGroupSubMenuSet;
     }

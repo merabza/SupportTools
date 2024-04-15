@@ -10,11 +10,11 @@ using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class ReCreateReactAppByTemplateNameCommand : CliMenuCommand
+public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuCommand
 {
     private readonly ReCreateReactAppFilesByTemplateNameToolCommand _command;
 
-    public ReCreateReactAppByTemplateNameCommand(ILogger logger, IParametersManager parametersManager,
+    public ReCreateReactAppByTemplateNameCliMenuCommand(ILogger logger, IParametersManager parametersManager,
         string reactAppName, string? reactTemplateName)
     {
         var parameters = (IParametersWithSmartSchemas)parametersManager.Parameters;

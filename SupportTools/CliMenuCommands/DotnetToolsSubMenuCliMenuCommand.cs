@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using SupportTools.DotnetTools;
 using SupportTools.MenuCommands;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
+public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 {
-    public DotnetToolsSubMenuCommand() : base("Dotnet Tools")
+    public DotnetToolsSubMenuCliMenuCommand() : base("Dotnet Tools")
     {
         MenuAction = EMenuAction.LoadSubMenu;
     }
@@ -35,7 +35,7 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
         //var dotnetAllToolsCreateOrUpdateCommand = new DotnetAllToolsCreateOrUpdateCommand();
 
         //ყველა ინსტრუმენტის განახლება ბოლო ვერსიამდე
-        var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCommand();
+        var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCliMenuCommand();
         dotnetToolsSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
 
         //დაინსტალირებული ინსტრუმენტების სიის დადგენა
@@ -46,7 +46,7 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
 
             //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
             foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
-                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCommand(tool), tool.PackageId);
+                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool), tool.PackageId);
         }
 
         //var dotnetToolCommand = new DotnetToolCliMenuCommand();
@@ -54,7 +54,7 @@ public sealed class DotnetToolsSubMenuCommand : CliMenuCommand
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null),
+        dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
             key.Length);
 
         return dotnetToolsSubMenuSet;

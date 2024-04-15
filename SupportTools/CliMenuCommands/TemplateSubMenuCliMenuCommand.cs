@@ -1,6 +1,6 @@
 ﻿using System;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -9,7 +9,7 @@ using SupportToolsData;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class TemplateSubMenuCommand : CliMenuCommand
+public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -17,7 +17,7 @@ public sealed class TemplateSubMenuCommand : CliMenuCommand
     private readonly string _templateName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public TemplateSubMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName) :
+    public TemplateSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName) :
         base(templateName)
     {
         _logger = logger;
@@ -40,7 +40,7 @@ public sealed class TemplateSubMenuCommand : CliMenuCommand
 
         //პროექტის პარამეტრი
         TemplateCruder templateCruder = new(_logger, _parametersManager);
-        EditItemAllFieldsInSequenceCommand editCommand = new(templateCruder, _templateName);
+        EditItemAllFieldsInSequenceCliMenuCommand editCommand = new(templateCruder, _templateName);
         templateSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
 
         templateCruder.FillDetailsSubMenu(templateSubMenuSet, _templateName);
@@ -54,7 +54,7 @@ public sealed class TemplateSubMenuCommand : CliMenuCommand
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        templateSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null), key.Length);
+        templateSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
 
         return templateSubMenuSet;
     }

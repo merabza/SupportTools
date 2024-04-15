@@ -2,11 +2,12 @@
 
 namespace SupportTools.CliMenuCommands;
 
-public class InfoCommand : CliMenuCommand
+public class InfoCliMenuCommand : CliMenuCommand
 {
     private readonly string _menuUrlPrefix;
 
-    public InfoCommand(string info, string menuUrlPrefix) : base(info, null, false, EStatusView.Brackets, true)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public InfoCliMenuCommand(string info, string menuUrlPrefix) : base(info, null, false, EStatusView.Brackets, true)
     {
         _menuUrlPrefix = menuUrlPrefix;
     }

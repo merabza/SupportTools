@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using CliTools;
-using CliTools.Commands;
+using CliTools.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
@@ -37,20 +37,20 @@ public sealed class SupportTools : CliAppLoop
 
         //პარამეტრების რედაქტორი
         var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, parameters, _parametersManager);
-        mainMenuSet.AddMenuItem(new ParametersEditorListCommand(supportToolsParametersEditor),
+        mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor),
             "Support Tools Parameters Editor");
 
-        var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCommand();
+        var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
-        mainMenuSet.AddMenuItem(new ProjectCreatorSubMenuCommand(_logger, _parametersManager));
+        mainMenuSet.AddMenuItem(new ProjectCreatorSubMenuCliMenuCommand(_logger, _parametersManager));
 
         var projectCruder = new ProjectCruder(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
         var newItemCommand =
-            new NewItemCommand(projectCruder, projectCruder.CrudNamePlural, $"New {projectCruder.CrudName}");
+            new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural, $"New {projectCruder.CrudName}");
         mainMenuSet.AddMenuItem(newItemCommand);
 
         //პროექტის დაიმპორტება
@@ -65,7 +65,7 @@ public sealed class SupportTools : CliAppLoop
         foreach (var projectGroupName in parameters.Projects
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
-            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCommand(_logger, _parametersManager, projectGroupName),
+            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_logger, _parametersManager, projectGroupName),
                 projectGroupName);
         
 
@@ -75,7 +75,7 @@ public sealed class SupportTools : CliAppLoop
 
         //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
-        mainMenuSet.AddMenuItem(key, "Exit", new ExitCommand(), key.Length);
+        mainMenuSet.AddMenuItem(key, "Exit", new ExitCliMenuCommand(), key.Length);
 
         return true;
     }

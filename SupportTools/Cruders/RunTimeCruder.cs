@@ -69,7 +69,7 @@ public sealed class RunTimeCruder : ParCruder
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        GenerateStandardRunTimesCommand generateCommand = new(ParametersManager);
+        GenerateStandardRunTimesCliMenuCommand generateCommand = new(ParametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand, "Generate standard RunTimes...");
     }
 }

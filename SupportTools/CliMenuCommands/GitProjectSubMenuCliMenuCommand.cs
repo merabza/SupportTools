@@ -1,6 +1,6 @@
 ﻿using System;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
@@ -9,7 +9,7 @@ using SupportToolsData;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class GitProjectSubMenuCommand : CliMenuCommand
+public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
     private readonly string _gitProjectName;
@@ -18,7 +18,7 @@ public sealed class GitProjectSubMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitProjectSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+    public GitProjectSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         string gitProjectName, EGitCol gitCol) : base(projectName)
     {
         _logger = logger;
@@ -56,7 +56,7 @@ public sealed class GitProjectSubMenuCommand : CliMenuCommand
 
         //პროექტის მენიუში დაბრუნება
         var key = ConsoleKey.Escape.Value().ToLower();
-        gitProjectSubMenuSet.AddMenuItem(key, "Exit to Git menu", new ExitToMainMenuCommand(null, null), key.Length);
+        gitProjectSubMenuSet.AddMenuItem(key, "Exit to Git menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
 
         return gitProjectSubMenuSet;
     }

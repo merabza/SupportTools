@@ -20,13 +20,6 @@ using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
-public enum ECreateAppVersions
-{
-    OnlySyncGit,
-    DoAll,
-    WithoutSolutionGitInit
-}
-
 public abstract class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;

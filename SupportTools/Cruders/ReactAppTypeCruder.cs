@@ -91,7 +91,7 @@ public sealed class ReactAppTypeCruder : ParCruder
         //UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
         //itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
-        ReCreateReactAppByTemplateNameCommand reCreateReactCommand =
+        ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
             new(_logger, ParametersManager, recordKey, reactAppTemplateNames[recordKey]);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand, "Recreate React App files By Template...");
     }

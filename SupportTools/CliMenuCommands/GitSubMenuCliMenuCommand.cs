@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
@@ -13,7 +13,7 @@ using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class GitSubMenuCommand : CliMenuCommand
+public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
 
@@ -23,7 +23,7 @@ public sealed class GitSubMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) :
+    public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) :
         base(projectName)
     {
         _logger = logger;
@@ -81,12 +81,12 @@ public sealed class GitSubMenuCommand : CliMenuCommand
         var gitProjectNames = (List<string>)result;
         foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
             gitSubMenuSet.AddMenuItem(
-                new GitProjectSubMenuCommand(_logger, _parametersManager, _projectName, gitProjectName, _gitCol),
+                new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, gitProjectName, _gitCol),
                 gitProjectName);
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        gitSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null), key.Length);
+        gitSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
 
         return gitSubMenuSet;
     }

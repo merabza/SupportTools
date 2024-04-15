@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CliMenu;
-using CliParameters.MenuCommands;
+using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -11,14 +11,14 @@ using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class ProjectCreatorSubMenuCommand : CliMenuCommand
+public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectCreatorSubMenuCommand(ILogger logger, ParametersManager parametersManager) : base("Project Creator")
+    public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base("Project Creator")
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -63,7 +63,7 @@ public sealed class ProjectCreatorSubMenuCommand : CliMenuCommand
         TemplateCruder projectCreatorTemplateCruder = new(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
-        NewItemCommand newItemCommand = new(projectCreatorTemplateCruder, projectCreatorTemplateCruder.CrudNamePlural,
+        NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder, projectCreatorTemplateCruder.CrudNamePlural,
             $"New {projectCreatorTemplateCruder.CrudName}");
         projectCreatorSubMenuSet.AddMenuItem(newItemCommand);
 
@@ -71,12 +71,12 @@ public sealed class ProjectCreatorSubMenuCommand : CliMenuCommand
         if (appProjectCreatorAllParameters is not null)
             foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o =>
                          o.Key))
-                projectCreatorSubMenuSet.AddMenuItem(new TemplateSubMenuCommand(_logger, _parametersManager, kvp.Key),
+                projectCreatorSubMenuSet.AddMenuItem(new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
                     kvp.Key);
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectCreatorSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCommand(null, null),
+        projectCreatorSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
             key.Length);
 
         return projectCreatorSubMenuSet;

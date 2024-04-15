@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CliMenu;
 using CliParameters;
+using CliParameters.CliMenuCommands;
 using CliParameters.FieldEditors;
-using CliParameters.MenuCommands;
 using CliParametersDataEdit.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -115,11 +115,11 @@ public sealed class ProjectCruder : ParCruder
         var project = projects[recordKey];
 
         RedundantFileNameCruder detailsCruder = new(ParametersManager, recordKey);
-        NewItemCommand newItemCommand = new(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
+        NewItemCliMenuCommand newItemCommand = new(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
         itemSubMenuSet.AddMenuItem(newItemCommand);
 
         foreach (var detailListCommand in project.RedundantFileNames.Select(mask =>
-                     new ItemSubMenuCommand(detailsCruder, mask, recordKey, true)))
+                     new ItemSubMenuCliMenuCommand(detailsCruder, mask, recordKey, true)))
             itemSubMenuSet.AddMenuItem(detailListCommand);
     }
 }
