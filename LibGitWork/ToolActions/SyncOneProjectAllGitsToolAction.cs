@@ -61,10 +61,13 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
             commitMessage = gitSync.UsedCommitMessage;
             if (projectName is null || changedGitProjects is null || !gitSync.Changed)
                 continue;
-            if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList) &&
-                !proList.Contains(projectName))
-                proList.Add(projectName);
-            changedGitProjects[EGitCollect.Collect].Add(gitProjectFolderName, [projectName]);
+            if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList))
+            {
+                if (!proList.Contains(projectName)) 
+                    proList.Add(projectName);
+            }
+            else
+                changedGitProjects[EGitCollect.Collect].Add(gitProjectFolderName, [projectName]);
         }
 
         return true;
