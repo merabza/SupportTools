@@ -44,7 +44,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (file.DirectoryName is null)
                 {
                     Console.WriteLine("file.DirectoryName is null");
-                    StShared.Pause();
+                    //StShared.Pause();
                     return;
                 }
 
@@ -54,7 +54,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
                 ProcessFiles([classCreatorInfo]);
 
-                StShared.Pause();
+                //StShared.Pause();
                 return;
             }
 
@@ -75,7 +75,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 ProcessFiles(infos);
 
 
-                StShared.Pause();
+                //StShared.Pause();
                 return;
             }
 

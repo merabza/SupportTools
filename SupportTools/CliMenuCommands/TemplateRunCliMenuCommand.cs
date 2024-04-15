@@ -45,7 +45,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
             Console.WriteLine("---");
 
             Console.WriteLine($"Task Finished. {StShared.TimeTakenMessage(startDateTime)}");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (DataInputEscapeException)
         {

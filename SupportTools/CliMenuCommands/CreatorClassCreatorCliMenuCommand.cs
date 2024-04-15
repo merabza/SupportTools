@@ -45,7 +45,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (file.DirectoryName is null)
                 {
                     Console.WriteLine("file.DirectoryName is null");
-                    StShared.Pause();
+                    //StShared.Pause();
                     return;
                 }
 
@@ -55,7 +55,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
                 ProcessFiles([classCreatorInfo]);
 
-                StShared.Pause();
+                //StShared.Pause();
                 return;
             }
 
@@ -76,13 +76,13 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 ProcessFiles(infos);
 
 
-                StShared.Pause();
+                //StShared.Pause();
                 return;
             }
 
 
             Console.WriteLine("File or folder with name {0} does not exists", path);
-            StShared.Pause();
+            //StShared.Pause();
 
             return;
         }

@@ -33,7 +33,7 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
                 new(_logger, Name!, _parametersManager);
             createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
 
-            StShared.Pause();
+            //StShared.Pause();
 
             return;
         }

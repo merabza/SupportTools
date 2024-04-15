@@ -12,6 +12,7 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base(
         "Delete Project", projectName)
     {

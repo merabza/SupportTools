@@ -33,7 +33,7 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
                 new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
             reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Wait();
 
-            StShared.Pause();
+            //StShared.Pause();
 
             return;
         }

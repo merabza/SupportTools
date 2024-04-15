@@ -48,7 +48,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
         if (toolCommand?.Par == null)
         {
             Console.WriteLine("Parameters not loaded. Tool not started.");
-            StShared.Pause();
+            //StShared.Pause();
             return;
         }
 
@@ -65,7 +65,6 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
         Console.WriteLine($"Tool Finished. {StShared.TimeTakenMessage(startDateTime)}");
 
 
-        StShared.Pause();
         MenuAction = EMenuAction.Reload;
     }
 }

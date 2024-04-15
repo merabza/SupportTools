@@ -34,7 +34,7 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
         try
         {
             _command.Run(CancellationToken.None).Wait();
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (DataInputEscapeException)
         {

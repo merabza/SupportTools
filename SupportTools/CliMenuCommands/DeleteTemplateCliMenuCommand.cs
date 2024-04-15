@@ -12,6 +12,7 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _templateName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteTemplateCliMenuCommand(ParametersManager parametersManager, string templateName) : base(
         "Delete Template", templateName)
     {

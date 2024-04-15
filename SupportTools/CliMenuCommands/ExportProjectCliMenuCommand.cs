@@ -17,6 +17,7 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base(
         "Export Project", projectName)
     {
@@ -65,7 +66,7 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
             var projectJsonText = JsonConvert.SerializeObject(projectExportData, Formatting.Indented);
             File.WriteAllText(fileWithExportData, projectJsonText);
 
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (DataInputEscapeException)
         {
