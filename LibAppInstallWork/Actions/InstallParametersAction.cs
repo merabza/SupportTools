@@ -20,12 +20,10 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
-    private readonly bool _isService;
 
     public InstallParametersAction(ILogger logger, string parametersFileDateMask, string parametersFileExtension,
         InstallerBaseParameters installerBaseParameters, FileStorageData fileStorageForUpload, string projectName,
-        string environmentName, bool isService, string appSettingsEncodedJsonFileName) : base(logger,
-        "Install Parameters", null, null)
+        string environmentName, string appSettingsEncodedJsonFileName) : base(logger, "Install Parameters", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
         _parametersFileDateMask = parametersFileDateMask;
@@ -33,7 +31,6 @@ public sealed class InstallParametersAction : ToolAction
         _fileStorageForUpload = fileStorageForUpload;
         _projectName = projectName;
         _environmentName = environmentName;
-        _isService = isService;
         _appSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
     }
 
@@ -55,8 +52,8 @@ public sealed class InstallParametersAction : ToolAction
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
         var updateAppParametersFileResult = await agentClient.UpdateAppParametersFile(_projectName, _environmentName,
-            _isService, Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask,
-            _parametersFileExtension, CancellationToken.None);
+            Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
+            CancellationToken.None);
 
         if (agentClient is IDisposable disposable)
             disposable.Dispose();

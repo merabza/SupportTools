@@ -66,7 +66,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
             AppSettingsInstallerParameters.ProjectName, AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
-            AppSettingsInstallerParameters.IsService, AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName);
+            AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName);
         if (!await installParametersAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName} parameters file is not updated", projectName);

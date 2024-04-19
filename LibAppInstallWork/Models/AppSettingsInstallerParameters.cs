@@ -9,7 +9,7 @@ namespace LibAppInstallWork.Models;
 public sealed class AppSettingsInstallerParameters : IParameters
 {
     private AppSettingsInstallerParameters(string projectName, ServerInfoModel serverInfo,
-        InstallerBaseParameters installerBaseParameters, bool isService, string appSettingsEncodedJsonFileName,
+        InstallerBaseParameters installerBaseParameters, string appSettingsEncodedJsonFileName,
         FileStorageData fileStorageForUpload, FileStorageData fileStorageForDownload,
         ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string parametersFileDateMask,
         string parametersFileExtension)
@@ -17,7 +17,6 @@ public sealed class AppSettingsInstallerParameters : IParameters
         ProjectName = projectName;
         ServerInfo = serverInfo;
         InstallerBaseParameters = installerBaseParameters;
-        IsService = isService;
         AppSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
         FileStorageForUpload = fileStorageForUpload;
         FileStorageForDownload = fileStorageForDownload;
@@ -30,7 +29,6 @@ public sealed class AppSettingsInstallerParameters : IParameters
     public string ProjectName { get; }
     public ServerInfoModel ServerInfo { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
-    public bool IsService { get; }
     public string AppSettingsEncodedJsonFileName { get; }
     public FileStorageData FileStorageForUpload { get; }
     public FileStorageData FileStorageForDownload { get; }
@@ -122,9 +120,8 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
 
         var appSettingsInstallerParameters = new AppSettingsInstallerParameters(projectName, serverInfo,
-            installerBaseParameters, project.IsService, serverInfo.AppSettingsEncodedJsonFileName,
-            fileStorageForUpload, fileStorageForDownload, webAgentForCheck, proxySettings, parametersFileDateMask,
-            parametersFileExtension);
+            installerBaseParameters, serverInfo.AppSettingsEncodedJsonFileName, fileStorageForUpload,
+            fileStorageForDownload, webAgentForCheck, proxySettings, parametersFileDateMask, parametersFileExtension);
         return appSettingsInstallerParameters;
     }
 }
