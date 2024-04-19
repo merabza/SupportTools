@@ -29,7 +29,11 @@ public sealed class ProgramInstaller : ToolCommand
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        string? appSettingsVersion = null;
+        if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
+        {
+            Logger.LogError("Server name is not specified");
+            return false;
+        }
 
         if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.EnvironmentName))
         {
@@ -37,14 +41,23 @@ public sealed class ProgramInstaller : ToolCommand
             return false;
         }
 
+        if (!Parameters.IsService)
+        {
+            //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
+            var installProgramAction = new InstallProgramAction(Logger, Parameters.InstallerBaseParameters,
+                Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
+                Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension,
+                Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.EnvironmentName);
+
+            return await installProgramAction.Run(cancellationToken);
+        }
+
+
+
+        string? appSettingsVersion = null;
         if (!string.IsNullOrWhiteSpace(Parameters.AppSettingsJsonSourceFileName) ||
             !string.IsNullOrWhiteSpace(Parameters.EncodedJsonFileName))
         {
-            if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
-            {
-                Logger.LogError("Server name is not specified");
-                return false;
-            }
 
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
             var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, _useConsole,
@@ -65,18 +78,18 @@ public sealed class ProgramInstaller : ToolCommand
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var projectName = Parameters.ProjectName;
         var environmentName = Parameters.ServerInfo.EnvironmentName;
-        var installProgramAction = new InstallServiceAction(Logger, Parameters.InstallerBaseParameters,
+        var installServiceAction = new InstallServiceAction(Logger, Parameters.InstallerBaseParameters,
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
-            Parameters.ServerInfo.EnvironmentName, Parameters.ServiceName, Parameters.ServiceUserName,
-            Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
-        if (!await installProgramAction.Run(cancellationToken))
+            Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName, Parameters.EncodedJsonFileName,
+            Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
+        if (!await installServiceAction.Run(cancellationToken))
         {
             Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
         }
 
-        var installingProgramVersion = installProgramAction.InstallingProgramVersion;
+        var installingProgramVersion = installServiceAction.InstallingProgramVersion;
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
         var checkProgramVersionAction = new CheckProgramVersionAction(Logger, Parameters.WebAgentForCheck,

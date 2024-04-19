@@ -8,7 +8,7 @@ namespace LibAppInstallWork.Models;
 
 public sealed class ProgramInstallerParameters : IParameters
 {
-    private ProgramInstallerParameters(string projectName, ServerInfoModel serverInfo, string? serviceName,
+    private ProgramInstallerParameters(string projectName, bool isService, ServerInfoModel serverInfo,
         InstallerBaseParameters installerBaseParameters, string serviceUserName, string appSettingsJsonSourceFileName,
         string encodedJsonFileName, ProxySettingsBase proxySettings, FileStorageData fileStorageForExchange,
         ApiClientSettingsDomain webAgentForCheck, string programArchiveDateMask, string programArchiveExtension,
@@ -16,8 +16,8 @@ public sealed class ProgramInstallerParameters : IParameters
         string? projectDescription)
     {
         ProjectName = projectName;
+        IsService = isService;
         ServerInfo = serverInfo;
-        ServiceName = serviceName;
         InstallerBaseParameters = installerBaseParameters;
         ServiceUserName = serviceUserName;
         AppSettingsJsonSourceFileName = appSettingsJsonSourceFileName;
@@ -34,8 +34,8 @@ public sealed class ProgramInstallerParameters : IParameters
     }
 
     public string ProjectName { get; }
+    public bool IsService { get; }
     public ServerInfoModel ServerInfo { get; }
-    public string? ServiceName { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
 
     public string AppSettingsJsonSourceFileName { get; }
@@ -66,12 +66,6 @@ public sealed class ProgramInstallerParameters : IParameters
         ServerInfoModel serverInfo)
     {
         var project = supportToolsParameters.GetProjectRequired(projectName);
-
-        if (!project.IsService)
-        {
-            StShared.WriteErrorLine($"Project {projectName} is not service", true);
-            return null;
-        }
 
         if (string.IsNullOrWhiteSpace(serverInfo.ServiceUserName))
         {
@@ -165,7 +159,7 @@ public sealed class ProgramInstallerParameters : IParameters
         if (proxySettings is null)
             return null;
 
-        var progInstallerParameters = new ProgramInstallerParameters(projectName, serverInfo, project.ServiceName,
+        var progInstallerParameters = new ProgramInstallerParameters(projectName, project.IsService, serverInfo,
             installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
             serverInfo.AppSettingsEncodedJsonFileName, proxySettings, fileStorageForDownload, webAgentForCheck,
             programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension,

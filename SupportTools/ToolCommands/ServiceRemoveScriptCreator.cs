@@ -18,6 +18,7 @@ public class ServiceRemoveScriptCreator : ToolCommand
     private const string ActionDescription = "Creating Service Remove Script";
     private readonly ServiceRemoveScriptCreatorParameters _par;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServiceRemoveScriptCreator(ILogger logger, ServiceRemoveScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
@@ -71,14 +72,8 @@ public class ServiceRemoveScriptCreator : ToolCommand
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_par.Project.ServiceName))
-        {
-            StShared.WriteErrorLine($"Project.ServiceName is not specified for server {_par.ProjectName}", true);
-            return false;
-        }
-
         var createRemoveScript = new CreateServiceRemoveScript(Logger, scriptFileNameForSave, _par.ProjectName,
-            _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder, _par.Project.ServiceName);
+            _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder);
         return await createRemoveScript.Run(cancellationToken);
     }
 }

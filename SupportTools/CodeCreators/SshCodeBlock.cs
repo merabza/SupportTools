@@ -9,17 +9,16 @@ public sealed class SshCodeBlock : CodeBlockBase, ICodeItem
     private readonly string _closeDelimiter;
     private readonly string _openDelimiter;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SshCodeBlock(string blockHeader, string openDelimiter, string closeDelimiter, params object?[] codeList) :
         base(codeList)
     {
         _openDelimiter = openDelimiter;
         _closeDelimiter = closeDelimiter;
         BlockHeader = blockHeader;
-        Initializer = null;
     }
 
-    public string BlockHeader { get; set; }
-    public string? Initializer { get; set; }
+    private string BlockHeader { get; }
 
     public override string Output(int indentLevel)
     {

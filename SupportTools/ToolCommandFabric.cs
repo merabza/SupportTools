@@ -210,10 +210,23 @@ public static class ToolCommandFabric
 
                 StShared.WriteErrorLine("appSettingsEncoderParametersForPublish does not created", true);
                 return null;
-            case ETools.ProgramInstaller
-                : //  InstallUpdate, //პროგრამის საინსტალაციო პაკეტის გამოყენებით პროგრამის დაინსტალირება-განახლება
+            case ETools.ProgramInstaller:
+                //  InstallUpdate, //პროგრამის საინსტალაციო პაკეტის გამოყენებით პროგრამის დაინსტალირება-განახლება
                 //+(DownloadPackage=>UpdateProgram=>DownloadParameters=>UpdateParameters)
-                //ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
+                
+                //var project = supportToolsParameters.GetProjectRequired(projectName);
+
+                //if (project.IsService)
+                //{
+                //    var programServiceUpdaterParameters =
+                //        ServiceInstall.Create(logger, supportToolsParameters, projectName, serverInfo);
+                //    if (programServiceUpdaterParameters is not null)
+                //        return new ServiceUpdater(logger, programServiceUpdaterParameters, parametersManager);
+                //    StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
+                //    return null;
+                //}
+
+                
                 var programInstallerParameters =
                     ProgramInstallerParameters.Create(supportToolsParameters, projectName, serverInfo);
 
@@ -246,7 +259,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.ProgRemover: //  Remove, //პროგრამის წაშლა
                 var serviceStartStopParameters =
-                    ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
+                    ProgramRemoverParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStartStopParameters is not null)
                     return new ProgramRemover(logger, serviceStartStopParameters, parametersManager);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);

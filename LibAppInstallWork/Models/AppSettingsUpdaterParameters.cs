@@ -12,14 +12,14 @@ namespace LibAppInstallWork.Models;
 
 public sealed class AppSettingsUpdaterParameters : IParameters
 {
-    private AppSettingsUpdaterParameters(string projectName, string environmentName, string? serviceName,
+    private AppSettingsUpdaterParameters(string projectName, string environmentName, bool isService,
         InstallerBaseParameters installerBaseParameters, ProxySettingsBase proxySettings,
         AppSettingsEncoderParameters appSettingsEncoderParameters, ApiClientSettingsDomain webAgentForCheck,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForUpload)
     {
         ProjectName = projectName;
         EnvironmentName = environmentName;
-        ServiceName = serviceName;
+        IsService = isService;
         InstallerBaseParameters = installerBaseParameters;
         ProxySettings = proxySettings;
         AppSettingsEncoderParameters = appSettingsEncoderParameters;
@@ -31,7 +31,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
 
     public string ProjectName { get; }
     public string EnvironmentName { get; }
-    public string? ServiceName { get; }
+    public bool IsService { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public ProxySettingsBase ProxySettings { get; }
     public ApiClientSettingsDomain WebAgentForCheck { get; }
@@ -140,7 +140,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
 
         var appSettingsUpdaterParameters = new AppSettingsUpdaterParameters(projectName, environmentName,
-            project.ServiceName, installerBaseParameters, proxySettings, appSettingsEncoderParameters,
+            project.IsService, installerBaseParameters, proxySettings, appSettingsEncoderParameters,
             checkVersionParameters.WebAgentForCheck, parametersFileDateMask, parametersFileExtension,
             fileStorageForUpload);
         return appSettingsUpdaterParameters;

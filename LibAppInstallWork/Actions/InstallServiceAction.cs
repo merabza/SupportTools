@@ -25,16 +25,14 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string? _projectDescription;
     private readonly string _projectName;
     private readonly string? _serviceDescriptionSignature;
-    private readonly string? _serviceName;
     private readonly string _serviceUserName;
 
 
     public InstallServiceAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
         string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
         string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
-        string environmentName, string? serviceName, string serviceUserName, string encodedJsonFileName,
-        string? serviceDescriptionSignature, string? projectDescription) : base(logger,
-        "Install service", null, null)
+        string environmentName, string serviceUserName, string encodedJsonFileName, string? serviceDescriptionSignature,
+        string? projectDescription) : base(logger, "Install service", null, null)
     {
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;
@@ -44,7 +42,6 @@ public sealed class InstallServiceAction : ToolAction
         _fileStorageForDownload = fileStorageForDownload;
         _projectName = projectName;
         _environmentName = environmentName;
-        _serviceName = serviceName;
         _serviceUserName = serviceUserName;
         _encodedJsonFileName = encodedJsonFileName;
         _serviceDescriptionSignature = serviceDescriptionSignature;
@@ -72,11 +69,11 @@ public sealed class InstallServiceAction : ToolAction
             _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        var installServiceResult = await agentClient.InstallService(_projectName, _environmentName, _serviceName,
-            _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
+        var installServiceResult = await agentClient.InstallService(_projectName, _environmentName, _serviceUserName,
+            Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
             _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
             cancellationToken);
-        
+
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 

@@ -64,8 +64,7 @@ public sealed class ServiceUpdater : ToolCommand
                 appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
                 appSettingsEncoderParameters.ParametersFileExtension,
                 appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
-            if (!await encodeParametersAndUploadAction.Run(cancellationToken) &&
-                ProgramServiceUpdaterParameters.IsService)
+            if (!await encodeParametersAndUploadAction.Run(cancellationToken))
                 return false;
             appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
         }
@@ -78,7 +77,7 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.ParametersFileDateMask,
             ProgramServiceUpdaterParameters.ParametersFileExtension,
             ProgramServiceUpdaterParameters.FileStorageForDownload, projectName, environmentName,
-            ProgramServiceUpdaterParameters.ServiceName, ProgramServiceUpdaterParameters.ServiceUserName,
+            ProgramServiceUpdaterParameters.ServiceUserName,
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName,
             ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
             ProgramServiceUpdaterParameters.ProjectDescription);

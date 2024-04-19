@@ -21,7 +21,7 @@ public sealed class ProjectCruder : ParCruder
     public ProjectCruder(ILogger logger, ParametersManager parametersManager) : base(parametersManager, "Project",
         "Projects")
     {
-        FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ServiceName)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService), false));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent), false));

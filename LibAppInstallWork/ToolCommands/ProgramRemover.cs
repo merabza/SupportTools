@@ -12,10 +12,10 @@ public sealed class ProgramRemover : ToolCommand
 {
     private const string ActionName = "Remove App";
     private const string ActionDescription = "Remove App";
-    private readonly ServiceStartStopParameters _parameters;
+    private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemover(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
+    public ProgramRemover(ILogger logger, ProgramRemoverParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _parameters = parameters;
@@ -44,8 +44,7 @@ public sealed class ProgramRemover : ToolCommand
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (await agentClient.RemoveProjectAndService(projectName, _parameters.ServiceName, _parameters.EnvironmentName,
-                CancellationToken.None))
+        if (await agentClient.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService, CancellationToken.None))
             return true;
 
         if (agentClient is IDisposable disposable)

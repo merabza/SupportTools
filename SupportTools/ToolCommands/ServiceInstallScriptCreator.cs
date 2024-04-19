@@ -167,22 +167,13 @@ public class ServiceInstallScriptCreator : ToolCommand
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_par.Project.ServiceName))
-        {
-            StShared.WriteErrorLine($"Project.ServiceName is not specified for server {_par.ProjectName}", true);
-            return false;
-        }
-
         var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
-
 
         var createInstallScript = new CreateServiceInstallScript(Logger, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,
-            //_par.Project.ServiceName, 
-            sf.Name, _par.ServerInfo.ServiceUserName,
-            _par.FileStorageForExchange.FtpSiteLsFileOffset);
+            sf.Name, _par.ServerInfo.ServiceUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
         return await createInstallScript.Run(cancellationToken);
     }
 }

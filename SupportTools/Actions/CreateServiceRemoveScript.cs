@@ -16,17 +16,15 @@ public class CreateServiceRemoveScript : ToolAction
     private readonly string _projectName;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
-    private readonly string _serviceName;
 
     public CreateServiceRemoveScript(ILogger logger, string scriptFileName, string projectName, string environmentName,
-        string serverSideDeployFolder, string serviceName) : base(logger, nameof(ServiceRemoveScriptCreator), null,
+        string serverSideDeployFolder) : base(logger, nameof(ServiceRemoveScriptCreator), null,
         null)
     {
         _scriptFileName = scriptFileName;
         _projectName = projectName;
         _environmentName = environmentName;
         _serverSideDeployFolder = serverSideDeployFolder;
-        _serviceName = serviceName;
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
@@ -41,7 +39,7 @@ public class CreateServiceRemoveScript : ToolAction
 
               deployFolder={_serverSideDeployFolder}
               projectName={_projectName}
-              ServiceName={_serviceName}{_environmentName}
+              ServiceName={_projectName}{_environmentName}
               environmentName={_environmentName}
 
               projectInstallFullPath=$deployFolder/$projectName/$environmentName

@@ -191,15 +191,15 @@ internal sealed class ProjectRecordCreator
         var projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
         var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
         var dbMigrationProjectName = $"{_newProjectName}DbMigration";
-        var csProjectExtension = ".csproj";
+        const string csProjectExtension = ".csproj";
         //string solutionExtension = ".sln";
-        var jsonExtension = ".json";
+        const string jsonExtension = ".json";
         var seedProjectName = $"Seed{_newProjectName}Db";
         var getJsonProjectName = $"GetJsonFromScaffold{_newProjectName}Db";
         var scaffoldSeedSecFolderName = $"{_newProjectName}ScaffoldSeeder.sec";
         var dbPartProjectsFolderName = $"{_newProjectName}DbPart";
         var securityFolder = supportToolsParameters.SecurityFolder;
-        var appSettingsFileName = $"appsettings{jsonExtension}";
+        const string appSettingsFileName = $"appsettings{jsonExtension}";
         var productionServerWebAgentName = $"{productionServerName}.WebAgent";
         var productionBaseName = $"{_newProjectName}Prod";
         var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
@@ -246,7 +246,7 @@ internal sealed class ProjectRecordCreator
 
         var newProject = new ProjectModel
         {
-            ServiceName = _templateModel.SupportProjectType == ESupportProjectType.Api ? _newProjectName : null,
+            IsService = _templateModel.SupportProjectType == ESupportProjectType.Api,
             UseAlternativeWebAgent = false,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
             SolutionFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,

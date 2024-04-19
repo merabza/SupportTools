@@ -9,7 +9,7 @@ namespace LibAppInstallWork.Models;
 public sealed class AppSettingsInstallerParameters : IParameters
 {
     private AppSettingsInstallerParameters(string projectName, ServerInfoModel serverInfo,
-        InstallerBaseParameters installerBaseParameters, string serviceName, string appSettingsEncodedJsonFileName,
+        InstallerBaseParameters installerBaseParameters, bool isService, string appSettingsEncodedJsonFileName,
         FileStorageData fileStorageForUpload, FileStorageData fileStorageForDownload,
         ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string parametersFileDateMask,
         string parametersFileExtension)
@@ -17,7 +17,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
         ProjectName = projectName;
         ServerInfo = serverInfo;
         InstallerBaseParameters = installerBaseParameters;
-        ServiceName = serviceName;
+        IsService = isService;
         AppSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
         FileStorageForUpload = fileStorageForUpload;
         FileStorageForDownload = fileStorageForDownload;
@@ -30,7 +30,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
     public string ProjectName { get; }
     public ServerInfoModel ServerInfo { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
-    public string ServiceName { get; }
+    public bool IsService { get; }
     public string AppSettingsEncodedJsonFileName { get; }
     public FileStorageData FileStorageForUpload { get; }
     public FileStorageData FileStorageForDownload { get; }
@@ -66,13 +66,6 @@ public sealed class AppSettingsInstallerParameters : IParameters
         }
 
         var webAgentForCheck = supportToolsParameters.GetWebAgentRequired(webAgentNameForCheck);
-
-        if (project.ServiceName is null)
-        {
-            StShared.WriteErrorLine(
-                $"Project ServiceName does not specified for project {projectName}/{environmentName}", true);
-            return null;
-        }
 
         if (serverInfo.AppSettingsEncodedJsonFileName is null)
         {
@@ -129,7 +122,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
 
         var appSettingsInstallerParameters = new AppSettingsInstallerParameters(projectName, serverInfo,
-            installerBaseParameters, project.ServiceName, serverInfo.AppSettingsEncodedJsonFileName,
+            installerBaseParameters, project.IsService, serverInfo.AppSettingsEncodedJsonFileName,
             fileStorageForUpload, fileStorageForDownload, webAgentForCheck, proxySettings, parametersFileDateMask,
             parametersFileExtension);
         return appSettingsInstallerParameters;

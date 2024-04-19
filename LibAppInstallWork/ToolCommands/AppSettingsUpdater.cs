@@ -56,7 +56,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
-            AppSettingsUpdaterParameters.ServiceName,
+            AppSettingsUpdaterParameters.IsService,
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
 
         var projectName = AppSettingsUpdaterParameters.ProjectName;

@@ -8,15 +8,14 @@ namespace LibAppInstallWork.Models;
 
 public sealed class ServiceUpdaterParameters : IParameters
 {
-    private ServiceUpdaterParameters(string serviceUserName, string serviceName,
-        InstallerBaseParameters installerBaseParameters, ProgramPublisherParameters progPublisherParameters,
-        CheckVersionParameters checkVersionParameters, ProxySettingsBase proxySettings,
-        AppSettingsEncoderParameters appSettingsEncoderParameters, string programArchiveDateMask,
-        string programArchiveExtension, string parametersFileDateMask, string parametersFileExtension,
-        FileStorageData fileStorageForDownload, string? serviceDescriptionSignature, string? projectDescription)
+    private ServiceUpdaterParameters(string serviceUserName, InstallerBaseParameters installerBaseParameters,
+        ProgramPublisherParameters progPublisherParameters, CheckVersionParameters checkVersionParameters,
+        ProxySettingsBase proxySettings, AppSettingsEncoderParameters appSettingsEncoderParameters,
+        string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
+        string parametersFileExtension, FileStorageData fileStorageForDownload, string? serviceDescriptionSignature,
+        string? projectDescription)
     {
         ServiceUserName = serviceUserName;
-        ServiceName = serviceName;
         InstallerBaseParameters = installerBaseParameters;
         ProgramPublisherParameters = progPublisherParameters;
         CheckVersionParameters = checkVersionParameters;
@@ -32,7 +31,6 @@ public sealed class ServiceUpdaterParameters : IParameters
     }
 
     public string ServiceUserName { get; }
-    public string ServiceName { get; }
     public ProgramPublisherParameters ProgramPublisherParameters { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public CheckVersionParameters CheckVersionParameters { get; }
@@ -45,9 +43,6 @@ public sealed class ServiceUpdaterParameters : IParameters
     public string ParametersFileExtension { get; }
     public string? ServiceDescriptionSignature { get; }
     public string? ProjectDescription { get; }
-
-
-    public bool IsService => !string.IsNullOrWhiteSpace(ServiceName);
 
     public bool CheckBeforeSave()
     {
@@ -89,12 +84,6 @@ public sealed class ServiceUpdaterParameters : IParameters
             StShared.WriteErrorLine(
                 $"ServiceUserName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
                 true);
-            return null;
-        }
-
-        if (project.ServiceName is null)
-        {
-            StShared.WriteErrorLine($"Project ServiceName does not specified for project {projectName}", true);
             return null;
         }
 
@@ -155,10 +144,10 @@ public sealed class ServiceUpdaterParameters : IParameters
             return null;
 
         var programServiceUpdaterParameters = new ServiceUpdaterParameters(serverInfo.ServiceUserName,
-            project.ServiceName, installerBaseParameters, progPublisherParameters, checkVersionParameters,
-            proxySettings, appSettingsEncoderParameters, programArchiveDateMask, programArchiveExtension,
-            parametersFileDateMask, parametersFileExtension, fileStorageForUpload,
-            supportToolsParameters.ServiceDescriptionSignature, project.ProjectDescription);
+            installerBaseParameters, progPublisherParameters, checkVersionParameters, proxySettings,
+            appSettingsEncoderParameters, programArchiveDateMask, programArchiveExtension, parametersFileDateMask,
+            parametersFileExtension, fileStorageForUpload, supportToolsParameters.ServiceDescriptionSignature,
+            project.ProjectDescription);
         return programServiceUpdaterParameters;
     }
 }

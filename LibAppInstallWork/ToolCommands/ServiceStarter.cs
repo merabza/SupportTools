@@ -27,21 +27,17 @@ public sealed class ServiceStarter : ToolCommand
 
     protected override bool CheckValidate()
     {
-        if (!string.IsNullOrWhiteSpace(_parameters.ServiceName))
-            return true;
-
-        Logger.LogError("Service Name not specified");
-        return false;
+        return true;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var serviceName = _parameters.ServiceName;
+        var projectName = _parameters.ProjectName;
         var environmentName = _parameters.EnvironmentName;
 
-        Logger.LogInformation("Try to start service {serviceName}/{environmentName}...", serviceName, environmentName);
+        Logger.LogInformation("Try to start service {projectName}/{environmentName}...", projectName, environmentName);
 
-        if (string.IsNullOrWhiteSpace(serviceName))
+        if (string.IsNullOrWhiteSpace(projectName))
         {
             Logger.LogError("Service Name not specified");
             return false;
@@ -54,20 +50,20 @@ public sealed class ServiceStarter : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {serviceName}/{environmentName} can not started",
-                serviceName, environmentName);
+            Logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not started",
+                projectName, environmentName);
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        var startServiceResult = await agentClient.StartService(_parameters.ServiceName, _parameters.EnvironmentName,
+        var startServiceResult = await agentClient.StartService(_parameters.ProjectName, _parameters.EnvironmentName,
             CancellationToken.None);
         if (startServiceResult.IsSome)
         {
-            Logger.LogError("Service {serviceName}/{environmentName} can not started", serviceName, environmentName);
+            Logger.LogError("Service {projectName}/{environmentName} can not started", projectName, environmentName);
             return false;
         }
-        
+
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 
@@ -77,15 +73,15 @@ public sealed class ServiceStarter : ToolCommand
         CheckParametersVersionAction checkParametersVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkParametersVersionAction.Run(cancellationToken))
-            Logger.LogError("Service {serviceName}/{environmentName} parameters file check failed", serviceName,
+            Logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
 
 
-        //შევამოწმოთ გაშვებული პროგრამის ვერსია ServiceStartParameters.ServiceName, 
+        //შევამოწმოთ გაშვებული პროგრამის ვერსია
         CheckProgramVersionAction checkProgramVersionAction =
             new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
-            Logger.LogError("Service {serviceName}/{environmentName} version check failed", serviceName,
+            Logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
                 environmentName);
 
         return true;

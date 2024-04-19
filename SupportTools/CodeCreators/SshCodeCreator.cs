@@ -20,12 +20,11 @@ public class SshCodeCreator : CodeCreator
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;
     private readonly string _serverSideServiceUserName;
-    private readonly string _serviceName;
     private readonly string _settingsFileName;
 
     public SshCodeCreator(ILogger logger, string placePath, string codeFileName, int portNumber, string ftpSiteAddress,
         string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName, string runTime,
-        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string serviceName,
+        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder,
         string settingsFileName, string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, placePath,
         codeFileName)
     {
@@ -40,7 +39,6 @@ public class SshCodeCreator : CodeCreator
         _environmentName = environmentName;
         _serverSideDownloadFolder = serverSideDownloadFolder;
         _serverSideDeployFolder = serverSideDeployFolder;
-        _serviceName = serviceName;
         _settingsFileName = settingsFileName;
         _serverSideServiceUserName = serverSideServiceUserName;
         _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
@@ -81,7 +79,7 @@ public class SshCodeCreator : CodeCreator
             "downloadSettingsFilePrefix=\"$myHostname-$environmentName-$projectName-\"",
             $"downloadFolder={_serverSideDownloadFolder}",
             $"deployFolder={_serverSideDeployFolder}",
-            $"ServiceName={_serviceName}",
+            $"ServiceName={_projectName}{_environmentName}",
             $"SettingsFileName={_settingsFileName}",
             $"userName={_serverSideServiceUserName}",
             "",

@@ -8,7 +8,7 @@ namespace SupportToolsData.Models;
 
 public sealed class ProjectModel : ItemData
 {
-    public string? ServiceName { get; init; }
+    public bool IsService { get; init; }
     public string? ProjectGroupName { get; init; }
     public string? ProjectDescription { get; set; }
     public bool UseAlternativeWebAgent { get; init; }
@@ -44,7 +44,6 @@ public sealed class ProjectModel : ItemData
     public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
     public List<ETools> AllowToolsList { get; init; } = [];
 
-    public bool IsService => !string.IsNullOrWhiteSpace(ServiceName);
 
     public ServerInfoModel GetServerInfoRequired(string serverName)
     {

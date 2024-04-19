@@ -26,21 +26,17 @@ public sealed class ServiceStopper : ToolCommand
 
     protected override bool CheckValidate()
     {
-        if (!string.IsNullOrWhiteSpace(_parameters.ServiceName))
-            return true;
-
-        Logger.LogError("Service Name not specified");
-        return false;
+        return true;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var serviceName = _parameters.ServiceName;
+        var projectName = _parameters.ProjectName;
         var environmentName = _parameters.EnvironmentName;
 
-        Logger.LogInformation("Try to stop service {serviceName}/{environmentName}...", serviceName, environmentName);
+        Logger.LogInformation("Try to stop service {projectName}/{environmentName}...", projectName, environmentName);
 
-        if (string.IsNullOrWhiteSpace(serviceName))
+        if (string.IsNullOrWhiteSpace(projectName))
         {
             Logger.LogError("Service Name not specified");
             return false;
@@ -53,16 +49,16 @@ public sealed class ServiceStopper : ToolCommand
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {serviceName}/{environmentName} can not be stopped",
-                serviceName, environmentName);
+            Logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not be stopped",
+                projectName, environmentName);
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        var stopServiceResult = await agentClient.StopService(serviceName, environmentName, cancellationToken);
+        var stopServiceResult = await agentClient.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsSome)
         {
-            Logger.LogError("Service {serviceName}/{environmentName} can not be stopped", serviceName, environmentName);
+            Logger.LogError("Service {projectName}/{environmentName} can not be stopped", projectName, environmentName);
             return false;
         }
         
