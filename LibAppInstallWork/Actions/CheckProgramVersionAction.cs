@@ -54,7 +54,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    await using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                         proxySettings.ApiVersionId, cancellationToken);
@@ -71,7 +71,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    await using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
                     var getVersionResult = await testApiClient.GetVersion(cancellationToken);
                     if (getVersionResult.IsT1)
                     {

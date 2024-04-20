@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using ApiClientsManagement;
 using Installer.AgentClients;
 using LibAppInstallWork.Models;
 using LibToolActions;
+using Markdig.Renderers.Html;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
@@ -11,22 +13,25 @@ using SystemToolsShared;
 
 namespace LibAppInstallWork.Actions;
 
-public sealed class CheckParametersVersionAction(
-    ILogger logger,
-    ApiClientSettingsDomain webAgentForCheck,
-    ProxySettingsBase proxySettings,
-    string? appSettingsVersion,
-    int maxTryCount = 10) : ToolAction(logger,
-    "Check Parameters Version", null, null)
+public sealed class CheckParametersVersionAction : ToolAction
 {
     private const string ProjectName = "";
 
-    private readonly string? _appSettingsVersion = appSettingsVersion;
-    private readonly int _maxTryCount = maxTryCount;
+    private readonly string? _appSettingsVersion;
+    private readonly int _maxTryCount;
+    private readonly ProxySettingsBase _proxySettings;
+    private readonly ApiClientSettingsDomain _webAgentForCheck;
 
-    private readonly ProxySettingsBase _proxySettings = proxySettings;
-
-    private readonly ApiClientSettingsDomain _webAgentForCheck = webAgentForCheck;
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
+        ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger,
+        "Check Parameters Version", null, null)
+    {
+        _appSettingsVersion = appSettingsVersion;
+        _maxTryCount = maxTryCount;
+        _proxySettings = proxySettings;
+        _webAgentForCheck = webAgentForCheck;
+    }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
@@ -46,54 +51,56 @@ public sealed class CheckParametersVersionAction(
             {
                 Logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
 
+                var errors = new List<Err>();
+
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    await using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
                         await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
-                    {
-                        Err.PrintErrorsOnConsole(getAppSettingsVersionByProxyResult.AsT1);
-                        break;
-                    }
-
-                    version = getAppSettingsVersionByProxyResult.AsT0;
+                        errors.AddRange(getAppSettingsVersionByProxyResult.AsT1);
+                    else
+                        version = getAppSettingsVersionByProxyResult.AsT0;
                 }
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    await using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
+                        errors.AddRange(getAppSettingsVersionResult.AsT1);
+                    else
+                        version = getAppSettingsVersionResult.AsT0;
+                }
+
+                if (errors.Count > 0)
+                    Err.PrintErrorsOnConsole(errors);
+                else
+                {
+
+                    getVersionSuccess = true;
+
+                    if (_appSettingsVersion == null)
                     {
-                        Err.PrintErrorsOnConsole(getAppSettingsVersionResult.AsT1);
-                        break;
+                        Logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
+                            version);
+                        return true;
                     }
 
-                    version = getAppSettingsVersionResult.AsT0;
-                }
-
-                getVersionSuccess = true;
-
-                if (_appSettingsVersion == null)
-                {
-                    Logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
-                        version);
-                    return true;
-                }
-
-                if (_appSettingsVersion != version)
-                {
-                    Logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
-                        version, _appSettingsVersion);
-                    getVersionSuccess = false;
+                    if (_appSettingsVersion != version)
+                    {
+                        Logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
+                            version, _appSettingsVersion);
+                        getVersionSuccess = false;
+                    }
                 }
             }
             catch
