@@ -17,12 +17,14 @@ public class ServiceInstallScriptCreator : ToolCommand
 {
     private const string ActionName = "Creating Service Install Script";
     private const string ActionDescription = "Creating Service Install Script";
+    private readonly ILogger _logger;
     private readonly ServiceInstallScriptCreatorParameters _par;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServiceInstallScriptCreator(ILogger logger, ServiceInstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _par = par;
     }
 
@@ -33,7 +35,7 @@ public class ServiceInstallScriptCreator : ToolCommand
 
         if (string.IsNullOrWhiteSpace(ftpSiteUserName))
         {
-            Logger.LogError("ftp site user name is not specified for FileStorageForExchange");
+            _logger.LogError("ftp site user name is not specified for FileStorageForExchange");
             return false;
         }
 
@@ -42,20 +44,20 @@ public class ServiceInstallScriptCreator : ToolCommand
         var isFtp = _par.FileStorageForExchange.IsFtp();
         if (isFtp is null)
         {
-            Logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not",
+            _logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not",
                 fileStoragePath);
             return false;
         }
 
         if (!isFtp.Value)
         {
-            Logger.LogError("File Storage {fileStoragePath} is not ftp file storage", fileStoragePath);
+            _logger.LogError("File Storage {fileStoragePath} is not ftp file storage", fileStoragePath);
             return false;
         }
 
         if (!Uri.TryCreate(fileStoragePath, UriKind.Absolute, out var uri))
         {
-            Logger.LogError("Invalid File Storage Path {fileStoragePath}", fileStoragePath);
+            _logger.LogError("Invalid File Storage Path {fileStoragePath}", fileStoragePath);
             return false;
         }
 
@@ -68,21 +70,21 @@ public class ServiceInstallScriptCreator : ToolCommand
         var userName = _par.FileStorageForExchange.UserName;
         if (string.IsNullOrWhiteSpace(userName))
         {
-            Logger.LogError("User Name is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("User Name is not specified for File Storage {fileStoragePath}", fileStoragePath);
             return false;
         }
 
         var password = _par.FileStorageForExchange.Password;
         if (string.IsNullOrWhiteSpace(password))
         {
-            Logger.LogError("Password is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("Password is not specified for File Storage {fileStoragePath}", fileStoragePath);
             return false;
         }
 
 
         if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
         {
-            Logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}", fileStoragePath);
             return false;
         }
 
@@ -169,7 +171,7 @@ public class ServiceInstallScriptCreator : ToolCommand
 
         var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
 
-        var createInstallScript = new CreateServiceInstallScript(Logger, scriptFileNameForSave,
+        var createInstallScript = new CreateServiceInstallScript(_logger, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,

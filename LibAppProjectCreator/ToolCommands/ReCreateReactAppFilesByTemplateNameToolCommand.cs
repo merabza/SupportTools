@@ -12,6 +12,7 @@ namespace LibAppProjectCreator.ToolCommands;
 
 public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
 {
+    private readonly ILogger _logger;
     private readonly string _reactAppName;
     private readonly string? _reactTemplateName;
 
@@ -19,6 +20,7 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         string? reactTemplateName, IParameters par, IParametersManager? parametersManager) : base(logger,
         "Recreate React app Files", par, parametersManager)
     {
+        _logger = logger;
         _reactAppName = reactAppName;
         _reactTemplateName = reactTemplateName;
     }
@@ -27,7 +29,7 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
     {
         if (ParametersManager is null)
         {
-            Logger.LogError("ParametersManager is null");
+            _logger.LogError("ParametersManager is null");
             return Task.FromResult(false);
         }
 
@@ -36,17 +38,17 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
 
         if (supportToolsParameters is null)
         {
-            Logger.LogError("SupportToolsParameters is null");
+            _logger.LogError("SupportToolsParameters is null");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
-            Logger.LogError("supportToolsParameters.WorkFolder is empty");
+            _logger.LogError("supportToolsParameters.WorkFolder is empty");
             return Task.FromResult(false);
         }
 
-        var reCreateReactAppFiles = new ReCreateReactAppFiles(Logger,
+        var reCreateReactAppFiles = new ReCreateReactAppFiles(_logger,
             supportToolsParameters.WorkFolder, _reactAppName.ToLower(), _reactTemplateName);
         return Task.FromResult(reCreateReactAppFiles.Run());
     }

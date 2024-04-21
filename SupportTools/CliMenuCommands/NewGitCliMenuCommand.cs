@@ -19,6 +19,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     //ახალი პროექტის შექმნის ამოცანა
+    // ReSharper disable once ConvertToPrimaryConstructor
     public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
         EGitCol gitCol) : base(
         "Add Git Project")

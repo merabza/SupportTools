@@ -20,6 +20,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 {
     private const string ActionName = "Create Application";
     public const string ActionDescription = "Create Application";
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _templateName;
     private readonly ETestOrReal _testOrReal;
@@ -27,6 +28,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     public AppProjectCreatorByTemplateToolAction(ILogger logger, IParametersManager parametersManager,
         string templateName, ETestOrReal testOrReal) : base(logger, ActionName, null, null)
     {
+        _logger = logger;
         _parametersManager = parametersManager;
         _templateName = templateName;
         _testOrReal = testOrReal;
@@ -39,32 +41,32 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         if (parameters is null)
         {
-            Logger.LogError("AppProjectCreatorAllParameters is empty");
+            _logger.LogError("AppProjectCreatorAllParameters is empty");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
-            Logger.LogError("supportToolsParameters.WorkFolder is empty");
+            _logger.LogError("supportToolsParameters.WorkFolder is empty");
             return false;
         }
 
         var templateModel = parameters.GetTemplate(_templateName);
         if (templateModel is null)
         {
-            Logger.LogError("templateModel is null");
+            _logger.LogError("templateModel is null");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(templateModel.TestProjectName))
         {
-            Logger.LogError("TestProjectName is empty");
+            _logger.LogError("TestProjectName is empty");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(templateModel.TestProjectShortName))
         {
-            Logger.LogError("TestProjectShortName is empty");
+            _logger.LogError("TestProjectShortName is empty");
             return false;
         }
 
@@ -100,29 +102,29 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         projectName = projectName.ToNormalClassName();
 
-        var par = AppProjectCreatorData.Create(Logger, projectName, projectShortName, templateModel.SupportProjectType,
+        var par = AppProjectCreatorData.Create(_logger, projectName, projectShortName, templateModel.SupportProjectType,
             projectName, projectsFolderPath, secretsFolderPath, parameters.IndentSize);
 
         if (par is null)
         {
-            Logger.LogError("AppProjectCreatorData does not created for project {projectName}", projectName);
+            _logger.LogError("AppProjectCreatorData does not created for project {projectName}", projectName);
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
-            Logger.LogError("supportToolsParameters.WorkFolder is empty");
+            _logger.LogError("supportToolsParameters.WorkFolder is empty");
             return false;
         }
 
-        var appCreator = AppCreatorFabric.CreateAppCreator(Logger, par, templateModel,
-            GitProjects.Create(Logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(Logger, supportToolsParameters.Gits, null, null), supportToolsParameters.WorkFolder,
+        var appCreator = AppCreatorFabric.CreateAppCreator(_logger, par, templateModel,
+            GitProjects.Create(_logger, supportToolsParameters.GitProjects),
+            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null), supportToolsParameters.WorkFolder,
             supportToolsParameters.ReactAppTemplates);
 
         if (appCreator is null)
         {
-            Logger.LogError("appCreator does not created for project {projectName}", projectName);
+            _logger.LogError("appCreator does not created for project {projectName}", projectName);
             return false;
         }
 
@@ -136,7 +138,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         if (existingProject is not null)
         {
-            StShared.ConsoleWriteInformationLine(Logger, true,
+            StShared.ConsoleWriteInformationLine(_logger, true,
                 "project with name {0} already exists and cannot be updated", projectName);
             return true;
         }
@@ -145,12 +147,12 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return true;
 
         var projectRecordCreator =
-            new ProjectRecordCreator(Logger, _parametersManager, templateModel, projectName, projectShortName, "");
+            new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName, projectShortName, "");
 
         if (projectRecordCreator.Create())
             return true;
 
-        StShared.ConsoleWriteInformationLine(Logger, true,
+        StShared.ConsoleWriteInformationLine(_logger, true,
             "code for project with name {0} created, but record create failed", projectName);
         return true;
     }

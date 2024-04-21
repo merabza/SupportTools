@@ -12,6 +12,7 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ServiceUpdater : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
 
@@ -19,6 +20,7 @@ public sealed class ServiceUpdater : ToolCommand
         IParametersManager parametersManager) : base(logger, ActionName, programServiceUpdaterParameters,
         parametersManager, ActionDescription)
     {
+        _logger = logger;
     }
 
     private ServiceUpdaterParameters ProgramServiceUpdaterParameters => (ServiceUpdaterParameters)Par;
@@ -30,7 +32,7 @@ public sealed class ServiceUpdater : ToolCommand
 
         if (string.IsNullOrEmpty(environmentName))
         {
-            Logger.LogError("Environment {environmentName} is empty", environmentName);
+            _logger.LogError("Environment {environmentName} is empty", environmentName);
             return false;
         }
 
@@ -38,7 +40,7 @@ public sealed class ServiceUpdater : ToolCommand
         var programPublisherParameters =
             ProgramServiceUpdaterParameters.ProgramPublisherParameters;
 
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, programPublisherParameters.ProjectName,
+        var createPackageAndUpload = new CreatePackageAndUpload(_logger, programPublisherParameters.ProjectName,
             programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
             programPublisherParameters.WorkFolder, programPublisherParameters.DateMask,
             programPublisherParameters.Runtime, programPublisherParameters.RedundantFileNames,
@@ -56,7 +58,7 @@ public sealed class ServiceUpdater : ToolCommand
         var installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
         if (installParameters)
         {
-            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
+            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
                 appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
                 appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
                 appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
@@ -70,7 +72,7 @@ public sealed class ServiceUpdater : ToolCommand
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallServiceAction(Logger,
+        var installProgramAction = new InstallServiceAction(_logger,
             ProgramServiceUpdaterParameters.InstallerBaseParameters,
             ProgramServiceUpdaterParameters.ProgramArchiveDateMask,
             ProgramServiceUpdaterParameters.ProgramArchiveExtension,
@@ -83,19 +85,19 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.ProjectDescription);
         if (!await installProgramAction.Run(cancellationToken))
         {
-            Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
+            _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
         }
 
         //string installingProgramVersion = installProgramAction.InstallingProgramVersion;
         //4. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(Logger,
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger,
             ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
             ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion);
 
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
-            Logger.LogError("project {projectName}/{environmentName} version check failed", projectName,
+            _logger.LogError("project {projectName}/{environmentName} version check failed", projectName,
                 environmentName);
             return false;
         }
@@ -104,7 +106,7 @@ public sealed class ServiceUpdater : ToolCommand
         {
             //5. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
             //, projectName
-            var checkParametersVersionAction = new CheckParametersVersionAction(Logger,
+            var checkParametersVersionAction = new CheckParametersVersionAction(_logger,
                 ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
                 ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion);
 
@@ -112,7 +114,7 @@ public sealed class ServiceUpdater : ToolCommand
                 return true;
         }
 
-        Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+        _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
             environmentName);
         return false;
     }

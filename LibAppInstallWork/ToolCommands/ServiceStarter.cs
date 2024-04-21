@@ -17,11 +17,13 @@ public sealed class ServiceStarter : ToolCommand
 {
     private const string ActionName = "Starting Service";
     private const string ActionDescription = "Starting Service";
+    private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
     public ServiceStarter(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _parameters = parameters;
     }
 
@@ -35,22 +37,22 @@ public sealed class ServiceStarter : ToolCommand
         var projectName = _parameters.ProjectName;
         var environmentName = _parameters.EnvironmentName;
 
-        Logger.LogInformation("Try to start service {projectName}/{environmentName}...", projectName, environmentName);
+        _logger.LogInformation("Try to start service {projectName}/{environmentName}...", projectName, environmentName);
 
         if (string.IsNullOrWhiteSpace(projectName))
         {
-            Logger.LogError("Service Name not specified");
+            _logger.LogError("Service Name not specified");
             return false;
         }
 
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall,
+            ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _parameters.WebAgentForInstall,
                 _parameters.InstallFolder);
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not started",
+            _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not started",
                 projectName, environmentName);
             return false;
         }
@@ -60,28 +62,28 @@ public sealed class ServiceStarter : ToolCommand
             CancellationToken.None);
         if (startServiceResult.IsSome)
         {
-            Logger.LogError("Service {projectName}/{environmentName} can not started", projectName, environmentName);
+            _logger.LogError("Service {projectName}/{environmentName} can not started", projectName, environmentName);
             return false;
         }
 
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 
-        Logger.LogInformation("Service Started");
+        _logger.LogInformation("Service Started");
 
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         CheckParametersVersionAction checkParametersVersionAction =
-            new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+            new(_logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkParametersVersionAction.Run(cancellationToken))
-            Logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
+            _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
         CheckProgramVersionAction checkProgramVersionAction =
-            new(Logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+            new(_logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
-            Logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
+            _logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
                 environmentName);
 
         return true;

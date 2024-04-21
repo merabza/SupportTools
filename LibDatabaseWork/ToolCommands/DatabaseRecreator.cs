@@ -11,7 +11,6 @@ namespace LibDatabaseWork.ToolCommands;
 public sealed class DatabaseReCreator : MigrationToolCommand
 {
     private const string ActionName = "Database Recreate";
-
     private const string ActionDescription = @"This action will do steps:
 
 1. Drop Existing Dev Database
@@ -19,7 +18,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 3. Correct New Database
 
 ";
-
+    private readonly ILogger _logger;
     private readonly CorrectNewDbParameters _correctNewDbParameters;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
@@ -27,6 +26,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
         CorrectNewDbParameters correctNewDbParameters, IParametersManager parametersManager) : base(logger, ActionName,
         databaseMigrationParameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _correctNewDbParameters = correctNewDbParameters;
     }
 
@@ -35,18 +35,18 @@ public sealed class DatabaseReCreator : MigrationToolCommand
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //წაიშალოს დეველოპერ ბაზა
-        var databaseDropper = new DatabaseDropper(Logger, DatabaseMigrationParameters, ParametersManager);
+        var databaseDropper = new DatabaseDropper(_logger, DatabaseMigrationParameters, ParametersManager);
         if (!await databaseDropper.Run(cancellationToken))
             return false;
 
         //შეიქმნას თავიდან (სტორედ პროცედურების გათვალისწინებით)
         var databaseMigrationCreator =
-            new DatabaseMigrationCreator(Logger, DatabaseMigrationParameters, ParametersManager);
+            new DatabaseMigrationCreator(_logger, DatabaseMigrationParameters, ParametersManager);
         if (!await databaseMigrationCreator.Run(cancellationToken))
             return false;
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
-        var correctNewDatabase = new CorrectNewDatabase(Logger, _correctNewDbParameters, ParametersManager);
+        var correctNewDatabase = new CorrectNewDatabase(_logger, _correctNewDbParameters, ParametersManager);
         return await correctNewDatabase.Run(cancellationToken);
     }
 }

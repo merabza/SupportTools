@@ -16,6 +16,7 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _appSettingsEncodedJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForUpload;
+    private readonly ILogger _logger;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
@@ -25,6 +26,7 @@ public sealed class InstallParametersAction : ToolAction
         InstallerBaseParameters installerBaseParameters, FileStorageData fileStorageForUpload, string projectName,
         string environmentName, string appSettingsEncodedJsonFileName) : base(logger, "Install Parameters", null, null)
     {
+        _logger = logger;
         _installerBaseParameters = installerBaseParameters;
         _parametersFileDateMask = parametersFileDateMask;
         _parametersFileExtension = parametersFileExtension;
@@ -38,16 +40,17 @@ public sealed class InstallParametersAction : ToolAction
     {
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(Logger, _fileStorageForUpload,
+            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _fileStorageForUpload,
                 _installerBaseParameters);
         if (agentClient is null)
         {
-            Logger.LogError("agentClient cannot be created. project {_projectName}/{_environmentName} does not updated",
+            _logger.LogError(
+                "agentClient cannot be created. project {_projectName}/{_environmentName} does not updated",
                 _projectName, _environmentName);
             return false;
         }
 
-        Logger.LogInformation("Updating app settings for project {_projectName}/{_environmentName} by web agent...",
+        _logger.LogInformation("Updating app settings for project {_projectName}/{_environmentName} by web agent...",
             _projectName, _environmentName);
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
@@ -61,7 +64,7 @@ public sealed class InstallParametersAction : ToolAction
         if (updateAppParametersFileResult.IsNone)
             return true;
 
-        Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
+        _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;
     }
 }

@@ -17,6 +17,7 @@ namespace LibGitWork.ToolActions;
 
 public sealed class GitSyncToolAction : ToolAction
 {
+    private readonly ILogger _logger;
     private readonly GitSyncParameters _gitSyncParameters;
     private readonly bool _askCommitMessage;
     public bool Changed { get; private set; }
@@ -26,6 +27,7 @@ public sealed class GitSyncToolAction : ToolAction
     public GitSyncToolAction(ILogger logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
         bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
     {
+        _logger = logger;
         _gitSyncParameters = gitSyncParameters;
         _askCommitMessage = askCommitMessage;
         UsedCommitMessage = commitMessage;
@@ -60,7 +62,7 @@ public sealed class GitSyncToolAction : ToolAction
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectFolderName = Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
-        var gitProcessor = new GitProcessor(true, Logger, projectFolderName);
+        var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
             return Task.FromResult(gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
@@ -73,7 +75,7 @@ public sealed class GitSyncToolAction : ToolAction
         if (!gitInitialized)
         {
             StShared.WriteErrorLine(
-                $"Git project folder exists, but not initialized. folder: {projectFolderName}.", true, Logger);
+                $"Git project folder exists, but not initialized. folder: {projectFolderName}.", true, _logger);
             return Task.FromResult(false);
         }
 
@@ -92,7 +94,7 @@ public sealed class GitSyncToolAction : ToolAction
 
         if (remoteOriginUrl != _gitSyncParameters.GitData.GitProjectAddress)
         {
-            StShared.WriteErrorLine($"Git is not valid. folder: {projectFolderName}.", true, Logger);
+            StShared.WriteErrorLine($"Git is not valid. folder: {projectFolderName}.", true, _logger);
             return Task.FromResult(false);
         }
 

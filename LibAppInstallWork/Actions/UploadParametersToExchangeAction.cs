@@ -17,6 +17,7 @@ public sealed class UploadParametersToExchangeAction : ToolAction
     private readonly FileStorageData _exchangeFileStorage;
     private readonly string _parametersContent;
     private readonly string _parametersFileExtension;
+    private readonly ILogger _logger;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;
     private readonly SmartSchema _uploadSmartSchema;
@@ -25,6 +26,7 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         string dateMask, string parametersFileExtension, string parametersContent, FileStorageData exchangeFileStorage,
         SmartSchema uploadSmartSchema) : base(logger, "Upload Parameters To Exchange File Storage", null, null)
     {
+        _logger = logger;
         _projectName = projectName;
         _serverInfo = serverInfo;
         _dateMask = dateMask;
@@ -38,13 +40,13 @@ public sealed class UploadParametersToExchangeAction : ToolAction
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
-            Logger.LogError("Server name is not specified");
+            _logger.LogError("Server name is not specified");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
-            Logger.LogError("Environment Name is not specified");
+            _logger.LogError("Environment Name is not specified");
             return Task.FromResult(false);
         }
 
@@ -54,21 +56,21 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //ასატვირთი ფაილის სახელის შექმნა
         var uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
 
-        var exchangeFileManager = FileManagersFabric.CreateFileManager(true, Logger, null, _exchangeFileStorage, true);
+        var exchangeFileManager = FileManagersFabric.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
 
         if (exchangeFileManager == null)
         {
-            Logger.LogError("cannot create file manager"); // for {_exchangeFileStorageName}");
+            _logger.LogError("cannot create file manager"); // for {_exchangeFileStorageName}");
             return Task.FromResult(false);
         }
 
         if (!exchangeFileManager.UploadContentToTextFile(_parametersContent, uploadFileName))
         {
-            Logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
+            _logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
             return Task.FromResult(false);
         }
 
-        Logger.LogInformation("Remove redundant files...");
+        _logger.LogInformation("Remove redundant files...");
         //ზედმეტი ფაილების წაშლა ფაილსერვერის მხარეს
         //პრეფიქსის, სუფიქსისა და ნიღბის გათვალისწინებით ფაილების სიის დადგენა
         //ამ სიიდან ზედმეტი ფაილების დადგენა და წაშლა

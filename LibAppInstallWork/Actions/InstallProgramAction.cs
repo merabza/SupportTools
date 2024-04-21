@@ -15,6 +15,7 @@ public sealed class InstallProgramAction : ToolAction
 {
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
+    private readonly ILogger _logger;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
@@ -30,6 +31,7 @@ public sealed class InstallProgramAction : ToolAction
         string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
         string environmentName) : base(logger, "Install service", null, null)
     {
+        _logger = logger;
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;
         _programArchiveExtension = programArchiveExtension;
@@ -44,17 +46,17 @@ public sealed class InstallProgramAction : ToolAction
     {
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(Logger, _fileStorageForDownload,
+            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _fileStorageForDownload,
                 _installerBaseParameters);
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
+            _logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
                 _projectName, _environmentName);
             return false;
         }
 
-        Logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
+        _logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
             _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
@@ -62,13 +64,13 @@ public sealed class InstallProgramAction : ToolAction
             _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
 
-                
+
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 
         if (installProgramResult.IsT1)
         {
-            Logger.LogError("Error when Install program project {_projectName}/{_environmentName}", _projectName,
+            _logger.LogError("Error when Install program project {_projectName}/{_environmentName}", _projectName,
                 _environmentName);
             Err.PrintErrorsOnConsole(installProgramResult.AsT1);
             return false;
@@ -79,7 +81,7 @@ public sealed class InstallProgramAction : ToolAction
         if (_installingProgramVersion != null)
             return true;
 
-        Logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
+        _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;
     }
 }

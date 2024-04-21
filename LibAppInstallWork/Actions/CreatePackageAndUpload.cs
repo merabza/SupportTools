@@ -23,6 +23,7 @@ public sealed class CreatePackageAndUpload : ToolAction
     private readonly string _dateMask;
     private readonly FileStorageData _exchangeFileStorage;
     private readonly string _mainProjectFileName;
+    private readonly ILogger _logger;
     private readonly string _projectName;
     private readonly List<string> _redundantFileNames;
     private readonly string _runtime;
@@ -37,6 +38,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
         SmartSchema uploadSmartSchema) : base(logger, "Program Publisher", null, null)
     {
+        _logger = logger;
         _projectName = projectName;
         _mainProjectFileName = mainProjectFileName;
         _serverInfo = serverInfo;
@@ -56,31 +58,31 @@ public sealed class CreatePackageAndUpload : ToolAction
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
-            Logger.LogError("Server name is not specified");
+            _logger.LogError("Server name is not specified");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
-            Logger.LogError("Environment Name is not specified");
+            _logger.LogError("Environment Name is not specified");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_mainProjectFileName))
         {
-            Logger.LogError("Project file name is not specified");
+            _logger.LogError("Project file name is not specified");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_projectName))
         {
-            Logger.LogError("Project name is not specified");
+            _logger.LogError("Project name is not specified");
             return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_workFolder))
         {
-            Logger.LogError("Work Folder name is not specified");
+            _logger.LogError("Work Folder name is not specified");
             return Task.FromResult(false);
         }
 
@@ -88,7 +90,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         if (!StShared.CreateFolder(_workFolder, true))
             return Task.FromResult(false);
 
-        var archiveFileExtension = ".zip";
+        const string archiveFileExtension = ".zip";
 
         var datePart = DateTime.Now.ToString(_dateMask);
         //სახელის შექმნა output ფოლდერისათვის
@@ -104,7 +106,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         //თუ არსებობს გამოვიტანოთ შეცდომა და დავასრულოთ პროცესი
         if (Directory.Exists(outputFolderPath))
         {
-            StShared.WriteErrorLine($"Project output folder {outputFolderPath} is already exists", true, Logger);
+            StShared.WriteErrorLine($"Project output folder {outputFolderPath} is already exists", true, _logger);
             return Task.FromResult(false);
         }
 
@@ -112,7 +114,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         if (!StShared.CreateFolder(outputFolderPath, true))
             return Task.FromResult(false);
 
-        Logger.LogInformation("Detecting version...");
+        _logger.LogInformation("Detecting version...");
 
         var projectXml = XElement.Load(_mainProjectFileName);
 
@@ -141,20 +143,20 @@ public sealed class CreatePackageAndUpload : ToolAction
             ((int)(DateTime.Now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
         AssemblyVersion = string.Join('.', assemblyVersionNumbers);
 
-        Logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
+        _logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
 
         //მთავარი პროექტის შექმნა
-        if (StShared.RunProcess(true, Logger, "dotnet",
+        if (StShared.RunProcess(true, _logger, "dotnet",
                 $"publish --configuration Release --runtime {_runtime} --self-contained --output {outputFolderPath} {_mainProjectFileName} /p:AssemblyVersion={AssemblyVersion}")
             .IsSome)
         {
-            Logger.LogError("Cannot publish project {_projectName}", _projectName);
+            _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return Task.FromResult(false);
         }
 
         //if (_redundantFileNames != null)
         //{
-        Logger.LogInformation("Delete Redundant Files");
+        _logger.LogInformation("Delete Redundant Files");
         //outputFolderPath ფოლდერიდან წაიშალოს ზედმეტი ფაილები
         foreach (var fileName in _redundantFileNames.Select(Path.GetFileName))
         {
@@ -164,39 +166,39 @@ public sealed class CreatePackageAndUpload : ToolAction
             foreach (var file in di.GetFiles(fileName))
             {
                 var fName = file.Name;
-                Logger.LogInformation("Delete {fName}", fName);
+                _logger.LogInformation("Delete {fName}", fName);
                 file.Delete();
             }
         }
         //}
 
 
-        Logger.LogInformation("Archiving {zipFileFullName}...", zipFileFullName);
+        _logger.LogInformation("Archiving {zipFileFullName}...", zipFileFullName);
         //შექმნილი output ფოლდერიდან ZIP ფაილის შექმნა, იმავე სამუშაო ფოლდერში
         ZipFile.CreateFromDirectory(outputFolderPath, zipFileFullName, CompressionLevel.Optimal, false);
 
-        Logger.LogInformation("Removing folder {outputFolderPath}...", outputFolderPath);
+        _logger.LogInformation("Removing folder {outputFolderPath}...", outputFolderPath);
         //output ფოლდერის წაშლა
         Directory.Delete(outputFolderPath, true);
 
-        Logger.LogInformation("Uploading {zipFileFullName}...", zipFileFullName);
+        _logger.LogInformation("Uploading {zipFileFullName}...", zipFileFullName);
         //ZIP ფაილის ატვირთვა FTP-ზე
         var exchangeFileManager =
-            FileManagersFabric.CreateFileManager(true, Logger, _workFolder, _exchangeFileStorage);
+            FileManagersFabric.CreateFileManager(true, _logger, _workFolder, _exchangeFileStorage);
 
         if (exchangeFileManager == null)
         {
-            Logger.LogError("cannot create file manager");
+            _logger.LogError("cannot create file manager");
             return Task.FromResult(false);
         }
 
         if (!exchangeFileManager.UploadFile(zipFileName, _uploadTempExtension))
         {
-            Logger.LogError("cannot upload file {zipFileName}", zipFileName);
+            _logger.LogError("cannot upload file {zipFileName}", zipFileName);
             return Task.FromResult(false);
         }
 
-        Logger.LogInformation("Remove redundant files...");
+        _logger.LogInformation("Remove redundant files...");
 
         //SmartSchema? localSmartSchema = _smartSchemas.GetSmartSchemaByKey(_localSmartSchemaName);
         //SmartSchema? uploadSmartSchema = _smartSchemas.GetSmartSchemaByKey(_uploadSmartSchemaName);
@@ -210,12 +212,12 @@ public sealed class CreatePackageAndUpload : ToolAction
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _uploadSmartSchema);
 
-        Logger.LogInformation("Deleting {zipFileFullName} file...", zipFileFullName);
+        _logger.LogInformation("Deleting {zipFileFullName} file...", zipFileFullName);
         //წაიშალოს ლოკალური ფაილი
         File.Delete(zipFileFullName);
 
 
-        var workFileManager = FileManagersFabric.CreateFileManager(true, Logger, _workFolder);
+        var workFileManager = FileManagersFabric.CreateFileManager(true, _logger, _workFolder);
 
         workFileManager?.RemoveRedundantFiles(
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,

@@ -9,6 +9,7 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class DatabaseDropper : MigrationToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Drop Database";
     private const string ActionDescription = "Drop Database";
 
@@ -20,10 +21,12 @@ public sealed class DatabaseDropper : MigrationToolCommand
     //}
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseDropper(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
         IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
         parametersManager, ActionDescription)
     {
+        _logger = logger;
     }
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
@@ -31,7 +34,7 @@ public sealed class DatabaseDropper : MigrationToolCommand
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //ბაზის წაშლა
-        return Task.FromResult(StShared.RunProcess(true, Logger, "dotnet",
+        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"ef database drop --force --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsNone);
     }

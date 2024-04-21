@@ -14,6 +14,7 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class AppSettingsUpdater : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Update Settings";
 
     private const string ActionDescription =
@@ -23,6 +24,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
         ActionDescription)
     {
+        _logger = logger;
     }
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
@@ -33,7 +35,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
 
         //1. დავამზადოთ პარამეტრების ფაილი დაშიფრული და ავტვირთოთ ფაილსაცავში პარამეტრების ფაილის შიგთავსი.
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
+        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
             appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
             appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
@@ -47,12 +49,12 @@ public sealed class AppSettingsUpdater : ToolCommand
 
         if (!result || string.IsNullOrWhiteSpace(encodedJson) || string.IsNullOrWhiteSpace(checkForVersion))
         {
-            Logger.LogError("Cannot encode parameters");
+            _logger.LogError("Cannot encode parameters");
             return false;
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        var installParametersAction = new InstallParametersAction(Logger,
+        var installParametersAction = new InstallParametersAction(_logger,
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
@@ -60,18 +62,18 @@ public sealed class AppSettingsUpdater : ToolCommand
         var projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!await installParametersAction.Run(cancellationToken))
         {
-            Logger.LogError("project {projectName} parameters file is not updated", projectName);
+            _logger.LogError("project {projectName} parameters file is not updated", projectName);
             return false;
         }
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
-        var checkParametersVersionAction = new CheckParametersVersionAction(Logger,
+        var checkParametersVersionAction = new CheckParametersVersionAction(_logger,
             AppSettingsUpdaterParameters.WebAgentForCheck, AppSettingsUpdaterParameters.ProxySettings, checkForVersion);
 
         if (await checkParametersVersionAction.Run(cancellationToken))
             return true;
 
-        Logger.LogError("project {projectName} parameters file check failed", projectName);
+        _logger.LogError("project {projectName} parameters file check failed", projectName);
         return false;
     }
 }

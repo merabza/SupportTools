@@ -15,6 +15,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SelectProjectAllowToolsCliMenuCommand(ParametersManager parametersManager, string projectName)
     {
         _parametersManager = parametersManager;

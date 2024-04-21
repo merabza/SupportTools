@@ -12,6 +12,7 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ProgramUpdater : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
 
@@ -19,6 +20,7 @@ public sealed class ProgramUpdater : ToolCommand
         IParametersManager parametersManager) : base(logger, ActionName, programUpdaterParameters, parametersManager,
         ActionDescription)
     {
+        _logger = logger;
     }
 
     private ProgramUpdaterParameters ProgramUpdaterParameters => (ProgramUpdaterParameters)Par;
@@ -30,14 +32,14 @@ public sealed class ProgramUpdater : ToolCommand
 
         if (string.IsNullOrEmpty(environmentName))
         {
-            Logger.LogError("Environment {environmentName} is empty", environmentName);
+            _logger.LogError("Environment {environmentName} is empty", environmentName);
             return false;
         }
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var programPublisherParameters = ProgramUpdaterParameters.ProgramPublisherParameters;
 
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, programPublisherParameters.ProjectName,
+        var createPackageAndUpload = new CreatePackageAndUpload(_logger, programPublisherParameters.ProjectName,
             programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
             programPublisherParameters.WorkFolder, programPublisherParameters.DateMask,
             programPublisherParameters.Runtime, programPublisherParameters.RedundantFileNames,
@@ -48,7 +50,7 @@ public sealed class ProgramUpdater : ToolCommand
             return false;
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallProgramAction(Logger, ProgramUpdaterParameters.InstallerBaseParameters,
+        var installProgramAction = new InstallProgramAction(_logger, ProgramUpdaterParameters.InstallerBaseParameters,
             ProgramUpdaterParameters.ProgramArchiveDateMask, ProgramUpdaterParameters.ProgramArchiveExtension,
             ProgramUpdaterParameters.ParametersFileDateMask, ProgramUpdaterParameters.ParametersFileExtension,
             ProgramUpdaterParameters.FileStorageForDownload, projectName, environmentName);
@@ -56,7 +58,7 @@ public sealed class ProgramUpdater : ToolCommand
         if (await installProgramAction.Run(cancellationToken))
             return true;
 
-        Logger.LogError("project {projectName} not updated", projectName);
+        _logger.LogError("project {projectName} not updated", projectName);
         return false;
     }
 }

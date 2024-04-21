@@ -15,6 +15,7 @@ public sealed class ProgramInstaller : ToolCommand
 {
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
+    private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -22,6 +23,7 @@ public sealed class ProgramInstaller : ToolCommand
         IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription)
     {
+        _logger = logger;
         _useConsole = useConsole;
     }
 
@@ -31,20 +33,20 @@ public sealed class ProgramInstaller : ToolCommand
     {
         if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
         {
-            Logger.LogError("Server name is not specified");
+            _logger.LogError("Server name is not specified");
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.EnvironmentName))
         {
-            Logger.LogError("Environment name is not specified");
+            _logger.LogError("Environment name is not specified");
             return false;
         }
 
         if (!Parameters.IsService)
         {
             //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-            var installProgramAction = new InstallProgramAction(Logger, Parameters.InstallerBaseParameters,
+            var installProgramAction = new InstallProgramAction(_logger, Parameters.InstallerBaseParameters,
                 Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
                 Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension,
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.EnvironmentName);
@@ -60,7 +62,7 @@ public sealed class ProgramInstaller : ToolCommand
         {
 
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
-            var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(Logger, _useConsole,
+            var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(_logger, _useConsole,
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,
                 Parameters.ServerInfo.EnvironmentName, Parameters.ParametersFileDateMask,
                 Parameters.ParametersFileExtension, null, null);
@@ -70,7 +72,7 @@ public sealed class ProgramInstaller : ToolCommand
 
             if (!result || string.IsNullOrWhiteSpace(appSettingsVersion))
             {
-                Logger.LogError("Parameters version does not detected");
+                _logger.LogError("Parameters version does not detected");
                 return false;
             }
         }
@@ -78,25 +80,25 @@ public sealed class ProgramInstaller : ToolCommand
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var projectName = Parameters.ProjectName;
         var environmentName = Parameters.ServerInfo.EnvironmentName;
-        var installServiceAction = new InstallServiceAction(Logger, Parameters.InstallerBaseParameters,
+        var installServiceAction = new InstallServiceAction(_logger, Parameters.InstallerBaseParameters,
             Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
             Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
             Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName, Parameters.EncodedJsonFileName,
             Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
         if (!await installServiceAction.Run(cancellationToken))
         {
-            Logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
+            _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
             return false;
         }
 
         var installingProgramVersion = installServiceAction.InstallingProgramVersion;
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(Logger, Parameters.WebAgentForCheck,
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, Parameters.WebAgentForCheck,
             Parameters.ProxySettings, installingProgramVersion);
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
-            Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+            _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
             return false;
         }
@@ -104,7 +106,7 @@ public sealed class ProgramInstaller : ToolCommand
         if (appSettingsVersion != null)
         {
             //4. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
-            var checkParametersVersionAction = new CheckParametersVersionAction(Logger, Parameters.WebAgentForCheck,
+            var checkParametersVersionAction = new CheckParametersVersionAction(_logger, Parameters.WebAgentForCheck,
                 Parameters.ProxySettings, appSettingsVersion);
 
             if (await checkParametersVersionAction.Run(cancellationToken))
@@ -112,7 +114,7 @@ public sealed class ProgramInstaller : ToolCommand
         }
 
 
-        Logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+        _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
             environmentName);
         return false;
     }

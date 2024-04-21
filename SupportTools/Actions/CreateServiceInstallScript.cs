@@ -22,6 +22,7 @@ public class CreateServiceInstallScript : ToolAction
     private readonly string? _projectDescription;
     private readonly string _projectName;
     private readonly string _runTime;
+    private readonly ILogger _logger;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;
@@ -36,6 +37,7 @@ public class CreateServiceInstallScript : ToolAction
         string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreator),
         null, null)
     {
+        _logger = logger;
         _scriptFileName = scriptFileName;
         _portNumber = portNumber;
         _ftpSiteAddress = ftpSiteAddress;
@@ -366,7 +368,7 @@ public class CreateServiceInstallScript : ToolAction
 
 
               """;
-        if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
+        if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, _logger))
         {
             File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
             return Task.FromResult(true);

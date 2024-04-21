@@ -34,13 +34,11 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
             var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
             var projects = parameters.Projects;
-            if (!projects.ContainsKey(_projectName))
+            if (!projects.TryGetValue(_projectName, out var project))
             {
                 StShared.WriteErrorLine($"Project {_projectName} does not found", true);
                 return;
             }
-
-            var project = projects[_projectName];
 
             var defCloneFile = project.ProjectFolderName is null
                 ? null

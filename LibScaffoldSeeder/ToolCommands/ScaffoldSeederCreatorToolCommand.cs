@@ -33,6 +33,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
                                              """;
 
+    private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -41,6 +42,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         parametersManager, ActionDescription)
     // ReSharper disable once ConvertToPrimaryConstructor
     {
+        _logger = logger;
         _useConsole = useConsole;
     }
 
@@ -48,10 +50,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(Logger, _useConsole, Parameters);
+        var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(_logger, _useConsole, Parameters);
         if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {
-            StShared.WriteErrorLine("solution does not created", true, Logger);
+            StShared.WriteErrorLine("solution does not created", true, _logger);
             return false;
         }
 
@@ -59,7 +61,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         if (ParametersManager is null)
         {
-            StShared.WriteErrorLine("ParametersManager is null", true, Logger);
+            StShared.WriteErrorLine("ParametersManager is null", true, _logger);
             return false;
         }
 
@@ -69,7 +71,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         if (project is null)
         {
-            StShared.WriteErrorLine($"project with name {Parameters.ProjectName} does not exists", true, Logger);
+            StShared.WriteErrorLine($"project with name {Parameters.ProjectName} does not exists", true, _logger);
             return false;
         }
 
@@ -112,11 +114,11 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             "ConnectionStringSeed",
             seedDbProjectNameUseJsonFilePath);
 
-        var creatorCreator = new CreatorCreator(Logger, new ParametersManager(null, creatorCreatorParameters));
+        var creatorCreator = new CreatorCreator(_logger, new ParametersManager(null, creatorCreatorParameters));
 
         if (!await creatorCreator.Run(CancellationToken.None))
         {
-            StShared.WriteErrorLine("Creator code not created", true, Logger);
+            StShared.WriteErrorLine("Creator code not created", true, _logger);
             return false;
         }
 
@@ -130,7 +132,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath))
         {
-            StShared.WriteErrorLine("Parameters does not saved", true, Logger);
+            StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
 
@@ -164,7 +166,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
                     .ProjectFullPath))
         {
-            StShared.WriteErrorLine("Parameters does not saved", true, Logger);
+            StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
 
@@ -231,14 +233,14 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
                     .ProjectFullPath))
         {
-            StShared.WriteErrorLine("Parameters does not saved", true, Logger);
+            StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
 
         if (haveToSaveSupportToolsParameters)
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
 
-        if (StShared.RunProcess(true, Logger, "dotnet",
+        if (StShared.RunProcess(true, _logger, "dotnet",
                 $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}")
             .IsSome)
             return false;
@@ -251,7 +253,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var jsonFromProjectDbProjectGetter =
-            new JsonFromProjectDbProjectGetter(Logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
+            new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
         return await jsonFromProjectDbProjectGetter.Run(CancellationToken.None);
     }
 
@@ -283,7 +285,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         if (providerPackageName is null)
         {
-            StShared.WriteErrorLine("Package name for ProdCopyDatabaseDataProvider does not found", true, Logger);
+            StShared.WriteErrorLine("Package name for ProdCopyDatabaseDataProvider does not found", true, _logger);
             return false;
         }
 
@@ -300,7 +302,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         string prodCopyDatabaseConnectionString, string createProjectSeederCodeProjectFileFullName,
         string databaseScaffoldClassLibProjectFullPath, string providerPackageName, string dbScContextName)
     {
-        return StShared.RunProcess(true, Logger, "dotnet",
+        return StShared.RunProcess(true, _logger, "dotnet",
                 $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring")
             .IsNone;
     }

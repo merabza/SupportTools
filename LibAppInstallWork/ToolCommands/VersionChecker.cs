@@ -12,6 +12,7 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class VersionChecker : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
 
@@ -19,6 +20,7 @@ public sealed class VersionChecker : ToolCommand
     public VersionChecker(ILogger logger, CheckVersionParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
     }
 
     private CheckVersionParameters CheckVersionParameters => (CheckVersionParameters)Par;
@@ -27,18 +29,18 @@ public sealed class VersionChecker : ToolCommand
     {
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
+        CheckParametersVersionAction checkParametersVersionAction = new(_logger, CheckVersionParameters.WebAgentForCheck,
             CheckVersionParameters.ProxySettings, null, 1);
         if (!await checkParametersVersionAction.Run(cancellationToken))
-            Logger.LogError("project {projectName} parameters file check failed", projectName);
+            _logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
-        CheckProgramVersionAction checkProgramVersionAction = new(Logger, CheckVersionParameters.WebAgentForCheck,
+        CheckProgramVersionAction checkProgramVersionAction = new(_logger, CheckVersionParameters.WebAgentForCheck,
             CheckVersionParameters.ProxySettings, null, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
-            Logger.LogError("project {projectName} version check failed", projectName);
+            _logger.LogError("project {projectName} version check failed", projectName);
         //return false;
 
         return true;

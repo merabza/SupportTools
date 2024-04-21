@@ -16,12 +16,14 @@ public class ServiceRemoveScriptCreator : ToolCommand
 {
     private const string ActionName = "Creating Service Remove Script";
     private const string ActionDescription = "Creating Service Remove Script";
+    private readonly ILogger _logger;
     private readonly ServiceRemoveScriptCreatorParameters _par;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServiceRemoveScriptCreator(ILogger logger, ServiceRemoveScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _par = par;
     }
 
@@ -72,7 +74,7 @@ public class ServiceRemoveScriptCreator : ToolCommand
             return false;
         }
 
-        var createRemoveScript = new CreateServiceRemoveScript(Logger, scriptFileNameForSave, _par.ProjectName,
+        var createRemoveScript = new CreateServiceRemoveScript(_logger, scriptFileNameForSave, _par.ProjectName,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDeployFolder);
         return await createRemoveScript.Run(cancellationToken);
     }

@@ -140,7 +140,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             return false;
 
         Console.WriteLine("Destination Files already exists: ");
-        foreach (var fileName in existsFileNames) Console.WriteLine(@$"    {fileName}");
+        foreach (var fileName in existsFileNames) Console.WriteLine($"    {fileName}");
 
         return true;
     }

@@ -14,18 +14,21 @@ public sealed class ProgramPublisher : ToolCommand
 {
     private const string ActionName = "Publishing App";
     private const string ActionDescription = "Publishing App";
+    private readonly ILogger _logger;
     private readonly ProgramPublisherParameters _parameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramPublisher(ILogger logger, ProgramPublisherParameters parameters, IParametersManager parametersManager)
         : base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _parameters = parameters;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, _parameters.ProjectName,
+        var createPackageAndUpload = new CreatePackageAndUpload(_logger, _parameters.ProjectName,
             _parameters.MainProjectFileName, _parameters.ServerInfo, _parameters.WorkFolder, _parameters.DateMask,
             _parameters.Runtime, _parameters.RedundantFileNames, _parameters.UploadTempExtension,
             _parameters.FileStorageForExchange, _parameters.SmartSchemaForLocal, _parameters.SmartSchemaForExchange);

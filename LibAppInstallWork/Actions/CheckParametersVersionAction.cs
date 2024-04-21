@@ -15,7 +15,7 @@ namespace LibAppInstallWork.Actions;
 public sealed class CheckParametersVersionAction : ToolAction
 {
     private const string ProjectName = "";
-
+    private readonly ILogger _logger;
     private readonly string? _appSettingsVersion;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
@@ -26,6 +26,7 @@ public sealed class CheckParametersVersionAction : ToolAction
         ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger,
         "Check Parameters Version", null, null)
     {
+        _logger = logger;
         _appSettingsVersion = appSettingsVersion;
         _maxTryCount = maxTryCount;
         _proxySettings = proxySettings;
@@ -41,14 +42,14 @@ public sealed class CheckParametersVersionAction : ToolAction
         {
             if (tryCount > 0)
             {
-                Logger.LogInformation("waiting for 3 second...");
+                _logger.LogInformation("waiting for 3 second...");
                 Thread.Sleep(3000);
             }
 
             tryCount++;
             try
             {
-                Logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
+                _logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
 
                 var errors = new List<Err>();
 
@@ -57,7 +58,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    await using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    await using var proxyApiClient = new ProjectsProxyApiClient(_logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
                         await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
@@ -72,7 +73,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    await using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    await using var testApiClient = new TestApiClient(_logger, _webAgentForCheck.Server);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                         errors.AddRange(getAppSettingsVersionResult.AsT1);
@@ -89,14 +90,14 @@ public sealed class CheckParametersVersionAction : ToolAction
 
                     if (_appSettingsVersion == null)
                     {
-                        Logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
+                        _logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
                             version);
                         return true;
                     }
 
                     if (_appSettingsVersion != version)
                     {
-                        Logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
+                        _logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
                             version, _appSettingsVersion);
                         getVersionSuccess = false;
                     }
@@ -104,25 +105,25 @@ public sealed class CheckParametersVersionAction : ToolAction
             }
             catch
             {
-                Logger.LogWarning("could not get Parameters version for project {ProjectName} on try {tryCount}",
+                _logger.LogWarning("could not get Parameters version for project {ProjectName} on try {tryCount}",
                     ProjectName, tryCount);
             }
         }
 
         if (!getVersionSuccess)
         {
-            Logger.LogError("could not get parameters version for project {ProjectName}", ProjectName);
+            _logger.LogError("could not get parameters version for project {ProjectName}", ProjectName);
             return false;
         }
 
         if (_appSettingsVersion != version)
         {
-            Logger.LogError("Current parameters version is {version}, but must be {_appSettingsVersion}", version,
+            _logger.LogError("Current parameters version is {version}, but must be {_appSettingsVersion}", version,
                 _appSettingsVersion);
             return false;
         }
 
-        Logger.LogInformation("{ProjectName} now is running on parameters version {version}", ProjectName, version);
+        _logger.LogInformation("{ProjectName} now is running on parameters version {version}", ProjectName, version);
         return true;
     }
 }

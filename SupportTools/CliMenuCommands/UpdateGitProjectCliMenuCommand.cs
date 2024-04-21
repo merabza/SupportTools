@@ -30,6 +30,7 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
     private readonly SupportToolsParameters _supportToolsParameters;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateGitProjectCliMenuCommand(ILogger logger, string gitName, IParametersManager parametersManager) : base(
         "Update Git Project")
     {

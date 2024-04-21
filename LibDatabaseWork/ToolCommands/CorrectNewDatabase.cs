@@ -16,6 +16,7 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class CorrectNewDatabase : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Correct new Database";
     private const string ActionDescription = "Correct new Database";
 
@@ -25,6 +26,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         IParametersManager? parametersManager) : base(logger, ActionName, correctNewDbParameters, parametersManager,
         ActionDescription)
     {
+        _logger = logger;
     }
 
     private CorrectNewDbParameters CorrectNewDbParameters => (CorrectNewDbParameters)Par;
@@ -42,7 +44,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         if (CorrectNewDbParameters.DataProvider != EDataProvider.None)
             return true;
 
-        Logger.LogError("DataProvider not specified");
+        _logger.LogError("DataProvider not specified");
         return false;
     }
 
@@ -51,24 +53,24 @@ public sealed class CorrectNewDatabase : ToolCommand
         var constraintsForCorrect = CorrectBitConstraints();
 
         var constraintsForCorrectCount = constraintsForCorrect.Count;
-        Logger.LogInformation("Correction needs {constraintsForCorrectCount} constraints", constraintsForCorrectCount);
+        _logger.LogInformation("Correction needs {constraintsForCorrectCount} constraints", constraintsForCorrectCount);
 
         foreach (var constraintDataModel in constraintsForCorrect)
         {
             var tableName = constraintDataModel.TableName;
-            Logger.LogInformation("Correcting table {tableName}", tableName);
+            _logger.LogInformation("Correcting table {tableName}", tableName);
 
             if (!DeleteConstraint(constraintDataModel))
             {
                 var defaultConstraintName = constraintDataModel.DefaultConstraintName;
-                Logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
+                _logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
                 return Task.FromResult(false);
             }
 
             if (CreateConstraint(constraintDataModel))
                 continue;
 
-            Logger.LogError("Cannot Create constraint for table {tableName}", tableName);
+            _logger.LogError("Cannot Create constraint for table {tableName}", tableName);
             return Task.FromResult(false);
         }
 
@@ -103,7 +105,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error when execute command {strCommand}", strCommand);
+            _logger.LogError(ex, "Error when execute command {strCommand}", strCommand);
         }
         finally
         {
@@ -142,7 +144,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         }
         catch (Exception ex)
         {
-            StShared.WriteException(ex, true, Logger);
+            StShared.WriteException(ex, true, _logger);
         }
         finally
         {

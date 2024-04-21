@@ -17,6 +17,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SaveGitsCloneFileCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
         base("Save Gits Clone File")
     {
@@ -67,13 +68,11 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
 
             foreach (var gitProjectName in project.GitProjectNames)
             {
-                if (!parameters.Gits.ContainsKey(gitProjectName))
+                if (!parameters.Gits.TryGetValue(gitProjectName, out var gitProject))
                 {
                     StShared.WriteErrorLine($"Git project with name {gitProjectName} does not exists", true);
                     return;
                 }
-
-                var gitProject = parameters.Gits[gitProjectName];
 
                 if (string.IsNullOrWhiteSpace(gitProject.GitProjectAddress))
                 {

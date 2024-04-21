@@ -16,11 +16,13 @@ public sealed class ServiceStopper : ToolCommand
 {
     private const string ActionName = "Stop Service";
     private const string ActionDescription = "Stop Service";
+    private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
     public ServiceStopper(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _parameters = parameters;
     }
 
@@ -34,22 +36,22 @@ public sealed class ServiceStopper : ToolCommand
         var projectName = _parameters.ProjectName;
         var environmentName = _parameters.EnvironmentName;
 
-        Logger.LogInformation("Try to stop service {projectName}/{environmentName}...", projectName, environmentName);
+        _logger.LogInformation("Try to stop service {projectName}/{environmentName}...", projectName, environmentName);
 
         if (string.IsNullOrWhiteSpace(projectName))
         {
-            Logger.LogError("Service Name not specified");
+            _logger.LogError("Service Name not specified");
             return false;
         }
 
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall,
+            ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _parameters.WebAgentForInstall,
                 _parameters.InstallFolder);
 
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not be stopped",
+            _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not be stopped",
                 projectName, environmentName);
             return false;
         }
@@ -58,14 +60,15 @@ public sealed class ServiceStopper : ToolCommand
         var stopServiceResult = await agentClient.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsSome)
         {
-            Logger.LogError("Service {projectName}/{environmentName} can not be stopped", projectName, environmentName);
+            _logger.LogError("Service {projectName}/{environmentName} can not be stopped", projectName,
+                environmentName);
             return false;
         }
-        
+
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 
-        Logger.LogInformation("Service Stopped");
+        _logger.LogInformation("Service Stopped");
         return true;
     }
 }

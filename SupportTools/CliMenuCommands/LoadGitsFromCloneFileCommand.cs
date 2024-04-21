@@ -15,6 +15,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public LoadGitsFromCloneFileCommand(ParametersManager parametersManager, string projectName) : base(
         "Load Gits From Clone File")
     {
@@ -39,8 +40,9 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             var mainProjectName = project.MainProjectName;
             string? mainProjectRelativePath = null;
             string? mainProjectFolderRelativePath = null;
-            if (!string.IsNullOrWhiteSpace(mainProjectName) && parameters.GitProjects.ContainsKey(mainProjectName))
-                mainProjectRelativePath = parameters.GitProjects[mainProjectName].ProjectRelativePath;
+            if (!string.IsNullOrWhiteSpace(mainProjectName) &&
+                parameters.GitProjects.TryGetValue(mainProjectName, out var gitProject))
+                mainProjectRelativePath = gitProject.ProjectRelativePath;
             if (!string.IsNullOrWhiteSpace(mainProjectRelativePath))
             {
                 var fileInfo = new FileInfo(mainProjectRelativePath);

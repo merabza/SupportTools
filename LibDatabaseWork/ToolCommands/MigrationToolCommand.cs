@@ -8,11 +8,14 @@ namespace LibDatabaseWork.ToolCommands;
 
 public /*open*/ class MigrationToolCommand : ToolCommand
 {
+    private readonly ILogger _logger;
+
     protected MigrationToolCommand(ILogger logger, string actionName,
         DatabaseMigrationParameters databaseMigrationParameters, IParametersManager? parametersManager,
         string? actionDescription = null) : base(logger, actionName, databaseMigrationParameters, parametersManager,
         actionDescription)
     {
+        _logger = logger;
     }
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
@@ -23,7 +26,7 @@ public /*open*/ class MigrationToolCommand : ToolCommand
         if (string.IsNullOrWhiteSpace(DatabaseMigrationParameters.StartupProjectFileName) ||
             !File.Exists(DatabaseMigrationParameters.StartupProjectFileName))
         {
-            Logger.LogError("Main Or Seed Project file name not Specified or not found");
+            _logger.LogError("Main Or Seed Project file name not Specified or not found");
             return false;
         }
 
@@ -31,7 +34,7 @@ public /*open*/ class MigrationToolCommand : ToolCommand
         if (string.IsNullOrWhiteSpace(DatabaseMigrationParameters.MigrationProjectFileName) ||
             !File.Exists(DatabaseMigrationParameters.MigrationProjectFileName))
         {
-            Logger.LogError("Migration Project file name not Specified or not found");
+            _logger.LogError("Migration Project file name not Specified or not found");
             return false;
         }
 
@@ -39,7 +42,7 @@ public /*open*/ class MigrationToolCommand : ToolCommand
         if (!string.IsNullOrWhiteSpace(DatabaseMigrationParameters.DbContextName))
             return true;
 
-        Logger.LogError("Database Context Name not Specified");
+        _logger.LogError("Database Context Name not Specified");
         return false;
     }
 }

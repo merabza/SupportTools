@@ -16,12 +16,14 @@ public sealed class ServicePublisher : ToolCommand
 {
     private const string ActionName = "Publishing Service";
     private const string ActionDescription = "Publishing Service";
+    private readonly ILogger _logger;
     private readonly AppSettingsEncoderParameters _appSettingsEncoderParameters;
 
     public ServicePublisher(ILogger logger, ProgramPublisherParameters parameters,
         AppSettingsEncoderParameters appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _appSettingsEncoderParameters = appSettingsEncoderParametersForPublish;
     }
 
@@ -30,7 +32,7 @@ public sealed class ServicePublisher : ToolCommand
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var createPackageAndUpload = new CreatePackageAndUpload(Logger, ProgramPublisherParameters.ProjectName,
+        var createPackageAndUpload = new CreatePackageAndUpload(_logger, ProgramPublisherParameters.ProjectName,
             ProgramPublisherParameters.MainProjectFileName, ProgramPublisherParameters.ServerInfo,
             ProgramPublisherParameters.WorkFolder, ProgramPublisherParameters.DateMask,
             ProgramPublisherParameters.Runtime, ProgramPublisherParameters.RedundantFileNames,
@@ -42,7 +44,7 @@ public sealed class ServicePublisher : ToolCommand
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         //AppSettingsEncoderParameters appSettingsEncoderParameters =
         //    ProgramPublisherParameters.AppSettingsEncoderParameters;
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(Logger,
+        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
             _appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
             _appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
             _appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, _appSettingsEncoderParameters.KeyPart1,

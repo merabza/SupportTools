@@ -10,6 +10,7 @@ namespace LibScaffoldSeeder.ToolCommands;
 
 public sealed class JsonFromProjectDbProjectGetter : ToolCommand
 {
+    private readonly ILogger _logger;
     private const string ActionName = "Get Json From Project DbProject";
     private const string ActionDescription = "Get Json From Project DbProject";
 
@@ -20,6 +21,7 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
         IParametersManager parametersManager) : base(logger, ActionName, jsonFromProjectDbProjectGetterParameters,
         parametersManager, ActionDescription)
     {
+        _logger = logger;
     }
 
     private JsonFromProjectDbProjectGetterParameters CorrectNewDbParameters =>
@@ -29,20 +31,20 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
     {
         if (string.IsNullOrWhiteSpace(CorrectNewDbParameters.GetJsonFromScaffoldDbProjectFileFullName))
         {
-            Logger.LogError("GetJsonFromScaffoldDbProjectFileFullName not specified");
+            _logger.LogError("GetJsonFromScaffoldDbProjectFileFullName not specified");
             return false;
         }
 
         if (!string.IsNullOrWhiteSpace(CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName))
             return true;
 
-        Logger.LogError("GetJsonFromScaffoldDbProjectParametersFileFullName not specified");
+        _logger.LogError("GetJsonFromScaffoldDbProjectParametersFileFullName not specified");
         return false;
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        return Task.FromResult(StShared.RunProcess(true, Logger, "dotnet",
+        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"run --project {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectFileFullName} --use {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName}")
             .IsNone);
     }

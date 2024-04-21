@@ -14,6 +14,7 @@ public class CreateServiceRemoveScript : ToolAction
 {
     private readonly string _environmentName;
     private readonly string _projectName;
+    private readonly ILogger _logger;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
 
@@ -21,6 +22,7 @@ public class CreateServiceRemoveScript : ToolAction
         string serverSideDeployFolder) : base(logger, nameof(ServiceRemoveScriptCreator), null,
         null)
     {
+        _logger = logger;
         _scriptFileName = scriptFileName;
         _projectName = projectName;
         _environmentName = environmentName;
@@ -80,7 +82,7 @@ public class CreateServiceRemoveScript : ToolAction
               exit 0
 
               """;
-        if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, Logger))
+        if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, _logger))
         {
             File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
             return Task.FromResult(true);

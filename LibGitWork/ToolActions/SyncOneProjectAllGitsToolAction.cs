@@ -16,13 +16,14 @@ namespace LibGitWork.ToolActions;
 
 public sealed class SyncOneProjectAllGitsToolAction : ToolAction
 {
+    private readonly ILogger _logger;
     private readonly SyncOneProjectAllGitsParameters _syncOneProjectAllGitsParameters;
 
     public SyncOneProjectAllGitsToolAction(ILogger logger,
-        SyncOneProjectAllGitsParameters syncOneProjectAllGitsParameters) : base(
-        logger,
-        "Sync One Project All Gits", null, null)
+        SyncOneProjectAllGitsParameters syncOneProjectAllGitsParameters) : base(logger, "Sync One Project All Gits",
+        null, null)
     {
+        _logger = logger;
         _syncOneProjectAllGitsParameters = syncOneProjectAllGitsParameters;
     }
 
@@ -54,16 +55,16 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
                 (!changedGitProjects[EGitCollect.Usage].TryGetValue(gitProjectFolderName, out var proListVal) ||
                  proListVal.Count == 1 && proListVal[0] == projectName))
                 continue;
-            var gitSync = new GitSyncToolAction(Logger,
-                new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder),
-                commitMessage, commitMessage == null);
+            var gitSync = new GitSyncToolAction(_logger,
+                new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
+                commitMessage == null);
             await gitSync.Run(cancellationToken);
             commitMessage = gitSync.UsedCommitMessage;
             if (projectName is null || changedGitProjects is null || !gitSync.Changed)
                 continue;
             if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList))
             {
-                if (!proList.Contains(projectName)) 
+                if (!proList.Contains(projectName))
                     proList.Add(projectName);
             }
             else
@@ -72,5 +73,4 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
 
         return true;
     }
-
 }

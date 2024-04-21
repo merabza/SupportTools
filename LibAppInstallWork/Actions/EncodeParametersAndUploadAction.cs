@@ -16,6 +16,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
     private readonly FileStorageData _exchangeFileStorage;
     private readonly string _keyPart1;
     private readonly string _keyPart2;
+    private readonly ILogger _logger;
     private readonly string _keysJsonFileName;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
@@ -28,6 +29,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         string dateMask, string parametersFileExtension, FileStorageData exchangeFileStorage,
         SmartSchema uploadSmartSchema) : base(logger, "Encode Parameters And Upload", null, null)
     {
+        _logger = logger;
         _keysJsonFileName = keysJsonFileName;
         _sourceJsonFileName = sourceJsonFileName;
         _encodedJsonFileName = encodedJsonFileName;
@@ -47,11 +49,11 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var encodeParametersAction = new EncodeParametersAction(Logger, _keysJsonFileName, _sourceJsonFileName,
+        var encodeParametersAction = new EncodeParametersAction(_logger, _keysJsonFileName, _sourceJsonFileName,
             _encodedJsonFileName, _keyPart1, _keyPart2);
         if (!await encodeParametersAction.Run(cancellationToken))
         {
-            Logger.LogError("Cannot encode parameters");
+            _logger.LogError("Cannot encode parameters");
             return false;
         }
 
@@ -60,12 +62,12 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
         if (EncodedJsonContent is null)
         {
-            Logger.LogError("Encoded Parameters Json Content is null");
+            _logger.LogError("Encoded Parameters Json Content is null");
             return false;
         }
 
 
-        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(Logger, _projectName,
+        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(_logger, _projectName,
             _serverInfo, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
             _uploadSmartSchema);
         return await uploadParametersToExchangeAction.Run(cancellationToken);

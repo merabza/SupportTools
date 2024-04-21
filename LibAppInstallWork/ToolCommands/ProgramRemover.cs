@@ -12,12 +12,14 @@ public sealed class ProgramRemover : ToolCommand
 {
     private const string ActionName = "Remove App";
     private const string ActionDescription = "Remove App";
+    private readonly ILogger _logger;
     private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramRemover(ILogger logger, ProgramRemoverParameters parameters, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
+        _logger = logger;
         _parameters = parameters;
     }
 
@@ -26,7 +28,7 @@ public sealed class ProgramRemover : ToolCommand
         if (!string.IsNullOrWhiteSpace(_parameters.ProjectName))
             return true;
 
-        Logger.LogError("Project Name not specified");
+        _logger.LogError("Project Name not specified");
         return false;
     }
 
@@ -35,22 +37,23 @@ public sealed class ProgramRemover : ToolCommand
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
         var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClient(Logger, _parameters.WebAgentForInstall,
+            ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _parameters.WebAgentForInstall,
                 _parameters.InstallFolder);
         if (agentClient is null)
         {
-            Logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
+            _logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
             return false;
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (await agentClient.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService, CancellationToken.None))
+        if (await agentClient.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService,
+                CancellationToken.None))
             return true;
 
         if (agentClient is IDisposable disposable)
             disposable.Dispose();
 
-        Logger.LogError("Project {projectName} can not removed", projectName);
+        _logger.LogError("Project {projectName} can not removed", projectName);
         return false;
     }
 }

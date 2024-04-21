@@ -10,9 +10,13 @@ namespace LibAppProjectCreator.ToolCommands;
 
 public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
 {
+    private readonly ILogger _logger;
+
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateAllReactAppsByTemplatesToolCommand(ILogger logger, string actionName, IParameters par,
         IParametersManager? parametersManager) : base(logger, actionName, par, parametersManager)
     {
+        _logger = logger;
     }
 
 
@@ -31,7 +35,7 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
             Console.WriteLine("Start create React App: {0}", kvp.Key);
 
             var command =
-                new ReCreateReactAppFilesByTemplateNameToolCommand(Logger, kvp.Key, kvp.Value, parameters,
+                new ReCreateReactAppFilesByTemplateNameToolCommand(_logger, kvp.Key, kvp.Value, parameters,
                     ParametersManager);
 
             await command.Run(cancellationToken);

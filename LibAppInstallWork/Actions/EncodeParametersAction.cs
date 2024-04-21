@@ -22,11 +22,13 @@ public sealed class EncodeParametersAction : ToolAction
     private readonly string _keyPart1;
     private readonly string _keyPart2;
     private readonly string _keysJsonFileName;
+    private readonly ILogger _logger;
     private readonly string _sourceJsonFileName;
 
     public EncodeParametersAction(ILogger logger, string keysJsonFileName, string sourceJsonFileName,
         string encodedJsonFileName, string keyPart1, string keyPart2) : base(logger, "Encode Parameters", null, null)
     {
+        _logger = logger;
         _sourceJsonFileName = sourceJsonFileName;
         _encodedJsonFileName = encodedJsonFileName;
         _keysJsonFileName = keysJsonFileName;
@@ -49,7 +51,7 @@ public sealed class EncodeParametersAction : ToolAction
         }
 
         if (!success)
-            Logger.LogWarning("Encoded file does not created");
+            _logger.LogWarning("Encoded file does not created");
         return Task.FromResult(success);
     }
 
@@ -61,13 +63,13 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (string.IsNullOrWhiteSpace(_keysJsonFileName))
         {
-            Logger.LogError("keys file is not specified");
+            _logger.LogError("keys file is not specified");
             return null;
         }
 
         if (!File.Exists(_keysJsonFileName))
         {
-            Logger.LogError("keys file {_keysJsonFileName} does not exists", _keysJsonFileName);
+            _logger.LogError("keys file {_keysJsonFileName} does not exists", _keysJsonFileName);
             return null;
         }
 
@@ -85,7 +87,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (encKey == "")
         {
-            Logger.LogError("key is not defined");
+            _logger.LogError("key is not defined");
             return null;
         }
 
@@ -138,14 +140,14 @@ public sealed class EncodeParametersAction : ToolAction
                      .Where(w => w.keys.Length != 0)
                      .Where(w => !Enc(appSetJObject, encKey, w.keys))
                      .Select(s => s.dataKey))
-            Logger.LogWarning("cannot found dataKey {dataKey}", dataKey);
+            _logger.LogWarning("cannot found dataKey {dataKey}", dataKey);
 
         AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
         if (string.IsNullOrWhiteSpace(appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Value<string>()))
             StShared.WriteWarningLine(
                 $"AppSettingsVersion did not defined. If you continue, we can not check installed AppSettingsVersion. Please add to {_sourceJsonFileName} file VersionInfo:AppSettingsVersion",
-                true, Logger, true);
+                true, _logger, true);
 
         appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);

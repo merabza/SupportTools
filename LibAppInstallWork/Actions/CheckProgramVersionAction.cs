@@ -16,15 +16,15 @@ public sealed class CheckProgramVersionAction : ToolAction
 {
     private readonly string? _installingProgramVersion;
     private readonly int _maxTryCount;
-
     private readonly ProxySettingsBase _proxySettings;
-
+    private readonly ILogger _logger;
     private readonly ApiClientSettingsDomain _webAgentForCheck;
 
     public CheckProgramVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
         ProxySettingsBase proxySettings, string? installingProgramVersion, int maxTryCount = 10) : base(logger,
         "Check Program Version", null, null)
     {
+        _logger = logger;
         _webAgentForCheck = webAgentForCheck;
         _proxySettings = proxySettings;
         _installingProgramVersion = installingProgramVersion;
@@ -40,21 +40,21 @@ public sealed class CheckProgramVersionAction : ToolAction
         {
             if (tryCount > 0)
             {
-                Logger.LogInformation("waiting for 3 second...");
+                _logger.LogInformation("waiting for 3 second...");
                 Thread.Sleep(3000);
             }
 
             tryCount++;
             try
             {
-                Logger.LogInformation("Try to get Version {tryCount}...", tryCount);
+                _logger.LogInformation("Try to get Version {tryCount}...", tryCount);
 
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    await using var proxyApiClient = new ProjectsProxyApiClient(Logger, _webAgentForCheck.Server,
+                    await using var proxyApiClient = new ProjectsProxyApiClient(_logger, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                         proxySettings.ApiVersionId, cancellationToken);
@@ -71,7 +71,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     // ReSharper disable once using
                     // ReSharper disable once DisposableConstructor
-                    await using var testApiClient = new TestApiClient(Logger, _webAgentForCheck.Server);
+                    await using var testApiClient = new TestApiClient(_logger, _webAgentForCheck.Server);
                     var getVersionResult = await testApiClient.GetVersion(cancellationToken);
                     if (getVersionResult.IsT1)
                     {
@@ -84,14 +84,14 @@ public sealed class CheckProgramVersionAction : ToolAction
 
                 if (_installingProgramVersion == null)
                 {
-                    Logger.LogInformation("Project is running on version {version}", version);
+                    _logger.LogInformation("Project is running on version {version}", version);
                     return true;
                 }
 
 
                 if (_installingProgramVersion != version)
                 {
-                    Logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,
+                    _logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,
                         _installingProgramVersion);
                     getVersionSuccess = false;
                     break;
@@ -102,25 +102,24 @@ public sealed class CheckProgramVersionAction : ToolAction
             }
             catch (Exception ex)
             {
-                Logger.LogWarning(ex, "could not get version on try {tryCount}", tryCount);
-                //Logger.LogWarning($"could not get version on try {tryCount}");
+                _logger.LogWarning(ex, "could not get version on try {tryCount}", tryCount);
             }
         }
 
         if (!getVersionSuccess)
         {
-            Logger.LogError("could not get version");
+            _logger.LogError("could not get version");
             return false;
         }
 
         if (_installingProgramVersion != version)
         {
-            Logger.LogError("Current version is {version}, but must be {_installingProgramVersion}", version,
+            _logger.LogError("Current version is {version}, but must be {_installingProgramVersion}", version,
                 _installingProgramVersion);
             return false;
         }
 
-        Logger.LogInformation("Project now is running on version {version}", version);
+        _logger.LogInformation("Project now is running on version {version}", version);
 
         return true;
     }
