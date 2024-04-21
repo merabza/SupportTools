@@ -10,7 +10,7 @@ using SystemToolsShared;
 
 // ReSharper disable ReplaceWithPrimaryConstructorParameter
 
-namespace LibAppInstallWork.Actions;
+namespace LibAppInstallWork.ToolActions;
 
 public sealed class CheckParametersVersionAction : ToolAction
 {

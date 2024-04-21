@@ -8,7 +8,7 @@ using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace SupportTools.Actions;
+namespace SupportTools.ToolActions;
 
 public class CreateServiceRemoveScript : ToolAction
 {

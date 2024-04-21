@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.Actions;
+namespace LibAppInstallWork.ToolActions;
 
 public sealed class InstallParametersAction : ToolAction
 {

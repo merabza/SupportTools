@@ -9,7 +9,7 @@ using SupportToolsData.Models;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.Actions;
+namespace LibAppInstallWork.ToolActions;
 
 public sealed class UploadParametersToExchangeAction : ToolAction
 {

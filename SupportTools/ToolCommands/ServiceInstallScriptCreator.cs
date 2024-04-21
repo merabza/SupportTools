@@ -6,7 +6,7 @@ using CliParameters;
 using LibMenuInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportTools.Actions;
+using SupportTools.ToolActions;
 using SupportTools.ToolCommandParameters;
 using SupportToolsData.Models;
 using SystemToolsShared;

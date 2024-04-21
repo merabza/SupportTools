@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork;
-using LibAppInstallWork.Actions;
+using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

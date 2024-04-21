@@ -16,7 +16,7 @@ using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.Actions;
+namespace LibAppInstallWork.ToolActions;
 
 public sealed class CreatePackageAndUpload : ToolAction
 {

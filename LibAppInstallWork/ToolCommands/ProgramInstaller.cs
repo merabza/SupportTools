@@ -3,9 +3,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using Installer.Actions;
-using LibAppInstallWork.Actions;
+using Installer.ToolActions;
 using LibAppInstallWork.Models;
+using LibAppInstallWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 

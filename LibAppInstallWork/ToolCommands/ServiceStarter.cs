@@ -4,8 +4,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using LibAppInstallWork.Actions;
 using LibAppInstallWork.Models;
+using LibAppInstallWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 
