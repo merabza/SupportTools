@@ -9,15 +9,15 @@ namespace LibDatabaseWork.Models;
 public sealed class CopyBaseParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CopyBaseParameters(IDatabaseApiClient agentClientForSource,
-        IDatabaseApiClient agentClientForDestination, FileManager? exchangeFileManager,
-        FileManager sourceFileManager, FileManager destinationFileManager, FileManager localFileManager,
-        DatabaseBackupParametersDomain sourceDbBackupParameters,
+    public CopyBaseParameters(IDatabaseApiClient agentClientForSource, IDatabaseApiClient agentClientForDestination,
+        FileManager? exchangeFileManager, FileManager sourceFileManager, FileManager destinationFileManager,
+        FileManager localFileManager, DatabaseBackupParametersDomain sourceDbBackupParameters,
         DatabaseBackupParametersDomain destinationDbBackupParameters, bool needDownloadFromSource,
         SmartSchema? sourceSmartSchema, SmartSchema? localSmartSchema, bool needUploadToDestination,
         SmartSchema? destinationSmartSchema, bool needDownloadFromExchange, SmartSchema? exchangeSmartSchema,
         bool needDownloadFromDestination, bool needUploadDestinationToExchange, string downloadTempExtension,
-        string uploadTempExtension, string sourceDatabaseName, string destinationDatabaseName, string localPath)
+        string uploadTempExtension, string sourceDatabaseName, string? destinationDbServerSideDataFolderPath,
+        string? destinationDbServerSideLogFolderPath, string destinationDatabaseName, string localPath)
     {
         AgentClientForSource = agentClientForSource;
         AgentClientForDestination = agentClientForDestination;
@@ -39,6 +39,8 @@ public sealed class CopyBaseParameters : IParameters
         DownloadTempExtension = downloadTempExtension;
         UploadTempExtension = uploadTempExtension;
         SourceDatabaseName = sourceDatabaseName;
+        DestinationDbServerSideDataFolderPath = destinationDbServerSideDataFolderPath;
+        DestinationDbServerSideLogFolderPath = destinationDbServerSideLogFolderPath;
         DestinationDatabaseName = destinationDatabaseName;
         LocalPath = localPath;
     }
@@ -51,6 +53,8 @@ public sealed class CopyBaseParameters : IParameters
     public FileManager LocalFileManager { get; }
     public DatabaseBackupParametersDomain SourceDbBackupParameters { get; }
     public string SourceDatabaseName { get; }
+    public string? DestinationDbServerSideDataFolderPath { get; }
+    public string? DestinationDbServerSideLogFolderPath { get; }
     public DatabaseBackupParametersDomain DestinationDbBackupParameters { get; }
     public string DestinationDatabaseName { get; }
     public bool NeedDownloadFromSource { get; }

@@ -214,8 +214,9 @@ public sealed class BaseCopier : ToolCommand
         _logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
         var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(
-            backupFileParametersForSource,
-            destinationDatabaseName, CancellationToken.None, CopyBaseParameters.LocalPath);
+            backupFileParametersForSource, CopyBaseParameters.DestinationDbServerSideDataFolderPath,
+            CopyBaseParameters.DestinationDbServerSideLogFolderPath, destinationDatabaseName, CancellationToken.None,
+            CopyBaseParameters.LocalPath);
 
         if (restoreDatabaseFromBackupResult.IsNone)
             return true;

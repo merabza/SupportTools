@@ -53,7 +53,6 @@ public static class CopyBaseParametersFabric
         ApiClients apiClients = new(supportToolsParameters.ApiClients);
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
 
-
         var localPath = dep.LocalPath;
 
         if (string.IsNullOrWhiteSpace(localPath))
@@ -82,7 +81,6 @@ public static class CopyBaseParametersFabric
         var backupBaseName = fromProductionToDeveloper
             ? dep.CurrentProductionBaseName
             : dep.DeveloperBaseName; //ბაზის სერვერის მხარე
-
 
         //მიზნის სერვერის აგენტის შექმნა
         var destinationDbWebAgentName = fromProductionToDeveloper
@@ -189,7 +187,6 @@ public static class CopyBaseParametersFabric
 
         var sourceDbBackupParameters = DatabaseBackupParametersDomain.Create(
             fromProductionToDeveloper ? dep.ProductionDbBackupParameters : dep.DeveloperDbBackupParameters,
-            //fromProductionToDeveloper ? dep.ProductionDbServerName : dep.DeveloperDbServerName,
             fromProductionToDeveloper ? dep.ProductionDbServerSideBackupPath : dep.DeveloperDbServerSideBackupPath);
 
         if (sourceDbBackupParameters is null)
@@ -197,13 +194,6 @@ public static class CopyBaseParametersFabric
             logger.LogError("sourceDbBackupParameters does not created");
             return null;
         }
-
-        //var sourceServerName = fromProductionToDeveloper ? dep.ProductionDbServerName : dep.DeveloperDbServerName;
-        //if (string.IsNullOrWhiteSpace(sourceServerName))
-        //{
-        //    logger.LogError("sourceServerName does not detected");
-        //    return null;
-        //}
 
         var sourceDatabaseName = fromProductionToDeveloper ? dep.CurrentProductionBaseName : dep.DeveloperBaseName;
         if (string.IsNullOrWhiteSpace(sourceDatabaseName))
@@ -216,23 +206,23 @@ public static class CopyBaseParametersFabric
             fromProductionToDeveloper
                 ? dep.DeveloperDbBackupParameters
                 : dep.ProductionDbBackupParameters,
-            //fromProductionToDeveloper ? dep.DeveloperDbServerName : dep.ProductionDbServerName,
             fromProductionToDeveloper
                 ? dep.DeveloperDbServerSideBackupPath
                 : dep.ProductionDbServerSideBackupPath);
+
+        var destinationDbServerSideDataFolderPath = fromProductionToDeveloper
+            ? dep.DeveloperDbServerSideDataFolderPath
+            : dep.ProductionDbServerSideDataFolderPath;
+
+        var destinationDbServerSideLogFolderPath = fromProductionToDeveloper
+            ? dep.DeveloperDbServerSideLogFolderPath
+            : dep.ProductionDbServerSideLogFolderPath;
 
         if (destinationDbBackupParameters is null)
         {
             logger.LogError("destinationDbBackupParameters does not created");
             return null;
         }
-
-        //var destinationServerName = fromProductionToDeveloper ? dep.DeveloperDbServerName : dep.ProductionDbServerName;
-        //if (string.IsNullOrWhiteSpace(destinationServerName))
-        //{
-        //    logger.LogError("destinationServerName does not detected");
-        //    return null;
-        //}
 
         var destinationDatabaseName = fromProductionToDeveloper
             ? dep.ProductionBaseCopyNameForDeveloperServer
@@ -292,6 +282,7 @@ public static class CopyBaseParametersFabric
             needDownloadFromDestination, needUploadDestinationToExchange,
             string.IsNullOrWhiteSpace(dep.DownloadTempExtension) ? "down!" : dep.DownloadTempExtension,
             string.IsNullOrWhiteSpace(dep.UploadTempExtension) ? "up!" : dep.UploadTempExtension, sourceDatabaseName,
+            destinationDbServerSideDataFolderPath, destinationDbServerSideLogFolderPath,
             destinationDatabaseName, localPath);
     }
 }
