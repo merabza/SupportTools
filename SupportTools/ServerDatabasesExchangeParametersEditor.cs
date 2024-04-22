@@ -33,16 +33,10 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
             nameof(DatabasesExchangeParameters.ProductionDbConnectionName)));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
-        FieldEditors.Add(new DbServerSideBackupPathFieldEditor(
-            nameof(DatabasesExchangeParameters.ProductionDbServerSideDataFolderPath), listsParametersManager,
-            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName),
-            nameof(DatabasesExchangeParameters.ProductionDbConnectionName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.ProductionDbServerSideDataFolderPath)));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
-        FieldEditors.Add(new DbServerSideBackupPathFieldEditor(
-            nameof(DatabasesExchangeParameters.ProductionDbServerSideLogFolderPath), listsParametersManager,
-            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName),
-            nameof(DatabasesExchangeParameters.ProductionDbConnectionName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.ProductionDbServerSideLogFolderPath)));
 
         //ბაზის სახელის არჩევა ხდება პროდაქშენ სერვერზე არსებული ბაზების სახელებიდან.
         //შესაძლებელია ახალი სახელის მითითება, თუ პროდაქშენ ბაზა ჯერ არ არსებობს
@@ -106,16 +100,10 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
             nameof(DatabasesExchangeParameters.DeveloperDbConnectionName)));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
-        FieldEditors.Add(new DbServerSideBackupPathFieldEditor(
-            nameof(DatabasesExchangeParameters.DeveloperDbServerSideDataFolderPath), listsParametersManager,
-            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName),
-            nameof(DatabasesExchangeParameters.ProductionDbConnectionName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.DeveloperDbServerSideDataFolderPath)));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
-        FieldEditors.Add(new DbServerSideBackupPathFieldEditor(
-            nameof(DatabasesExchangeParameters.DeveloperDbServerSideLogFolderPath), listsParametersManager,
-            nameof(DatabasesExchangeParameters.ProductionDbWebAgentName),
-            nameof(DatabasesExchangeParameters.ProductionDbConnectionName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.DeveloperDbServerSideLogFolderPath)));
 
         //პროდაქშენ ბაზის ასლის ბაზის სახელის არჩევა ხდება დეველოპერ სერვერზე არსებული ბაზების სახელებიდან
         //აქ დამატებით შეიძლება ახალი, ჯერ არ არსებული, ბაზის სახელის მითითება
