@@ -35,8 +35,8 @@ public sealed class CorrectNewDatabase : ToolCommand
     {
         var dbKit = ManagerFactory.GetKit(EDataProvider.Sql);
         // ReSharper disable once using
-        using var dbm = DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString);
-        return dbm ?? throw new Exception("Cannot create DbManager");
+        return DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString) ??
+               throw new Exception("Cannot create DbManager");
     }
 
     protected override bool CheckValidate()
@@ -119,9 +119,11 @@ public sealed class CorrectNewDatabase : ToolCommand
     private List<ConstraintDataModel> CorrectBitConstraints()
     {
         // ReSharper disable once using
+
         using var dbm = GetDbManager();
         try
         {
+
             const string query = """
                                  SELECT t.Name as tableName, c.Name as columnName, dc.Name as defaultConstraintName
                                  FROM sys.tables t
