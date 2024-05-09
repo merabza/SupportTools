@@ -47,6 +47,5 @@ public sealed class AppProjectCreatorData
 
         logger.LogError("securityWorkFolderPath is empty");
         return null;
-
     }
 }

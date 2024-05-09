@@ -11,6 +11,7 @@ namespace LibDatabaseWork.ToolCommands;
 public sealed class DatabaseReCreator : MigrationToolCommand
 {
     private const string ActionName = "Database Recreate";
+
     private const string ActionDescription = @"This action will do steps:
 
 1. Drop Existing Dev Database
@@ -18,8 +19,9 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 3. Correct New Database
 
 ";
-    private readonly ILogger _logger;
+
     private readonly CorrectNewDbParameters _correctNewDbParameters;
+    private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     public DatabaseReCreator(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,

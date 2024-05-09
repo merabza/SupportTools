@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 
 namespace LibGitWork.CliMenuCommands;
 
-
-
 public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
@@ -30,9 +28,7 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
         var syncOneGroupAllProjectsGitsToolAction =
             SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, _projectGroupName);
         syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Wait();
-
     }
-
 }
 
 //public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand

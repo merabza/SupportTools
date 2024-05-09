@@ -13,9 +13,9 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class BaseCopier : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Copy Database";
     private const string ActionDescription = "Copy Database";
+    private readonly ILogger _logger;
 
     public BaseCopier(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(
         logger, ActionName, parameters, parametersManager, ActionDescription)

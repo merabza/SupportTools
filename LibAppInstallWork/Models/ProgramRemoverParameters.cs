@@ -1,7 +1,7 @@
-﻿using ApiClientsManagement;
+﻿using System;
+using ApiClientsManagement;
 using LibParameters;
 using SupportToolsData.Models;
-using System;
 using SystemToolsShared;
 
 namespace LibAppInstallWork.Models;
@@ -12,7 +12,7 @@ public sealed class ProgramRemoverParameters : IParameters
         ApiClientSettingsDomain? webAgentForInstall, string? installFolder
         //, ProxySettingsBase proxySettings,
         //ApiClientSettingsDomain webAgentForCheck
-        )
+    )
     {
         ProjectName = projectName;
         EnvironmentName = environmentName;
@@ -28,6 +28,7 @@ public sealed class ProgramRemoverParameters : IParameters
     public bool IsService { get; }
 
     public ApiClientSettingsDomain? WebAgentForInstall { get; }
+
     public string? InstallFolder { get; }
     //public ProxySettingsBase ProxySettings { get; }
 
@@ -97,7 +98,7 @@ public sealed class ProgramRemoverParameters : IParameters
             return proxySettings is null
                 ? null
                 : new ProgramRemoverParameters(projectName, serverInfo.EnvironmentName, project.IsService,
-                    webAgentForInstall, installFolder);//, proxySettings, checkVersionParameters.WebAgentForCheck);
+                    webAgentForInstall, installFolder); //, proxySettings, checkVersionParameters.WebAgentForCheck);
         }
         catch (Exception e)
         {

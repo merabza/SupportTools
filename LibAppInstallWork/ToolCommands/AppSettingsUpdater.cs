@@ -14,11 +14,12 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class AppSettingsUpdater : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Update Settings";
 
     private const string ActionDescription =
         "this tool will crate new encoded parameters file, then will Install parameters file server side adn will chek that parameters updated";
+
+    private readonly ILogger _logger;
 
     public AppSettingsUpdater(ILogger logger, AppSettingsUpdaterParameters parameters,
         IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,

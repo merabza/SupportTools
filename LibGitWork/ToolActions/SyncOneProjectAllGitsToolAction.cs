@@ -1,14 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SupportToolsData.Models;
 using SupportToolsData;
+using SupportToolsData.Models;
 using SystemToolsShared;
-using System.Collections.Generic;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -53,7 +53,7 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
             if (projectName is not null && !_syncOneProjectAllGitsParameters.IsFirstSync &&
                 changedGitProjects is not null &&
                 (!changedGitProjects[EGitCollect.Usage].TryGetValue(gitProjectFolderName, out var proListVal) ||
-                 proListVal.Count == 1 && proListVal[0] == projectName))
+                 (proListVal.Count == 1 && proListVal[0] == projectName)))
                 continue;
             var gitSync = new GitSyncToolAction(_logger,
                 new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
@@ -68,7 +68,9 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
                     proList.Add(projectName);
             }
             else
+            {
                 changedGitProjects[EGitCollect.Collect].Add(gitProjectFolderName, [projectName]);
+            }
         }
 
         return true;

@@ -22,8 +22,8 @@ public sealed class CreatePackageAndUpload : ToolAction
 {
     private readonly string _dateMask;
     private readonly FileStorageData _exchangeFileStorage;
-    private readonly string _mainProjectFileName;
     private readonly ILogger _logger;
+    private readonly string _mainProjectFileName;
     private readonly string _projectName;
     private readonly List<string> _redundantFileNames;
     private readonly string _runtime;

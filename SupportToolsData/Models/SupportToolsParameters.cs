@@ -47,12 +47,13 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
     public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
-    public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
     public bool CheckBeforeSave()
     {
         return true;
     }
+
+    public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
 
     public string GetUploadTempExtension()
@@ -104,7 +105,8 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
                                     $"ApiClient with name {webAgentKey} does not exists");
         if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
             throw new InvalidOperationException($"Server does not specified for ApiClient with name {webAgentKey}");
-        return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey, apiClientSettings.WithMessaging);
+        return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey,
+            apiClientSettings.WithMessaging);
     }
 
     private ApiClientSettings? GetWebAgent(string webAgentKey)
@@ -209,5 +211,4 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     {
         return string.IsNullOrWhiteSpace(projectGroupName) ? "__No Group__" : projectGroupName;
     }
-
 }

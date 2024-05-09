@@ -15,9 +15,9 @@ public sealed class UploadParametersToExchangeAction : ToolAction
 {
     private readonly string _dateMask;
     private readonly FileStorageData _exchangeFileStorage;
+    private readonly ILogger _logger;
     private readonly string _parametersContent;
     private readonly string _parametersFileExtension;
-    private readonly ILogger _logger;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;
     private readonly SmartSchema _uploadSmartSchema;

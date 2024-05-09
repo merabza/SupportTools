@@ -16,8 +16,8 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _appSettingsEncodedJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForUpload;
-    private readonly ILogger _logger;
     private readonly InstallerBaseParameters _installerBaseParameters;
+    private readonly ILogger _logger;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;

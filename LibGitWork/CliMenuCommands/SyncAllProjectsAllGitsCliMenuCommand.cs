@@ -28,8 +28,5 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommand : CliMenuCommand
         syncOneProjectAllGitsToolAction.Run(CancellationToken.None).Wait();
 
         //StShared.Pause();
-
-
     }
-
 }

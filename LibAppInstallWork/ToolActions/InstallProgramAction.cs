@@ -15,8 +15,8 @@ public sealed class InstallProgramAction : ToolAction
 {
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
-    private readonly ILogger _logger;
     private readonly InstallerBaseParameters _installerBaseParameters;
+    private readonly ILogger _logger;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _programArchiveDateMask;

@@ -18,7 +18,8 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base("Project Creator")
+    public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
+        "Project Creator")
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -63,7 +64,8 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         TemplateCruder projectCreatorTemplateCruder = new(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
-        NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder, projectCreatorTemplateCruder.CrudNamePlural,
+        NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder,
+            projectCreatorTemplateCruder.CrudNamePlural,
             $"New {projectCreatorTemplateCruder.CrudName}");
         projectCreatorSubMenuSet.AddMenuItem(newItemCommand);
 
@@ -71,7 +73,8 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         if (appProjectCreatorAllParameters is not null)
             foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o =>
                          o.Key))
-                projectCreatorSubMenuSet.AddMenuItem(new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
+                projectCreatorSubMenuSet.AddMenuItem(
+                    new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
                     kvp.Key);
 
         //მთავარ მენიუში გასვლა

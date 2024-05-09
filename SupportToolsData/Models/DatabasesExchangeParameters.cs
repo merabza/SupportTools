@@ -70,13 +70,12 @@ public sealed class DatabasesExchangeParameters : IParameters
 
     //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბექაპის შენახვა
     public string? DeveloperDbServerSideBackupPath { get; set; }
-    
+
     //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
     public string? DeveloperDbServerSideDataFolderPath { get; set; }
 
     //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
     public string? DeveloperDbServerSideLogFolderPath { get; set; }
-
 
 
     //პროდაქშენ ბაზის ასლის სახელი დეველოპერ სერვერზე დაკოპირებისას

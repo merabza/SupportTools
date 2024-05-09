@@ -74,3 +74,4 @@
 //        syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None).Wait();
 //    }
 //}
+

@@ -15,8 +15,8 @@ namespace LibAppInstallWork.ToolActions;
 public sealed class CheckParametersVersionAction : ToolAction
 {
     private const string ProjectName = "";
-    private readonly ILogger _logger;
     private readonly string? _appSettingsVersion;
+    private readonly ILogger _logger;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
     private readonly ApiClientSettingsDomain _webAgentForCheck;
@@ -82,10 +82,11 @@ public sealed class CheckParametersVersionAction : ToolAction
                 }
 
                 if (errors.Count > 0)
+                {
                     Err.PrintErrorsOnConsole(errors);
+                }
                 else
                 {
-
                     getVersionSuccess = true;
 
                     if (_appSettingsVersion == null)

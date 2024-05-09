@@ -16,8 +16,8 @@ public sealed class ServicePublisher : ToolCommand
 {
     private const string ActionName = "Publishing Service";
     private const string ActionDescription = "Publishing Service";
-    private readonly ILogger _logger;
     private readonly AppSettingsEncoderParameters _appSettingsEncoderParameters;
+    private readonly ILogger _logger;
 
     public ServicePublisher(ILogger logger, ProgramPublisherParameters parameters,
         AppSettingsEncoderParameters appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :

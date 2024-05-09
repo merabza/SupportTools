@@ -17,11 +17,9 @@ namespace LibGitWork.ToolActions;
 
 public sealed class GitSyncToolAction : ToolAction
 {
-    private readonly ILogger _logger;
-    private readonly GitSyncParameters _gitSyncParameters;
     private readonly bool _askCommitMessage;
-    public bool Changed { get; private set; }
-    public string? UsedCommitMessage { get; private set; }
+    private readonly GitSyncParameters _gitSyncParameters;
+    private readonly ILogger _logger;
 
 
     public GitSyncToolAction(ILogger logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
@@ -33,22 +31,22 @@ public sealed class GitSyncToolAction : ToolAction
         UsedCommitMessage = commitMessage;
     }
 
+    public bool Changed { get; private set; }
+    public string? UsedCommitMessage { get; private set; }
+
     public static GitSyncToolAction? Create(ILogger logger, ParametersManager parametersManager,
         string projectName, EGitCol gitCol, string gitProjectName)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var gitSyncParameters =
             GitSyncParameters.Create(logger, supportToolsParameters, projectName, gitCol, gitProjectName);
-        
-        if (gitSyncParameters is not null) 
+
+        if (gitSyncParameters is not null)
             return new GitSyncToolAction(logger, gitSyncParameters);
-        
+
         StShared.WriteErrorLine("GitSyncParameters is not created", true);
         return null;
-
     }
-
-
 
 
     protected override bool CheckValidate()
@@ -61,7 +59,8 @@ public sealed class GitSyncToolAction : ToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var projectFolderName = Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
+        var projectFolderName =
+            Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
             return Task.FromResult(gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress));
@@ -133,8 +132,7 @@ public sealed class GitSyncToolAction : ToolAction
 
         // ReSharper disable once using
         var result = Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
-        
-        return result;
 
+        return result;
     }
 }

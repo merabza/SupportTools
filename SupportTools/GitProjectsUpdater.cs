@@ -163,7 +163,7 @@ public sealed class GitProjectsUpdater
             }
             //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
 
-            if (gitProcessor.GetGitState() != GitState.NeedToPull) 
+            if (gitProcessor.GetGitState() != GitState.NeedToPull)
                 return true;
 
             if (!gitProcessor.Pull())

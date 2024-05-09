@@ -56,7 +56,8 @@ public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
 
         //პროექტის მენიუში დაბრუნება
         var key = ConsoleKey.Escape.Value().ToLower();
-        gitProjectSubMenuSet.AddMenuItem(key, "Exit to Git menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
+        gitProjectSubMenuSet.AddMenuItem(key, "Exit to Git menu", new ExitToMainMenuCliMenuCommand(null, null),
+            key.Length);
 
         return gitProjectSubMenuSet;
     }

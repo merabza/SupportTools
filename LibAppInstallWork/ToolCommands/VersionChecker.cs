@@ -12,9 +12,9 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class VersionChecker : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
+    private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public VersionChecker(ILogger logger, CheckVersionParameters parameters, IParametersManager parametersManager) :
@@ -29,7 +29,8 @@ public sealed class VersionChecker : ToolCommand
     {
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(_logger, CheckVersionParameters.WebAgentForCheck,
+        CheckParametersVersionAction checkParametersVersionAction = new(_logger,
+            CheckVersionParameters.WebAgentForCheck,
             CheckVersionParameters.ProxySettings, null, 1);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} parameters file check failed", projectName);

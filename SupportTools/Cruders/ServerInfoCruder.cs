@@ -31,7 +31,6 @@ public sealed class ServerInfoCruder : ParCruder
             throw new ArgumentNullException(nameof(project));
 
 
-
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, nameof(ServerInfoModel.ServerName), ParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         if (project.IsService)

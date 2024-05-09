@@ -213,7 +213,7 @@ public static class ToolCommandFabric
             case ETools.ProgramInstaller:
                 //  InstallUpdate, //პროგრამის საინსტალაციო პაკეტის გამოყენებით პროგრამის დაინსტალირება-განახლება
                 //+(DownloadPackage=>UpdateProgram=>DownloadParameters=>UpdateParameters)
-                
+
                 //var project = supportToolsParameters.GetProjectRequired(projectName);
 
                 //if (project.IsService)
@@ -226,7 +226,7 @@ public static class ToolCommandFabric
                 //    return null;
                 //}
 
-                
+
                 var programInstallerParameters =
                     ProgramInstallerParameters.Create(supportToolsParameters, projectName, serverInfo);
 

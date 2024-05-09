@@ -84,7 +84,8 @@ public class ServiceInstallScriptCreator : ToolCommand
 
         if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
         {
-            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}",
+                fileStoragePath);
             return false;
         }
 

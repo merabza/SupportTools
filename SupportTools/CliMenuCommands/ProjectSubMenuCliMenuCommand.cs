@@ -54,7 +54,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
-        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main),
+        projectSubMenuSet.AddMenuItem(
+            new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main),
             "Git");
 
         var project = parameters.GetProject(_projectName);
@@ -91,7 +92,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
+        projectSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
+            key.Length);
 
         return projectSubMenuSet;
     }

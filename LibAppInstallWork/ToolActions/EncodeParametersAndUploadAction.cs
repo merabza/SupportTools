@@ -16,8 +16,8 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
     private readonly FileStorageData _exchangeFileStorage;
     private readonly string _keyPart1;
     private readonly string _keyPart2;
-    private readonly ILogger _logger;
     private readonly string _keysJsonFileName;
+    private readonly ILogger _logger;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;

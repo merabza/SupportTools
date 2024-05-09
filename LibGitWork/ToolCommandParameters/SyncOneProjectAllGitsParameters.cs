@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LibParameters;
-using SupportToolsData.Models;
-using SupportToolsData;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using SupportToolsData;
 using SupportToolsData.Domain;
+using SupportToolsData.Models;
+using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
@@ -38,7 +38,6 @@ public class SyncOneProjectAllGitsParameters : IParameters
         string projectName, EGitCol gitCol,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
     {
-
         var project = supportToolsParameters.GetProject(projectName);
 
         if (project == null)
@@ -81,6 +80,5 @@ public class SyncOneProjectAllGitsParameters : IParameters
         return new SyncOneProjectAllGitsParameters(projectName, gitsFolder,
             gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), changedGitProjects,
             isFirstSync);
-
     }
 }

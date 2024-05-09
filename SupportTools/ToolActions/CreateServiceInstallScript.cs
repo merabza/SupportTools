@@ -18,11 +18,11 @@ public class CreateServiceInstallScript : ToolAction
     private readonly int _ftpSiteLsFileOffset;
     private readonly string _ftpSitePassword;
     private readonly string _ftpSiteUserName;
+    private readonly ILogger _logger;
     private readonly int _portNumber;
     private readonly string? _projectDescription;
     private readonly string _projectName;
     private readonly string _runTime;
-    private readonly ILogger _logger;
     private readonly string _scriptFileName;
     private readonly string _serverSideDeployFolder;
     private readonly string _serverSideDownloadFolder;

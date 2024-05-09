@@ -12,9 +12,9 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class DatabaseMigrationCreator : MigrationToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Database Migration Initial";
     private const string ActionDescription = "Database Migration Initial";
+    private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor

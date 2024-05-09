@@ -12,9 +12,9 @@ namespace LibAppInstallWork.ToolCommands;
 
 public sealed class ServiceUpdater : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
+    private readonly ILogger _logger;
 
     public ServiceUpdater(ILogger logger, ServiceUpdaterParameters programServiceUpdaterParameters,
         IParametersManager parametersManager) : base(logger, ActionName, programServiceUpdaterParameters,

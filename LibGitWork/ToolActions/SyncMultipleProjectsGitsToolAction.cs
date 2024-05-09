@@ -1,14 +1,14 @@
-﻿using LibGitWork.ToolCommandParameters;
-using LibParameters;
-using LibToolActions;
-using SupportToolsData.Models;
-using SupportToolsData;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using LibGitWork.ToolCommandParameters;
+using LibParameters;
+using LibToolActions;
 using Microsoft.Extensions.Logging;
+using SupportToolsData;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
@@ -60,13 +60,14 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
         while (gitCollectUsage == EGitCollect.Collect || changedGitProjects[EGitCollect.Collect].Count > 0)
         {
             changedGitProjects[EGitCollect.Collect] = [];
-            Console.WriteLine($"---=== {gitCollectUsage} {(loopNom==0?"":loopNom)} ===---");
+            Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? "" : loopNom)} ===---");
             //პროექტების ჩამონათვალი
             foreach (var kvp in projectsListOrdered)
             {
                 SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main, changedGitProjects, loopNom == 0);
                 if (_syncMultipleProjectsGitsParameters.ScaffoldSeedersWorkFolder is not null)
-                    SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects, loopNom == 0);
+                    SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects,
+                        loopNom == 0);
             }
 
             Console.WriteLine("---===---------===---");

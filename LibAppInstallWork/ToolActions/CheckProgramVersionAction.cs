@@ -15,9 +15,9 @@ namespace LibAppInstallWork.ToolActions;
 public sealed class CheckProgramVersionAction : ToolAction
 {
     private readonly string? _installingProgramVersion;
+    private readonly ILogger _logger;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
-    private readonly ILogger _logger;
     private readonly ApiClientSettingsDomain _webAgentForCheck;
 
     public CheckProgramVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,

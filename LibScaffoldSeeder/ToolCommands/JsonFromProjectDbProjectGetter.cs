@@ -10,9 +10,9 @@ namespace LibScaffoldSeeder.ToolCommands;
 
 public sealed class JsonFromProjectDbProjectGetter : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Get Json From Project DbProject";
     private const string ActionDescription = "Get Json From Project DbProject";
+    private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor

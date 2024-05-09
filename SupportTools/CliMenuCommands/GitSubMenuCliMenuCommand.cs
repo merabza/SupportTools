@@ -23,7 +23,8 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol) :
+    public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+        EGitCol gitCol) :
         base(projectName)
     {
         _logger = logger;
@@ -48,7 +49,8 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         //თითოული git ნაწილისათვის შემოწმდეს არის თუ არა რამე დასაკომიტებელი, თუ არის, დაკომიტდეს ავტომატური მესიჯის შემოთავაზებით და ახალი მესიჯის შეყვანის საშუალებით
         //მესიჯის შეყვანის შემდეგ გამოვიდეს შეკითხვა გავრცელდეს თუ არა იგივე მესიჯი სხვა დანარჩენ ცვლილებებზე თუ იქნება.
         //გიტის დაკომიტების მერე გაეშვას პული და ბოლოს პუში
-        gitSubMenuSet.AddMenuItem(new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, _projectName, _gitCol));
+        gitSubMenuSet.AddMenuItem(
+            new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, _projectName, _gitCol));
 
         if (_gitCol == EGitCol.Main) //მხოლოდ მთავარი ვარიანტისთვის არის შესაძლებელი ახალი გიტის დამატება ამოკლება
         {

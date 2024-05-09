@@ -37,8 +37,8 @@ public static class AppCreatorFabric
                 {
                     logger.LogError("ProjectShortName is not specified");
                     return null;
-
                 }
+
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, par.ProjectShortName, par.ProjectName, par.IndentSize, gitProjects,
                         gitRepos,

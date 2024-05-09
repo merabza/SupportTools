@@ -16,9 +16,9 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class CorrectNewDatabase : ToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Correct new Database";
     private const string ActionDescription = "Correct new Database";
+    private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -123,7 +123,6 @@ public sealed class CorrectNewDatabase : ToolCommand
         using var dbm = GetDbManager();
         try
         {
-
             const string query = """
                                  SELECT t.Name as tableName, c.Name as columnName, dc.Name as defaultConstraintName
                                  FROM sys.tables t

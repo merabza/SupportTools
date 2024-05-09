@@ -32,6 +32,5 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
             SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, null, true);
         syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
         //StShared.Pause();
-
     }
 }

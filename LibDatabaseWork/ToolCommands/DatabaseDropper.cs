@@ -9,9 +9,9 @@ namespace LibDatabaseWork.ToolCommands;
 
 public sealed class DatabaseDropper : MigrationToolCommand
 {
-    private readonly ILogger _logger;
     private const string ActionName = "Drop Database";
     private const string ActionDescription = "Drop Database";
+    private readonly ILogger _logger;
 
     //კონსტრუქტორი გამოიყენება, როცა პარამეტრები უნდა ჩაიტვირთოს ფაილიდან
     //public DatabaseDropper(ILogger logger, bool useConsole, ParametersTaskInfo parametersTaskInfo) : base(logger,

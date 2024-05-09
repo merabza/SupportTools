@@ -55,12 +55,10 @@ public sealed class ProgramInstaller : ToolCommand
         }
 
 
-
         string? appSettingsVersion = null;
         if (!string.IsNullOrWhiteSpace(Parameters.AppSettingsJsonSourceFileName) ||
             !string.IsNullOrWhiteSpace(Parameters.EncodedJsonFileName))
         {
-
             //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
             var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(_logger, _useConsole,
                 Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.ServerName,

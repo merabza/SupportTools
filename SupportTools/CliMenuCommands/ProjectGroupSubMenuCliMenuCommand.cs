@@ -18,7 +18,8 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
     private readonly string _projectGroupName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectGroupName) :
+    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager,
+        string projectGroupName) :
         base(projectGroupName)
     {
         _logger = logger;
@@ -57,12 +58,10 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         //    "Git");
 
 
-        
         //ყველა პროექტის git-ის სინქრონიზაცია
-        var syncGroupAllProjectsGits = new SyncOneGroupAllProjectsGitsCliMenuCommand(_logger, _parametersManager, _projectGroupName);
+        var syncGroupAllProjectsGits =
+            new SyncOneGroupAllProjectsGitsCliMenuCommand(_logger, _parametersManager, _projectGroupName);
         projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGits);
-
-
 
 
         //var project = parameters.GetProject(_projectGroupName);
@@ -98,29 +97,29 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         //            kvp.Value.GetItemKey());
 
 
-        
         //პროექტების ჩამონათვალი
         foreach (var kvp in parameters.Projects
-                     .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+                     .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
+                                 _projectGroupName)
                      .OrderBy(o => o.Key))
             projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
                 kvp.Key);
 
 
-
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectGroupSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
+        projectGroupSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
+            key.Length);
 
         return projectGroupSubMenuSet;
     }
-    
+
     protected override string GetStatus()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         return parameters.Projects
-            .Count(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName).ToString();
+            .Count(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+            .ToString();
     }
-
 }

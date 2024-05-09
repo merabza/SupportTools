@@ -1,24 +1,24 @@
-﻿using LibParameters;
+﻿using System.Collections.Generic;
+using LibParameters;
+using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Domain;
 using SupportToolsData.Models;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
 public class GitSyncParameters : IParameters
 {
-    public GitDataDomain GitData { get; }
-    public string GitsFolder { get; }
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSyncParameters(GitDataDomain gitData, string gitsFolder)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
+
+    public GitDataDomain GitData { get; }
+    public string GitsFolder { get; }
 
 
     public bool CheckBeforeSave()
@@ -29,7 +29,6 @@ public class GitSyncParameters : IParameters
     public static GitSyncParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
         string projectName, EGitCol gitCol, string gitProjectName)
     {
-
         var project = supportToolsParameters.GetProject(projectName);
         if (project is null)
         {
@@ -78,6 +77,5 @@ public class GitSyncParameters : IParameters
 
         StShared.WriteErrorLine("Gits folder not found", true);
         return null;
-
     }
 }

@@ -65,9 +65,10 @@ public sealed class SupportTools : CliAppLoop
         foreach (var projectGroupName in parameters.Projects
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
-            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_logger, _parametersManager, projectGroupName),
+            mainMenuSet.AddMenuItem(
+                new ProjectGroupSubMenuCliMenuCommand(_logger, _parametersManager, projectGroupName),
                 projectGroupName);
-        
+
 
         ////პროექტების ჩამონათვალი
         //foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
