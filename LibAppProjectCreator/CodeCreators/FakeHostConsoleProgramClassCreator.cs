@@ -6,6 +6,7 @@ namespace LibAppProjectCreator.CodeCreators;
 
 public sealed class FakeHostConsoleProgramClassCreator : CodeCreator
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public FakeHostConsoleProgramClassCreator(ILogger logger, string placePath, string? codeFileName = null) : base(
         logger,
         placePath, codeFileName)
