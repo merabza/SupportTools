@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CodeTools;
+﻿using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
@@ -16,6 +12,10 @@ using LibGitWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
@@ -82,7 +82,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackgroundTasksTools);
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsMini);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
@@ -273,6 +273,10 @@ public sealed class ApiAppCreator : AppCreatorBase
                 return false;
         }
 
+        Console.WriteLine("Create AppSettingsVersion...");
+        appSettingsJsonJObject.Add(
+            new JProperty("VersionInfo", new JObject(new JProperty("AppSettingsVersion", "1.1"))));
+
         Console.WriteLine("Creating SettingsFiles...");
 
         var settingsFilesCreator = new SettingsFilesCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
@@ -347,10 +351,10 @@ public sealed class ApiAppCreator : AppCreatorBase
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები
         var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
         Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
-        var testModelClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
+        var projectMasterDataRepositoryClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
             _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
             masterDataRepositoryClassFileName);
-        testModelClassCreator.CreateFileStructure();
+        projectMasterDataRepositoryClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestQuery.cs...");
         var testQueryClassCreator = new TestQueryClassCreator(Logger,
@@ -457,7 +461,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         Console.WriteLine("Creating TestModel.cs...");
         var testModelClassCreator = new TestModelClassCreator(Logger,
             _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName,
-            _apiAppCreatorData.UseCarcass, "TestModel.cs");
+            _apiAppCreatorData.UseCarcass, true, "TestModel.cs");
         testModelClassCreator.CreateFileStructure();
     }
 

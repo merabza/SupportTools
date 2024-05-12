@@ -30,11 +30,6 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
         {
             var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-
-            //string? defCloneFile = parameters.WorkFolder;
-
-            //bool haveChanges = false;
-
             var filenameForImport = MenuInputer.InputFilePath("File name for Import", null);
 
             if (!File.Exists(filenameForImport))
@@ -62,17 +57,6 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
                 return;
             }
 
-            //string? projectName = null;
-            //if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
-            //{
-            //    projectName = new DirectoryInfo(project.ProjectFolderName).Name;
-            //}
-
-            //projectName = Inputer.InputTextRequired("Project Name", projectName);
-
-            //if (!string.IsNullOrWhiteSpace(parameters.WorkFolder) )
-            //    project.ProjectFolderName = Path.Combine(parameters.WorkFolder, projectName);
-
             var projectName = projectExportData.ProjectName;
             if (parameters.Projects.ContainsKey(projectName))
             {
@@ -91,13 +75,12 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 
             _parametersManager.Save(parameters, $"Project {projectName} Added");
 
-            //StShared.Pause();
         }
         catch (DataInputEscapeException)
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

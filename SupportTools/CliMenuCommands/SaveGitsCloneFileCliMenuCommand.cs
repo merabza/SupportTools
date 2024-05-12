@@ -113,16 +113,16 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {
             StShared.WriteException(e, true);
         }
-        finally
-        {
-            StShared.Pause();
-        }
+        //finally
+        //{
+        //    StShared.Pause();
+        //}
 
         MenuAction = EMenuAction.Reload;
     }

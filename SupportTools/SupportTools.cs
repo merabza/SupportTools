@@ -27,7 +27,7 @@ public sealed class SupportTools : CliAppLoop
         _parametersManager = parametersManager;
     }
 
-    protected override bool BuildMainMenu()
+    protected override void BuildMainMenu()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -77,7 +77,5 @@ public sealed class SupportTools : CliAppLoop
         //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
         mainMenuSet.AddMenuItem(key, "Exit", new ExitCliMenuCommand(), key.Length);
-
-        return true;
     }
 }

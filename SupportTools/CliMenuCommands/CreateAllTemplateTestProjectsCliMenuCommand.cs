@@ -33,15 +33,13 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
                 new(_logger, Name!, _parametersManager);
             createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
 
-            //StShared.Pause();
-
             return;
         }
         catch (DataInputEscapeException)
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

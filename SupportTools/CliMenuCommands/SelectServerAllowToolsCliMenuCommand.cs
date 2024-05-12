@@ -76,7 +76,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
             Console.WriteLine();
             Console.WriteLine("Escape... ");
             MenuAction = EMenuAction.Reload;
-            StShared.Pause();
+            //StShared.Pause();
         }
 
         catch (Exception e)

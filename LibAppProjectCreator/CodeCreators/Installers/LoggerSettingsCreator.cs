@@ -12,6 +12,7 @@ public sealed class LoggerSettingsCreator
     private readonly string _projectNamespace;
     private readonly JObject _userSecretJsonJObject;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public LoggerSettingsCreator(string projectNamespace, JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {

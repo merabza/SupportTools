@@ -15,6 +15,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly bool _useIdentity;
     private readonly bool _useReact;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
         bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks,
         string? codeFileName = null) : base(logger, placePath,
@@ -43,7 +44,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
             "using SwaggerTools",
             "using SystemToolsShared",
             "using WebInstallers",
-            "using TestToolsMini.Endpoints.V1",
+            "using TestToolsApi.Endpoints.V1",
             "using WindowsServiceTools",
             _useDatabase ? $"using {_projectNamespace}Db.Installers" : null,
             _useReact ? "using ReactTools" : null,
@@ -64,7 +65,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 "",
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
                 "",
-                $"builder.InstallServices(args, typeof(TestEndpoints), typeof(ConfigurationEncryptInstaller), typeof(SerilogLoggerInstaller), typeof(UseWindowsServiceInstaller), typeof(SwaggerInstaller){(_useDatabase ? $", typeof({_projectNamespace}DatabaseInstaller)" : "")}{(_useReact ? ", typeof(ReactInstaller)" : "")}{(_useCarcass ? ", typeof(CarcassRepositoriesInstaller)" : "")}{(_useDatabase ? ", typeof(RepositoriesInstaller)" : "")}{(_useCarcass && _useIdentity ? ", typeof(CarcassIdentityInstaller)" : "")}{(_useBackgroundTasks ? ", typeof(BackgroundTasksQueueInstaller)" : "")}{(_useCarcass ? ", typeof(DataTypesEndpoints)" : "")})",
+                $"builder.InstallServices(args, typeof(TestEndpoints), typeof(ConfigurationEncryptInstaller), typeof(SerilogLoggerInstaller), typeof(UseWindowsServiceInstaller), typeof(SwaggerInstaller){(_useDatabase ? $", typeof({_projectNamespace}DatabaseInstaller)" : "")}{(_useReact ? ", typeof(ReactInstaller)" : "")}{(_useCarcass ? ", typeof(CarcassRepositoriesInstaller)" : "")}{(_useDatabase && _useCarcass ? ", typeof(RepositoriesInstaller)" : "")}{(_useCarcass && _useIdentity ? ", typeof(CarcassIdentityInstaller)" : "")}{(_useBackgroundTasks ? ", typeof(BackgroundTasksQueueInstaller)" : "")}{(_useCarcass ? ", typeof(DataTypesEndpoints)" : "")})",
                 "",
                 "var app = builder.Build()",
                 "",

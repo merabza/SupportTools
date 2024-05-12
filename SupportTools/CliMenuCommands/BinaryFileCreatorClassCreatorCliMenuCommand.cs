@@ -29,7 +29,6 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
         try
         {
-            //SupportToolsParameters parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
             var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
             if (path is null)
@@ -44,7 +43,6 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (file.DirectoryName is null)
                 {
                     Console.WriteLine("file.DirectoryName is null");
-                    //StShared.Pause();
                     return;
                 }
 
@@ -54,7 +52,6 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
                 ProcessFiles([classCreatorInfo]);
 
-                //StShared.Pause();
                 return;
             }
 
@@ -75,13 +72,12 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 ProcessFiles(infos);
 
 
-                //StShared.Pause();
                 return;
             }
 
 
-            Console.WriteLine("File or folder with name {0} does not exists", path);
-            StShared.Pause();
+            Console.WriteLine("File or folder with name {0} is not exists", path);
+            //StShared.Pause();
 
             return;
         }
@@ -89,7 +85,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

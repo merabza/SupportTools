@@ -24,7 +24,7 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
             "using System",
             "using CliMenu",
             "using LibParameters",
-            "using CliParameters.MenuCommands",
+            "using CliParameters.CliMenuCommands",
             $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
             "using LibDataInput",
             "using Microsoft.Extensions.Logging",
@@ -55,7 +55,7 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
                         "var task = parameters.GetTask(Name)"
                     ),
                     "var key = ConsoleKey.Escape.Value().ToLower()",
-                    "taskSubMenuSet.AddMenuItem(key, \"Exit to Main menu\", new ExitToMainMenuCommand(null, null), key.Length)",
+                    "taskSubMenuSet.AddMenuItem(key, \"Exit to Main menu\", new ExitToMainMenuCliMenuCommand(null, null), key.Length)",
                     "return taskSubMenuSet")
             ));
         CodeFile.AddRange(block.CodeItems);

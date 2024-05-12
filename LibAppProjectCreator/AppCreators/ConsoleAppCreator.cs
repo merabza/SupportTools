@@ -322,7 +322,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         Console.WriteLine("Creating TestModel.cs...");
         var testModelClassCreator = new TestModelClassCreator(Logger,
-            _consoleAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName, false,
+            _consoleAppCreatorData.DatabaseProjectData.FoldersForCreate["Models"], ProjectName, false, false,
             "TestModel.cs");
         testModelClassCreator.CreateFileStructure();
     }

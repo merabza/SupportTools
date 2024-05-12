@@ -30,7 +30,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             "",
             new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
             $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
-            $"mainMenuSet.AddMenuItem(new ParametersEditorListCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
+            $"mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
             "",
             new OneLineComment("საჭირო მენიუს ელემენტები"),
             ""
@@ -48,7 +48,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         var exitPart = new FlatCodeBlock(
             new OneLineComment("გასასვლელი"),
             "var key = ConsoleKey.Escape.Value().ToLower()",
-            "mainMenuSet.AddMenuItem(key, \"Exit\", new ExitCommand(), key.Length)",
+            "mainMenuSet.AddMenuItem(key, \"Exit\", new ExitCliMenuCommand(), key.Length)",
             "",
             "return true");
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
@@ -56,16 +56,16 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
 
         var block = new CodeBlock("",
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using CliMenu",
+            "using CliParameters.CliMenuCommands",
+            "using CliTools",
+            "using CliTools.CliMenuCommands",
+            "using LibDataInput",
+            "using LibParameters",
+            "using Microsoft.Extensions.Logging",
             "using System",
             "using System.Linq",
-            "using LibParameters",
-            "using CliParameters.MenuCommands",
-            "using CliMenu",
-            "using LibDataInput",
-            "using CliTools",
-            "using CliTools.Commands",
             $"using {_projectNamespace}.MenuCommands",
-            "using Microsoft.Extensions.Logging",
             $"using {_projectNamespace}.Models",
             _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), "",
             _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(), "",

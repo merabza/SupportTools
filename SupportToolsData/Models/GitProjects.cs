@@ -29,7 +29,7 @@ public sealed class GitProjects
     public GitProjectDataDomain DbContextAnalyzer => GetGitProjectByKey(nameof(DbContextAnalyzer));
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
     public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
-    public GitProjectDataDomain TestToolsMini => GetGitProjectByKey(nameof(TestToolsMini));
+    public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
     public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
     public GitProjectDataDomain ConfigurationEncrypt => GetGitProjectByKey(nameof(ConfigurationEncrypt));
     public GitProjectDataDomain SerilogLogger => GetGitProjectByKey(nameof(SerilogLogger));
@@ -41,7 +41,7 @@ public sealed class GitProjects
 
     public static GitProjects Create(ILogger logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
-        Dictionary<string, GitProjectDataDomain> gitProjects = new();
+        Dictionary<string, GitProjectDataDomain> gitProjects = [];
         foreach (var (key, value) in gitPrs)
         {
             if (string.IsNullOrWhiteSpace(value.GitName))
@@ -75,6 +75,6 @@ public sealed class GitProjects
 
     public GitProjectDataDomain? GetGitProjectIfExistsByKey(string key)
     {
-        return _gitProjects.TryGetValue(key, out var project) ? project : null;
+        return _gitProjects.GetValueOrDefault(key);
     }
 }

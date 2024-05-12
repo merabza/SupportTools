@@ -36,7 +36,7 @@ public sealed class GenerateStandardEnvironmentsCliMenuCommand : CliMenuCommand
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

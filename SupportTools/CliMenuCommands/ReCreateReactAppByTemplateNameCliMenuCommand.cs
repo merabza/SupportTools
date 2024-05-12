@@ -40,7 +40,7 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

@@ -30,7 +30,6 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
         try
         {
-            //SupportToolsParameters parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
             var path = MenuInputer.InputFileOrFolderPath("File or folder path with cs code", null);
             if (path is null)
@@ -45,7 +44,6 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (file.DirectoryName is null)
                 {
                     Console.WriteLine("file.DirectoryName is null");
-                    //StShared.Pause();
                     return;
                 }
 
@@ -55,7 +53,6 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
                 ProcessFiles([classCreatorInfo]);
 
-                //StShared.Pause();
                 return;
             }
 
@@ -75,14 +72,11 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
                 ProcessFiles(infos);
 
-
-                //StShared.Pause();
                 return;
             }
 
 
             Console.WriteLine("File or folder with name {0} does not exists", path);
-            //StShared.Pause();
 
             return;
         }
@@ -90,7 +84,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
         {
             Console.WriteLine();
             Console.WriteLine("Escape... ");
-            StShared.Pause();
+            //StShared.Pause();
         }
         catch (Exception e)
         {

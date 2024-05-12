@@ -23,8 +23,7 @@ public sealed class ServerDatabasesExchangeParametersManager : IParametersManage
 
     public IParameters Parameters { get; set; }
 
-    public void Save(IParameters parameters, string message, bool pauseAfterMessage = true,
-        string? saveAsFilePath = null)
+    public void Save(IParameters parameters, string message, string? saveAsFilePath = null)
     {
         Parameters = parameters;
         if (parameters is not DatabasesExchangeParameters par)
@@ -32,6 +31,6 @@ public sealed class ServerDatabasesExchangeParametersManager : IParametersManage
 
         _fieldEditor.SetValue(_record, par);
 
-        _parentParametersManager.Save(_parentParametersManager.Parameters, message, true, saveAsFilePath);
+        _parentParametersManager.Save(_parentParametersManager.Parameters, message, saveAsFilePath);
     }
 }
