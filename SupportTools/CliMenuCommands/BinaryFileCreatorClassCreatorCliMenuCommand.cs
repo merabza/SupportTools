@@ -29,7 +29,6 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
         try
         {
-
             var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
             if (path is null)
                 return;

@@ -30,7 +30,6 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
         try
         {
-
             var path = MenuInputer.InputFileOrFolderPath("File or folder path with cs code", null);
             if (path is null)
                 return;

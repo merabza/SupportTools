@@ -6,9 +6,9 @@ namespace LibAppProjectCreator.CodeCreators.Database;
 
 public sealed class TestModelClassCreator : CodeCreator
 {
+    private readonly bool _isApi;
     private readonly string _projectNamespace;
     private readonly bool _useCarcass;
-    private readonly bool _isApi;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public TestModelClassCreator(ILogger logger, string placePath, string projectNamespace, bool useCarcass, bool isApi,
