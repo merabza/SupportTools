@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -30,57 +29,42 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
+
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        var result = parameters.GetGitProjectNames(_projectName, _gitCol);
+        if (result.IsNone)
         {
-            var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-
-            var result = parameters.GetGitProjectNames(_projectName, _gitCol);
-            if (result.IsNone)
-            {
-                StShared.WriteErrorLine(
-                    $"Git Project with name {_projectName} does not exists", true);
-                return;
-            }
-
-            var gitProjectNames = (List<string>)result;
-
-            if (!gitProjectNames.Contains(_gitProjectName))
-            {
-                StShared.WriteErrorLine(
-                    $"Git Project with name {_gitProjectName} does not exists in project {_projectName}", true);
-                return;
-            }
-
-            if (!Inputer.InputBool(
-                    $"This will Delete Git Project with Name {_gitProjectName}, from this project. are you sure?",
-                    false, false))
-                return;
-
-            gitProjectNames.Remove(_gitProjectName);
-            if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
-            {
-                StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}",
-                    true);
-                return;
-            }
-
-            _parametersManager.Save(parameters,
-                $"Git Project with Name {_gitProjectName} in project {_projectName} deleted.");
-
-            MenuAction = EMenuAction.LevelUp;
+            StShared.WriteErrorLine(
+                $"Git Project with name {_projectName} does not exists", true);
             return;
         }
-        catch (DataInputEscapeException)
+
+        var gitProjectNames = (List<string>)result;
+
+        if (!gitProjectNames.Contains(_gitProjectName))
         {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
+            StShared.WriteErrorLine(
+                $"Git Project with name {_gitProjectName} does not exists in project {_projectName}", true);
+            return;
         }
 
-        MenuAction = EMenuAction.Reload;
+        if (!Inputer.InputBool(
+                $"This will Delete Git Project with Name {_gitProjectName}, from this project. are you sure?",
+                false, false))
+            return;
+
+        gitProjectNames.Remove(_gitProjectName);
+        if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
+        {
+            StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}",
+                true);
+            return;
+        }
+
+        _parametersManager.Save(parameters,
+            $"Git Project with Name {_gitProjectName} in project {_projectName} deleted.");
+
+        MenuAction = EMenuAction.LevelUp;
     }
 }

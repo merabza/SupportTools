@@ -1,5 +1,4 @@
-﻿using System;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibParameters;
 using SupportToolsData.Models;
@@ -22,36 +21,20 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        var projects = parameters.Projects;
+        if (!projects.ContainsKey(_projectName))
         {
-            var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-
-            var projects = parameters.Projects;
-            if (!projects.ContainsKey(_projectName))
-            {
-                StShared.WriteErrorLine($"Project {_projectName} does not found", true);
-                return;
-            }
-
-            if (!Inputer.InputBool($"This will Delete Project {_projectName}. are you sure?", false, false))
-                return;
-
-            projects.Remove(_projectName);
-            _parametersManager.Save(parameters, $"Project {_projectName} Deleted");
-            MenuAction = EMenuAction.LevelUp;
+            StShared.WriteErrorLine($"Project {_projectName} does not found", true);
             return;
         }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
 
-        MenuAction = EMenuAction.Reload;
+        if (!Inputer.InputBool($"This will Delete Project {_projectName}. are you sure?", false, false))
+            return;
+
+        projects.Remove(_projectName);
+        _parametersManager.Save(parameters, $"Project {_projectName} Deleted");
+        MenuAction = EMenuAction.LevelUp;
     }
 }

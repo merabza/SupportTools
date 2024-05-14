@@ -1,5 +1,4 @@
-﻿using System;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibParameters;
 using SupportToolsData.Models;
@@ -22,42 +21,27 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
+
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
+        if (parameters == null)
         {
-            var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-            var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
-            if (parameters == null)
-            {
-                StShared.WriteErrorLine("Support Tools Parameters not found", true);
-                return;
-            }
-
-            var templates = parameters.Templates;
-            if (!templates.ContainsKey(_templateName))
-            {
-                StShared.WriteErrorLine($"Template {_templateName} not found", true);
-                return;
-            }
-
-            if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
-                return;
-
-            templates.Remove(_templateName);
-            _parametersManager.Save(parameters, $"Template {_templateName} Deleted");
-            MenuAction = EMenuAction.LevelUp;
+            StShared.WriteErrorLine("Support Tools Parameters not found", true);
             return;
         }
-        catch (DataInputEscapeException)
+
+        var templates = parameters.Templates;
+        if (!templates.ContainsKey(_templateName))
         {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
+            StShared.WriteErrorLine($"Template {_templateName} not found", true);
+            return;
         }
 
-        MenuAction = EMenuAction.Reload;
+        if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
+            return;
+
+        templates.Remove(_templateName);
+        _parametersManager.Save(parameters, $"Template {_templateName} Deleted");
+        MenuAction = EMenuAction.LevelUp;
     }
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator.ToolCommands;
-using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using System.Threading;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -27,25 +24,8 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
     {
         MenuAction = EMenuAction.Reload;
 
-        try
-        {
-            CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
-                new(_logger, Name!, _parametersManager);
-            createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
-
-            return;
-        }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
-
-        MenuAction = EMenuAction.Reload;
+        CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
+            new(_logger, Name!, _parametersManager);
+        createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
     }
 }

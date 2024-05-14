@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace LibGitWork.CliMenuCommands;
 
@@ -26,7 +26,5 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommand : CliMenuCommand
         var syncOneProjectAllGitsToolAction =
             SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null);
         syncOneProjectAllGitsToolAction.Run(CancellationToken.None).Wait();
-
-        //StShared.Pause();
     }
 }

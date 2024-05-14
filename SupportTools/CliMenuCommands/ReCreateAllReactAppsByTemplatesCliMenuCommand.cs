@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator.ToolCommands;
-using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using System.Threading;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -27,27 +24,8 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
     {
         MenuAction = EMenuAction.Reload;
 
-        try
-        {
-            ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
-                new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
-            reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Wait();
-
-            //StShared.Pause();
-
-            return;
-        }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
-
-        MenuAction = EMenuAction.Reload;
+        ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
+            new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
+        reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Wait();
     }
 }

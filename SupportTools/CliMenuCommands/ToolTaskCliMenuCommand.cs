@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System;
+using System.Threading;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor

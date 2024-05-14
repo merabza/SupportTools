@@ -1,6 +1,6 @@
-﻿using System;
-using CodeTools;
+﻿using CodeTools;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace LibAppProjectCreator.CodeCreators;
 
@@ -38,31 +38,23 @@ public sealed class NewTaskCommandCreator : CodeCreator
                     "_parametersManager = parametersManager"),
                 new CodeBlock("protected override void RunAction()",
                     "MenuAction = EMenuAction.Reload",
-                    new CodeBlock("try",
-                        $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
-                        "",
-                        new OneLineComment("ამოცანის შექმნის პროცესი დაიწყო"),
-                        "Console.WriteLine(\"Create new Task started\")",
-                        "",
-                        "var newTaskName = Inputer.InputText(\"New Task Name\", null)",
-                        new CodeBlock("if (string.IsNullOrEmpty(newTaskName))",
-                            "return"),
-                        "",
-                        new OneLineComment("ახალი ამოცანის შექმნა და ჩამატება ამოცანების სიაში"),
-                        new CodeBlock("if (!parameters.AddTask(newTaskName, new TaskModel()))",
-                            "StShared.WriteErrorLine($\"Task with Name { newTaskName } does not created\", true)",
-                            "return"),
-                        "",
-                        new OneLineComment("პარამეტრების შენახვა (ცვლილებების გათვალისწინებით)"),
-                        "_parametersManager.Save(parameters, \"Create New Task Finished\")",
-                        ""),
-                    new CodeBlock("catch (DataInputEscapeException)",
-                        "Console.WriteLine()",
-                        "Console.WriteLine(\"Escape... \")",
-                        "StShared.Pause()"),
-                    new CodeBlock("catch (Exception e)",
-                        "StShared.WriteException(e, true)"),
-                    "MenuAction = EMenuAction.Reload")
+                    $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
+                    "",
+                    new OneLineComment("ამოცანის შექმნის პროცესი დაიწყო"),
+                    "Console.WriteLine(\"Create new Task started\")",
+                    "",
+                    "var newTaskName = Inputer.InputText(\"New Task Name\", null)",
+                    new CodeBlock("if (string.IsNullOrEmpty(newTaskName))",
+                        "return"),
+                    "",
+                    new OneLineComment("ახალი ამოცანის შექმნა და ჩამატება ამოცანების სიაში"),
+                    new CodeBlock("if (!parameters.AddTask(newTaskName, new TaskModel()))",
+                        "StShared.WriteErrorLine($\"Task with Name { newTaskName } does not created\", true)",
+                        "return"),
+                    "",
+                    new OneLineComment("პარამეტრების შენახვა (ცვლილებების გათვალისწინებით)"),
+                    "_parametersManager.Save(parameters, \"Create New Task Finished\")",
+                    "")
             ));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

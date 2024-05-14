@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator.ToolCommands;
-using LibDataInput;
 using LibFileParameters.Interfaces;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using System.Threading;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -31,20 +28,7 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
     protected override void RunAction()
     {
         MenuAction = EMenuAction.Reload;
-        try
-        {
-            _command.Run(CancellationToken.None).Wait();
-            //StShared.Pause();
-        }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
+
+        _command.Run(CancellationToken.None).Wait();
     }
 }

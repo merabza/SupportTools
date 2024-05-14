@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using CliMenu;
-using LibDataInput;
+﻿using CliMenu;
 using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -62,72 +61,53 @@ public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
+
+        //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
+        if (FileStat.CreateFolderIfNotExists(_workFolder, true) == null)
         {
-            //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-            if (FileStat.CreateFolderIfNotExists(_workFolder, true) == null)
-            {
-                StShared.WriteErrorLine($"does not exists and cannot create work folder {_workFolder}", true,
-                    _logger);
-                return;
-            }
-
-            //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-            //_gitsFolder = Path.Combine(_workFolder, "Gits");
-            if (FileStat.CreateFolderIfNotExists(_gitsFolder, true) == null)
-            {
-                StShared.WriteErrorLine($"does not exists and cannot create work folder {_gitsFolder}", true,
-                    _logger);
-                return;
-            }
-
-            List<string> usedProjectNames = [];
-            var gitRepos = GitRepos.Create(_logger, _supportToolsParameters.Gits, null, null);
-
-            foreach (var kvp in gitRepos.Gits)
-            {
-                var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager);
-                if (gitProjectsUpdater is null)
-                {
-                    StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
-                    return;
-                }
-
-                if (!gitProjectsUpdater.ProcessOneGitProject(kvp.Key))
-                    return;
-                usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
-            }
-
-            foreach (var projectName in _supportToolsParameters.GitProjects.Keys.Except(usedProjectNames))
-                _supportToolsParameters.GitProjects.Remove(projectName);
-
-            Console.WriteLine("Find Dependencies");
-
-            if (!RegisterDependenciesProjects())
-                return;
-
-            _parametersManager.Save(_supportToolsParameters, "Project Saved");
-
-            MenuAction = EMenuAction.LevelUp;
-            Console.WriteLine("Success");
+            StShared.WriteErrorLine($"does not exists and cannot create work folder {_workFolder}", true,
+                _logger);
             return;
         }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
-        //finally
-        //{
-        //    StShared.Pause();
-        //}
 
-        MenuAction = EMenuAction.Reload;
+        //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
+        //_gitsFolder = Path.Combine(_workFolder, "Gits");
+        if (FileStat.CreateFolderIfNotExists(_gitsFolder, true) == null)
+        {
+            StShared.WriteErrorLine($"does not exists and cannot create work folder {_gitsFolder}", true,
+                _logger);
+            return;
+        }
+
+        List<string> usedProjectNames = [];
+        var gitRepos = GitRepos.Create(_logger, _supportToolsParameters.Gits, null, null);
+
+        foreach (var kvp in gitRepos.Gits)
+        {
+            var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager);
+            if (gitProjectsUpdater is null)
+            {
+                StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
+                return;
+            }
+
+            if (!gitProjectsUpdater.ProcessOneGitProject(kvp.Key))
+                return;
+            usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
+        }
+
+        foreach (var projectName in _supportToolsParameters.GitProjects.Keys.Except(usedProjectNames))
+            _supportToolsParameters.GitProjects.Remove(projectName);
+
+        Console.WriteLine("Find Dependencies");
+
+        if (!RegisterDependenciesProjects())
+            return;
+
+        _parametersManager.Save(_supportToolsParameters, "Project Saved");
+
+        MenuAction = EMenuAction.LevelUp;
+        Console.WriteLine("Success");
     }
 
     private bool RegisterDependenciesProjects()

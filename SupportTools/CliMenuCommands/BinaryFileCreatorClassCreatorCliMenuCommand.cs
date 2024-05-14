@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator.CodeCreators;
 using LibDataInput;
 using LibMenuInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.Models;
-using SystemToolsShared;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -27,71 +26,53 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
     {
         MenuAction = EMenuAction.Reload;
 
-        try
+        var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
+        if (path is null)
+            return;
+
+        if (File.Exists(path))
         {
-            var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
-            if (path is null)
-                return;
+            Console.WriteLine("Entered path {0} is a file", path);
 
-            if (File.Exists(path))
+            var file = new FileInfo(path);
+
+            if (file.DirectoryName is null)
             {
-                Console.WriteLine("Entered path {0} is a file", path);
-
-                var file = new FileInfo(path);
-
-                if (file.DirectoryName is null)
-                {
-                    Console.WriteLine("file.DirectoryName is null");
-                    return;
-                }
-
-                var classCreatorInfo = ClassCreatorInfo.Create(path, false);
-                if (classCreatorInfo is null)
-                    return;
-
-                ProcessFiles([classCreatorInfo]);
-
+                Console.WriteLine("file.DirectoryName is null");
                 return;
             }
 
-            if (Directory.Exists(path))
-            {
-                Console.WriteLine("Entered path {0} is a Folder", path);
-
-                var infos = new List<ClassCreatorInfo>();
-                var dir = new DirectoryInfo(path);
-                foreach (var file in dir.GetFiles())
-                {
-                    var classCreatorInfo = ClassCreatorInfo.Create(file.FullName, false);
-                    if (classCreatorInfo is null)
-                        return;
-                    infos.Add(classCreatorInfo);
-                }
-
-                ProcessFiles(infos);
-
-
+            var classCreatorInfo = ClassCreatorInfo.Create(path, false);
+            if (classCreatorInfo is null)
                 return;
-            }
 
-
-            Console.WriteLine("File or folder with name {0} is not exists", path);
-            //StShared.Pause();
+            ProcessFiles([classCreatorInfo]);
 
             return;
         }
-        catch (DataInputEscapeException)
+
+        if (Directory.Exists(path))
         {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
+            Console.WriteLine("Entered path {0} is a Folder", path);
+
+            var infos = new List<ClassCreatorInfo>();
+            var dir = new DirectoryInfo(path);
+            foreach (var file in dir.GetFiles())
+            {
+                var classCreatorInfo = ClassCreatorInfo.Create(file.FullName, false);
+                if (classCreatorInfo is null)
+                    return;
+                infos.Add(classCreatorInfo);
+            }
+
+            ProcessFiles(infos);
+
+
+            return;
         }
 
-        MenuAction = EMenuAction.Reload;
+
+        Console.WriteLine("File or folder with name {0} is not exists", path);
     }
 
 

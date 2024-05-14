@@ -1,11 +1,10 @@
-﻿using System;
-using System.Threading;
-using CliMenu;
+﻿using CliMenu;
 using LibAppProjectCreator;
-using LibDataInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
+using System;
+using System.Threading;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -29,34 +28,20 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
-        {
-            MenuAction = EMenuAction.Reload;
 
-            //დავინიშნოთ დრო
-            var startDateTime = DateTime.Now;
-            Console.WriteLine("Task is running...");
-            Console.WriteLine("---");
+        MenuAction = EMenuAction.Reload;
 
-            MenuAction = EMenuAction.Reload;
+        //დავინიშნოთ დრო
+        var startDateTime = DateTime.Now;
+        Console.WriteLine("Task is running...");
+        Console.WriteLine("---");
 
-            _appProjectCreatorByTemplate.Run(CancellationToken.None).Wait();
+        MenuAction = EMenuAction.Reload;
 
-            Console.WriteLine("---");
+        _appProjectCreatorByTemplate.Run(CancellationToken.None).Wait();
 
-            Console.WriteLine($"Task Finished. {StShared.TimeTakenMessage(startDateTime)}");
-            //StShared.Pause();
-        }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-            //StShared.Pause();
-        }
+        Console.WriteLine("---");
+
+        Console.WriteLine($"Task Finished. {StShared.TimeTakenMessage(startDateTime)}");
     }
 }

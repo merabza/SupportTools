@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters.CliMenuCommands;
 using CliTools;
 using CliTools.CliMenuCommands;
@@ -12,6 +10,8 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
+using System;
+using System.Linq;
 
 namespace SupportTools;
 

@@ -1,6 +1,6 @@
-﻿using System;
-using CodeTools;
+﻿using CodeTools;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace LibAppProjectCreator.CodeCreators;
 
@@ -45,31 +45,24 @@ public sealed class TaskCommandCreator : CodeCreator
                     "_parametersManager = parametersManager",
                     "_taskName = taskName"),
                 new CodeBlock("protected override void RunAction()",
-                    new CodeBlock("try",
-                        "MenuAction = EMenuAction.Reload",
-                        $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
-                        "var task = parameters.GetTask(_taskName)",
-                        new CodeBlock("if (task == null)",
-                            "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
-                            "return"),
-                        "",
-                        $"{_projectNamespace}TaskRunner crawlerRunner = new(_logger, parameters, _taskName, task)",
-                        "",
-                        new OneLineComment("დავინიშნოთ დრო"),
-                        "var watch = Stopwatch.StartNew()",
-                        "Console.WriteLine(\"Crawler is running...\")",
-                        "Console.WriteLine(\"-- - \")",
-                        " crawlerRunner.Run()",
-                        "watch.Stop()",
-                        "Console.WriteLine(\"-- - \")",
-                        "Console.WriteLine($\"Crawler Finished.Time taken: { watch.Elapsed.Seconds } second(s)\")",
-                        "StShared.Pause()"),
-                    new CodeBlock("catch (DataInputEscapeException)",
-                        "Console.WriteLine()",
-                        "Console.WriteLine(\"Escape... \")",
-                        "StShared.Pause()"),
-                    new CodeBlock("catch (Exception e)",
-                        "StShared.WriteException(e, true)"))
+                    "MenuAction = EMenuAction.Reload",
+                    $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
+                    "var task = parameters.GetTask(_taskName)",
+                    new CodeBlock("if (task == null)",
+                        "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
+                        "return"),
+                    "",
+                    $"{_projectNamespace}TaskRunner crawlerRunner = new(_logger, parameters, _taskName, task)",
+                    "",
+                    new OneLineComment("დავინიშნოთ დრო"),
+                    "var watch = Stopwatch.StartNew()",
+                    "Console.WriteLine(\"Crawler is running...\")",
+                    "Console.WriteLine(\"-- - \")",
+                    " crawlerRunner.Run()",
+                    "watch.Stop()",
+                    "Console.WriteLine(\"-- - \")",
+                    "Console.WriteLine($\"Crawler Finished.Time taken: { watch.Elapsed.Seconds } second(s)\")",
+                    "StShared.Pause()")
             ));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

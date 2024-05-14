@@ -1,6 +1,6 @@
-﻿using System;
-using CodeTools;
+﻿using CodeTools;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace LibAppProjectCreator.CodeCreators;
 
@@ -39,26 +39,18 @@ public sealed class DeleteTaskCommandCreator : CodeCreator
                     "_parametersManager = parametersManager",
                     "_taskName = taskName"),
                 new CodeBlock("protected override void RunAction()",
-                    new CodeBlock("try",
-                        $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
-                        "var task = parameters.GetTask(_taskName)",
-                        new CodeBlock("if (task == null)",
-                            "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
-                            "return"),
-                        new CodeBlock(
-                            "if (!Inputer.InputBool($\"This will Delete  Task { _taskName }.are you sure ? \", false, false))",
-                            "return"),
-                        "parameters.RemoveTask(_taskName)",
-                        "_parametersManager.Save(parameters, $\"Task { _taskName } deleted.\")",
-                        "MenuAction = EMenuAction.LevelUp",
+                    $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
+                    "var task = parameters.GetTask(_taskName)",
+                    new CodeBlock("if (task == null)",
+                        "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)",
                         "return"),
-                    new CodeBlock("catch (DataInputEscapeException)",
-                        "Console.WriteLine()",
-                        "Console.WriteLine(\"Escape... \")",
-                        "StShared.Pause()"),
-                    new CodeBlock("catch (Exception e)",
-                        "StShared.WriteException(e, true)"),
-                    "MenuAction = EMenuAction.Reload")
+                    new CodeBlock(
+                        "if (!Inputer.InputBool($\"This will Delete  Task { _taskName }.are you sure ? \", false, false))",
+                        "return"),
+                    "parameters.RemoveTask(_taskName)",
+                    "_parametersManager.Save(parameters, $\"Task { _taskName } deleted.\")",
+                    "MenuAction = EMenuAction.LevelUp",
+                    "return")
             ));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

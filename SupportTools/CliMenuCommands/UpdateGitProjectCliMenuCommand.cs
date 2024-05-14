@@ -1,9 +1,8 @@
-﻿using System;
-using CliMenu;
-using LibDataInput;
+﻿using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -43,46 +42,27 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        try
+
+        ////https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
+        ////https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
+
+        //            //ჩამოტვირთული გიტის ფაილები გაანალიზდეს, იმისათვის, რომ დადგინდეს, რა პროექტები არის ამ ფაილებში
+        //            //და რომელ პროექტებზეა დამოკიდებული ეს პროექტები
+        //            //დადგენილი ინფორმაციის შენახვა მოხდეს პარამეტრებში
+
+        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager);
+        if (gitProjectsUpdater is null)
         {
-            ////https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
-            ////https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
-
-            //            //ჩამოტვირთული გიტის ფაილები გაანალიზდეს, იმისათვის, რომ დადგინდეს, რა პროექტები არის ამ ფაილებში
-            //            //და რომელ პროექტებზეა დამოკიდებული ეს პროექტები
-            //            //დადგენილი ინფორმაციის შენახვა მოხდეს პარამეტრებში
-
-            var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager);
-            if (gitProjectsUpdater is null)
-            {
-                StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
-                return;
-            }
-
-            if (!gitProjectsUpdater.ProcessOneGitProject(_gitName))
-                return;
-
-            _parametersManager.Save(_supportToolsParameters, "Project Saved");
-
-            MenuAction = EMenuAction.LevelUp;
-            Console.WriteLine("Success");
+            StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
             return;
         }
-        catch (DataInputEscapeException)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Escape... ");
-            //StShared.Pause();
-        }
-        catch (Exception e)
-        {
-            StShared.WriteException(e, true);
-        }
-        //finally
-        //{
-        //    StShared.Pause();
-        //}
 
-        MenuAction = EMenuAction.Reload;
+        if (!gitProjectsUpdater.ProcessOneGitProject(_gitName))
+            return;
+
+        _parametersManager.Save(_supportToolsParameters, "Project Saved");
+
+        MenuAction = EMenuAction.LevelUp;
+        Console.WriteLine("Success");
     }
 }
