@@ -31,22 +31,29 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
 
 
     public static SyncMultipleProjectsGitsToolAction Create(ILogger logger, ParametersManager parametersManager,
-        string? projectGroupName)
+        string? projectGroupName, string? projectName)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var syncMultipleProjectsGitsParameters =
-            SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName);
+            SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName, projectName);
 
         return new SyncMultipleProjectsGitsToolAction(logger, parametersManager, syncMultipleProjectsGitsParameters);
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var projectsList = _syncMultipleProjectsGitsParameters.ProjectGroupName is null
-            ? _syncMultipleProjectsGitsParameters.Projects
-            : _syncMultipleProjectsGitsParameters.Projects.Where(x =>
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
+        if (_syncMultipleProjectsGitsParameters.ProjectGroupName is null &&
+            _syncMultipleProjectsGitsParameters.ProjectName is null)
+            projectsList = _syncMultipleProjectsGitsParameters.Projects;
+        else if (_syncMultipleProjectsGitsParameters.ProjectGroupName is not null)
+            projectsList = _syncMultipleProjectsGitsParameters.Projects.Where(x =>
                 SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                 _syncMultipleProjectsGitsParameters.ProjectGroupName);
+        else
+            projectsList =
+                _syncMultipleProjectsGitsParameters.Projects.Where(x =>
+                    x.Key == _syncMultipleProjectsGitsParameters.ProjectName);
 
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 

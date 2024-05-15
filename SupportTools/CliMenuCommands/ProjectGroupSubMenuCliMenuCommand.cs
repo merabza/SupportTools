@@ -39,63 +39,10 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        ////პროექტის წაშლა
-        //var deleteProjectCommand = new DeleteProjectCliMenuCommand(_parametersManager, _projectGroupName);
-        //projectGroupSubMenuSet.AddMenuItem(deleteProjectCommand);
-
-        ////პროექტის ექსპორტი
-        //var exportProjectCommand = new ExportProjectCliMenuCommand(_parametersManager, _projectGroupName);
-        //projectGroupSubMenuSet.AddMenuItem(exportProjectCommand);
-
-        ////პროექტის პარამეტრი
-        //var projectCruder = new ProjectCruder(_logger, _parametersManager);
-        //var editCommand = new EditItemAllFieldsInSequenceCommand(projectCruder, _projectGroupName);
-        //projectGroupSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
-
-        //projectCruder.FillDetailsSubMenu(projectGroupSubMenuSet, _projectGroupName);
-
-        //projectGroupSubMenuSet.AddMenuItem(new GitSubMenuCommand(_logger, _parametersManager, _projectGroupName, EGitCol.Main),
-        //    "Git");
-
-
         //ყველა პროექტის git-ის სინქრონიზაცია
         var syncGroupAllProjectsGits =
             new SyncOneGroupAllProjectsGitsCliMenuCommand(_logger, _parametersManager, _projectGroupName);
         projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGits);
-
-
-        //var project = parameters.GetProject(_projectGroupName);
-
-        //if (project != null)
-        //{
-        //    if (!string.IsNullOrWhiteSpace(project.SeedProjectFilePath))
-        //        projectGroupSubMenuSet.AddMenuItem(
-        //            new GitSubMenuCommand(_logger, _parametersManager, _projectGroupName, EGitCol.ScaffoldSeed),
-        //            "Git ScaffoldSeeder projects");
-
-        //    //დასაშვები ინსტრუმენტების არჩევა
-        //    projectGroupSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectGroupName),
-        //        "Select Allow tools...");
-
-        //    foreach (var tool in ToolCommandFabric.ToolsByProjects.Intersect(project.AllowToolsList))
-        //        projectGroupSubMenuSet.AddMenuItem(
-        //            new ToolTaskCliMenuCommand(_logger, tool, _projectGroupName, null, _parametersManager), tool.ToString());
-        //}
-
-        //var serverInfoCruder = new ServerInfoCruder(_logger, _parametersManager, _projectGroupName);
-
-        ////ახალი სერვერის ინფორმაციის შექმნა
-        //var newItemCommand = new NewItemCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
-        //    $"New {serverInfoCruder.CrudName}");
-        //projectGroupSubMenuSet.AddMenuItem(newItemCommand);
-
-        ////სერვერების ჩამონათვალი
-        //if (project?.ServerInfos != null)
-        //    foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
-        //        projectGroupSubMenuSet.AddMenuItem(
-        //            new ServerInfoSubMenuCommand(_logger, _parametersManager, _projectGroupName, kvp.Key),
-        //            kvp.Value.GetItemKey());
-
 
         //პროექტების ჩამონათვალი
         foreach (var kvp in parameters.Projects

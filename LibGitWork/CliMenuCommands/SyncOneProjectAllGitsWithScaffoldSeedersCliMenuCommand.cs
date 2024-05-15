@@ -6,19 +6,20 @@ using System.Threading;
 
 namespace LibGitWork.CliMenuCommands;
 
-public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
+public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
-    private readonly string _projectGroupName;
+    private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneGroupAllProjectsGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager,
-        string projectGroupName) : base("Sync One Group All Projects Gits", null, true)
+    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(ILogger logger, ParametersManager parametersManager,
+        string projectName,
+        bool askRunAction = true) : base("Sync One Project All Gits With Scaffold Seeders", null, askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;
-        _projectGroupName = projectGroupName;
+        _projectName = projectName;
     }
 
     protected override void RunAction()
@@ -26,7 +27,7 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
         MenuAction = EMenuAction.Reload;
 
         var syncOneGroupAllProjectsGitsToolAction =
-            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, _projectGroupName, null);
+            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, _projectName);
         syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Wait();
     }
 }

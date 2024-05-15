@@ -1,6 +1,7 @@
 ﻿using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
+using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
@@ -53,6 +54,16 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
+
+
+        
+        //ყველა პროექტის git-ის სინქრონიზაცია
+        var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
+            new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
+        projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
+
+
+
 
         projectSubMenuSet.AddMenuItem(
             new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main),
