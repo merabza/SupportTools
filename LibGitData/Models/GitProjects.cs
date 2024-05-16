@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibGitData.Domain;
 using Microsoft.Extensions.Logging;
-using SupportToolsData.Domain;
 
-namespace SupportToolsData.Models;
+namespace LibGitData.Models;
 
 public sealed class GitProjects
 {

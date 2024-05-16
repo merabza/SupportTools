@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
 
-public class SyncMultipleProjectsGitsToolAction : ToolAction
+public class SyncMultipleProjectsGitsToolAction : GitToolAction
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -21,8 +19,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
 
     private SyncMultipleProjectsGitsToolAction(ILogger logger, ParametersManager parametersManager,
         SyncMultipleProjectsGitsParameters syncMultipleProjectsGitsParameters) : base(logger,
-        "Sync One Group All Projects Gits",
-        null, null)
+        "Sync Multiple Projects Gits", null, null)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -69,11 +66,11 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
             changedGitProjects[EGitCollect.Collect] = [];
             Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? "" : loopNom)} ===---");
             //პროექტების ჩამონათვალი
-            foreach (var kvp in projectsListOrdered)
+            foreach (var (projectName, project) in projectsListOrdered)
             {
-                SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.Main, changedGitProjects, loopNom == 0);
+                SyncAllGitsForOneProject(projectName, project, EGitCol.Main, changedGitProjects, loopNom == 0);
                 if (_syncMultipleProjectsGitsParameters.ScaffoldSeedersWorkFolder is not null)
-                    SyncAllGitsForOneProject(kvp.Key, kvp.Value, EGitCol.ScaffoldSeed, changedGitProjects,
+                    SyncAllGitsForOneProject(projectName, project, EGitCol.ScaffoldSeed, changedGitProjects,
                         loopNom == 0);
             }
 
@@ -90,22 +87,8 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
     private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,
         Dictionary<EGitCollect, Dictionary<string, List<string>>> changedGitProjects, bool isFirstSync)
     {
-        switch (gitCol)
-        {
-            case EGitCol.Main:
-                if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
-                    break;
-                StShared.WriteErrorLine($"ProjectFolderName is not specified for project {projectName}", true);
-                return;
-            case EGitCol.ScaffoldSeed:
-                if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
-                    break;
-                StShared.WriteWarningLine($"ScaffoldSeederProjectName is not specified for project {projectName}",
-                    true);
-                return;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(gitCol), gitCol, null);
-        }
+        if (!GitStat.CheckGipProject(projectName, project, gitCol))
+            return;
 
         var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
             projectName, gitCol, changedGitProjects, isFirstSync);

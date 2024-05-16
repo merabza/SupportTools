@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace SupportToolsData.Domain;
+namespace LibGitData.Domain;
 
 public sealed class GitProjectDataDomain
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectDataDomain(string gitName, string projectRelativePath, List<string> dependsOnProjectNames)
     {
         GitName = gitName;

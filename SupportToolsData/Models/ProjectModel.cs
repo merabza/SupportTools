@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CliParametersDataEdit.Models;
+using LibGitData.Models;
 using LibParameters;
 
 namespace SupportToolsData.Models;

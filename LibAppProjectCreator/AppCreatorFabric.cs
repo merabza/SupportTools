@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
+using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;

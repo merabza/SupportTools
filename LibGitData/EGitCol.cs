@@ -1,4 +1,4 @@
-﻿namespace SupportToolsData;
+﻿namespace LibGitData;
 
 public enum EGitCol
 {

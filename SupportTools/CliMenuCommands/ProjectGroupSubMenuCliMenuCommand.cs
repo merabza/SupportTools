@@ -45,12 +45,11 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGits);
 
         //პროექტების ჩამონათვალი
-        foreach (var kvp in parameters.Projects
+        foreach (var (projectName, _) in parameters.Projects
                      .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
-                                 _projectGroupName)
-                     .OrderBy(o => o.Key))
-            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
-                kvp.Key);
+                                 _projectGroupName).OrderBy(o => o.Key))
+            projectGroupSubMenuSet.AddMenuItem(
+                new ProjectSubMenuCliMenuCommand(_logger, _parametersManager, projectName), projectName);
 
 
         //მთავარ მენიუში გასვლა

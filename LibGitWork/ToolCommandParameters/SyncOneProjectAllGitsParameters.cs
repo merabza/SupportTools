@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LibGitData;
+using LibGitData.Domain;
+using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportToolsData;
-using SupportToolsData.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -42,7 +43,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
         if (project == null)
         {
-            StShared.WriteErrorLine("project does not found", true);
+            StShared.WriteErrorLine("project is not found", true);
             return null;
         }
 
@@ -50,7 +51,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
         if (gitsFolder == null)
         {
-            StShared.WriteErrorLine("Gits folder does not found", true);
+            StShared.WriteErrorLine("Gits folder is not found", true);
             return null;
         }
 

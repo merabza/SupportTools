@@ -1,28 +1,30 @@
 ﻿using CliParameters.FieldEditors;
 using LibParameters;
+using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
 
 namespace SupportTools.FieldEditors;
 
-public sealed class RunTimeNameFieldEditor : FieldEditor<string>
+public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
 {
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RunTimeNameFieldEditor(string propertyName,
+    public GitIgnorePathNameFieldEditor(ILogger logger, string propertyName,
         IParametersManager parametersManager) : base(propertyName)
     {
+        _logger = logger;
         _parametersManager = parametersManager;
     }
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
     {
-        var currentRunTimeName = GetValue(recordForUpdate);
+        var currentGitIgnorePathName = GetValue(recordForUpdate);
 
-        var runTimeCruder = new RunTimeCruder(_parametersManager);
+        var gitIgnorePathsCruder = new GitIgnoreFilePathsCruder(_logger, _parametersManager);
 
-        SetValue(recordForUpdate,
-            runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName));
+        SetValue(recordForUpdate, gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName));
     }
 
     public override string GetValueStatus(object? record)
@@ -32,9 +34,9 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
         if (val == null)
             return "";
 
-        var runTimeCruder = new RunTimeCruder(_parametersManager);
+        var gitIgnorePathsCruder = new GitIgnoreFilePathsCruder(_logger, _parametersManager);
 
-        var status = runTimeCruder.GetStatusFor(val);
+        var status = gitIgnorePathsCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? "" : $"({status})")}";
     }
 }

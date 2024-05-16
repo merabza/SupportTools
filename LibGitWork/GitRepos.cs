@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using LibGitData.Domain;
+using LibGitData.Models;
 using Microsoft.Extensions.Logging;
-using SupportToolsData.Domain;
-using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
@@ -21,21 +21,27 @@ public sealed class GitRepos
         string? mainProjectFolderRelativePath, string? spaProjectFolderRelativePath)
     {
         Dictionary<string, GitDataDomain> gits = [];
-        foreach (var kvp in gitRepos)
+        foreach (var (gitProjectName, gitData) in gitRepos)
         {
-            if (string.IsNullOrWhiteSpace(kvp.Value.GitProjectAddress))
+            if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
             {
-                logger.LogError("GitProjectAddress is empty for Git Repo with key {kvp.Key})", kvp.Key);
+                logger.LogError("GitProjectAddress is empty for Git Repo with key {gitProjectName})", gitProjectName);
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(kvp.Value.GitProjectFolderName))
+            if (string.IsNullOrWhiteSpace(gitData.GitProjectFolderName))
             {
-                logger.LogError("GitProjectFolderName is empty for Git Repo with key {kvp.Key})", kvp.Key);
+                logger.LogError("GitProjectFolderName is empty for Git Repo with key {gitProjectName})", gitProjectName);
                 continue;
             }
 
-            var gitProjectFolderName = kvp.Value.GitProjectFolderName;
+            if (string.IsNullOrWhiteSpace(gitData.GitIgnorePathName))
+            {
+                logger.LogError("GitIgnorePathName is empty for Git Repo with key {gitProjectName})", gitProjectName);
+                continue;
+            }
+
+            var gitProjectFolderName = gitData.GitProjectFolderName;
             if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
             {
                 if (mainProjectFolderRelativePath is null)
@@ -54,7 +60,7 @@ public sealed class GitRepos
                         .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
             }
 
-            gits.Add(kvp.Key, new GitDataDomain(kvp.Value.GitProjectAddress, gitProjectFolderName));
+            gits.Add(gitProjectName, new GitDataDomain(gitData.GitProjectAddress, gitProjectFolderName, gitData.GitIgnorePathName));
         }
 
         return new GitRepos(gits);

@@ -114,6 +114,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibGitWork", "LibGitWork\Li
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRContracts", "..\SystemTools\SignalRContracts\SignalRContracts.csproj", "{2C280EEF-D2FF-4097-84F2-FCCEACC765B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibGitData", "LibGitData\LibGitData.csproj", "{DEF2E730-7982-4A86-A0EF-0011228C4423}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -300,6 +302,10 @@ Global
 		{2C280EEF-D2FF-4097-84F2-FCCEACC765B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C280EEF-D2FF-4097-84F2-FCCEACC765B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C280EEF-D2FF-4097-84F2-FCCEACC765B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEF2E730-7982-4A86-A0EF-0011228C4423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF2E730-7982-4A86-A0EF-0011228C4423}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF2E730-7982-4A86-A0EF-0011228C4423}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF2E730-7982-4A86-A0EF-0011228C4423}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

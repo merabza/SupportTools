@@ -1,22 +1,20 @@
-﻿using CliMenu;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
 using CliParameters.FieldEditors;
-using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SupportTools.FieldEditors;
 
-public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataModel>>
+public sealed class GitIgnoreFilePathsFieldEditor : FieldEditor<Dictionary<string, string>>
 {
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
-        propertyName, false, null, true)
+    public GitIgnoreFilePathsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -24,8 +22,8 @@ public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataMode
 
     public override CliMenuSet GetSubMenu(object record)
     {
-        var gitCruder = new GitCruder(_logger, _parametersManager);
-        var menuSet = gitCruder.GetListMenu();
+        var gitIgnoreFilePathsCruder = new GitIgnoreFilePathsCruder(_logger, _parametersManager);
+        var menuSet = gitIgnoreFilePathsCruder.GetListMenu();
         return menuSet;
     }
 

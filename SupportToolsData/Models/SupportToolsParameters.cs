@@ -8,6 +8,8 @@ using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibFileParameters.Interfaces;
 using LibFileParameters.Models;
+using LibGitData;
+using LibGitData.Models;
 using SystemToolsShared;
 
 namespace SupportToolsData.Models;
@@ -39,6 +41,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ProjectModel> Projects { get; init; } = [];
     public Dictionary<string, ServerDataModel> Servers { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
+    public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
     public Dictionary<string, GitDataModel> Gits { get; init; } = [];
     public Dictionary<string, string> ReactAppTemplates { get; init; } = [];
     public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = [];

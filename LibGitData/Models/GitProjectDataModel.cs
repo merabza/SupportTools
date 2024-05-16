@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace SupportToolsData.Models;
+namespace LibGitData.Models;
 
 public sealed class GitProjectDataModel
 {

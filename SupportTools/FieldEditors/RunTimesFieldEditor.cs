@@ -30,7 +30,7 @@ public sealed class RunTimesFieldEditor : FieldEditor<Dictionary<string, string>
     {
         var val = GetValue(record);
 
-        if (val == null || val.Count <= 0)
+        if (val is not { Count: > 0 })
             return "No Details";
 
         if (val.Count > 1)

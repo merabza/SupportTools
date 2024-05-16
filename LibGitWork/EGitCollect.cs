@@ -1,4 +1,4 @@
-﻿namespace SupportToolsData;
+﻿namespace LibGitWork;
 
 public enum EGitCollect
 {

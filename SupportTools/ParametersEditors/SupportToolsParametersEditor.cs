@@ -59,6 +59,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             new ProjectsFieldEditor(logger, nameof(SupportToolsParameters.Projects), parametersManager));
         FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, parametersManager));
         FieldEditors.Add(new RunTimesFieldEditor(nameof(SupportToolsParameters.RunTimes), parametersManager));
+        FieldEditors.Add(new GitIgnoreFilePathsFieldEditor(logger,
+            nameof(SupportToolsParameters.GitIgnoreModelFilePaths), parametersManager));
         FieldEditors.Add(new EnvironmentFieldEditor(nameof(SupportToolsParameters.Environments), parametersManager));
     }
 }

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibDataInput;
+using LibGitData;
+using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -82,10 +84,7 @@ public sealed class GitSyncToolAction : ToolAction
         if (getRemoteOriginUrlResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
-                new Err
-                {
-                    ErrorCode = "GetRemoteOriginUrlError", ErrorMessage = "Error when detecting Remote Origin Url"
-                }));
+                GitSyncToolActionErrors.GetRedundantCachedFilesListError));
             return Task.FromResult(false);
         }
 
@@ -97,27 +96,68 @@ public sealed class GitSyncToolAction : ToolAction
             return Task.FromResult(false);
         }
 
+        //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
+        //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
+        var getRedundantCachedFilesListResult = gitProcessor.GetRedundantCachedFilesList();
+        if (getRedundantCachedFilesListResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+                GitSyncToolActionErrors.GetRedundantCachedFilesListError));
+            return Task.FromResult(false);
+        }
+        var redundantCachedFilesList = getRedundantCachedFilesListResult.AsT0;
+
+        //და წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
+        //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
+        if (redundantCachedFilesList.Where(x => !string.IsNullOrWhiteSpace(x)).Any(redundantCachedFileName =>
+                !gitProcessor.RemoveFromCacheRedundantCachedFile(redundantCachedFileName)))
+            return Task.FromResult(false);
+
         var haveUnTrackedFilesResult = gitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
-                new Err
-                {
-                    ErrorCode = "HaveUnTrackedFilesError", ErrorMessage = "Error when detecting UnTracked Files"
-                }));
+                GitSyncToolActionErrors.HaveUnTrackedFilesError));
             return Task.FromResult(false);
         }
-
         var haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
+
         if (haveUnTrackedFiles)
+        {
+            //შემდეგი კოდი დავაკომენტარე, რადგან ის ამოწმებდა შეიცვალა თუ არა .gitignore. პრინციპში ასეთი შემოწმება საჭირო არც არის,
+            //  რადგან პირდაპირ შეგვიძლია არასაჭირო ფაილების ქეშიდან გასუფთავება
+            //თუ .gitignore ფაილი არ შეიცვალა, არც ზედმეტად ქშირებული ფაილები არ უნდა იყოს, მაგრამ მაინც თავს ვიზღვევთ
+
+            //იმისათვის, რომ დავადგინოთ .gitignore ფაილი შეიცვალა თუ არა, უნდა გავუშვათ შემდეგი ბრძანება:
+            //git diff --name-only .gitignore
+
+            //var isGitIgnoreFileChangedResult = gitProcessor.IsGitIgnoreFileChanged();
+            //if (isGitIgnoreFileChangedResult.IsT1)
+            //{
+            //    Err.PrintErrorsOnConsole(Err.RecreateErrors(isGitIgnoreFileChangedResult.AsT1,
+            //        new Err
+            //        {
+            //            ErrorCode = "IsGitIgnoreFileChangedError", ErrorMessage = "Error when detecting Is .gitignore File Changed"
+            //        }));
+            //    return Task.FromResult(false);
+            //}
+            //var isGitIgnoreFileChanged = isGitIgnoreFileChangedResult.AsT0;
+
+            //if (!isGitIgnoreFileChanged)
+            //{
+            //}
+
+
             if (!gitProcessor.Add())
                 return Task.FromResult(false);
+        }
+
 
         var needCommitResult = gitProcessor.NeedCommit();
         if (needCommitResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1,
-                new Err { ErrorCode = "NeedCommitError", ErrorMessage = "Error when detecting Need Commit" }));
+                GitSyncToolActionErrors.NeedCommitError));
             return Task.FromResult(false);
         }
 

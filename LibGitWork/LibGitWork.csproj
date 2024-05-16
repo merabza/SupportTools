@@ -9,7 +9,13 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliMenu\CliMenu.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />
+    <ProjectReference Include="..\LibGitData\LibGitData.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

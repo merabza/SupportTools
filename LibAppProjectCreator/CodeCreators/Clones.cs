@@ -1,4 +1,4 @@
-﻿using SupportToolsData.Domain;
+﻿using LibGitData.Domain;
 
 namespace LibAppProjectCreator.CodeCreators;
 
@@ -9,14 +9,16 @@ public sealed class Clones
 
     private Clones()
     {
-        AppCliTools = new GitDataDomain("git@github.com:merabza/AppCliTools.git", "AppCliTools");
-        BackendCarcass = new GitDataDomain("git@github.com:merabza/BackendCarcass.git", "BackendCarcass");
-        DatabaseTools = new GitDataDomain("git@github.com:merabza/DatabaseTools.git", "DatabaseTools");
-        ParametersManagement =
-            new GitDataDomain("git@github.com:merabza/ParametersManagement.git", "ParametersManagement");
-        SystemTools = new GitDataDomain("git@github.com:merabza/SystemTools.git", "SystemTools");
-        ToolsManagement = new GitDataDomain("git@github.com:merabza/ToolsManagement.git", "ToolsManagement");
-        WebSystemTools = new GitDataDomain("git@github.com:merabza/WebSystemTools.git", "WebSystemTools");
+        const string cSharp = "CSharp";
+
+        AppCliTools = new GitDataDomain("git@github.com:merabza/AppCliTools.git", "AppCliTools", cSharp);
+        BackendCarcass = new GitDataDomain("git@github.com:merabza/BackendCarcass.git", "BackendCarcass", cSharp);
+        DatabaseTools = new GitDataDomain("git@github.com:merabza/DatabaseTools.git", "DatabaseTools", cSharp);
+        ParametersManagement = new GitDataDomain("git@github.com:merabza/ParametersManagement.git",
+            "ParametersManagement", cSharp);
+        SystemTools = new GitDataDomain("git@github.com:merabza/SystemTools.git", "SystemTools", cSharp);
+        ToolsManagement = new GitDataDomain("git@github.com:merabza/ToolsManagement.git", "ToolsManagement", cSharp);
+        WebSystemTools = new GitDataDomain("git@github.com:merabza/WebSystemTools.git", "WebSystemTools", cSharp);
     }
 
     public static Clones Instance

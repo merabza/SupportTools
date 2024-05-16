@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using LibDataInput;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -10,7 +11,10 @@ public sealed class GitProcessor
 {
     private readonly ILogger _logger;
     private readonly string _projectPath;
+    private readonly string _switchToProjectPath;
     private readonly bool _useConsole;
+
+    private const string Git = "git";
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProcessor(bool useConsole, ILogger logger, string projectPath)
@@ -18,6 +22,7 @@ public sealed class GitProcessor
         _useConsole = useConsole;
         _logger = logger;
         _projectPath = projectPath;
+        _switchToProjectPath = $"-C {_projectPath}";
     }
 
     public GitState GetGitState()
@@ -40,13 +45,13 @@ else
 echo "Diverged"
 fi*/
         //"git remote update"
-        if (StShared.RunProcess(false, null, "git", $"-C {_projectPath} remote update").IsSome)
+        if (StShared.RunProcess(false, null, Git, $"{_switchToProjectPath} remote update").IsSome)
         {
             StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
             return GitState.Unknown;
         }
 
-        var localResult = StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} rev-parse @");
+        var localResult = StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} rev-parse @");
         if (localResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 1", _useConsole, _logger);
@@ -56,7 +61,7 @@ fi*/
         var local = localResult.AsT0.Item1;
 
         var remoteResult =
-            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} rev-parse @{{u}}");
+            StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} rev-parse @{{u}}");
         if (remoteResult.IsT1)
         {
             StShared.WriteErrorLine("git rev-parse Error 2", _useConsole, _logger);
@@ -66,7 +71,7 @@ fi*/
         var remote = remoteResult.AsT0.Item1;
 
         var strBaseResult =
-            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} merge-base @ @{{u}}");
+            StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} merge-base @ @{{u}}");
         if (strBaseResult.IsT1)
         {
             StShared.WriteErrorLine("git merge-baseError", _useConsole, _logger);
@@ -103,13 +108,13 @@ fi*/
 
     //public bool IsGitRemoteAddressValid(string remoteAddress)
     //{
-    //    return StShared.RunProcess(_useConsole, _logger, "git", $"ls-remote {remoteAddress}");
+    //    return StShared.RunProcess(_useConsole, _logger, Git, $"ls-remote {remoteAddress}");
     //}
 
 
     public bool Pull()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} pull").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} pull").IsNone)
             return true;
 
         StShared.WriteErrorLine("cannot pull", _useConsole, _logger);
@@ -118,8 +123,8 @@ fi*/
 
     public OneOf<string, Err[]> GetRemoteOriginUrl()
     {
-        var result = StShared.RunProcessWithOutput(false, null, "git",
-            $"-C {_projectPath} config --get remote.origin.url");
+        var result = StShared.RunProcessWithOutput(false, null, Git,
+            $"{_switchToProjectPath} config --get remote.origin.url");
         if (result.IsT1)
             return result.AsT1;
         return result.AsT0.Item1.Trim(Environment.NewLine.ToCharArray());
@@ -127,7 +132,7 @@ fi*/
 
     public bool Commit(string commitMessage)
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} commit -m \"{commitMessage}\"").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run commit for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -136,7 +141,7 @@ fi*/
     public OneOf<bool, Err[]> NeedCommit()
     {
         var gitStatusOutputResult =
-            StShared.RunProcessWithOutput(false, null, "git", $"-C {_projectPath} status --porcelain");
+            StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
             return gitStatusOutputResult.AsT1;
         var gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
@@ -145,7 +150,7 @@ fi*/
 
     public bool Add()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} add .").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} add .").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run add for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -153,7 +158,7 @@ fi*/
 
     public bool Reset()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} reset").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} reset").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run reset for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -161,7 +166,7 @@ fi*/
 
     public bool Checkout()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} checkout .").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} checkout .").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run checkout for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -169,7 +174,7 @@ fi*/
 
     public bool Clean_fdx()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} clean -fdx").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} clean -fdx").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run clean -fdx for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -177,9 +182,9 @@ fi*/
 
     public OneOf<bool, Err[]> HaveUnTrackedFiles()
     {
-        //return !StShared.RunProcess(_useConsole, null, "git", $"-C {_projectPath} diff-files --quiet", false);
-        var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, "git",
-            $"-C {_projectPath} status --porcelain --untracked-files");
+        //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
+        var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
+            $"{_switchToProjectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
             return statusCommandOutputResult.AsT1;
@@ -190,12 +195,12 @@ fi*/
 
     public bool IsGitInitialized()
     {
-        return StShared.RunProcess(false, _logger, "git", $"-C {_projectPath} rev-parse").IsNone;
+        return StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} rev-parse").IsNone;
     }
 
     private bool Push()
     {
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"-C {_projectPath} push").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} push").IsNone)
             return true;
 
         StShared.WriteErrorLine("cannot push", _useConsole, _logger);
@@ -204,8 +209,7 @@ fi*/
 
     public bool Clone(string remoteAddress)
     {
-        //git clone git@bitbucket.org:mzakalashvili/systemtools.git SystemTools
-        if (StShared.RunProcess(_useConsole, _logger, "git", $"clone {remoteAddress} {_projectPath}").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"clone {remoteAddress} {_projectPath}").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot clone {remoteAddress} to {_projectPath}", _useConsole, _logger);
         return false;
@@ -253,5 +257,32 @@ fi*/
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+    }
+
+    //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
+    //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
+    public OneOf<string[], Err[]>  GetRedundantCachedFilesList()
+    {
+        //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
+        var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
+            $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
+
+        if (statusCommandOutputResult.IsT1)
+            return statusCommandOutputResult.AsT1;
+        var statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
+
+        return string.IsNullOrWhiteSpace(statusCommandOutput)
+            ? []
+            : statusCommandOutput.Split(Environment.NewLine).ToArray();
+    }
+
+    //წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
+    //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
+    public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
+    {
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} rm --cached {redundantCachedFileName}").IsNone)
+            return true;
+        StShared.WriteErrorLine($"cannot remove file {redundantCachedFileName} from cache", _useConsole, _logger);
+        return false;
     }
 }

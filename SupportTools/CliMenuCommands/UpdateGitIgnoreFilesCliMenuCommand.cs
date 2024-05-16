@@ -6,14 +6,14 @@ using Microsoft.Extensions.Logging;
 
 namespace SupportTools.CliMenuCommands;
 
-public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
+public sealed class UpdateGitIgnoreFilesCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UpdateGitProjectsCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        UpdateGitProjectsToolAction.ActionName)
+    public UpdateGitIgnoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
+        UpdateGitIgnoreFilesToolAction.ActionName)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -21,7 +21,8 @@ public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
 
     protected override void RunAction()
     {
-        var updateGitProjectsToolAction = new UpdateGitProjectsToolAction(_logger, _parametersManager);
+        MenuAction = EMenuAction.Reload;
+        var updateGitProjectsToolAction = new UpdateGitIgnoreFilesToolAction(_logger, _parametersManager);
         updateGitProjectsToolAction.Run(CancellationToken.None).Wait();
     }
 }

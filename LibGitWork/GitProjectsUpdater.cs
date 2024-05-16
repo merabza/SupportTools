@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using LibDataInput;
-using LibGitWork;
+using LibGitData.Domain;
+using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportToolsData.Domain;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
-namespace SupportTools;
+namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {

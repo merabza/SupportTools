@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using CodeTools;
+using LibAppProjectCreator.Models;
+using LibAppProjectCreator.ProjectFileXmlModifiers;
+using LibDataInput;
+using LibGitData.Domain;
+using LibGitData.Models;
+using LibGitWork;
+using LibGitWork.ToolActions;
+using LibGitWork.ToolCommandParameters;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using CodeTools;
-using LibAppProjectCreator.Models;
-using LibAppProjectCreator.ProjectFileXmlModifiers;
-using LibDataInput;
-using LibGitWork;
-using LibGitWork.ToolActions;
-using LibGitWork.ToolCommandParameters;
-using Microsoft.Extensions.Logging;
-using SupportToolsData.Domain;
-using SupportToolsData.Models;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor

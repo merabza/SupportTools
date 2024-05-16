@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
+using LibGitData.Models;
 using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
+using SupportTools.FieldEditors;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.Cruders;
@@ -22,6 +24,8 @@ public sealed class GitCruder : ParCruder
         _logger = logger;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
+        FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
+            ParametersManager));
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -123,10 +127,7 @@ public sealed class GitCruder : ParCruder
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        var updateGitProjectsCommand =
-            UpdateGitProjectsCliMenuCommand.Create(_logger, ParametersManager);
-        if (updateGitProjectsCommand is null)
-            return;
+        var updateGitProjectsCommand = new UpdateGitProjectsCliMenuCommand(_logger, ParametersManager);
         cruderSubMenuSet.AddMenuItem(updateGitProjectsCommand);
     }
 }
