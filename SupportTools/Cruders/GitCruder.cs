@@ -25,7 +25,7 @@ public sealed class GitCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
         FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
-            ParametersManager));
+            ParametersManager, true));
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared;
 
 namespace LibGitWork;
 
@@ -31,6 +32,7 @@ public class WrongGitignoreFilesListCreator
 
         var projectsList = supportToolsParameters.Projects;
         var gitIgnoreTemplateFileContents = new Dictionary<string, string>();
+        var missingGitIgnoreTemplateFiles = new Dictionary<string, string>();
         var wrongGitIgnoreFilesList = new Dictionary<string, string>();
 
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
@@ -67,15 +69,34 @@ public class WrongGitignoreFilesListCreator
                     if (!gitIgnoreModelFilePaths.TryGetValue(gitIgnorePathName, out var gitIgnoreTemplateFileName))
                         continue;
 
+                    if ( missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
+                        continue;
+
                     if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName,
                             out var gitIgnoreTemplateFileContent))
                     {
-                        gitIgnoreTemplateFileContent = File.ReadAllText(gitIgnoreTemplateFileName);
+                        if (File.Exists(gitIgnoreTemplateFileName))
+                            gitIgnoreTemplateFileContent = File.ReadAllText(gitIgnoreTemplateFileName);
+                        else
+                        {
+                            missingGitIgnoreTemplateFiles.Add(gitIgnorePathName, gitIgnoreTemplateFileName);
+                            StShared.WriteErrorLine($"{gitIgnoreTemplateFileName} is not exists", true, _logger, false);
+                            continue;
+                        }
+
                         gitIgnoreTemplateFileContents.Add(gitIgnorePathName, gitIgnoreTemplateFileContent);
                     }
 
                     var gitignoreFileName = Path.Combine(gitsFolder, gd.GitProjectFolderName, ".gitignore");
-                    var gitignoreFileContent = File.ReadAllText(gitignoreFileName);
+
+                    string? gitignoreFileContent = null;
+                    if (File.Exists(gitignoreFileName))
+                        gitignoreFileContent = File.ReadAllText(gitignoreFileName);
+                    else
+                    {
+                        StShared.WriteErrorLine($"{gitignoreFileName} is not exists", true, _logger, false);
+                        continue;
+                    }
 
                     if (gitignoreFileContent != gitIgnoreTemplateFileContent)
                         wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
