@@ -9,21 +9,24 @@ using SupportToolsData.Models;
 using System;
 using System.Linq;
 using LibGitData;
+using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
-        base(projectName)
+    public ProjectSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string projectName) : base(projectName)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
@@ -56,7 +59,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
 
-        
+
         //ყველა პროექტის git-ის სინქრონიზაცია
         var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
@@ -84,10 +87,11 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
             foreach (var tool in ToolCommandFabric.ToolsByProjects.Intersect(project.AllowToolsList))
                 projectSubMenuSet.AddMenuItem(
-                    new ToolTaskCliMenuCommand(_logger, tool, _projectName, null, _parametersManager), tool.ToString());
+                    new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName, null,
+                        _parametersManager), tool.ToString());
         }
 
-        var serverInfoCruder = new ServerInfoCruder(_logger, _parametersManager, _projectName);
+        var serverInfoCruder = new ServerInfoCruder(_logger, _httpClientFactory, _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
         var newItemCommand = new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
@@ -98,8 +102,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project?.ServerInfos != null)
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 projectSubMenuSet.AddMenuItem(
-                    new ServerInfoSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, kvp.Key),
-                    kvp.Value.GetItemKey());
+                    new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
+                        kvp.Key), kvp.Value.GetItemKey());
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

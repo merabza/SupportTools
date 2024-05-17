@@ -12,18 +12,21 @@ using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace SupportTools;
 
 public sealed class SupportTools : CliAppLoop
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportTools(ILogger logger, ParametersManager parametersManager)
+    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
@@ -36,7 +39,8 @@ public sealed class SupportTools : CliAppLoop
         AddChangeMenu(mainMenuSet);
 
         //პარამეტრების რედაქტორი
-        var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, parameters, _parametersManager);
+        var supportToolsParametersEditor =
+            new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor),
             "Support Tools Parameters Editor");
 
@@ -44,7 +48,8 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
-        mainMenuSet.AddMenuItem(new ProjectCreatorSubMenuCliMenuCommand(_logger, _parametersManager));
+        mainMenuSet.AddMenuItem(
+            new ProjectCreatorSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager));
 
         var projectCruder = new ProjectCruder(_logger, _parametersManager);
 
@@ -66,8 +71,8 @@ public sealed class SupportTools : CliAppLoop
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
             mainMenuSet.AddMenuItem(
-                new ProjectGroupSubMenuCliMenuCommand(_logger, _parametersManager, projectGroupName),
-                projectGroupName);
+                new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
+                    projectGroupName), projectGroupName);
 
 
         ////პროექტების ჩამონათვალი

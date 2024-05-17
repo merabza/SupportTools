@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiClientsManagement;
@@ -17,16 +18,18 @@ public sealed class CheckParametersVersionAction : ToolAction
     private const string ProjectName = "";
     private readonly string? _appSettingsVersion;
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
     private readonly ApiClientSettingsDomain _webAgentForCheck;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckParametersVersionAction(ILogger logger, ApiClientSettingsDomain webAgentForCheck,
-        ProxySettingsBase proxySettings, string? appSettingsVersion, int maxTryCount = 10) : base(logger,
-        "Check Parameters Version", null, null)
+    public CheckParametersVersionAction(ILogger logger, IHttpClientFactory httpClientFactory,
+        ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string? appSettingsVersion,
+        int maxTryCount = 10) : base(logger, "Check Parameters Version", null, null)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _appSettingsVersion = appSettingsVersion;
         _maxTryCount = maxTryCount;
         _proxySettings = proxySettings;
@@ -56,10 +59,8 @@ public sealed class CheckParametersVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    // ReSharper disable once using
-                    // ReSharper disable once DisposableConstructor
-                    await using var proxyApiClient = new ProjectsProxyApiClient(_logger, _webAgentForCheck.Server,
-                        _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
+                    var proxyApiClient = new ProjectsProxyApiClient(_logger, _httpClientFactory,
+                        _webAgentForCheck.Server, _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
                         await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
@@ -71,9 +72,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    // ReSharper disable once using
-                    // ReSharper disable once DisposableConstructor
-                    await using var testApiClient = new TestApiClient(_logger, _webAgentForCheck.Server);
+                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                         errors.AddRange(getAppSettingsVersionResult.AsT1);

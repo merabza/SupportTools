@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
 using Installer.ToolActions;
@@ -19,13 +20,15 @@ public sealed class AppSettingsInstaller : ToolCommand
         "This tool will Download latest parameters file from exchange server, then will update parameters file, and check if parameters updated";
 
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly bool _useConsole;
 
-    public AppSettingsInstaller(ILogger logger, bool useConsole, AppSettingsInstallerParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters,
-        parametersManager, ActionDescription)
+    public AppSettingsInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+        AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
+        parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _useConsole = useConsole;
     }
 
@@ -63,7 +66,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        InstallParametersAction installParametersAction = new(_logger,
+        InstallParametersAction installParametersAction = new(_logger, _httpClientFactory,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
@@ -77,7 +80,7 @@ public sealed class AppSettingsInstaller : ToolCommand
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
         //, AppSettingsInstallerParameters.ProjectName
-        CheckParametersVersionAction checkParametersVersionAction = new(_logger,
+        CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
             AppSettingsInstallerParameters.WebAgentForCheck, AppSettingsInstallerParameters.ProxySettings,
             appSettingsVersion);
 

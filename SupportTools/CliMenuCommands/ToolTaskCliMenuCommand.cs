@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using System;
+using System.Net.Http;
 using System.Threading;
 using SystemToolsShared;
 
@@ -14,16 +15,18 @@ namespace SupportTools.CliMenuCommands;
 public sealed class ToolTaskCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel? _serverInfo;
     private readonly ETools _tool;
     private IToolCommand? _toolCommand;
 
-    public ToolTaskCliMenuCommand(ILogger logger, ETools tool, string projectName, ServerInfoModel? serverInfo,
-        IParametersManager parametersManager) : base(null, null, true)
+    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName,
+        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, null, true)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _tool = tool;
         _projectName = projectName;
         _serverInfo = serverInfo;
@@ -34,7 +37,8 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     {
         return _toolCommand ??= _serverInfo is null
             ? ToolCommandFabric.Create(_logger, _tool, _parametersManager, _projectName)
-            : ToolCommandFabric.Create(_logger, _tool, _parametersManager, _projectName, _serverInfo);
+            : ToolCommandFabric.Create(_logger, _httpClientFactory, _tool, _parametersManager, _projectName,
+                _serverInfo);
     }
 
     protected override string? GetActionDescription()

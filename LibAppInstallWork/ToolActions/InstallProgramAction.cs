@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using LibAppInstallWork.Models;
+﻿using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -17,6 +17,7 @@ public sealed class InstallProgramAction : ToolAction
     private readonly FileStorageData _fileStorageForDownload;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _programArchiveDateMask;
@@ -26,12 +27,10 @@ public sealed class InstallProgramAction : ToolAction
     private string? _installingProgramVersion;
 
 
-    public InstallProgramAction(ILogger logger, InstallerBaseParameters installerBaseParameters,
-        string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
-        string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName,
-        string environmentName) : base(logger, "Install service", null, null)
+    public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory, InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName, string environmentName) : base(logger, "Install service", null, null)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _installerBaseParameters = installerBaseParameters;
         _programArchiveDateMask = programArchiveDateMask;
         _programArchiveExtension = programArchiveExtension;
@@ -45,9 +44,7 @@ public sealed class InstallProgramAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
-        var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _fileStorageForDownload,
-                _installerBaseParameters);
+        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _httpClientFactory, _fileStorageForDownload, _installerBaseParameters);
 
         if (agentClient is null)
         {
@@ -63,10 +60,6 @@ public sealed class InstallProgramAction : ToolAction
         var installProgramResult = await agentClient.InstallProgram(_projectName, _environmentName,
             _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
-
-
-        if (agentClient is IDisposable disposable)
-            disposable.Dispose();
 
         if (installProgramResult.IsT1)
         {

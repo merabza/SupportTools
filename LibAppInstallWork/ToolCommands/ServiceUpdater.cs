@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -15,12 +16,14 @@ public sealed class ServiceUpdater : ToolCommand
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public ServiceUpdater(ILogger logger, ServiceUpdaterParameters programServiceUpdaterParameters,
-        IParametersManager parametersManager) : base(logger, ActionName, programServiceUpdaterParameters,
-        parametersManager, ActionDescription)
+    public ServiceUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
+        ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager) : base(logger,
+        ActionName, programServiceUpdaterParameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     private ServiceUpdaterParameters ProgramServiceUpdaterParameters => (ServiceUpdaterParameters)Par;
@@ -72,7 +75,7 @@ public sealed class ServiceUpdater : ToolCommand
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallServiceAction(_logger,
+        var installProgramAction = new InstallServiceAction(_logger, _httpClientFactory,
             ProgramServiceUpdaterParameters.InstallerBaseParameters,
             ProgramServiceUpdaterParameters.ProgramArchiveDateMask,
             ProgramServiceUpdaterParameters.ProgramArchiveExtension,
@@ -91,7 +94,7 @@ public sealed class ServiceUpdater : ToolCommand
 
         //string installingProgramVersion = installProgramAction.InstallingProgramVersion;
         //4. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(_logger,
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
             ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion);
 
@@ -106,7 +109,7 @@ public sealed class ServiceUpdater : ToolCommand
         {
             //5. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
             //, projectName
-            var checkParametersVersionAction = new CheckParametersVersionAction(_logger,
+            var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
                 ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
                 ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion);
 

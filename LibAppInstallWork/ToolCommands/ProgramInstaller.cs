@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 12/22/2020 19:46:54
 
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -16,14 +17,16 @@ public sealed class ProgramInstaller : ToolCommand
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramInstaller(ILogger logger, bool useConsole, IParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters,
+    public ProgramInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+        IParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _useConsole = useConsole;
     }
 
@@ -46,10 +49,11 @@ public sealed class ProgramInstaller : ToolCommand
         if (!Parameters.IsService)
         {
             //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-            var installProgramAction = new InstallProgramAction(_logger, Parameters.InstallerBaseParameters,
-                Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
-                Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension,
-                Parameters.FileStorageForExchange, Parameters.ProjectName, Parameters.ServerInfo.EnvironmentName);
+            var installProgramAction = new InstallProgramAction(_logger, _httpClientFactory,
+                Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask,
+                Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
+                Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, Parameters.ProjectName,
+                Parameters.ServerInfo.EnvironmentName);
 
             return await installProgramAction.Run(cancellationToken);
         }
@@ -78,11 +82,11 @@ public sealed class ProgramInstaller : ToolCommand
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var projectName = Parameters.ProjectName;
         var environmentName = Parameters.ServerInfo.EnvironmentName;
-        var installServiceAction = new InstallServiceAction(_logger, Parameters.InstallerBaseParameters,
-            Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
-            Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, projectName,
-            Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName, Parameters.EncodedJsonFileName,
-            Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
+        var installServiceAction = new InstallServiceAction(_logger, _httpClientFactory,
+            Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
+            Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension, Parameters.FileStorageForExchange,
+            projectName, Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName,
+            Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
         if (!await installServiceAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
@@ -92,8 +96,8 @@ public sealed class ProgramInstaller : ToolCommand
         var installingProgramVersion = installServiceAction.InstallingProgramVersion;
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
-        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, Parameters.WebAgentForCheck,
-            Parameters.ProxySettings, installingProgramVersion);
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
+            Parameters.WebAgentForCheck, Parameters.ProxySettings, installingProgramVersion);
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
@@ -104,13 +108,12 @@ public sealed class ProgramInstaller : ToolCommand
         if (appSettingsVersion != null)
         {
             //4. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
-            var checkParametersVersionAction = new CheckParametersVersionAction(_logger, Parameters.WebAgentForCheck,
-                Parameters.ProxySettings, appSettingsVersion);
+            var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
+                Parameters.WebAgentForCheck, Parameters.ProxySettings, appSettingsVersion);
 
             if (await checkParametersVersionAction.Run(cancellationToken))
                 return true;
         }
-
 
         _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
             environmentName);

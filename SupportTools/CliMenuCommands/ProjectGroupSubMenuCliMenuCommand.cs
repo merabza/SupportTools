@@ -7,22 +7,24 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectGroupName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager,
-        string projectGroupName) :
-        base(projectGroupName)
+    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string projectGroupName) : base(projectGroupName)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
     }
@@ -49,7 +51,8 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
                      .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                                  _projectGroupName).OrderBy(o => o.Key))
             projectGroupSubMenuSet.AddMenuItem(
-                new ProjectSubMenuCliMenuCommand(_logger, _parametersManager, projectName), projectName);
+                new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, projectName),
+                projectName);
 
 
         //მთავარ მენიუში გასვლა

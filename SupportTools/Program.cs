@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Net.Http;
 using CliParameters;
 using LibParameters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
+using SupportTools;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -33,25 +35,34 @@ try
     }
 
     var parametersFileName = argParser.ParametersFileName;
-    ServicesCreator servicesCreator = new(par.LogFolder, null, "SupportTools");
+    var servicesCreator = new SupportToolsServicesCreator(par);
+    IHttpClientFactory? httpClientFactory;
     using (var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information))
     {
         if (serviceProvider == null)
         {
             Console.WriteLine("Logger not created");
-            return 8;
+            return 4;
         }
 
         logger = serviceProvider.GetService<ILogger<Program>>();
         if (logger is null)
         {
             StShared.WriteErrorLine("logger is null", true);
-            return 3;
+            return 5;
+        }
+
+        httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+        if (httpClientFactory is null)
+        {
+            StShared.WriteErrorLine("httpClientFactory is null", true);
+            return 6;
         }
     }
 
-    SupportTools.SupportTools supportTools = new(logger, new ParametersManager(parametersFileName, par));
-    return supportTools.Run() ? 0 : 1;
+    SupportTools.SupportTools supportTools =
+        new(logger, httpClientFactory, new ParametersManager(parametersFileName, par));
+    return supportTools.Run() ? 0 : 100;
 }
 catch (Exception e)
 {

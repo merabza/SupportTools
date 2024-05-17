@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 1/11/2021 20:04:36
 
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -20,12 +21,14 @@ public sealed class AppSettingsUpdater : ToolCommand
         "this tool will crate new encoded parameters file, then will Install parameters file server side adn will chek that parameters updated";
 
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public AppSettingsUpdater(ILogger logger, AppSettingsUpdaterParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription)
+    public AppSettingsUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
+        AppSettingsUpdaterParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
+        parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
@@ -55,7 +58,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        var installParametersAction = new InstallParametersAction(_logger,
+        var installParametersAction = new InstallParametersAction(_logger, _httpClientFactory,
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
@@ -68,7 +71,7 @@ public sealed class AppSettingsUpdater : ToolCommand
         }
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
-        var checkParametersVersionAction = new CheckParametersVersionAction(_logger,
+        var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             AppSettingsUpdaterParameters.WebAgentForCheck, AppSettingsUpdaterParameters.ProxySettings, checkForVersion);
 
         if (await checkParametersVersionAction.Run(cancellationToken))

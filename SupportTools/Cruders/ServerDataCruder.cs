@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
@@ -13,14 +14,14 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerDataCruder : ParCruder
 {
-    public ServerDataCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager, "Server",
-        "Servers")
+    public ServerDataCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
+        : base(parametersManager, "Server", "Servers")
     {
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerDataModel.IsLocal), true));
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerDataModel.WebAgentName), ParametersManager,
-            true));
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerDataModel.WebAgentInstallerName),
+        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory, nameof(ServerDataModel.WebAgentName),
             ParametersManager, true));
+        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
+            nameof(ServerDataModel.WebAgentInstallerName), ParametersManager, true));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUserName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUsersGroupName)));
         FieldEditors.Add(new RunTimeNameFieldEditor(nameof(ServerDataModel.Runtime), ParametersManager));

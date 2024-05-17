@@ -8,20 +8,23 @@ using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
-        "Project Creator")
+    public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager) : base("Project Creator")
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
@@ -45,7 +48,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         if (appProjectCreatorAllParameters is not null)
         {
-            AppProjectCreatorParametersEditor appProjectCreatorParametersEditor = new(_logger,
+            AppProjectCreatorParametersEditor appProjectCreatorParametersEditor = new(_logger, _httpClientFactory,
                 appProjectCreatorAllParameters, _parametersManager, _parametersManager);
 
             appProjectCreatorParametersEditor.FillDetailsSubMenu(projectCreatorSubMenuSet);

@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -15,12 +16,14 @@ public sealed class ProgramUpdater : ToolCommand
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public ProgramUpdater(ILogger logger, ProgramUpdaterParameters programUpdaterParameters,
-        IParametersManager parametersManager) : base(logger, ActionName, programUpdaterParameters, parametersManager,
-        ActionDescription)
+    public ProgramUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
+        ProgramUpdaterParameters programUpdaterParameters, IParametersManager parametersManager) : base(logger,
+        ActionName, programUpdaterParameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     private ProgramUpdaterParameters ProgramUpdaterParameters => (ProgramUpdaterParameters)Par;
@@ -50,10 +53,11 @@ public sealed class ProgramUpdater : ToolCommand
             return false;
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallProgramAction(_logger, ProgramUpdaterParameters.InstallerBaseParameters,
-            ProgramUpdaterParameters.ProgramArchiveDateMask, ProgramUpdaterParameters.ProgramArchiveExtension,
-            ProgramUpdaterParameters.ParametersFileDateMask, ProgramUpdaterParameters.ParametersFileExtension,
-            ProgramUpdaterParameters.FileStorageForDownload, projectName, environmentName);
+        var installProgramAction = new InstallProgramAction(_logger, _httpClientFactory,
+            ProgramUpdaterParameters.InstallerBaseParameters, ProgramUpdaterParameters.ProgramArchiveDateMask,
+            ProgramUpdaterParameters.ProgramArchiveExtension, ProgramUpdaterParameters.ParametersFileDateMask,
+            ProgramUpdaterParameters.ParametersFileExtension, ProgramUpdaterParameters.FileStorageForDownload,
+            projectName, environmentName);
 
         if (await installProgramAction.Run(cancellationToken))
             return true;

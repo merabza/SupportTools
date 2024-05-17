@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
@@ -16,12 +17,14 @@ namespace SupportTools.Cruders;
 public sealed class ServerInfoCruder : ParCruder
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _projectName;
 
-    public ServerInfoCruder(ILogger logger, ParametersManager parametersManager, string projectName) : base(
-        parametersManager, "Server", "Servers", true)
+    public ServerInfoCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
+        string projectName) : base(parametersManager, "Server", "Servers", true)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _projectName = projectName;
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
@@ -31,12 +34,13 @@ public sealed class ServerInfoCruder : ParCruder
             throw new ArgumentNullException(nameof(project));
 
 
-        FieldEditors.Add(new ServerDataNameFieldEditor(logger, nameof(ServerInfoModel.ServerName), ParametersManager));
+        FieldEditors.Add(new ServerDataNameFieldEditor(logger, httpClientFactory, nameof(ServerInfoModel.ServerName),
+            ParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         if (project.IsService)
         {
-            FieldEditors.Add(new ApiClientNameFieldEditor(logger, nameof(ServerInfoModel.WebAgentNameForCheck),
-                ParametersManager));
+            FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
+                nameof(ServerInfoModel.WebAgentNameForCheck), ParametersManager));
             FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
@@ -44,7 +48,7 @@ public sealed class ServerInfoCruder : ParCruder
 
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
-        FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger,
+        FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
             nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
     }
 
@@ -123,6 +127,7 @@ public sealed class ServerInfoCruder : ParCruder
             return;
         foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ?? []))
             itemSubMenuSet.AddMenuItem(
-                new ToolTaskCliMenuCommand(_logger, tool, _projectName, server, ParametersManager), tool.ToString());
+                new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName, server, ParametersManager),
+                tool.ToString());
     }
 }

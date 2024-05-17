@@ -1,13 +1,13 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -18,12 +18,15 @@ public sealed class ServiceStarter : ToolCommand
     private const string ActionName = "Starting Service";
     private const string ActionDescription = "Starting Service";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStarter(ILogger logger, ServiceStartStopParameters parameters, IParametersManager parametersManager) :
-        base(logger, ActionName, parameters, parametersManager, ActionDescription)
+    public ServiceStarter(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
+        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parameters = parameters;
     }
 
@@ -46,9 +49,8 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _parameters.WebAgentForInstall,
-                _parameters.InstallFolder);
+        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _httpClientFactory,
+            _parameters.WebAgentForInstall, _parameters.InstallFolder);
 
         if (agentClient is null)
         {
@@ -66,22 +68,19 @@ public sealed class ServiceStarter : ToolCommand
             return false;
         }
 
-        if (agentClient is IDisposable disposable)
-            disposable.Dispose();
-
         _logger.LogInformation("Service Started");
 
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction =
-            new(_logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+        CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
+            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
 
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
-        CheckProgramVersionAction checkProgramVersionAction =
-            new(_logger, _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+        CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,
+            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
                 environmentName);

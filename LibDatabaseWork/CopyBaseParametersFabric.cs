@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using DatabasesManagement;
 using FileManagersMain;
@@ -15,7 +16,8 @@ namespace LibDatabaseWork;
 
 public static class CopyBaseParametersFabric
 {
-    public static CopyBaseParameters? CreateCopyBaseParameters(ILogger logger, bool fromProductionToDeveloper,
+    public static CopyBaseParameters? CreateCopyBaseParameters(ILogger logger, IHttpClientFactory httpClientFactory,
+        bool fromProductionToDeveloper,
         SupportToolsParameters supportToolsParameters, string projectName, ServerInfoModel serverInfo)
     {
         //შევამოწმოთ პროექტის პარამეტრები
@@ -166,8 +168,8 @@ public static class CopyBaseParametersFabric
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
         var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
-            sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections, null, null,
-            CancellationToken.None).Result;
+            httpClientFactory, sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections,
+            null, null, CancellationToken.None).Result;
 
         if (agentClientForSource is null)
         {
@@ -176,8 +178,8 @@ public static class CopyBaseParametersFabric
         }
 
         var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
-            destinationDbWebAgentName, apiClients, destinationDbConnectionName, databaseServerConnections, null, null,
-            CancellationToken.None).Result;
+            httpClientFactory, destinationDbWebAgentName, apiClients, destinationDbConnectionName,
+            databaseServerConnections, null, null, CancellationToken.None).Result;
 
         if (agentClientForDestination is null)
         {

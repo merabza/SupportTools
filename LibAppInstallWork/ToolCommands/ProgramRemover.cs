@@ -1,10 +1,10 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -13,13 +13,14 @@ public sealed class ProgramRemover : ToolCommand
     private const string ActionName = "Remove App";
     private const string ActionDescription = "Remove App";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemover(ILogger logger, ProgramRemoverParameters parameters, IParametersManager parametersManager) :
-        base(logger, ActionName, parameters, parametersManager, ActionDescription)
+    public ProgramRemover(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parameters = parameters;
     }
 
@@ -36,9 +37,7 @@ public sealed class ProgramRemover : ToolCommand
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
-        var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _parameters.WebAgentForInstall,
-                _parameters.InstallFolder);
+        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _httpClientFactory, _parameters.WebAgentForInstall, _parameters.InstallFolder);
         if (agentClient is null)
         {
             _logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
@@ -49,9 +48,6 @@ public sealed class ProgramRemover : ToolCommand
         if (await agentClient.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService,
                 CancellationToken.None))
             return true;
-
-        if (agentClient is IDisposable disposable)
-            disposable.Dispose();
 
         _logger.LogError("Project {projectName} can not removed", projectName);
         return false;

@@ -6,13 +6,14 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
+using System.Net.Http;
 
 namespace SupportTools.ParametersEditors;
 
 public sealed class AppProjectCreatorParametersEditor : ParametersEditor
 {
-    public AppProjectCreatorParametersEditor(ILogger logger, IParameters parameters,
-        IParametersManager parametersManager, ParametersManager listsParametersManager) : base(
+    public AppProjectCreatorParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParameters parameters, IParametersManager parametersManager, ParametersManager listsParametersManager) : base(
         "AppProjectCreatorParametersEditor", parameters, parametersManager)
     {
         FieldEditors.Add(new IntFieldEditor(nameof(AppProjectCreatorAllParameters.IndentSize)));
@@ -27,7 +28,7 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
         //ჭკვიანი სქემის სახელი.
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(AppProjectCreatorAllParameters.UseSmartSchema),
             listsParametersManager));
-        FieldEditors.Add(new ServerDataNameFieldEditor(logger,
+        FieldEditors.Add(new ServerDataNameFieldEditor(logger, httpClientFactory,
             nameof(AppProjectCreatorAllParameters.ProductionServerName), listsParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(
             nameof(AppProjectCreatorAllParameters.ProductionEnvironmentName),

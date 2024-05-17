@@ -7,14 +7,14 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
+using System.Net.Http;
 
 namespace SupportTools.ParametersEditors;
 
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
-    public SupportToolsParametersEditor(ILogger logger, IParameters parameters,
-        ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters,
-        parametersManager)
+    public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
+        ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
@@ -42,8 +42,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger, nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
         //AppProjectCreatorAllParameters
-        FieldEditors.Add(
-            new ApiClientsFieldEditor(logger, nameof(SupportToolsParameters.ApiClients), parametersManager));
+        FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
+            parametersManager));
         FieldEditors.Add(new GitsFieldEditor(logger, nameof(SupportToolsParameters.Gits), parametersManager));
         FieldEditors.Add(new ReactAppTemplatesFieldEditor(logger, nameof(SupportToolsParameters.ReactAppTemplates),
             parametersManager));
@@ -57,7 +57,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new ArchiversFieldEditor(nameof(SupportToolsParameters.Archivers), parametersManager));
         FieldEditors.Add(
             new ProjectsFieldEditor(logger, nameof(SupportToolsParameters.Projects), parametersManager));
-        FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, parametersManager));
+        FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, httpClientFactory,
+            parametersManager));
         FieldEditors.Add(new RunTimesFieldEditor(nameof(SupportToolsParameters.RunTimes), parametersManager));
         FieldEditors.Add(new GitIgnoreFilePathsFieldEditor(logger,
             nameof(SupportToolsParameters.GitIgnoreModelFilePaths), parametersManager));

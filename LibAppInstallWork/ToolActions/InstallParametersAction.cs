@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using LibAppInstallWork.Models;
+﻿using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -18,15 +18,18 @@ public sealed class InstallParametersAction : ToolAction
     private readonly FileStorageData _fileStorageForUpload;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
 
-    public InstallParametersAction(ILogger logger, string parametersFileDateMask, string parametersFileExtension,
-        InstallerBaseParameters installerBaseParameters, FileStorageData fileStorageForUpload, string projectName,
-        string environmentName, string appSettingsEncodedJsonFileName) : base(logger, "Install Parameters", null, null)
+    public InstallParametersAction(ILogger logger, IHttpClientFactory httpClientFactory, string parametersFileDateMask,
+        string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
+        FileStorageData fileStorageForUpload, string projectName, string environmentName,
+        string appSettingsEncodedJsonFileName) : base(logger, "Install Parameters", null, null)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _installerBaseParameters = installerBaseParameters;
         _parametersFileDateMask = parametersFileDateMask;
         _parametersFileExtension = parametersFileExtension;
@@ -39,9 +42,8 @@ public sealed class InstallParametersAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
-        var agentClient =
-            ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _fileStorageForUpload,
-                _installerBaseParameters);
+        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _httpClientFactory,
+            _fileStorageForUpload, _installerBaseParameters);
         if (agentClient is null)
         {
             _logger.LogError(
@@ -57,9 +59,6 @@ public sealed class InstallParametersAction : ToolAction
         var updateAppParametersFileResult = await agentClient.UpdateAppParametersFile(_projectName, _environmentName,
             Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
             CancellationToken.None);
-
-        if (agentClient is IDisposable disposable)
-            disposable.Dispose();
 
         if (updateAppParametersFileResult.IsNone)
             return true;
