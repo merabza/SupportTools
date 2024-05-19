@@ -17,7 +17,7 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSyncCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        string gitProjectName, EGitCol gitCol) : base("Sync", null, true)
+        string gitProjectName, EGitCol gitCol) : base("Sync", EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -32,12 +32,10 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
     }
 
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var gitSyncToolAction =
             GitSyncToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, _gitProjectName);
-        gitSyncToolAction?.Run(CancellationToken.None).Wait();
+        return gitSyncToolAction?.Run(CancellationToken.None).Result ?? false;
     }
 }

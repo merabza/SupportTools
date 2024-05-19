@@ -15,7 +15,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateRunCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName,
-        ETestOrReal testOrReal)
+        ETestOrReal testOrReal) : base(null, EMenuAction.Reload)
     {
         _appProjectCreatorByTemplate =
             new AppProjectCreatorByTemplateToolAction(logger, parametersManager, templateName, testOrReal);
@@ -26,22 +26,8 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
         return AppProjectCreatorByTemplateToolAction.ActionDescription;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
-        MenuAction = EMenuAction.Reload;
-
-        //დავინიშნოთ დრო
-        var startDateTime = DateTime.Now;
-        Console.WriteLine("Task is running...");
-        Console.WriteLine("---");
-
-        MenuAction = EMenuAction.Reload;
-
-        _appProjectCreatorByTemplate.Run(CancellationToken.None).Wait();
-
-        Console.WriteLine("---");
-
-        Console.WriteLine($"Task Finished. {StShared.TimeTakenMessage(startDateTime)}");
+        return _appProjectCreatorByTemplate.Run(CancellationToken.None).Result;
     }
 }

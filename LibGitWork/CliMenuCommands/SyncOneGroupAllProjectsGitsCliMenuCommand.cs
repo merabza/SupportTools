@@ -14,19 +14,18 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneGroupAllProjectsGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager,
-        string projectGroupName) : base("Sync One Group All Projects Gits", null, true)
+        string projectGroupName) : base("Sync One Group All Projects Gits", EMenuAction.Reload, EMenuAction.Reload,
+        null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var syncOneGroupAllProjectsGitsToolAction =
             SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, _projectGroupName, null);
-        syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Wait();
+        return syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Result;
     }
 }

@@ -24,20 +24,13 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol) :
-        base(projectName)
+        EGitCol gitCol) : base(projectName, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitCol = gitCol;
     }
-
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.LoadSubMenu;
-    }
-
 
     public override CliMenuSet GetSubmenu()
     {

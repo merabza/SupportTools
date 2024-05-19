@@ -19,9 +19,8 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
 
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol) : base(
-        "Add Git Project")
+    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol)
+        : base("Add Git Project", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -29,7 +28,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
         Console.WriteLine("Add new Git started");
 
@@ -39,7 +38,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         if (string.IsNullOrWhiteSpace(newGitName))
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return;
+            return false;
         }
 
         //მიმდინარე პარამეტრები
@@ -49,7 +48,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return;
+            return false;
         }
 
         var gitProjectNames = _gitCol switch
@@ -65,28 +64,14 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
             StShared.WriteErrorLine(
                 $"Git Project with Name {newGitName} in project {_projectName} is already exists. cannot create Server with this name. ",
                 true, _logger);
-            return;
+            return false;
         }
 
-        //switch (_gitCol)
-        //{
-        //    //პროექტის დამატება პროექტების სიაში
-        //    case EGitCol.Main:
-        //        project.GitProjectNames.Add(newGitName);
-        //        break;
-        //    case EGitCol.ScaffoldSeed:
-        //        project.ScaffoldSeederGitProjectNames.Add(newGitName);
-        //        break;
-        //    default:
-        //        throw new ArgumentOutOfRangeException();
-        //}
         gitProjectNames.Add(newGitName);
 
         //ცვლილებების შენახვა
         _parametersManager.Save(parameters, "Add Git Project Finished");
 
-        //მოვითხოვოთ მენიუს ახლიდან ჩატვირთვა. ჩაიტვირთოს მთავარი მენიუ
-        //MenuState = new MenuState {RebuildMenu = true};
-        MenuAction = EMenuAction.Reload;
+        return true;
     }
 }

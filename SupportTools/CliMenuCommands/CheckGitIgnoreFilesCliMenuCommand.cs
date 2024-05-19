@@ -14,16 +14,16 @@ public sealed class CheckGitIgnoreFilesCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckGitIgnoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        CheckGitIgnoreFilesToolAction.ActionName)
+        CheckGitIgnoreFilesToolAction.ActionName, EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
         var updateGitProjectsToolAction = new CheckGitIgnoreFilesToolAction(_logger, _parametersManager);
-        updateGitProjectsToolAction.Run(CancellationToken.None).Wait();
+        return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
     }
 
     protected override string GetStatus()

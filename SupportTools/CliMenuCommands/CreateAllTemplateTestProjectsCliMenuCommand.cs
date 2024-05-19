@@ -14,18 +14,16 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     public CreateAllTemplateTestProjectsCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
-        "Create All Template Test Projects")
+        "Create All Template Test Projects", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
             new(_logger, Name!, _parametersManager);
-        createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Wait();
+        return createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Result;
     }
 }

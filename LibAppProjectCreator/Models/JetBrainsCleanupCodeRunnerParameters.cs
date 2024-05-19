@@ -36,7 +36,7 @@ public sealed class JetBrainsCleanupCodeRunnerParameters : IParameters
             if (!File.Exists(project.SolutionFileName))
             {
                 StShared.WriteErrorLine(
-                    $"SolutionFile with name {project.SolutionFileName} does not Exists. Project {projectName}", true);
+                    $"SolutionFile with name {project.SolutionFileName} is not Exists. Project {projectName}", true);
                 return null;
             }
 

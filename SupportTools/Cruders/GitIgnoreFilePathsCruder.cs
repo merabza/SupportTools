@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
+using CliParametersDataEdit.CliMenuCommands;
+using LanguageExt.ClassInstances;
 using LibGitData;
-using LibGitData.Models;
-using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static WebAgentProjectsApiContracts.V1.Routes.ProjectsApiRoutes;
 
 namespace SupportTools.Cruders;
 
@@ -18,7 +19,8 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
 {
     private readonly ILogger _logger;
 
-    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager, "GitIgnore File Path", "GitIgnore File Paths")
+    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
+        "GitIgnore File Path", "GitIgnore File Paths")
     {
         _logger = logger;
         FieldEditors.Add(new FilePathFieldEditor(nameof(TextItemData.Text), null, true));
@@ -81,6 +83,9 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
 
         var updateGitIgnoreFilesCliMenuCommand = new UpdateGitIgnoreFilesCliMenuCommand(_logger, ParametersManager);
         cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
+
+        GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, ParametersManager);
+        cruderSubMenuSet.AddMenuItem(generateCommand, "Generate standard .gitignore files...");
     }
 
     public override string GetStatusFor(string name)
@@ -107,17 +112,26 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
 
                 foreach (var gitProjectName in gitProjectNames)
                 {
-                    if (!gits.TryGetValue(gitProjectName, out var git)) 
+                    if (!gits.TryGetValue(gitProjectName, out var git))
                         continue;
                     if (git.GitIgnorePathName == name)
                         usageCount++;
                 }
 
-                
+
 
             }
         }
+
         return $"Usage count is: {usageCount}";
     }
 
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    {
+        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+
+        ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand = new(_logger, recordKey, ParametersManager);
+        itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand,
+            "Apply this file type to all projects that do not have a type specified");
+    }
 }

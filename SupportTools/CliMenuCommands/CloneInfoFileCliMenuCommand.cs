@@ -6,7 +6,7 @@ namespace SupportTools.CliMenuCommands;
 
 public /*open*/ class CloneInfoFileCliMenuCommand : CliMenuCommand
 {
-    protected CloneInfoFileCliMenuCommand(string menuName) : base(menuName)
+    protected CloneInfoFileCliMenuCommand(string menuName) : base(menuName, EMenuAction.LevelUp)
     {
     }
 

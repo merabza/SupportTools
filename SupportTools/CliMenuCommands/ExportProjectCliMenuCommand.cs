@@ -17,24 +17,21 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base(
-        "Export Project", projectName)
+    public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base("Export Project", EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         var projects = parameters.Projects;
         if (!projects.TryGetValue(_projectName, out var project))
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
-            return;
+            return false;
         }
 
         var defCloneFile = project.ProjectFolderName is null
@@ -46,12 +43,12 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
         if (string.IsNullOrWhiteSpace(fileWithExportData))
         {
             StShared.WriteErrorLine("File name does not entered", true);
-            return;
+            return false;
         }
 
-        if (File.Exists(fileWithExportData))
-            if (!Inputer.InputBool($"File {fileWithExportData} exists, overwrite?", false, false))
-                return;
+        if (File.Exists(fileWithExportData) &&
+            !Inputer.InputBool($"File {fileWithExportData} exists, overwrite?", false, false))
+            return false;
 
         var projectExportData = new ProjectExportData(_projectName, project);
         foreach (var gitName in project.GitProjectNames.Where(gitName => parameters.Gits.ContainsKey(gitName)))
@@ -60,5 +57,7 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
 
         var projectJsonText = JsonConvert.SerializeObject(projectExportData, Formatting.Indented);
         File.WriteAllText(fileWithExportData, projectJsonText);
+
+        return true;
     }
 }

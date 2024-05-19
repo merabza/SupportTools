@@ -17,19 +17,16 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CreatorClassCreatorCliMenuCommand(ILogger logger) : base(
-        "Create Class Creator")
+    public CreatorClassCreatorCliMenuCommand(ILogger logger) : base("Create Class Creator", EMenuAction.Reload)
     {
         _logger = logger;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var path = MenuInputer.InputFileOrFolderPath("File or folder path with cs code", null);
         if (path is null)
-            return;
+            return false;
 
         if (File.Exists(path))
         {
@@ -40,16 +37,16 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             if (file.DirectoryName is null)
             {
                 Console.WriteLine("file.DirectoryName is null");
-                return;
+                return false;
             }
 
             var classCreatorInfo = ClassCreatorInfo.Create(path, true);
             if (classCreatorInfo is null)
-                return;
+                return false;
 
             ProcessFiles([classCreatorInfo]);
 
-            return;
+            return true;
         }
 
         if (Directory.Exists(path))
@@ -62,25 +59,28 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             {
                 var classCreatorInfo = ClassCreatorInfo.Create(file.FullName, true);
                 if (classCreatorInfo is null)
-                    return;
+                    return false;
                 infos.Add(classCreatorInfo);
             }
 
             ProcessFiles(infos);
 
-            return;
+            return true;
         }
 
 
         Console.WriteLine("File or folder with name {0} does not exists", path);
+        return false;
     }
 
 
     private void ProcessFiles(List<ClassCreatorInfo> classCreatorInfos)
     {
-        if (CheckDestinationFilesExists(classCreatorInfos))
-            if (!Inputer.InputBool("Overwrite?", false))
-                return;
+        if (CheckDestinationFilesExists(classCreatorInfos) && !Inputer.InputBool("Overwrite?", false))
+        {
+            MenuAction = EMenuAction.Reload;
+            return;
+        }
 
         CreateCodeFiles(classCreatorInfos);
     }

@@ -15,8 +15,7 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol, bool askRunAction = true) : base("Sync One Project All gits", null, askRunAction)
+    public SyncOneProjectAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol, bool askRunAction = true) : base("Sync One Project All gits", EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -24,12 +23,11 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
 
         var syncOneProjectAllGitsToolAction =
             SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, null, true);
-        syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
+        return syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Result ?? false;
     }
 }

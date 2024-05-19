@@ -32,7 +32,7 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateGitProjectCliMenuCommand(ILogger logger, string gitName, IParametersManager parametersManager) : base(
-        "Update Git Project")
+        "Update Git Project", EMenuAction.LevelUp)
     {
         _logger = logger;
         _gitName = gitName;
@@ -40,10 +40,8 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
         ////https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
         ////https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
 
@@ -55,15 +53,15 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
-            return;
+            return false;
         }
 
         if (!gitProjectsUpdater.ProcessOneGitProject(_gitName))
-            return;
+            return false;
 
         _parametersManager.Save(_supportToolsParameters, "Project Saved");
 
-        MenuAction = EMenuAction.LevelUp;
         Console.WriteLine("Success");
+        return true;
     }
 }

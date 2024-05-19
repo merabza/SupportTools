@@ -11,22 +11,22 @@ public sealed class GenerateStandardRunTimesCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateStandardRunTimesCliMenuCommand(IParametersManager parametersManager)
+    public GenerateStandardRunTimesCliMenuCommand(IParametersManager parametersManager) : base(null, EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
         var parameters = (IParametersWithSmartSchemas)_parametersManager.Parameters;
 
         if (!Inputer.InputBool("This process will change RunTimes, are you sure?", false, false))
-            return;
+            return false;
 
         StandardRunTimesGenerator.Generate(_parametersManager);
 
         //შენახვა
         _parametersManager.Save(parameters, "RunTimes generated success");
+        return true;
     }
 }

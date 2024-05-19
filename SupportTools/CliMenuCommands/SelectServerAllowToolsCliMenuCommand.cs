@@ -17,16 +17,15 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SelectServerAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
-        string serverName)
+        string serverName) : base(null, EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
         _serverName = serverName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var server = parameters.GetServerByProject(_projectName, _serverName);
@@ -34,7 +33,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         if (server is null)
         {
             StShared.WriteErrorLine($"Server with name {_serverName} is not exists 2", true);
-            return;
+            return false;
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
@@ -51,7 +50,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         foreach (var kvp in checks)
         {
             if (!Enum.TryParse(kvp.Key, out ETools tool))
-                return;
+                return false;
 
             if (kvp.Value)
             {
@@ -67,6 +66,6 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         _parametersManager.Save(parameters, "Changes saved");
-        MenuAction = EMenuAction.Reload;
+        return true;
     }
 }

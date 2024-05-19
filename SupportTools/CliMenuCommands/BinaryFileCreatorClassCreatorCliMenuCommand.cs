@@ -16,19 +16,17 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public BinaryFileCreatorClassCreatorCliMenuCommand(ILogger logger) : base(
-        "Create binary file Class Creator")
+    public BinaryFileCreatorClassCreatorCliMenuCommand(ILogger logger) : base("Create binary file Class Creator",
+        EMenuAction.Reload)
     {
         _logger = logger;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
         if (path is null)
-            return;
+            return false;
 
         if (File.Exists(path))
         {
@@ -39,16 +37,16 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             if (file.DirectoryName is null)
             {
                 Console.WriteLine("file.DirectoryName is null");
-                return;
+                return false;
             }
 
             var classCreatorInfo = ClassCreatorInfo.Create(path, false);
             if (classCreatorInfo is null)
-                return;
+                return false;
 
             ProcessFiles([classCreatorInfo]);
 
-            return;
+            return true;
         }
 
         if (Directory.Exists(path))
@@ -61,26 +59,28 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             {
                 var classCreatorInfo = ClassCreatorInfo.Create(file.FullName, false);
                 if (classCreatorInfo is null)
-                    return;
+                    return false;
                 infos.Add(classCreatorInfo);
             }
 
             ProcessFiles(infos);
-
-
-            return;
+            return true;
         }
 
 
         Console.WriteLine("File or folder with name {0} is not exists", path);
+        return false;
+
     }
 
 
     private void ProcessFiles(List<ClassCreatorInfo> classCreatorInfos)
     {
-        if (CheckDestinationFilesExists(classCreatorInfos))
-            if (!Inputer.InputBool("Overwrite?", false))
-                return;
+        if (CheckDestinationFilesExists(classCreatorInfos) && !Inputer.InputBool("Overwrite?", false))
+        {
+            MenuAction = EMenuAction.Reload;
+            return;
+        }
 
         CreateCodeFiles(classCreatorInfos);
     }

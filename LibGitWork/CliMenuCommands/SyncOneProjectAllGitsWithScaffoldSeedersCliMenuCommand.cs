@@ -14,20 +14,18 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand : Cli
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(ILogger logger, ParametersManager parametersManager,
-        string projectName,
-        bool askRunAction = true) : base("Sync One Project All Gits With Scaffold Seeders", null, askRunAction)
+        string projectName, bool askRunAction = true) : base("Sync One Project All Gits With Scaffold Seeders",
+        EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var syncOneGroupAllProjectsGitsToolAction =
             SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, _projectName);
-        syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Wait();
+        return syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Result;
     }
 }

@@ -15,13 +15,13 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SelectProjectAllowToolsCliMenuCommand(ParametersManager parametersManager, string projectName)
+    public SelectProjectAllowToolsCliMenuCommand(ParametersManager parametersManager, string projectName):base(null,EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
 
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
@@ -32,7 +32,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"Project with name {_projectName} does not exists", true);
-            return;
+            return false;
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
@@ -45,7 +45,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         foreach (var kvp in checks)
         {
             if (!Enum.TryParse(kvp.Key, out ETools tool))
-                return;
+                return false;
 
             if (kvp.Value)
             {
@@ -62,6 +62,6 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         _parametersManager.Save(parameters, "Changes saved");
-        MenuAction = EMenuAction.Reload;
+        return true;
     }
 }

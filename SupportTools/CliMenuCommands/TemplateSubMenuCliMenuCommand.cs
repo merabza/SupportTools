@@ -18,16 +18,11 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName) :
-        base(templateName)
+        base(templateName, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _templateName = templateName;
-    }
-
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.LoadSubMenu;
     }
 
     public override CliMenuSet GetSubmenu()

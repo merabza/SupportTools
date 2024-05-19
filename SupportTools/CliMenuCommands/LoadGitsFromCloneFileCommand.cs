@@ -1,5 +1,4 @@
-﻿using CliMenu;
-using LibGitData.Models;
+﻿using LibGitData.Models;
 using LibMenuInput;
 using LibParameters;
 using SupportToolsData.Models;
@@ -23,9 +22,8 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         _projectName = projectName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         var project = parameters.GetProject(_projectName);
@@ -33,7 +31,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return;
+            return false;
         }
 
         var mainProjectName = project.MainProjectName;
@@ -57,7 +55,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         if (!File.Exists(fileWithCloneCommands))
         {
             StShared.WriteErrorLine($"File {fileWithCloneCommands} does not exists", true);
-            return;
+            return false;
         }
 
         var lines = File.ReadLines(fileWithCloneCommands);
@@ -129,7 +127,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         //    parameters.Gits.Where(x => project.GitProjectNames.Contains(x.Key)).Select(x => x.Value));
         //gitSyncAll.Run();
 
-        MenuAction = EMenuAction.LevelUp;
         Console.WriteLine("Success");
+        return true;
     }
 }

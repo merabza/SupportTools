@@ -14,7 +14,7 @@ public sealed class ServerDataNameFieldEditor : FieldEditor<string>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServerDataNameFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
-        IParametersManager parametersManager) : base(propertyName)
+        IParametersManager parametersManager) : base(propertyName, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

@@ -17,9 +17,8 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteGitProjectCliMenuCommand(ParametersManager parametersManager, string projectName,
-        string gitProjectName, EGitCol gitCol) :
-        base(
-            "Delete Git Project", gitProjectName)
+        string gitProjectName, EGitCol gitCol) : base("Delete Git Project", EMenuAction.LevelUp, EMenuAction.Reload,
+        gitProjectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
@@ -27,17 +26,15 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         var result = parameters.GetGitProjectNames(_projectName, _gitCol);
         if (result.IsNone)
         {
-            StShared.WriteErrorLine(
-                $"Git Project with name {_projectName} does not exists", true);
-            return;
+            StShared.WriteErrorLine($"Git Project with name {_projectName} does not exists", true);
+            return false;
         }
 
         var gitProjectNames = (List<string>)result;
@@ -46,25 +43,27 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
         {
             StShared.WriteErrorLine(
                 $"Git Project with name {_gitProjectName} does not exists in project {_projectName}", true);
-            return;
+            return false;
         }
 
         if (!Inputer.InputBool(
-                $"This will Delete Git Project with Name {_gitProjectName}, from this project. are you sure?",
-                false, false))
-            return;
+                $"This will Delete Git Project with Name {_gitProjectName}, from this project. are you sure?", false,
+                false))
+        {
+            return false;
+        }
 
         gitProjectNames.Remove(_gitProjectName);
         if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
         {
-            StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}",
-                true);
-            return;
+            StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}", true);
+            return false;
         }
 
         _parametersManager.Save(parameters,
             $"Git Project with Name {_gitProjectName} in project {_projectName} deleted.");
 
         MenuAction = EMenuAction.LevelUp;
+        return true;
     }
 }

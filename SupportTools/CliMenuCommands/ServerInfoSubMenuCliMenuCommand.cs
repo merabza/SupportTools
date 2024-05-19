@@ -17,7 +17,8 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfoSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName, string serverName) : base(serverName)
+        ParametersManager parametersManager, string projectName, string serverName) : base(serverName,
+        EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -25,12 +26,6 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
         _projectName = projectName;
         _serverName = serverName;
     }
-
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.LoadSubMenu;
-    }
-
 
     public override CliMenuSet GetSubmenu()
     {

@@ -69,7 +69,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (!File.Exists(_keysJsonFileName))
         {
-            _logger.LogError("keys file {_keysJsonFileName} does not exists", _keysJsonFileName);
+            _logger.LogError("keys file {_keysJsonFileName} is not exists", _keysJsonFileName);
             return null;
         }
 

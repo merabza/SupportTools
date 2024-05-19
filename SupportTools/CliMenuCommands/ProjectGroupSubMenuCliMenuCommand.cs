@@ -21,19 +21,13 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectGroupSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectGroupName) : base(projectGroupName)
+        ParametersManager parametersManager, string projectGroupName) : base(projectGroupName, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
     }
-
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.LoadSubMenu;
-    }
-
 
     public override CliMenuSet GetSubmenu()
     {

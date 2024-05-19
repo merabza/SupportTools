@@ -85,14 +85,14 @@ public sealed class ReactAppTypeCruder : ParCruder
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
         var reactAppTemplateNames = GetReactAppTemplateNames();
-        if (!reactAppTemplateNames.ContainsKey(recordKey))
+        if (!reactAppTemplateNames.TryGetValue(recordKey, out var name))
             return;
 
         //UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
         //itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
         ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
-            new(_logger, ParametersManager, recordKey, reactAppTemplateNames[recordKey]);
+            new(_logger, ParametersManager, recordKey, name);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand, "Recreate React App files By Template...");
     }
 }

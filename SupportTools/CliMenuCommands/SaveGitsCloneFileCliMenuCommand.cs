@@ -27,7 +27,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
         _projectName = projectName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
         //1. დავადგინოთ Main Project File Name
         //2. გავიაროთ გიტი ყველა პროექტი და ვიპოვოთ გიტის ის პროექტი, რომლის ფოლდერიც შეიცავს Main Project File Name-ს ანუ არის ამ ფაილის მშობელი
@@ -41,7 +41,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return;
+            return false;
         }
 
         //var mainProjectName = project.MainProjectName;
@@ -53,12 +53,11 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
         if (string.IsNullOrWhiteSpace(fileWithCloneCommands))
         {
             StShared.WriteErrorLine("File name does not entered", true);
-            return;
+            return false;
         }
 
-        if (File.Exists(fileWithCloneCommands))
-            if (!Inputer.InputBool($"File {fileWithCloneCommands} exists, overwrite?", false, false))
-                return;
+        if (File.Exists(fileWithCloneCommands) && !Inputer.InputBool($"File {fileWithCloneCommands} exists, overwrite?", false, false))
+            return false;
 
         StringBuilder sb = new();
         sb.AppendLine($"mkdir {_projectName}");
@@ -66,17 +65,18 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
 
         foreach (var gitProjectName in project.GitProjectNames)
         {
+
             if (!parameters.Gits.TryGetValue(gitProjectName, out var gitProject))
             {
                 StShared.WriteErrorLine($"Git project with name {gitProjectName} does not exists", true);
-                return;
+                return false;
             }
 
             if (string.IsNullOrWhiteSpace(gitProject.GitProjectAddress))
             {
                 StShared.WriteErrorLine(
                     $"GitProjectAddress does not specified for project with name {gitProjectName}", true);
-                return;
+                return false;
             }
 
             var gitProjectFolderName = gitProject.GitProjectFolderName;
@@ -84,7 +84,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
             {
                 StShared.WriteErrorLine(
                     $"GitProjectFolderName does not specified for project with name {gitProjectName}", true);
-                return;
+                return false;
             }
 
             if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
@@ -105,5 +105,6 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
 
         MenuAction = EMenuAction.LevelUp;
         Console.WriteLine("Success");
+        return true;
     }
 }

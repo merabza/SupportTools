@@ -7,14 +7,10 @@ public class InfoCliMenuCommand : CliMenuCommand
     private readonly string _menuUrlPrefix;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public InfoCliMenuCommand(string info, string menuUrlPrefix) : base(info, null, false, EStatusView.Brackets, true)
+    public InfoCliMenuCommand(string info, string menuUrlPrefix) : base(info, EMenuAction.GoToMenuLink,
+        EMenuAction.GoToMenuLink, null, false, EStatusView.Brackets, true)
     {
         _menuUrlPrefix = menuUrlPrefix;
-    }
-
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.GoToMenuLink;
     }
 
     public override string GetMenuLinkToGo()

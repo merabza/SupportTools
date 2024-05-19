@@ -15,15 +15,13 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ImportProjectCliMenuCommand(ParametersManager parametersManager) : base("Import Project")
+    public ImportProjectCliMenuCommand(ParametersManager parametersManager) : base("Import Project", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         var filenameForImport = MenuInputer.InputFilePath("File name for Import", null);
@@ -31,7 +29,7 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
         if (!File.Exists(filenameForImport))
         {
             StShared.WriteErrorLine($"File {filenameForImport} does not exists", true);
-            return;
+            return false;
         }
 
         var importData = File.ReadAllText(filenameForImport);
@@ -50,14 +48,14 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
         if (projectExportData is null)
         {
             StShared.WriteErrorLine($"Project data does not deserialized from file {filenameForImport}", true);
-            return;
+            return false;
         }
 
         var projectName = projectExportData.ProjectName;
         if (parameters.Projects.ContainsKey(projectName))
         {
             StShared.WriteErrorLine($"Project with name {projectName} already exists", true);
-            return;
+            return false;
         }
 
         var project = projectExportData.Project;
@@ -70,5 +68,6 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
             parameters.Gits.Add(git.Key, git.Value);
 
         _parametersManager.Save(parameters, $"Project {projectName} Added");
+        return true;
     }
 }

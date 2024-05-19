@@ -14,18 +14,16 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
     private readonly IParametersManager _parametersManager;
 
     public ReCreateAllReactAppsByTemplatesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        "ReCreate All React Apps By Templates")
+        "ReCreate All React Apps By Templates", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
         ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
             new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
-        reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Wait();
+        return reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Result;
     }
 }

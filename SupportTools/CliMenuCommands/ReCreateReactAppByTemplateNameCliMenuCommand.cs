@@ -12,7 +12,7 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
     private readonly ReCreateReactAppFilesByTemplateNameToolCommand _command;
 
     public ReCreateReactAppByTemplateNameCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        string reactAppName, string? reactTemplateName)
+        string reactAppName, string? reactTemplateName) : base(null, EMenuAction.Reload)
     {
         var parameters = (IParametersWithSmartSchemas)parametersManager.Parameters;
 
@@ -25,10 +25,8 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
         return _command.Description;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-        MenuAction = EMenuAction.Reload;
-
-        _command.Run(CancellationToken.None).Wait();
+        return _command.Run(CancellationToken.None).Result;
     }
 }

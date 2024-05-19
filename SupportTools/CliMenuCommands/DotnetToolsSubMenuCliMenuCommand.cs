@@ -10,14 +10,10 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 {
-    public DotnetToolsSubMenuCliMenuCommand() : base("Dotnet Tools")
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public DotnetToolsSubMenuCliMenuCommand() : base("Dotnet Tools", EMenuAction.LoadSubMenu)
     {
-        MenuAction = EMenuAction.LoadSubMenu;
-    }
 
-    protected override void RunAction()
-    {
-        MenuAction = EMenuAction.LoadSubMenu;
     }
 
     public override CliMenuSet GetSubmenu()

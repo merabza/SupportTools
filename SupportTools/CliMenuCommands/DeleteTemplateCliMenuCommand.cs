@@ -13,35 +13,35 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteTemplateCliMenuCommand(ParametersManager parametersManager, string templateName) : base(
-        "Delete Template", templateName)
+        "Delete Template", EMenuAction.LevelUp, EMenuAction.Reload, templateName)
     {
         _parametersManager = parametersManager;
         _templateName = templateName;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
-
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
         if (parameters == null)
         {
             StShared.WriteErrorLine("Support Tools Parameters not found", true);
-            return;
+            return false;
         }
 
         var templates = parameters.Templates;
         if (!templates.ContainsKey(_templateName))
         {
             StShared.WriteErrorLine($"Template {_templateName} not found", true);
-            return;
+            return false;
         }
 
         if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
-            return;
+            return false;
 
         templates.Remove(_templateName);
         _parametersManager.Save(parameters, $"Template {_templateName} Deleted");
         MenuAction = EMenuAction.LevelUp;
+        return true;
     }
 }

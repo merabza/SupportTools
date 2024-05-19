@@ -22,8 +22,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     private readonly ETools _tool;
     private IToolCommand? _toolCommand;
 
-    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName,
-        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, null, true)
+    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName, ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -46,29 +45,16 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
         return MemoCreateToolCommand()?.Description;
     }
 
-    protected override void RunAction()
+    protected override bool RunBody()
     {
         var toolCommand = MemoCreateToolCommand();
         if (toolCommand?.Par == null)
         {
             Console.WriteLine("Parameters not loaded. Tool not started.");
-            //StShared.Pause();
-            return;
+            return false;
         }
 
-        //დავინიშნოთ დრო
-        var startDateTime = DateTime.Now;
-
-        Console.WriteLine("Tools is running...");
-        Console.WriteLine("---");
-
         toolCommand.Run(CancellationToken.None).Wait();
-
-        Console.WriteLine("---");
-
-        Console.WriteLine($"Tool Finished. {StShared.TimeTakenMessage(startDateTime)}");
-
-
-        MenuAction = EMenuAction.Reload;
+        return true;
     }
 }
