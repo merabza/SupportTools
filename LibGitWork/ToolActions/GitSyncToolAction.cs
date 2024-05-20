@@ -101,7 +101,7 @@ public sealed class GitSyncToolAction : ToolAction
         var getRedundantCachedFilesListResult = gitProcessor.GetRedundantCachedFilesList();
         if (getRedundantCachedFilesListResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
                 GitSyncToolActionErrors.GetRedundantCachedFilesListError));
             return Task.FromResult(false);
         }
