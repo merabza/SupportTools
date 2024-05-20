@@ -87,7 +87,7 @@ public class SyncMultipleProjectsGitsToolAction : GitToolAction
     private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,
         Dictionary<EGitCollect, Dictionary<string, List<string>>> changedGitProjects, bool isFirstSync)
     {
-        if (!GitStat.CheckGipProject(projectName, project, gitCol))
+        if (!GitStat.CheckGitProject(projectName, project, gitCol))
             return;
 
         var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,

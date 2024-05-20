@@ -41,7 +41,7 @@ public class WrongGitignoreFilesListCreator
 
             foreach (var gitCol in Enum.GetValues<EGitCol>())
             {
-                if (!GitStat.CheckGipProject(projectName, project, gitCol, false))
+                if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
                     continue;
 
                 var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
@@ -69,7 +69,7 @@ public class WrongGitignoreFilesListCreator
                     if (!gitIgnoreModelFilePaths.TryGetValue(gitIgnorePathName, out var gitIgnoreTemplateFileName))
                         continue;
 
-                    if ( missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
+                    if (missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
                         continue;
 
                     if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName,
@@ -89,18 +89,14 @@ public class WrongGitignoreFilesListCreator
 
                     var gitignoreFileName = Path.Combine(gitsFolder, gd.GitProjectFolderName, ".gitignore");
 
-                    string? gitignoreFileContent = null;
                     if (File.Exists(gitignoreFileName))
-                        gitignoreFileContent = File.ReadAllText(gitignoreFileName);
-                    else
                     {
-                        StShared.WriteErrorLine($"{gitignoreFileName} is not exists", true, _logger, false);
-                        continue;
+                        var gitignoreFileContent = File.ReadAllText(gitignoreFileName);
+                        if (gitignoreFileContent != gitIgnoreTemplateFileContent)
+                            wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
                     }
-
-                    if (gitignoreFileContent != gitIgnoreTemplateFileContent)
+                    else
                         wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
-
                 }
 
             }

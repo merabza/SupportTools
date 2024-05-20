@@ -7,7 +7,7 @@ namespace LibGitWork;
 
 public static class GitStat
 {
-    public static bool CheckGipProject(string projectName, ProjectModel project, EGitCol gitCol,
+    public static bool CheckGitProject(string projectName, ProjectModel project, EGitCol gitCol,
         bool writeWarning = true)
     {
         switch (gitCol)
