@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using LibDataInput;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OneOf;
+using System;
+using System.Linq;
 using SystemToolsShared;
 
 namespace LibGitWork;
@@ -98,11 +97,12 @@ fi*/
             return GitState.NeedToPush;
         }
 
-        StShared.WriteErrorLine("Diverged", _useConsole, _logger, false);
-        return !Inputer.InputBool("Your branch and 'origin/master' have diverged, continue with pull for merge?", true,
-            false)
-            ? GitState.Diverged
-            : GitState.NeedToPull;
+        StShared.WriteWarningLine("Diverged", _useConsole, _logger);
+        //return !Inputer.InputBool("Your branch and 'origin/master' have diverged, continue with pull for merge?", true,
+        //    false)
+        //    ? GitState.Diverged
+        //    : GitState.NeedToPull;
+        return GitState.NeedToPull;
     }
 
 
