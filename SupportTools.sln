@@ -120,6 +120,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiToolsShared", "..\System
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApiContracts", "..\SystemTools\TestApiContracts\TestApiContracts.csproj", "{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentDatabasesApiContracts", "..\WebAgentContracts\WebAgentDatabasesApiContracts\WebAgentDatabasesApiContracts.csproj", "{83D7737C-E14A-43A2-9F14-12264DA14E05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -318,6 +320,10 @@ Global
 		{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D7737C-E14A-43A2-9F14-12264DA14E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D7737C-E14A-43A2-9F14-12264DA14E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D7737C-E14A-43A2-9F14-12264DA14E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D7737C-E14A-43A2-9F14-12264DA14E05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,6 +369,7 @@ Global
 		{2C280EEF-D2FF-4097-84F2-FCCEACC765B6} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 		{16272E2F-E9A5-4D03-948F-C83540C05AE6} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 		{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
+		{83D7737C-E14A-43A2-9F14-12264DA14E05} = {DAF78034-D0C2-4E88-8EE3-F219EC254BEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6088D4D5-9C94-40A5-A44F-E146E1810790}
