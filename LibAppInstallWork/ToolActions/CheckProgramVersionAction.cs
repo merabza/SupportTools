@@ -8,6 +8,7 @@ using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
+using TestApiContracts;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
