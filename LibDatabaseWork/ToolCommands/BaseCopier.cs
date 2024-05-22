@@ -35,11 +35,11 @@ public sealed class BaseCopier : ToolCommand
     {
         _logger.LogInformation("Create Agent Client for source Database");
 
-        var agentClientForSource = CopyBaseParameters.AgentClientForSource;
+        var agentClientForSource = CopyBaseParameters.DatabaseManagerForSource;
 
         _logger.LogInformation("Create Agent Client for destination Database");
 
-        var agentClientForDestination = CopyBaseParameters.AgentClientForDestination;
+        var agentClientForDestination = CopyBaseParameters.DatabaseManagerForDestination;
 
         Console.Write("Create File storages: ");
 

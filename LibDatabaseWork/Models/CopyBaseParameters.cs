@@ -1,15 +1,15 @@
-﻿using FileManagersMain;
+﻿using DatabasesManagement;
+using FileManagersMain;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
 using LibParameters;
-using WebAgentDatabasesApiContracts;
 
 namespace LibDatabaseWork.Models;
 
 public sealed class CopyBaseParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CopyBaseParameters(IDatabaseApiClient agentClientForSource, IDatabaseApiClient agentClientForDestination,
+    public CopyBaseParameters(IDatabaseManager databaseManagerForSource, IDatabaseManager databaseManagerForDestination,
         FileManager? exchangeFileManager, FileManager sourceFileManager, FileManager destinationFileManager,
         FileManager localFileManager, DatabaseBackupParametersDomain sourceDbBackupParameters,
         DatabaseBackupParametersDomain destinationDbBackupParameters, bool needDownloadFromSource,
@@ -19,8 +19,8 @@ public sealed class CopyBaseParameters : IParameters
         string uploadTempExtension, string sourceDatabaseName, string? destinationDbServerSideDataFolderPath,
         string? destinationDbServerSideLogFolderPath, string destinationDatabaseName, string localPath)
     {
-        AgentClientForSource = agentClientForSource;
-        AgentClientForDestination = agentClientForDestination;
+        DatabaseManagerForSource = databaseManagerForSource;
+        DatabaseManagerForDestination = databaseManagerForDestination;
         ExchangeFileManager = exchangeFileManager;
         SourceFileManager = sourceFileManager;
         DestinationFileManager = destinationFileManager;
@@ -45,8 +45,8 @@ public sealed class CopyBaseParameters : IParameters
         LocalPath = localPath;
     }
 
-    public IDatabaseApiClient AgentClientForSource { get; }
-    public IDatabaseApiClient AgentClientForDestination { get; }
+    public IDatabaseManager DatabaseManagerForSource { get; }
+    public IDatabaseManager DatabaseManagerForDestination { get; }
     public FileManager? ExchangeFileManager { get; }
     public FileManager SourceFileManager { get; }
     public FileManager DestinationFileManager { get; }

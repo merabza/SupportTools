@@ -167,7 +167,7 @@ public static class CopyBaseParametersFabric
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
+        var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
             httpClientFactory, sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections,
             null, null, CancellationToken.None).Result;
 
@@ -177,7 +177,7 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManagementClient(true, logger,
+        var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
             httpClientFactory, destinationDbWebAgentName, apiClients, destinationDbConnectionName,
             databaseServerConnections, null, null, CancellationToken.None).Result;
 
