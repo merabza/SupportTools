@@ -49,10 +49,10 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder);
 
-        if (agentClient is null)
+        if (projectManager is null)
         {
             _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not started",
                 projectName, environmentName);
@@ -60,7 +60,7 @@ public sealed class ServiceStarter : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        var startServiceResult = await agentClient.StartService(_parameters.ProjectName, _parameters.EnvironmentName,
+        var startServiceResult = await projectManager.StartService(_parameters.ProjectName, _parameters.EnvironmentName,
             CancellationToken.None);
         if (startServiceResult.IsSome)
         {

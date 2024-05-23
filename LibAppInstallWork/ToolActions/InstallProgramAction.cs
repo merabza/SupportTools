@@ -44,9 +44,10 @@ public sealed class InstallProgramAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         //კლიენტის შექმნა
-        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _httpClientFactory, _fileStorageForDownload, _installerBaseParameters);
+        var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+            _fileStorageForDownload, _installerBaseParameters);
 
-        if (agentClient is null)
+        if (projectManager is null)
         {
             _logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
                 _projectName, _environmentName);
@@ -57,7 +58,7 @@ public sealed class InstallProgramAction : ToolAction
             _environmentName);
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        var installProgramResult = await agentClient.InstallProgram(_projectName, _environmentName,
+        var installProgramResult = await projectManager.InstallProgram(_projectName, _environmentName,
             _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
 

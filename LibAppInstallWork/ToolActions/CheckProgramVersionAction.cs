@@ -1,14 +1,14 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiClientsManagement;
-using Installer.AgentClients;
+﻿using ApiClientsManagement;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 using TestApiContracts;
+using WebAgentProjectsApiContracts;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -56,10 +56,11 @@ public sealed class CheckProgramVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(_logger, _httpClientFactory,
-                        _webAgentForCheck.Server, _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
-                    var getVersionByProxyResult = await proxyApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
-                        proxySettings.ApiVersionId, cancellationToken);
+                    var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
+                        _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
+                    var getVersionByProxyResult =
+                        await projectsApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
+                            proxySettings.ApiVersionId, cancellationToken);
                     if (getVersionByProxyResult.IsT1)
                     {
                         Err.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);

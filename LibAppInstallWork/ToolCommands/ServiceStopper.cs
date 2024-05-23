@@ -48,10 +48,10 @@ public sealed class ServiceStopper : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder);
 
-        if (agentClient is null)
+        if (projectManager is null)
         {
             _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not be stopped",
                 projectName, environmentName);
@@ -59,7 +59,7 @@ public sealed class ServiceStopper : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        var stopServiceResult = await agentClient.StopService(projectName, environmentName, cancellationToken);
+        var stopServiceResult = await projectManager.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsSome)
         {
             _logger.LogError("Service {projectName}/{environmentName} can not be stopped", projectName,

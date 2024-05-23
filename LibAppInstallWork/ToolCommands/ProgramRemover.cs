@@ -37,15 +37,16 @@ public sealed class ProgramRemover : ToolCommand
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
-        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClient(_logger, _httpClientFactory, _parameters.WebAgentForInstall, _parameters.InstallFolder);
-        if (agentClient is null)
+        var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
+            _parameters.WebAgentForInstall, _parameters.InstallFolder);
+        if (projectManager is null)
         {
             _logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
             return false;
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (await agentClient.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService,
+        if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService,
                 CancellationToken.None))
             return true;
 

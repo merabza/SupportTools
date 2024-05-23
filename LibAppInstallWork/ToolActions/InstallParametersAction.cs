@@ -41,10 +41,9 @@ public sealed class InstallParametersAction : ToolAction
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        //კლიენტის შექმნა
-        var agentClient = ProjectsAgentClientsFabric.CreateProjectsApiClientWithFileStorage(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
             _fileStorageForUpload, _installerBaseParameters);
-        if (agentClient is null)
+        if (projectManager is null)
         {
             _logger.LogError(
                 "agentClient cannot be created. project {_projectName}/{_environmentName} does not updated",
@@ -56,7 +55,7 @@ public sealed class InstallParametersAction : ToolAction
             _projectName, _environmentName);
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
-        var updateAppParametersFileResult = await agentClient.UpdateAppParametersFile(_projectName, _environmentName,
+        var updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName, _environmentName,
             Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
             CancellationToken.None);
 

@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiClientsManagement;
-using Installer.AgentClients;
+﻿using ApiClientsManagement;
 using LibAppInstallWork.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 using TestApiContracts;
+using WebAgentProjectsApiContracts;
 
 // ReSharper disable ReplaceWithPrimaryConstructorParameter
 
@@ -60,10 +60,10 @@ public sealed class CheckParametersVersionAction : ToolAction
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var proxyApiClient = new ProjectsProxyApiClient(_logger, _httpClientFactory,
-                        _webAgentForCheck.Server, _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
+                    var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
+                        _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
                     var getAppSettingsVersionByProxyResult =
-                        await proxyApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
+                        await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
                         errors.AddRange(getAppSettingsVersionByProxyResult.AsT1);
