@@ -23,9 +23,7 @@ public static class ProjectsManagersFabric
 
         if (installerBaseParameters.WebAgentForInstall is not null)
         {
-            var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory,
-                installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey,
-                installerBaseParameters.WebAgentForInstall.WithMessaging);
+            var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory, installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey);
             return new ProjectsManagerRemoteWithFileStorage(projectsApiClient);
         }
 
@@ -48,7 +46,7 @@ public static class ProjectsManagersFabric
         if (programUpdaterWebAgent is not null)
         {
             var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory, programUpdaterWebAgent.Server,
-                programUpdaterWebAgent.ApiKey, programUpdaterWebAgent.WithMessaging);
+                programUpdaterWebAgent.ApiKey);
             return new ProjectsManagerRemote(projectsApiClient);
         }
 

@@ -61,7 +61,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
-                        _webAgentForCheck.ApiKey, _webAgentForCheck.WithMessaging);
+                        _webAgentForCheck.ApiKey);
                     var getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
