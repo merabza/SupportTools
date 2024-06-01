@@ -1,13 +1,13 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CliMenu;
 using LibAppProjectCreator.CodeCreators;
 using LibDataInput;
 using LibMenuInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -70,7 +70,6 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
         Console.WriteLine("File or folder with name {0} is not exists", path);
         return false;
-
     }
 
 

@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibGitData;
@@ -6,9 +9,6 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SupportTools.Cruders;
 
@@ -96,27 +96,22 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
         var usageCount = 0;
 
         foreach (var (_, project) in projects)
+        foreach (var gitCol in Enum.GetValues<EGitCol>())
         {
-            foreach (var gitCol in Enum.GetValues<EGitCol>())
+            var gits = supportToolsParameters.Gits;
+            var gitProjectNames = gitCol switch
             {
-                var gits = supportToolsParameters.Gits;
-                var gitProjectNames = gitCol switch
-                {
-                    EGitCol.Main => project.GitProjectNames,
-                    EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-                    _ => null
-                } ?? [];
+                EGitCol.Main => project.GitProjectNames,
+                EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+                _ => null
+            } ?? [];
 
-                foreach (var gitProjectName in gitProjectNames)
-                {
-                    if (!gits.TryGetValue(gitProjectName, out var git))
-                        continue;
-                    if (git.GitIgnorePathName == name)
-                        usageCount++;
-                }
-
-
-
+            foreach (var gitProjectName in gitProjectNames)
+            {
+                if (!gits.TryGetValue(gitProjectName, out var git))
+                    continue;
+                if (git.GitIgnorePathName == name)
+                    usageCount++;
             }
         }
 
@@ -127,7 +122,8 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
-        ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand = new(_logger, recordKey, ParametersManager);
+        ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand =
+            new(_logger, recordKey, ParametersManager);
         itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand,
             "Apply this file type to all projects that do not have a type specified");
     }

@@ -1,6 +1,6 @@
-﻿using CliMenu;
+﻿using System.IO;
+using CliMenu;
 using SupportToolsData.Models;
-using System.IO;
 
 namespace SupportTools.CliMenuCommands;
 

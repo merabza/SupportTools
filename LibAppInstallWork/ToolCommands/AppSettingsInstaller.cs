@@ -19,8 +19,9 @@ public sealed class AppSettingsInstaller : ToolCommand
     private const string ActionDescription =
         "This tool will Download latest parameters file from exchange server, then will update parameters file, and check if parameters updated";
 
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+
+    private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     public AppSettingsInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,

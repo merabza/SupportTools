@@ -1,13 +1,13 @@
-﻿using CliMenu;
+﻿using System;
+using System.IO;
+using System.Text;
+using CliMenu;
 using LibDataInput;
+using LibGitData.Models;
 using LibMenuInput;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System;
-using System.IO;
-using System.Text;
-using LibGitData.Models;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -56,7 +56,8 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
             return false;
         }
 
-        if (File.Exists(fileWithCloneCommands) && !Inputer.InputBool($"File {fileWithCloneCommands} exists, overwrite?", false, false))
+        if (File.Exists(fileWithCloneCommands) &&
+            !Inputer.InputBool($"File {fileWithCloneCommands} exists, overwrite?", false, false))
             return false;
 
         StringBuilder sb = new();
@@ -65,7 +66,6 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
 
         foreach (var gitProjectName in project.GitProjectNames)
         {
-
             if (!parameters.Gits.TryGetValue(gitProjectName, out var gitProject))
             {
                 StShared.WriteErrorLine($"Git project with name {gitProjectName} does not exists", true);

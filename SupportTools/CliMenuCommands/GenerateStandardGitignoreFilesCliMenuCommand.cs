@@ -13,7 +13,8 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateStandardGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(null,
+    public GenerateStandardGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
+        null,
         EMenuAction.Reload)
     {
         _logger = logger;
@@ -22,13 +23,12 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
 
     protected override bool RunBody()
     {
-
         if (!Inputer.InputBool("This process will change .gitignore records, are you sure?", false, false))
             return false;
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var standardGitignoreFilesGenerator = new StandardGitignoreFilesGenerator(_logger, parameters);
-        if ( ! standardGitignoreFilesGenerator.Generate() && Inputer.InputBool($"Continue ans Save Changes?", false))
+        if (!standardGitignoreFilesGenerator.Generate() && Inputer.InputBool("Continue ans Save Changes?", false))
             return false;
         //შენახვა
         _parametersManager.Save(parameters, "RunTimes generated success");

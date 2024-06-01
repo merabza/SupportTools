@@ -1,16 +1,16 @@
-﻿using LibAppProjectCreator.Models;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using LibAppProjectCreator.Models;
 using LibDataInput;
+using LibGitData.Models;
 using LibGitWork;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using LibGitData.Models;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor

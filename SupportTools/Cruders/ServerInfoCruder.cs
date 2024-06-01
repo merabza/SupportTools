@@ -16,8 +16,8 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerInfoCruder : ParCruder
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly string _projectName;
 
     public ServerInfoCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,

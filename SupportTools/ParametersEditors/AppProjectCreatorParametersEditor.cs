@@ -1,4 +1,5 @@
-﻿using CliParameters;
+﻿using System.Net.Http;
+using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
 using CliParametersEdit.FieldEditors;
@@ -6,7 +7,6 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
-using System.Net.Http;
 
 namespace SupportTools.ParametersEditors;
 

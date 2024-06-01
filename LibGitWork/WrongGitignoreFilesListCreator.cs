@@ -1,12 +1,12 @@
-﻿using LibGitData.Models;
-using LibGitData;
-using SupportToolsData.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LibGitData;
+using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
@@ -37,68 +37,68 @@ public class WrongGitignoreFilesListCreator
 
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
         foreach (var (projectName, project) in projectsListOrdered)
+        foreach (var gitCol in Enum.GetValues<EGitCol>())
         {
+            if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
+                continue;
 
-            foreach (var gitCol in Enum.GetValues<EGitCol>())
+            var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+            if (gitsFolder is null)
+                continue;
+
+            var gitProjects = GitProjects.Create(_logger, supportToolsParameters.GitProjects);
+
+            var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
+                project.MainProjectFolderRelativePath(gitProjects),
+                project.SpaProjectFolderRelativePath(gitProjects));
+
+
+            var gitProjectNames = gitCol switch
             {
-                if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
+                EGitCol.Main => project.GitProjectNames,
+                EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+                _ => null
+            } ?? [];
+
+            var gitData = gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value);
+            foreach (var gd in gitData.OrderBy(x => x.GitProjectFolderName))
+            {
+                var gitIgnorePathName = gd.GitIgnorePathName;
+                if (!gitIgnoreModelFilePaths.TryGetValue(gitIgnorePathName, out var gitIgnoreTemplateFileName))
                     continue;
 
-                var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
-                if (gitsFolder is null)
+                if (missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
                     continue;
 
-                var gitProjects = GitProjects.Create(_logger, supportToolsParameters.GitProjects);
-
-                var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
-                    project.MainProjectFolderRelativePath(gitProjects),
-                    project.SpaProjectFolderRelativePath(gitProjects));
-
-
-                var gitProjectNames = gitCol switch
+                if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName,
+                        out var gitIgnoreTemplateFileContent))
                 {
-                    EGitCol.Main => project.GitProjectNames,
-                    EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-                    _ => null
-                } ?? [];
-
-                var gitData = gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value);
-                foreach (var gd in gitData.OrderBy(x => x.GitProjectFolderName))
-                {
-                    var gitIgnorePathName = gd.GitIgnorePathName;
-                    if (!gitIgnoreModelFilePaths.TryGetValue(gitIgnorePathName, out var gitIgnoreTemplateFileName))
-                        continue;
-
-                    if (missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
-                        continue;
-
-                    if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName,
-                            out var gitIgnoreTemplateFileContent))
+                    if (File.Exists(gitIgnoreTemplateFileName))
                     {
-                        if (File.Exists(gitIgnoreTemplateFileName))
-                            gitIgnoreTemplateFileContent = File.ReadAllText(gitIgnoreTemplateFileName);
-                        else
-                        {
-                            missingGitIgnoreTemplateFiles.Add(gitIgnorePathName, gitIgnoreTemplateFileName);
-                            StShared.WriteErrorLine($"{gitIgnoreTemplateFileName} is not exists", true, _logger, false);
-                            continue;
-                        }
-
-                        gitIgnoreTemplateFileContents.Add(gitIgnorePathName, gitIgnoreTemplateFileContent);
-                    }
-
-                    var gitignoreFileName = Path.Combine(gitsFolder, gd.GitProjectFolderName, ".gitignore");
-
-                    if (File.Exists(gitignoreFileName))
-                    {
-                        var gitignoreFileContent = File.ReadAllText(gitignoreFileName);
-                        if (gitignoreFileContent != gitIgnoreTemplateFileContent)
-                            wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                        gitIgnoreTemplateFileContent = File.ReadAllText(gitIgnoreTemplateFileName);
                     }
                     else
-                        wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                    {
+                        missingGitIgnoreTemplateFiles.Add(gitIgnorePathName, gitIgnoreTemplateFileName);
+                        StShared.WriteErrorLine($"{gitIgnoreTemplateFileName} is not exists", true, _logger, false);
+                        continue;
+                    }
+
+                    gitIgnoreTemplateFileContents.Add(gitIgnorePathName, gitIgnoreTemplateFileContent);
                 }
 
+                var gitignoreFileName = Path.Combine(gitsFolder, gd.GitProjectFolderName, ".gitignore");
+
+                if (File.Exists(gitignoreFileName))
+                {
+                    var gitignoreFileContent = File.ReadAllText(gitignoreFileName);
+                    if (gitignoreFileContent != gitIgnoreTemplateFileContent)
+                        wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                }
+                else
+                {
+                    wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                }
             }
         }
 

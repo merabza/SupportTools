@@ -1,20 +1,20 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
-using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectGroupName;

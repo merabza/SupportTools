@@ -15,8 +15,8 @@ public sealed class VersionChecker : ToolCommand
 {
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public VersionChecker(ILogger logger, IHttpClientFactory httpClientFactory, CheckVersionParameters parameters,

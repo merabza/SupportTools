@@ -1,23 +1,23 @@
-﻿using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
-using System;
-using SystemToolsShared;
 using System.Linq;
-using LibParameters;
-using SupportToolsData.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using LibGitData.Models;
+using LibParameters;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
+using SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
 
 public sealed class UpdateGitProjectsToolAction : ToolAction
 {
-    private readonly IParametersManager _parametersManager;
     public const string ActionName = "Update Git Projects";
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager) : base(logger, ActionName,

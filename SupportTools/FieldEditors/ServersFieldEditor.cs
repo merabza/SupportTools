@@ -12,8 +12,8 @@ namespace SupportTools.FieldEditors;
 
 public sealed class ServersFieldEditor : FieldEditor<Dictionary<string, ServerDataModel>>
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor

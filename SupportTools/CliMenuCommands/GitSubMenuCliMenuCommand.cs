@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitData;
@@ -6,9 +9,6 @@ using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;

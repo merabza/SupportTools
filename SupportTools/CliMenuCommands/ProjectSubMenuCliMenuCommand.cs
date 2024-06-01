@@ -1,22 +1,22 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
+using LibGitData;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
-using LibGitData;
-using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;
@@ -53,13 +53,10 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
 
-
         //ყველა პროექტის git-ის სინქრონიზაცია
         var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
-
-
 
 
         projectSubMenuSet.AddMenuItem(

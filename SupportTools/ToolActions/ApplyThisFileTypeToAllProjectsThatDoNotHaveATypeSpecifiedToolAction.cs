@@ -1,10 +1,10 @@
 ﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -41,8 +41,7 @@ public class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction
             _parametersManager.Save(parameters, "GitIgnorePathNames applied success");
         else
             StShared.WriteWarningLine("All Git Projects already have GitIgnorePathNames, No Changes made", true);
-    
-        return Task.FromResult(true);
 
+        return Task.FromResult(true);
     }
 }

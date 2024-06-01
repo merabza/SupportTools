@@ -24,7 +24,7 @@
 //            StShared.WriteErrorLine("supportToolsParameters.WorkFolder does not specified", true);
 //            return null;
 //        }
-        
+
 //        return new UpdateGitProjectsParameters(workFolder);
 //    }
 
@@ -33,3 +33,4 @@
 //        return true;
 //    }
 //}
+

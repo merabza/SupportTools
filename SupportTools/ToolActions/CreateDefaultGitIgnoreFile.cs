@@ -1,8 +1,8 @@
-﻿using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -11,8 +11,8 @@ namespace SupportTools.ToolActions;
 
 public class CreateDefaultGitIgnoreFile : ToolAction
 {
-    private readonly ILogger _logger;
     private readonly string _gitIgnoreFileName;
+    private readonly ILogger _logger;
 
     public CreateDefaultGitIgnoreFile(ILogger logger, string gitIgnoreFileName) : base(logger,
         nameof(CreateCSharpGitIgnoreFile), null, null)

@@ -105,6 +105,7 @@ public sealed class GitSyncToolAction : ToolAction
                 GitSyncToolActionErrors.GetRedundantCachedFilesListError));
             return Task.FromResult(false);
         }
+
         var redundantCachedFilesList = getRedundantCachedFilesListResult.AsT0;
 
         //და წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
@@ -120,17 +121,15 @@ public sealed class GitSyncToolAction : ToolAction
                 GitSyncToolActionErrors.HaveUnTrackedFilesError));
             return Task.FromResult(false);
         }
+
         var haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
 
         if (haveUnTrackedFiles)
-        {
             //შემდეგი კოდი დავაკომენტარე, რადგან ის ამოწმებდა შეიცვალა თუ არა .gitignore. პრინციპში ასეთი შემოწმება საჭირო არც არის,
             //  რადგან პირდაპირ შეგვიძლია არასაჭირო ფაილების ქეშიდან გასუფთავება
             //თუ .gitignore ფაილი არ შეიცვალა, არც ზედმეტად ქშირებული ფაილები არ უნდა იყოს, მაგრამ მაინც თავს ვიზღვევთ
-
             //იმისათვის, რომ დავადგინოთ .gitignore ფაილი შეიცვალა თუ არა, უნდა გავუშვათ შემდეგი ბრძანება:
             //git diff --name-only .gitignore
-
             //var isGitIgnoreFileChangedResult = gitProcessor.IsGitIgnoreFileChanged();
             //if (isGitIgnoreFileChangedResult.IsT1)
             //{
@@ -142,15 +141,11 @@ public sealed class GitSyncToolAction : ToolAction
             //    return Task.FromResult(false);
             //}
             //var isGitIgnoreFileChanged = isGitIgnoreFileChangedResult.AsT0;
-
             //if (!isGitIgnoreFileChanged)
             //{
             //}
-
-
             if (!gitProcessor.Add())
                 return Task.FromResult(false);
-        }
 
 
         var needCommitResult = gitProcessor.NeedCommit();

@@ -1,8 +1,8 @@
-﻿using CliMenu;
+﻿using System.Threading;
+using CliMenu;
 using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 
 namespace LibGitWork.CliMenuCommands;
 

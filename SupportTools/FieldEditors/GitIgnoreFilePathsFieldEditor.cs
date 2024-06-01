@@ -14,7 +14,8 @@ public sealed class GitIgnoreFilePathsFieldEditor : FieldEditor<Dictionary<strin
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFilePathsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(propertyName, false, null, true)
+    public GitIgnoreFilePathsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) :
+        base(propertyName, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

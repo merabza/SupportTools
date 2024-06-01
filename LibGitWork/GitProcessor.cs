@@ -1,19 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
-using OneOf;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using OneOf;
 using SystemToolsShared;
 
 namespace LibGitWork;
 
 public sealed class GitProcessor
 {
+    private const string Git = "git";
     private readonly ILogger _logger;
     private readonly string _projectPath;
     private readonly string _switchToProjectPath;
     private readonly bool _useConsole;
-
-    private const string Git = "git";
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProcessor(bool useConsole, ILogger logger, string projectPath)
@@ -132,7 +131,8 @@ fi*/
 
     public bool Commit(string commitMessage)
     {
-        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"")
+            .IsNone)
             return true;
         StShared.WriteErrorLine($"cannot run commit for folder {_projectPath}", _useConsole, _logger);
         return false;
@@ -261,7 +261,7 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], Err[]>  GetRedundantCachedFilesList()
+    public OneOf<string[], Err[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
@@ -280,7 +280,8 @@ fi*/
     //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
     public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
     {
-        if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} rm --cached {redundantCachedFileName}").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, Git,
+                $"{_switchToProjectPath} rm --cached {redundantCachedFileName}").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot remove file {redundantCachedFileName} from cache", _useConsole, _logger);
         return false;

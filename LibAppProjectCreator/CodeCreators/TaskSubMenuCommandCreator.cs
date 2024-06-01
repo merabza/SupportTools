@@ -1,6 +1,6 @@
-﻿using CodeTools;
+﻿using System;
+using CodeTools;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace LibAppProjectCreator.CodeCreators;
 

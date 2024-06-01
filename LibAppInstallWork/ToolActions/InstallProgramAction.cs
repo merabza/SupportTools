@@ -1,10 +1,10 @@
-﻿using LibAppInstallWork.Models;
+﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -15,9 +15,9 @@ public sealed class InstallProgramAction : ToolAction
 {
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly ILogger _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _programArchiveDateMask;
@@ -27,7 +27,10 @@ public sealed class InstallProgramAction : ToolAction
     private string? _installingProgramVersion;
 
 
-    public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory, InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload, string projectName, string environmentName) : base(logger, "Install service", null, null)
+    public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory,
+        InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
+        string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
+        string projectName, string environmentName) : base(logger, "Install service", null, null)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

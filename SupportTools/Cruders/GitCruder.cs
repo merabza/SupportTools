@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibGitData.Models;
@@ -8,9 +11,6 @@ using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.Cruders;

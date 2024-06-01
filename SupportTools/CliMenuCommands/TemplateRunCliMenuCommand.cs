@@ -1,11 +1,9 @@
-﻿using CliMenu;
+﻿using System.Threading;
+using CliMenu;
 using LibAppProjectCreator;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
-using System;
-using System.Threading;
-using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

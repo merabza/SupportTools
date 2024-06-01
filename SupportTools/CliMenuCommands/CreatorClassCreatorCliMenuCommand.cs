@@ -1,14 +1,14 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CliMenu;
 using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibDataInput;
 using LibMenuInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace SupportTools.CliMenuCommands;
 

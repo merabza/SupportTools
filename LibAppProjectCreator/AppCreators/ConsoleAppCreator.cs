@@ -1,4 +1,7 @@
-﻿using LibAppProjectCreator.CodeCreators;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.Database;
 using LibAppProjectCreator.CodeCreators.GitIgnoreCreators;
 using LibAppProjectCreator.JsonCreators;
@@ -6,9 +9,6 @@ using LibAppProjectCreator.Models;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;

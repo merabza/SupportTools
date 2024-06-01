@@ -1,12 +1,11 @@
-﻿using CliMenu;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
+using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Net.Http;
-using System.Threading;
-using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -14,15 +13,17 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ToolTaskCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel? _serverInfo;
     private readonly ETools _tool;
     private IToolCommand? _toolCommand;
 
-    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName, ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, EMenuAction.Reload, EMenuAction.Reload, null, true)
+    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName,
+        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, EMenuAction.Reload,
+        EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

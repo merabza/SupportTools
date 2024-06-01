@@ -4,7 +4,6 @@ namespace LibGitWork.Errors;
 
 public static class GitSyncToolActionErrors
 {
-
     public static readonly Err GetRemoteOriginUrlError = new()
     {
         ErrorCode = nameof(GetRemoteOriginUrlError),
@@ -29,13 +28,9 @@ public static class GitSyncToolActionErrors
         ErrorMessage = "Error when detecting Need Commit"
     };
 
-    
-    
-    
+
     public static Err PropertyIsEmpty(string propertyName)
     {
         return new Err { ErrorCode = nameof(PropertyIsEmpty), ErrorMessage = $"Property {propertyName} Is Empty " };
     }
-
-
 }

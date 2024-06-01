@@ -1,11 +1,11 @@
-﻿using LibAppInstallWork.Models;
-using LibFileParameters.Models;
-using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using LibAppInstallWork.Models;
+using LibFileParameters.Models;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -16,9 +16,9 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _appSettingsEncodedJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForUpload;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly InstallerBaseParameters _installerBaseParameters;
     private readonly ILogger _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
     private readonly string _projectName;

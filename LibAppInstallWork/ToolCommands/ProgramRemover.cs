@@ -1,10 +1,10 @@
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -12,12 +12,14 @@ public sealed class ProgramRemover : ToolCommand
 {
     private const string ActionName = "Remove App";
     private const string ActionDescription = "Remove App";
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemover(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager, ActionDescription)
+    public ProgramRemover(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters,
+        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -46,7 +48,8 @@ public sealed class ProgramRemover : ToolCommand
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName, _parameters.IsService,
+        if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName,
+                _parameters.IsService,
                 CancellationToken.None))
             return true;
 

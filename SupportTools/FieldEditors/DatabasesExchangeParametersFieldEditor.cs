@@ -1,16 +1,16 @@
-﻿using CliMenu;
+﻿using System.Net.Http;
+using CliMenu;
 using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System.Net.Http;
 
 namespace SupportTools.FieldEditors;
 
 public sealed class DatabasesExchangeParametersFieldEditor : FieldEditor<DatabasesExchangeParameters>
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
 
     private readonly ParametersManager _parametersManager;
 

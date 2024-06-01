@@ -15,8 +15,8 @@ public sealed class ServiceUpdater : ToolCommand
 {
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
 
     public ServiceUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
         ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager) : base(logger,

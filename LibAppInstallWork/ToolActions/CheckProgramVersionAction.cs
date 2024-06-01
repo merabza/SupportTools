@@ -1,11 +1,11 @@
-﻿using ApiClientsManagement;
-using LibAppInstallWork.Models;
-using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ApiClientsManagement;
+using LibAppInstallWork.Models;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 using TestApiContracts;
 using WebAgentProjectsApiContracts;
@@ -16,9 +16,9 @@ namespace LibAppInstallWork.ToolActions;
 
 public sealed class CheckProgramVersionAction : ToolAction
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string? _installingProgramVersion;
     private readonly ILogger _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
     private readonly ApiClientSettingsDomain _webAgentForCheck;

@@ -16,8 +16,8 @@ public sealed class ProgramInstaller : ToolCommand
 {
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor

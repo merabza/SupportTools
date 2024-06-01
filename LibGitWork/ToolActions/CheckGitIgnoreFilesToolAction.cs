@@ -1,15 +1,15 @@
 ﻿using System;
-using LibParameters;
-using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
+using LibParameters;
+using Microsoft.Extensions.Logging;
 
 namespace LibGitWork.ToolActions;
 
 public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
 {
-    private readonly IParametersManager _parametersManager;
     public const string ActionName = "Check .gitignore Files";
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckGitIgnoreFilesToolAction(ILogger logger, IParametersManager parametersManager) : base(logger,
@@ -20,7 +20,6 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
@@ -31,12 +30,8 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
         }
 
         Console.WriteLine("wrong .gitignore files are found:");
-        foreach (var (gitignoreFileName, _)in wrongGitIgnoreFilesList)
-        {
-            Console.WriteLine(gitignoreFileName);
-        }
+        foreach (var (gitignoreFileName, _)in wrongGitIgnoreFilesList) Console.WriteLine(gitignoreFileName);
 
         return Task.FromResult(true);
-
     }
 }

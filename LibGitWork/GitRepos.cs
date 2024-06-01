@@ -31,7 +31,8 @@ public sealed class GitRepos
 
             if (string.IsNullOrWhiteSpace(gitData.GitProjectFolderName))
             {
-                logger.LogError("GitProjectFolderName is empty for Git Repo with key {gitProjectName})", gitProjectName);
+                logger.LogError("GitProjectFolderName is empty for Git Repo with key {gitProjectName})",
+                    gitProjectName);
                 continue;
             }
 
@@ -60,7 +61,8 @@ public sealed class GitRepos
                         .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
             }
 
-            gits.Add(gitProjectName, new GitDataDomain(gitData.GitProjectAddress, gitProjectFolderName, gitData.GitIgnorePathName));
+            gits.Add(gitProjectName,
+                new GitDataDomain(gitData.GitProjectAddress, gitProjectFolderName, gitData.GitIgnorePathName));
         }
 
         return new GitRepos(gits);

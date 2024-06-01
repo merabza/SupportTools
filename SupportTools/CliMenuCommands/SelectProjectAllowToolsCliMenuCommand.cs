@@ -1,10 +1,10 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using CliMenu;
 using LibMenuInput;
 using LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -15,7 +15,8 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SelectProjectAllowToolsCliMenuCommand(ParametersManager parametersManager, string projectName):base(null,EMenuAction.Reload)
+    public SelectProjectAllowToolsCliMenuCommand(ParametersManager parametersManager, string projectName) : base(null,
+        EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
@@ -23,7 +24,6 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

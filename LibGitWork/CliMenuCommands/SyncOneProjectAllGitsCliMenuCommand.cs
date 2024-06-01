@@ -1,9 +1,9 @@
-﻿using CliMenu;
+﻿using System.Threading;
+using CliMenu;
+using LibGitData;
 using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using LibGitData;
 
 namespace LibGitWork.CliMenuCommands;
 
@@ -27,7 +27,6 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-
         var syncOneProjectAllGitsToolAction =
             SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, null, true);
         return syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Result ?? false;

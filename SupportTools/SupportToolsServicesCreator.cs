@@ -6,11 +6,9 @@ namespace SupportTools;
 
 public class SupportToolsServicesCreator : ServicesCreator
 {
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServicesCreator(SupportToolsParameters par) : base(par.LogFolder, null, "SupportTools")
     {
-
     }
 
     protected override void ConfigureServices(IServiceCollection services)

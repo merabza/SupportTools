@@ -1,15 +1,15 @@
-﻿using CliMenu;
+﻿using System.Net.Http;
+using CliMenu;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
-using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;

@@ -1,17 +1,17 @@
-﻿using LibParameters;
-using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using LibParameters;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
 
 namespace LibGitWork.ToolActions;
 
 public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
 {
-    private readonly IParametersManager _parametersManager;
     public const string ActionName = "Update .gitignore Files";
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateGitIgnoreFilesToolAction(ILogger logger, IParametersManager parametersManager) : base(logger,
@@ -22,7 +22,6 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
@@ -40,6 +39,5 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
         }
 
         return Task.FromResult(true);
-
     }
 }

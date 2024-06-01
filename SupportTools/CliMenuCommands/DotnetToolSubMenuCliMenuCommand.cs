@@ -1,8 +1,8 @@
-﻿using CliMenu;
+﻿using System;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using SupportTools.Models;
-using System;
 
 namespace SupportTools.CliMenuCommands;
 

@@ -1,9 +1,9 @@
-﻿using ApiClientsManagement;
+﻿using System.Net.Http;
+using ApiClientsManagement;
+using Installer.ProjectManagers;
 using LibAppInstallWork.Models;
 using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using Installer.ProjectManagers;
 using WebAgentProjectsApiContracts;
 
 namespace LibAppInstallWork;
@@ -23,7 +23,8 @@ public static class ProjectsManagersFabric
 
         if (installerBaseParameters.WebAgentForInstall is not null)
         {
-            var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory, installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey);
+            var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory,
+                installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey);
             return new ProjectsManagerRemoteWithFileStorage(projectsApiClient);
         }
 

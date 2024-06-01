@@ -1,11 +1,11 @@
-﻿using ApiClientsManagement;
-using LibAppInstallWork.Models;
-using LibToolActions;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ApiClientsManagement;
+using LibAppInstallWork.Models;
+using LibToolActions;
+using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 using TestApiContracts;
 using WebAgentProjectsApiContracts;
@@ -18,8 +18,8 @@ public sealed class CheckParametersVersionAction : ToolAction
 {
     private const string ProjectName = "";
     private readonly string? _appSettingsVersion;
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
     private readonly ApiClientSettingsDomain _webAgentForCheck;

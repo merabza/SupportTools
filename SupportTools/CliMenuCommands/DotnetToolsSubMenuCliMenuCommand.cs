@@ -1,10 +1,10 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using SupportTools.DotnetTools;
 using SupportTools.MenuCommands;
-using System;
-using System.Linq;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -13,7 +13,6 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
     // ReSharper disable once ConvertToPrimaryConstructor
     public DotnetToolsSubMenuCliMenuCommand() : base("Dotnet Tools", EMenuAction.LoadSubMenu)
     {
-
     }
 
     public override CliMenuSet GetSubmenu()

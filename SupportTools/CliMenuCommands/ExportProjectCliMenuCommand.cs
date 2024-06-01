@@ -1,12 +1,12 @@
-﻿using CliMenu;
+﻿using System.IO;
+using System.Linq;
+using CliMenu;
 using LibDataInput;
 using LibMenuInput;
 using LibParameters;
 using Newtonsoft.Json;
 using SupportTools.Models;
 using SupportToolsData.Models;
-using System.IO;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -17,7 +17,8 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base("Export Project", EMenuAction.Reload, EMenuAction.Reload, projectName)
+    public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base("Export Project",
+        EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;

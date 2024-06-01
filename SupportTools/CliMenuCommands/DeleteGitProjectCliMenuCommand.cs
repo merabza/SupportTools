@@ -1,9 +1,9 @@
-﻿using CliMenu;
+﻿using System.Collections.Generic;
+using CliMenu;
 using LibDataInput;
 using LibGitData;
 using LibParameters;
 using SupportToolsData.Models;
-using System.Collections.Generic;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
@@ -49,9 +49,7 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
         if (!Inputer.InputBool(
                 $"This will Delete Git Project with Name {_gitProjectName}, from this project. are you sure?", false,
                 false))
-        {
             return false;
-        }
 
         gitProjectNames.Remove(_gitProjectName);
         if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))

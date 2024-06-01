@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibParameters;
@@ -6,16 +9,13 @@ using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
-using System.Net.Http;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
 

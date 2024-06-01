@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using CliTools;
 using CliTools.CliMenuCommands;
@@ -10,16 +13,13 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
-using System.Net.Http;
 
 namespace SupportTools;
 
 public sealed class SupportTools : CliAppLoop
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
