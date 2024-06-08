@@ -8,6 +8,7 @@ using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SqlServerDbTools;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
@@ -110,10 +111,7 @@ public sealed class GitProjectsUpdater
             if (getRemoteOriginUrlResult.IsT1)
             {
                 Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
-                    new Err
-                    {
-                        ErrorCode = "GetRemoteOriginUrlError", ErrorMessage = "Error when detecting Remote Origin Url"
-                    }));
+                    SqlDbClientErrors.GetRemoteOriginUrlError));
                 return false;
             }
 
@@ -136,8 +134,7 @@ public sealed class GitProjectsUpdater
             var needCommitResult = gitProcessor.NeedCommit();
             if (needCommitResult.IsT1)
             {
-                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1,
-                    new Err { ErrorCode = "", ErrorMessage = "" }));
+                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
                 return false;
             }
 

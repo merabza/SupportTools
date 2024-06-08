@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OneOf;
+using SupportTools.Errors;
 using SupportTools.Models;
 using SystemToolsShared;
 
@@ -69,10 +70,7 @@ public sealed class DotnetToolsManager
         var createListOfDotnetToolsResult = CreateListOfDotnetTools(necessaryToolsNames);
         if (createListOfDotnetToolsResult.IsT1)
             return Err.RecreateErrors(createListOfDotnetToolsResult.AsT1,
-                new Err
-                {
-                    ErrorCode = "CreateListOfDotnetToolsError", ErrorMessage = "Error when Create List Of Dotnet Tools"
-                });
+                DotnetToolsManagerErrors.CreateListOfDotnetToolsError);
         var dotnetTools = createListOfDotnetToolsResult.AsT0;
         return new DotnetToolsManager(necessaryToolsNames, dotnetTools);
     }
@@ -83,11 +81,7 @@ public sealed class DotnetToolsManager
         var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
         if (createListOfDotnetToolsInstalledResult.IsT1)
             return Err.RecreateErrors(createListOfDotnetToolsInstalledResult.AsT1,
-                new Err
-                {
-                    ErrorCode = "CreateListOfDotnetToolsInstalledError",
-                    ErrorMessage = "Error when Create List Of Dotnet Tools Installed"
-                });
+                DotnetToolsManagerErrors.CreateListOfDotnetToolsInstalledError);
         var listOfTools = createListOfDotnetToolsInstalledResult.AsT0;
 
         foreach (var pair in necessaryToolsNames)
@@ -95,11 +89,7 @@ public sealed class DotnetToolsManager
             var getAvailableVersionOfToolResult = GetAvailableVersionOfTool(pair.Value);
             if (getAvailableVersionOfToolResult.IsT1)
                 return Err.RecreateErrors(getAvailableVersionOfToolResult.AsT1,
-                    new Err
-                    {
-                        ErrorCode = "GetAvailableVersionOfToolError",
-                        ErrorMessage = "Error when detect Available Version Of Tool"
-                    });
+                    DotnetToolsManagerErrors.GetAvailableVersionOfToolError);
             var availableVersion = getAvailableVersionOfToolResult.AsT0;
             var nesTool = listOfTools.FirstOrDefault(tool => tool.PackageId == pair.Value);
             if (nesTool is null)
