@@ -12,6 +12,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

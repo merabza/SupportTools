@@ -5,6 +5,7 @@ using OneOf;
 using SupportTools.Errors;
 using SupportTools.Models;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

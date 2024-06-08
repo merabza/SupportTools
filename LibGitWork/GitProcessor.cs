@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 namespace LibGitWork;
 
@@ -97,19 +98,8 @@ fi*/
         }
 
         StShared.WriteWarningLine("Diverged", _useConsole, _logger);
-        //return !Inputer.InputBool("Your branch and 'origin/master' have diverged, continue with pull for merge?", true,
-        //    false)
-        //    ? GitState.Diverged
-        //    : GitState.NeedToPull;
         return GitState.NeedToPull;
     }
-
-
-    //public bool IsGitRemoteAddressValid(string remoteAddress)
-    //{
-    //    return StShared.RunProcess(_useConsole, _logger, Git, $"ls-remote {remoteAddress}");
-    //}
-
 
     public bool Pull()
     {
