@@ -104,7 +104,7 @@ public sealed class GitCruder : ParCruder
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new GitDataModel();
     }
