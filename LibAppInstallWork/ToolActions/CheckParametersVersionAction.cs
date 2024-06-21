@@ -27,7 +27,8 @@ public sealed class CheckParametersVersionAction : ToolAction
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckParametersVersionAction(ILogger logger, IHttpClientFactory httpClientFactory,
         ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string? appSettingsVersion,
-        int maxTryCount = 10) : base(logger, "Check Parameters Version", null, null)
+        int maxTryCount = 10, bool useConsole = false) : base(logger, "Check Parameters Version", null, null,
+        useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -61,7 +62,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
-                        _webAgentForCheck.ApiKey);
+                        _webAgentForCheck.ApiKey, UseConsole);
                     var getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
@@ -73,7 +74,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server);
+                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                         errors.AddRange(getAppSettingsVersionResult.AsT1);

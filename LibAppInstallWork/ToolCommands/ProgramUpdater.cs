@@ -19,8 +19,9 @@ public sealed class ProgramUpdater : ToolCommand
     private readonly ILogger _logger;
 
     public ProgramUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
-        ProgramUpdaterParameters programUpdaterParameters, IParametersManager parametersManager) : base(logger,
-        ActionName, programUpdaterParameters, parametersManager, ActionDescription)
+        ProgramUpdaterParameters programUpdaterParameters, IParametersManager parametersManager,
+        bool useConsole) : base(logger,
+        ActionName, programUpdaterParameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -57,7 +58,7 @@ public sealed class ProgramUpdater : ToolCommand
             ProgramUpdaterParameters.InstallerBaseParameters, ProgramUpdaterParameters.ProgramArchiveDateMask,
             ProgramUpdaterParameters.ProgramArchiveExtension, ProgramUpdaterParameters.ParametersFileDateMask,
             ProgramUpdaterParameters.ParametersFileExtension, ProgramUpdaterParameters.FileStorageForDownload,
-            projectName, environmentName);
+            projectName, environmentName, UseConsole);
 
         if (await installProgramAction.Run(cancellationToken))
             return true;

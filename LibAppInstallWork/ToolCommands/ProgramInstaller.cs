@@ -23,7 +23,7 @@ public sealed class ProgramInstaller : ToolCommand
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
         IParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters,
-        parametersManager, ActionDescription)
+        parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -53,7 +53,7 @@ public sealed class ProgramInstaller : ToolCommand
                 Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask,
                 Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
                 Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, Parameters.ProjectName,
-                Parameters.ServerInfo.EnvironmentName);
+                Parameters.ServerInfo.EnvironmentName, _useConsole);
 
             return await installProgramAction.Run(cancellationToken);
         }
@@ -86,7 +86,8 @@ public sealed class ProgramInstaller : ToolCommand
             Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
             Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension, Parameters.FileStorageForExchange,
             projectName, Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName,
-            Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription);
+            Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription,
+            UseConsole);
         if (!await installServiceAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
@@ -97,7 +98,7 @@ public sealed class ProgramInstaller : ToolCommand
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
         var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
-            Parameters.WebAgentForCheck, Parameters.ProxySettings, installingProgramVersion);
+            Parameters.WebAgentForCheck, Parameters.ProxySettings, installingProgramVersion, UseConsole);
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
@@ -109,7 +110,7 @@ public sealed class ProgramInstaller : ToolCommand
         {
             //4. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
             var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
-                Parameters.WebAgentForCheck, Parameters.ProxySettings, appSettingsVersion);
+                Parameters.WebAgentForCheck, Parameters.ProxySettings, appSettingsVersion, 10, UseConsole);
 
             if (await checkParametersVersionAction.Run(cancellationToken))
                 return true;

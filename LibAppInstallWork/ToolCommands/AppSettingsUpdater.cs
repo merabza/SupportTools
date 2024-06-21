@@ -25,8 +25,8 @@ public sealed class AppSettingsUpdater : ToolCommand
     private readonly ILogger _logger;
 
     public AppSettingsUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
-        AppSettingsUpdaterParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
-        parameters, parametersManager, ActionDescription)
+        AppSettingsUpdaterParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -63,7 +63,7 @@ public sealed class AppSettingsUpdater : ToolCommand
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
-            AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
+            AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName, UseConsole);
         var projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!await installParametersAction.Run(cancellationToken))
         {
@@ -73,7 +73,8 @@ public sealed class AppSettingsUpdater : ToolCommand
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
         var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
-            AppSettingsUpdaterParameters.WebAgentForCheck, AppSettingsUpdaterParameters.ProxySettings, checkForVersion);
+            AppSettingsUpdaterParameters.WebAgentForCheck, AppSettingsUpdaterParameters.ProxySettings, checkForVersion,
+            10, UseConsole);
 
         if (await checkParametersVersionAction.Run(cancellationToken))
             return true;

@@ -18,8 +18,8 @@ public sealed class ProgramRemover : ToolCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProgramRemover(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription)
+        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -40,7 +40,7 @@ public sealed class ProgramRemover : ToolCommand
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
-            _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
         if (projectManager is null)
         {
             _logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);

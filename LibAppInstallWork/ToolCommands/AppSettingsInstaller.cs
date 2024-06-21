@@ -26,7 +26,7 @@ public sealed class AppSettingsInstaller : ToolCommand
 
     public AppSettingsInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
         AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
-        parameters, parametersManager, ActionDescription)
+        parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -72,7 +72,7 @@ public sealed class AppSettingsInstaller : ToolCommand
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
             AppSettingsInstallerParameters.ProjectName, AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
-            AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName);
+            AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName, UseConsole);
         if (!await installParametersAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName} parameters file is not updated", projectName);
@@ -83,7 +83,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         //, AppSettingsInstallerParameters.ProjectName
         CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
             AppSettingsInstallerParameters.WebAgentForCheck, AppSettingsInstallerParameters.ProxySettings,
-            appSettingsVersion);
+            appSettingsVersion, 10, UseConsole);
 
         if (await checkParametersVersionAction.Run(cancellationToken))
             return true;

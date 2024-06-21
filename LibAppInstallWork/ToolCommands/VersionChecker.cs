@@ -20,8 +20,8 @@ public sealed class VersionChecker : ToolCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public VersionChecker(ILogger logger, IHttpClientFactory httpClientFactory, CheckVersionParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription)
+        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -34,7 +34,7 @@ public sealed class VersionChecker : ToolCommand
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
-            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1);
+            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
@@ -42,7 +42,7 @@ public sealed class VersionChecker : ToolCommand
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
         CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,
-            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1);
+            CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} version check failed", projectName);
         //return false;

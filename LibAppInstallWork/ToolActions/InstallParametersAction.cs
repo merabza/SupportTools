@@ -26,7 +26,8 @@ public sealed class InstallParametersAction : ToolAction
     public InstallParametersAction(ILogger logger, IHttpClientFactory httpClientFactory, string parametersFileDateMask,
         string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
         FileStorageData fileStorageForUpload, string projectName, string environmentName,
-        string appSettingsEncodedJsonFileName) : base(logger, "Install Parameters", null, null)
+        string appSettingsEncodedJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null,
+        useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -42,7 +43,7 @@ public sealed class InstallParametersAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForUpload, _installerBaseParameters);
+            _fileStorageForUpload, _installerBaseParameters, UseConsole);
         if (projectManager is null)
         {
             _logger.LogError(

@@ -21,8 +21,8 @@ public sealed class ServiceStopper : ToolCommand
     private readonly ServiceStartStopParameters _parameters;
 
     public ServiceStopper(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription)
+        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -49,7 +49,7 @@ public sealed class ServiceStopper : ToolCommand
 
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
-            _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
 
         if (projectManager is null)
         {

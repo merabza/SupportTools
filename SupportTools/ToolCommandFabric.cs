@@ -177,7 +177,7 @@ public static class ToolCommandFabric
                     AppSettingsUpdaterParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (appSettingsUpdaterParameters is not null)
                     return new AppSettingsUpdater(logger, httpClientFactory, appSettingsUpdaterParameters,
-                        parametersManager);
+                        parametersManager, true);
                 StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
                 return null;
             case ETools.LocalBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
@@ -250,7 +250,7 @@ public static class ToolCommandFabric
                         ServiceUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
                     if (programServiceUpdaterParameters is not null)
                         return new ServiceUpdater(logger, httpClientFactory, programServiceUpdaterParameters,
-                            parametersManager);
+                            parametersManager, true);
                     StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
                     return null;
                 }
@@ -258,14 +258,16 @@ public static class ToolCommandFabric
                 var programUpdaterParameters =
                     ProgramUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
                 if (programUpdaterParameters is not null)
-                    return new ProgramUpdater(logger, httpClientFactory, programUpdaterParameters, parametersManager);
+                    return new ProgramUpdater(logger, httpClientFactory, programUpdaterParameters, parametersManager,
+                        true);
                 StShared.WriteErrorLine("programUpdaterParameters is null", true);
                 return null;
             case ETools.ProgRemover: //  Remove, //პროგრამის წაშლა
                 var serviceStartStopParameters =
                     ProgramRemoverParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStartStopParameters is not null)
-                    return new ProgramRemover(logger, httpClientFactory, serviceStartStopParameters, parametersManager);
+                    return new ProgramRemover(logger, httpClientFactory, serviceStartStopParameters, parametersManager,
+                        true);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
                 return null;
             case ETools.ServerBaseToLocalCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
@@ -295,21 +297,24 @@ public static class ToolCommandFabric
                 var serviceStartParameters =
                     ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStartParameters is not null)
-                    return new ServiceStarter(logger, httpClientFactory, serviceStartParameters, parametersManager);
+                    return new ServiceStarter(logger, httpClientFactory, serviceStartParameters, parametersManager,
+                        true);
                 StShared.WriteErrorLine("serviceStartParameters is null", true);
                 return null;
             case ETools.ServiceStopper: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var serviceStopParameters =
                     ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStopParameters is not null)
-                    return new ServiceStopper(logger, httpClientFactory, serviceStopParameters, parametersManager);
+                    return new ServiceStopper(logger, httpClientFactory, serviceStopParameters, parametersManager,
+                        true);
                 StShared.WriteErrorLine("serviceStopParameters is null", true);
                 return null;
             case ETools.VersionChecker: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var checkVersionParameters =
                     CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (checkVersionParameters is not null)
-                    return new VersionChecker(logger, httpClientFactory, checkVersionParameters, parametersManager);
+                    return new VersionChecker(logger, httpClientFactory, checkVersionParameters, parametersManager,
+                        true);
                 StShared.WriteErrorLine("checkVersionParameters is null", true);
                 return null;
             case ETools.RecreateDevDatabase:

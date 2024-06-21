@@ -34,7 +34,8 @@ public sealed class InstallServiceAction : ToolAction
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
         string projectName, string environmentName, string serviceUserName, string encodedJsonFileName,
-        string? serviceDescriptionSignature, string? projectDescription) : base(logger, "Install service", null, null)
+        string? serviceDescriptionSignature, string? projectDescription, bool useConsole) : base(logger,
+        "Install service", null, null, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -58,7 +59,7 @@ public sealed class InstallServiceAction : ToolAction
     {
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForDownload, _installerBaseParameters);
+            _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)
         {

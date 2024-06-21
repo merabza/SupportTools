@@ -12,7 +12,7 @@ public static class ProjectsManagersFabric
 {
     public static IIProjectsManagerWithFileStorage? CreateProjectsManagerWithFileStorage(ILogger logger,
         IHttpClientFactory httpClientFactory, FileStorageData fileStorageForUpload,
-        InstallerBaseParameters installerBaseParameters)
+        InstallerBaseParameters installerBaseParameters, bool useConsole)
     {
         if (installerBaseParameters.WebAgentForInstall is not null &&
             installerBaseParameters.LocalInstallerSettings is not null)
@@ -24,7 +24,8 @@ public static class ProjectsManagersFabric
         if (installerBaseParameters.WebAgentForInstall is not null)
         {
             var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory,
-                installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey);
+                installerBaseParameters.WebAgentForInstall.Server, installerBaseParameters.WebAgentForInstall.ApiKey,
+                useConsole);
             return new ProjectsManagerRemoteWithFileStorage(projectsApiClient);
         }
 
@@ -36,7 +37,7 @@ public static class ProjectsManagersFabric
     }
 
     public static IProjectsManager? CreateProjectsManager(ILogger logger, IHttpClientFactory httpClientFactory,
-        ApiClientSettingsDomain? programUpdaterWebAgent, string? installFolder)
+        ApiClientSettingsDomain? programUpdaterWebAgent, string? installFolder, bool useConsole)
     {
         if (programUpdaterWebAgent is not null && installFolder is not null)
         {
@@ -47,7 +48,7 @@ public static class ProjectsManagersFabric
         if (programUpdaterWebAgent is not null)
         {
             var projectsApiClient = new ProjectsApiClient(logger, httpClientFactory, programUpdaterWebAgent.Server,
-                programUpdaterWebAgent.ApiKey);
+                programUpdaterWebAgent.ApiKey, useConsole);
             return new ProjectsManagerRemote(projectsApiClient);
         }
 

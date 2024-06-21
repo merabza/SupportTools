@@ -18,6 +18,7 @@ public sealed class CheckProgramVersionAction : ToolAction
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string? _installingProgramVersion;
+    private readonly bool _useConsole;
     private readonly ILogger _logger;
     private readonly int _maxTryCount;
     private readonly ProxySettingsBase _proxySettings;
@@ -25,13 +26,14 @@ public sealed class CheckProgramVersionAction : ToolAction
 
     public CheckProgramVersionAction(ILogger logger, IHttpClientFactory httpClientFactory,
         ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string? installingProgramVersion,
-        int maxTryCount = 10) : base(logger, "Check Program Version", null, null)
+        bool useConsole, int maxTryCount = 10) : base(logger, "Check Program Version", null, null)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _webAgentForCheck = webAgentForCheck;
         _proxySettings = proxySettings;
         _installingProgramVersion = installingProgramVersion;
+        _useConsole = useConsole;
         _maxTryCount = maxTryCount;
     }
 
@@ -57,7 +59,7 @@ public sealed class CheckProgramVersionAction : ToolAction
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
-                        _webAgentForCheck.ApiKey);
+                        _webAgentForCheck.ApiKey, _useConsole);
                     var getVersionByProxyResult =
                         await projectsApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
@@ -72,7 +74,8 @@ public sealed class CheckProgramVersionAction : ToolAction
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server);
+                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
+                        _useConsole);
                     var getVersionResult = await testApiClient.GetVersion(cancellationToken);
                     if (getVersionResult.IsT1)
                     {

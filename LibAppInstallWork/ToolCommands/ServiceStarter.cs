@@ -1,13 +1,13 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -22,8 +22,8 @@ public sealed class ServiceStarter : ToolCommand
     private readonly ServiceStartStopParameters _parameters;
 
     public ServiceStarter(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription)
+        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -50,7 +50,7 @@ public sealed class ServiceStarter : ToolCommand
 
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
-            _parameters.WebAgentForInstall, _parameters.InstallFolder);
+            _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
 
         if (projectManager is null)
         {
@@ -72,7 +72,7 @@ public sealed class ServiceStarter : ToolCommand
 
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
-            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
@@ -80,7 +80,7 @@ public sealed class ServiceStarter : ToolCommand
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
         CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,
-            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1);
+            _parameters.WebAgentForCheck, _parameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
                 environmentName);

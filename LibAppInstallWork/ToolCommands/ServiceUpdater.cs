@@ -19,8 +19,9 @@ public sealed class ServiceUpdater : ToolCommand
     private readonly ILogger _logger;
 
     public ServiceUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
-        ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager) : base(logger,
-        ActionName, programServiceUpdaterParameters, parametersManager, ActionDescription)
+        ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager,
+        bool useConsole) : base(logger, ActionName, programServiceUpdaterParameters, parametersManager,
+        ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -85,7 +86,7 @@ public sealed class ServiceUpdater : ToolCommand
             ProgramServiceUpdaterParameters.ServiceUserName,
             appSettingsEncoderParameters.AppSettingsEncodedJsonFileName,
             ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
-            ProgramServiceUpdaterParameters.ProjectDescription);
+            ProgramServiceUpdaterParameters.ProjectDescription, UseConsole);
         if (!await installProgramAction.Run(cancellationToken))
         {
             _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
@@ -96,7 +97,7 @@ public sealed class ServiceUpdater : ToolCommand
         //4. შევამოწმოთ, რომ გაშვებული პროგრამის ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით//, projectName
         var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
-            ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion);
+            ProgramServiceUpdaterParameters.ProxySettings, createPackageAndUpload.AssemblyVersion, UseConsole);
 
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
@@ -111,7 +112,7 @@ public sealed class ServiceUpdater : ToolCommand
             //, projectName
             var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
                 ProgramServiceUpdaterParameters.CheckVersionParameters.WebAgentForCheck,
-                ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion);
+                ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion, 10, UseConsole);
 
             if (await checkParametersVersionAction.Run(cancellationToken))
                 return true;

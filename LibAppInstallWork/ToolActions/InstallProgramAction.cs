@@ -30,7 +30,8 @@ public sealed class InstallProgramAction : ToolAction
     public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
-        string projectName, string environmentName) : base(logger, "Install service", null, null)
+        string projectName, string environmentName, bool useConsole) : base(logger, "Install service", null, null,
+        useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -48,7 +49,7 @@ public sealed class InstallProgramAction : ToolAction
     {
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForDownload, _installerBaseParameters);
+            _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)
         {
