@@ -17,28 +17,27 @@ public sealed class GitRepos
     public Dictionary<string, GitDataDomain> Gits { get; }
 
 
-    public static GitRepos Create(ILogger logger, Dictionary<string, GitDataModel> gitRepos,
-        string? mainProjectFolderRelativePath, string? spaProjectFolderRelativePath)
+    public static GitRepos Create(ILogger? logger, Dictionary<string, GitDataModel> gitRepos,
+        string? mainProjectFolderRelativePath, string? spaProjectFolderRelativePath, bool useConsole)
     {
         Dictionary<string, GitDataDomain> gits = [];
         foreach (var (gitProjectName, gitData) in gitRepos)
         {
             if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
             {
-                logger.LogError("GitProjectAddress is empty for Git Repo with key {gitProjectName})", gitProjectName);
+                StShared.WriteErrorLine($"GitProjectAddress is empty for Git Repo with key {gitProjectName})", useConsole, logger);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(gitData.GitProjectFolderName))
             {
-                logger.LogError("GitProjectFolderName is empty for Git Repo with key {gitProjectName})",
-                    gitProjectName);
+                StShared.WriteErrorLine($"GitProjectFolderName is empty for Git Repo with key {gitProjectName})", useConsole, logger);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(gitData.GitIgnorePathName))
             {
-                logger.LogError("GitIgnorePathName is empty for Git Repo with key {gitProjectName})", gitProjectName);
+                StShared.WriteErrorLine($"GitIgnorePathName is empty for Git Repo with key {gitProjectName})", useConsole, logger);
                 continue;
             }
 

@@ -20,8 +20,8 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager) : base(logger, ActionName,
-        null, null, true)
+    public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(logger, ActionName,
+        null, null, useConsole)
     {
         _parametersManager = parametersManager;
     }
@@ -53,11 +53,11 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         }
 
         List<string> usedProjectNames = [];
-        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, null);
+        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, null, UseConsole);
 
         foreach (var kvp in gitRepos.Gits)
         {
-            var gitProjectsUpdater = GitProjectsUpdater.Create(Logger, _parametersManager);
+            var gitProjectsUpdater = GitProjectsUpdater.Create(Logger, _parametersManager, UseConsole);
             if (gitProjectsUpdater is null)
             {
                 StShared.WriteErrorLine("gitProjectsUpdater does not created", true, Logger);

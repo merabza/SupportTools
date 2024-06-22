@@ -35,7 +35,7 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
     protected override bool RunBody()
     {
         var gitSyncToolAction =
-            GitSyncToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, _gitProjectName);
+            GitSyncToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, _gitProjectName, true);
         return gitSyncToolAction?.Run(CancellationToken.None).Result ?? false;
     }
 }

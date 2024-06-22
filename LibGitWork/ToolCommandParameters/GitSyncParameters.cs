@@ -27,8 +27,8 @@ public class GitSyncParameters : IParameters
         return true;
     }
 
-    public static GitSyncParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, EGitCol gitCol, string gitProjectName)
+    public static GitSyncParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters,
+        string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var project = supportToolsParameters.GetProject(projectName);
         if (project is null)
@@ -62,7 +62,8 @@ public class GitSyncParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects));
+            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
+            useConsole);
 
         if (!gitRepos.Gits.TryGetValue(gitProjectName, out var value))
         {

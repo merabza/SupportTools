@@ -22,10 +22,10 @@ public sealed class GitSyncToolAction : ToolAction
 {
     private readonly bool _askCommitMessage;
     private readonly GitSyncParameters _gitSyncParameters;
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
 
 
-    public GitSyncToolAction(ILogger logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
+    public GitSyncToolAction(ILogger? logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
         bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
     {
         _logger = logger;
@@ -38,14 +38,15 @@ public sealed class GitSyncToolAction : ToolAction
     public string? UsedCommitMessage { get; private set; }
 
     public static GitSyncToolAction? Create(ILogger logger, ParametersManager parametersManager,
-        string projectName, EGitCol gitCol, string gitProjectName)
+        string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var gitSyncParameters =
-            GitSyncParameters.Create(logger, supportToolsParameters, projectName, gitCol, gitProjectName);
+        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull,
+            supportToolsParameters, projectName, gitCol, gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
-            return new GitSyncToolAction(logger, gitSyncParameters);
+            return new GitSyncToolAction(loggerOrNull, gitSyncParameters);
 
         StShared.WriteErrorLine("GitSyncParameters is not created", true);
         return null;
@@ -64,7 +65,7 @@ public sealed class GitSyncToolAction : ToolAction
     {
         var projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
-        var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
+        var gitProcessor = new GitProcessor(false, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
             return Task.FromResult(gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს

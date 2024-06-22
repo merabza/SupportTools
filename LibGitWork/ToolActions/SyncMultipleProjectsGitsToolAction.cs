@@ -13,13 +13,13 @@ namespace LibGitWork.ToolActions;
 
 public class SyncMultipleProjectsGitsToolAction : GitToolAction
 {
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
     private readonly SyncMultipleProjectsGitsParameters _syncMultipleProjectsGitsParameters;
 
-    private SyncMultipleProjectsGitsToolAction(ILogger logger, ParametersManager parametersManager,
-        SyncMultipleProjectsGitsParameters syncMultipleProjectsGitsParameters) : base(logger,
-        "Sync Multiple Projects Gits", null, null)
+    private SyncMultipleProjectsGitsToolAction(ILogger? logger, ParametersManager parametersManager,
+        SyncMultipleProjectsGitsParameters syncMultipleProjectsGitsParameters, bool useConsole) : base(logger,
+        "Sync Multiple Projects Gits", null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -28,13 +28,15 @@ public class SyncMultipleProjectsGitsToolAction : GitToolAction
 
 
     public static SyncMultipleProjectsGitsToolAction Create(ILogger logger, ParametersManager parametersManager,
-        string? projectGroupName, string? projectName)
+        string? projectGroupName, string? projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var syncMultipleProjectsGitsParameters =
             SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName, projectName);
-
-        return new SyncMultipleProjectsGitsToolAction(logger, parametersManager, syncMultipleProjectsGitsParameters);
+        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        return new SyncMultipleProjectsGitsToolAction(loggerOrNull, parametersManager,
+            syncMultipleProjectsGitsParameters,
+            useConsole);
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
@@ -91,7 +93,7 @@ public class SyncMultipleProjectsGitsToolAction : GitToolAction
             return;
 
         var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
-            projectName, gitCol, changedGitProjects, isFirstSync);
+            projectName, gitCol, changedGitProjects, isFirstSync, UseConsole);
         syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None).Wait();
     }
 }

@@ -19,11 +19,11 @@ public sealed class GitProjectsUpdater
 {
     private readonly GitRepos _gitRepos;
     private readonly string _gitsFolder;
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly SupportToolsParameters _supportToolsParameters;
     private readonly string _workFolder;
 
-    private GitProjectsUpdater(ILogger logger, SupportToolsParameters supportToolsParameters, string workFolder,
+    private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string workFolder,
         string gitsFolder, GitRepos gitRepos)
     {
         _logger = logger;
@@ -35,7 +35,7 @@ public sealed class GitProjectsUpdater
 
     public List<string> UsedProjectNames { get; } = [];
 
-    public static GitProjectsUpdater? Create(ILogger logger, IParametersManager parametersManager)
+    public static GitProjectsUpdater? Create(ILogger? logger, IParametersManager parametersManager, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var workFolder = supportToolsParameters.WorkFolder;
@@ -46,7 +46,7 @@ public sealed class GitProjectsUpdater
         }
 
         var gitsFolder = Path.Combine(workFolder, "Gits");
-        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, null, null);
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, null, null, useConsole);
         return new GitProjectsUpdater(logger, supportToolsParameters, workFolder, gitsFolder, gitRepos);
     }
 

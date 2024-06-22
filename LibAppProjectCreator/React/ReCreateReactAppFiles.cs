@@ -71,7 +71,7 @@ public sealed class ReCreateReactAppFiles
         //თუ დაინიცირებულია ვჩერდებით
         //თუ არა უბრალოდ ვაინიცირებთ და ვაკომიტებთ
 
-        var isInsideWorkTreeResult = StShared.RunProcessWithOutput(true, _logger, "git",
+        var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",
             $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
         if (isInsideWorkTreeResult.IsT1)
             return false;

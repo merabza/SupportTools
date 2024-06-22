@@ -17,6 +17,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.LogGitWork), false));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.TempFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.SecurityFolder)));

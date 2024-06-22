@@ -13,14 +13,16 @@ namespace LibGitWork;
 
 public class WrongGitignoreFilesListCreator
 {
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly IParametersManager _parametersManager;
+    private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public WrongGitignoreFilesListCreator(ILogger logger, IParametersManager parametersManager)
+    public WrongGitignoreFilesListCreator(ILogger? logger, IParametersManager parametersManager, bool useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
+        _useConsole = useConsole;
     }
 
 
@@ -50,7 +52,7 @@ public class WrongGitignoreFilesListCreator
 
             var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
                 project.MainProjectFolderRelativePath(gitProjects),
-                project.SpaProjectFolderRelativePath(gitProjects));
+                project.SpaProjectFolderRelativePath(gitProjects), _useConsole);
 
 
             var gitProjectNames = gitCol switch

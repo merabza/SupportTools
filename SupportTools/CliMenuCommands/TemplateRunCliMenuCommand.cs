@@ -16,7 +16,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
         ETestOrReal testOrReal) : base(null, EMenuAction.Reload)
     {
         _appProjectCreatorByTemplate =
-            new AppProjectCreatorByTemplateToolAction(logger, parametersManager, templateName, testOrReal);
+            new AppProjectCreatorByTemplateToolAction(logger, parametersManager, templateName, testOrReal, true);
     }
 
     protected override string GetActionDescription()

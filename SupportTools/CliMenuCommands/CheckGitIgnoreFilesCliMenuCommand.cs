@@ -22,14 +22,14 @@ public sealed class CheckGitIgnoreFilesCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-        var updateGitProjectsToolAction = new CheckGitIgnoreFilesToolAction(_logger, _parametersManager);
+        var updateGitProjectsToolAction = new CheckGitIgnoreFilesToolAction(_logger, _parametersManager, true);
         return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
     }
 
     protected override string GetStatus()
     {
         MenuAction = EMenuAction.Reload;
-        var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(_logger, _parametersManager);
+        var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(_logger, _parametersManager, true);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         return wrongGitIgnoreFilesList.Count.ToString();

@@ -76,7 +76,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
 
     public static ScaffoldSeederCreatorParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName)
+        string projectName, bool useConsole)
     {
         try
         {
@@ -193,7 +193,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.MainProjectFolderRelativePath(gitProjects),
-                    project.SpaProjectFolderRelativePath(gitProjects)));
+                    project.SpaProjectFolderRelativePath(gitProjects), useConsole));
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

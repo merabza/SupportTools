@@ -51,7 +51,7 @@ public static class ToolCommandFabric
     ];
 
     public static IToolCommand? Create(ILogger logger, ETools tool, IParametersManager parametersManager,
-        string projectName)
+        string projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         switch (tool)
@@ -114,7 +114,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.ScaffoldSeederCreator: //სკაფოლდინგისა და სიდინგის პროექტების შექმნა
                 var scaffoldSeederCreatorParameters =
-                    ScaffoldSeederCreatorParameters.Create(logger, supportToolsParameters, projectName);
+                    ScaffoldSeederCreatorParameters.Create(logger, supportToolsParameters, projectName, useConsole);
                 if (scaffoldSeederCreatorParameters is not null)
                     return new ScaffoldSeederCreatorToolCommand(logger, true, scaffoldSeederCreatorParameters,
                         parametersManager);

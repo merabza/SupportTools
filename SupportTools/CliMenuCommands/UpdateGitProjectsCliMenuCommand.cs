@@ -21,7 +21,7 @@ public sealed class UpdateGitProjectsCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-        var updateGitProjectsToolAction = new UpdateGitProjectsToolAction(_logger, _parametersManager);
+        var updateGitProjectsToolAction = new UpdateGitProjectsToolAction(_logger, _parametersManager, true);
         return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
     }
 }

@@ -25,7 +25,7 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand : Cli
     protected override bool RunBody()
     {
         var syncOneGroupAllProjectsGitsToolAction =
-            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, _projectName);
+            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, _projectName, true);
         return syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Result;
     }
 }

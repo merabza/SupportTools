@@ -12,15 +12,15 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckGitIgnoreFilesToolAction(ILogger logger, IParametersManager parametersManager) : base(logger,
-        ActionName, null, null, true)
+    public CheckGitIgnoreFilesToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, null, null, useConsole)
     {
         _parametersManager = parametersManager;
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager);
+        var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         if (wrongGitIgnoreFilesList.Count == 0)

@@ -22,7 +22,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommand : CliMenuCommand
     protected override bool RunBody()
     {
         var syncOneProjectAllGitsToolAction =
-            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, null);
+            SyncMultipleProjectsGitsToolAction.Create(_logger, _parametersManager, null, null, true);
         return syncOneProjectAllGitsToolAction.Run(CancellationToken.None).Result;
     }
 }

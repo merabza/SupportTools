@@ -27,8 +27,8 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-        var syncOneProjectAllGitsToolAction =
-            SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, null, true);
+        var syncOneProjectAllGitsToolAction = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
+            _projectName, _gitCol, null, true, true);
         return syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Result ?? false;
     }
 }

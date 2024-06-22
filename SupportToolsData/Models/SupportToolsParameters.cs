@@ -20,6 +20,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public const string DefaultUploadFileTempExtension = ".up!";
 
     public string? LogFolder { get; set; }
+    public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }
     public string? TempFolder { get; set; }
     public string? SecurityFolder { get; set; }

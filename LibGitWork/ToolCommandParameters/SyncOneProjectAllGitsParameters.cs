@@ -35,9 +35,10 @@ public class SyncOneProjectAllGitsParameters : IParameters
     }
 
 
-    public static SyncOneProjectAllGitsParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
+    public static SyncOneProjectAllGitsParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters,
         string projectName, EGitCol gitCol,
-        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
+        bool useConsole)
     {
         var project = supportToolsParameters.GetProject(projectName);
 
@@ -65,8 +66,8 @@ public class SyncOneProjectAllGitsParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.MainProjectFolderRelativePath(gitProjects),
-            project.SpaProjectFolderRelativePath(gitProjects));
+            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
+            useConsole);
 
         var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 

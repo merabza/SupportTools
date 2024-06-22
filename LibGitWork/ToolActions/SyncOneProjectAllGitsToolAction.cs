@@ -16,10 +16,10 @@ namespace LibGitWork.ToolActions;
 
 public sealed class SyncOneProjectAllGitsToolAction : ToolAction
 {
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly SyncOneProjectAllGitsParameters _syncOneProjectAllGitsParameters;
 
-    public SyncOneProjectAllGitsToolAction(ILogger logger,
+    public SyncOneProjectAllGitsToolAction(ILogger? logger,
         SyncOneProjectAllGitsParameters syncOneProjectAllGitsParameters) : base(logger, "Sync One Project All Gits",
         null, null)
     {
@@ -27,16 +27,18 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         _syncOneProjectAllGitsParameters = syncOneProjectAllGitsParameters;
     }
 
-    public static SyncOneProjectAllGitsToolAction? Create(ILogger logger, ParametersManager parametersManager,
+    public static SyncOneProjectAllGitsToolAction? Create(ILogger? logger, ParametersManager parametersManager,
         string projectName, EGitCol gitCol,
-        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
+        bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(logger, supportToolsParameters, projectName,
-            gitCol, changedGitProjects, isFirstSync);
+        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters, projectName,
+            gitCol, changedGitProjects, isFirstSync, useConsole);
 
         if (gitSyncAllParameters is not null)
-            return new SyncOneProjectAllGitsToolAction(logger, gitSyncAllParameters);
+            return new SyncOneProjectAllGitsToolAction(loggerOrNull, gitSyncAllParameters);
 
         StShared.WriteErrorLine("SyncOneProjectAllGitsParameters is not created", true);
         return null;

@@ -21,7 +21,7 @@ public sealed class UpdateGitIgnoreFilesCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-        var updateGitProjectsToolAction = new UpdateGitIgnoreFilesToolAction(_logger, _parametersManager);
+        var updateGitProjectsToolAction = new UpdateGitIgnoreFilesToolAction(_logger, _parametersManager, true);
         return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
     }
 }

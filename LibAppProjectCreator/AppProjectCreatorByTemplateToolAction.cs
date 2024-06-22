@@ -27,7 +27,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     private readonly ETestOrReal _testOrReal;
 
     public AppProjectCreatorByTemplateToolAction(ILogger logger, IParametersManager parametersManager,
-        string templateName, ETestOrReal testOrReal) : base(logger, ActionName, null, null)
+        string templateName, ETestOrReal testOrReal, bool useConsole) : base(logger, ActionName, null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -120,8 +120,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         var appCreator = AppCreatorFabric.CreateAppCreator(_logger, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null), supportToolsParameters.WorkFolder,
-            supportToolsParameters.ReactAppTemplates);
+            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole),
+            supportToolsParameters.WorkFolder, supportToolsParameters.ReactAppTemplates);
 
         if (appCreator is null)
         {

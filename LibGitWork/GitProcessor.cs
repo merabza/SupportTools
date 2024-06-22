@@ -10,13 +10,13 @@ namespace LibGitWork;
 public sealed class GitProcessor
 {
     private const string Git = "git";
-    private readonly ILogger _logger;
+    private readonly ILogger? _logger;
     private readonly string _projectPath;
     private readonly string _switchToProjectPath;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitProcessor(bool useConsole, ILogger logger, string projectPath)
+    public GitProcessor(bool useConsole, ILogger? logger, string projectPath)
     {
         _useConsole = useConsole;
         _logger = logger;

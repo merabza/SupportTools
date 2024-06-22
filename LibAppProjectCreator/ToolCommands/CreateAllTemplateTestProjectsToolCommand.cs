@@ -16,7 +16,8 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
     private readonly ILogger _logger;
 
     public CreateAllTemplateTestProjectsToolCommand(ILogger logger, string actionName,
-        ParametersManager parametersManager) : base(logger, actionName, parametersManager)
+        ParametersManager parametersManager, bool useConsole) : base(logger, actionName, parametersManager, null,
+        useConsole)
     {
         _logger = logger;
     }
@@ -39,7 +40,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
             Console.WriteLine("Start create test Project: {0}", kvp.Key);
 
             AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate =
-                new(_logger, ParametersManager, kvp.Key, ETestOrReal.Test);
+                new(_logger, ParametersManager, kvp.Key, ETestOrReal.Test, UseConsole);
 
             await appProjectCreatorByTemplate.Run(cancellationToken);
 
