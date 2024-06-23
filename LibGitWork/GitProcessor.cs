@@ -81,7 +81,8 @@ fi*/
 
         if (local == remote)
         {
-            Console.WriteLine($"{_projectPath} Up to date");
+            StShared.ConsoleWriteInformationLine(_logger, _useConsole, "{0} Up to date", _projectPath);
+            //Console.WriteLine($"{_projectPath} Up to date");
             return GitState.UpToDate;
         }
 
