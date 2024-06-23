@@ -44,7 +44,7 @@ else
 echo "Diverged"
 fi*/
         //"git remote update"
-        if (StShared.RunProcess(false, null, Git, $"{_switchToProjectPath} remote update").IsSome)
+        if (StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} remote update").IsSome)
         {
             StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
             return GitState.Unknown;
