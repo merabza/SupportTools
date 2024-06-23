@@ -65,7 +65,7 @@ public sealed class GitSyncToolAction : ToolAction
     {
         var projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
-        var gitProcessor = new GitProcessor(false, _logger, projectFolderName);
+        var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
             return Task.FromResult(gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
