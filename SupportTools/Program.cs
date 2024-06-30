@@ -36,28 +36,26 @@ try
 
     var parametersFileName = argParser.ParametersFileName;
     var servicesCreator = new SupportToolsServicesCreator(par);
-    IHttpClientFactory? httpClientFactory;
-    using (var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information))
+    // ReSharper disable once using
+    var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information);
+    if (serviceProvider == null)
     {
-        if (serviceProvider == null)
-        {
-            Console.WriteLine("Logger not created");
-            return 4;
-        }
+        Console.WriteLine("Logger not created");
+        return 4;
+    }
 
-        logger = serviceProvider.GetService<ILogger<Program>>();
-        if (logger is null)
-        {
-            StShared.WriteErrorLine("logger is null", true);
-            return 5;
-        }
+    logger = serviceProvider.GetService<ILogger<Program>>();
+    if (logger is null)
+    {
+        StShared.WriteErrorLine("logger is null", true);
+        return 5;
+    }
 
-        httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
-        if (httpClientFactory is null)
-        {
-            StShared.WriteErrorLine("httpClientFactory is null", true);
-            return 6;
-        }
+    var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+    if (httpClientFactory is null)
+    {
+        StShared.WriteErrorLine("httpClientFactory is null", true);
+        return 6;
     }
 
     SupportTools.SupportTools supportTools =
