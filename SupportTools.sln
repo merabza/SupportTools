@@ -118,6 +118,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAgentDatabasesApiContrac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiContracts", "..\SystemTools\ApiContracts\ApiContracts.csproj", "{6C767ABD-9A46-402E-800B-7D705F1EEB89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoriesDom", "..\SystemTools\RepositoriesDom\RepositoriesDom.csproj", "{3C2AA966-4B59-42E7-B3F0-CF25D4A08269}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -312,6 +314,10 @@ Global
 		{6C767ABD-9A46-402E-800B-7D705F1EEB89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C767ABD-9A46-402E-800B-7D705F1EEB89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C767ABD-9A46-402E-800B-7D705F1EEB89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -356,6 +362,7 @@ Global
 		{7516EBCB-BE89-42B5-BB8E-9BD1E8E13F8F} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 		{83D7737C-E14A-43A2-9F14-12264DA14E05} = {DAF78034-D0C2-4E88-8EE3-F219EC254BEC}
 		{6C767ABD-9A46-402E-800B-7D705F1EEB89} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
+		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6088D4D5-9C94-40A5-A44F-E146E1810790}
