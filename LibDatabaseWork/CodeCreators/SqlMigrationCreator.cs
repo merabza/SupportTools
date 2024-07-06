@@ -8,6 +8,7 @@ public sealed class SqlMigrationCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SqlMigrationCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -25,16 +26,17 @@ public sealed class SqlMigrationCreator : CodeCreator
             "",
             $"namespace {_projectNamespace}.Migrations",
             "",
-            new CodeBlock("public partial sealed class Sql : Migration",
+            new CodeBlock("public sealed partial class Sql : Migration",
                 "",
                 new CodeBlock("protected override void Up(MigrationBuilder migrationBuilder)",
                     "var assembly = Assembly.GetExecutingAssembly()",
                     "var sqlFiles = assembly.GetManifestResourceNames().Where(file => file.EndsWith(\".sql\"))",
                     new CodeBlock("foreach (var sqlFile in sqlFiles)",
-                        new CodeBlock(
-                            "using (Stream stream = assembly.GetManifestResourceStream(sqlFile)) using (StreamReader reader = new StreamReader(stream))",
-                            "var sqlScript = reader.ReadToEnd()",
-                            "migrationBuilder.Sql($\"EXEC(N'{sqlScript}')\")"))),
+                        "using var stream = assembly.GetManifestResourceStream(sqlFile)",
+                        "if (stream is null) continue",
+                        "using var reader = new StreamReader(stream)",
+                        "var sqlScript = reader.ReadToEnd()",
+                        "migrationBuilder.Sql($\"EXEC(N'{sqlScript}')\")")),
                 new CodeBlock("protected override void Down(MigrationBuilder migrationBuilder)", "")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

@@ -27,19 +27,21 @@ public class CopyAndReplaceFilesAndFolders : FolderProcessor
     protected override bool ProcessOneFile(string? afterRootPath, MyFileInfo file)
     {
         var dirNames = afterRootPath is null
-            ? new List<string>()
+            ? []
             : afterRootPath.PrepareAfterRootPath(FileManager.DirectorySeparatorChar);
         var preparedDestinationAfterRootPath = CheckDestinationDirs(dirNames);
 
         var sourceFileFullPath = FileManager.GetPath(afterRootPath, file.FileName);
         var destinationFileFullPath = _destinationFileManager.GetPath(preparedDestinationAfterRootPath, file.FileName);
 
-        if (FileStat.FileCompare(sourceFileFullPath, destinationFileFullPath))
-            return true;
+        if (File.Exists(destinationFileFullPath))
+        {
+            if (FileStat.FileCompare(sourceFileFullPath, destinationFileFullPath))
+                return true;
+            File.Delete(destinationFileFullPath);
+        }
 
-        File.Delete(destinationFileFullPath);
         File.Copy(sourceFileFullPath, destinationFileFullPath);
-
         return true;
     }
 

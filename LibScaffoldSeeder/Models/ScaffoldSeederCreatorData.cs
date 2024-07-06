@@ -1,9 +1,7 @@
-﻿using System;
+﻿using LibAppProjectCreator.Models;
+using SupportToolsData;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using LibAppProjectCreator.Models;
-using SupportToolsData;
 
 namespace LibScaffoldSeeder.Models;
 
@@ -38,26 +36,25 @@ public sealed class ScaffoldSeederCreatorData
     {
         //სკაფოლდინგის ბიბლიოთეკა
         var databaseScaffoldClassLibProjectName = $"{projectName}DbSc";
-        var databaseScaffoldClassLibProject =
-            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, databaseScaffoldClassLibProjectName,
-                Array.Empty<string>());
+        var databaseScaffoldClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            databaseScaffoldClassLibProjectName, []);
 
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
-        var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(
-            appCreatorBaseData.SolutionPath, scaffoldSeederCreatorParameters.DataSeedingClassLibProjectName,
-            new[] { "CarcassSeeders", "ProjectSeeders", "Models", "Json" });
+        var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            scaffoldSeederCreatorParameters.DataSeedingClassLibProjectName,
+            ["CarcassSeeders", "ProjectSeeders", "Models", "Json"]);
 
         //სიდერის კოდის შემქმნელი აპლიკაცია
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName,
             scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName, EDotnetProjectType.Console, "",
-            "Program", new[] { "Models", "Properties" });
+            "Program", ["Models", "Properties"]);
 
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName,
             scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName, EDotnetProjectType.Console, "", "Program",
-            new[] { "Models" });
+            ["Models"]);
 
         var projectFolders = new List<string> { "Migrations" };
         var migrationSqlFilesFolder = scaffoldSeederCreatorParameters.MigrationSqlFilesFolder;
@@ -65,24 +62,24 @@ public sealed class ScaffoldSeederCreatorData
         if (!string.IsNullOrWhiteSpace(migrationSqlFilesFolder) && Directory.Exists(migrationSqlFilesFolder))
         {
             var sqlDir = new DirectoryInfo(migrationSqlFilesFolder);
-            if (sqlDir.GetFiles("*.sql").Any())
+            if (sqlDir.GetFiles("*.sql").Length > 0)
                 projectFolders.Add("Sql");
         }
 
         //მიგრაციის პროექტი ბიბლიოთეკა
         var dbMigrationProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.DbMigrationProjectName, projectFolders.ToArray());
+            scaffoldSeederCreatorParameters.DbMigrationProjectName, [.. projectFolders]);
 
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
         var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.SeedDbProjectName, scaffoldSeederCreatorParameters.SeedDbProjectName,
-            EDotnetProjectType.Console, "", "Program", Array.Empty<string>());
+            EDotnetProjectType.Console, "", "Program", []);
 
         //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
         //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია
         var fakeHostWebApiProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.FakeHostProjectName, scaffoldSeederCreatorParameters.FakeHostProjectName,
-            EDotnetProjectType.Web, "--no-https", "Program", Array.Empty<string>());
+            EDotnetProjectType.Web, "--no-https", "Program", []);
 
         return new ScaffoldSeederCreatorData(databaseScaffoldClassLibProject, dataSeedingClassLibProject,
             createProjectSeederCodeProject, getJsonFromProjectDbProject, dbMigrationProject,
