@@ -82,10 +82,10 @@ public sealed class EncodeParametersAction : ToolAction
             return null;
 
 
-        //string encKey = $"{_keyPart1 ?? ""}{_keyPart2.Capitalize() ?? ""}";
+        //string encKey = $"{_keyPart1 ?? string.Empty}{_keyPart2.Capitalize() ?? string.Empty}";
         var encKey = $"{_keyPart1}{_keyPart2.Capitalize()}";
 
-        if (encKey == "")
+        if (encKey == string.Empty)
         {
             _logger.LogError("key is not defined");
             return null;

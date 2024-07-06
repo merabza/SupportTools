@@ -40,7 +40,7 @@ public sealed class CheckProgramVersionAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
-        var version = "";
+        var version = string.Empty;
         var tryCount = 0;
         while (!getVersionSuccess && tryCount < _maxTryCount)
         {

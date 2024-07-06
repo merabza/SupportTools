@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System.Collections.Generic;
+using System.IO;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.Models;
@@ -136,7 +135,7 @@ public sealed class ApiAppCreatorData
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
-            EDotnetProjectType.Web, template.UseHttps ? "" : "--no-https", "Program", projectFolders.ToArray(),
+            EDotnetProjectType.Web, template.UseHttps ? string.Empty : "--no-https", "Program", [.. projectFolders],
             template.UseReact);
 
         //დავიანგარიშოთ კლიენტის ფოლდერის სრული გზა
@@ -146,7 +145,7 @@ public sealed class ApiAppCreatorData
 
 
         var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"Lib{projectName}Repositories", Array.Empty<string>());
+            $"Lib{projectName}Repositories", []);
 
         var databaseProjectFolders = new List<string>
         {
@@ -166,13 +165,13 @@ public sealed class ApiAppCreatorData
         var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
 
         var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{projectName}Db",
-            databaseProjectFolders.ToArray(), dbPartSolutionFolderName);
+            [.. databaseProjectFolders], dbPartSolutionFolderName);
 
         var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{projectName}DbMigration", new[] { "Migrations" });
+            $"{projectName}DbMigration", ["Migrations"]);
 
         var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{projectName}MasterDataLoaders", new[] { "Installers" });
+            $"{projectName}MasterDataLoaders", ["Installers"]);
 
         return new ApiAppCreatorData(dbPartPath, reactClientPath,
             appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass, template.UseDatabase,

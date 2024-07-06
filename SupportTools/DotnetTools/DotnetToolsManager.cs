@@ -94,7 +94,7 @@ public sealed class DotnetToolsManager
             var availableVersion = getAvailableVersionOfToolResult.AsT0;
             var nesTool = listOfTools.FirstOrDefault(tool => tool.PackageId == pair.Value);
             if (nesTool is null)
-                listOfTools.Add(new DotnetTool(pair.Value, "N/A", availableVersion, ""));
+                listOfTools.Add(new DotnetTool(pair.Value, "N/A", availableVersion, string.Empty));
             else
                 nesTool.AvailableVersion = availableVersion;
         }

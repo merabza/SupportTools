@@ -94,14 +94,14 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             var lines = fileContent.Split(Environment.NewLine);
             var lineData = lines.Select(LineData.Create).ToList();
             for (var i = 1; i < lineData.Count - 1; i++)
-                if (lineData[i].DryLine == "")
+                if (lineData[i].DryLine == string.Empty)
                     lineData[i].Indent = lineData[i - 1].Indent;
             lineData.Add(LineData.CreateEndOfFile());
 
 
             var stackItems = new Stack<CodeBlockBase>();
             var startCodeBlock =
-                new CodeBlock("", "new OneLineComment($\"Created by {GetType().Name} at {DateTime.Now}\")");
+                new CodeBlock(string.Empty, "new OneLineComment($\"Created by {GetType().Name} at {DateTime.Now}\")");
             CodeBlockBase mainCodeBlock = startCodeBlock;
             var currentCodeBlock = mainCodeBlock;
             stackItems.Push(currentCodeBlock);
@@ -112,7 +112,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 {
                     currentCodeBlock.Add(new OneLineComment(lineData[i].TrimLine[2..]));
                 }
-                else if (lineData[i].DryLine == "")
+                else if (lineData[i].DryLine == string.Empty)
                 {
                     currentCodeBlock.Add(new CodeExtraLine());
                 }

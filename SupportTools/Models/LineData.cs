@@ -2,6 +2,7 @@
 
 public sealed class LineData
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public LineData(string line, string trimLine, string dryLine, int indent, bool isEndOfFile)
     {
         Line = line;
@@ -19,14 +20,14 @@ public sealed class LineData
 
     public static LineData CreateEndOfFile()
     {
-        return new LineData("", "", "", 0, true);
+        return new LineData(string.Empty, string.Empty, string.Empty, 0, true);
     }
 
     public static LineData Create(string line)
     {
         var indent = CountIndent(line);
         var trimLine = line.Trim();
-        var dryLine = trimLine.Replace(" ", "");
+        var dryLine = trimLine.Replace(" ", string.Empty);
         return new LineData(line, trimLine, dryLine, indent, false);
     }
 

@@ -6,6 +6,7 @@ namespace SupportTools.Models;
 
 public sealed class ClassCreatorInfo
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ClassCreatorInfo(string sourceFileFullPath, string destinationFolder, string className,
         string destinationCodeFileName)
     {
@@ -30,8 +31,8 @@ public sealed class ClassCreatorInfo
             return null;
         }
 
-        var className = Path.GetFileNameWithoutExtension(file.Name).Replace(".", "").Capitalize() +
-                        (creatorCreatesClass ? "Class" : "") + "Creator";
+        var className = Path.GetFileNameWithoutExtension(file.Name).Replace(".", string.Empty).Capitalize() +
+                        (creatorCreatesClass ? "Class" : string.Empty) + "Creator";
         var codeFileName = className + ".cs";
         return new ClassCreatorInfo(path, Path.Combine(file.DirectoryName, "CodeCreators"), className, codeFileName);
     }

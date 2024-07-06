@@ -19,23 +19,23 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System",
             "using CliMenu",
             "using LibParameters",
             "using CliParameters.CliMenuCommands",
-            $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
+            $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using LibDataInput",
             "using Microsoft.Extensions.Logging",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}.MenuCommands",
-            "",
+            string.Empty,
             new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock("public sealed class TaskSubMenuCommand : CliMenuCommand",
                 "private readonly ILogger _logger",
                 "private readonly ParametersManager _parametersManager",
-                "",
+                string.Empty,
                 new CodeBlock(
                     "public TaskSubMenuCommand(ILogger logger, ParametersManager parametersManager, string taskName) : base(taskName)",
                     "_logger = logger",

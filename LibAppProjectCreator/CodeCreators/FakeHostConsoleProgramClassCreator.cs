@@ -16,19 +16,19 @@ public sealed class FakeHostConsoleProgramClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "",
+            string.Empty,
             "using Microsoft.AspNetCore.Builder",
-            "",
+            string.Empty,
             "var builder = WebApplication.CreateBuilder(args)",
-            "",
+            string.Empty,
             new OneLineComment("Add services to the container."),
-            "",
+            string.Empty,
             "var app = builder.Build()",
-            "",
+            string.Empty,
             new OneLineComment("Configure the HTTP request pipeline."),
-            "",
+            string.Empty,
             "app.Run()");
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

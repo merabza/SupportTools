@@ -32,11 +32,11 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
         var val = GetValue(record);
 
         if (val == null)
-            return "";
+            return string.Empty;
 
         var gitIgnorePathsCruder = new GitIgnoreFilePathsCruder(_logger, _parametersManager);
 
         var status = gitIgnorePathsCruder.GetStatusFor(val);
-        return $"{val} {(string.IsNullOrWhiteSpace(status) ? "" : $"({status})")}";
+        return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

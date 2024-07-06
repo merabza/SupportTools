@@ -61,24 +61,21 @@ public sealed class ConsoleAppCreatorData
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName,
-            projectName, EDotnetProjectType.Console, "", "Program", [.. projectFolders]);
+            projectName, EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
 
         if (!template.UseDatabase)
             return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, null, null, null, null,
                 template.UseDatabase, template.UseMenu);
 
-        var libProjectRepositoriesProjectData =
-            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-                $"Lib{projectName}Repositories",
-                Array.Empty<string>());
-        var doProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"Do{projectName}", new[] { "Models" });
-        var databaseProjectData = ProjectForCreate.CreateClassLibProject(
-            appCreatorBaseData.SolutionPath,
-            $"{projectName}Db", new[] { "Models" });
-        var dbMigrationProjectData =
-            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"{projectName}DbMigration",
-                new[] { "Migrations" });
+        var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"Lib{projectName}Repositories", []);
+
+        var doProjectData =
+            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"Do{projectName}", ["Models"]);
+        var databaseProjectData =
+            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"{projectName}Db", ["Models"]);
+        var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"{projectName}DbMigration", ["Migrations"]);
 
         return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, libProjectRepositoriesProjectData,
             doProjectData, databaseProjectData, dbMigrationProjectData, template.UseDatabase, template.UseMenu);

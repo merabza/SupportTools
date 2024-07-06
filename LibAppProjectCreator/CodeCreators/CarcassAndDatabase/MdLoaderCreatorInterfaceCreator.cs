@@ -22,13 +22,13 @@ public sealed class MdLoaderCreatorInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using CarcassRepositories.MasterDataLoaders",
             $"using {_projectNamespace}Db",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}MasterDataLoaders",
-            "",
+            string.Empty,
             new CodeBlock($"public interface I{_projectShortName.Capitalize()}MdLoaderCreator",
                 $"ICustomMdLoader Create({_projectNamespace}DbContext ctx)"
             ));

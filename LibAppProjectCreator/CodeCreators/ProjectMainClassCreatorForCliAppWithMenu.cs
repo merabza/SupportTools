@@ -24,16 +24,16 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
     {
         var buildMainMenuBlock = new CodeBlock("protected override bool BuildMainMenu()",
             $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
-            "",
+            string.Empty,
             "var mainMenuSet = new CliMenuSet(\"Main Menu\")",
             "AddChangeMenu(mainMenuSet)",
-            "",
+            string.Empty,
             new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
             $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
             $"mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
-            "",
+            string.Empty,
             new OneLineComment("საჭირო მენიუს ელემენტები"),
-            ""
+            string.Empty
         );
 
         var taskPart = new FlatCodeBlock(
@@ -49,12 +49,12 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             new OneLineComment("გასასვლელი"),
             "var key = ConsoleKey.Escape.Value().ToLower()",
             "mainMenuSet.AddMenuItem(key, \"Exit\", new ExitCliMenuCommand(), key.Length)",
-            "",
+            string.Empty,
             "return true");
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
 
 
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using CliMenu",
             "using CliParameters.CliMenuCommands",
@@ -67,10 +67,11 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             "using System.Linq",
             $"using {_projectNamespace}.MenuCommands",
             $"using {_projectNamespace}.Models",
-            _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), "",
-            _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(), "",
+            _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), string.Empty,
+            _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(),
+            string.Empty,
             $"namespace {_projectNamespace}",
-            "",
+            string.Empty,
             new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock($"public sealed class {_projectNamespace} : CliAppLoop",
                 "private readonly ILogger _logger",
@@ -83,9 +84,9 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
                     ? new CodeCommand(
                         $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric")
                     : new CodeExtraLine(),
-                "",
+                string.Empty,
                 new CodeBlock(
-                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : "")})",
+                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : string.Empty)})",
                     "_logger = logger",
                     "_parametersManager = parametersManager",
                     _useDatabase

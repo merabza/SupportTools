@@ -36,7 +36,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
                 $"FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger, nameof({_projectNamespace}Parameters.DatabaseConnectionParameters), parametersManager))"));
 
 
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using CliParameters",
             "using CliParameters.FieldEditors",
@@ -44,9 +44,9 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
             "using Microsoft.Extensions.Logging",
             $"using {_projectNamespace}.Models",
             propertiesBlock,
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}.Models",
-            "",
+            string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}ParametersEditor : ParametersEditor",
                 new CodeBlock(
                     $"public {_projectNamespace}ParametersEditor(IParameters parameters, ParametersManager parametersManager, ILogger logger) : base(\"{_projectNamespace} Parameters Editor\", parameters, parametersManager)",

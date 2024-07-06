@@ -16,6 +16,7 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
     private readonly JObject _userSecretJsonJObject;
     private readonly bool _useServerCarcass;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseInstallerClassCreator(ILogger logger, string placePath, string projectNamespace,
         JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys, bool useServerCarcass, string? codeFileName = null) :
@@ -30,10 +31,10 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var databaseNameInParameters = _projectNamespace.Replace(".", "") + "Database";
+        var databaseNameInParameters = _projectNamespace.Replace(".", string.Empty) + "Database";
         var connectionStringJsonKey = $"Data:{databaseNameInParameters}:ConnectionString";
 
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System",
             _useServerCarcass ? "using CarcassDb" : null,
@@ -42,23 +43,23 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
             "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection",
             "using WebInstallers",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}Db.Installers",
-            "",
+            string.Empty,
             new OneLineComment(" ReSharper disable once UnusedType.Global"),
             new CodeBlock($"public sealed class {_projectNamespace}DatabaseInstaller : IInstaller",
                 "public int InstallPriority => 30",
                 "public int ServiceUsePriority => 30",
-                "",
+                string.Empty,
                 new CodeBlock("public void InstallServices(WebApplicationBuilder builder, string[] args)",
                     "Console.WriteLine(\"DatabaseInstaller.InstallServices Started\")",
-                    "",
+                    string.Empty,
                     _useServerCarcass
                         ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))"
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
                     "Console.WriteLine(\"DatabaseInstaller.InstallServices Finished\")"),
-                "",
+                string.Empty,
                 new CodeBlock("public void UseServices(WebApplication app)")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

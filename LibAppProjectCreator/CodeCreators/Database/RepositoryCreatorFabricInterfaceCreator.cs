@@ -8,6 +8,7 @@ public sealed class RepositoryCreatorFabricInterfaceCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public RepositoryCreatorFabricInterfaceCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -17,10 +18,10 @@ public sealed class RepositoryCreatorFabricInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             $"namespace Lib{_projectNamespace}Repositories",
-            "",
+            string.Empty,
             new CodeBlock($"public interface I{_projectNamespace}RepositoryCreatorFabric",
                 $"I{_projectNamespace}Repository Get{_projectNamespace}Repository()"
             ));

@@ -10,6 +10,7 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReactAppTypeNameFieldEditor(ILogger logger, string propertyName, IParametersManager parametersManager) :
         base(propertyName)
     {
@@ -33,11 +34,11 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
         var val = GetValue(record);
 
         if (val == null)
-            return "";
+            return string.Empty;
 
         ReactAppTypeCruder reactAppTypeCruder = new(_logger, _parametersManager);
 
         var status = reactAppTypeCruder.GetStatusFor(val);
-        return $"{val} {(string.IsNullOrWhiteSpace(status) ? "" : $"({status})")}";
+        return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

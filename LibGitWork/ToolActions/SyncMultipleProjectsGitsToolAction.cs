@@ -66,7 +66,7 @@ public class SyncMultipleProjectsGitsToolAction : GitToolAction
         while (gitCollectUsage == EGitCollect.Collect || changedGitProjects[EGitCollect.Collect].Count > 0)
         {
             changedGitProjects[EGitCollect.Collect] = [];
-            Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? "" : loopNom)} ===---");
+            Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
             //პროექტების ჩამონათვალი
             foreach (var (projectName, project) in projectsListOrdered)
             {

@@ -8,6 +8,7 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DesignTimeDbContextFactoryClassCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -17,17 +18,17 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "",
+            string.Empty,
             "using System",
             "using System.IO",
             "using Microsoft.EntityFrameworkCore",
             "using Microsoft.EntityFrameworkCore.Design",
             "using Microsoft.Extensions.Configuration",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}Db",
-            "",
+            string.Empty,
             new OneLineComment("ეს არის ზოგადი კლასი მიგრაციასთან სამუშაოდ"),
             new OneLineComment("თუმცა მე გადავაკეთე ისე, რომ კონსტრუქტორი ღებულობს ინფორმაციას:"),
             new OneLineComment(
@@ -41,14 +42,14 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
             new OneLineComment(
                 "ბაზასთან დაკავშირების სტრიქონის გადმოწოდება არასწორია, რადგან მომიწევდა ამ სტრიქონის გამშვები პროექტის კოდში ჩაშენება."),
             new OneLineComment("რაც უსაფრთხოების თვალსაზრისით არასწორია"),
-            "",
+            string.Empty,
             new CodeBlock(
                 "public class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
-                "",
+                string.Empty,
                 "private readonly string _assemblyName",
                 "private readonly string _connectionParamName",
                 "private readonly string? _parametersJsonFileName",
-                "",
+                string.Empty,
                 new CodeBlock(
                     "protected DesignTimeDbContextFactory(string assemblyName, string connectionParamName, string? parametersJsonFileName = null)",
                     "_assemblyName = assemblyName",
@@ -69,7 +70,7 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
                     new OneLineComment(".AddEnvironmentVariables()"),
                     "var connectionString = configuration[_connectionParamName]",
                     "Console.WriteLine($\"DesignTimeDbContextFactory CreateDbContext connectionString = {connectionString}\")",
-                    "",
+                    string.Empty,
                     "var builder = new DbContextOptionsBuilder<T>()",
                     "builder.UseSqlServer(connectionString, b => b.MigrationsAssembly(_assemblyName))",
                     "var dbContext = Activator.CreateInstance(typeof(T), builder.Options, true)",

@@ -41,7 +41,7 @@ public sealed class CheckParametersVersionAction : ToolAction
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var getVersionSuccess = false;
-        var version = "";
+        var version = string.Empty;
         var tryCount = 0;
         while (!getVersionSuccess && tryCount < _maxTryCount)
         {
@@ -74,7 +74,8 @@ public sealed class CheckParametersVersionAction : ToolAction
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
-                    var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
+                    var testApiClient =
+                        new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
                     var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                         errors.AddRange(getAppSettingsVersionResult.AsT1);

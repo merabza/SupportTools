@@ -30,11 +30,11 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
         var val = GetValue(record);
 
         if (val == null)
-            return "";
+            return string.Empty;
 
         var runTimeCruder = new RunTimeCruder(_parametersManager);
 
         var status = runTimeCruder.GetStatusFor(val);
-        return $"{val} {(string.IsNullOrWhiteSpace(status) ? "" : $"({status})")}";
+        return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

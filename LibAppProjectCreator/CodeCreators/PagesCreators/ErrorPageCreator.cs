@@ -5,6 +5,7 @@ namespace LibAppProjectCreator.CodeCreators.PagesCreators;
 
 public sealed class ErrorPageCreator : CodeCreator
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ErrorPageCreator(ILogger logger, string placePath, string? codeFileName = null) : base(logger, placePath,
         codeFileName)
     {

@@ -18,13 +18,13 @@ public sealed class ProjectDesignTimeDbContextFactoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "",
+            string.Empty,
             $"using {_projectNamespace}Db",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}",
-            "",
+            string.Empty,
             new OneLineComment("ეს კლასი საჭიროა იმისათვის, რომ შესაძლებელი გახდეს მიგრაციასთან მუშაობა."),
             new OneLineComment("ანუ დეველოპერ ბაზის წაშლა და ახლიდან დაგენერირება, ან მიგრაციაში ცვლილებების გაკეთება"),
             new OneLineComment(" ReSharper disable once UnusedType.Global"),
@@ -33,7 +33,7 @@ public sealed class ProjectDesignTimeDbContextFactoryClassCreator : CodeCreator
                 new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock(
                     $"public {_projectNamespace}DesignTimeDbContextFactory() : base(\"{_projectNamespace}DbMigration\", \"ConnectionString\", @\"D:\\1WorkSecurity\\{_projectNamespace}\\{_projectNamespace}.json\")",
-                    ""
+                    string.Empty
                 )));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

@@ -8,6 +8,7 @@ public sealed class TopNavRoutesJsCreator
     private readonly string _fileName;
     private readonly string _folderPathForSave;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public TopNavRoutesJsCreator(string folderPathForSave, string fileName)
     {
         _folderPathForSave = folderPathForSave;

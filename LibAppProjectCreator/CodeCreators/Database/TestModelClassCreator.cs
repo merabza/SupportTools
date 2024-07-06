@@ -21,19 +21,19 @@ public sealed class TestModelClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             _useCarcass || _isApi ? null : "using LibParameters",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}Db.Models",
-            "",
+            string.Empty,
             new OneLineComment(
                 "ეს არის სატესტო მოდელი, რომელიც არის უბრალოდ ნიმუშისათვის და შესაძლებელია წაიშალოს საჭირების შემთხვევაში"),
-            "",
+            string.Empty,
             new CodeBlock($"public sealed class TestModel{(_useCarcass || _isApi ? "" : " : ItemData")}",
                 new CodeBlock("public int TestId", true, "get", "set"),
                 new CodeBlock("public string TestName", true, "get", "set"),
-                "",
+                string.Empty,
                 new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock("public TestModel(string testName)",
                     "TestName = testName")

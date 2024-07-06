@@ -47,13 +47,15 @@ public sealed class ScaffoldSeederCreatorData
         //სიდერის კოდის შემქმნელი აპლიკაცია
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName,
-            scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName, EDotnetProjectType.Console, "",
+            scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName, EDotnetProjectType.Console,
+            string.Empty,
             "Program", ["Models", "Properties"]);
 
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName,
-            scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName, EDotnetProjectType.Console, "", "Program",
+            scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName, EDotnetProjectType.Console, string.Empty,
+            "Program",
             ["Models"]);
 
         var projectFolders = new List<string> { "Migrations" };
@@ -73,7 +75,7 @@ public sealed class ScaffoldSeederCreatorData
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
         var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.SeedDbProjectName, scaffoldSeederCreatorParameters.SeedDbProjectName,
-            EDotnetProjectType.Console, "", "Program", []);
+            EDotnetProjectType.Console, string.Empty, "Program", []);
 
         //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
         //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია

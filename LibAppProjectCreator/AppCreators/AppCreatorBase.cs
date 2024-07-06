@@ -214,7 +214,7 @@ public abstract class AppCreatorBase
             {
                 //პროექტების შექმნა
                 if (StShared.RunProcess(true, Logger, "dotnet",
-                        $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? "" : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
+                        $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? string.Empty : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
                     .IsSome)
                     return false;
 
@@ -242,7 +242,7 @@ public abstract class AppCreatorBase
                 //projPath = Path.Combine(SolutionPath, projectForCreate.ProjectName,
                 //    $"{projectForCreate.ProjectName}.csproj");
                 if (StShared.RunProcess(true, Logger, "dotnet",
-                        $"sln {SolutionPath} add {(projectForCreate.SolutionFolderName is null ? "" : $"--solution-folder {projectForCreate.SolutionFolderName} ")}{projectForCreate.ProjectFileFullName}")
+                        $"sln {SolutionPath} add {(projectForCreate.SolutionFolderName is null ? string.Empty : $"--solution-folder {projectForCreate.SolutionFolderName} ")}{projectForCreate.ProjectFileFullName}")
                     .IsSome)
                     return false;
             }
@@ -252,7 +252,7 @@ public abstract class AppCreatorBase
                 var projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName, projectFromGit.ProjectName,
                     $"{projectFromGit.ProjectName}.csproj");
                 if (StShared.RunProcess(true, Logger, "dotnet",
-                        $"sln {SolutionPath} add {(projectFromGit.SolutionFolderName is null ? "" : $"--solution-folder {projectFromGit.SolutionFolderName} ")}{projPath}")
+                        $"sln {SolutionPath} add {(projectFromGit.SolutionFolderName is null ? string.Empty : $"--solution-folder {projectFromGit.SolutionFolderName} ")}{projPath}")
                     .IsSome)
                     return false;
             }
@@ -265,7 +265,7 @@ public abstract class AppCreatorBase
 
         //პაკეტების მიერთება პროექტებში, სიის მიხედვით
         if (!Packages.All(packageData => StShared.RunProcess(true, Logger, "dotnet",
-                    $"add {packageData.ProjectFilePath} package {packageData.PackageName}{(packageData.Version == null ? "" : $" --version {packageData.Version}")}")
+                    $"add {packageData.ProjectFilePath} package {packageData.PackageName}{(packageData.Version == null ? string.Empty : $" --version {packageData.Version}")}")
                 .IsNone))
             return false;
 

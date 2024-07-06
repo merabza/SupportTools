@@ -92,9 +92,9 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
                 secretsFolderPath = parameters.SecretsFolderPathReal;
                 //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "TempReal");
-                projectName = Inputer.InputTextRequired("New project name", "");
+                projectName = Inputer.InputTextRequired("New project name", string.Empty);
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
-                    ? Inputer.InputTextRequired("New project short name", "")
+                    ? Inputer.InputTextRequired("New project short name", string.Empty)
                     : null;
                 break;
             default:
@@ -148,7 +148,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return true;
 
         var projectRecordCreator =
-            new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName, projectShortName, "");
+            new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName, projectShortName,
+                string.Empty);
 
         if (projectRecordCreator.Create())
             return true;

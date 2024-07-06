@@ -18,7 +18,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             //"using CliShared",
             $"using {_projectNamespace}Db",
@@ -27,9 +27,9 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
             "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection",
             "using SystemToolsShared",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}",
-            "",
+            string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}ServicesCreator : ServicesCreator",
                 $"private readonly {_projectNamespace}Parameters _par",
                 new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
@@ -39,7 +39,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                 ),
                 new CodeBlock("protected override void ConfigureServices(IServiceCollection services)",
                     "base.ConfigureServices(services)",
-                    "",
+                    string.Empty,
                     new CodeBlock("if (!string.IsNullOrEmpty(_par.DatabaseConnectionParameters?.ConnectionString))",
                         $"services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(_par.DatabaseConnectionParameters.ConnectionString))"),
                     $"services.AddScoped<I{_projectNamespace}Repository, {_projectNamespace}Repository>()",

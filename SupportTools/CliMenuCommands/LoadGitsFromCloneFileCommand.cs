@@ -68,7 +68,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
 
             var cloneParameters = lineTrimmed[gitCloneCommandStart.Length..].Trim();
 
-            var pars = cloneParameters.Split(' ').Select(x => x.Trim()).Where(x => x != "").ToArray();
+            var pars = cloneParameters.Split(' ').Select(x => x.Trim()).Where(x => x != string.Empty).ToArray();
 
             if (pars.Length != 2)
                 continue;

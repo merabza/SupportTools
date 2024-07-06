@@ -20,7 +20,7 @@
 //        TextBuilder.AppendLine(
 //            $"dotnet ef database drop --force --context {_projectNamespace}DbContext --startup-project {_projectNamespace}\\{_projectNamespace}.csproj --project {_projectNamespace}DbMigration\\{_projectNamespace}DbMigration.csproj");
 //        TextBuilder.AppendLine("rem Remove-Item $migrationCsFiles");
-//        TextBuilder.AppendLine("");
+//        TextBuilder.AppendLine(string.Empty);
 //        TextBuilder.AppendLine("pause");
 //        FinishAndSave();
 //    }

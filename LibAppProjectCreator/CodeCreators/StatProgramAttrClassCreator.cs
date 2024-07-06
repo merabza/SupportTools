@@ -21,12 +21,12 @@
 
 //    public override void CreateFileStructure()
 //    {
-//        var block = new CodeBlock("",
+//        var block = new CodeBlock(string.Empty,
 //            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
 //            "using SystemToolsShared",
-//            "",
+//            string.Empty,
 //            $"namespace {_projectNamespace}",
-//            "",
+//            string.Empty,
 //            new CodeBlock("public sealed class StatProgramAttr",
 //                new CodeBlock("public static void SetAttr()",
 //                    $"ProgramAttributes.Instance.SetAttribute(\"AppName\", \"{string.Join(" ", _projectNamespace.SplitUpperCase())}\")",

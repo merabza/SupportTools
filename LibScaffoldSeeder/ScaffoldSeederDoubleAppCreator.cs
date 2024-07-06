@@ -55,7 +55,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     private ScaffoldSeederSolutionCreator? CreateAppCreator(bool forMain)
     {
         //შეიქმნას პროექტის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
-        var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, "",
+        var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, string.Empty,
             ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
             forMain ? _projectWorkFolderPath : _projectTempFolderPath,
             SolutionSecurityFolderPath, IndentSize);

@@ -20,13 +20,13 @@ public sealed class ProjectForCreate : ProjectBase
     public EDotnetProjectType DotnetProjectType { get; }
     public string ProjectCreateParameters { get; }
     public string? ClassForDelete { get; }
-    public Dictionary<string, string> FoldersForCreate { get; } = new();
+    public Dictionary<string, string> FoldersForCreate { get; } = [];
 
 
     public static ProjectForCreate CreateClassLibProject(string createInPath, string projectName,
         string[] availableFolders, string? solutionFolderName = null)
     {
-        return Create(createInPath, projectName, projectName, EDotnetProjectType.ClassLib, "", "Class1",
+        return Create(createInPath, projectName, projectName, EDotnetProjectType.ClassLib, string.Empty, "Class1",
             availableFolders, false, solutionFolderName);
     }
 

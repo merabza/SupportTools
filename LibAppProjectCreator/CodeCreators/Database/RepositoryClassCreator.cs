@@ -8,6 +8,7 @@ public sealed class RepositoryClassCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public RepositoryClassCreator(ILogger logger, string placePath, string projectNamespace,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
@@ -17,24 +18,19 @@ public sealed class RepositoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System",
-            //"using System.Collections.Generic",
-            //"using System.Linq",
-            //"using System.Net",
             $"using {_projectNamespace}Db",
-            //$"using {_projectNamespace}Db.Models",
-            //"using Microsoft.EntityFrameworkCore",
             "using Microsoft.EntityFrameworkCore.Storage",
             "using Microsoft.Extensions.Logging",
-            "",
+            string.Empty,
             $"namespace Lib{_projectNamespace}Repositories",
-            "",
+            string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}Repository : I{_projectNamespace}Repository",
                 $"private readonly {_projectNamespace}DbContext _context",
                 $"private readonly ILogger<{_projectNamespace}Repository> _logger",
-                "",
+                string.Empty,
                 new CodeBlock(
                     $"public {_projectNamespace}Repository({_projectNamespace}DbContext ctx, ILogger<{_projectNamespace}Repository> logger)",
                     "_context = ctx",
@@ -49,7 +45,7 @@ public sealed class RepositoryClassCreator : CodeCreator
                         "throw"
                     )
                 ),
-                "",
+                string.Empty,
                 new CodeBlock("public int SaveChangesWithTransaction()",
                     new CodeBlock("try",
                         "using IDbContextTransaction transaction = GetTransaction()",

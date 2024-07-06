@@ -21,7 +21,7 @@
 
 //    public override void CreateFileStructure()
 //    {
-//        var block = new CodeBlock("",
+//        var block = new CodeBlock(string.Empty,
 //            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
 //            "using System",
 //            "using System.Text",
@@ -33,23 +33,23 @@
 //            "using Microsoft.Extensions.DependencyInjection",
 //            "using Microsoft.IdentityModel.Tokens",
 //            _useServerCarcass ? "using ServerCarcass.Models" : $"using {_projectNamespace}.Models",
-//            "",
+//            string.Empty,
 //            $"namespace {_projectNamespace}.Installers",
-//            "",
+//            string.Empty,
 //            new OneLineComment(" ReSharper disable once UnusedType.Global"),
 //            new CodeBlock("public sealed class IdentityInstaller : IInstaller, IAppMiddlewareInstaller",
 //                "public int InstallPriority => 30",
 //                "public int MiddlewarePriority => 30",
 //                new CodeBlock("public void InstallServices(WebApplicationBuilder builder, string[] args)",
 //                    "Console.WriteLine(\"identityInstaller.InstallServices Started\")",
-//                    "",
+//                    string.Empty,
 //                    _useServerCarcass
 //                        ? new FlatCodeBlock("builder.Services.AddScoped<IUserStore<AppUser>, MyUserStore>()",
 //                            "builder.Services.AddScoped<IUserPasswordStore<AppUser>, MyUserStore>()",
 //                            "builder.Services.AddScoped<IUserEmailStore<AppUser>, MyUserStore>()",
 //                            "builder.Services.AddScoped<IUserRoleStore<AppUser>, MyUserStore>()",
 //                            "builder.Services.AddScoped<IRoleStore<AppRole>, MyUserStore>()",
-//                            "",
+//                            string.Empty,
 //                            @"builder.Services.AddIdentity<AppUser, AppRole>(options =>
 //        { 
 //            options.Password.RequiredLength = 3;
@@ -58,12 +58,12 @@
 //            options.Password.RequireUppercase = false;
 //            options.Password.RequireDigit = false;
 //        }).AddDefaultTokenProviders()",
-//                            "")
+//                            string.Empty)
 //                        : null,
 //                    new OneLineComment(" configure strongly typed settings objects"),
 //                    "var appSettingsSection = builder.Configuration.GetSection(\"AppSettings\")",
 //                    "builder.Services.Configure<AppSettings>(appSettingsSection)",
-//                    "",
+//                    string.Empty,
 //                    new OneLineComment(" configure jwt authentication"),
 //                    "var appSettings = appSettingsSection.Get<AppSettings>()",
 //                    "string? jwtSecret = appSettings.JwtSecret",
@@ -85,9 +85,9 @@
 //                ValidateIssuer = false, ValidateAudience = false
 //            };
 //        })",
-//                    "",
+//                    string.Empty,
 //                    "Console.WriteLine(\"identityInstaller.InstallServices Finished\")"),
-//                "",
+//                string.Empty,
 //                new CodeBlock("public void UseMiddleware(WebApplication app)",
 //                    "app.UseAuthentication()",
 //                    "app.UseAuthorization()")));

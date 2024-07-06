@@ -126,7 +126,7 @@ public sealed class CreateReactClientApp
         //  return false;
         //}
         //if (!RunNodeProcess(
-        //        $"npx create-react-app {_projectName.ToLower()}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? "" : $" --template {_reactTemplateName}")}",
+        //        $"npx create-react-app {_projectName.ToLower()}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? string.Empty : $" --template {_reactTemplateName}")}",
         //        _tempFolderPath))
         //{
         //    StShared.WriteErrorLine("Error When creating react app", true, _logger);

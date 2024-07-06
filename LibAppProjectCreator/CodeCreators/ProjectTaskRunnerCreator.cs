@@ -20,21 +20,21 @@ public sealed class ProjectTaskRunnerCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock("",
+        var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System",
-            $"using {(_useDatabase ? "Do" : "")}{_projectNamespace}.Models",
+            $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using Microsoft.Extensions.Logging",
             "using SystemToolsShared",
-            "",
+            string.Empty,
             $"namespace {_projectNamespace}",
-            "",
+            string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}TaskRunner",
                 "private readonly ILogger _logger",
                 $"private readonly {_projectNamespace}Parameters _par",
                 "private readonly string? _taskName",
                 "private readonly TaskModel? _task",
-                "",
+                string.Empty,
                 new CodeBlock(
                     $"public {_projectNamespace}TaskRunner(ILogger logger, {_projectNamespace}Parameters par, string taskName, TaskModel task)",
                     "_logger = logger",
@@ -49,7 +49,7 @@ public sealed class ProjectTaskRunnerCreator : CodeCreator
                     "_task = null"),
                 new CodeBlock("public void Run()",
                     new CodeBlock("try",
-                        ""),
+                        string.Empty),
                     new CodeBlock("catch (Exception e)",
                         "StShared.WriteException(e, true)",
                         "throw"))

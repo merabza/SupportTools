@@ -30,11 +30,11 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
         var val = GetValue(record);
 
         if (val == null)
-            return "";
+            return string.Empty;
 
         var environmentCruder = new EnvironmentCruder(_parametersManager);
 
         var status = environmentCruder.GetStatusFor(val);
-        return $"{val} {(string.IsNullOrWhiteSpace(status) ? "" : $"({status})")}";
+        return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

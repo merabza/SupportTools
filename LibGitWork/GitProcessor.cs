@@ -139,7 +139,7 @@ fi*/
         if (gitStatusOutputResult.IsT1)
             return gitStatusOutputResult.AsT1;
         var gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
-        return gitStatusOutput != "";
+        return gitStatusOutput != string.Empty;
     }
 
     public bool Add()
