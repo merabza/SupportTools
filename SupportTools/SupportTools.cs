@@ -8,6 +8,7 @@ using CliTools.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
+using LibTools.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
@@ -65,6 +66,10 @@ public sealed class SupportTools : CliAppLoop
         //ყველა პროექტის git-ის სინქრონიზაცია
         var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGits);
+
+        //ყველა პროექტის bin obj და სხვა ზედმეტი ფაილებისა და ფოლდერებისგან გასუფთავება
+        var clearAllProjectsCliMenuCommand = new ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(_logger, _parametersManager);
+        mainMenuSet.AddMenuItem(clearAllProjectsCliMenuCommand);
 
         //პროექტების ჯგუფების ჩამონათვალი
         foreach (var projectGroupName in parameters.Projects

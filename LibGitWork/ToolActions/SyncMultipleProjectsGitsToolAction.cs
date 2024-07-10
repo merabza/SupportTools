@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
+using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 
 namespace LibGitWork.ToolActions;
 
-public class SyncMultipleProjectsGitsToolAction : GitToolAction
+public class SyncMultipleProjectsGitsToolAction : ToolAction
 {
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
