@@ -1,55 +1,79 @@
-﻿//using LibGitData;
-//using LibGitData.Models;
-//using LibParameters;
-//using Microsoft.Extensions.Logging;
-//using SupportToolsData.Models;
-//using System.Linq;
-//using SystemToolsShared;
+﻿using System.Collections.Generic;
+using System.Linq;
+using LibGitData;
+using LibGitData.Domain;
+using LibGitData.Models;
+using LibGitWork;
+using LibParameters;
+using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
+using SystemToolsShared;
 
-//namespace LibTools.ToolCommandParameters;
+namespace LibTools.ToolCommandParameters;
 
-//public class ClearOneSolutionAllProjectsParameters : IParameters
-//{
-//    // ReSharper disable once ConvertToPrimaryConstructor
-//    public ClearOneSolutionAllProjectsParameters(string? projectName)
-//    {
-//        ProjectName = projectName;
-//    }
+public class ClearOneProjectAllGitsParameters : IParameters
+{
+    // ReSharper disable once ConvertToPrimaryConstructor
+    private ClearOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData)
+    {
+        ProjectName = projectName;
+        GitData = gitData;
+        GitsFolder = gitsFolder;
+    }
 
-//    public string? ProjectName { get; }
+    public string? ProjectName { get; }
+    public List<GitDataDomain> GitData { get; }
+    public string GitsFolder { get; }
 
-//    public bool CheckBeforeSave()
-//    {
-//        return true;
-//    }
+    public bool CheckBeforeSave()
+    {
+        return true;
+    }
 
 
-//    public static ClearOneSolutionAllProjectsParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol, bool useConsole)
-//    {
-//        var project = supportToolsParameters.GetProject(projectName);
+    public static ClearOneProjectAllGitsParameters? Create(ILogger? logger,
+        SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol)
+    {
+        var project = supportToolsParameters.GetProject(projectName);
 
-//        if (project == null)
-//        {
-//            StShared.WriteErrorLine("project is not found", true);
-//            return null;
-//        }
+        if (project == null)
+        {
+            StShared.WriteErrorLine("project is not found", true);
+            return null;
+        }
 
-//        var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
 
-//        if (gitsFolder == null)
-//        {
-//            StShared.WriteErrorLine("Gits folder is not found", true);
-//            return null;
-//        }
+        if (gitsFolder == null)
+        {
+            StShared.WriteErrorLine("Gits folder is not found", true);
+            return null;
+        }
 
-//        var gitProjectNames = gitCol switch
-//        {
-//            EGitCol.Main => project.GitProjectNames,
-//            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-//            _ => null
-//        } ?? [];
+        var gitProjectNames = gitCol switch
+        {
+            EGitCol.Main => project.GitProjectNames,
+            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+            _ => null
+        } ?? [];
 
-//        return new ClearOneSolutionAllProjectsParameters(projectName, gitsFolder);
-//    }
-//}
+        var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
+            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
+            true);
+
+        var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
+
+
+        if (absentGitRepoNames.Count != 0)
+        {
+            foreach (var absentGitRepoName in absentGitRepoNames)
+                StShared.WriteErrorLine(absentGitRepoName, true, null, false);
+            StShared.WriteErrorLine("Gits with this names are absent", true);
+        }
+
+        return new ClearOneProjectAllGitsParameters(projectName, gitsFolder,
+            gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList());
+    }
+}
