@@ -16,11 +16,10 @@ namespace LibTools.ToolActions;
 
 public class ClearMultipleProjectsToolAction : ToolAction
 {
-    private readonly ILogger? _logger;
-
     //private readonly ParametersManager _parametersManager;
     private readonly ClearAllProjectsParameters _clearAllProjectsParameters;
     private readonly string? _excludeFolder;
+    private readonly ILogger? _logger;
 
     private ClearMultipleProjectsToolAction(ILogger logger, ClearAllProjectsParameters clearAllProjectsParameters,
         string? excludeFolder, bool useConsole) : base(logger, "Clear Multiple Projects", null, null, useConsole)
@@ -109,15 +108,12 @@ public class ClearMultipleProjectsToolAction : ToolAction
 
         if (gitCol == EGitCol.Main)
             ProcessFolder(project.ProjectFolderName);
-        
-        //todo EGitCol.ScaffoldSeed
 
+        //todo EGitCol.ScaffoldSeed
     }
 
     private static bool AreFolderNamesEqual(string folderPath1, string folderPath2)
     {
-
-
         var normalizedPath1 = Path.GetFullPath(folderPath1).TrimEnd(Path.DirectorySeparatorChar);
         var normalizedPath2 = Path.GetFullPath(folderPath2).TrimEnd(Path.DirectorySeparatorChar);
 
@@ -186,7 +182,6 @@ public class ClearMultipleProjectsToolAction : ToolAction
             Directory.Delete(folderPath, true);
 
         return true;
-
     }
 
     private static bool MustBeDeleted(string folderPath)

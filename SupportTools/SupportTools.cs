@@ -68,7 +68,8 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
         //ყველა პროექტის bin obj და სხვა ზედმეტი ფაილებისა და ფოლდერებისგან გასუფთავება
-        var clearAllProjectsCliMenuCommand = new ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(_logger, _parametersManager);
+        var clearAllProjectsCliMenuCommand =
+            new ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(clearAllProjectsCliMenuCommand);
 
         //პროექტების ჯგუფების ჩამონათვალი

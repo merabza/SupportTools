@@ -20,7 +20,8 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(logger, ActionName,
+    public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(
+        logger, ActionName,
         null, null, useConsole)
     {
         _parametersManager = parametersManager;

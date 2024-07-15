@@ -1,7 +1,7 @@
-﻿using LibAppProjectCreator.Models;
-using SupportToolsData;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using LibAppProjectCreator.Models;
+using SupportToolsData;
 
 namespace LibScaffoldSeeder.Models;
 

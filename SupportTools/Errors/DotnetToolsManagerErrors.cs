@@ -17,6 +17,4 @@ public static class DotnetToolsManagerErrors
     {
         ErrorCode = nameof(GetAvailableVersionOfToolError), ErrorMessage = "Error when detect Available Version Of Tool"
     };
-
-
 }

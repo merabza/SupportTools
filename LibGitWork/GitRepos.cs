@@ -25,19 +25,22 @@ public sealed class GitRepos
         {
             if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
             {
-                StShared.WriteErrorLine($"GitProjectAddress is empty for Git Repo with key {gitProjectName})", useConsole, logger);
+                StShared.WriteErrorLine($"GitProjectAddress is empty for Git Repo with key {gitProjectName})",
+                    useConsole, logger);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(gitData.GitProjectFolderName))
             {
-                StShared.WriteErrorLine($"GitProjectFolderName is empty for Git Repo with key {gitProjectName})", useConsole, logger);
+                StShared.WriteErrorLine($"GitProjectFolderName is empty for Git Repo with key {gitProjectName})",
+                    useConsole, logger);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(gitData.GitIgnorePathName))
             {
-                StShared.WriteErrorLine($"GitIgnorePathName is empty for Git Repo with key {gitProjectName})", useConsole, logger);
+                StShared.WriteErrorLine($"GitIgnorePathName is empty for Git Repo with key {gitProjectName})",
+                    useConsole, logger);
                 continue;
             }
 

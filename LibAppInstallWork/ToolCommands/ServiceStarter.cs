@@ -1,13 +1,13 @@
 //Created by ProjectMainClassCreator at 5/10/2021 16:03:33
 
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

@@ -34,7 +34,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters, projectName,
+        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters,
+            projectName,
             gitCol, changedGitProjects, isFirstSync, useConsole);
 
         if (gitSyncAllParameters is not null)
