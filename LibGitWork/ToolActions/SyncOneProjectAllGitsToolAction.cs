@@ -34,12 +34,12 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncAllParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters,
+        var syncOneProjectAllGitsParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters,
             projectName,
             gitCol, changedGitProjects, isFirstSync, useConsole);
 
-        if (gitSyncAllParameters is not null)
-            return new SyncOneProjectAllGitsToolAction(loggerOrNull, gitSyncAllParameters);
+        if (syncOneProjectAllGitsParameters is not null)
+            return new SyncOneProjectAllGitsToolAction(loggerOrNull, syncOneProjectAllGitsParameters);
 
         StShared.WriteErrorLine("SyncOneProjectAllGitsParameters is not created", true);
         return null;
