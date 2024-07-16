@@ -121,7 +121,7 @@ public sealed class GitCruder : ParCruder
 
         foreach (var itemSubMenuCommand in projects
                      .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(recordKey))
-                     .Select(projectKvp => new InfoCliMenuCommand(projectKvp.Key, "/Main Menu/")))
+                     .Select(projectKvp => new InfoCliMenuCommand(projectKvp.Key, "/Main Menu/")).OrderBy(x => x.Name))
             itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
     }
 
