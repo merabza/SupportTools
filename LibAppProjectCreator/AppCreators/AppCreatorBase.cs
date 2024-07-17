@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CodeTools;
 using LibAppProjectCreator.Models;
-using LibAppProjectCreator.ProjectFileXmlModifiers;
 using LibDataInput;
 using LibGitData.Domain;
 using LibGitData.Models;
@@ -221,13 +220,6 @@ public abstract class AppCreatorBase
                 var projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
 
                 AddProjectParametersWithCheck(projectXml, "PropertyGroup", "ImplicitUsings", "disable");
-
-                if (projectForCreate.UseReact)
-                {
-                    var projectFileXmlModifierForReact = new ProjectFileXmlModifierForReact(projectXml);
-                    if (!projectFileXmlModifierForReact.Run())
-                        return false;
-                }
 
                 projectXml.Save(projectForCreate.ProjectFileFullName);
 

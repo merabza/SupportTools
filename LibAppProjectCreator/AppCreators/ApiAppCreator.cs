@@ -81,6 +81,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseBackgroundTasks)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackgroundTasksTools);
 
+        if (_apiAppCreatorData.UseSignalR)
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
+
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
@@ -99,6 +102,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassRepositories);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcassMini);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassApi);
         }
 
         if (!_apiAppCreatorData.UseDatabase)
@@ -154,7 +158,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
             ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
             _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseBackgroundTasks,
-            "Program.cs");
+            _apiAppCreatorData.UseSignalR, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         ////შეიქმნას აპლიკაციის მთავარი პარამეტრების შემნახველი კლასი StatProgramAttr.cs
@@ -356,12 +360,6 @@ public sealed class ApiAppCreator : AppCreatorBase
             masterDataRepositoryClassFileName);
         projectMasterDataRepositoryClassCreator.CreateFileStructure();
 
-        Console.WriteLine("Creating TestQuery.cs...");
-        var testQueryClassCreator = new TestQueryClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName,
-            "TestQuery.cs");
-        testQueryClassCreator.CreateFileStructure();
-
         var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName.Capitalize()}MdLoaderCreator.cs";
         Console.WriteLine($"Creating {mdLoaderCreatorInterfaceFileName}...");
         var mdLoaderCreatorInterfaceCreator = new MdLoaderCreatorInterfaceCreator(Logger,
@@ -394,6 +392,21 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseDatabase(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
+
+
+        var assemblyReferenceClassFileName = "AssemblyReference.cs";
+        Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
+        var projectMasterDataRepositoryClassCreator = new AssemblyReferenceClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",
+            assemblyReferenceClassFileName);
+        projectMasterDataRepositoryClassCreator.CreateFileStructure();
+
+        Console.WriteLine("Creating TestQuery.cs...");
+        var testQueryClassCreator = new TestQueryClassCreator(Logger,
+            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName,
+            "TestQuery.cs");
+        testQueryClassCreator.CreateFileStructure();
+
+
         var databaseProjectInstallersPath = _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Installers"];
 
         Console.WriteLine("Creating DatabaseInstaller.cs...");

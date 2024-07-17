@@ -11,7 +11,7 @@ public sealed class ApiAppCreatorData
 {
     private ApiAppCreatorData(string? dbPartPath, string reactClientPath,
         AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
-        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
+        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks, bool useSignalR,
         string? reactTemplateName, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
         ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate masterDataLoadersProjectData)
     {
@@ -25,6 +25,7 @@ public sealed class ApiAppCreatorData
         UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
         UseIdentity = useIdentity;
         UseBackgroundTasks = useBackgroundTasks;
+        UseSignalR = useSignalR;
         ReactTemplateName = reactTemplateName;
         DatabaseProjectData = databaseProjectData;
         DbMigrationProjectData = dbMigrationProjectData;
@@ -38,6 +39,7 @@ public sealed class ApiAppCreatorData
     public bool UseDbPartFolderForDatabaseProjects { get; }
     public bool UseIdentity { get; set; }
     public bool UseBackgroundTasks { get; set; }
+    public bool UseSignalR { get; set; }
     public string? ReactTemplateName { get; }
     public string ReactClientPath { get; }
     public string? DbPartPath { get; }
@@ -173,10 +175,10 @@ public sealed class ApiAppCreatorData
         var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{projectName}MasterDataLoaders", ["Installers"]);
 
-        return new ApiAppCreatorData(dbPartPath, reactClientPath,
-            appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass, template.UseDatabase,
-            template.UseDbPartFolderForDatabaseProjects, template.UseIdentity, template.UseBackgroundTasks,
-            template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
+        return new ApiAppCreatorData(dbPartPath, reactClientPath, appCreatorBaseData, mainProjectData,
+            template.UseReact, template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
+            template.UseIdentity, template.UseBackgroundTasks, template.UseSignalR, template.ReactTemplateName,
+            databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
             masterDataLoadersProjectData);
     }
 }

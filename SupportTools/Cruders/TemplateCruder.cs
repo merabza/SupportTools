@@ -30,6 +30,7 @@ public sealed class TemplateCruder : ParCruder
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseCarcass), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseIdentity), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseBackgroundTasks), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseSignalR), false));
         FieldEditors.Add(new ReactAppTypeNameFieldEditor(logger, nameof(TemplateModel.ReactTemplateName),
             parametersManager));
     }
@@ -94,6 +95,7 @@ public sealed class TemplateCruder : ParCruder
                 EnableFieldByName(nameof(TemplateModel.UseCarcass), false);
                 EnableFieldByName(nameof(TemplateModel.UseIdentity), false);
                 EnableFieldByName(nameof(TemplateModel.UseBackgroundTasks), false);
+                EnableFieldByName(nameof(TemplateModel.UseSignalR), false);
                 break;
             case ESupportProjectType.Api:
                 EnableFieldByName(nameof(TemplateModel.UseMenu), false);
@@ -102,6 +104,7 @@ public sealed class TemplateCruder : ParCruder
                 EnableFieldByName(nameof(TemplateModel.UseCarcass));
                 EnableFieldByName(nameof(TemplateModel.UseIdentity));
                 EnableFieldByName(nameof(TemplateModel.UseBackgroundTasks));
+                EnableFieldByName(nameof(TemplateModel.UseSignalR));
                 break;
             case ESupportProjectType.ScaffoldSeeder:
                 break;

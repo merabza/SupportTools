@@ -37,8 +37,10 @@ public sealed class GitProjects
     public GitProjectDataDomain WindowsServiceTools => GetGitProjectByKey(nameof(WindowsServiceTools));
     public GitProjectDataDomain ReactTools => GetGitProjectByKey(nameof(ReactTools));
     public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
+    public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
     public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));
-
+    public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey(nameof(BackendCarcassApi));
+    
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
         Dictionary<string, GitProjectDataDomain> gitProjects = [];

@@ -10,6 +10,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly string _appKey;
     private readonly string _projectNamespace;
     private readonly bool _useBackgroundTasks;
+    private readonly bool _useSignalR;
     private readonly bool _useCarcass;
     private readonly bool _useDatabase;
     private readonly bool _useIdentity;
@@ -17,9 +18,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks,
-        string? codeFileName = null) : base(logger, placePath,
-        codeFileName)
+        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks, bool useSignalR,
+        string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appKey = appKey;
@@ -28,6 +28,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
         _useCarcass = useCarcass;
         _useIdentity = useIdentity;
         _useBackgroundTasks = useBackgroundTasks;
+        _useSignalR = useSignalR;
     }
 
 
@@ -35,45 +36,98 @@ public sealed class ApiProgramClassCreator : CodeCreator
     {
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using System",
-            new OneLineComment("using System.IO"),
             "using ConfigurationEncrypt",
+            "using FluentValidationInstaller",
             "using Microsoft.AspNetCore.Builder",
+            "using Microsoft.Extensions.DependencyInjection",
             "using Serilog",
-            "using SerilogLogger",
+            _useSignalR ? "using SignalRMessages.Installers" : null,
             "using SwaggerTools",
-            "using SystemToolsShared",
+            "using System",
+            "using System.Collections.Generic",
             "using WebInstallers",
-            "using TestToolsApi.Endpoints.V1",
-            "using WindowsServiceTools",
-            _useDatabase ? $"using {_projectNamespace}Db.Installers" : null,
-            _useReact ? "using ReactTools" : null,
-            _useCarcass ? "using CarcassRepositories.Installers" : null,
-            _useCarcass ? $"using {_projectNamespace}MasterDataLoaders.Installers" : null,
-            _useIdentity && _useCarcass ? "using CarcassIdentity.Installers" : null,
-            _useBackgroundTasks ? "using BackgroundTasksTools" : null,
-            _useCarcass ? "using ServerCarcassMini.Endpoints.V1" : null,
+
+            //"using SerilogLogger",
+            //"using SystemToolsShared",
+            //"using TestToolsApi.Endpoints.V1",
+            //"using WindowsServiceTools",
+            //_useDatabase ? $"using {_projectNamespace}Db.Installers" : null,
+            //_useReact ? "using ReactTools" : null,
+            //_useCarcass ? "using CarcassRepositories.Installers" : null,
+            //_useCarcass ? $"using {_projectNamespace}MasterDataLoaders.Installers" : null,
+            //_useIdentity && _useCarcass ? "using CarcassIdentity.Installers" : null,
+            //_useBackgroundTasks ? "using BackgroundTasksTools" : null,
+            //_useCarcass ? "using ServerCarcassMini.Endpoints.V1" : null,
             //$"using {_projectNamespace}",
             //$"using {_projectNamespace}.Installers",
             string.Empty,
             new CodeBlock("try",
-                new OneLineComment("პროგრამის ატრიბუტების დაყენება "),
-                $"ProgramAttributes.Instance.SetAttribute(\"AppName\", \"{string.Join(" ", _projectNamespace.SplitUpperCase())}\")",
-                $"ProgramAttributes.Instance.SetAttribute(\"AppKey\", \"{_appKey}\")",
-                "ProgramAttributes.Instance.SetAttribute(\"VersionCount\", 1)",
-                $"ProgramAttributes.Instance.SetAttribute(\"UseSwaggerWithJWTBearer\", {_useIdentity.ToString().ToLower()})",
+                $$"""
+                   var parameters = new Dictionary<string, string>
+                   {
+                       {{(_useSignalR?"{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey":"")}}
+                       { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
+                       { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
+                       { SwaggerInstaller.VersionCountKey, 1.ToString() },
+                       { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
+                   }
+                   """,
                 string.Empty,
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
                 string.Empty,
-                $"builder.InstallServices(args, typeof(TestEndpoints), typeof(ConfigurationEncryptInstaller), typeof(SerilogLoggerInstaller), typeof(UseWindowsServiceInstaller), typeof(SwaggerInstaller){(_useDatabase ? $", typeof({_projectNamespace}DatabaseInstaller)" : string.Empty)}{(_useReact ? ", typeof(ReactInstaller)" : string.Empty)}{(_useCarcass ? ", typeof(CarcassRepositoriesInstaller)" : string.Empty)}{(_useDatabase && _useCarcass ? ", typeof(RepositoriesInstaller)" : string.Empty)}{(_useCarcass && _useIdentity ? ", typeof(CarcassIdentityInstaller)" : string.Empty)}{(_useBackgroundTasks ? ", typeof(BackgroundTasksQueueInstaller)" : string.Empty)}{(_useCarcass ? ", typeof(DataTypesEndpoints)" : string.Empty)})",
+                $"""
+                 builder.InstallServices(args, parameters, 
+
+                 //BackendCarcass
+                 CarcassRepositories.AssemblyReference.Assembly,
+                 BackendCarcassApi.AssemblyReference.Assembly,
+                 CarcassDom.AssemblyReference.Assembly,
+
+                 //{_projectNamespace}DbPart
+                 {_projectNamespace}Db.AssemblyReference.Assembly,
+
+                 //WebSystemTools
+                 ApiExceptionHandler.AssemblyReference.Assembly,
+                 BackgroundTasksTools.AssemblyReference.Assembly,
+                 ConfigurationEncrypt.AssemblyReference.Assembly,
+                 CorsTools.AssemblyReference.Assembly,
+                 ReCounterServiceInstaller.AssemblyReference.Assembly,
+                 SerilogLogger.AssemblyReference.Assembly,
+                 StaticFilesTools.AssemblyReference.Assembly,
+                 SwaggerTools.AssemblyReference.Assembly,
+                 TestToolsApi.AssemblyReference.Assembly,
+                 WindowsServiceTools.AssemblyReference.Assembly,
+
+                 //{_projectNamespace}
+                 {_projectNamespace}Repositories.AssemblyReference.Assembly,
+                 {_projectNamespace}.AssemblyReference.Assembly
+                 )
+                 """,
                 string.Empty,
-                "var app = builder.Build()",
+                $$$"""
+                   builder.Services.AddMediatR(cfg =>
+                   {{
+                       //BackendCarcass
+                       cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);
+                       //{{{_projectNamespace}}}
+                   }})
+                   """,
+                string.Empty,
+                new OneLineComment("FluentValidationInstaller"),
+                string.Empty,
+                $"""
+                 builder.Services.InstallValidation(
+                 //BackendCarcass
+                 BackendCarcassApi.AssemblyReference.Assembly,
+                 //{_projectNamespace}
+                  )
+                 """,
+                string.Empty,
+                new OneLineComment("ReSharper disable once using"),
+                string.Empty,
+                "using var app = builder.Build()",
                 string.Empty,
                 "app.UseServices()",
-                string.Empty,
-                new OneLineComment(
-                    "Log.Information(\"Directory.GetCurrentDirectory() = {0}\", Directory.GetCurrentDirectory())"),
-                new OneLineComment("Log.Information(\"AppContext.BaseDirectory = {0}\", AppContext.BaseDirectory)"),
                 string.Empty,
                 "app.Run()",
                 "return 0"),
