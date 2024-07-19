@@ -93,6 +93,13 @@ public sealed class GitClearToolAction : ToolAction
             return true;
 
         var dir = new DirectoryInfo(folderPath);
+        var subDirs = dir.GetDirectories().OrderBy(x=>x.Name).ToArray();
+        var subFiles = dir.GetFiles();
+        if ( subDirs is [{ Name: "bin" }, { Name: "obj" }] && subFiles.Length == 0 && MustBeDeleted(folderPath) )
+        {
+            Directory.Delete(folderPath, true);
+            return true;
+        }
         //if (_excludeFolder is not null)
         //{
         //    var excludeFolder = new DirectoryInfo(_excludeFolder);
@@ -160,7 +167,10 @@ public sealed class GitClearToolAction : ToolAction
 
     private static bool MustBeDeleted(string folderPath)
     {
-        if (Directory.GetFiles(folderPath, "*.cs").Length != 0)
+        if (Directory.GetFiles(folderPath, "*.cs").Length != 0 && Directory.GetFiles(folderPath, "*.cs").Length !=
+            Directory.GetFiles(folderPath, "*.AssemblyInfo.cs").Length +
+            Directory.GetFiles(folderPath, "*.AssemblyAttributes.cs").Length +
+            Directory.GetFiles(folderPath, "*.GlobalUsings.g.cs").Length)
             return false;
 
         if (Directory.GetDirectories(folderPath, ".git").Length != 0)
