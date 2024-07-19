@@ -97,7 +97,7 @@ public class ClearMultipleProjectsToolAction : ToolAction
 
     private void ClearOneSolution(string projectName, ProjectModel project, EGitCol gitCol)
     {
-        if (!GitStat.CheckGitProject(projectName, project, gitCol))
+        if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
             return;
 
         var clearOneProjectAllGitsToolAction =
