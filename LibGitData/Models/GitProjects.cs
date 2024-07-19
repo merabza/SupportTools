@@ -28,6 +28,7 @@ public sealed class GitProjects
     public GitProjectDataDomain DbTools => GetGitProjectByKey(nameof(DbTools));
     public GitProjectDataDomain DbContextAnalyzer => GetGitProjectByKey(nameof(DbContextAnalyzer));
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
+    public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
     public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
     public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
@@ -38,9 +39,10 @@ public sealed class GitProjects
     public GitProjectDataDomain ReactTools => GetGitProjectByKey(nameof(ReactTools));
     public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
     public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
+    public GitProjectDataDomain FluentValidationInstaller => GetGitProjectByKey(nameof(FluentValidationInstaller));
     public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey(nameof(BackendCarcassApi));
-    
+
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
         Dictionary<string, GitProjectDataDomain> gitProjects = [];

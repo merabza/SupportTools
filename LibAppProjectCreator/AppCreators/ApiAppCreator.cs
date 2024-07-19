@@ -84,10 +84,13 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseSignalR)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
 
+        if (_apiAppCreatorData.UseFluentValidation)
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.FluentValidationInstaller);
+
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
-
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SerilogLogger);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
@@ -158,7 +161,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
             ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
             _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseBackgroundTasks,
-            _apiAppCreatorData.UseSignalR, "Program.cs");
+            _apiAppCreatorData.UseSignalR, _apiAppCreatorData.UseFluentValidation, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         ////შეიქმნას აპლიკაციის მთავარი პარამეტრების შემნახველი კლასი StatProgramAttr.cs
@@ -396,7 +399,8 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         var assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
-        var projectMasterDataRepositoryClassCreator = new AssemblyReferenceClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",
+        var projectMasterDataRepositoryClassCreator = new AssemblyReferenceClassCreator(Logger,
+            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",
             assemblyReferenceClassFileName);
         projectMasterDataRepositoryClassCreator.CreateFileStructure();
 

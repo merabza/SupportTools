@@ -11,7 +11,8 @@ public sealed class ApiAppCreatorData
 {
     private ApiAppCreatorData(string? dbPartPath, string reactClientPath,
         AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
-        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks, bool useSignalR,
+        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
+        bool useSignalR, bool useFluentValidation,
         string? reactTemplateName, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
         ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate masterDataLoadersProjectData)
     {
@@ -26,6 +27,7 @@ public sealed class ApiAppCreatorData
         UseIdentity = useIdentity;
         UseBackgroundTasks = useBackgroundTasks;
         UseSignalR = useSignalR;
+        UseFluentValidation = useFluentValidation;
         ReactTemplateName = reactTemplateName;
         DatabaseProjectData = databaseProjectData;
         DbMigrationProjectData = dbMigrationProjectData;
@@ -40,6 +42,7 @@ public sealed class ApiAppCreatorData
     public bool UseIdentity { get; set; }
     public bool UseBackgroundTasks { get; set; }
     public bool UseSignalR { get; set; }
+    public bool UseFluentValidation { get; }
     public string? ReactTemplateName { get; }
     public string ReactClientPath { get; }
     public string? DbPartPath { get; }
@@ -54,13 +57,13 @@ public sealed class ApiAppCreatorData
     public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger,
         AppCreatorBaseData appCreatorBaseData, string projectName, TemplateModel template)
     {
-        if (template.UseCarcass && !template.UseDatabase)
+        if (template is { UseCarcass: true, UseDatabase: false })
         {
             StShared.WriteErrorLine("Use Carcass without database is not allowed", true, logger);
             return null;
         }
 
-        if (template.UseCarcass && !template.UseIdentity)
+        if (template is { UseCarcass: true, UseIdentity: false })
         {
             StShared.WriteErrorLine("Use Carcass without Identity is not allowed", true, logger);
             return null;
@@ -177,7 +180,8 @@ public sealed class ApiAppCreatorData
 
         return new ApiAppCreatorData(dbPartPath, reactClientPath, appCreatorBaseData, mainProjectData,
             template.UseReact, template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
-            template.UseIdentity, template.UseBackgroundTasks, template.UseSignalR, template.ReactTemplateName,
+            template.UseIdentity, template.UseBackgroundTasks, template.UseSignalR, template.UseFluentValidation,
+            template.ReactTemplateName,
             databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
             masterDataLoadersProjectData);
     }

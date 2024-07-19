@@ -20,6 +20,7 @@ public sealed class TemplateModel : ItemData
     public bool UseIdentity { get; set; }
     public bool UseBackgroundTasks { get; set; }
     public bool UseSignalR { get; set; }
+    public bool UseFluentValidation { get; set; }
 
     //react parameters
     public string? ReactTemplateName { get; set; }

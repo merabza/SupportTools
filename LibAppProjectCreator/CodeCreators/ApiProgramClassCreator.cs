@@ -11,6 +11,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly string _projectNamespace;
     private readonly bool _useBackgroundTasks;
     private readonly bool _useSignalR;
+    private readonly bool _useFluentValidation;
     private readonly bool _useCarcass;
     private readonly bool _useDatabase;
     private readonly bool _useIdentity;
@@ -18,7 +19,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks, bool useSignalR,
+        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks, bool useSignalR, bool useFluentValidation,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
@@ -29,15 +30,32 @@ public sealed class ApiProgramClassCreator : CodeCreator
         _useIdentity = useIdentity;
         _useBackgroundTasks = useBackgroundTasks;
         _useSignalR = useSignalR;
+        _useFluentValidation = useFluentValidation;
     }
 
 
     public override void CreateFileStructure()
     {
+        var fluentValidationInstallerCodeCommands = _useFluentValidation
+            ? new FlatCodeBlock(string.Empty, 
+                new OneLineComment("FluentValidationInstaller"), 
+                string.Empty,
+                $"""
+                 builder.Services.InstallValidation(
+                 //BackendCarcass
+                 BackendCarcassApi.AssemblyReference.Assembly
+                 //{_projectNamespace}
+                  )
+                 """
+            )
+            : null;
+
+
+
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using ConfigurationEncrypt",
-            "using FluentValidationInstaller",
+            _useFluentValidation ? "using FluentValidationInstaller" : null,
             "using Microsoft.AspNetCore.Builder",
             "using Microsoft.Extensions.DependencyInjection",
             "using Serilog",
@@ -88,7 +106,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
                  //WebSystemTools
                  ApiExceptionHandler.AssemblyReference.Assembly,
-                 BackgroundTasksTools.AssemblyReference.Assembly,
                  ConfigurationEncrypt.AssemblyReference.Assembly,
                  CorsTools.AssemblyReference.Assembly,
                  ReCounterServiceInstaller.AssemblyReference.Assembly,
@@ -112,16 +129,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                        //{{{_projectNamespace}}}
                    }})
                    """,
-                string.Empty,
-                new OneLineComment("FluentValidationInstaller"),
-                string.Empty,
-                $"""
-                 builder.Services.InstallValidation(
-                 //BackendCarcass
-                 BackendCarcassApi.AssemblyReference.Assembly,
-                 //{_projectNamespace}
-                  )
-                 """,
+                fluentValidationInstallerCodeCommands,
                 string.Empty,
                 new OneLineComment("ReSharper disable once using"),
                 string.Empty,
