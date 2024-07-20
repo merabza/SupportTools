@@ -9,7 +9,7 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(string? dbPartPath, string reactClientPath,
+    private ApiAppCreatorData(string? dbPartPath,
         AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
         bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
         bool useSignalR, bool useFluentValidation,
@@ -21,7 +21,7 @@ public sealed class ApiAppCreatorData
         UseReact = useReact;
         UseCarcass = useCarcass;
         DbPartPath = dbPartPath;
-        ReactClientPath = reactClientPath;
+        //ReactClientPath = reactClientPath;
         UseDatabase = useDatabase;
         UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
         UseIdentity = useIdentity;
@@ -44,7 +44,7 @@ public sealed class ApiAppCreatorData
     public bool UseSignalR { get; set; }
     public bool UseFluentValidation { get; }
     public string? ReactTemplateName { get; }
-    public string ReactClientPath { get; }
+    //public string ReactClientPath { get; }
     public string? DbPartPath { get; }
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
@@ -131,12 +131,12 @@ public sealed class ApiAppCreatorData
             "Installers"
         };
 
-        if (template.UseReact)
-        {
-            projectFolders.Add("Pages");
-            projectFolders.Add("ClientApp");
-            //projectFolders.Add("ClientApp/public");
-        }
+        //if (template.UseReact)
+        //{
+        //    projectFolders.Add("Pages");
+        //    projectFolders.Add("ClientApp");
+        //    //projectFolders.Add("ClientApp/public");
+        //}
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
@@ -144,7 +144,7 @@ public sealed class ApiAppCreatorData
             template.UseReact);
 
         //დავიანგარიშოთ კლიენტის ფოლდერის სრული გზა
-        var reactClientPath = Path.Combine(mainProjectData.ProjectFullPath, "ClientApp");
+        //var reactClientPath = Path.Combine(mainProjectData.ProjectFullPath, "ClientApp");
         //შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
         //AppCreatorBaseData.CheckRequiredFolder(reactClientPath, false);
 
@@ -178,11 +178,10 @@ public sealed class ApiAppCreatorData
         var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{projectName}MasterDataLoaders", ["Installers"]);
 
-        return new ApiAppCreatorData(dbPartPath, reactClientPath, appCreatorBaseData, mainProjectData,
-            template.UseReact, template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
+        return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
+            template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
             template.UseIdentity, template.UseBackgroundTasks, template.UseSignalR, template.UseFluentValidation,
-            template.ReactTemplateName,
-            databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
+            template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
             masterDataLoadersProjectData);
     }
 }

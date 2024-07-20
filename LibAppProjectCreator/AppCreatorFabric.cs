@@ -42,9 +42,7 @@ public static class AppCreatorFabric
 
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, par.ProjectShortName, par.ProjectName, par.IndentSize, gitProjects,
-                        gitRepos,
-                        apiAppCreatorData, workFolder,
-                        reactAppTemplates);
+                        gitRepos, apiAppCreatorData);
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
 

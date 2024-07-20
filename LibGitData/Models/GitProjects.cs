@@ -37,7 +37,7 @@ public sealed class GitProjects
     public GitProjectDataDomain SwaggerTools => GetGitProjectByKey(nameof(SwaggerTools));
     public GitProjectDataDomain WindowsServiceTools => GetGitProjectByKey(nameof(WindowsServiceTools));
     public GitProjectDataDomain ReactTools => GetGitProjectByKey(nameof(ReactTools));
-    public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
+    //public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
     public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
     public GitProjectDataDomain FluentValidationInstaller => GetGitProjectByKey(nameof(FluentValidationInstaller));
     public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));

@@ -239,7 +239,7 @@ internal sealed class ProjectRecordCreator
             gitProjectNames.Add("DatabaseTools");
         if (_templateModel.UseReact)
         {
-            gitProjectNames.Add($"{_newProjectName}ClientApp");
+            //gitProjectNames.Add($"{_newProjectName}ClientApp");
             gitProjectNames.Add("ReactAppCarcass");
             gitProjectNames.Add("WebSystemTools");
         }

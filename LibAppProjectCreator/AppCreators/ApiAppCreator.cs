@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CodeTools;
+﻿using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
-using LibAppProjectCreator.CodeCreators.GitIgnoreCreators;
 using LibAppProjectCreator.CodeCreators.Installers;
 using LibAppProjectCreator.CodeCreators.PagesCreators;
 using LibAppProjectCreator.JsonCreators;
 using LibAppProjectCreator.Models;
-using LibAppProjectCreator.React;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
@@ -24,21 +22,17 @@ public sealed class ApiAppCreator : AppCreatorBase
 {
     private readonly ApiAppCreatorData _apiAppCreatorData;
     private readonly string _projectShortName;
-    private readonly Dictionary<string, string> _reactAppTemplates;
+    //private readonly Dictionary<string, string> _reactAppTemplates;
 
-    private readonly string _workFolder;
+    //private readonly string _workFolder;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
-        GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData, string workFolder,
-        Dictionary<string, string> reactAppTemplates) : base(logger, projectName, indentSize, gitProjects, gitRepos,
-        apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
-        apiAppCreatorData.AppCreatorBaseData.SolutionPath)
+    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize, GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData) : base(logger, projectName, indentSize, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath, apiAppCreatorData.AppCreatorBaseData.SolutionPath)
     {
         _projectShortName = projectShortName;
         _apiAppCreatorData = apiAppCreatorData;
-        _workFolder = workFolder;
-        _reactAppTemplates = reactAppTemplates;
+        //_workFolder = workFolder;
+        //_reactAppTemplates = reactAppTemplates;
     }
 
     protected override void PrepareFoldersForCheckAndClear()
@@ -49,12 +43,12 @@ public sealed class ApiAppCreator : AppCreatorBase
             FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
     }
 
-    protected override void PrepareFoldersForCreate()
-    {
-        base.PrepareFoldersForCreate();
-        //FoldersForCreate.Add(_apiAppCreatorData.TempPath);
-        FoldersForCreate.Add(_apiAppCreatorData.ReactClientPath);
-    }
+    //protected override void PrepareFoldersForCreate()
+    //{
+    //    base.PrepareFoldersForCreate();
+    //    //FoldersForCreate.Add(_apiAppCreatorData.TempPath);
+    //    //FoldersForCreate.Add(_apiAppCreatorData.ReactClientPath);
+    //}
 
     //protected override string GetSolutionFolderName()
     //{
@@ -78,8 +72,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         }
         //AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreMvcNewtonsoftJson);
 
-        if (_apiAppCreatorData.UseBackgroundTasks)
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackgroundTasksTools);
+        //if (_apiAppCreatorData.UseBackgroundTasks)
+        //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackgroundTasksTools);
 
         if (_apiAppCreatorData.UseSignalR)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
@@ -265,20 +259,20 @@ public sealed class ApiAppCreator : AppCreatorBase
         //        "WindowsServiceInstaller.cs");
         //windowsServiceInstallerClassCreator.CreateFileStructure();
 
-        if (_apiAppCreatorData.UseReact)
-        {
-            if (string.IsNullOrWhiteSpace(_apiAppCreatorData.ReactTemplateName))
-            {
-                Logger.LogError("ReactTemplateName does not specified");
-                return false;
-            }
+        //if (_apiAppCreatorData.UseReact)
+        //{
+        //    if (string.IsNullOrWhiteSpace(_apiAppCreatorData.ReactTemplateName))
+        //    {
+        //        Logger.LogError("ReactTemplateName does not specified");
+        //        return false;
+        //    }
 
-            var createReactApp = new CreateReactClientApp(Logger,
-                _apiAppCreatorData.ReactClientPath, ProjectName, _apiAppCreatorData.ReactTemplateName, _workFolder,
-                _reactAppTemplates);
-            if (!createReactApp.Run())
-                return false;
-        }
+        //    var createReactApp = new CreateReactClientApp(Logger,
+        //        _apiAppCreatorData.ReactClientPath, ProjectName, _apiAppCreatorData.ReactTemplateName, _workFolder,
+        //        _reactAppTemplates);
+        //    if (!createReactApp.Run())
+        //        return false;
+        //}
 
         Console.WriteLine("Create AppSettingsVersion...");
         appSettingsJsonJObject.Add(
@@ -299,10 +293,10 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (!apiAppLaunchSettingsJsonCreator.Create())
             return false;
 
-        Console.WriteLine("Creating main project .gitignore...");
-        var mainProjectGitIgnoreCreator =
-            new MainProjectGitIgnoreCreator(Logger, SolutionPath, ProjectName, ".gitignore");
-        mainProjectGitIgnoreCreator.CreateFileStructure();
+        //Console.WriteLine("Creating main project .gitignore...");
+        //var mainProjectGitIgnoreCreator =
+        //    new MainProjectGitIgnoreCreator(Logger, SolutionPath, ProjectName, ".gitignore");
+        //mainProjectGitIgnoreCreator.CreateFileStructure();
 
         return true;
     }
@@ -314,20 +308,20 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    _apiAppCreatorData.UseBackgroundTasks, "ReactInstaller.cs");
         //reactInstallerClassCreator.CreateFileStructure();
 
-        var pagesPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Pages"];
+        //var pagesPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Pages"];
 
-        Console.WriteLine("Creating _ViewImports.cshtml...");
-        var viewImportsPageCreator =
-            new ViewImportsPageCreator(Logger, pagesPath, ProjectName, "_ViewImports.cshtml");
-        viewImportsPageCreator.CreateFileStructure();
+        //Console.WriteLine("Creating _ViewImports.cshtml...");
+        //var viewImportsPageCreator =
+        //    new ViewImportsPageCreator(Logger, pagesPath, ProjectName, "_ViewImports.cshtml");
+        //viewImportsPageCreator.CreateFileStructure();
 
-        Console.WriteLine("Creating Error.cshtml...");
-        var errorPageCreator = new ErrorPageCreator(Logger, pagesPath, "Error.cshtml");
-        errorPageCreator.CreateFileStructure();
+        //Console.WriteLine("Creating Error.cshtml...");
+        //var errorPageCreator = new ErrorPageCreator(Logger, pagesPath, "Error.cshtml");
+        //errorPageCreator.CreateFileStructure();
 
-        Console.WriteLine("Creating Error.cshtml.cs...");
-        var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "Error.cshtml.cs");
-        errorModelClassCreator.CreateFileStructure();
+        //Console.WriteLine("Creating Error.cshtml.cs...");
+        //var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "Error.cshtml.cs");
+        //errorModelClassCreator.CreateFileStructure();
     }
 
     //private void MakeFilesWhenUseBackgroundTasks(string installersPath)

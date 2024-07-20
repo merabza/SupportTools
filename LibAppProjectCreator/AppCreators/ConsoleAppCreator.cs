@@ -1,14 +1,13 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using LibAppProjectCreator.CodeCreators;
+﻿using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.Database;
-using LibAppProjectCreator.CodeCreators.GitIgnoreCreators;
 using LibAppProjectCreator.JsonCreators;
 using LibAppProjectCreator.Models;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
@@ -161,10 +160,10 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         if (!projectParametersJsonCreator.Create())
             return Task.FromResult(false);
 
-        Console.WriteLine("Creating main project .gitignore...");
-        var mainProjectGitIgnoreCreator = new MainProjectGitIgnoreCreator(Logger,
-            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, ".gitignore");
-        mainProjectGitIgnoreCreator.CreateFileStructure();
+        //Console.WriteLine("Creating main project .gitignore...");
+        //var mainProjectGitIgnoreCreator = new MainProjectGitIgnoreCreator(Logger,
+        //    _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, ".gitignore");
+        //mainProjectGitIgnoreCreator.CreateFileStructure();
 
         return Task.FromResult(StShared.RunProcess(true, Logger, "git", $"init {SolutionPath}").IsNone);
     }
