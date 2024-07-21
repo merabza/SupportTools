@@ -13,6 +13,7 @@ public sealed class DbServerSideBackupPathFieldEditor : FieldEditor<string>
     private readonly string _databaseWebAgentNamePropertyName;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DbServerSideBackupPathFieldEditor(string propertyName, IParametersManager parametersManager,
         string databaseWebAgentNamePropertyName, string databaseConnectionNamePropertyName) : base(propertyName)
     {
