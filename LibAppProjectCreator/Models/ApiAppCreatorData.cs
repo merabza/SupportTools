@@ -9,12 +9,12 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(string? dbPartPath,
-        AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact, bool useCarcass,
-        bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useBackgroundTasks,
-        bool useSignalR, bool useFluentValidation,
-        string? reactTemplateName, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
-        ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate masterDataLoadersProjectData)
+    private ApiAppCreatorData(string? dbPartPath, AppCreatorBaseData appCreatorBaseData,
+        ProjectForCreate mainProjectData, bool useReact, bool useCarcass, bool useDatabase,
+        bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
+        bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
+        ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
+        ProjectForCreate masterDataLoadersProjectData)
     {
         AppCreatorBaseData = appCreatorBaseData;
         MainProjectData = mainProjectData;
@@ -25,7 +25,7 @@ public sealed class ApiAppCreatorData
         UseDatabase = useDatabase;
         UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
         UseIdentity = useIdentity;
-        UseBackgroundTasks = useBackgroundTasks;
+        UseReCounter = useReCounter;
         UseSignalR = useSignalR;
         UseFluentValidation = useFluentValidation;
         ReactTemplateName = reactTemplateName;
@@ -40,10 +40,12 @@ public sealed class ApiAppCreatorData
     public bool UseDatabase { get; set; }
     public bool UseDbPartFolderForDatabaseProjects { get; }
     public bool UseIdentity { get; set; }
-    public bool UseBackgroundTasks { get; set; }
+    public bool UseReCounter { get; set; }
     public bool UseSignalR { get; set; }
     public bool UseFluentValidation { get; }
+
     public string? ReactTemplateName { get; }
+
     //public string ReactClientPath { get; }
     public string? DbPartPath { get; }
     public AppCreatorBaseData AppCreatorBaseData { get; }
@@ -180,7 +182,7 @@ public sealed class ApiAppCreatorData
 
         return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
             template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
-            template.UseIdentity, template.UseBackgroundTasks, template.UseSignalR, template.UseFluentValidation,
+            template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
             template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
             masterDataLoadersProjectData);
     }

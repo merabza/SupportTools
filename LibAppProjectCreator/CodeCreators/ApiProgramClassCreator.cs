@@ -9,7 +9,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 {
     private readonly string _appKey;
     private readonly string _projectNamespace;
-    private readonly bool _useBackgroundTasks;
+    private readonly bool _useReCounter;
     private readonly bool _useSignalR;
     private readonly bool _useFluentValidation;
     private readonly bool _useCarcass;
@@ -19,7 +19,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useBackgroundTasks, bool useSignalR, bool useFluentValidation,
+        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR, bool useFluentValidation,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
@@ -28,7 +28,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
         _useReact = useReact;
         _useCarcass = useCarcass;
         _useIdentity = useIdentity;
-        _useBackgroundTasks = useBackgroundTasks;
+        _useReCounter = useReCounter;
         _useSignalR = useSignalR;
         _useFluentValidation = useFluentValidation;
     }
@@ -108,16 +108,13 @@ public sealed class ApiProgramClassCreator : CodeCreator
                  ApiExceptionHandler.AssemblyReference.Assembly,
                  ConfigurationEncrypt.AssemblyReference.Assembly,
                  CorsTools.AssemblyReference.Assembly,
-                 ReCounterServiceInstaller.AssemblyReference.Assembly,
+                 {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : "")}
                  SerilogLogger.AssemblyReference.Assembly,
                  StaticFilesTools.AssemblyReference.Assembly,
                  SwaggerTools.AssemblyReference.Assembly,
                  TestToolsApi.AssemblyReference.Assembly,
                  WindowsServiceTools.AssemblyReference.Assembly,
 
-                 //{_projectNamespace}
-                 {_projectNamespace}Repositories.AssemblyReference.Assembly,
-                 {_projectNamespace}.AssemblyReference.Assembly
                  )
                  """,
                 string.Empty,
@@ -148,3 +145,10 @@ public sealed class ApiProgramClassCreator : CodeCreator
         FinishAndSave();
     }
 }
+
+
+/*
+//{_projectNamespace}
+{_projectNamespace}Repositories.AssemblyReference.Assembly,
+{_projectNamespace}.AssemblyReference.Assembly
+ */

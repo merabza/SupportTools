@@ -18,7 +18,7 @@ public sealed class TemplateModel : ItemData
     public bool UseReact { get; set; }
     public bool UseCarcass { get; set; }
     public bool UseIdentity { get; set; }
-    public bool UseBackgroundTasks { get; set; }
+    public bool UseReCounter { get; set; }
     public bool UseSignalR { get; set; }
     public bool UseFluentValidation { get; set; }
 

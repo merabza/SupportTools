@@ -82,7 +82,15 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
+
+        if ( _apiAppCreatorData.UseReCounter)
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReCounterServiceInstaller);
+
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
+
+        
+
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SerilogLogger);
@@ -153,7 +161,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
             ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
-            _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseBackgroundTasks,
+            _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter,
             _apiAppCreatorData.UseSignalR, _apiAppCreatorData.UseFluentValidation, "Program.cs");
         programClassCreator.CreateFileStructure();
 

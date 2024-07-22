@@ -29,7 +29,9 @@ public sealed class GitProjects
     public GitProjectDataDomain DbContextAnalyzer => GetGitProjectByKey(nameof(DbContextAnalyzer));
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
     public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
+    public GitProjectDataDomain ReCounterServiceInstaller => GetGitProjectByKey(nameof(ReCounterServiceInstaller));
     public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
+    public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey(nameof(StaticFilesTools));
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
     public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
     public GitProjectDataDomain ConfigurationEncrypt => GetGitProjectByKey(nameof(ConfigurationEncrypt));

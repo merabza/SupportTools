@@ -29,7 +29,7 @@ public sealed class TemplateCruder : ParCruder
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReact), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseCarcass), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseIdentity), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseBackgroundTasks), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReCounter), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseSignalR), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseFluentValidation), false));
         FieldEditors.Add(new ReactAppTypeNameFieldEditor(logger, nameof(TemplateModel.ReactTemplateName),
@@ -95,7 +95,7 @@ public sealed class TemplateCruder : ParCruder
                 EnableFieldByName(nameof(TemplateModel.UseReact), false);
                 EnableFieldByName(nameof(TemplateModel.UseCarcass), false);
                 EnableFieldByName(nameof(TemplateModel.UseIdentity), false);
-                EnableFieldByName(nameof(TemplateModel.UseBackgroundTasks), false);
+                EnableFieldByName(nameof(TemplateModel.UseReCounter), false);
                 EnableFieldByName(nameof(TemplateModel.UseSignalR), false);
                 EnableFieldByName(nameof(TemplateModel.UseFluentValidation), false);
                 break;
@@ -105,7 +105,7 @@ public sealed class TemplateCruder : ParCruder
                 EnableFieldByName(nameof(TemplateModel.UseReact));
                 EnableFieldByName(nameof(TemplateModel.UseCarcass));
                 EnableFieldByName(nameof(TemplateModel.UseIdentity));
-                EnableFieldByName(nameof(TemplateModel.UseBackgroundTasks));
+                EnableFieldByName(nameof(TemplateModel.UseReCounter));
                 EnableFieldByName(nameof(TemplateModel.UseSignalR));
                 EnableFieldByName(nameof(TemplateModel.UseFluentValidation));
                 break;
