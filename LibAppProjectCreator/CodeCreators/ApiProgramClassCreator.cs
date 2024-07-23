@@ -19,7 +19,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR, bool useFluentValidation,
+        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
+        bool useFluentValidation,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
@@ -37,8 +38,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
     public override void CreateFileStructure()
     {
         var fluentValidationInstallerCodeCommands = _useFluentValidation
-            ? new FlatCodeBlock(string.Empty, 
-                new OneLineComment("FluentValidationInstaller"), 
+            ? new FlatCodeBlock(string.Empty,
+                new OneLineComment("FluentValidationInstaller"),
                 string.Empty,
                 $"""
                  builder.Services.InstallValidation(
@@ -49,8 +50,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
                  """
             )
             : null;
-
-
 
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
@@ -81,25 +80,27 @@ public sealed class ApiProgramClassCreator : CodeCreator
             string.Empty,
             new CodeBlock("try",
                 $$"""
-                   var parameters = new Dictionary<string, string>
-                   {
-                       {{(_useSignalR?"{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey":"")}}
-                       { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
-                       { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
-                       { SwaggerInstaller.VersionCountKey, 1.ToString() },
-                       { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
-                   }
-                   """,
+                  var parameters = new Dictionary<string, string>
+                  {
+                      {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : "")}}
+                      { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
+                      { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
+                      { SwaggerInstaller.VersionCountKey, 1.ToString() },
+                      { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
+                  }
+                  """,
                 string.Empty,
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
                 string.Empty,
                 $"""
                  builder.InstallServices(args, parameters, 
 
-                 //BackendCarcass
-                 CarcassRepositories.AssemblyReference.Assembly,
-                 BackendCarcassApi.AssemblyReference.Assembly,
-                 CarcassDom.AssemblyReference.Assembly,
+                 {(_useCarcass && _useDatabase ? """
+                                                 //BackendCarcass
+                                                 CarcassRepositories.AssemblyReference.Assembly,
+                                                 BackendCarcassApi.AssemblyReference.Assembly,
+                                                 CarcassDom.AssemblyReference.Assembly,
+                                                 """ : null)}
 
                  //{_projectNamespace}DbPart
                  {_projectNamespace}Db.AssemblyReference.Assembly,
@@ -113,8 +114,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                  StaticFilesTools.AssemblyReference.Assembly,
                  SwaggerTools.AssemblyReference.Assembly,
                  TestToolsApi.AssemblyReference.Assembly,
-                 WindowsServiceTools.AssemblyReference.Assembly,
-
+                 WindowsServiceTools.AssemblyReference.Assembly
                  )
                  """,
                 string.Empty,

@@ -36,13 +36,13 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using System",
-            _useServerCarcass ? "using CarcassDb" : null,
-            //$"using {_projectNamespace}Db",
             "using Microsoft.AspNetCore.Builder",
             "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection",
+            "using System",
+            "using System.Collections.Generic",
             "using WebInstallers",
+            _useServerCarcass ? "using CarcassDb" : null,
             string.Empty,
             $"namespace {_projectNamespace}Db.Installers",
             string.Empty,
@@ -51,14 +51,20 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                 "public int InstallPriority => 30",
                 "public int ServiceUsePriority => 30",
                 string.Empty,
-                new CodeBlock("public void InstallServices(WebApplicationBuilder builder, string[] args)",
-                    "Console.WriteLine(\"DatabaseInstaller.InstallServices Started\")",
+                new CodeBlock(
+                    "public void InstallServices(WebApplicationBuilder builder, string[] args, Dictionary<string, string> parameters)",
+                    new OneLineComment("Console.WriteLine(\"DatabaseInstaller.InstallServices Started\")"),
+                    "var connectionString = builder.Configuration[\"Data:AppGrammarGeDatabase:ConnectionString\"]",
+                    string.Empty,
+                    new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString))",
+                        "Console.WriteLine(\"AppGrammarGeDatabaseInstaller.InstallServices connectionString is empty\")",
+                        "return"),
                     string.Empty,
                     _useServerCarcass
                         ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))"
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
-                    "Console.WriteLine(\"DatabaseInstaller.InstallServices Finished\")"),
+                    new OneLineComment("Console.WriteLine(\"DatabaseInstaller.InstallServices Finished\")")),
                 string.Empty,
                 new CodeBlock("public void UseServices(WebApplication app)")));
         CodeFile.AddRange(block.CodeItems);

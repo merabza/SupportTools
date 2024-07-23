@@ -30,7 +30,7 @@ public sealed class GitProjects
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
     public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
     public GitProjectDataDomain ReCounterServiceInstaller => GetGitProjectByKey(nameof(ReCounterServiceInstaller));
-    public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
+    //public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
     public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey(nameof(StaticFilesTools));
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
     public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
@@ -42,7 +42,7 @@ public sealed class GitProjects
     //public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
     public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
     public GitProjectDataDomain FluentValidationInstaller => GetGitProjectByKey(nameof(FluentValidationInstaller));
-    public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));
+    //public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey(nameof(BackendCarcassApi));
 
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)

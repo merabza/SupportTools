@@ -14,7 +14,7 @@ public sealed class ApiAppCreatorData
         bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
         bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
-        ProjectForCreate masterDataLoadersProjectData)
+        ProjectForCreate repositoriesProjectData)
     {
         AppCreatorBaseData = appCreatorBaseData;
         MainProjectData = mainProjectData;
@@ -32,7 +32,7 @@ public sealed class ApiAppCreatorData
         DatabaseProjectData = databaseProjectData;
         DbMigrationProjectData = dbMigrationProjectData;
         LibProjectRepositoriesProjectData = libProjectRepositoriesProjectData;
-        MasterDataLoadersProjectData = masterDataLoadersProjectData;
+        RepositoriesProjectData = repositoriesProjectData;
     }
 
     public bool UseReact { get; set; }
@@ -51,7 +51,7 @@ public sealed class ApiAppCreatorData
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
     public ProjectForCreate LibProjectRepositoriesProjectData { get; }
-    public ProjectForCreate MasterDataLoadersProjectData { get; }
+    public ProjectForCreate RepositoriesProjectData { get; }
     public ProjectForCreate DatabaseProjectData { get; }
     public ProjectForCreate DbMigrationProjectData { get; }
 
@@ -177,13 +177,13 @@ public sealed class ApiAppCreatorData
         var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{projectName}DbMigration", ["Migrations"]);
 
-        var masterDataLoadersProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{projectName}MasterDataLoaders", ["Installers"]);
+        var repositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+            $"{projectName}Repositories", ["Installers"]);
 
         return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
             template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
             template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
             template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
-            masterDataLoadersProjectData);
+            repositoriesProjectData);
     }
 }

@@ -97,15 +97,15 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WindowsServiceTools);
 
-        if (_apiAppCreatorData is { UseCarcass: true, UseIdentity: true })
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcass);
+        //if (_apiAppCreatorData is { UseCarcass: true, UseIdentity: true })
+        //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcass);
 
         if (_apiAppCreatorData.UseCarcass)
         {
             AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassRepositories);
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcassMini);
+            //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcassMini);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassApi);
         }
 
@@ -142,9 +142,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (!_apiAppCreatorData.UseCarcass)
             return true;
 
-        AddReference(_apiAppCreatorData.MasterDataLoadersProjectData, _apiAppCreatorData.DatabaseProjectData);
-        AddReference(_apiAppCreatorData.MasterDataLoadersProjectData, GitProjects.CarcassRepositories);
-        AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.MasterDataLoadersProjectData);
+        AddReference(_apiAppCreatorData.RepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
+        AddReference(_apiAppCreatorData.RepositoriesProjectData, GitProjects.CarcassRepositories);
+        AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.RepositoriesProjectData);
         AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
         return true;
     }
@@ -357,40 +357,47 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseCarcassAndUseDatabase()
     {
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები
-        var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
-        Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
-        var projectMasterDataRepositoryClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
-            masterDataRepositoryClassFileName);
-        projectMasterDataRepositoryClassCreator.CreateFileStructure();
+        //var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
+        //Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
+        //var projectMasterDataRepositoryClassCreator = new ProjectMasterDataRepositoryClassCreator(Logger,
+        //    _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+        //    masterDataRepositoryClassFileName);
+        //projectMasterDataRepositoryClassCreator.CreateFileStructure();
 
-        var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName.Capitalize()}MdLoaderCreator.cs";
-        Console.WriteLine($"Creating {mdLoaderCreatorInterfaceFileName}...");
-        var mdLoaderCreatorInterfaceCreator = new MdLoaderCreatorInterfaceCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
-            mdLoaderCreatorInterfaceFileName);
-        mdLoaderCreatorInterfaceCreator.CreateFileStructure();
+        //var mdLoaderCreatorInterfaceFileName = $"I{_projectShortName.Capitalize()}MdLoaderCreator.cs";
+        //Console.WriteLine($"Creating {mdLoaderCreatorInterfaceFileName}...");
+        //var mdLoaderCreatorInterfaceCreator = new MdLoaderCreatorInterfaceCreator(Logger,
+        //    _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+        //    mdLoaderCreatorInterfaceFileName);
+        //mdLoaderCreatorInterfaceCreator.CreateFileStructure();
 
-        var masterDataRepoManagerClassFileName = $"{_projectShortName}MasterDataRepoManager.cs";
-        Console.WriteLine($"Creating {masterDataRepoManagerClassFileName}...");
-        var masterDataRepoManagerClassCreator = new MasterDataRepoManagerClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
-            masterDataRepoManagerClassFileName);
-        masterDataRepoManagerClassCreator.CreateFileStructure();
+        //var masterDataRepoManagerClassFileName = $"{_projectShortName}MasterDataRepoManager.cs";
+        //Console.WriteLine($"Creating {masterDataRepoManagerClassFileName}...");
+        //var masterDataRepoManagerClassCreator = new MasterDataRepoManagerClassCreator(Logger,
+        //    _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+        //    masterDataRepoManagerClassFileName);
+        //masterDataRepoManagerClassCreator.CreateFileStructure();
 
-        var testMdLoaderCreatorClassFileName = $"Test{_projectShortName.Capitalize()}MdLoaderCreator.cs";
-        Console.WriteLine($"Creating {testMdLoaderCreatorClassFileName}...");
-        var testMdLoaderCreatorClassCreator = new TestMdLoaderCreatorClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
-            testMdLoaderCreatorClassFileName);
-        testMdLoaderCreatorClassCreator.CreateFileStructure();
+        //var testMdLoaderCreatorClassFileName = $"Test{_projectShortName.Capitalize()}MdLoaderCreator.cs";
+        //Console.WriteLine($"Creating {testMdLoaderCreatorClassFileName}...");
+        //var testMdLoaderCreatorClassCreator = new TestMdLoaderCreatorClassCreator(Logger,
+        //    _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+        //    testMdLoaderCreatorClassFileName);
+        //testMdLoaderCreatorClassCreator.CreateFileStructure();
 
-        var testMdLoaderClassFileName = $"Test{_projectShortName.Capitalize()}MdLoader.cs";
-        Console.WriteLine($"Creating {testMdLoaderClassFileName}...");
-        var testMdLoaderClassCreator = new TestMdLoaderClassCreator(Logger,
-            _apiAppCreatorData.MasterDataLoadersProjectData.ProjectFullPath, ProjectName, _projectShortName,
-            testMdLoaderClassFileName);
-        testMdLoaderClassCreator.CreateFileStructure();
+        //var testMdLoaderClassFileName = $"Test{_projectShortName.Capitalize()}MdLoader.cs";
+        //Console.WriteLine($"Creating {testMdLoaderClassFileName}...");
+        //var testMdLoaderClassCreator = new TestMdLoaderClassCreator(Logger,
+        //    _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+        //    testMdLoaderClassFileName);
+        //testMdLoaderClassCreator.CreateFileStructure();
+
+        var projectAbstractRepositoryClassFileName = $"{_projectShortName.Capitalize()}AbstractRepository.cs";
+        Console.WriteLine($"Creating {projectAbstractRepositoryClassFileName}...");
+        var projectAbstractRepositoryClassCreator = new ProjectAbstractRepositoryClassCreator(Logger,
+            _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
+            projectAbstractRepositoryClassFileName);
+        projectAbstractRepositoryClassCreator.CreateFileStructure();
     }
 
     private void MakeFilesWhenUseDatabase(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
@@ -400,10 +407,10 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         var assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
-        var projectMasterDataRepositoryClassCreator = new AssemblyReferenceClassCreator(Logger,
+        var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
             _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",
             assemblyReferenceClassFileName);
-        projectMasterDataRepositoryClassCreator.CreateFileStructure();
+        assemblyReferenceClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestQuery.cs...");
         var testQueryClassCreator = new TestQueryClassCreator(Logger,
@@ -485,7 +492,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
     private void MakeFilesWhenUseCarcass()
     {
-        var installersPath = _apiAppCreatorData.MasterDataLoadersProjectData.FoldersForCreate["Installers"];
+        var installersPath = _apiAppCreatorData.RepositoriesProjectData.FoldersForCreate["Installers"];
 
         Console.WriteLine("Creating RepositoriesInstaller.cs...");
         var repositoriesInstallerClassCreator = new RepositoriesInstallerClassCreator(Logger, installersPath,
@@ -512,6 +519,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddProject(_apiAppCreatorData.DbMigrationProjectData);
         if (!_apiAppCreatorData.UseCarcass)
             return;
-        AddProject(_apiAppCreatorData.MasterDataLoadersProjectData);
+        AddProject(_apiAppCreatorData.RepositoriesProjectData);
     }
 }
