@@ -49,7 +49,7 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
+        dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
             key.Length);
 
         return dotnetToolsSubMenuSet;

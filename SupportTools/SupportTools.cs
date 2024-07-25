@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using CliMenu;
@@ -14,6 +15,7 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
+using static WebAgentProjectsApiContracts.V1.Routes.ProjectsApiRoutes;
 
 namespace SupportTools;
 
@@ -32,13 +34,12 @@ public sealed class SupportTools : CliAppLoop
         _parametersManager = parametersManager;
     }
 
-    protected override void BuildMainMenu()
+    public override CliMenuSet BuildMainMenu()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //მთავარი მენიუს ჩატვირთვა
         var mainMenuSet = new CliMenuSet("Main Menu");
-        AddChangeMenu(mainMenuSet);
 
         //პარამეტრების რედაქტორი
         var supportToolsParametersEditor =
@@ -81,13 +82,14 @@ public sealed class SupportTools : CliAppLoop
                 new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
                     projectGroupName), projectGroupName);
 
-
-        ////პროექტების ჩამონათვალი
-        //foreach (var kvp in parameters.Projects.OrderBy(o => o.Key))
-        //    mainMenuSet.AddMenuItem(new ProjectSubMenuCommand(_logger, _parametersManager, kvp.Key), kvp.Key);
+        //ბოლოს გამოყენებული ბრძანებები
+        foreach (var itemSubMenuCommand in GetRecentCommands())
+            mainMenuSet.AddMenuItem(itemSubMenuCommand);
 
         //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
         mainMenuSet.AddMenuItem(key, "Exit", new ExitCliMenuCommand(), key.Length);
+        return mainMenuSet;
     }
+
 }

@@ -31,7 +31,7 @@ public class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
         //               "Run REAL Project by this Dotnet Tool");
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolSubMenuSet.AddMenuItem(key, "Exit to Main menu", new ExitToMainMenuCliMenuCommand(null, null),
+        dotnetToolSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
             key.Length);
         return dotnetToolSubMenuSet;
     }

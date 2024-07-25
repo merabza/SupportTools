@@ -4,6 +4,7 @@ using System.Linq;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
+using CliTools.CliMenuCommands;
 using LibGitData.Models;
 using LibGitWork;
 using LibParameters;
@@ -119,11 +120,11 @@ public sealed class GitCruder : ParCruder
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
 
+        //Main Menu/
         foreach (var itemSubMenuCommand in projects
                      .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(recordKey)).Select(projectKvp =>
                          new InfoCliMenuCommand(projectKvp.Key,
-                             $"/Main Menu/{projectKvp.Value.ProjectGroupName}/{projectKvp.Key}"))
-                     .OrderBy(x => x.Name))
+                             $"{projectKvp.Value.ProjectGroupName}/{projectKvp.Key}")).OrderBy(x => x.Name))
             itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
     }
 
