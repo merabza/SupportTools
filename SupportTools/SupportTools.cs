@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters.CliMenuCommands;
 using CliTools;
 using CliTools.CliMenuCommands;
@@ -15,7 +11,9 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
-using static WebAgentProjectsApiContracts.V1.Routes.ProjectsApiRoutes;
+using System;
+using System.Linq;
+using System.Net.Http;
 
 namespace SupportTools;
 
