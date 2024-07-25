@@ -24,7 +24,8 @@ public sealed class SupportTools : CliAppLoop
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager)
+    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) :
+        base((IParametersWithRecentData)parametersManager.Parameters)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
