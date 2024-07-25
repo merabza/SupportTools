@@ -114,7 +114,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             "ConnectionStringSeed",
             seedDbProjectNameUseJsonFilePath);
 
-        var creatorCreator = new CreatorCreator(_logger, new ParametersManager(null, creatorCreatorParameters));
+        var creatorCreator = new CreatorCreator(_logger, creatorCreatorParameters);
 
         if (!await creatorCreator.Run(CancellationToken.None))
         {

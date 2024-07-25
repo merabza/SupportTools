@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using ApiClientsManagement;
+using CliTools;
 using Installer.Models;
 using LanguageExt;
 using LibApiClientParameters;
@@ -15,13 +16,15 @@ using SystemToolsShared;
 namespace SupportToolsData.Models;
 
 public sealed class SupportToolsParameters : IParametersWithFileStorages, IParametersWithDatabaseServerConnections,
-    IParametersWithSmartSchemas, IParametersWithArchivers, IParametersWithApiClients
+    IParametersWithSmartSchemas, IParametersWithArchivers, IParametersWithApiClients, IParametersWithRecentData
 {
     public const string DefaultUploadFileTempExtension = ".up!";
 
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }
+    public string? RecentCommandsFileName { get; set; }
+    public int RecentCommandsCount { get; set; }
     public string? TempFolder { get; set; }
     public string? SecurityFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }
