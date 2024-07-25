@@ -4,17 +4,17 @@ namespace SupportTools.CliMenuCommands;
 
 public class InfoCliMenuCommand : CliMenuCommand
 {
-    private readonly string _menuUrlPrefix;
+    private readonly string _menuLink;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public InfoCliMenuCommand(string info, string menuUrlPrefix) : base(info, EMenuAction.GoToMenuLink,
+    public InfoCliMenuCommand(string info, string menuLink) : base(info, EMenuAction.GoToMenuLink,
         EMenuAction.GoToMenuLink, null, false, EStatusView.Brackets, true)
     {
-        _menuUrlPrefix = menuUrlPrefix;
+        _menuLink = menuLink;
     }
 
     public override string GetMenuLinkToGo()
     {
-        return $"{_menuUrlPrefix}{Name}";
+        return _menuLink;
     }
 }

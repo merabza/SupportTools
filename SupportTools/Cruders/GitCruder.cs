@@ -120,8 +120,10 @@ public sealed class GitCruder : ParCruder
         var projects = parameters.Projects;
 
         foreach (var itemSubMenuCommand in projects
-                     .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(recordKey))
-                     .Select(projectKvp => new InfoCliMenuCommand(projectKvp.Key, "/Main Menu/")).OrderBy(x => x.Name))
+                     .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(recordKey)).Select(projectKvp =>
+                         new InfoCliMenuCommand(projectKvp.Key,
+                             $"/Main Menu/{projectKvp.Value.ProjectGroupName}/{projectKvp.Key}"))
+                     .OrderBy(x => x.Name))
             itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
     }
 
