@@ -67,7 +67,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseReact)
         {
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReactTools);
+            //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReactTools);
         }
         //AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreMvcNewtonsoftJson);
 

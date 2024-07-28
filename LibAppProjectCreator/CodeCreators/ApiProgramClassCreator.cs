@@ -63,20 +63,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
             "using System",
             "using System.Collections.Generic",
             "using WebInstallers",
-
-            //"using SerilogLogger",
-            //"using SystemToolsShared",
-            //"using TestToolsApi.Endpoints.V1",
-            //"using WindowsServiceTools",
-            //_useDatabase ? $"using {_projectNamespace}Db.Installers" : null,
-            //_useReact ? "using ReactTools" : null,
-            //_useCarcass ? "using CarcassRepositories.Installers" : null,
-            //_useCarcass ? $"using {_projectNamespace}MasterDataLoaders.Installers" : null,
-            //_useIdentity && _useCarcass ? "using CarcassIdentity.Installers" : null,
-            //_useBackgroundTasks ? "using BackgroundTasksTools" : null,
-            //_useCarcass ? "using ServerCarcassMini.Endpoints.V1" : null,
-            //$"using {_projectNamespace}",
-            //$"using {_projectNamespace}.Installers",
             string.Empty,
             new CodeBlock("try",
                 $$"""
@@ -92,8 +78,10 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 string.Empty,
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
                 string.Empty,
+                "const bool debugMode = true;",
+                string.Empty,
                 $"""
-                 builder.InstallServices(args, parameters, 
+                 builder.InstallServices(debugMode, args, parameters, 
 
                  {(_useCarcass && _useDatabase ? """
                                                  //BackendCarcass
@@ -132,7 +120,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 string.Empty,
                 "using var app = builder.Build()",
                 string.Empty,
-                "app.UseServices()",
+                "app.UseServices(debugMode)",
                 string.Empty,
                 "app.Run()",
                 "return 0"),

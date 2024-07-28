@@ -41,7 +41,7 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
                 "public int InstallPriority => 30",
                 "public int ServiceUsePriority => 30",
                 string.Empty,
-                new CodeBlock("public void InstallServices(WebApplicationBuilder builder, string[] args, Dictionary<string, string> parameters)",
+                new CodeBlock("public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new OneLineComment("Console.WriteLine(\"RepositoriesInstaller.InstallServices Started\")"),
                     string.Empty,
                     "builder.Services.AddScoped<IUserRightsRepository, UserRightsRepository>()",
@@ -51,7 +51,7 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
                     string.Empty,
                     new OneLineComment("Console.WriteLine(\"RepositoriesInstaller.InstallServices Finished\")")),
                 string.Empty,
-                new CodeBlock("public void UseServices(WebApplication app)")));
+                new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

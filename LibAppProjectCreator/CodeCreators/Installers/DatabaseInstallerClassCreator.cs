@@ -52,21 +52,23 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                 "public int ServiceUsePriority => 30",
                 string.Empty,
                 new CodeBlock(
-                    "public void InstallServices(WebApplicationBuilder builder, string[] args, Dictionary<string, string> parameters)",
-                    new OneLineComment("Console.WriteLine(\"DatabaseInstaller.InstallServices Started\")"),
+                    "public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
+                    new CodeBlock("if (debugMode)",
+                        $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices Started\")"),
                     "var connectionString = builder.Configuration[\"Data:AppGrammarGeDatabase:ConnectionString\"]",
                     string.Empty,
                     new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString))",
-                        "Console.WriteLine(\"AppGrammarGeDatabaseInstaller.InstallServices connectionString is empty\")",
+                        $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices connectionString is empty\")",
                         "return"),
                     string.Empty,
                     _useServerCarcass
                         ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))"
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
-                    new OneLineComment("Console.WriteLine(\"DatabaseInstaller.InstallServices Finished\")")),
+                    new CodeBlock("if (debugMode)",
+                        $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices Finished\")")),
                 string.Empty,
-                new CodeBlock("public void UseServices(WebApplication app)")));
+                new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
 

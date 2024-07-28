@@ -17,10 +17,7 @@ public sealed class GitProjects
     public GitProjectDataDomain CarcassDb => GetGitProjectByKey(nameof(CarcassDb));
     public GitProjectDataDomain CarcassDataSeeding => GetGitProjectByKey(nameof(CarcassDataSeeding));
     public GitProjectDataDomain CarcassIdentity => GetGitProjectByKey(nameof(CarcassIdentity));
-
     public GitProjectDataDomain CarcassRepositories => GetGitProjectByKey(nameof(CarcassRepositories));
-
-    //public GitProjectDataDomain CarcassJsonModels => GetGitProjectByKey(nameof(CarcassJsonModels));
     public GitProjectDataDomain CliParameters => GetGitProjectByKey(nameof(CliParameters));
     public GitProjectDataDomain CliTools => GetGitProjectByKey(nameof(CliTools));
     public GitProjectDataDomain CliParametersDataEdit => GetGitProjectByKey(nameof(CliParametersDataEdit));
@@ -30,7 +27,6 @@ public sealed class GitProjects
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
     public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
     public GitProjectDataDomain ReCounterServiceInstaller => GetGitProjectByKey(nameof(ReCounterServiceInstaller));
-    //public GitProjectDataDomain ServerCarcass => GetGitProjectByKey(nameof(ServerCarcass));
     public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey(nameof(StaticFilesTools));
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
     public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
@@ -38,11 +34,8 @@ public sealed class GitProjects
     public GitProjectDataDomain SerilogLogger => GetGitProjectByKey(nameof(SerilogLogger));
     public GitProjectDataDomain SwaggerTools => GetGitProjectByKey(nameof(SwaggerTools));
     public GitProjectDataDomain WindowsServiceTools => GetGitProjectByKey(nameof(WindowsServiceTools));
-    public GitProjectDataDomain ReactTools => GetGitProjectByKey(nameof(ReactTools));
-    //public GitProjectDataDomain BackgroundTasksTools => GetGitProjectByKey(nameof(BackgroundTasksTools));
     public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
     public GitProjectDataDomain FluentValidationInstaller => GetGitProjectByKey(nameof(FluentValidationInstaller));
-    //public GitProjectDataDomain ServerCarcassMini => GetGitProjectByKey(nameof(ServerCarcassMini));
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey(nameof(BackendCarcassApi));
 
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
