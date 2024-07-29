@@ -50,22 +50,22 @@ public abstract class AppCreatorBase
     public string SolutionPath { get; }
 
     //შესაქმნელი ფოლდერების სია
-    protected List<string> FoldersForCreate { get; } = new();
+    private List<string> FoldersForCreate { get; } = [];
 
     //გასაწმენდი ფოლდერების სია
-    protected List<string> FoldersForCheckAndClear { get; } = new();
+    protected List<string> FoldersForCheckAndClear { get; } = [];
 
     //გიტით დასაკლონი პროექტების სია
-    public List<GitCloneDataModel> GitClones { get; } = new();
+    public List<GitCloneDataModel> GitClones { get; } = [];
 
     //სოლუშენში ჩასამატებელი პროექტების სია
-    private List<ProjectBase> Projects { get; } = new();
+    private List<ProjectBase> Projects { get; } = [];
 
     //რეფერენსების სია
-    private List<ReferenceDataModel> References { get; } = new();
+    private List<ReferenceDataModel> References { get; } = [];
 
     //გარე პაკეტების სია
-    private List<PackageDataModel> Packages { get; } = new();
+    private List<PackageDataModel> Packages { get; } = [];
 
 
     //სოლუშენში შემავალი პროექტების მომზადება
@@ -88,7 +88,7 @@ public abstract class AppCreatorBase
         FoldersForCheckAndClear.Add(SecurityPath);
     }
 
-    protected virtual void PrepareFoldersForCreate()
+    private void PrepareFoldersForCreate()
     {
         FoldersForCreate.Add(WorkPath);
         FoldersForCreate.Add(SolutionPath);

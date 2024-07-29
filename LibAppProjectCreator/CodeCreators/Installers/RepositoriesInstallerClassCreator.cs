@@ -24,12 +24,12 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
     {
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             "using Microsoft.AspNetCore.Builder",
             "using Microsoft.Extensions.DependencyInjection",
             "using System.Collections.Generic",
             string.Empty,
             "using CarcassDom",
-            "using CarcassMasterDataDom",
             "using CarcassRepositories",
             "using RepositoriesDom",
             "using WebInstallers",
@@ -41,15 +41,22 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
                 "public int InstallPriority => 30",
                 "public int ServiceUsePriority => 30",
                 string.Empty,
-                new CodeBlock("public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
-                    new OneLineComment("Console.WriteLine(\"RepositoriesInstaller.InstallServices Started\")"),
+                new CodeBlock(
+                    "public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
+                    new CodeBlock("if (debugMode)",
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
                     string.Empty,
                     "builder.Services.AddScoped<IUserRightsRepository, UserRightsRepository>()",
                     $"builder.Services.AddScoped<IAbstractRepository, {_projectShortName.Capitalize()}AbstractRepository>()",
-                    new OneLineComment($"builder.Services.AddScoped<IMasterDataLoaderCreator, {_projectShortName.Capitalize()}MasterDataLoaderCrudCreator>()"),
-                    new OneLineComment($"builder.Services.AddScoped<IReturnValuesLoaderCreator, {_projectShortName.Capitalize()}ReturnValuesLoaderCreator>()"),
+                    "builder.Services.AddScoped<IMasterDataLoaderCreator, MasterDataLoaderCreator>()",
+                    "builder.Services.AddScoped<IReturnValuesLoaderCreator, ReturnValuesLoaderCreator>()",
+                    new OneLineComment(
+                        $"builder.Services.AddScoped<IMasterDataLoaderCreator, {_projectShortName.Capitalize()}MasterDataLoaderCrudCreator>()"),
+                    new OneLineComment(
+                        $"builder.Services.AddScoped<IReturnValuesLoaderCreator, {_projectShortName.Capitalize()}ReturnValuesLoaderCreator>()"),
                     string.Empty,
-                    new OneLineComment("Console.WriteLine(\"RepositoriesInstaller.InstallServices Finished\")")),
+                    new CodeBlock("if (debugMode)",
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")")),
                 string.Empty,
                 new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
         CodeFile.AddRange(block.CodeItems);

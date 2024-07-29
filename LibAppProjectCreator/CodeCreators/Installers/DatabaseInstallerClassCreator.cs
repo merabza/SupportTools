@@ -36,10 +36,10 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty,
             new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System",
             "using Microsoft.AspNetCore.Builder",
             "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection",
-            "using System",
             "using System.Collections.Generic",
             "using WebInstallers",
             _useServerCarcass ? "using CarcassDb" : null,
@@ -54,7 +54,7 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                 new CodeBlock(
                     "public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new CodeBlock("if (debugMode)",
-                        $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices Started\")"),
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
                     "var connectionString = builder.Configuration[\"Data:AppGrammarGeDatabase:ConnectionString\"]",
                     string.Empty,
                     new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString))",
@@ -66,7 +66,7 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
                     new CodeBlock("if (debugMode)",
-                        $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices Finished\")")),
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Finished\")")),
                 string.Empty,
                 new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
         CodeFile.AddRange(block.CodeItems);

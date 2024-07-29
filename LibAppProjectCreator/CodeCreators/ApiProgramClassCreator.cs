@@ -78,17 +78,18 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 string.Empty,
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
                 string.Empty,
-                "const bool debugMode = true;",
+                "var debugMode = builder.Environment.IsDevelopment()",
                 string.Empty,
                 $"""
                  builder.InstallServices(debugMode, args, parameters, 
 
-                 {(_useCarcass && _useDatabase ? """
-                                                 //BackendCarcass
-                                                 CarcassRepositories.AssemblyReference.Assembly,
-                                                 BackendCarcassApi.AssemblyReference.Assembly,
-                                                 CarcassDom.AssemblyReference.Assembly,
-                                                 """ : null)}
+                 {(_useCarcass && _useDatabase ? $"""
+                                                  //BackendCarcass
+                                                  CarcassRepositories.AssemblyReference.Assembly,
+                                                  BackendCarcassApi.AssemblyReference.Assembly,
+                                                  CarcassDom.AssemblyReference.Assembly,
+                                                  {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : "")}
+                                                  """ : null)}
 
                  //{_projectNamespace}DbPart
                  {_projectNamespace}Db.AssemblyReference.Assembly,

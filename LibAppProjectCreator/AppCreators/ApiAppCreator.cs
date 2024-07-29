@@ -49,12 +49,6 @@ public sealed class ApiAppCreator : AppCreatorBase
     //    //FoldersForCreate.Add(_apiAppCreatorData.ReactClientPath);
     //}
 
-    //protected override string GetSolutionFolderName()
-    //{
-    //    //ძირითადი პროექტების ფოლდერს ბოლოში ემატება .server
-    //    return $"{Par.ProjectName}.server";
-    //}
-
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
     {
@@ -165,48 +159,9 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.UseSignalR, _apiAppCreatorData.UseFluentValidation, "Program.cs");
         programClassCreator.CreateFileStructure();
 
-        ////შეიქმნას აპლიკაციის მთავარი პარამეტრების შემნახველი კლასი StatProgramAttr.cs
-        //Console.WriteLine("Creating StatProgramAttr.cs...");
-        //var statProgramAttrClassCreator = new StatProgramAttrClassCreator(Logger,
-        //    _apiAppCreatorData.MainProjectData.ProjectFullPath, Par.ProjectName, keyPart1, "StatProgramAttr.cs");
-        //statProgramAttrClassCreator.CreateFileStructure();
-
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
 
         //var installersPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Installers"];
-
-        ////Installer Interfaces
-        //Console.WriteLine("Creating IInstaller.cs...");
-        //var installerClassCreator =
-        //    new InstallerInterfaceCreator(Logger, installersPath, Par.ProjectName, "IInstaller.cs");
-        //installerClassCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating IAppMiddlewareInstaller.cs...");
-        //var appMiddlewareInstallerInterfaceCreator = new AppMiddlewareInstallerInterfaceCreator(Logger,
-        //    installersPath, Par.ProjectName, "IAppMiddlewareInstaller.cs");
-        //appMiddlewareInstallerInterfaceCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating IAppUseInstaller.cs...");
-        //var appUseInstallerInterfaceCreator = new AppUseInstallerInterfaceCreator(Logger,
-        //    installersPath, Par.ProjectName, "IAppUseInstaller.cs");
-        //appUseInstallerInterfaceCreator.CreateFileStructure();
-
-        ////Installer Extension Class
-        //Console.WriteLine("Creating InstallerExtensions.cs...");
-        //var installerExtensionsClassCreator = new InstallerExtensionsClassCreator(Logger,
-        //    installersPath, Par.ProjectName, "InstallerExtensions.cs");
-        //installerExtensionsClassCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating ConfigurationEncryptInstaller.cs...");
-        //var configurationEncryptInstallerClassCreator =
-        //    new ConfigurationEncryptInstallerClassCreator(Logger, installersPath, Par.ProjectName,
-        //        "ConfigurationEncryptInstaller.cs");
-        //configurationEncryptInstallerClassCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating ControllersInstaller.cs...");
-        //var controllersInstallerClassCreator = new ControllersInstallerClassCreator(Logger,
-        //    installersPath, Par.ProjectName, _apiAppCreatorData.UseCarcass, "ControllersInstaller.cs");
-        //controllersInstallerClassCreator.CreateFileStructure();
 
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: false })
             MakeFilesWhenUseIdentityAndNotUseCarcass(modelsPath);
@@ -223,11 +178,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseIdentity)
             MakeFilesWhenUseIdentity(appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
 
-        //Console.WriteLine("Creating KestrelServerOptionsInstaller.cs...");
-        //var kestrelServerOptionsInstallerClassCreator = new KestrelServerOptionsInstallerClassCreator(Logger,
-        //    installersPath, Par.ProjectName, "KestrelServerOptionsInstaller.cs");
-        //kestrelServerOptionsInstallerClassCreator.CreateFileStructure();
-
         Console.WriteLine("Creating KestrelOptions...");
         var kestrelOptionsCreator = new KestrelOptionsCreator(appSettingsJsonJObject);
         kestrelOptionsCreator.Run();
@@ -238,33 +188,10 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseReact)
             MakeFilesWhenUseReact();
 
-        //Console.WriteLine("Creating RepositoriesInstaller.cs...");
-        //var repositoriesInstallerClassCreator =
-        //    new RepositoriesInstallerClassCreator(Logger, installersPath, Par.ProjectName,
-        //        "RepositoriesInstaller.cs");
-        //repositoriesInstallerClassCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating SerilogLoggerInstaller.cs...");
-        //var serilogLoggerInstallerClassCreator = new SerilogLoggerInstallerClassCreator(Logger, installersPath,
-        //    Par.ProjectName, appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys,
-        //    "SerilogLoggerInstaller.cs");
-        //serilogLoggerInstallerClassCreator.CreateFileStructure();
         Console.WriteLine("Creating LoggerProperties...");
         var loggerSettingsCreator = new LoggerSettingsCreator(ProjectName, appSettingsJsonJObject,
             userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
         loggerSettingsCreator.Run();
-
-
-        //Console.WriteLine("Creating SwaggerInstaller.cs...");
-        //var swaggerInstallerClassCreator = new SwaggerInstallerClassCreator(Logger, installersPath, Par.ProjectName,
-        //    _apiAppCreatorData.UseIdentity, "SwaggerInstaller.cs");
-        //swaggerInstallerClassCreator.CreateFileStructure();
-
-        //Console.WriteLine("Creating WindowsServiceInstaller.cs...");
-        //var windowsServiceInstallerClassCreator =
-        //    new WindowsServiceInstallerClassCreator(Logger, installersPath, Par.ProjectName,
-        //        "WindowsServiceInstaller.cs");
-        //windowsServiceInstallerClassCreator.CreateFileStructure();
 
         //if (_apiAppCreatorData.UseReact)
         //{
@@ -297,15 +224,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         Console.WriteLine("Creating launchSettings.json...");
         var apiAppLaunchSettingsJsonCreator = new ApiAppLaunchSettingsJsonCreator(_apiAppCreatorData.UseReact,
             ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
-        if (!apiAppLaunchSettingsJsonCreator.Create())
-            return false;
-
-        //Console.WriteLine("Creating main project .gitignore...");
-        //var mainProjectGitIgnoreCreator =
-        //    new MainProjectGitIgnoreCreator(Logger, SolutionPath, ProjectName, ".gitignore");
-        //mainProjectGitIgnoreCreator.CreateFileStructure();
-
-        return true;
+        
+        return apiAppLaunchSettingsJsonCreator.Create();
     }
 
     private void MakeFilesWhenUseReact()
@@ -343,11 +263,6 @@ public sealed class ApiAppCreator : AppCreatorBase
     private static void MakeFilesWhenUseIdentity(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
-        //Console.WriteLine("Creating IdentityInstaller.cs...");
-        //var identityInstallerClassCreator = new IdentityInstallerClassCreator(Logger, installersPath, Par.ProjectName,
-        //    _apiAppCreatorData.UseCarcass, "IdentityInstaller.cs");
-        //identityInstallerClassCreator.CreateFileStructure();
-
         Console.WriteLine("Creating Identity Settings...");
         var identitySettingsCreator = new IdentitySettingsCreator(appSettingsJsonJObject, userSecretJsonJObject,
             forEncodeAppSettingsJsonKeys);

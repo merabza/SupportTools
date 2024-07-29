@@ -108,11 +108,6 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     protected override Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
     {
         ////---===მთავარი პროექტის ფაილები===---
-        ////შეიქმნას აპლიკაციის მთავარი პარამეტრების შემნახველი კლასი StatProgramAttr.cs
-        //Console.WriteLine("Creating StatProgramAttr.cs...");
-        //var statProgramAttrClassCreator = new StatProgramAttrClassCreator(Logger,
-        //    _consoleAppCreatorData.MainProjectData.ProjectFullPath, Par.ProjectName, null, "StatProgramAttr.cs");
-        //statProgramAttrClassCreator.CreateFileStructure();
 
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
