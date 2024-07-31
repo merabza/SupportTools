@@ -11,7 +11,8 @@ public sealed class GenerateStandardRunTimesCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateStandardRunTimesCliMenuCommand(IParametersManager parametersManager) : base(null, EMenuAction.Reload)
+    public GenerateStandardRunTimesCliMenuCommand(IParametersManager parametersManager) : base(
+        "Generate standard RunTimes...", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }

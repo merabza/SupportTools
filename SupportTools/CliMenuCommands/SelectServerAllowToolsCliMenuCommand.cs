@@ -17,7 +17,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SelectServerAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
-        string serverName) : base(null, EMenuAction.Reload)
+        string serverName) : base("Select Allow tools...", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;

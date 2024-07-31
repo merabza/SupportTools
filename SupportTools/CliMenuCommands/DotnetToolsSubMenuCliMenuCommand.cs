@@ -41,7 +41,6 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 
             //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
             foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
-                //tool.PackageId
                 dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool));
         }
 

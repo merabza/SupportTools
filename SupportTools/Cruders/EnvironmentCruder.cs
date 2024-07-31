@@ -70,7 +70,6 @@ public sealed class EnvironmentCruder : ParCruder
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
         GenerateStandardEnvironmentsCliMenuCommand generateCommand = new(ParametersManager);
-        //"Generate standard Environments..."
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 }

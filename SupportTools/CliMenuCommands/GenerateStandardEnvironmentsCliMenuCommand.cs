@@ -11,8 +11,8 @@ public sealed class GenerateStandardEnvironmentsCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateStandardEnvironmentsCliMenuCommand(IParametersManager parametersManager) : base(null,
-        EMenuAction.Reload)
+    public GenerateStandardEnvironmentsCliMenuCommand(IParametersManager parametersManager) : base(
+        "Generate standard Environments...", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }

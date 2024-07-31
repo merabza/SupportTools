@@ -14,7 +14,8 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCli
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand(ILogger logger,
-        string gitIgnoreFileName, IParametersManager parametersManager) : base(null, EMenuAction.Reload)
+        string gitIgnoreFileName, IParametersManager parametersManager) : base(
+        "Apply this file type to all projects that do not have a type specified", EMenuAction.Reload)
     {
         _logger = logger;
         _gitIgnoreFileName = gitIgnoreFileName;

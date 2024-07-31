@@ -40,11 +40,9 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 
         templateCruder.FillDetailsSubMenu(templateSubMenuSet, _templateName);
 
-        //"Create Test Project by this Template"
         templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
             ETestOrReal.Test));
 
-        //"Create REAL Project by this Template"
         templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
             ETestOrReal.Real));
 

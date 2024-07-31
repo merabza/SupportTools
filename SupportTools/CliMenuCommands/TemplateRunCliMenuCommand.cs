@@ -13,7 +13,7 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateRunCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName,
-        ETestOrReal testOrReal) : base(null, EMenuAction.Reload)
+        ETestOrReal testOrReal) : base($"Create {testOrReal} Project by {templateName} Template", EMenuAction.Reload)
     {
         _appProjectCreatorByTemplate =
             new AppProjectCreatorByTemplateToolAction(logger, parametersManager, templateName, testOrReal, true);

@@ -11,7 +11,7 @@ public class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
     private readonly DotnetTool _tool;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DotnetToolSubMenuCliMenuCommand(DotnetTool tool) : base(null, EMenuAction.LoadSubMenu)
+    public DotnetToolSubMenuCliMenuCommand(DotnetTool tool) : base(tool.PackageId, EMenuAction.LoadSubMenu)
     {
         _tool = tool;
     }

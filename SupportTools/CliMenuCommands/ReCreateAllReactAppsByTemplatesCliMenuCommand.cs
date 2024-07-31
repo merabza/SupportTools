@@ -23,7 +23,7 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
     protected override bool RunBody()
     {
         ReCreateAllReactAppsByTemplatesToolCommand reCreateAllReactAppsByTemplatesToolCommand =
-            new(_logger, Name!, _parametersManager.Parameters, _parametersManager);
+            new(_logger, Name, _parametersManager.Parameters, _parametersManager);
         return reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Result;
     }
 }

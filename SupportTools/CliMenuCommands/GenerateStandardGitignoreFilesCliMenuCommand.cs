@@ -14,8 +14,7 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GenerateStandardGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        null,
-        EMenuAction.Reload)
+        "Generate standard .gitignore files...", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;

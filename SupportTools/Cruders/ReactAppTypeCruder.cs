@@ -93,8 +93,6 @@ public sealed class ReactAppTypeCruder : ParCruder
 
         ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
             new(_logger, ParametersManager, recordKey, name);
-
-        //"Recreate React App files By Template..."
         itemSubMenuSet.AddMenuItem(reCreateReactCommand);
     }
 }
