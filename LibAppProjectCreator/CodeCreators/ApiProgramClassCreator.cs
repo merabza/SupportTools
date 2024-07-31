@@ -63,6 +63,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
             "using System",
             "using System.Collections.Generic",
             "using WebInstallers",
+            "using Microsoft.Extensions.Hosting",
             string.Empty,
             new CodeBlock("try",
                 $$"""

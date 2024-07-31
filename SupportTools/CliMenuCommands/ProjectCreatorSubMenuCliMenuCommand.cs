@@ -68,15 +68,14 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         //პროექტების ჩამონათვალი
         if (appProjectCreatorAllParameters is not null)
-            foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o =>
-                         o.Key))
+            foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o => o.Key))
+                //kvp.Key
                 projectCreatorSubMenuSet.AddMenuItem(
-                    new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key),
-                    kvp.Key);
+                    new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key));
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectCreatorSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
+        projectCreatorSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 
         return projectCreatorSubMenuSet;

@@ -115,8 +115,9 @@ public sealed class ServerInfoCruder : ParCruder
 
 
         //დასაშვები ინსტრუმენტების არჩევა
-        itemSubMenuSet.AddMenuItem(new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey),
-            "Select Allow tools...");
+        //"Select Allow tools..."
+        itemSubMenuSet.AddMenuItem(
+            new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey));
 
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
@@ -126,8 +127,8 @@ public sealed class ServerInfoCruder : ParCruder
         if (server == null || project == null)
             return;
         foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ?? []))
-            itemSubMenuSet.AddMenuItem(
-                new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName, server, ParametersManager),
-                tool.ToString());
+            //tool.ToString()
+            itemSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName,
+                server, ParametersManager));
     }
 }

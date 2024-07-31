@@ -75,13 +75,13 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
         var gitProjectNames = (List<string>)result;
         foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
-            gitSubMenuSet.AddMenuItem(
-                new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, gitProjectName, _gitCol),
-                gitProjectName);
+            //gitProjectName
+            gitSubMenuSet.AddMenuItem(new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
+                gitProjectName, _gitCol));
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        gitSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null), key.Length);
+        gitSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
 
         return gitSubMenuSet;
     }

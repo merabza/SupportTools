@@ -44,14 +44,13 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         foreach (var (projectName, _) in parameters.Projects
                      .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                                  _projectGroupName).OrderBy(o => o.Key))
-            projectGroupSubMenuSet.AddMenuItem(
-                new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, projectName),
-                projectName);
-
-
+            //projectName
+            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                _parametersManager, projectName));
+        
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectGroupSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
+        projectGroupSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 
         return projectGroupSubMenuSet;

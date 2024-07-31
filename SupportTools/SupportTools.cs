@@ -40,10 +40,9 @@ public sealed class SupportTools : CliAppLoop
         var mainMenuSet = new CliMenuSet("Main Menu");
 
         //პარამეტრების რედაქტორი
-        var supportToolsParametersEditor =
-            new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
-        mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor),
-            "Support Tools Parameters Editor");
+        var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
+        //"Support Tools Parameters Editor"
+        mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
@@ -76,9 +75,8 @@ public sealed class SupportTools : CliAppLoop
         foreach (var projectGroupName in parameters.Projects
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
-            mainMenuSet.AddMenuItem(
-                new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
-                    projectGroupName), projectGroupName);
+            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                _parametersManager, projectGroupName));
 
         //ბოლოს გამოყენებული ბრძანებები
         foreach (var itemSubMenuCommand in GetRecentCommands())
@@ -86,7 +84,7 @@ public sealed class SupportTools : CliAppLoop
 
         //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
-        mainMenuSet.AddMenuItem(key, "Exit", new ExitCliMenuCommand(), key.Length);
+        mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length);
         return mainMenuSet;
     }
 

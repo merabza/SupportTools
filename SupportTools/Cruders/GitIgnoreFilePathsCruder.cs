@@ -82,7 +82,8 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
         cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
 
         GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, ParametersManager);
-        cruderSubMenuSet.AddMenuItem(generateCommand, "Generate standard .gitignore files...");
+        //"Generate standard .gitignore files..."
+        cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 
     public override string GetStatusFor(string name)
@@ -124,7 +125,7 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
 
         ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand =
             new(_logger, recordKey, ParametersManager);
-        itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand,
-            "Apply this file type to all projects that do not have a type specified");
+        //"Apply this file type to all projects that do not have a type specified"
+        itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand);
     }
 }

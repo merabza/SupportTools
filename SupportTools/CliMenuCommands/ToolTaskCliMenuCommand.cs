@@ -22,7 +22,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     private IToolCommand? _toolCommand;
 
     public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName,
-        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(null, EMenuAction.Reload,
+        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(tool.ToString(), EMenuAction.Reload,
         EMenuAction.Reload, null, true)
     {
         _logger = logger;

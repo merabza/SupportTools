@@ -76,8 +76,8 @@ public sealed class ReactAppTypeCruder : ParCruder
     {
         ReCreateAllReactAppsByTemplatesCliMenuCommand reCreateAllReactAppsByTemplatesCliMenuCommand =
             new(_logger, ParametersManager);
-        cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand,
-            "Recreate All React App files By Templates...");
+        //"Recreate All React App files By Templates..."
+        cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand);
     }
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
@@ -93,6 +93,8 @@ public sealed class ReactAppTypeCruder : ParCruder
 
         ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
             new(_logger, ParametersManager, recordKey, name);
-        itemSubMenuSet.AddMenuItem(reCreateReactCommand, "Recreate React App files By Template...");
+
+        //"Recreate React App files By Template..."
+        itemSubMenuSet.AddMenuItem(reCreateReactCommand);
     }
 }

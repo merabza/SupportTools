@@ -46,10 +46,11 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
             throw new DataInputEscapeException("List is empty");
 
 
-        if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", "(None)", new CliMenuCommand(), 1);
+        if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);
 
         foreach (var listItem in keys)
-            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem), listItem);
+            //listItem
+            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem));
 
         var index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
 

@@ -41,7 +41,8 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 
             //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
             foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
-                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool), tool.PackageId);
+                //tool.PackageId
+                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool));
         }
 
         //var dotnetToolCommand = new DotnetToolCliMenuCommand();
@@ -49,7 +50,7 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolsSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
+        dotnetToolsSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 
         return dotnetToolsSubMenuSet;

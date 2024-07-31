@@ -36,20 +36,21 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
         //პროექტის პარამეტრი
         TemplateCruder templateCruder = new(_logger, _parametersManager);
         EditItemAllFieldsInSequenceCliMenuCommand editCommand = new(templateCruder, _templateName);
-        templateSubMenuSet.AddMenuItem(editCommand, "Edit All fields in sequence");
+        templateSubMenuSet.AddMenuItem(editCommand);
 
         templateCruder.FillDetailsSubMenu(templateSubMenuSet, _templateName);
 
-        templateSubMenuSet.AddMenuItem(
-            new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName, ETestOrReal.Test),
-            "Create Test Project by this Template");
-        templateSubMenuSet.AddMenuItem(
-            new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName, ETestOrReal.Real),
-            "Create REAL Project by this Template");
+        //"Create Test Project by this Template"
+        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
+            ETestOrReal.Test));
+
+        //"Create REAL Project by this Template"
+        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
+            ETestOrReal.Real));
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        templateSubMenuSet.AddMenuItem(key, "Exit to level up menu", new ExitToMainMenuCliMenuCommand(null, null),
+        templateSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 
         return templateSubMenuSet;
