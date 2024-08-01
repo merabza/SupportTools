@@ -41,7 +41,6 @@ public sealed class SupportTools : CliAppLoop
 
         //პარამეტრების რედაქტორი
         var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
-        //"Support Tools Parameters Editor"
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();

@@ -52,21 +52,19 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
-
         //ყველა პროექტის git-ის სინქრონიზაცია
         var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
 
-        //"Git"
-        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName, EGitCol.Main));
+        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
+            EGitCol.Main));
 
         var project = parameters.GetProject(_projectName);
 
         if (project != null)
         {
             if (!string.IsNullOrWhiteSpace(project.SeedProjectFilePath))
-                //"Git ScaffoldSeeder projects"
                 projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
                     EGitCol.ScaffoldSeed));
 
@@ -90,7 +88,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project?.ServerInfos != null)
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
-                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory, kvp.Value.GetItemKey(),
                     _parametersManager, _projectName, kvp.Key));
 
         //მთავარ მენიუში გასვლა

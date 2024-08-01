@@ -16,8 +16,8 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
     private readonly string _serverName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerInfoSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName, string serverName) : base(serverName,
+    public ServerInfoSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, string itemKey,
+        ParametersManager parametersManager, string projectName, string serverName) : base(itemKey,
         EMenuAction.LoadSubMenu)
     {
         _logger = logger;

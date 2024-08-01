@@ -24,7 +24,8 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol) : base(projectName, EMenuAction.LoadSubMenu)
+        EGitCol gitCol) : base(gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git",
+        EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _parametersManager = parametersManager;

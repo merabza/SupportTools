@@ -76,7 +76,6 @@ public sealed class ReactAppTypeCruder : ParCruder
     {
         ReCreateAllReactAppsByTemplatesCliMenuCommand reCreateAllReactAppsByTemplatesCliMenuCommand =
             new(_logger, ParametersManager);
-        //"Recreate All React App files By Templates..."
         cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand);
     }
 
