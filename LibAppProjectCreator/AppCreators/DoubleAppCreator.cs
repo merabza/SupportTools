@@ -36,7 +36,7 @@ public abstract class DoubleAppCreator
 
         var solutionPathExists = Directory.Exists(_mainAppCreator.SolutionPath);
 
-        if (!await _mainAppCreator.PrepareParametersAndCreateApp(cancellationToken,
+        if (!await _mainAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
                 solutionPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
             return false;
 
@@ -61,7 +61,7 @@ public abstract class DoubleAppCreator
         if (tempAppCreator is null)
             return false;
 
-        if (!await tempAppCreator.PrepareParametersAndCreateApp(cancellationToken,
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
                 ECreateAppVersions.WithoutSolutionGitInit))
             return false;
 
@@ -80,8 +80,7 @@ public abstract class DoubleAppCreator
             return false;
         }
 
-        var excludeSet = new ExcludeSet
-            { FolderFileMasks = new List<string> { @"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*" } };
+        var excludeSet = new ExcludeSet { FolderFileMasks = [@"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*"] };
 
         if (!sourceFileManager.IsFolderEmpty(null))
         {

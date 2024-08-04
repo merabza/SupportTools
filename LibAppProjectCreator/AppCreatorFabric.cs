@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using LibAppProjectCreator.AppCreators;
+﻿using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
+using System;
 
 namespace LibAppProjectCreator;
 
 public static class AppCreatorFabric
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, AppProjectCreatorData par, TemplateModel template,
-        GitProjects gitProjects, GitRepos gitRepos, string workFolder, Dictionary<string, string> reactAppTemplates)
+        GitProjects gitProjects, GitRepos gitRepos)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
             par.SolutionFolderName, par.SecurityWorkFolderPath);

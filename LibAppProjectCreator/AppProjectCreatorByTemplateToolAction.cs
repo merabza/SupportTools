@@ -13,8 +13,6 @@ using SupportToolsData;
 using SupportToolsData.Models;
 using SystemToolsShared;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace LibAppProjectCreator;
 
 public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
@@ -26,6 +24,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     private readonly string _templateName;
     private readonly ETestOrReal _testOrReal;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public AppProjectCreatorByTemplateToolAction(ILogger logger, IParametersManager parametersManager,
         string templateName, ETestOrReal testOrReal, bool useConsole) : base(logger, ActionName, null, null, useConsole)
     {
@@ -120,8 +119,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         var appCreator = AppCreatorFabric.CreateAppCreator(_logger, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole),
-            supportToolsParameters.WorkFolder, supportToolsParameters.ReactAppTemplates);
+            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole));
 
         if (appCreator is null)
         {
@@ -129,7 +127,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        if (!await appCreator.PrepareParametersAndCreateApp(cancellationToken))
+        if (!await appCreator.PrepareParametersAndCreateApp(_testOrReal == ETestOrReal.Real, cancellationToken))
             return false;
 
         if (_testOrReal != ETestOrReal.Real)

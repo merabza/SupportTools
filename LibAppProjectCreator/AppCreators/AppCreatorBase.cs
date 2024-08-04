@@ -106,7 +106,7 @@ public abstract class AppCreatorBase
         return PrepareSpecific();
     }
 
-    public async Task<bool> PrepareParametersAndCreateApp(CancellationToken cancellationToken,
+    public async Task<bool> PrepareParametersAndCreateApp(bool askForDelete, CancellationToken cancellationToken,
         ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
     {
         if (!PrepareParameters())
@@ -115,7 +115,7 @@ public abstract class AppCreatorBase
             return false;
         }
 
-        if (await CreateApp(createAppVersions, cancellationToken))
+        if (await CreateApp(askForDelete, createAppVersions, cancellationToken))
             return true;
 
         StShared.WriteErrorLine("Scaffold Seeder Solution does not created", true, Logger);
@@ -186,7 +186,7 @@ public abstract class AppCreatorBase
     }
 
     //აპლიკაციის შექმნის პროცესი
-    private async Task<bool> CreateApp(ECreateAppVersions createAppVersions, CancellationToken cancellationToken)
+    private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions, CancellationToken cancellationToken)
     {
         if (!AppGitsSync())
             return false;
@@ -196,7 +196,7 @@ public abstract class AppCreatorBase
 
 
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
-        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder)))
+        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete)))
             return false;
 
         //შევქმნათ ფოლდერების სიაში არსებული ყველა ფოლდერი
