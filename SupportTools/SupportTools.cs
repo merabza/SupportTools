@@ -65,6 +65,10 @@ public sealed class SupportTools : CliAppLoop
         var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
+        //ყველა პროექტის git-ის სინქრონიზაცია ახალი მეთოდით
+        var syncAllProjectsGitsV2 = new SyncAllProjectsAllGitsCliMenuCommandV2(_logger, _parametersManager);
+        mainMenuSet.AddMenuItem(syncAllProjectsGitsV2);
+
         //ყველა პროექტის bin obj და სხვა ზედმეტი ფაილებისა და ფოლდერებისგან გასუფთავება
         var clearAllProjectsCliMenuCommand =
             new ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(_logger, _parametersManager);

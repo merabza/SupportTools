@@ -1,30 +1,29 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using LibDataInput;
+﻿using LibDataInput;
 using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 
-namespace LibGitWork.ToolActions;
+namespace LibGitWork;
 
-public sealed class GitSyncToolAction : ToolAction
+public sealed class GitSyncer
 {
     private readonly bool _askCommitMessage;
     private readonly GitSyncParameters _gitSyncParameters;
     private readonly ILogger? _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSyncToolAction(ILogger? logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
-        bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
+    public GitSyncer(ILogger? logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
+        bool askCommitMessage = true)
     {
         _logger = logger;
         _gitSyncParameters = gitSyncParameters;
@@ -35,7 +34,7 @@ public sealed class GitSyncToolAction : ToolAction
     public bool Changed { get; private set; }
     public string? UsedCommitMessage { get; private set; }
 
-    public static GitSyncToolAction? Create(ILogger logger, ParametersManager parametersManager,
+    public static GitSyncer? Create(ILogger logger, ParametersManager parametersManager,
         string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
@@ -44,14 +43,14 @@ public sealed class GitSyncToolAction : ToolAction
             supportToolsParameters, projectName, gitCol, gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
-            return new GitSyncToolAction(loggerOrNull, gitSyncParameters);
+            return new GitSyncer(loggerOrNull, gitSyncParameters);
 
         StShared.WriteErrorLine("GitSyncParameters is not created", true);
         return null;
     }
 
 
-    protected override bool CheckValidate()
+    private bool CheckValidate()
     {
         if (!string.IsNullOrWhiteSpace(_gitSyncParameters.GitsFolder))
             return true;
@@ -59,7 +58,7 @@ public sealed class GitSyncToolAction : ToolAction
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    private Task<bool> RunAction(CancellationToken cancellationToken)
     {
         var projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);

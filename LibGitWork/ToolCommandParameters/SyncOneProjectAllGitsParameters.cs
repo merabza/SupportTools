@@ -36,8 +36,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
 
     public static SyncOneProjectAllGitsParameters? Create(ILogger? logger,
-        SupportToolsParameters supportToolsParameters,
-        string projectName, EGitCol gitCol,
+        SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
         bool useConsole)
     {
