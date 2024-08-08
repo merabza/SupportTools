@@ -43,7 +43,7 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
                 "public int ServiceUsePriority => 30",
                 string.Empty,
                 new CodeBlock(
-                    "public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
+                    "public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new CodeBlock("if (debugMode)",
                         "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
                     string.Empty,
@@ -57,9 +57,9 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
                         $"builder.Services.AddScoped<IReturnValuesLoaderCreator, {_projectShortName.Capitalize()}ReturnValuesLoaderCreator>()"),
                     string.Empty,
                     new CodeBlock("if (debugMode)",
-                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")")),
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"), "return true"),
                 string.Empty,
-                new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
+                new CodeBlock("public bool UseServices(WebApplication app, bool debugMode)", "return true")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

@@ -52,23 +52,23 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                 "public int ServiceUsePriority => 30",
                 string.Empty,
                 new CodeBlock(
-                    "public void InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
+                    "public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new CodeBlock("if (debugMode)",
                         "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
                     "var connectionString = builder.Configuration[\"Data:AppGrammarGeDatabase:ConnectionString\"]",
                     string.Empty,
                     new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString))",
                         $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices connectionString is empty\")",
-                        "return"),
+                        "return false"),
                     string.Empty,
                     _useServerCarcass
                         ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))"
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
                     new CodeBlock("if (debugMode)",
-                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Finished\")")),
+                        "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Finished\")"), "return true"),
                 string.Empty,
-                new CodeBlock("public void UseServices(WebApplication app, bool debugMode)")));
+                new CodeBlock("public bool UseServices(WebApplication app, bool debugMode)", "return true")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
 

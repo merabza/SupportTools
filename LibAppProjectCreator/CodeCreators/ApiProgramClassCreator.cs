@@ -81,32 +81,32 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 string.Empty,
                 "var debugMode = builder.Environment.IsDevelopment()",
                 string.Empty,
-                $"""
-                 builder.InstallServices(debugMode, args, parameters, 
+                new CodeBlock($"""
+                               if (!builder.InstallServices(debugMode, args, parameters, 
 
-                 {(_useCarcass && _useDatabase ? $"""
-                                                  //BackendCarcass
-                                                  CarcassRepositories.AssemblyReference.Assembly,
-                                                  BackendCarcassApi.AssemblyReference.Assembly,
-                                                  CarcassDom.AssemblyReference.Assembly,
-                                                  {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : "")}
-                                                  """ : null)}
+                               {(_useCarcass && _useDatabase ? $"""
+                                                                //BackendCarcass
+                                                                CarcassRepositories.AssemblyReference.Assembly,
+                                                                BackendCarcassApi.AssemblyReference.Assembly,
+                                                                CarcassDom.AssemblyReference.Assembly,
+                                                                {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : "")}
+                                                                """ : null)}
 
-                 //{_projectNamespace}DbPart
-                 {_projectNamespace}Db.AssemblyReference.Assembly,
+                               //{_projectNamespace}DbPart
+                               {_projectNamespace}Db.AssemblyReference.Assembly,
 
-                 //WebSystemTools
-                 ApiExceptionHandler.AssemblyReference.Assembly,
-                 ConfigurationEncrypt.AssemblyReference.Assembly,
-                 CorsTools.AssemblyReference.Assembly,
-                 {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : "")}
-                 SerilogLogger.AssemblyReference.Assembly,
-                 StaticFilesTools.AssemblyReference.Assembly,
-                 SwaggerTools.AssemblyReference.Assembly,
-                 TestToolsApi.AssemblyReference.Assembly,
-                 WindowsServiceTools.AssemblyReference.Assembly
-                 )
-                 """,
+                               //WebSystemTools
+                               ApiExceptionHandler.AssemblyReference.Assembly,
+                               ConfigurationEncrypt.AssemblyReference.Assembly,
+                               CorsTools.AssemblyReference.Assembly,
+                               {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : "")}
+                               SerilogLogger.AssemblyReference.Assembly,
+                               StaticFilesTools.AssemblyReference.Assembly,
+                               SwaggerTools.AssemblyReference.Assembly,
+                               TestToolsApi.AssemblyReference.Assembly,
+                               WindowsServiceTools.AssemblyReference.Assembly
+                               ))
+                               """, "return 2"),
                 string.Empty,
                 $$$"""
                    builder.Services.AddMediatR(cfg =>
@@ -122,7 +122,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 string.Empty,
                 "using var app = builder.Build()",
                 string.Empty,
-                "app.UseServices(debugMode)",
+                new CodeBlock("if (!app.UseServices(debugMode))", "return 1"),
                 string.Empty,
                 "app.Run()",
                 "return 0"),
