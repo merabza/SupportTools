@@ -26,7 +26,10 @@ public sealed class ApiAppCreator : AppCreatorBase
     //private readonly string _workFolder;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize, GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData) : base(logger, projectName, indentSize, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath, apiAppCreatorData.AppCreatorBaseData.SolutionPath)
+    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
+        GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData) : base(logger, projectName,
+        indentSize, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath,
+        apiAppCreatorData.AppCreatorBaseData.SecurityPath, apiAppCreatorData.AppCreatorBaseData.SolutionPath)
     {
         _projectShortName = projectShortName;
         _apiAppCreatorData = apiAppCreatorData;
@@ -77,13 +80,13 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
 
-        if ( _apiAppCreatorData.UseReCounter)
+        if (_apiAppCreatorData.UseReCounter)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReCounterServiceInstaller);
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
 
-        
+
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
@@ -193,6 +196,13 @@ public sealed class ApiAppCreator : AppCreatorBase
             userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
         loggerSettingsCreator.Run();
 
+        if (_apiAppCreatorData.UseReact)
+        {
+            Console.WriteLine("Creating Cors Properties...");
+            var corsSettingsCreator = new CorsSettingsCreator(ProjectName, appSettingsJsonJObject,
+                userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
+            corsSettingsCreator.Run();
+        }
         //if (_apiAppCreatorData.UseReact)
         //{
         //    if (string.IsNullOrWhiteSpace(_apiAppCreatorData.ReactTemplateName))
@@ -224,7 +234,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         Console.WriteLine("Creating launchSettings.json...");
         var apiAppLaunchSettingsJsonCreator = new ApiAppLaunchSettingsJsonCreator(_apiAppCreatorData.UseReact,
             ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
-        
+
         return apiAppLaunchSettingsJsonCreator.Create();
     }
 
@@ -307,6 +317,13 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    testMdLoaderClassFileName);
         //testMdLoaderClassCreator.CreateFileStructure();
 
+        var assemblyReferenceClassFileName = "AssemblyReference.cs";
+        Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
+        var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
+            _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, $"{ProjectName}Repositories",
+            assemblyReferenceClassFileName);
+        assemblyReferenceClassCreator.CreateFileStructure();
+
         var projectAbstractRepositoryClassFileName = $"{_projectShortName.Capitalize()}AbstractRepository.cs";
         Console.WriteLine($"Creating {projectAbstractRepositoryClassFileName}...");
         var projectAbstractRepositoryClassCreator = new ProjectAbstractRepositoryClassCreator(Logger,
@@ -318,7 +335,6 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseDatabase(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
-
 
         var assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");

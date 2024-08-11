@@ -94,6 +94,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
                                //{_projectNamespace}DbPart
                                {_projectNamespace}Db.AssemblyReference.Assembly,
+                               {_projectNamespace}Repositories.AssemblyReference.Assembly,
 
                                //WebSystemTools
                                ApiExceptionHandler.AssemblyReference.Assembly,

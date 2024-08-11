@@ -10,6 +10,7 @@ public sealed class ApiAppLaunchSettingsJsonCreator
     private readonly string _projectName;
     private readonly bool _useReact;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ApiAppLaunchSettingsJsonCreator(bool useReact, string projectName, string projectFullPath)
     {
         _useReact = useReact;

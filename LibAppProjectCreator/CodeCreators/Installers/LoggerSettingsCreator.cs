@@ -48,7 +48,7 @@ public sealed class LoggerSettingsCreator
                 new JObject(new JProperty("Name", "Console")),
                 new JObject(new JProperty("Name", "File"),
                     new JProperty("Args", new JObject(
-                        new JProperty("path", $"D:\\Logs\\{_projectNamespace}\\{_projectNamespace}-logs.txt"),
+                        new JProperty("path", $@"D:\Logs\{_projectNamespace}\{_projectNamespace}-logs.txt"),
                         new JProperty("rollingInterval", "Day")))))))));
 
         _forEncodeAppSettingsJsonKeys.Add("Serilog:WriteTo:1:Args:path");
