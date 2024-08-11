@@ -55,16 +55,16 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                     "public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new CodeBlock("if (debugMode)",
                         "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
-                    "var connectionString = builder.Configuration[\"Data:AppGrammarGeDatabase:ConnectionString\"]",
+                    $"var connectionString = builder.Configuration[\"{connectionStringJsonKey}\"]",
                     string.Empty,
-                    new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString))",
+                    new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)",
                         $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices connectionString is empty\")",
                         "return false"),
                     string.Empty,
                     _useServerCarcass
-                        ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))"
+                        ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(connectionString))"
                         : null,
-                    $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(builder.Configuration[\"{connectionStringJsonKey}\"]))",
+                    $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(connectionString))",
                     new CodeBlock("if (debugMode)",
                         "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Finished\")"), "return true"),
                 string.Empty,
