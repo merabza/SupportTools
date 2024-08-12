@@ -9,14 +9,12 @@ public sealed class CorsSettingsCreator
 {
     private readonly JObject _appSettingsJsonJObject;
     private readonly List<string> _forEncodeAppSettingsJsonKeys;
-    private readonly string _projectNamespace;
     private readonly JObject _userSecretJsonJObject;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CorsSettingsCreator(string projectNamespace, JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
+    public CorsSettingsCreator(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
-        _projectNamespace = projectNamespace;
         _appSettingsJsonJObject = appSettingsJsonJObject;
         _userSecretJsonJObject = userSecretJsonJObject;
         _forEncodeAppSettingsJsonKeys = forEncodeAppSettingsJsonKeys;

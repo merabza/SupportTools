@@ -199,8 +199,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData.UseReact)
         {
             Console.WriteLine("Creating Cors Properties...");
-            var corsSettingsCreator = new CorsSettingsCreator(ProjectName, appSettingsJsonJObject,
-                userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
+            var corsSettingsCreator = new CorsSettingsCreator(appSettingsJsonJObject, userSecretJsonJObject,
+                forEncodeAppSettingsJsonKeys);
             corsSettingsCreator.Run();
         }
         //if (_apiAppCreatorData.UseReact)
