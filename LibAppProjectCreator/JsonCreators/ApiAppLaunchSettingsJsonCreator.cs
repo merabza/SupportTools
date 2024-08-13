@@ -8,12 +8,12 @@ public sealed class ApiAppLaunchSettingsJsonCreator
 {
     private readonly string _projectFullPath;
     private readonly string _projectName;
-    private readonly bool _useReact;
+    //private readonly bool _useReact;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApiAppLaunchSettingsJsonCreator(bool useReact, string projectName, string projectFullPath)
+    public ApiAppLaunchSettingsJsonCreator(string projectName, string projectFullPath)
     {
-        _useReact = useReact;
+        //_useReact = useReact;
         _projectName = projectName;
         _projectFullPath = projectFullPath;
     }
@@ -23,12 +23,14 @@ public sealed class ApiAppLaunchSettingsJsonCreator
     {
         var projObject = new JObject(new JProperty("commandName", "Project"),
             new JProperty("workingDirectory", _projectFullPath),
-            new JProperty("launchBrowser", true), new JProperty("externalUrlConfiguration", true));
-        if (!_useReact)
-            projObject.Add(new JProperty("launchUrl", "swagger"));
-        projObject.Add(new JProperty("environmentVariables",
-            new JObject(new JProperty("ASPNETCORE_ENVIRONMENT", "Development"))));
-        projObject.Add(new JProperty("applicationUrl", "http://localhost:5099"));
+            new JProperty("launchBrowser", true), new JProperty("externalUrlConfiguration", true))
+        {
+            //if (!_useReact)
+            new JProperty("launchUrl", "swagger"),
+            new JProperty("environmentVariables",
+                new JObject(new JProperty("ASPNETCORE_ENVIRONMENT", "Development"))),
+            new JProperty("applicationUrl", "http://localhost:5099")
+        };
 
         var launchSettingsJObject = new JObject(
             new JProperty("profiles", new JObject(

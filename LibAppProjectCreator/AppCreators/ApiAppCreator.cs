@@ -232,8 +232,8 @@ public sealed class ApiAppCreator : AppCreatorBase
             return false;
 
         Console.WriteLine("Creating launchSettings.json...");
-        var apiAppLaunchSettingsJsonCreator = new ApiAppLaunchSettingsJsonCreator(_apiAppCreatorData.UseReact,
-            ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
+        var apiAppLaunchSettingsJsonCreator =
+            new ApiAppLaunchSettingsJsonCreator(ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
 
         return apiAppLaunchSettingsJsonCreator.Create();
     }
