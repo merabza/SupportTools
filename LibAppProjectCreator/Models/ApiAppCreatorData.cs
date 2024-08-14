@@ -180,6 +180,13 @@ public sealed class ApiAppCreatorData
         var repositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{projectName}Repositories", ["Installers"]);
 
+        var frontProjectFolderName = $"{projectName}Front";
+        var frontPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
+
+        var frontendProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{projectName}Db",
+            [.. databaseProjectFolders], dbPartSolutionFolderName);
+
+
         return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
             template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
             template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,

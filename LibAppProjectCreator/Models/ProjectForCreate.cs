@@ -23,6 +23,13 @@ public sealed class ProjectForCreate : ProjectBase
     public Dictionary<string, string> FoldersForCreate { get; } = [];
 
 
+    public static ProjectForCreate CreateReactProject(string createInPath, string projectName,
+        string[] availableFolders, string? solutionFolderName = null)
+    {
+        return Create(createInPath, projectName, projectName, EDotnetProjectType.ReactEsProj, string.Empty, null,
+            availableFolders, false, solutionFolderName);
+    }
+
     public static ProjectForCreate CreateClassLibProject(string createInPath, string projectName,
         string[] availableFolders, string? solutionFolderName = null)
     {
