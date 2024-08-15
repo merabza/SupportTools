@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
 using LibGitData;
 using LibParameters;
@@ -30,14 +29,7 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var result = parameters.GetGitProjectNames(_projectName, _gitCol);
-        if (result.IsNone)
-        {
-            StShared.WriteErrorLine($"Git Project with name {_projectName} does not exists", true);
-            return false;
-        }
-
-        var gitProjectNames = (List<string>)result;
+        var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
 
         if (!gitProjectNames.Contains(_gitProjectName))
         {

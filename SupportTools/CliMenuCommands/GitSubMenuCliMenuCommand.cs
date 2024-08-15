@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitData;
@@ -9,7 +6,8 @@ using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using System;
+using System.Linq;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -66,17 +64,9 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
 
 
-        var result = parameters.GetGitProjectNames(_projectName, _gitCol);
-        if (result.IsNone)
-        {
-            StShared.WriteErrorLine(
-                $"Git Project with name {_projectName} does not exists", true);
-            return gitSubMenuSet;
-        }
+        var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
 
-        var gitProjectNames = (List<string>)result;
         foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
-            //gitProjectName
             gitSubMenuSet.AddMenuItem(new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
                 gitProjectName, _gitCol));
 

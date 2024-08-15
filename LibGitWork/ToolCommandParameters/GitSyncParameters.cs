@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LibGitData;
+﻿using LibGitData;
 using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
@@ -37,14 +36,7 @@ public class GitSyncParameters : IParameters
             return null;
         }
 
-        var result = supportToolsParameters.GetGitProjectNames(projectName, gitCol);
-        if (result.IsNone)
-        {
-            StShared.WriteErrorLine($"Git Project with name {projectName} does not exists", true);
-            return null;
-        }
-
-        var gitProjectNames = (List<string>)result;
+        var gitProjectNames = project.GetGitProjectNames(gitCol);
 
         if (!gitProjectNames.Contains(gitProjectName))
         {

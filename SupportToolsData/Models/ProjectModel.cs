@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CliParametersDataEdit.Models;
+using LanguageExt;
+using LibGitData;
 using LibGitData.Models;
 using LibParameters;
 
@@ -102,4 +104,17 @@ public sealed class ProjectModel : ItemData
             ? null
             : projectRelativePath[..projectRelativePath.LastIndexOf(Path.DirectorySeparatorChar)];
     }
+
+    
+    public List<string> GetGitProjectNames(EGitCol gitCol)
+    {
+        return gitCol switch
+        {
+            EGitCol.Main => GitProjectNames,
+            EGitCol.ScaffoldSeed => ScaffoldSeederGitProjectNames,
+            _ => []
+        };
+    }
+
+
 }

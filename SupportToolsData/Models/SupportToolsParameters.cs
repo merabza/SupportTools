@@ -4,7 +4,6 @@ using System.IO;
 using ApiClientsManagement;
 using CliTools;
 using Installer.Models;
-using LanguageExt;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibFileParameters.Interfaces;
@@ -87,22 +86,25 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
             case EGitCol.ScaffoldSeed:
                 project.ScaffoldSeederGitProjectNames.Remove(gitName);
                 return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
-    public Option<List<string>> GetGitProjectNames(string projectName, EGitCol gitCol)
+    //public static Option<List<string>> GetGitProjectNames(ProjectModel project, EGitCol gitCol)
+    //{
+    //    return gitCol switch
+    //    {
+    //        EGitCol.Main => project.GitProjectNames,
+    //        EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+    //        _ => null
+    //    };
+    //}
+
+    public List<string> GetGitProjectNames(string projectName, EGitCol gitCol)
     {
         var project = GetProject(projectName);
-        if (project is null)
-            return null;
-        return gitCol switch
-        {
-            EGitCol.Main => project.GitProjectNames,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => null
-        };
+        return project is null ? [] : project.GetGitProjectNames(gitCol);
     }
 
     public ApiClientSettingsDomain GetWebAgentRequired(string webAgentKey)
