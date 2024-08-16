@@ -47,45 +47,24 @@ fi*/
 
         StShared.ConsoleWriteInformationLine(_logger, _useConsole, "Checking {0}...", _projectPath);
 
-        if (StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} remote update").IsSome)
-        {
-            StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
+        if (!GitRemoteUpdate()) 
             return GitState.Unknown;
-        }
 
-        var localResult = StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} rev-parse @");
-        if (localResult.IsT1)
-        {
-            StShared.WriteErrorLine("git rev-parse Error 1", _useConsole, _logger);
+        var local = GitGetLocalId();
+        if (local is null) 
             return GitState.Unknown;
-        }
 
-        var local = localResult.AsT0.Item1;
-
-        var remoteResult =
-            StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} rev-parse @{{u}}");
-        if (remoteResult.IsT1)
-        {
-            StShared.WriteErrorLine("git rev-parse Error 2", _useConsole, _logger);
+        var remote = GitGetRemoteId();
+        if (remote is null) 
             return GitState.Unknown;
-        }
 
-        var remote = remoteResult.AsT0.Item1;
-
-        var strBaseResult =
-            StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} merge-base @ @{{u}}");
-        if (strBaseResult.IsT1)
-        {
-            StShared.WriteErrorLine("git merge-baseError", _useConsole, _logger);
+        var strBase = GitGetBaseId();
+        if (strBase is null) 
             return GitState.Unknown;
-        }
-
-        var strBase = strBaseResult.AsT0.Item1;
 
         if (local == remote)
         {
             StShared.ConsoleWriteInformationLine(_logger, _useConsole, "{0} Up to date", _projectPath);
-            //Console.WriteLine($"{_projectPath} Up to date");
             return GitState.UpToDate;
         }
 
@@ -103,6 +82,40 @@ fi*/
 
         StShared.WriteWarningLine("Diverged", _useConsole, _logger);
         return GitState.NeedToPull;
+    }
+
+    public string? GitGetLocalId()
+    {
+        return GitGetId("rev-parse @");
+    }
+
+    public string? GitGetRemoteId()
+    {
+        return GitGetId("rev-parse @{u}");
+    }
+
+    public string? GitGetBaseId()
+    {
+        return GitGetId("merge-base @ @{u}");
+    }
+
+    private string? GitGetId(string parameters)
+    {
+        var localResult = StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} {parameters}");
+        if (!localResult.IsT1) 
+            return localResult.AsT0.Item1;
+
+        StShared.WriteErrorLine($"{Git} {parameters} Error", _useConsole, _logger);
+        return null;
+    }
+
+    public bool GitRemoteUpdate()
+    {
+        if (!StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} remote update").IsSome) 
+            return true;
+
+        StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
+            return false;
     }
 
     public bool Pull()
@@ -192,7 +205,7 @@ fi*/
         return StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} rev-parse").IsNone;
     }
 
-    private bool Push()
+    public bool Push()
     {
         if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} push").IsNone)
             return true;
