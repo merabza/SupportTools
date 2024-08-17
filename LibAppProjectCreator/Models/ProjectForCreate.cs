@@ -7,16 +7,14 @@ namespace LibAppProjectCreator.Models;
 public sealed class ProjectForCreate : ProjectBase
 {
     private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType, string projectCreateParameters,
-        string projectFullPath, string projectFileFullName, string? classForDelete, bool useReact,
-        string? solutionFolderName) : base(projectName, projectFullPath, projectFileFullName, solutionFolderName)
+        string projectFullPath, string projectFileFullName, string? classForDelete, string? solutionFolderName) : base(
+        projectName, projectFullPath, projectFileFullName, solutionFolderName)
     {
-        UseReact = useReact;
         DotnetProjectType = dotnetProjectType;
         ProjectCreateParameters = projectCreateParameters;
         ClassForDelete = classForDelete;
     }
 
-    public bool UseReact { get; }
     public EDotnetProjectType DotnetProjectType { get; }
     public string ProjectCreateParameters { get; }
     public string? ClassForDelete { get; }
@@ -27,39 +25,33 @@ public sealed class ProjectForCreate : ProjectBase
         string[] availableFolders, string? solutionFolderName = null)
     {
         return Create(createInPath, projectName, projectName, EDotnetProjectType.ReactEsProj, string.Empty, null,
-            availableFolders, false, solutionFolderName);
+            availableFolders, solutionFolderName);
     }
 
     public static ProjectForCreate CreateClassLibProject(string createInPath, string projectName,
         string[] availableFolders, string? solutionFolderName = null)
     {
         return Create(createInPath, projectName, projectName, EDotnetProjectType.ClassLib, string.Empty, "Class1",
-            availableFolders, false, solutionFolderName);
+            availableFolders, solutionFolderName);
     }
-
 
     public static ProjectForCreate Create(string createInPath, string projectFolderName, string projectName,
         EDotnetProjectType dotnetProjectType, string projectCreateParameters, string? classForDelete,
-        string[] availableFolders, bool useReact = false, string? solutionFolderName = null)
+        string[] availableFolders, string? solutionFolderName = null)
     {
         var projectPath = Path.Combine(createInPath, projectFolderName);
-        var projectFileFullName = Path.Combine(projectPath, $"{projectName}.csproj");
+        var projectFileFullName = Path.Combine(projectPath,
+            $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj");
         var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters,
-            projectPath,
-            projectFileFullName, classForDelete, useReact, solutionFolderName);
-
-        //FoldersForCreate.Add(projectPath);
+            projectPath, projectFileFullName, classForDelete, solutionFolderName);
 
         foreach (var folder in availableFolders)
         {
             var folderFullPath = Path.Combine(projectPath, folder);
             //ჩაემატოს პროექტის ფოლდერებში
             projectDataModel.AddFolder(folder, folderFullPath);
-            //ჩაემატოს შესაქმნელი ფოლდერების სიაში
-            //FoldersForCreate.Add(folderFullPath);
         }
 
-        //Projects.Add(projectDataModel);
         return projectDataModel;
     }
 

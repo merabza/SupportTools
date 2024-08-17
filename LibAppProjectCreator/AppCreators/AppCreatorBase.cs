@@ -13,6 +13,7 @@ using LibGitWork;
 using LibGitWork.ToolActions;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
+using SupportToolsData;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -211,6 +212,14 @@ public abstract class AppCreatorBase
         foreach (var prj in Projects)
             if (prj is ProjectForCreate projectForCreate)
             {
+                if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
+                {
+                    //რეაქტის პროექტის შექმნა ფრონტისთვის
+                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath, true);
+                    reactEsProjectCreator.Create();
+                    return true;
+                }
+
                 //პროექტების შექმნა
                 if (StShared.RunProcess(true, Logger, "dotnet",
                         $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? string.Empty : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
@@ -231,8 +240,6 @@ public abstract class AppCreatorBase
                     File.Delete(programCs);
                 }
 
-                //projPath = Path.Combine(SolutionPath, projectForCreate.ProjectName,
-                //    $"{projectForCreate.ProjectName}.csproj");
                 if (StShared.RunProcess(true, Logger, "dotnet",
                         $"sln {SolutionPath} add {(projectForCreate.SolutionFolderName is null ? string.Empty : $"--solution-folder {projectForCreate.SolutionFolderName} ")}{projectForCreate.ProjectFileFullName}")
                     .IsSome)
@@ -250,10 +257,11 @@ public abstract class AppCreatorBase
             }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
-        if (References.Any(refData =>
-                StShared.RunProcess(true, Logger, "dotnet",
-                    $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome))
-            return false;
+        foreach (var refData in References)
+        {
+            if (StShared.RunProcess(true, Logger, "dotnet", $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome) 
+                return false;
+        }
 
         //პაკეტების მიერთება პროექტებში, სიის მიხედვით
         if (!Packages.All(packageData => StShared.RunProcess(true, Logger, "dotnet",

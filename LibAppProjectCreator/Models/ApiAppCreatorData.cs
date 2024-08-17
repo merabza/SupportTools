@@ -14,14 +14,13 @@ public sealed class ApiAppCreatorData
         bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
         bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
-        ProjectForCreate repositoriesProjectData)
+        ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData)
     {
         AppCreatorBaseData = appCreatorBaseData;
         MainProjectData = mainProjectData;
         UseReact = useReact;
         UseCarcass = useCarcass;
         DbPartPath = dbPartPath;
-        //ReactClientPath = reactClientPath;
         UseDatabase = useDatabase;
         UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
         UseIdentity = useIdentity;
@@ -33,6 +32,7 @@ public sealed class ApiAppCreatorData
         DbMigrationProjectData = dbMigrationProjectData;
         LibProjectRepositoriesProjectData = libProjectRepositoriesProjectData;
         RepositoriesProjectData = repositoriesProjectData;
+        FrontendProjectData = frontendProjectData;
     }
 
     public bool UseReact { get; set; }
@@ -43,15 +43,13 @@ public sealed class ApiAppCreatorData
     public bool UseReCounter { get; set; }
     public bool UseSignalR { get; set; }
     public bool UseFluentValidation { get; }
-
     public string? ReactTemplateName { get; }
-
-    //public string ReactClientPath { get; }
     public string? DbPartPath { get; }
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
     public ProjectForCreate LibProjectRepositoriesProjectData { get; }
     public ProjectForCreate RepositoriesProjectData { get; }
+    public ProjectForCreate FrontendProjectData { get; }
     public ProjectForCreate DatabaseProjectData { get; }
     public ProjectForCreate DbMigrationProjectData { get; }
 
@@ -77,55 +75,6 @@ public sealed class ApiAppCreatorData
             return null;
         }
 
-        //if (par.TempFolderPath is null)
-        //{
-        //    StShared.WriteErrorLine("Temp folder does not specified", true, logger);
-        //    return null;
-        //}
-
-        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს სამუშაო ფოლდერს
-        //if (FileStat.NormalizePath(par.WorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
-        //{
-        //    StShared.WriteErrorLine($"Work and Temp Folders are same {par.TempFolderPath}.", true, logger);
-        //    return null;
-        //}
-
-        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს საიდუმლოებების ფოლდერს
-        //if (FileStat.NormalizePath(par.SecurityWorkFolderPath) == FileStat.NormalizePath(par.TempFolderPath))
-        //{
-        //    StShared.WriteErrorLine($"Security and Temp Folders are same {par.TempFolderPath}.", true, logger);
-        //    return null;
-        //}
-
-        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის სამუშაო ფოლდერს
-        //if (FileStat.NormalizePath(appCreatorBaseData.WorkPath) == FileStat.NormalizePath(par.TempFolderPath))
-        //{
-        //    StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
-        //        logger);
-        //    return null;
-        //}
-
-        ////დროებით ფოლდერი არ უნდა ემთხვეოდეს პროექტის საიდუმლოებების ფოლდერს
-        //if (FileStat.NormalizePath(appCreatorBaseData.SecurityPath) == FileStat.NormalizePath(par.TempFolderPath))
-        //{
-        //    StShared.WriteErrorLine($"project Work and Temp Folders are same {par.TempFolderPath}.", true,
-        //        logger);
-        //    return null;
-        //}
-
-        ////შევამოწმოთ და თუ არ არსებობს შევქმნათ დროებითი სამუშაოებისათვის განკუთვნილი ფოლდერი
-        //if (!StShared.CreateFolder(par.TempFolderPath, true))
-        //{
-        //    StShared.WriteErrorLine($"Cannot create temp Folder {par.TempFolderPath}", true, logger);
-        //    return null;
-        //}
-
-        ////შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
-        //var projectTempPath = Path.Combine(par.TempFolderPath, par.ProjectName.ToLower());
-        ////foldersForCreate.Add(tempPath);
-        //if (!FileStat.CheckRequiredFolder(true, projectTempPath, false))
-        //    return null;
-
         var projectFolders = new List<string>
         {
             "Properties",
@@ -133,23 +82,9 @@ public sealed class ApiAppCreatorData
             "Installers"
         };
 
-        //if (template.UseReact)
-        //{
-        //    projectFolders.Add("Pages");
-        //    projectFolders.Add("ClientApp");
-        //    //projectFolders.Add("ClientApp/public");
-        //}
-
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
-            EDotnetProjectType.Web, template.UseHttps ? string.Empty : "--no-https", "Program", [.. projectFolders],
-            template.UseReact);
-
-        //დავიანგარიშოთ კლიენტის ფოლდერის სრული გზა
-        //var reactClientPath = Path.Combine(mainProjectData.ProjectFullPath, "ClientApp");
-        //შევამოწმოთ არსებობს თუ არა უკვე პროექტის ფოლდერი
-        //AppCreatorBaseData.CheckRequiredFolder(reactClientPath, false);
-
+            EDotnetProjectType.Web, template.UseHttps ? string.Empty : "--no-https", "Program", [.. projectFolders]);
 
         var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"Lib{projectName}Repositories", []);
@@ -182,15 +117,13 @@ public sealed class ApiAppCreatorData
 
         var frontProjectFolderName = $"{projectName}Front";
         var frontPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
-
-        var frontendProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{projectName}Db",
-            [.. databaseProjectFolders], dbPartSolutionFolderName);
-
+        var frontendProjectData =
+            ProjectForCreate.CreateReactProject(frontPath, $"{projectName}frontend", [], frontProjectFolderName);
 
         return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
             template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
             template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
             template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
-            repositoriesProjectData);
+            repositoriesProjectData, frontendProjectData);
     }
 }

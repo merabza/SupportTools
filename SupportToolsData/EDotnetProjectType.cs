@@ -12,7 +12,7 @@ public enum EDotnetProjectType
 
 dotnet --version
 
-8.0.303
+8.0.400
 
 dotnet new list
 
@@ -21,9 +21,11 @@ These templates matched your input:
    Template Name             Short Name                  Language    Tags
    ------------------------  --------------------------  ----------  -----------------------------------------------------------------------------
    .NET Aspire App Host      aspire-apphost              [C#]        Common/.NET Aspire/Cloud
-   .NET Aspire Application   aspire                      [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service
+   .NET Aspire Empty App     aspire                      [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service
    .NET Aspire Service D...  aspire-servicedefaults      [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service
-   .NET Aspire Starter A...  aspire-starter              [C#]        Common/.NET Aspire/Blazor/Web/Web API/API/Service/Cloud
+   .NET Aspire Starter App   aspire-starter              [C#]        Common/.NET Aspire/Blazor/Web/Web API/API/Service/Cloud
+   .NET Aspire Test Proj...  aspire-mstest               [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
+   .NET Aspire Test Proj...  aspire-nunit                [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
    .NET Aspire Test Proj...  aspire-xunit                [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
    .NET MAUI App             maui                        [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Mobile
    .NET MAUI Blazor Hybr...  maui-blazor                 [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Blazor/Blazor Hybrid/Mobile
@@ -102,4 +104,4 @@ These templates matched your input:
    WPF Custom Control Li...  wpfcustomcontrollib         [C#],VB     Common/WPF
    WPF User Control Library  wpfusercontrollib           [C#],VB     Common/WPF
    xUnit Test Project        xunit                       [C#],F#,VB  Test/xUnit
- * */
+*/

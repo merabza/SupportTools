@@ -21,9 +21,6 @@ public sealed class ApiAppCreator : AppCreatorBase
 {
     private readonly ApiAppCreatorData _apiAppCreatorData;
     private readonly string _projectShortName;
-    //private readonly Dictionary<string, string> _reactAppTemplates;
-
-    //private readonly string _workFolder;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
@@ -33,43 +30,24 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         _projectShortName = projectShortName;
         _apiAppCreatorData = apiAppCreatorData;
-        //_workFolder = workFolder;
-        //_reactAppTemplates = reactAppTemplates;
     }
 
     protected override void PrepareFoldersForCheckAndClear()
     {
         base.PrepareFoldersForCheckAndClear();
-        //FoldersForCheckAndClear.Add(_apiAppCreatorData.ProjectTempPath);
         if (!string.IsNullOrWhiteSpace(_apiAppCreatorData.DbPartPath))
             FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
     }
 
-    //protected override void PrepareFoldersForCreate()
-    //{
-    //    base.PrepareFoldersForCreate();
-    //    //FoldersForCreate.Add(_apiAppCreatorData.TempPath);
-    //    //FoldersForCreate.Add(_apiAppCreatorData.ReactClientPath);
-    //}
-
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
     {
-        //if (_apiAppCreatorData.UseCarcass)
-        //    AddGitClone(WorkPath, Clones.Instance.BackendCarcass);
-
-        //AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
         if (_apiAppCreatorData.UseReact)
         {
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
-            //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReactTools);
         }
-        //AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreMvcNewtonsoftJson);
-
-        //if (_apiAppCreatorData.UseBackgroundTasks)
-        //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackgroundTasksTools);
 
         if (_apiAppCreatorData.UseSignalR)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
@@ -85,31 +63,24 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
-
-
-
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SerilogLogger);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WindowsServiceTools);
 
-        //if (_apiAppCreatorData is { UseCarcass: true, UseIdentity: true })
-        //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcass);
-
         if (_apiAppCreatorData.UseCarcass)
         {
             AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassRepositories);
-            //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ServerCarcassMini);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassApi);
         }
 
         if (!_apiAppCreatorData.UseDatabase)
             return true;
+    
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
-        //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CliParametersDataEdit);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.DatabaseProjectData);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.LibProjectRepositoriesProjectData);
 
@@ -143,6 +114,12 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.RepositoriesProjectData, GitProjects.CarcassRepositories);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.RepositoriesProjectData);
         AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
+
+        if (!_apiAppCreatorData.UseReact)
+            return true;
+
+        AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.FrontendProjectData);
+
         return true;
     }
 
@@ -150,7 +127,6 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         var appSettingsJsonJObject = new JObject();
         var userSecretJsonJObject = new JObject();
-        //var forEncodeAppSettingsJsonKeys = new Dictionary<string, string>();
         var forEncodeAppSettingsJsonKeys = new List<string>();
         var keyPart1 = Guid.NewGuid().ToString("N");
 
@@ -163,8 +139,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         programClassCreator.CreateFileStructure();
 
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
-
-        //var installersPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Installers"];
 
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: false })
             MakeFilesWhenUseIdentityAndNotUseCarcass(modelsPath);
@@ -185,9 +159,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         var kestrelOptionsCreator = new KestrelOptionsCreator(appSettingsJsonJObject);
         kestrelOptionsCreator.Run();
 
-        //if (_apiAppCreatorData.UseBackgroundTasks)
-        //    MakeFilesWhenUseBackgroundTasks(installersPath);
-
         if (_apiAppCreatorData.UseReact)
             MakeFilesWhenUseReact();
 
@@ -203,20 +174,6 @@ public sealed class ApiAppCreator : AppCreatorBase
                 forEncodeAppSettingsJsonKeys);
             corsSettingsCreator.Run();
         }
-        //if (_apiAppCreatorData.UseReact)
-        //{
-        //    if (string.IsNullOrWhiteSpace(_apiAppCreatorData.ReactTemplateName))
-        //    {
-        //        Logger.LogError("ReactTemplateName does not specified");
-        //        return false;
-        //    }
-
-        //    var createReactApp = new CreateReactClientApp(Logger,
-        //        _apiAppCreatorData.ReactClientPath, ProjectName, _apiAppCreatorData.ReactTemplateName, _workFolder,
-        //        _reactAppTemplates);
-        //    if (!createReactApp.Run())
-        //        return false;
-        //}
 
         Console.WriteLine("Create AppSettingsVersion...");
         appSettingsJsonJObject.Add(
@@ -260,15 +217,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         //var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "Error.cshtml.cs");
         //errorModelClassCreator.CreateFileStructure();
     }
-
-    //private void MakeFilesWhenUseBackgroundTasks(string installersPath)
-    //{
-    //    Console.WriteLine("Creating ProjectBackgroundTasksQueueInstaller.cs...");
-    //    var projectBackgroundTasksQueueInstallerClassCreator = new ProjectBackgroundTasksQueueInstallerClassCreator(
-    //        Logger, installersPath, Par.ProjectName, _apiAppCreatorData.UseCarcass,
-    //        "ProjectBackgroundTasksQueueInstaller.cs");
-    //    projectBackgroundTasksQueueInstallerClassCreator.CreateFileStructure();
-    //}
 
     private static void MakeFilesWhenUseIdentity(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
