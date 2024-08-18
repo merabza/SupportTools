@@ -233,6 +233,8 @@ public sealed class GitSyncToolAction : ToolAction
             UsedCommitMessage =
                 Inputer.InputTextRequired("Message", UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
+        Changed = true;
+
         // ReSharper disable once using
         var result = Task.FromResult(gitProcessor.Commit(UsedCommitMessage) && gitProcessor.SyncRemote());
 
