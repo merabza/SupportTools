@@ -49,14 +49,14 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         //            //და რომელ პროექტებზეა დამოკიდებული ეს პროექტები
         //            //დადგენილი ინფორმაციის შენახვა მოხდეს პარამეტრებში
 
-        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, true);
+        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, _gitName, true);
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
             return false;
         }
 
-        if (!gitProjectsUpdater.ProcessOneGitProject(_gitName))
+        if (!gitProjectsUpdater.ProcessOneGitProject())
             return false;
 
         _parametersManager.Save(_supportToolsParameters, "Project Saved");

@@ -56,16 +56,16 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         List<string> usedProjectNames = [];
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, null, UseConsole);
 
-        foreach (var kvp in gitRepos.Gits)
+        foreach (var gitProjectsUpdater in gitRepos.Gits.Select(kvp =>
+                     GitProjectsUpdater.Create(Logger, _parametersManager, kvp.Key, UseConsole)))
         {
-            var gitProjectsUpdater = GitProjectsUpdater.Create(Logger, _parametersManager, UseConsole);
             if (gitProjectsUpdater is null)
             {
                 StShared.WriteErrorLine("gitProjectsUpdater does not created", true, Logger);
                 return Task.FromResult(false);
             }
 
-            if (!gitProjectsUpdater.ProcessOneGitProject(kvp.Key))
+            if (!gitProjectsUpdater.ProcessOneGitProject())
                 return Task.FromResult(false);
             usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
         }

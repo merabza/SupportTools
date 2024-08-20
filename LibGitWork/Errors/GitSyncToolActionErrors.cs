@@ -4,6 +4,31 @@ namespace LibGitWork.Errors;
 
 public static class GitSyncToolActionErrors
 {
+
+    public static readonly Err CouldNotUpdateGitRemote = new()
+    {
+        ErrorCode = nameof(CouldNotUpdateGitRemote),
+        ErrorMessage = "Could not Update Git Remote"
+    };
+
+    public static readonly Err CouldNotGetGitRemoteId = new()
+    {
+        ErrorCode = nameof(CouldNotGetGitRemoteId),
+        ErrorMessage = "Could not get git Remote Id"
+    };
+
+    public static readonly Err CouldNotGetGitLocalId = new()
+    {
+        ErrorCode = nameof(CouldNotGetGitLocalId),
+        ErrorMessage = "Could not get git Local Id"
+    };
+
+    public static readonly Err CouldNotGetGitBaseId = new()
+    {
+        ErrorCode = nameof(CouldNotGetGitBaseId),
+        ErrorMessage = "Could not get git Base Id"
+    };
+
     public static readonly Err GetRemoteOriginUrlError = new()
     {
         ErrorCode = nameof(GetRemoteOriginUrlError),
@@ -27,7 +52,6 @@ public static class GitSyncToolActionErrors
         ErrorCode = nameof(NeedCommitError),
         ErrorMessage = "Error when detecting Need Commit"
     };
-
 
     public static Err PropertyIsEmpty(string propertyName)
     {

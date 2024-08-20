@@ -17,25 +17,30 @@ namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {
-    private readonly GitRepos _gitRepos;
     private readonly string _gitsFolder;
+    private readonly GitDataDomain _gitData;
+    private readonly string _projectFolderName;
+    private readonly string _gitName;
     private readonly ILogger? _logger;
     private readonly SupportToolsParameters _supportToolsParameters;
-    private readonly string _workFolder;
 
-    private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string workFolder,
-        string gitsFolder, GitRepos gitRepos)
+    public string? LastRemoteId { get; private set; }
+    
+    private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string gitsFolder,
+        GitDataDomain gitData, string projectFolderName, string gitName)
     {
         _logger = logger;
         _supportToolsParameters = supportToolsParameters;
-        _workFolder = workFolder;
         _gitsFolder = gitsFolder;
-        _gitRepos = gitRepos;
+        _gitData = gitData;
+        _projectFolderName = projectFolderName;
+        _gitName = gitName;
     }
 
     public List<string> UsedProjectNames { get; } = [];
 
-    public static GitProjectsUpdater? Create(ILogger? logger, IParametersManager parametersManager, bool useConsole)
+    public static GitProjectsUpdater? Create(ILogger? logger, IParametersManager parametersManager, string gitName,
+        bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var workFolder = supportToolsParameters.WorkFolder;
@@ -47,28 +52,29 @@ public sealed class GitProjectsUpdater
 
         var gitsFolder = Path.Combine(workFolder, "Gits");
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, null, null, useConsole);
-        return new GitProjectsUpdater(logger, supportToolsParameters, workFolder, gitsFolder, gitRepos);
+
+        var gitData = gitRepos.GetGitRepoByKey(gitName);
+        if (gitData is null)
+        {
+            StShared.WriteErrorLine($"git with name {gitName} does not exists", true, logger);
+            return null;
+        }
+
+        var projectFolderName = GetProjectFolderName(logger, workFolder, gitsFolder, gitData);
+        if (!string.IsNullOrWhiteSpace(projectFolderName))
+            return new GitProjectsUpdater(logger, supportToolsParameters, gitsFolder, gitData, projectFolderName, gitName);
+
+        StShared.WriteErrorLine($"cannot count projectFolderName for git with name {gitName}", true, logger);
+        return null;
+
     }
 
-    public bool ProcessOneGitProject(string gitName, bool processFolder = true)
+    public bool ProcessOneGitProject(bool processFolder = true)
     {
-        var git = _gitRepos.GetGitRepoByKey(gitName);
-        if (git is null)
-        {
-            StShared.WriteErrorLine($"git with name {gitName} does not exists", true, _logger);
+
+        if (!UpdateOneGitProject(_projectFolderName, _gitData))
             return false;
-        }
-
-        var projectFolderName = GetProjectFolderName(git);
-        if (!string.IsNullOrWhiteSpace(projectFolderName))
-        {
-            if (!UpdateOneGitProject(projectFolderName, git)) 
-                return false;
-            return !processFolder || ProcessFolder(projectFolderName, gitName);
-        }
-
-        StShared.WriteErrorLine($"cannot count projectFolderName for git with name {gitName}", true, _logger);
-        return false;
+        return !processFolder || ProcessFolder(_projectFolderName, _gitName);
 
         /*
 
@@ -84,21 +90,23 @@ public sealed class GitProjectsUpdater
         //გავიაროთ projectFolderName ფოლდერი, თავისი ქვეფოლდერებით და მოვძებნოთ *.csproj ფაილები
     }
 
-    private string? GetProjectFolderName(GitDataDomain git)
+    private static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder,
+        GitDataDomain gitData)
     {
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-        if (FileStat.CreateFolderIfNotExists(_workFolder, true) == null)
+        if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)
         {
-            StShared.WriteErrorLine($"does not exists and cannot create work folder {_workFolder}", true, _logger);
+            StShared.WriteErrorLine($"does not exists and cannot create work folder {workFolder}", true, logger);
             return null;
         }
 
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         //_gitsFolder = Path.Combine(_workFolder, "Gits");
-        if (FileStat.CreateFolderIfNotExists(_gitsFolder, true) != null)
-            return Path.Combine(_gitsFolder, git.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
+        if (FileStat.CreateFolderIfNotExists(gitsFolder, true) != null)
+            return Path.Combine(gitsFolder,
+                gitData.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
 
-        StShared.WriteErrorLine($"does not exists and cannot create work folder {_gitsFolder}", true, _logger);
+        StShared.WriteErrorLine($"does not exists and cannot create work folder {gitsFolder}", true, logger);
         return null;
 
         //შემოწმდეს Gits ფოლდერში პროექტის ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
@@ -147,7 +155,9 @@ public sealed class GitProjectsUpdater
             if (needCommitResult.AsT0)
             {
                 //  თუ აღმოჩნდა რომ ცვლილებები მომხდარა, გამოვიდეს შეტყობინება ცვლილებების გაუქმებისა და თავიდან დაკლონვის შესახებ
-                if (!Inputer.InputBool("Have changes, Restore to server version?", true))
+                if (!Inputer.InputBool(
+                        $"{projectFolderName} Have changes it is SupportTools Work folder and must be Restored to server version. continue?",
+                        true))
                     return false;
 
                 //     თანხმობის შემთხვევაში ან თავიდან დაიკლონოს, ან უკეთესია, თუ Checkout გაკეთდება.
@@ -164,17 +174,19 @@ public sealed class GitProjectsUpdater
                 if (!gitProcessor.Clean_fdx())
                     return false;
             }
-            //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
-
-            if (gitProcessor.GetGitState() != GitState.NeedToPull)
-                return true;
-
-            if (!gitProcessor.Pull())
-                return false;
+            else
+            {
+                //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
+                if (gitProcessor.GetGitState() == GitState.NeedToPull && !gitProcessor.Pull())
+                    return false;
+            }
         }
 
+        gitProcessor.CheckRemoteId();
+        LastRemoteId = gitProcessor.LastRemoteId;
         return true;
     }
+
 
     private bool ProcessFolder(string folderPath, string gitName)
     {

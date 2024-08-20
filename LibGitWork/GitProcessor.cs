@@ -15,6 +15,10 @@ public sealed class GitProcessor
     private readonly string _switchToProjectPath;
     private readonly bool _useConsole;
 
+    private string? _remoteId;
+
+    public string? LastRemoteId => _remoteId;
+
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProcessor(bool useConsole, ILogger? logger, string projectPath)
     {
@@ -23,7 +27,30 @@ public sealed class GitProcessor
         _projectPath = projectPath;
         _switchToProjectPath = $"-C {_projectPath}";
     }
+    public void CheckRemoteId()
+    {
+        _remoteId ??= GitGetRemoteId();
+    }
 
+    //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
+    //{
+    //    if (updateRemote && !GitRemoteUpdate())
+    //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
+
+    //    var local = GitGetLocalId();
+    //    if (local is null)
+    //        return new[] { GitSyncToolActionErrors.CouldNotGetGitLocalId };
+
+    //    var remote = GitGetRemoteId();
+    //    if (remote is null)
+    //        return new[] { GitSyncToolActionErrors.CouldNotGetGitRemoteId };
+
+    //    var strBase = GitGetBaseId();
+    //    if (strBase is null)
+    //        return new[] { GitSyncToolActionErrors.CouldNotGetGitBaseId };
+
+    //    return local != remote && local == strBase;
+    //}
     public GitState GetGitState()
     {
         //https://newbedev.com/check-if-pull-needed-in-git
@@ -47,22 +74,22 @@ fi*/
 
         StShared.ConsoleWriteInformationLine(_logger, _useConsole, "Checking {0}...", _projectPath);
 
-        if (!GitRemoteUpdate()) 
-            return GitState.Unknown;
+        //if (!GitRemoteUpdate()) 
+        //    return GitState.Unknown;
 
         var local = GitGetLocalId();
         if (local is null) 
             return GitState.Unknown;
 
-        var remote = GitGetRemoteId();
-        if (remote is null) 
+        _remoteId = GitGetRemoteId();
+        if (_remoteId is null) 
             return GitState.Unknown;
 
         var strBase = GitGetBaseId();
         if (strBase is null) 
             return GitState.Unknown;
 
-        if (local == remote)
+        if (local == _remoteId)
         {
             StShared.ConsoleWriteInformationLine(_logger, _useConsole, "{0} Up to date", _projectPath);
             return GitState.UpToDate;
@@ -74,7 +101,7 @@ fi*/
             return GitState.NeedToPull;
         }
 
-        if (remote == strBase)
+        if (_remoteId == strBase)
         {
             Console.WriteLine("need to push");
             return GitState.NeedToPush;
@@ -84,17 +111,17 @@ fi*/
         return GitState.NeedToPull;
     }
 
-    public string? GitGetLocalId()
+    private string? GitGetLocalId()
     {
         return GitGetId("rev-parse @");
     }
 
-    public string? GitGetRemoteId()
+    private string? GitGetRemoteId()
     {
         return GitGetId("rev-parse @{u}");
     }
 
-    public string? GitGetBaseId()
+    private string? GitGetBaseId()
     {
         return GitGetId("merge-base @ @{u}");
     }
@@ -205,7 +232,7 @@ fi*/
         return StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} rev-parse").IsNone;
     }
 
-    public bool Push()
+    private bool Push()
     {
         if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} push").IsNone)
             return true;
@@ -217,7 +244,10 @@ fi*/
     public bool Clone(string remoteAddress)
     {
         if (StShared.RunProcess(_useConsole, _logger, Git, $"clone {remoteAddress} {_projectPath}").IsNone)
+        {
+            CheckRemoteId();
             return true;
+        }
         StShared.WriteErrorLine($"cannot clone {remoteAddress} to {_projectPath}", _useConsole, _logger);
         return false;
     }
@@ -241,6 +271,9 @@ echo "Need to push"
 else
 echo "Diverged"
 fi*/
+        if ( _remoteId is null && !GitRemoteUpdate()) 
+            return false;
+
 
         while (true)
             switch (GetGitState())
