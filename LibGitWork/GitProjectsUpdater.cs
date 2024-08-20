@@ -50,7 +50,7 @@ public sealed class GitProjectsUpdater
         return new GitProjectsUpdater(logger, supportToolsParameters, workFolder, gitsFolder, gitRepos);
     }
 
-    public bool ProcessOneGitProject(string gitName)
+    public bool ProcessOneGitProject(string gitName, bool processFolder = true)
     {
         var git = _gitRepos.GetGitRepoByKey(gitName);
         if (git is null)
@@ -61,7 +61,12 @@ public sealed class GitProjectsUpdater
 
         var projectFolderName = GetProjectFolderName(git);
         if (!string.IsNullOrWhiteSpace(projectFolderName))
-            return UpdateOneGitProject(projectFolderName, git) && ProcessFolder(projectFolderName, gitName);
+        {
+            if (!UpdateOneGitProject(projectFolderName, git)) 
+                return false;
+            return !processFolder || ProcessFolder(projectFolderName, gitName);
+        }
+
         StShared.WriteErrorLine($"cannot count projectFolderName for git with name {gitName}", true, _logger);
         return false;
 

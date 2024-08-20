@@ -80,7 +80,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
                 {
                     if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
                         gitSyncToolsByGitProjectNames.Add(gitProjectName,
-                            new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName));
+                            new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true));
                     gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
                 }
             }

@@ -4,7 +4,9 @@ using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LibDataInput;
+using SystemToolsShared;
 
 namespace LibGitWork;
 
@@ -14,6 +16,7 @@ public class GitProjectSyncronizer
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _gitProjectName;
+    private readonly bool _useConsole;
 
     public int Count =>_gitSyncToolActionList.Count;
 
@@ -22,11 +25,12 @@ public class GitProjectSyncronizer
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectSyncronizer(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
-        string? commitMessage = null)
+        bool useConsole, string? commitMessage = null)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _gitProjectName = gitProjectName;
+        _useConsole = useConsole;
         UsedCommitMessage = commitMessage;
     }
 
@@ -43,6 +47,23 @@ public class GitProjectSyncronizer
     {
         foreach (var gitSyncToolAction in _gitSyncToolActionList)
         {
+
+            //ეს ნაწილი არის SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება
+            var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, _useConsole);
+            if (gitProjectsUpdater is null)
+            {
+                StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
+                continue;
+            }
+
+            if (!gitProjectsUpdater.ProcessOneGitProject(_gitProjectName))
+            {
+                StShared.WriteErrorLine("ProcessOneGitProject is not working", true, _logger);
+                continue;
+            }
+            //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
+
+
             var (phase1Result, gitProcessor) = gitSyncToolAction.RunActionPhase1();
             
             //აქ გავჩერდი, თუ საჭირო იყო, კლონირება მოხდა, დადგინდა ცვლილებები დასაკომიტებელია თუ არა. ცნობილია მოხდა თუ არა შეცდომები
