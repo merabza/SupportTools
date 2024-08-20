@@ -53,7 +53,7 @@ public class GitProjectSyncronizer
             return;
         }
 
-        if (!gitProjectsUpdater.ProcessOneGitProject())
+        if (!gitProjectsUpdater.ProcessOneGitProject(false))
         {
             StShared.WriteErrorLine("ProcessOneGitProject is not working", true, _logger);
             return;
