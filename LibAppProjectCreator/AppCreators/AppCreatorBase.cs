@@ -215,7 +215,7 @@ public abstract class AppCreatorBase
                 if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
                 {
                     //რეაქტის პროექტის შექმნა ფრონტისთვის
-                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath, true);
+                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath, $"{ProjectName}frontend.esproj", true);
                     reactEsProjectCreator.Create();
                     return true;
                 }
@@ -259,6 +259,16 @@ public abstract class AppCreatorBase
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         foreach (var refData in References)
         {
+            if (!File.Exists(refData.ProjectFilePath))
+            {
+                StShared.WriteErrorLine($"{refData.ProjectFilePath} is not exists", true, Logger, false);
+                continue;
+            }   
+            if (!File.Exists(refData.ReferenceProjectFilePath))
+            {
+                StShared.WriteErrorLine($"{refData.ReferenceProjectFilePath} is not exists", true, Logger, false);
+                continue;
+            }   
             if (StShared.RunProcess(true, Logger, "dotnet", $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome) 
                 return false;
         }

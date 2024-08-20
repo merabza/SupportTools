@@ -1,16 +1,20 @@
-﻿using SystemToolsShared;
+﻿using System.IO;
+using System.Xml.Linq;
+using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
 public class ReactEsProjectCreator
 {
     private readonly string _projectFullPath;
+    private readonly string _projectName;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReactEsProjectCreator(string projectFullPath, bool useConsole)
+    public ReactEsProjectCreator(string projectFullPath, string projectName, bool useConsole)
     {
         _projectFullPath = projectFullPath;
+        _projectName = projectName;
         _useConsole = useConsole;
     }
 
@@ -24,7 +28,7 @@ public class ReactEsProjectCreator
          *<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha">
              <PropertyGroup>
                <StartupCommand>set BROWSER=none&amp;&amp;npm start</StartupCommand>
-             <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+               <JavaScriptTestRoot>src\</JavaScriptTestRoot>
                <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
                <!-- Command to run on project build -->
                <BuildCommand></BuildCommand>
@@ -35,6 +39,9 @@ public class ReactEsProjectCreator
              </PropertyGroup>
            </Project>
          */
+
+        CreateEsprojFile(Path.Combine(_projectFullPath, _projectName));
+
 
         //Microsoft.VisualStudio.JavaScript.Sdk-ს ბოლო ვერსიის დასადგენად უნდა მოვქაჩოთ გვერდი 
         //https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK
@@ -50,4 +57,24 @@ public class ReactEsProjectCreator
         //შევქმნათ src ფოლდერი და მისი შიგთავსი
 
     }
+
+    private void CreateEsprojFile(string projectFileFullName)
+    {
+        var project =
+            new XElement("Project",new XAttribute("Sdk", "Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha"),
+                new XElement("PropertyGroup",
+                    new XElement("StartupCommand", "set BROWSER=none&amp;&amp;npm start"),
+                    new XElement("JavaScriptTestRoot", "src\\"),
+                    new XElement("JavaScriptTestFramework", "Jest"),
+                    new XComment(" Command to run on project build "),
+                    new XElement("BuildCommand"),
+                    new XComment(" Command to create an optimized build of the project that's ready for publishing "),
+                    new XElement("ProductionBuildCommand", "npm run build"),
+                    new XComment(" Folder where production build objects will be placed "),
+                    new XElement("BuildOutputFolder", "$(MSBuildProjectDirectory)\\build")
+                )
+            );
+        project.Save(projectFileFullName);
+    }
+
 }
