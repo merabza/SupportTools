@@ -72,7 +72,6 @@ echo "Diverged"
 fi*/
         //"git remote update"
 
-        StShared.ConsoleWriteInformationLine(_logger, _useConsole, "Checking {0}...", _projectPath);
 
         //if (!GitRemoteUpdate()) 
         //    return GitState.Unknown;

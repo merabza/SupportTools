@@ -72,6 +72,8 @@ public sealed class GitSyncToolAction : ToolAction
 
     public bool RunActionPhase1() //GitProcessor? gitProcessor = null
     {
+        StShared.ConsoleWriteInformationLine(_logger, true, "Checking {0}...", _projectFolderName);
+
         _phase1Result = EFirstPhaseResult.FinishedWithErrors;
         if (!Directory.Exists(_projectFolderName))
             if (_gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
@@ -156,6 +158,7 @@ public sealed class GitSyncToolAction : ToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
+
         RunActionPhase1();
 
         return Task.FromResult(RunActionPhase2());

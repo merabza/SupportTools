@@ -79,6 +79,7 @@ public class GitProjectSyncronizer
                     {
                         _usedCommitMessage ??= Inputer.InputTextRequired("Message",
                             _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
+
                         if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage)) continue;
                     }
                 }
