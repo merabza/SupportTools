@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -21,14 +22,13 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     private readonly ScaffoldSeederCreatorData _scaffoldSeederCreatorData;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ScaffoldSeederSolutionCreator(ILogger logger,
+    public ScaffoldSeederSolutionCreator(ILogger logger, IHttpClientFactory httpClientFactory,
         ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, string projectName, int indentSize,
-        ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(logger, projectName, indentSize,
-        scaffoldSeederCreatorParameters.GitProjects, scaffoldSeederCreatorParameters.GitRepos,
+        ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(logger, httpClientFactory, projectName,
+        indentSize, scaffoldSeederCreatorParameters.GitProjects, scaffoldSeederCreatorParameters.GitRepos,
         scaffoldSeederAppCreatorData.AppCreatorBaseData.WorkPath,
         scaffoldSeederAppCreatorData.AppCreatorBaseData.SecurityPath,
         scaffoldSeederAppCreatorData.AppCreatorBaseData.SolutionPath)
-    // ReSharper disable once ConvertToPrimaryConstructor
     {
         _par = scaffoldSeederCreatorParameters;
         _scaffoldSeederCreatorData = scaffoldSeederAppCreatorData;
@@ -208,7 +208,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     }
 
 
-    private bool RegisterEmbeddedResource(string projectFileFullName, string sqlFileName)
+    private static bool RegisterEmbeddedResource(string projectFileFullName, string sqlFileName)
     {
         var projectXml = XElement.Load(projectFileFullName);
 

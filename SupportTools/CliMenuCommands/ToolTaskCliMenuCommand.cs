@@ -36,7 +36,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     private IToolCommand? MemoCreateToolCommand()
     {
         return _toolCommand ??= _serverInfo is null
-            ? ToolCommandFabric.Create(_logger, _tool, _parametersManager, _projectName, true)
+            ? ToolCommandFabric.Create(_logger, _httpClientFactory, _tool, _parametersManager, _projectName, true)
             : ToolCommandFabric.Create(_logger, _httpClientFactory, _tool, _parametersManager, _projectName,
                 _serverInfo);
     }

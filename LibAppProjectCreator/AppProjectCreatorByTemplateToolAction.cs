@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppProjectCreator.Models;
@@ -20,18 +21,21 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     private const string ActionName = "Create Application";
     public const string ActionDescription = "Create Application";
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IParametersManager _parametersManager;
     private readonly string _templateName;
     private readonly ETestOrReal _testOrReal;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public AppProjectCreatorByTemplateToolAction(ILogger logger, IParametersManager parametersManager,
-        string templateName, ETestOrReal testOrReal, bool useConsole) : base(logger, ActionName, null, null, useConsole)
+    public AppProjectCreatorByTemplateToolAction(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, string templateName, ETestOrReal testOrReal, bool useConsole) : base(
+        logger, ActionName, null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _templateName = templateName;
         _testOrReal = testOrReal;
+        _httpClientFactory = httpClientFactory;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
@@ -72,7 +76,6 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         string? projectsFolderPath;
         string? secretsFolderPath;
-        //string? tempFolderPath;
         string projectName;
         string? projectShortName;
         var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
@@ -81,7 +84,6 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             case ETestOrReal.Test:
                 projectsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Projects");
                 secretsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Security");
-                //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "Temp");
                 projectName = templateModel.TestProjectName;
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
                     ? templateModel.TestProjectShortName
@@ -90,7 +92,6 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
                 secretsFolderPath = parameters.SecretsFolderPathReal;
-                //tempFolderPath = Path.Combine(appCreatorDataFolderFullName, "TempReal");
                 projectName = Inputer.InputTextRequired("New project name", string.Empty);
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
                     ? Inputer.InputTextRequired("New project short name", string.Empty)
@@ -117,7 +118,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        var appCreator = AppCreatorFabric.CreateAppCreator(_logger, par, templateModel,
+        var appCreator = AppCreatorFabric.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
             GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole));
 

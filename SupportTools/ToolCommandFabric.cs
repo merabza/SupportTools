@@ -50,8 +50,8 @@ public static class ToolCommandFabric
         ETools.VersionChecker
     ];
 
-    public static IToolCommand? Create(ILogger logger, ETools tool, IParametersManager parametersManager,
-        string projectName, bool useConsole)
+    public static IToolCommand? Create(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool,
+        IParametersManager parametersManager, string projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         switch (tool)
@@ -116,8 +116,8 @@ public static class ToolCommandFabric
                 var scaffoldSeederCreatorParameters =
                     ScaffoldSeederCreatorParameters.Create(logger, supportToolsParameters, projectName, useConsole);
                 if (scaffoldSeederCreatorParameters is not null)
-                    return new ScaffoldSeederCreatorToolCommand(logger, true, scaffoldSeederCreatorParameters,
-                        parametersManager);
+                    return new ScaffoldSeederCreatorToolCommand(logger, httpClientFactory, true,
+                        scaffoldSeederCreatorParameters, parametersManager);
                 StShared.WriteErrorLine("scaffoldSeederCreatorParameters is null", true);
                 return null;
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა

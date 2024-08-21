@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
@@ -11,18 +12,20 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _templateName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public TemplateSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string templateName) :
-        base(templateName, EMenuAction.LoadSubMenu)
+    public TemplateSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string templateName) : base(templateName, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _templateName = templateName;
+        _httpClientFactory = httpClientFactory;
     }
 
     public override CliMenuSet GetSubmenu()
@@ -40,11 +43,11 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 
         templateCruder.FillDetailsSubMenu(templateSubMenuSet, _templateName);
 
-        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
-            ETestOrReal.Test));
+        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
+            _templateName, ETestOrReal.Test));
 
-        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _parametersManager, _templateName,
-            ETestOrReal.Real));
+        templateSubMenuSet.AddMenuItem(new TemplateRunCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
+            _templateName, ETestOrReal.Real));
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

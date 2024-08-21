@@ -6,13 +6,14 @@ using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SupportToolsData.Models;
 using System;
+using System.Net.Http;
 
 namespace LibAppProjectCreator;
 
 public static class AppCreatorFabric
 {
-    public static AppCreatorBase? CreateAppCreator(ILogger logger, AppProjectCreatorData par, TemplateModel template,
-        GitProjects gitProjects, GitRepos gitRepos)
+    public static AppCreatorBase? CreateAppCreator(ILogger logger, IHttpClientFactory httpClientFactory,
+        AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
             par.SolutionFolderName, par.SecurityWorkFolderPath);
@@ -28,8 +29,8 @@ public static class AppCreatorFabric
             case ESupportProjectType.Console:
                 var consoleAppWithDatabaseCreatorData =
                     ConsoleAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
-                return new ConsoleAppCreator(logger, par.ProjectName, par.IndentSize, gitProjects, gitRepos,
-                    consoleAppWithDatabaseCreatorData);
+                return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
+                    gitRepos, consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:
                 var apiAppCreatorData =
                     ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData, par.ProjectName, template);
@@ -40,8 +41,8 @@ public static class AppCreatorFabric
                 }
 
                 if (apiAppCreatorData is not null)
-                    return new ApiAppCreator(logger, par.ProjectShortName, par.ProjectName, par.IndentSize, gitProjects,
-                        gitRepos, apiAppCreatorData);
+                    return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,
+                        par.IndentSize, gitProjects, gitRepos, apiAppCreatorData);
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
 

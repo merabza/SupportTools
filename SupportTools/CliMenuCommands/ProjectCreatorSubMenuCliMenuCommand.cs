@@ -55,7 +55,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         projectCreatorSubMenuSet.AddMenuItem(binaryFileCreatorClassCreatorCliMenuCommand);
 
         var createAllTemplateTestProjectsToolCommand =
-            new CreateAllTemplateTestProjectsCliMenuCommand(_logger, _parametersManager);
+            new CreateAllTemplateTestProjectsCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
         projectCreatorSubMenuSet.AddMenuItem(createAllTemplateTestProjectsToolCommand);
 
         TemplateCruder projectCreatorTemplateCruder = new(_logger, _parametersManager);
@@ -68,10 +68,11 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         //პროექტების ჩამონათვალი
         if (appProjectCreatorAllParameters is not null)
+        {
             foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o => o.Key))
-                //kvp.Key
                 projectCreatorSubMenuSet.AddMenuItem(
-                    new TemplateSubMenuCliMenuCommand(_logger, _parametersManager, kvp.Key));
+                    new TemplateSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, kvp.Key));
+        }
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

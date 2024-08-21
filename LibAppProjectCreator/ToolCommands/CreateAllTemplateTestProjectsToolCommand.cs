@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -14,12 +15,14 @@ namespace LibAppProjectCreator.ToolCommands;
 public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public CreateAllTemplateTestProjectsToolCommand(ILogger logger, string actionName,
-        ParametersManager parametersManager, bool useConsole) : base(logger, actionName, parametersManager, null,
-        useConsole)
+    public CreateAllTemplateTestProjectsToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        string actionName, ParametersManager parametersManager, bool useConsole) : base(logger, actionName,
+        parametersManager, null, useConsole)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
@@ -39,8 +42,8 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
         {
             Console.WriteLine("Start create test Project: {0}", kvp.Key);
 
-            AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate =
-                new(_logger, ParametersManager, kvp.Key, ETestOrReal.Test, UseConsole);
+            AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate = new(_logger, _httpClientFactory,
+                ParametersManager, kvp.Key, ETestOrReal.Test, UseConsole);
 
             await appProjectCreatorByTemplate.Run(cancellationToken);
 

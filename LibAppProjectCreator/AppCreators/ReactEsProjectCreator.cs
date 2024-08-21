@@ -1,24 +1,38 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Xml.Linq;
+using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
 public class ReactEsProjectCreator
 {
+    private const string SdkRef = "https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK";
+
+    private readonly ILogger _logger;
     private readonly string _projectFullPath;
     private readonly string _projectName;
     private readonly bool _useConsole;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReactEsProjectCreator(string projectFullPath, string projectName, bool useConsole)
+    public ReactEsProjectCreator(ILogger logger, IHttpClientFactory httpClientFactory, string projectFullPath,
+        string projectName, bool useConsole)
     {
+        _logger = logger;
         _projectFullPath = projectFullPath;
         _projectName = projectName;
         _useConsole = useConsole;
+        _httpClientFactory = httpClientFactory;
     }
 
-    public void Create()
+    public bool Create()
     {
         //შეიქმნას ფოლდერი სადაც უნდა ჩაიწეროს რეაქტის ფრონტ პროექტი
         StShared.CreateFolder(_projectFullPath, _useConsole);
@@ -40,7 +54,22 @@ public class ReactEsProjectCreator
            </Project>
          */
 
-        CreateEsprojFile(Path.Combine(_projectFullPath, _projectName));
+        var sdkUri = new Uri(SdkRef);
+        var (statusCode, content) = GetOnePageContent(sdkUri);
+
+        if (statusCode != HttpStatusCode.OK || string.IsNullOrWhiteSpace(content))
+            return false;
+
+        HtmlDocument htmlDoc = new();
+        htmlDoc.LoadHtml(content);
+        var refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);
+        const string startString = "/packages/";
+        var result = refsTitlesList.Where(x => x.Item1.StartsWith(startString)).OrderByDescending(x => x.Item2)
+            .FirstOrDefault().Item1;
+        var javaScriptSdk = result[startString.Length..];
+
+
+        CreateEsprojFile(Path.Combine(_projectFullPath, _projectName), javaScriptSdk);
 
 
         //Microsoft.VisualStudio.JavaScript.Sdk-ს ბოლო ვერსიის დასადგენად უნდა მოვქაჩოთ გვერდი 
@@ -56,12 +85,55 @@ public class ReactEsProjectCreator
 
         //შევქმნათ src ფოლდერი და მისი შიგთავსი
 
+        return true;
     }
 
-    private void CreateEsprojFile(string projectFileFullName)
+
+    private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
+    {
+        List<(string, string)> refsList = [];
+
+        var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
+        if (links is null || links.Count == 0)
+            return [];
+        refsList.AddRange(from link in links
+            let hrefValue = link.GetAttributeValue("href", string.Empty)
+            let titleValue = link.GetAttributeValue("title", string.Empty)
+            where !string.IsNullOrWhiteSpace(hrefValue) && !string.IsNullOrWhiteSpace(titleValue) &&
+                  char.IsDigit(titleValue[0])
+            select (hrefValue, titleValue));
+
+        return refsList;
+    }
+
+
+
+    private (HttpStatusCode, string?) GetOnePageContent(Uri uri)
+    {
+        try
+        {
+            // ReSharper disable once using
+            var client = _httpClientFactory.CreateClient();
+            // ReSharper disable once using
+            using var response = client.GetAsync(uri).Result;
+
+            return response.IsSuccessStatusCode
+                ? (response.StatusCode, response.Content.ReadAsStringAsync().Result)
+                : (response.StatusCode, null);
+        }
+        catch
+        {
+            StShared.WriteErrorLine($"Error when downloading {uri}", true, _logger, false);
+            //StShared.WriteException(e, true);
+        }
+
+        return (HttpStatusCode.BadRequest, null);
+    }
+
+    private void CreateEsprojFile(string projectFileFullName, string javaScriptSdk)
     {
         var project =
-            new XElement("Project",new XAttribute("Sdk", "Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha"),
+            new XElement("Project", new XAttribute("Sdk", javaScriptSdk),
                 new XElement("PropertyGroup",
                     new XElement("StartupCommand", "set BROWSER=none&amp;&amp;npm start"),
                     new XElement("JavaScriptTestRoot", "src\\"),

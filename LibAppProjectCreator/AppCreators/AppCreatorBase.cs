@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -27,14 +28,16 @@ public abstract class AppCreatorBase
     private readonly int _indentSize;
     protected readonly GitProjects GitProjects;
     protected readonly ILogger Logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     protected readonly string ProjectName;
 
 
-    protected AppCreatorBase(ILogger logger, string projectName, int indentSize, GitProjects gitProjects,
-        GitRepos gitRepos, string workPath, string securityPath, string solutionPath)
+    protected AppCreatorBase(ILogger logger, IHttpClientFactory httpClientFactory, string projectName, int indentSize,
+        GitProjects gitProjects, GitRepos gitRepos, string workPath, string securityPath, string solutionPath)
     {
         Logger = logger;
+        _httpClientFactory = httpClientFactory;
         ProjectName = projectName;
         _indentSize = indentSize;
         GitProjects = gitProjects;
@@ -98,7 +101,7 @@ public abstract class AppCreatorBase
         //FoldersForCreate.Add(WorkPath);
         FoldersForCreate.Add(SolutionPath);
         FoldersForCreate.Add(SecurityPath);
-        foreach (var folder in FoldersForCheckAndClear) 
+        foreach (var folder in FoldersForCheckAndClear)
             FoldersForCreate.Add(folder);
     }
 
@@ -193,7 +196,8 @@ public abstract class AppCreatorBase
     }
 
     //აპლიკაციის შექმნის პროცესი
-    private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions, CancellationToken cancellationToken)
+    private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions,
+        CancellationToken cancellationToken)
     {
         if (!AppGitsSync())
             return false;
@@ -222,10 +226,10 @@ public abstract class AppCreatorBase
                 if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
                 {
                     //რეაქტის პროექტის შექმნა ფრონტისთვის
-                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath,
-                        $"{ProjectName}frontend.esproj", true);
-                    reactEsProjectCreator.Create();
-                    return true;
+                    var reactEsProjectCreator = new ReactEsProjectCreator(Logger, _httpClientFactory,
+                        projectForCreate.ProjectFullPath,
+                        projectForCreate.ProjectFileName, true);
+                    return reactEsProjectCreator.Create();
                 }
 
                 //პროექტების შექმნა
@@ -272,13 +276,16 @@ public abstract class AppCreatorBase
             {
                 StShared.WriteErrorLine($"{refData.ProjectFilePath} is not exists", true, Logger, false);
                 continue;
-            }   
+            }
+
             if (!File.Exists(refData.ReferenceProjectFilePath))
             {
                 StShared.WriteErrorLine($"{refData.ReferenceProjectFilePath} is not exists", true, Logger, false);
                 continue;
-            }   
-            if (StShared.RunProcess(true, Logger, "dotnet", $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome) 
+            }
+
+            if (StShared.RunProcess(true, Logger, "dotnet",
+                    $"add {refData.ProjectFilePath} reference {refData.ReferenceProjectFilePath}").IsSome)
                 return false;
         }
 

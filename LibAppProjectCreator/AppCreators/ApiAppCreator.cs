@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using SystemToolsShared;
@@ -23,10 +24,11 @@ public sealed class ApiAppCreator : AppCreatorBase
     private readonly string _projectShortName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApiAppCreator(ILogger logger, string projectShortName, string projectName, int indentSize,
-        GitProjects gitProjects, GitRepos gitRepos, ApiAppCreatorData apiAppCreatorData) : base(logger, projectName,
-        indentSize, gitProjects, gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath,
-        apiAppCreatorData.AppCreatorBaseData.SecurityPath, apiAppCreatorData.AppCreatorBaseData.SolutionPath)
+    public ApiAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, string projectShortName,
+        string projectName, int indentSize, GitProjects gitProjects, GitRepos gitRepos,
+        ApiAppCreatorData apiAppCreatorData) : base(logger, httpClientFactory, projectName, indentSize, gitProjects,
+        gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
+        apiAppCreatorData.AppCreatorBaseData.SolutionPath)
     {
         _projectShortName = projectShortName;
         _apiAppCreatorData = apiAppCreatorData;
@@ -45,7 +47,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
 
-        if (_apiAppCreatorData.UseReact) 
+        if (_apiAppCreatorData.UseReact)
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
 
         if (_apiAppCreatorData.UseSignalR)
@@ -78,7 +80,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         if (!_apiAppCreatorData.UseDatabase)
             return true;
-    
+
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.DatabaseProjectData);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.LibProjectRepositoriesProjectData);
@@ -399,7 +401,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (!_apiAppCreatorData.UseCarcass)
             return;
         AddProject(_apiAppCreatorData.RepositoriesProjectData);
-        if ( _apiAppCreatorData.UseReact )
+        if (_apiAppCreatorData.UseReact)
             AddProject(_apiAppCreatorData.FrontendProjectData);
     }
 }

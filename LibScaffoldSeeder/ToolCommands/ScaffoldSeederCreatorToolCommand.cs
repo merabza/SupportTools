@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
@@ -34,23 +35,22 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                                              """;
 
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ScaffoldSeederCreatorToolCommand(ILogger logger, bool useConsole, ScaffoldSeederCreatorParameters parameters,
-        IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters,
-        parametersManager, ActionDescription)
-    // ReSharper disable once ConvertToPrimaryConstructor
+    public ScaffoldSeederCreatorToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole, ScaffoldSeederCreatorParameters parameters, IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
         _useConsole = useConsole;
+        _httpClientFactory = httpClientFactory;
     }
 
     private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(_logger, _useConsole, Parameters);
+        var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(_logger, _httpClientFactory, _useConsole, Parameters);
         if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {
             StShared.WriteErrorLine("solution does not created", true, _logger);
@@ -258,15 +258,15 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     }
 
 
-    public static void ForceDeleteDirectory(string path)
-    {
-        var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
+    //public static void ForceDeleteDirectory(string path)
+    //{
+    //    var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
 
-        foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-            info.Attributes = FileAttributes.Normal;
+    //    foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
+    //        info.Attributes = FileAttributes.Normal;
 
-        directory.Delete(true);
-    }
+    //    directory.Delete(true);
+    //}
 
 
     private bool ScaffoldProdCopyDatabase(ScaffoldSeederCreatorData scaffoldSeederCreatorData)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using CompressionManagement;
 using FileManagersMain;
 using LibAppProjectCreator.AppCreators;
@@ -17,20 +18,19 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 {
     private const int IndentSize = 4;
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _projectTempFolderPath;
     private readonly string _projectWorkFolderPath;
     private readonly string _scaffoldSeederFolderName;
     private readonly string _scaffoldSeederFolderPath;
     private readonly ScaffoldSeederCreatorParameters _ssParameters;
-
     private readonly bool _useConsole;
-    //public string SolutionFolderPath { get; }
 
-    //public ScaffoldSeederCreatorData? ScaffoldSeederCreatorData => _scaffoldSeederCreatorData;
-
-    public ScaffoldSeederDoubleAppCreator(ILogger logger, bool useConsole, ScaffoldSeederCreatorParameters ssParameters)
+    public ScaffoldSeederDoubleAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+        ScaffoldSeederCreatorParameters ssParameters)
         : base(logger, useConsole)
     {
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
         _useConsole = useConsole;
         _ssParameters = ssParameters;
@@ -49,7 +49,6 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
     public string SolutionFolderPath { get; }
 
-    //public ScaffoldSeederCreatorData? ScaffoldSeederTempCreatorData { get; private set; }
     public ScaffoldSeederCreatorData? ScaffoldSeederMainCreatorData { get; private set; }
 
     private ScaffoldSeederSolutionCreator? CreateAppCreator(bool forMain)
@@ -86,11 +85,9 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         if (forMain)
             ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
-        //else
-        //    ScaffoldSeederTempCreatorData = scaffoldSeederCreatorData;
 
-        return new ScaffoldSeederSolutionCreator(_logger, _ssParameters, _scaffoldSeederFolderName, IndentSize,
-            scaffoldSeederCreatorData);
+        return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters, _scaffoldSeederFolderName,
+            IndentSize, scaffoldSeederCreatorData);
     }
 
     protected override AppCreatorBase? CreateMainAppCreator()
@@ -147,11 +144,6 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
     protected override AppCreatorBase? CreateTempAppCreator()
     {
-        //შევამოწმოთ არსებობს თუ არა სოლუშენის ფოლდერი დროებითი ფოლდერების მხარეს
-        //და თუ არსებობს წავშალოთ 
-        //if (Directory.Exists(SolutionFolderPath))
-        //    Directory.Delete(SolutionFolderPath, true);
-
         var appCreator = CreateAppCreator(false);
 
         if (appCreator is null)
