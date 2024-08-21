@@ -9,10 +9,9 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(string? dbPartPath, AppCreatorBaseData appCreatorBaseData,
-        ProjectForCreate mainProjectData, bool useReact, bool useCarcass, bool useDatabase,
-        bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
+    private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact,
+        bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter,
+        bool useSignalR, bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
         ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData)
     {
@@ -20,7 +19,6 @@ public sealed class ApiAppCreatorData
         MainProjectData = mainProjectData;
         UseReact = useReact;
         UseCarcass = useCarcass;
-        DbPartPath = dbPartPath;
         UseDatabase = useDatabase;
         UseDbPartFolderForDatabaseProjects = useDbPartFolderForDatabaseProjects;
         UseIdentity = useIdentity;
@@ -44,7 +42,6 @@ public sealed class ApiAppCreatorData
     public bool UseSignalR { get; set; }
     public bool UseFluentValidation { get; }
     public string? ReactTemplateName { get; }
-    public string? DbPartPath { get; }
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
     public ProjectForCreate LibProjectRepositoriesProjectData { get; }
@@ -120,10 +117,10 @@ public sealed class ApiAppCreatorData
         var frontendProjectData =
             ProjectForCreate.CreateReactProject(frontPath, $"{projectName}frontend", [], frontProjectFolderName);
 
-        return new ApiAppCreatorData(dbPartPath, appCreatorBaseData, mainProjectData, template.UseReact,
-            template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
-            template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
-            template.ReactTemplateName, databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData,
-            repositoriesProjectData, frontendProjectData);
+        return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
+            template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
+            template.UseReCounter, template.UseSignalR, template.UseFluentValidation, template.ReactTemplateName,
+            databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData,
+            frontendProjectData);
     }
 }

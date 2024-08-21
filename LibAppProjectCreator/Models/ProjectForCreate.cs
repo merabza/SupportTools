@@ -6,9 +6,9 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ProjectForCreate : ProjectBase
 {
-    private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType, string projectCreateParameters,
-        string projectFullPath, string projectFileFullName, string? classForDelete, string? solutionFolderName) : base(
-        projectName, projectFullPath, projectFileFullName, solutionFolderName)
+    private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType,
+        string projectCreateParameters, string createInPath, string projectFolderName, string projectFileName, string? classForDelete,
+        string? solutionFolderName) : base(projectName, createInPath, projectFolderName, projectFileName, solutionFolderName)
     {
         DotnetProjectType = dotnetProjectType;
         ProjectCreateParameters = projectCreateParameters;
@@ -39,15 +39,13 @@ public sealed class ProjectForCreate : ProjectBase
         EDotnetProjectType dotnetProjectType, string projectCreateParameters, string? classForDelete,
         string[] availableFolders, string? solutionFolderName = null)
     {
-        var projectPath = Path.Combine(createInPath, projectFolderName);
-        var projectFileFullName = Path.Combine(projectPath,
-            $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj");
+        var projectFileName = $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj";
         var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters,
-            projectPath, projectFileFullName, classForDelete, solutionFolderName);
+            createInPath, projectFolderName, projectFileName, classForDelete, solutionFolderName);
 
         foreach (var folder in availableFolders)
         {
-            var folderFullPath = Path.Combine(projectPath, folder);
+            var folderFullPath = Path.Combine(createInPath, projectFolderName, folder);
             //ჩაემატოს პროექტის ფოლდერებში
             projectDataModel.AddFolder(folder, folderFullPath);
         }

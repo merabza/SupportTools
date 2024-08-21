@@ -1,20 +1,27 @@
 ﻿// ReSharper disable ConvertToPrimaryConstructor
 
+using System.IO;
+
 namespace LibAppProjectCreator.Models;
 
 public /*open*/ class ProjectBase
 {
-    public ProjectBase(string projectName, string projectFullPath, string projectFileFullName,
+    protected ProjectBase(string projectName, string createInPath, string projectFolderName, string projectFileName,
         string? solutionFolderName)
     {
         ProjectName = projectName;
-        ProjectFullPath = projectFullPath;
-        ProjectFileFullName = projectFileFullName;
+        CreateInPath = createInPath;
+        ProjectFolderName = projectFolderName;
+        ProjectFileName = projectFileName;
         SolutionFolderName = solutionFolderName;
     }
 
-    public string ProjectFullPath { get; }
     public string ProjectName { get; }
-    public string ProjectFileFullName { get; }
+    public string CreateInPath { get; }
+    public string ProjectFolderName { get; }
+    public string ProjectFileName { get; }
     public string? SolutionFolderName { get; }
+
+    public string ProjectFullPath => Path.Combine(CreateInPath, ProjectFolderName);
+    public string ProjectFileFullName => Path.Combine(CreateInPath, ProjectFolderName, ProjectFileName);
 }

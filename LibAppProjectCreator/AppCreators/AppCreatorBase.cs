@@ -87,21 +87,27 @@ public abstract class AppCreatorBase
     {
         FoldersForCheckAndClear.Add(SolutionPath);
         FoldersForCheckAndClear.Add(SecurityPath);
+
+        foreach (var projectBase in Projects.Where(projectBase =>
+                     !string.IsNullOrWhiteSpace(projectBase.SolutionFolderName)))
+            FoldersForCheckAndClear.Add(projectBase.CreateInPath);
     }
 
     private void PrepareFoldersForCreate()
     {
-        FoldersForCreate.Add(WorkPath);
+        //FoldersForCreate.Add(WorkPath);
         FoldersForCreate.Add(SolutionPath);
         FoldersForCreate.Add(SecurityPath);
+        foreach (var folder in FoldersForCheckAndClear) 
+            FoldersForCreate.Add(folder);
     }
 
     private bool PrepareParameters()
     {
         Stats.IndentSize = _indentSize < 1 ? 4 : _indentSize;
+        PrepareProjectsData();
         PrepareFoldersForCheckAndClear();
         PrepareFoldersForCreate();
-        PrepareProjectsData();
 
         //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
         return PrepareSpecific();
@@ -156,8 +162,8 @@ public abstract class AppCreatorBase
         if (gitRepo is null)
             return null;
         //შევქმნათ პროექტის მოდელი
-        ProjectFromGit projectFromGit = new(gitRepo.GitProjectFolderName, projectData.ProjectName, projectPath,
-            projectFileFullName);
+        ProjectFromGit projectFromGit = new(gitRepo.GitProjectFolderName, projectData.ProjectName, createInPath,
+            projectData.ProjectRelativePath, projectFile.Name);
         //დავამატოთ პროექტების სიაში
         Projects.Add(projectFromGit);
         //დავამატოთ დასაკლონი პროექტების სიაში შესაბამისი გიტის პროექტი
@@ -210,12 +216,14 @@ public abstract class AppCreatorBase
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
+        {
             if (prj is ProjectForCreate projectForCreate)
             {
                 if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
                 {
                     //რეაქტის პროექტის შექმნა ფრონტისთვის
-                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath, $"{ProjectName}frontend.esproj", true);
+                    var reactEsProjectCreator = new ReactEsProjectCreator(projectForCreate.ProjectFullPath,
+                        $"{ProjectName}frontend.esproj", true);
                     reactEsProjectCreator.Create();
                     return true;
                 }
@@ -255,6 +263,7 @@ public abstract class AppCreatorBase
                     .IsSome)
                     return false;
             }
+        }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         foreach (var refData in References)

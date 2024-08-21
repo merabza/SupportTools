@@ -32,22 +32,21 @@ public sealed class ApiAppCreator : AppCreatorBase
         _apiAppCreatorData = apiAppCreatorData;
     }
 
-    protected override void PrepareFoldersForCheckAndClear()
-    {
-        base.PrepareFoldersForCheckAndClear();
-        if (!string.IsNullOrWhiteSpace(_apiAppCreatorData.DbPartPath))
-            FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
-    }
+    //protected override void PrepareFoldersForCheckAndClear()
+    //{
+    //    base.PrepareFoldersForCheckAndClear();
+    //    if (!string.IsNullOrWhiteSpace(_apiAppCreatorData.DbPartPath))
+    //        FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
+    //}
 
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
     {
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
-        if (_apiAppCreatorData.UseReact)
-        {
+
+        if (_apiAppCreatorData.UseReact) 
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
-        }
 
         if (_apiAppCreatorData.UseSignalR)
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
@@ -388,6 +387,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         appSettingsClassCreator.CreateFileStructure();
     }
 
+    //შესაქმნელი პროექტების მონაცემების სიის შექმნა
     protected override void PrepareProjectsData()
     {
         AddProject(_apiAppCreatorData.MainProjectData);
@@ -399,5 +399,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (!_apiAppCreatorData.UseCarcass)
             return;
         AddProject(_apiAppCreatorData.RepositoriesProjectData);
+        if ( _apiAppCreatorData.UseReact )
+            AddProject(_apiAppCreatorData.FrontendProjectData);
     }
 }
