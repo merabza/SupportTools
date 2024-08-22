@@ -47,7 +47,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
             //projectName
             projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory,
                 _parametersManager, projectName));
-        
+
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
         projectGroupSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),

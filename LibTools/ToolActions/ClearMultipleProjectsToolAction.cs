@@ -1,25 +1,25 @@
-﻿using LibGitData;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using LibGitData;
 using LibGitWork;
 using LibParameters;
 using LibToolActions;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace LibTools.ToolActions;
 
 public class ClearMultipleProjectsToolAction : ToolAction
 {
-    private readonly ParametersManager _parametersManager;
     private readonly ClearAllProjectsParameters _clearAllProjectsParameters;
     private readonly string? _excludeFolder;
     private readonly ILogger? _logger;
+    private readonly ParametersManager _parametersManager;
 
     private ClearMultipleProjectsToolAction(ILogger logger, ParametersManager parametersManager,
         ClearAllProjectsParameters clearAllProjectsParameters, string? excludeFolder, bool useConsole) : base(logger,

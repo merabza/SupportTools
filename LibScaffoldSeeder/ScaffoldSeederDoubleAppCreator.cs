@@ -17,8 +17,8 @@ namespace LibScaffoldSeeder;
 public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 {
     private const int IndentSize = 4;
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly string _projectTempFolderPath;
     private readonly string _projectWorkFolderPath;
     private readonly string _scaffoldSeederFolderName;

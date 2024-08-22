@@ -9,8 +9,8 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor

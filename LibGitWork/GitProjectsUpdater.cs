@@ -17,15 +17,13 @@ namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {
-    private readonly string _gitsFolder;
     private readonly GitDataDomain _gitData;
-    private readonly string _projectFolderName;
     private readonly string _gitName;
+    private readonly string _gitsFolder;
     private readonly ILogger? _logger;
+    private readonly string _projectFolderName;
     private readonly SupportToolsParameters _supportToolsParameters;
 
-    public string? LastRemoteId { get; private set; }
-    
     private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string gitsFolder,
         GitDataDomain gitData, string projectFolderName, string gitName)
     {
@@ -36,6 +34,8 @@ public sealed class GitProjectsUpdater
         _projectFolderName = projectFolderName;
         _gitName = gitName;
     }
+
+    public string? LastRemoteId { get; private set; }
 
     public List<string> UsedProjectNames { get; } = [];
 
@@ -62,16 +62,15 @@ public sealed class GitProjectsUpdater
 
         var projectFolderName = GetProjectFolderName(logger, workFolder, gitsFolder, gitData);
         if (!string.IsNullOrWhiteSpace(projectFolderName))
-            return new GitProjectsUpdater(logger, supportToolsParameters, gitsFolder, gitData, projectFolderName, gitName);
+            return new GitProjectsUpdater(logger, supportToolsParameters, gitsFolder, gitData, projectFolderName,
+                gitName);
 
         StShared.WriteErrorLine($"cannot count projectFolderName for git with name {gitName}", true, logger);
         return null;
-
     }
 
     public bool ProcessOneGitProject(bool processFolder = true)
     {
-
         if (!UpdateOneGitProject(_projectFolderName, _gitData))
             return false;
         return !processFolder || ProcessFolder(_projectFolderName, _gitName);
@@ -176,7 +175,7 @@ public sealed class GitProjectsUpdater
             }
             else
             {
-                if ( ! gitProcessor.GitRemoteUpdate() )
+                if (!gitProcessor.GitRemoteUpdate())
                     return false;
 
                 //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull

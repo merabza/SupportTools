@@ -88,7 +88,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project?.ServerInfos != null)
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
-                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory, kvp.Value.GetItemKey(),
+                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                    kvp.Value.GetItemKey(),
                     _parametersManager, _projectName, kvp.Key));
 
         //მთავარ მენიუში გასვლა

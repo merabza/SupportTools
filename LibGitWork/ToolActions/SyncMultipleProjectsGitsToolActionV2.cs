@@ -55,7 +55,6 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //  და თუ რამე დაიფუშა, ყოველი დაფუშვის მერე, ოღონდ თუ დარჩენილია დასასინქრონიზებელი ფოლდერი
 
 
-
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_syncMultipleProjectsGitsParametersV2.ProjectGroupName is null &&
             _syncMultipleProjectsGitsParametersV2.ProjectName is null)
@@ -73,29 +72,17 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, GitProjectSyncronizer>();
         foreach (var (projectName, project) in projectsListOrdered)
+        foreach (var gitCol in Enum.GetValues<EGitCol>())
+        foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
         {
-            foreach (var gitCol in Enum.GetValues<EGitCol>())
-            {
-                foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
-                {
-                    if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
-                        gitSyncToolsByGitProjectNames.Add(gitProjectName,
-                            new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true));
-                    gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
-                }
-            }
+            if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
+                gitSyncToolsByGitProjectNames.Add(gitProjectName,
+                    new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true));
+            gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
         }
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
-        {
             keyValuePair.Value.RunSync();
-        }
-
-
-
-
-
-
 
 
         //var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
@@ -103,7 +90,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //    [EGitCollect.Collect] = [],
         //    [EGitCollect.Usage] = []
         //};
-        
+
         //var loopNom = 0;
         //var gitCollectUsage = EGitCollect.Collect;
 

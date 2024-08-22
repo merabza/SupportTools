@@ -7,8 +7,10 @@ namespace LibAppProjectCreator.Models;
 public sealed class ProjectForCreate : ProjectBase
 {
     private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType,
-        string projectCreateParameters, string createInPath, string projectFolderName, string projectFileName, string? classForDelete,
-        string? solutionFolderName) : base(projectName, createInPath, projectFolderName, projectFileName, solutionFolderName)
+        string projectCreateParameters, string createInPath, string projectFolderName, string projectFileName,
+        string? classForDelete,
+        string? solutionFolderName) : base(projectName, createInPath, projectFolderName, projectFileName,
+        solutionFolderName)
     {
         DotnetProjectType = dotnetProjectType;
         ProjectCreateParameters = projectCreateParameters;

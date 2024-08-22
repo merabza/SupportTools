@@ -9,13 +9,13 @@ public sealed class ApiProgramClassCreator : CodeCreator
 {
     private readonly string _appKey;
     private readonly string _projectNamespace;
-    private readonly bool _useReCounter;
-    private readonly bool _useSignalR;
-    private readonly bool _useFluentValidation;
     private readonly bool _useCarcass;
     private readonly bool _useDatabase;
+    private readonly bool _useFluentValidation;
     private readonly bool _useIdentity;
     private readonly bool _useReact;
+    private readonly bool _useReCounter;
+    private readonly bool _useSignalR;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
@@ -136,7 +136,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
         FinishAndSave();
     }
 }
-
 
 /*
 //{_projectNamespace}

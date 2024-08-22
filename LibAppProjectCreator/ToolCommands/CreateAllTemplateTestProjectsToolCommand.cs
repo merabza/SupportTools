@@ -14,8 +14,8 @@ namespace LibAppProjectCreator.ToolCommands;
 
 public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
 
     public CreateAllTemplateTestProjectsToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         string actionName, ParametersManager parametersManager, bool useConsole) : base(logger, actionName,

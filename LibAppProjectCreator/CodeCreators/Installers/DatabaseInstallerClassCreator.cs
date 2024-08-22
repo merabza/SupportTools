@@ -62,7 +62,7 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
                         "return false"),
                     string.Empty,
                     _useServerCarcass
-                        ? $"builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(connectionString))"
+                        ? "builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(connectionString))"
                         : null,
                     $"builder.Services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(connectionString))",
                     new CodeBlock("if (debugMode)",

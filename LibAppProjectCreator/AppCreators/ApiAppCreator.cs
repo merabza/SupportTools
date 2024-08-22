@@ -1,4 +1,9 @@
-﻿using CodeTools;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using CodeTools;
 using LibAppProjectCreator.CodeCreators;
 using LibAppProjectCreator.CodeCreators.CarcassAndDatabase;
 using LibAppProjectCreator.CodeCreators.Database;
@@ -9,11 +14,6 @@ using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
@@ -284,7 +284,6 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseDatabase(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
-
         var assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,

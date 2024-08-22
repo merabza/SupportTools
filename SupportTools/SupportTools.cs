@@ -1,4 +1,7 @@
-﻿using CliMenu;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters.CliMenuCommands;
 using CliTools;
 using CliTools.CliMenuCommands;
@@ -11,9 +14,6 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
-using System;
-using System.Linq;
-using System.Net.Http;
 
 namespace SupportTools;
 
@@ -40,7 +40,8 @@ public sealed class SupportTools : CliAppLoop
         var mainMenuSet = new CliMenuSet("Main Menu");
 
         //პარამეტრების რედაქტორი
-        var supportToolsParametersEditor = new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
+        var supportToolsParametersEditor =
+            new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
@@ -90,5 +91,4 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length);
         return mainMenuSet;
     }
-
 }

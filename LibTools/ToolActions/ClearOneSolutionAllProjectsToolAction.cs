@@ -1,12 +1,12 @@
-﻿using LibGitData;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using LibGitData;
 using LibParameters;
 using LibToolActions;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -15,9 +15,9 @@ namespace LibTools.ToolActions;
 
 public sealed class ClearOneProjectAllGitsToolAction : ToolAction
 {
-    private readonly ILogger? _logger;
     private readonly ClearOneProjectAllGitsParameters _clearOneProjectAllGitsParameters;
     private readonly string? _excludeFolder;
+    private readonly ILogger? _logger;
 
     private ClearOneProjectAllGitsToolAction(ILogger? logger,
         ClearOneProjectAllGitsParameters clearOneProjectAllGitsParameters, string? excludeFolder) : base(logger,

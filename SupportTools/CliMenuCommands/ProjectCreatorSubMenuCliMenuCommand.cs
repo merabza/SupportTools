@@ -68,11 +68,9 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         //პროექტების ჩამონათვალი
         if (appProjectCreatorAllParameters is not null)
-        {
             foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o => o.Key))
                 projectCreatorSubMenuSet.AddMenuItem(
                     new TemplateSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, kvp.Key));
-        }
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

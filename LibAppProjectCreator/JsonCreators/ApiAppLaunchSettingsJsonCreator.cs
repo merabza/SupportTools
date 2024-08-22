@@ -7,6 +7,7 @@ namespace LibAppProjectCreator.JsonCreators;
 public sealed class ApiAppLaunchSettingsJsonCreator
 {
     private readonly string _projectFullPath;
+
     private readonly string _projectName;
     //private readonly bool _useReact;
 

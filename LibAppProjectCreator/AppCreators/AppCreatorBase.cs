@@ -24,11 +24,11 @@ namespace LibAppProjectCreator.AppCreators;
 public abstract class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly int _indentSize;
     protected readonly GitProjects GitProjects;
     protected readonly ILogger Logger;
-    private readonly IHttpClientFactory _httpClientFactory;
 
     protected readonly string ProjectName;
 
@@ -220,7 +220,6 @@ public abstract class AppCreatorBase
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
-        {
             if (prj is ProjectForCreate projectForCreate)
             {
                 if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
@@ -267,7 +266,6 @@ public abstract class AppCreatorBase
                     .IsSome)
                     return false;
             }
-        }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         foreach (var refData in References)

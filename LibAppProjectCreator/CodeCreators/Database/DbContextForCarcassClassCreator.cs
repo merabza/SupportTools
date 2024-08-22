@@ -71,7 +71,7 @@ public sealed class DbContextForCarcassClassCreator : CodeCreator
                         $"Console.WriteLine(\"{_projectNamespace}DbContext OnModelCreating Pass 1...\");"),
                     string.Empty,
                     "modelBuilder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly)",
-                string.Empty)));
+                    string.Empty)));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

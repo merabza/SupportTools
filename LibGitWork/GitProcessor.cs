@@ -15,10 +15,6 @@ public sealed class GitProcessor
     private readonly string _switchToProjectPath;
     private readonly bool _useConsole;
 
-    private string? _remoteId;
-
-    public string? LastRemoteId => _remoteId;
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProcessor(bool useConsole, ILogger? logger, string projectPath)
     {
@@ -27,9 +23,12 @@ public sealed class GitProcessor
         _projectPath = projectPath;
         _switchToProjectPath = $"-C {_projectPath}";
     }
+
+    public string? LastRemoteId { get; private set; }
+
     public void CheckRemoteId()
     {
-        _remoteId ??= GitGetRemoteId();
+        LastRemoteId ??= GitGetRemoteId();
     }
 
     //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
@@ -77,18 +76,18 @@ fi*/
         //    return GitState.Unknown;
 
         var local = GitGetLocalId();
-        if (local is null) 
+        if (local is null)
             return GitState.Unknown;
 
-        _remoteId = GitGetRemoteId();
-        if (_remoteId is null) 
+        LastRemoteId = GitGetRemoteId();
+        if (LastRemoteId is null)
             return GitState.Unknown;
 
         var strBase = GitGetBaseId();
-        if (strBase is null) 
+        if (strBase is null)
             return GitState.Unknown;
 
-        if (local == _remoteId)
+        if (local == LastRemoteId)
         {
             StShared.ConsoleWriteInformationLine(_logger, _useConsole, "{0} Up to date", _projectPath);
             return GitState.UpToDate;
@@ -100,7 +99,7 @@ fi*/
             return GitState.NeedToPull;
         }
 
-        if (_remoteId == strBase)
+        if (LastRemoteId == strBase)
         {
             Console.WriteLine("need to push");
             return GitState.NeedToPush;
@@ -128,7 +127,7 @@ fi*/
     private string? GitGetId(string parameters)
     {
         var localResult = StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} {parameters}");
-        if (!localResult.IsT1) 
+        if (!localResult.IsT1)
             return localResult.AsT0.Item1;
 
         StShared.WriteErrorLine($"{Git} {parameters} Error", _useConsole, _logger);
@@ -137,11 +136,11 @@ fi*/
 
     public bool GitRemoteUpdate()
     {
-        if (!StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} remote update").IsSome) 
+        if (!StShared.RunProcess(false, _logger, Git, $"{_switchToProjectPath} remote update").IsSome)
             return true;
 
         StShared.WriteErrorLine($"cannot run remote update for folder {_projectPath}", _useConsole, _logger);
-            return false;
+        return false;
     }
 
     public bool Pull()
@@ -247,6 +246,7 @@ fi*/
             CheckRemoteId();
             return true;
         }
+
         StShared.WriteErrorLine($"cannot clone {remoteAddress} to {_projectPath}", _useConsole, _logger);
         return false;
     }
@@ -270,7 +270,7 @@ echo "Need to push"
 else
 echo "Diverged"
 fi*/
-        if ( _remoteId is null && !GitRemoteUpdate()) 
+        if (LastRemoteId is null && !GitRemoteUpdate())
             return false;
 
 

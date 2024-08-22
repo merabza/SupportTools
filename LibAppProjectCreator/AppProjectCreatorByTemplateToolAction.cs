@@ -20,8 +20,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 {
     private const string ActionName = "Create Application";
     public const string ActionDescription = "Create Application";
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _templateName;
     private readonly ETestOrReal _testOrReal;

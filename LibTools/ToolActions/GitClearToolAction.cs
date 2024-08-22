@@ -1,12 +1,12 @@
-﻿using LibGitWork;
-using LibToolActions;
-using LibTools.ToolCommandParameters;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LibGitWork;
+using LibToolActions;
+using LibTools.ToolCommandParameters;
+using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -15,11 +15,12 @@ namespace LibTools.ToolActions;
 
 public sealed class GitClearToolAction : ToolAction
 {
+    private readonly string? _excludeFolder;
     private readonly GitClearParameters _gitClearParameters;
     private readonly ILogger? _logger;
-    private readonly string? _excludeFolder;
 
-    public GitClearToolAction(ILogger? logger, GitClearParameters gitClearParameters, string? excludeFolder) : base(logger, "Git Clear", null,
+    public GitClearToolAction(ILogger? logger, GitClearParameters gitClearParameters, string? excludeFolder) : base(
+        logger, "Git Clear", null,
         null)
     {
         _logger = logger;
@@ -53,7 +54,6 @@ public sealed class GitClearToolAction : ToolAction
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-
         var projectFolderName =
             Path.Combine(_gitClearParameters.GitsFolder, _gitClearParameters.GitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
@@ -93,9 +93,9 @@ public sealed class GitClearToolAction : ToolAction
             return true;
 
         var dir = new DirectoryInfo(folderPath);
-        var subDirs = dir.GetDirectories().OrderBy(x=>x.Name).ToArray();
+        var subDirs = dir.GetDirectories().OrderBy(x => x.Name).ToArray();
         var subFiles = dir.GetFiles();
-        if ( subDirs is [{ Name: "bin" }, { Name: "obj" }] && subFiles.Length == 0 && MustBeDeleted(folderPath) )
+        if (subDirs is [{ Name: "bin" }, { Name: "obj" }] && subFiles.Length == 0 && MustBeDeleted(folderPath))
         {
             Directory.Delete(folderPath, true);
             return true;
@@ -179,5 +179,4 @@ public sealed class GitClearToolAction : ToolAction
         var dir = new DirectoryInfo(folderPath);
         return dir.GetDirectories().Where(x => x.Name != ".git").Select(x => x.FullName).All(MustBeDeleted);
     }
-
 }

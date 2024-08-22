@@ -34,12 +34,15 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
                                              """;
 
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+
+    private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ScaffoldSeederCreatorToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole, ScaffoldSeederCreatorParameters parameters, IParametersManager parametersManager) : base(logger, "Scaffold Seeder Creator", parameters, parametersManager, ActionDescription)
+    public ScaffoldSeederCreatorToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+        ScaffoldSeederCreatorParameters parameters, IParametersManager parametersManager) : base(logger,
+        "Scaffold Seeder Creator", parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
         _useConsole = useConsole;
@@ -50,7 +53,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     protected override async Task<bool> RunAction(CancellationToken cancellationToken)
     {
-        var scaffoldSeederDoubleAppCreator = new ScaffoldSeederDoubleAppCreator(_logger, _httpClientFactory, _useConsole, Parameters);
+        var scaffoldSeederDoubleAppCreator =
+            new ScaffoldSeederDoubleAppCreator(_logger, _httpClientFactory, _useConsole, Parameters);
         if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {
             StShared.WriteErrorLine("solution does not created", true, _logger);

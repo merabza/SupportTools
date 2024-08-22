@@ -4,7 +4,6 @@ namespace LibGitWork.Errors;
 
 public static class GitSyncToolActionErrors
 {
-
     public static readonly Err CouldNotUpdateGitRemote = new()
     {
         ErrorCode = nameof(CouldNotUpdateGitRemote),

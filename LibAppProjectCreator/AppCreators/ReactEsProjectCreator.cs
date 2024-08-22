@@ -14,12 +14,12 @@ namespace LibAppProjectCreator.AppCreators;
 public class ReactEsProjectCreator
 {
     private const string SdkRef = "https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK";
+    private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
     private readonly string _projectFullPath;
     private readonly string _projectName;
     private readonly bool _useConsole;
-    private readonly IHttpClientFactory _httpClientFactory;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReactEsProjectCreator(ILogger logger, IHttpClientFactory httpClientFactory, string projectFullPath,
@@ -107,7 +107,6 @@ public class ReactEsProjectCreator
     }
 
 
-
     private (HttpStatusCode, string?) GetOnePageContent(Uri uri)
     {
         try
@@ -148,5 +147,4 @@ public class ReactEsProjectCreator
             );
         project.Save(projectFileFullName);
     }
-
 }

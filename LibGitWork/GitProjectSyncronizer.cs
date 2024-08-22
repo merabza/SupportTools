@@ -1,23 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using LibDataInput;
 using LibGitData;
 using LibGitWork.ToolActions;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using LibDataInput;
 using SystemToolsShared;
 
 namespace LibGitWork;
 
 public class GitProjectSyncronizer
 {
+    private readonly string _gitProjectName;
     private readonly List<GitSyncToolAction> _gitSyncToolActionList = [];
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
-    private readonly string _gitProjectName;
     private readonly bool _useConsole;
-
-    public int Count => _gitSyncToolActionList.Count;
 
     private string? _usedCommitMessage;
 
@@ -33,6 +31,8 @@ public class GitProjectSyncronizer
         _usedCommitMessage = commitMessage;
     }
 
+    public int Count => _gitSyncToolActionList.Count;
+
     public void Add(string projectName, EGitCol gitCol)
     {
         var gitSyncToolAction = GitSyncToolAction.Create(_logger, _parametersManager, projectName, gitCol,
@@ -44,7 +44,6 @@ public class GitProjectSyncronizer
 
     public void RunSync()
     {
-
         //ეს ნაწილი არის SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება
         var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, _gitProjectName, _useConsole);
         if (gitProjectsUpdater is null)
@@ -64,41 +63,39 @@ public class GitProjectSyncronizer
         //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
 
         foreach (var gitCollect in Enum.GetValues<EGitCollect>())
+        foreach (var gitSyncToolAction in _gitSyncToolActionList)
         {
-            foreach (var gitSyncToolAction in _gitSyncToolActionList)
+            if (gitCollect == EGitCollect.Collect)
             {
-                if (gitCollect == EGitCollect.Collect)
+                if (!gitSyncToolAction.RunActionPhase1())
+                    continue;
+
+                if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.Cloned)
+                    continue;
+
+                if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.NeedCommit)
                 {
-                    if (!gitSyncToolAction.RunActionPhase1())
-                        continue;
+                    _usedCommitMessage ??= Inputer.InputTextRequired("Message",
+                        _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
-                    if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.Cloned)
-                        continue;
-
-                    if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.NeedCommit)
-                    {
-                        _usedCommitMessage ??= Inputer.InputTextRequired("Message",
-                            _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
-
-                        if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage)) continue;
-                    }
+                    if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage)) continue;
                 }
+            }
+
+            gitSyncToolAction.GitProcessor.CheckRemoteId();
+
+            if (gitSyncToolAction.LastRemoteId != lastRemoteId)
+            {
+                //მოშორებული ინფორმაციის განახლება
+                //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
+                if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) continue;
 
                 gitSyncToolAction.GitProcessor.CheckRemoteId();
 
-                if (gitSyncToolAction.LastRemoteId != lastRemoteId)
-                {
-                    //მოშორებული ინფორმაციის განახლება
-                    //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
-                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) continue;
-
-                    gitSyncToolAction.GitProcessor.CheckRemoteId();
-
-                    lastRemoteId = gitSyncToolAction.LastRemoteId;
-                }
-
-                gitSyncToolAction.GitProcessor.SyncRemote();
+                lastRemoteId = gitSyncToolAction.LastRemoteId;
             }
+
+            gitSyncToolAction.GitProcessor.SyncRemote();
         }
     }
 }

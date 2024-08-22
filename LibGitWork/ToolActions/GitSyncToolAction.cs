@@ -22,12 +22,6 @@ public sealed class GitSyncToolAction : ToolAction
     private readonly GitSyncParameters _gitSyncParameters;
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
-    private readonly GitProcessor _gitProcessor;
-    private EFirstPhaseResult _phase1Result;
-
-    public string? LastRemoteId => _gitProcessor.LastRemoteId;
-    public GitProcessor GitProcessor => _gitProcessor;
-    public EFirstPhaseResult Phase1Result => _phase1Result;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSyncToolAction(ILogger? logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
@@ -39,8 +33,13 @@ public sealed class GitSyncToolAction : ToolAction
         UsedCommitMessage = commitMessage;
         _projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
-        _gitProcessor = new GitProcessor(true, _logger, _projectFolderName);
+        GitProcessor = new GitProcessor(true, _logger, _projectFolderName);
     }
+
+    public string? LastRemoteId => GitProcessor.LastRemoteId;
+    public GitProcessor GitProcessor { get; }
+
+    public EFirstPhaseResult Phase1Result { get; private set; }
 
     public bool Changed { get; private set; }
     public string? UsedCommitMessage { get; private set; }
@@ -74,21 +73,23 @@ public sealed class GitSyncToolAction : ToolAction
     {
         StShared.ConsoleWriteInformationLine(_logger, true, "Checking {0}...", _projectFolderName);
 
-        _phase1Result = EFirstPhaseResult.FinishedWithErrors;
+        Phase1Result = EFirstPhaseResult.FinishedWithErrors;
         if (!Directory.Exists(_projectFolderName))
-            if (_gitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
+            if (GitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
             {
-                _phase1Result = EFirstPhaseResult.Cloned;
+                Phase1Result = EFirstPhaseResult.Cloned;
                 return true;
-            }   
+            }
             else
+            {
                 return false;
+            }
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
         // თუ რომელიმე არ სრულდება გამოვიდეს შესაბამისი შეტყობინება
 
-        var gitInitialized = _gitProcessor.IsGitInitialized();
+        var gitInitialized = GitProcessor.IsGitInitialized();
 
         if (!gitInitialized)
         {
@@ -97,7 +98,7 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        var getRemoteOriginUrlResult = _gitProcessor.GetRemoteOriginUrl();
+        var getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
         if (getRemoteOriginUrlResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
@@ -115,7 +116,7 @@ public sealed class GitSyncToolAction : ToolAction
 
         //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
         //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-        var getRedundantCachedFilesListResult = _gitProcessor.GetRedundantCachedFilesList();
+        var getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
         if (getRedundantCachedFilesListResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
@@ -128,10 +129,10 @@ public sealed class GitSyncToolAction : ToolAction
         //და წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
         //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
         if (redundantCachedFilesList.Where(x => !string.IsNullOrWhiteSpace(x)).Any(redundantCachedFileName =>
-                !_gitProcessor.RemoveFromCacheRedundantCachedFile(redundantCachedFileName)))
+                !GitProcessor.RemoveFromCacheRedundantCachedFile(redundantCachedFileName)))
             return false;
 
-        var haveUnTrackedFilesResult = _gitProcessor.HaveUnTrackedFiles();
+        var haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
@@ -141,24 +142,22 @@ public sealed class GitSyncToolAction : ToolAction
 
         var haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
 
-        if (haveUnTrackedFiles && !_gitProcessor.Add())
+        if (haveUnTrackedFiles && !GitProcessor.Add())
             return false;
 
-        var needCommitResult = _gitProcessor.NeedCommit();
+        var needCommitResult = GitProcessor.NeedCommit();
         if (needCommitResult.IsT0)
         {
-            _phase1Result = needCommitResult.AsT0 ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
+            Phase1Result = needCommitResult.AsT0 ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
             return true;
         }
 
         Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, GitSyncToolActionErrors.NeedCommitError));
         return false;
-
     }
 
     protected override Task<bool> RunAction(CancellationToken cancellationToken)
     {
-
         RunActionPhase1();
 
         return Task.FromResult(RunActionPhase2());
@@ -167,18 +166,18 @@ public sealed class GitSyncToolAction : ToolAction
     private bool RunActionPhase2()
     {
         //თუ ცვლილებები არის, მაშინ ჯერ ვაკეთებთ ქომიტს და შემდეგ სინქრონიზაციას
-        if (_phase1Result != EFirstPhaseResult.NeedCommit) 
-            return _gitProcessor.SyncRemote();
+        if (Phase1Result != EFirstPhaseResult.NeedCommit)
+            return GitProcessor.SyncRemote();
 
         if (_askCommitMessage || UsedCommitMessage is null)
             UsedCommitMessage =
                 Inputer.InputTextRequired("Message", UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
-        if (!_gitProcessor.Commit(UsedCommitMessage))
+        if (!GitProcessor.Commit(UsedCommitMessage))
             return false;
 
         Changed = true;
 
-        return _gitProcessor.SyncRemote();
+        return GitProcessor.SyncRemote();
     }
 }

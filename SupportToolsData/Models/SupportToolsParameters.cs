@@ -22,8 +22,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }
-    public string? RecentCommandsFileName { get; set; }
-    public int RecentCommandsCount { get; set; }
     public string? TempFolder { get; set; }
     public string? SecurityFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }
@@ -58,6 +56,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     {
         return true;
     }
+
+    public string? RecentCommandsFileName { get; set; }
+    public int RecentCommandsCount { get; set; }
 
     public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
