@@ -57,7 +57,7 @@ public abstract class AppCreatorBase
     private List<string> FoldersForCreate { get; } = [];
 
     //გასაწმენდი ფოლდერების სია
-    protected List<string> FoldersForCheckAndClear { get; } = [];
+    private List<string> FoldersForCheckAndClear { get; } = [];
 
     //გიტით დასაკლონი პროექტების სია
     public List<GitCloneDataModel> GitClones { get; } = [];
@@ -86,7 +86,7 @@ public abstract class AppCreatorBase
         return true;
     }
 
-    protected virtual void PrepareFoldersForCheckAndClear()
+    private void PrepareFoldersForCheckAndClear()
     {
         FoldersForCheckAndClear.Add(SolutionPath);
         FoldersForCheckAndClear.Add(SecurityPath);

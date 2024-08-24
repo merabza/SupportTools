@@ -237,7 +237,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         if ( string.IsNullOrWhiteSpace(_apiAppCreatorData.FrontendProjectData.SolutionFolderName))
         {
-            Logger.LogError("_apiAppCreatorData.FrontendProjectData.SolutionFolderName is emopty");
+            Logger.LogError("_apiAppCreatorData.FrontendProjectData.SolutionFolderName is empty");
             return false;
         }
         
