@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -161,7 +162,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         kestrelOptionsCreator.Run();
 
         if (_apiAppCreatorData.UseReact)
-            MakeFilesWhenUseReact();
+            if (!MakeFilesWhenUseReact())
+                return false;
 
         Console.WriteLine("Creating LoggerProperties...");
         var loggerSettingsCreator = new LoggerSettingsCreator(ProjectName, appSettingsJsonJObject,
@@ -193,11 +195,58 @@ public sealed class ApiAppCreator : AppCreatorBase
         var apiAppLaunchSettingsJsonCreator =
             new ApiAppLaunchSettingsJsonCreator(ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
 
-        return apiAppLaunchSettingsJsonCreator.Create();
+        if (!apiAppLaunchSettingsJsonCreator.Create())
+            return false;
+
+        const string cSharp = "CSharp";
+        return CopyGitIgnoreFile(cSharp, _apiAppCreatorData.AppCreatorBaseData.SolutionPath);
     }
 
-    private void MakeFilesWhenUseReact()
+    private bool CopyGitIgnoreFile(string gitignoreFileKey, string folderForGitIgnore)
     {
+        Console.WriteLine("Coping .gitignore file...");
+        var gitIgnoreModelFilePaths = _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
+        const string gitignore = ".gitignore";
+     
+        if (!gitIgnoreModelFilePaths.ContainsKey(gitignoreFileKey))
+        {
+            Logger.LogError("gitIgnoreModelFilePaths are not contains {gitignoreFileKey} key", gitignoreFileKey);
+            return false;
+        }
+
+        if (!File.Exists(gitIgnoreModelFilePaths[gitignoreFileKey]))
+        {
+            Logger.LogError("{gitIgnoreModelFilePaths[gitignoreFileKey]} file is not found", gitIgnoreModelFilePaths[gitignoreFileKey]);
+            return false;
+        }
+
+        if (!Directory.Exists(folderForGitIgnore))
+        {
+            Logger.LogError("folder {folderForGitIgnore} is not found", folderForGitIgnore);
+            return false;
+        }
+
+
+
+        File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey],
+            Path.Combine(folderForGitIgnore, gitignore));
+        return true;
+    }
+
+    private bool MakeFilesWhenUseReact()
+    {
+        if ( string.IsNullOrWhiteSpace(_apiAppCreatorData.FrontendProjectData.SolutionFolderName))
+        {
+            Logger.LogError("_apiAppCreatorData.FrontendProjectData.SolutionFolderName is emopty");
+            return false;
+        }
+        
+        const string react = "React";
+        return CopyGitIgnoreFile(react, _apiAppCreatorData.FrontendProjectData.SolutionFolderName);
+
+
+
+
         //Console.WriteLine("Creating ReactInstaller.cs...");
         //var reactInstallerClassCreator = new ReactInstallerClassCreator(Logger, installersPath, Par.ProjectName,
         //    _apiAppCreatorData.UseBackgroundTasks, "ReactInstaller.cs");
@@ -266,7 +315,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    testMdLoaderClassFileName);
         //testMdLoaderClassCreator.CreateFileStructure();
 
-        var assemblyReferenceClassFileName = "AssemblyReference.cs";
+        const string assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
             _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, $"{ProjectName}Repositories",
@@ -284,7 +333,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     private void MakeFilesWhenUseDatabase(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {
-        var assemblyReferenceClassFileName = "AssemblyReference.cs";
+        const string assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
             _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",

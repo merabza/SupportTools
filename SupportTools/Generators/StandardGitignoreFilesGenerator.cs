@@ -22,16 +22,23 @@ public sealed class StandardGitignoreFilesGenerator
 
     public bool Generate()
     {
-        const string cSharpGitIgnoreFileName = @"D:\1WorkSecurity\SupportTools\CSharp.gitignore";
+
+        if (string.IsNullOrWhiteSpace(_parameters.FolderForGitignoreFiles))
+        {
+            _logger.LogError("supportToolsParameters.FolderForGitignoreFiles is empty");
+            return false;
+        }
+
+        var cSharpGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "CSharp.gitignore");
         var createCSharpGitIgnoreFile = new CreateCSharpGitIgnoreFile(_logger, cSharpGitIgnoreFileName);
         var allSuccess = !TryAdd("CSharp", cSharpGitIgnoreFileName, createCSharpGitIgnoreFile);
 
-        const string reactGitIgnoreFileName = @"D:\1WorkSecurity\SupportTools\React.gitignore";
+        var reactGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "React.gitignore");
         var createReactGitIgnoreFile = new CreateReactGitIgnoreFile(_logger, reactGitIgnoreFileName);
         if (TryAdd("React", reactGitIgnoreFileName, createReactGitIgnoreFile))
             allSuccess = false;
 
-        const string defaultGitIgnoreFileName = @"D:\1WorkSecurity\SupportTools\Default.gitignore";
+        var defaultGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "Default.gitignore");
         var createDefaultGitIgnoreFile = new CreateDefaultGitIgnoreFile(_logger, defaultGitIgnoreFileName);
         if (TryAdd("Default", defaultGitIgnoreFileName, createDefaultGitIgnoreFile))
             allSuccess = false;

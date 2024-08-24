@@ -205,7 +205,6 @@ public abstract class AppCreatorBase
         if (createAppVersions == ECreateAppVersions.OnlySyncGit)
             return true;
 
-
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
         if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete)))
             return false;
@@ -228,7 +227,9 @@ public abstract class AppCreatorBase
                     var reactEsProjectCreator = new ReactEsProjectCreator(Logger, _httpClientFactory,
                         projectForCreate.ProjectFullPath,
                         projectForCreate.ProjectFileName, true);
-                    return reactEsProjectCreator.Create();
+                    if (! reactEsProjectCreator.Create() )
+                        return false;
+                    continue;
                 }
 
                 //პროექტების შექმნა

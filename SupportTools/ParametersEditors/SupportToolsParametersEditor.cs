@@ -19,6 +19,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.LogGitWork), false));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
+        FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.FolderForGitignoreFiles)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(SupportToolsParameters.RecentCommandsFileName)));
         FieldEditors.Add(new IntFieldEditor(nameof(SupportToolsParameters.RecentCommandsCount)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.TempFolder)));

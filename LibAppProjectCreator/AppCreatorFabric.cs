@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
@@ -13,10 +14,11 @@ namespace LibAppProjectCreator;
 public static class AppCreatorFabric
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, IHttpClientFactory httpClientFactory,
-        AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos)
+        AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos,
+        Dictionary<string, string> gitIgnoreModelFilePaths)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
-            par.SolutionFolderName, par.SecurityWorkFolderPath);
+            par.SolutionFolderName, par.SecurityWorkFolderPath, gitIgnoreModelFilePaths);
 
         if (appCreatorBaseData is null)
         {

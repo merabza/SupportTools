@@ -120,7 +120,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         var appCreator = AppCreatorFabric.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole));
+            GitRepos.Create(_logger, supportToolsParameters.Gits, null, null, UseConsole),
+            supportToolsParameters.GitIgnoreModelFilePaths);
 
         if (appCreator is null)
         {

@@ -22,6 +22,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }
+    public string? FolderForGitignoreFiles { get; set; }
     public string? TempFolder { get; set; }
     public string? SecurityFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }

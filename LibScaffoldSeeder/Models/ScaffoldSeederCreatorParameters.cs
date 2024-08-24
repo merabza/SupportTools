@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DbTools;
 using LibFileParameters.Models;
 using LibGitData.Models;
@@ -19,7 +20,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         string devDatabaseConnectionString, EDataProvider prodCopyDatabaseDataProvider,
         string prodCopyDatabaseConnectionString, string newDataSeedingClassLibProjectName,
         SmartSchema smartSchemaForLocal, string excludesRulesParametersFilePath, string fakeHostProjectName,
-        string? migrationSqlFilesFolder, GitProjects gitProjects, GitRepos gitRepos)
+        string? migrationSqlFilesFolder, GitProjects gitProjects, GitRepos gitRepos,
+        Dictionary<string, string> gitIgnoreModelFilePaths)
     {
         LogFolder = logFolder;
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
@@ -41,6 +43,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         MigrationSqlFilesFolder = migrationSqlFilesFolder;
         GitProjects = gitProjects;
         GitRepos = gitRepos;
+        GitIgnoreModelFilePaths = gitIgnoreModelFilePaths;
     }
 
     public string LogFolder { get; }
@@ -60,6 +63,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public SmartSchema SmartSchemaForLocal { get; }
     public GitProjects GitProjects { get; }
     public GitRepos GitRepos { get; }
+    public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
     public string CreateProjectSeederCodeProjectName => $"Create{ScaffoldSeederProjectName}SeederCode";
@@ -193,7 +197,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.MainProjectFolderRelativePath(gitProjects),
-                    project.SpaProjectFolderRelativePath(gitProjects), useConsole));
+                    project.SpaProjectFolderRelativePath(gitProjects), useConsole),
+                supportToolsParameters.GitIgnoreModelFilePaths);
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

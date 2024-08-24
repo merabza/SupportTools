@@ -71,7 +71,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         //შეიქმნას აპლიკაციის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
         var appCreatorBaseData = AppCreatorBaseData.Create(_logger, appCreatorParameters.WorkFolderPath,
             _scaffoldSeederFolderName, appCreatorParameters.SolutionFolderName,
-            appCreatorParameters.SecurityWorkFolderPath);
+            appCreatorParameters.SecurityWorkFolderPath, _ssParameters.GitIgnoreModelFilePaths);
 
         if (appCreatorBaseData is null)
         {
