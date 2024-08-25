@@ -45,58 +45,78 @@ public class GitProjectSyncronizer
     public void RunSync()
     {
         //ეს ნაწილი არის SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება
-        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, _gitProjectName, _useConsole);
+        var gitProjectsUpdater =
+            GitProjectsUpdater.Create(_logger, _parametersManager, _gitProjectName, _useConsole);
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
             return;
         }
 
-        if (!gitProjectsUpdater.ProcessOneGitProject(false))
-        {
-            StShared.WriteErrorLine("ProcessOneGitProject is not working", true, _logger);
-            return;
-        }
-
-        var lastRemoteId = gitProjectsUpdater.LastRemoteId;
-
-        //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
-
+        var haveSameChanges = false;
         foreach (var gitCollect in Enum.GetValues<EGitCollect>())
-        foreach (var gitSyncToolAction in _gitSyncToolActionList)
         {
-            if (gitCollect == EGitCollect.Collect)
+            if ( gitCollect == EGitCollect.Usage && !haveSameChanges)
+                continue;
+
+            var gitProjectsUpdaterGitProcessor = gitProjectsUpdater.ProcessOneGitProject(false);
+
+            if (gitProjectsUpdaterGitProcessor is null)
             {
-                if (!gitSyncToolAction.RunActionPhase1())
-                    continue;
-
-                if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.Cloned)
-                    continue;
-
-                if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.NeedCommit)
-                {
-                    _usedCommitMessage ??= Inputer.InputTextRequired("Message",
-                        _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
-
-                    if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage)) 
-                        continue;
-                }
+                StShared.WriteErrorLine("ProcessOneGitProject is not working", true, _logger);
+                return;
             }
 
-            gitSyncToolAction.GitProcessor.CheckRemoteId();
+            var lastRemoteId = gitProjectsUpdater.LastRemoteId;
 
-            if (gitSyncToolAction.LastRemoteId != lastRemoteId)
+            //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
+
+            foreach (var gitSyncToolAction in _gitSyncToolActionList)
             {
-                //მოშორებული ინფორმაციის განახლება
-                //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
-                if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) continue;
+                if (gitCollect == EGitCollect.Collect)
+                {
+                    if (!gitSyncToolAction.RunActionPhase1())
+                        continue;
+
+                    switch (gitSyncToolAction.Phase1Result)
+                    {
+                        case EFirstPhaseResult.Cloned:
+                            continue;
+                        case EFirstPhaseResult.NeedCommit:
+                        {
+                            _usedCommitMessage ??= Inputer.InputTextRequired("Message",
+                                _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
+
+                            if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage))
+                                continue;
+
+                            haveSameChanges = true;
+                            break;
+                        }
+                        case EFirstPhaseResult.FinishedWithErrors:
+                            continue;
+                        case EFirstPhaseResult.NotNeedCommit:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
 
                 gitSyncToolAction.GitProcessor.CheckRemoteId();
 
-                lastRemoteId = gitSyncToolAction.LastRemoteId;
-            }
+                if (gitSyncToolAction.LastRemoteId != lastRemoteId)
+                {
+                    //მოშორებული ინფორმაციის განახლება
+                    //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
+                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) continue;
 
-            gitSyncToolAction.GitProcessor.SyncRemote();
+                    gitSyncToolAction.GitProcessor.CheckRemoteId();
+
+                    lastRemoteId = gitSyncToolAction.LastRemoteId;
+                }
+
+                gitSyncToolAction.GitProcessor.SyncRemote();
+            }
         }
     }
 }

@@ -56,7 +56,8 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        if (!gitProjectsUpdater.ProcessOneGitProject())
+        var gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
+        if (gitProcessor is null)
             return false;
 
         _parametersManager.Save(_supportToolsParameters, "Project Saved");

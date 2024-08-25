@@ -69,11 +69,14 @@ public sealed class GitProjectsUpdater
         return null;
     }
 
-    public bool ProcessOneGitProject(bool processFolder = true)
+    public GitProcessor? ProcessOneGitProject(bool processFolder = true)
     {
-        if (!UpdateOneGitProject(_projectFolderName, _gitData))
-            return false;
-        return !processFolder || ProcessFolder(_projectFolderName, _gitName);
+        var gitProcessor = UpdateOneGitProject(_projectFolderName, _gitData);
+        if (gitProcessor is null)
+            return null;
+        if (!processFolder) 
+            return gitProcessor;
+        return !ProcessFolder(_projectFolderName, _gitName) ? null : gitProcessor;
 
         /*
 
@@ -111,7 +114,7 @@ public sealed class GitProjectsUpdater
         //შემოწმდეს Gits ფოლდერში პროექტის ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
     }
 
-    private bool UpdateOneGitProject(string projectFolderName, GitDataDomain git)
+    private GitProcessor? UpdateOneGitProject(string projectFolderName, GitDataDomain git)
     {
         var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
 
@@ -125,7 +128,7 @@ public sealed class GitProjectsUpdater
             {
                 Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
                     SqlDbClientErrors.GetRemoteOriginUrlError));
-                return false;
+                return null;
             }
 
             var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
@@ -139,7 +142,7 @@ public sealed class GitProjectsUpdater
         {
             //მოხდეს ამ Git პროექტის დაკლონვა შესაბამისი ფოლდერის სახელის მითითებით
             if (!gitProcessor.Clone(git.GitProjectAddress))
-                return false;
+                return null;
         }
         else
         {
@@ -148,7 +151,7 @@ public sealed class GitProjectsUpdater
             if (needCommitResult.IsT1)
             {
                 Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
-                return false;
+                return null;
             }
 
             if (needCommitResult.AsT0)
@@ -157,7 +160,7 @@ public sealed class GitProjectsUpdater
                 if (!Inputer.InputBool(
                         $"{projectFolderName} Have changes it is SupportTools Work folder and must be Restored to server version. continue?",
                         true))
-                    return false;
+                    return null;
 
                 //     თანხმობის შემთხვევაში ან თავიდან დაიკლონოს, ან უკეთესია, თუ Checkout გაკეთდება.
                 /*შემდეგი 3 ბრძანება თანმიმდევრობით იგივეა, რომ გიტის პროექტი თავიდან დაკლონო, ოღონდ მინიმალური ჩამოტვირთვით
@@ -167,26 +170,26 @@ public sealed class GitProjectsUpdater
                      */
 
                 if (!gitProcessor.Reset())
-                    return false;
+                    return null;
                 if (!gitProcessor.Checkout())
-                    return false;
+                    return null;
                 if (!gitProcessor.Clean_fdx())
-                    return false;
+                    return null;
             }
             else
             {
                 if (!gitProcessor.GitRemoteUpdate())
-                    return false;
+                    return null;
 
                 //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
                 if (gitProcessor.GetGitState() == GitState.NeedToPull && !gitProcessor.Pull())
-                    return false;
+                    return null;
             }
         }
 
         gitProcessor.CheckRemoteId();
         LastRemoteId = gitProcessor.LastRemoteId;
-        return true;
+        return gitProcessor;
     }
 
 

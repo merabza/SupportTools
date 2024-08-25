@@ -65,7 +65,8 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
                 return Task.FromResult(false);
             }
 
-            if (!gitProjectsUpdater.ProcessOneGitProject())
+            var gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
+            if (gitProcessor is null)
                 return Task.FromResult(false);
             usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
         }
