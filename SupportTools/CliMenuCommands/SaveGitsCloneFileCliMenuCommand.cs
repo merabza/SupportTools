@@ -87,13 +87,13 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
                 return false;
             }
 
-            if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
-            {
-                var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
-                var mainProjectFolderRelativePath = project.MainProjectFolderRelativePath(gitProjects);
-                gitProjectFolderName = gitProjectFolderName.Replace(GitDataModel.MainProjectFolderRelativePathName,
-                    mainProjectFolderRelativePath);
-            }
+            //if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
+            //{
+            //    var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
+            //    var mainProjectFolderRelativePath = project.MainProjectFolderRelativePath(gitProjects);
+            //    gitProjectFolderName = gitProjectFolderName.Replace(GitDataModel.MainProjectFolderRelativePathName,
+            //        mainProjectFolderRelativePath);
+            //}
 
             sb.AppendLine(
                 $"git clone {parameters.Gits[gitProjectName].GitProjectAddress} {gitProjectFolderName}");

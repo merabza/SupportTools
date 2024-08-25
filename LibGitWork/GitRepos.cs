@@ -18,7 +18,7 @@ public sealed class GitRepos
 
 
     public static GitRepos Create(ILogger? logger, Dictionary<string, GitDataModel> gitRepos,
-        string? mainProjectFolderRelativePath, string? spaProjectFolderRelativePath, bool useConsole)
+        string? spaProjectFolderRelativePath, bool useConsole, bool useGitRecordNameForComplexGitProjectFolderName)
     {
         Dictionary<string, GitDataDomain> gits = [];
         foreach (var (gitProjectName, gitData) in gitRepos)
@@ -45,22 +45,29 @@ public sealed class GitRepos
             }
 
             var gitProjectFolderName = gitData.GitProjectFolderName;
-            if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
-            {
-                if (mainProjectFolderRelativePath is null)
-                    continue;
-                gitProjectFolderName = Path.Combine(mainProjectFolderRelativePath,
-                    gitProjectFolderName[GitDataModel.MainProjectFolderRelativePathName.Length..]
-                        .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
-            }
+
+            //if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
+            //{
+            //    if (mainProjectFolderRelativePath is null)
+            //        continue;
+            //    gitProjectFolderName = Path.Combine(mainProjectFolderRelativePath,
+            //        gitProjectFolderName[GitDataModel.MainProjectFolderRelativePathName.Length..]
+            //            .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
+            //}
 
             if (gitProjectFolderName.StartsWith(GitDataModel.SpaProjectFolderRelativePathName))
             {
-                if (spaProjectFolderRelativePath is null)
-                    continue;
-                gitProjectFolderName = Path.Combine(spaProjectFolderRelativePath,
-                    gitProjectFolderName[GitDataModel.SpaProjectFolderRelativePathName.Length..]
-                        .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
+                if (useGitRecordNameForComplexGitProjectFolderName)
+                    gitProjectFolderName = gitProjectName;
+                else
+                {
+                    if (spaProjectFolderRelativePath is null)
+                        continue;
+                    gitProjectFolderName = Path.Combine(spaProjectFolderRelativePath,
+                        gitProjectFolderName[GitDataModel.SpaProjectFolderRelativePathName.Length..]
+                            .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
+                }
+
             }
 
             gits.Add(gitProjectName,

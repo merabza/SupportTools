@@ -51,7 +51,7 @@ public sealed class GitProjectsUpdater
         }
 
         var gitsFolder = Path.Combine(workFolder, "Gits");
-        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, null, null, useConsole);
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,  null, useConsole, true);
 
         var gitData = gitRepos.GetGitRepoByKey(gitName);
         if (gitData is null)

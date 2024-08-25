@@ -54,7 +54,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         }
 
         List<string> usedProjectNames = [];
-        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, null, UseConsole);
+        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
         foreach (var gitProjectsUpdater in gitRepos.Gits.Select(kvp =>
                      GitProjectsUpdater.Create(Logger, _parametersManager, kvp.Key, UseConsole)))

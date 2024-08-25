@@ -51,8 +51,7 @@ public class WrongGitignoreFilesListCreator
             var gitProjects = GitProjects.Create(_logger, supportToolsParameters.GitProjects);
 
             var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
-                project.MainProjectFolderRelativePath(gitProjects),
-                project.SpaProjectFolderRelativePath(gitProjects), _useConsole);
+                project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
 
 
             var gitProjectNames = gitCol switch

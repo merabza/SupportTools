@@ -196,8 +196,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 project.NewDataSeedingClassLibProjectName, smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
-                GitRepos.Create(logger, supportToolsParameters.Gits, project.MainProjectFolderRelativePath(gitProjects),
-                    project.SpaProjectFolderRelativePath(gitProjects), useConsole),
+                GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
+                    useConsole, false),
                 supportToolsParameters.GitIgnoreModelFilePaths);
             return scaffoldSeederCreatorParameters;
         }

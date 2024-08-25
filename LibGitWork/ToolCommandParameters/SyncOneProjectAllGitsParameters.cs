@@ -66,8 +66,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
-            useConsole);
+            project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
         var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 

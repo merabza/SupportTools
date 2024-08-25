@@ -14,14 +14,14 @@ namespace LibTools.ToolCommandParameters;
 public class ClearOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    private ClearOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData)
+    private ClearOneProjectAllGitsParameters(string gitsFolder, List<GitDataDomain> gitData)
     {
-        ProjectName = projectName;
+        //ProjectName = projectName;
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
 
-    public string? ProjectName { get; }
+    //public string? ProjectName { get; }
     public List<GitDataDomain> GitData { get; }
     public string GitsFolder { get; }
 
@@ -60,8 +60,8 @@ public class ClearOneProjectAllGitsParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
-            true);
+            project.SpaProjectFolderRelativePath(gitProjects),
+            true, false);
 
         var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 
@@ -73,7 +73,7 @@ public class ClearOneProjectAllGitsParameters : IParameters
             StShared.WriteErrorLine("Gits with this names are absent", true);
         }
 
-        return new ClearOneProjectAllGitsParameters(projectName, gitsFolder,
+        return new ClearOneProjectAllGitsParameters(gitsFolder,
             gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList());
     }
 }

@@ -100,7 +100,8 @@ public sealed class GitCruder : ParCruder
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         var projects = parameters.Projects;
 
-        var usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name));
+        var usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
+                         projects.Values.Count(project => project.ScaffoldSeederGitProjectNames.Contains(name));
 
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }

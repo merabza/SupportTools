@@ -54,8 +54,7 @@ public class GitSyncParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.MainProjectFolderRelativePath(gitProjects), project.SpaProjectFolderRelativePath(gitProjects),
-            useConsole);
+            project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
         if (!gitRepos.Gits.TryGetValue(gitProjectName, out var value))
         {

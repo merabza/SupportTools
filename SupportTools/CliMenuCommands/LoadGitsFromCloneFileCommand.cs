@@ -34,17 +34,17 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             return false;
         }
 
-        var mainProjectName = project.MainProjectName;
-        string? mainProjectRelativePath = null;
-        string? mainProjectFolderRelativePath = null;
-        if (!string.IsNullOrWhiteSpace(mainProjectName) &&
-            parameters.GitProjects.TryGetValue(mainProjectName, out var gitProject))
-            mainProjectRelativePath = gitProject.ProjectRelativePath;
-        if (!string.IsNullOrWhiteSpace(mainProjectRelativePath))
-        {
-            var fileInfo = new FileInfo(mainProjectRelativePath);
-            mainProjectFolderRelativePath = fileInfo.Directory?.FullName + Path.DirectorySeparatorChar;
-        }
+        //var mainProjectName = project.MainProjectName;
+        //string? mainProjectRelativePath = null;
+        //string? mainProjectFolderRelativePath = null;
+        //if (!string.IsNullOrWhiteSpace(mainProjectName) &&
+        //    parameters.GitProjects.TryGetValue(mainProjectName, out var gitProject))
+            //mainProjectRelativePath = gitProject.ProjectRelativePath;
+        //if (!string.IsNullOrWhiteSpace(mainProjectRelativePath))
+        //{
+            //var fileInfo = new FileInfo(mainProjectRelativePath);
+            //mainProjectFolderRelativePath = fileInfo.Directory?.FullName + Path.DirectorySeparatorChar;
+        //}
 
         var defCloneFile = GetDefCloneFileName(parameters, project);
 
@@ -82,11 +82,11 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             var gitProjectAddress = pars[0];
             var gitProjectFolderName = pars[1];
 
-            //თუ ფოლდერი რამდენიმე სექციით არის მოცემული, მაშინ დავადგინოთ მასში მთავარი პროექტის ფოლდერის მონაწილეობა და მის ადგილას ჩავწეროთ {MainProjectPath}
-            if (!string.IsNullOrWhiteSpace(mainProjectFolderRelativePath) &&
-                gitProjectFolderName.StartsWith(mainProjectFolderRelativePath))
-                gitProjectFolderName = GitDataModel.MainProjectFolderRelativePathName +
-                                       gitProjectFolderName[mainProjectFolderRelativePath.Length..];
+            ////თუ ფოლდერი რამდენიმე სექციით არის მოცემული, მაშინ დავადგინოთ მასში მთავარი პროექტის ფოლდერის მონაწილეობა და მის ადგილას ჩავწეროთ {MainProjectPath}
+            //if (!string.IsNullOrWhiteSpace(mainProjectFolderRelativePath) &&
+            //    gitProjectFolderName.StartsWith(mainProjectFolderRelativePath))
+            //    gitProjectFolderName = GitDataModel.MainProjectFolderRelativePathName +
+            //                           gitProjectFolderName[mainProjectFolderRelativePath.Length..];
 
 
             var gitName = gitProjectFolderName;
