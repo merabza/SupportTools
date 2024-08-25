@@ -52,10 +52,15 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
-        //ყველა პროექტის git-ის სინქრონიზაცია
-        var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
-            new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
-        projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
+        ////ყველა პროექტის git-ის სინქრონიზაცია
+        //var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
+        //    new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
+        //projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
+
+        //ყველა პროექტის git-ის სინქრონიზაცია V2
+        var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2 =
+            new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(_logger, _parametersManager, _projectName);
+        projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2);
 
         projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
             EGitCol.Main));

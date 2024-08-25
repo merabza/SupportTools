@@ -62,11 +62,11 @@ public sealed class SupportTools : CliAppLoop
         var importProjectCommand = new ImportProjectCliMenuCommand(_parametersManager);
         mainMenuSet.AddMenuItem(importProjectCommand);
 
-        //ყველა პროექტის git-ის სინქრონიზაცია
-        var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
-        mainMenuSet.AddMenuItem(syncAllProjectsGits);
+        ////ყველა პროექტის git-ის სინქრონიზაცია
+        //var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
+        //mainMenuSet.AddMenuItem(syncAllProjectsGits);
 
-        //ყველა პროექტის git-ის სინქრონიზაცია ახალი მეთოდით
+        //ყველა პროექტის git-ის სინქრონიზაცია ახალი მეთოდით V2
         var syncAllProjectsGitsV2 = new SyncAllProjectsAllGitsCliMenuCommandV2(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGitsV2);
 
