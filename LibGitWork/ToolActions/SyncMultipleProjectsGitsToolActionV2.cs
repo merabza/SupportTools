@@ -81,7 +81,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
         }
 
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
+        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
             keyValuePair.Value.RunSync();
 
 

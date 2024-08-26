@@ -54,10 +54,13 @@ public class GitProjectSyncronizer
         }
 
         var haveSameChanges = false;
-        foreach (var gitCollect in Enum.GetValues<EGitCollect>())
+        var loopNom = 0;
+
+        var gitCollect = EGitCollect.Collect;
+        while (gitCollect == EGitCollect.Collect || haveSameChanges)
         {
-            if ( gitCollect == EGitCollect.Usage && !haveSameChanges)
-                continue;
+            haveSameChanges = false;
+            Console.WriteLine($"---=== {_gitProjectName} {gitCollect} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
 
             var gitProjectsUpdaterGitProcessor = gitProjectsUpdater.ProcessOneGitProject(false);
 
@@ -117,6 +120,12 @@ public class GitProjectSyncronizer
 
                 gitSyncToolAction.GitProcessor.SyncRemote();
             }
+
+            gitCollect = EGitCollect.Usage;
+            loopNom++;
+
+            Console.WriteLine("---===---------===---");
+
         }
     }
 }
