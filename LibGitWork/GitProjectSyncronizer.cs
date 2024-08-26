@@ -60,7 +60,8 @@ public class GitProjectSyncronizer
         while (gitCollect == EGitCollect.Collect || haveSameChanges)
         {
             haveSameChanges = false;
-            Console.WriteLine($"---=== {_gitProjectName} {gitCollect} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
+            Console.WriteLine(
+                $"---=== {_gitProjectName} {gitCollect} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
 
             var gitProjectsUpdaterGitProcessor = gitProjectsUpdater.ProcessOneGitProject(false);
 

@@ -28,7 +28,7 @@ public sealed class GitProcessor
 
     public void CheckRemoteId()
     {
-        LastRemoteId ??= GitGetRemoteId();
+        LastRemoteId = GitGetRemoteId();
     }
 
     //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
