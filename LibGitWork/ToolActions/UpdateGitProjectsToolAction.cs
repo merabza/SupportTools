@@ -96,9 +96,15 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
                 return false;
             }
 
+            if (project.ProjectFileName is null)
+            {
+                StShared.WriteErrorLine("project.ProjectFileName is null", true);
+                return false;
+            }
+
             List<string> dependsOnProjectNames = [];
 
-            var filePath = Path.Combine(gitsFolder, project.ProjectRelativePath);
+            var filePath = Path.Combine(gitsFolder, project.ProjectRelativePath, project.ProjectFileName);
             var projectXml = XElement.Load(filePath);
 
             var projectReferences =

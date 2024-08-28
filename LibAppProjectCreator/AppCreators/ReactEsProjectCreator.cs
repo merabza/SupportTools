@@ -15,27 +15,49 @@ public class ReactEsProjectCreator
 {
     private const string SdkRef = "https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK";
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string _createInPath;
+    private readonly string _projectFolderName;
 
     private readonly ILogger _logger;
-    private readonly string _projectFullPath;
+    private readonly string _projectFileName;
     private readonly string _projectName;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReactEsProjectCreator(ILogger logger, IHttpClientFactory httpClientFactory, string projectFullPath,
-        string projectName, bool useConsole)
+    public ReactEsProjectCreator(ILogger logger, IHttpClientFactory httpClientFactory, string createInPath,
+        string projectFolderName, string projectFileName, string projectName, bool useConsole)
     {
         _logger = logger;
-        _projectFullPath = projectFullPath;
+        _projectFileName = projectFileName;
         _projectName = projectName;
         _useConsole = useConsole;
         _httpClientFactory = httpClientFactory;
+        _createInPath = createInPath;
+        _projectFolderName = projectFolderName;
     }
 
     public bool Create()
     {
+        //var dir = new DirectoryInfo(_projectFullPath);
+        //var parDir = dir.Parent;
+        //if (parDir is null)
+        //{
+        //    StShared.WriteErrorLine($"{_projectFullPath} folder has no parent", true, _logger);
+        //    return false;
+        //}
+
+        //var parDirFullName = parDir.FullName;
         //შეიქმნას ფოლდერი სადაც უნდა ჩაიწეროს რეაქტის ფრონტ პროექტი
-        StShared.CreateFolder(_projectFullPath, _useConsole);
+        StShared.CreateFolder(_createInPath, _useConsole);
+
+
+
+        //var reactProjectName = Path.GetFileNameWithoutExtension(_projectFileName).ToLower();
+        if (!StShared.RunCmdProcess($"npm init --yes vite@latest {_projectName} -- --template=react-ts", _createInPath))
+        {
+            StShared.WriteErrorLine("Error When creating react app using npm", true, _logger);
+            return false;
+        }
 
         //შეიქმნას .esproj ფაილი. ნიმუში:
         /*
@@ -62,14 +84,13 @@ public class ReactEsProjectCreator
 
         HtmlDocument htmlDoc = new();
         htmlDoc.LoadHtml(content);
+
         var refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);
         const string startString = "/packages/";
         var result = refsTitlesList.Where(x => x.Item1.StartsWith(startString)).OrderByDescending(x => x.Item2)
             .FirstOrDefault().Item1;
         var javaScriptSdk = result[startString.Length..];
-
-
-        CreateEsprojFile(Path.Combine(_projectFullPath, _projectName), javaScriptSdk);
+        CreateEsprojFile(Path.Combine(_createInPath, _projectFolderName, _projectFileName), javaScriptSdk);
 
 
         //Microsoft.VisualStudio.JavaScript.Sdk-ს ბოლო ვერსიის დასადგენად უნდა მოვქაჩოთ გვერდი 

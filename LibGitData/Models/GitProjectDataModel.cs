@@ -6,16 +6,14 @@ namespace LibGitData.Models;
 
 public sealed class GitProjectDataModel
 {
-    public string? ProjectName => string.IsNullOrWhiteSpace(ProjectRelativePath)
+    public string? ProjectExtension => string.IsNullOrWhiteSpace(ProjectFileName)
         ? null
-        : Path.GetFileNameWithoutExtension(ProjectRelativePath);
-
-    public string? ProjectExtension => string.IsNullOrWhiteSpace(ProjectRelativePath)
-        ? null
-        : Path.GetExtension(ProjectRelativePath);
+        : Path.GetExtension(ProjectFileName);
 
     public string? GitName { get; set; }
     public string? ProjectRelativePath { get; set; }
+    public string? ProjectFileName { get; set; }
+    
     public List<string> DependsOnProjectNames { get; set; } = [];
 
     public void DependsOn(List<string> dependsOnProjectNames)

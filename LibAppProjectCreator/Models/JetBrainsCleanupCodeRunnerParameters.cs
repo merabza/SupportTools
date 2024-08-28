@@ -8,7 +8,8 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class JetBrainsCleanupCodeRunnerParameters : IParameters
 {
-    public JetBrainsCleanupCodeRunnerParameters(string solutionFileName)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    private JetBrainsCleanupCodeRunnerParameters(string solutionFileName)
     {
         SolutionFileName = solutionFileName;
     }

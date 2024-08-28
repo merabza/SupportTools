@@ -2,6 +2,7 @@
 
 public sealed class ReferenceDataModel
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReferenceDataModel(string projectFilePath, string referenceProjectFilePath)
     {
         ProjectFilePath = projectFilePath;

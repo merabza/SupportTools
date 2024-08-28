@@ -1,28 +1,24 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using CliMenu;
+﻿using CliMenu;
 using LibDataInput;
-using LibGitData.Models;
 using LibMenuInput;
 using LibParameters;
-using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System;
+using System.IO;
+using System.Text;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SaveGitsCloneFileCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
-        base("Save Gits Clone File")
+    public SaveGitsCloneFileCliMenuCommand(ParametersManager parametersManager, string projectName) : base(
+        "Save Gits Clone File")
     {
-        _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
     }

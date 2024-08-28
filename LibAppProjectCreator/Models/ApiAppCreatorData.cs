@@ -113,9 +113,10 @@ public sealed class ApiAppCreatorData
             $"{projectName}Repositories", ["Installers"]);
 
         var frontProjectFolderName = $"{projectName}Front";
-        var frontPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
+        var frontEndProjectName = $"{projectName.ToLower()}frontend";
+        var createInPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
         var frontendProjectData =
-            ProjectForCreate.CreateReactProject(frontPath, $"{projectName}frontend", [], frontProjectFolderName);
+            ProjectForCreate.CreateReactProject(createInPath, frontEndProjectName, [], frontProjectFolderName);
 
         return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
             template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,

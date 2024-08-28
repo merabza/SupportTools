@@ -24,6 +24,7 @@ public sealed class ConsoleAppLaunchSettingsJsonCreator
         var projectParametersFileFullName =
             Path.Combine(_projectParametersFilePath, $"{_projectName}.json");
 
+        // ReSharper disable once CollectionNeverUpdated.Local
         var jObject = new JObject(new JProperty("profiles",
             new JObject(new JProperty(_projectName,
                 new JObject(new JProperty("commandName", "Project"),

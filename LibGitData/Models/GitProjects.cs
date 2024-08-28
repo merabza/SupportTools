@@ -55,11 +55,16 @@ public sealed class GitProjects
                 continue;
             }
 
+            if (string.IsNullOrWhiteSpace(value.ProjectFileName))
+            {
+                logger?.LogError("ProjectFileName is empty for Git Project with key {key})", key);
+                continue;
+            }
+
             var dependsOnProjectNames = value.DependsOnProjectNames;
 
             gitProjects.Add(key,
-                new GitProjectDataDomain(value.GitName, value.ProjectRelativePath,
-                    dependsOnProjectNames));
+                new GitProjectDataDomain(value.GitName, value.ProjectRelativePath, value.ProjectFileName, dependsOnProjectNames));
         }
 
         return new GitProjects(gitProjects);

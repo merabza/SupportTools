@@ -58,12 +58,12 @@ public sealed class ProjectModel : ItemData
         return ServerInfos.GetValueOrDefault(serverName);
     }
 
-    public string? MainProjectFolderRelativePath(GitProjects gitProjects)
-    {
-        return string.IsNullOrWhiteSpace(MainProjectName)
-            ? null
-            : ProjectFolderRelativePath(MainProjectName, gitProjects);
-    }
+    //public string? MainProjectFolderRelativePath(GitProjects gitProjects)
+    //{
+    //    return string.IsNullOrWhiteSpace(MainProjectName)
+    //        ? null
+    //        : ProjectFolderRelativePath(MainProjectName, gitProjects);
+    //}
 
     public string? MainProjectFileName(GitProjects gitProjects)
     {
@@ -88,20 +88,20 @@ public sealed class ProjectModel : ItemData
             return null;
         var gitProject = gitProjects.GetGitProjectByKey(projectName);
         var projectRelativePath = gitProject.ProjectRelativePath;
-        return string.IsNullOrWhiteSpace(projectRelativePath)
+        var projectFileName = gitProject.ProjectFileName;
+        return string.IsNullOrWhiteSpace(projectRelativePath) || string.IsNullOrWhiteSpace(projectFileName)
             ? null
-            : Path.Combine(ProjectFolderName, projectRelativePath);
+            : Path.Combine(ProjectFolderName, projectRelativePath, projectFileName);
     }
 
     private static string? ProjectFolderRelativePath(string projectName, GitProjects gitProjects)
     {
         var gitProject = gitProjects.GetGitProjectByKey(projectName);
         var projectRelativePath = gitProject.ProjectRelativePath;
-        if (string.IsNullOrWhiteSpace(projectRelativePath))
-            return null;
-        return !projectRelativePath.Contains(Path.DirectorySeparatorChar)
-            ? null
-            : projectRelativePath[..projectRelativePath.LastIndexOf(Path.DirectorySeparatorChar)];
+        return string.IsNullOrWhiteSpace(projectRelativePath) ? null : projectRelativePath;
+        //return !projectRelativePath.Contains(Path.DirectorySeparatorChar)
+        //    ? null
+        //    : projectRelativePath[..projectRelativePath.LastIndexOf(Path.DirectorySeparatorChar)];
     }
 
 

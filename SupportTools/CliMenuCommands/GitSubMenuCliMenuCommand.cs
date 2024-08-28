@@ -50,7 +50,7 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
             gitSubMenuSet.AddMenuItem(new LoadGitsFromCloneFileCommand(_parametersManager, _projectName));
 
             //გიტების ინფორმაციაზე დაყრდნობით კლონირების ფაილის შექმნა
-            gitSubMenuSet.AddMenuItem(new SaveGitsCloneFileCliMenuCommand(_logger, _parametersManager, _projectName));
+            gitSubMenuSet.AddMenuItem(new SaveGitsCloneFileCliMenuCommand(_parametersManager, _projectName));
             //მომავალში სასურველი იქნება ბრენჩების შექმნის ათვისება და pull Request-ების ათვისება.
         }
 

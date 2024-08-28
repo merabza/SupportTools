@@ -321,6 +321,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         File.WriteAllText(saveAsFilePath, paramsJsonText);
 
         //launchSettings.json//"SeedGeoModelDb"
+        // ReSharper disable once CollectionNeverUpdated.Local
         var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
             new JObject(new JProperty(Parameters.SeedDbProjectName,
                 new JObject(new JProperty("commandName", "Project"),

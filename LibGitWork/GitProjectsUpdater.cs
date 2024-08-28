@@ -203,22 +203,26 @@ public sealed class GitProjectsUpdater
             .Any(folderFullName => !ProcessFolder(folderFullName, gitName)))
             return false;
 
-        var fileNames = Directory.GetFiles(folderPath, "*.csproj").ToList();
-        fileNames.AddRange(Directory.GetFiles(folderPath, "*.esproj"));
+        //var fileNames = Directory.GetFiles(folderPath, "*.csproj").ToList();
+        //fileNames.AddRange(Directory.GetFiles(folderPath, "*.esproj"));
 
-        return fileNames.All(fileFullName => ProcessOneFile(fileFullName, gitName));
+        var fileNames = dir.GetFiles("*.csproj").Select(x=>x.Name).ToList();
+        fileNames.AddRange(dir.GetFiles("*.esproj").Select(x=>x.Name));
+
+        return fileNames.All(fileName => ProcessOneFile(folderPath, fileName, gitName));
     }
 
-    private bool ProcessOneFile(string filePath, string gitName)
+    private bool ProcessOneFile(string folderPath, string fileName, string gitName)
     {
+        var filePath = Path.Combine(folderPath, fileName);
         Console.WriteLine($"Dependencies for {filePath}");
         var projectXml = XElement.Load(filePath);
 
         var projectReferences =
             projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
 
-        var projectRelativePath = Path.GetRelativePath(_gitsFolder, filePath);
-        var project = RegisterProject(projectRelativePath, gitName);
+        var projectRelativePath = Path.GetRelativePath(_gitsFolder, folderPath);
+        var project = RegisterProject(projectRelativePath, fileName, gitName);
         List<string> dependsOnProjectNames = [];
 
         foreach (var element in projectReferences)
@@ -248,14 +252,15 @@ public sealed class GitProjectsUpdater
         return true;
     }
 
-    private GitProjectDataModel RegisterProject(string projectRelativePath, string gitName)
+    private GitProjectDataModel RegisterProject(string projectRelativePath, string projectFileName, string gitName)
     {
-        var projectName = Path.GetFileNameWithoutExtension(projectRelativePath);
+        var projectName = Path.GetFileNameWithoutExtension(projectFileName);
         if (!UsedProjectNames.Contains(projectName))
             UsedProjectNames.Add(projectName);
 
-        _supportToolsParameters.GitProjects.TryAdd(projectName, new GitProjectDataModel
-            { GitName = gitName, ProjectRelativePath = projectRelativePath });
+        _supportToolsParameters.GitProjects.TryAdd(projectName,
+            new GitProjectDataModel
+                { GitName = gitName, ProjectRelativePath = projectRelativePath, ProjectFileName = projectFileName });
 
         var gitProject = _supportToolsParameters.GitProjects[projectName];
 
@@ -264,6 +269,9 @@ public sealed class GitProjectsUpdater
 
         if (gitProject.ProjectRelativePath != projectRelativePath)
             gitProject.ProjectRelativePath = projectRelativePath;
+
+        if (gitProject.ProjectFileName != projectFileName)
+            gitProject.ProjectFileName = projectFileName;
 
         return _supportToolsParameters.GitProjects[projectName];
     }

@@ -47,7 +47,7 @@ public abstract class AppCreatorBase
         SolutionPath = solutionPath;
     }
 
-    private string WorkPath { get; }
+    protected string WorkPath { get; }
 
     protected string SecurityPath { get; }
 
@@ -88,12 +88,13 @@ public abstract class AppCreatorBase
 
     private void PrepareFoldersForCheckAndClear()
     {
-        FoldersForCheckAndClear.Add(SolutionPath);
+        //FoldersForCheckAndClear.Add(SolutionPath);
         FoldersForCheckAndClear.Add(SecurityPath);
 
-        foreach (var projectBase in Projects.Where(projectBase =>
-                     !string.IsNullOrWhiteSpace(projectBase.SolutionFolderName)))
-            FoldersForCheckAndClear.Add(projectBase.CreateInPath);
+        //foreach (var projectBase in Projects.Where(projectBase =>
+        //             !string.IsNullOrWhiteSpace(projectBase.SolutionFolderName)))
+        foreach (var createInPath in Projects.Select(x=>x.CreateInPath).Distinct())
+            FoldersForCheckAndClear.Add(createInPath);
     }
 
     private void PrepareFoldersForCreate()
@@ -128,7 +129,7 @@ public abstract class AppCreatorBase
         if (await CreateApp(askForDelete, createAppVersions, cancellationToken))
             return true;
 
-        StShared.WriteErrorLine("Scaffold Seeder Solution does not created", true, Logger);
+        StShared.WriteErrorLine("Solution does not created", true, Logger);
         return false;
     }
 
@@ -156,7 +157,8 @@ public abstract class AppCreatorBase
             return foundedProjectDataModel;
 
         //დავიანგარიშოთ პროექტის ფაილის გზა
-        var projectFileFullName = Path.Combine(createInPath, projectData.ProjectRelativePath);
+        var projectFileFullName =
+            Path.Combine(createInPath, projectData.ProjectRelativePath, projectData.ProjectFileName);
         var projectFile = new FileInfo(projectFileFullName);
         var projectPath = projectFile.DirectoryName;
         if (projectPath is null)
@@ -225,31 +227,34 @@ public abstract class AppCreatorBase
                 {
                     //რეაქტის პროექტის შექმნა ფრონტისთვის
                     var reactEsProjectCreator = new ReactEsProjectCreator(Logger, _httpClientFactory,
-                        projectForCreate.ProjectFullPath,
-                        projectForCreate.ProjectFileName, true);
-                    if (! reactEsProjectCreator.Create() )
+                        projectForCreate.CreateInPath, projectForCreate.ProjectFolderName,
+                        projectForCreate.ProjectFileName, projectForCreate.ProjectName, true);
+                    if (!reactEsProjectCreator.Create())
                         return false;
-                    continue;
                 }
-
-                //პროექტების შექმნა
-                if (StShared.RunProcess(true, Logger, "dotnet",
-                        $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? string.Empty : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
-                    .IsSome)
-                    return false;
-
-                var projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
-
-                AddProjectParametersWithCheck(projectXml, "PropertyGroup", "ImplicitUsings", "disable");
-
-                projectXml.Save(projectForCreate.ProjectFileFullName);
-
-                if (projectForCreate.ClassForDelete != null)
+                else
                 {
-                    //წაიშალოს არსებული ავტომატურად შექმნილი Program.cs
-                    var programCs = Path.Combine(projectForCreate.ProjectFullPath,
-                        $"{projectForCreate.ClassForDelete}.cs");
-                    File.Delete(programCs);
+
+
+                    //პროექტების შექმნა
+                    if (StShared.RunProcess(true, Logger, "dotnet",
+                            $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? string.Empty : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")
+                        .IsSome)
+                        return false;
+
+                    var projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
+
+                    AddProjectParametersWithCheck(projectXml, "PropertyGroup", "ImplicitUsings", "disable");
+
+                    projectXml.Save(projectForCreate.ProjectFileFullName);
+
+                    if (projectForCreate.ClassForDelete != null)
+                    {
+                        //წაიშალოს არსებული ავტომატურად შექმნილი Program.cs
+                        var programCs = Path.Combine(projectForCreate.ProjectFullPath,
+                            $"{projectForCreate.ClassForDelete}.cs");
+                        File.Delete(programCs);
+                    }
                 }
 
                 if (StShared.RunProcess(true, Logger, "dotnet",
@@ -267,6 +272,9 @@ public abstract class AppCreatorBase
                     .IsSome)
                     return false;
             }
+
+        if (!await MakeAdditionalFiles(cancellationToken))
+            return false;
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         foreach (var refData in References)
@@ -292,9 +300,6 @@ public abstract class AppCreatorBase
         if (!Packages.All(packageData => StShared.RunProcess(true, Logger, "dotnet",
                     $"add {packageData.ProjectFilePath} package {packageData.PackageName}{(packageData.Version == null ? string.Empty : $" --version {packageData.Version}")}")
                 .IsNone))
-            return false;
-
-        if (!await MakeAdditionalFiles(cancellationToken))
             return false;
 
         if (StShared.RunProcess(true, Logger, "jb", $"cleanupcode {SolutionPath}").IsSome)

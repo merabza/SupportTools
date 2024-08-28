@@ -120,7 +120,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         if (!_apiAppCreatorData.UseReact)
             return true;
 
-        AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.FrontendProjectData);
+        //ფრონტის რეფერენსის დამატება ჯერ ვერ მოვახერხე. ეს არ მუშაობს და ამიტომ დავაკომენტარე
+        //AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.FrontendProjectData);
 
         return true;
     }
@@ -135,9 +136,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
-            ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseReact,
-            _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter,
-            _apiAppCreatorData.UseSignalR, _apiAppCreatorData.UseFluentValidation, "Program.cs");
+            ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseCarcass,
+            _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter, _apiAppCreatorData.UseSignalR,
+            _apiAppCreatorData.UseFluentValidation, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
@@ -205,6 +206,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     private bool CopyGitIgnoreFile(string gitignoreFileKey, string folderForGitIgnore)
     {
         Console.WriteLine("Coping .gitignore file...");
+
         var gitIgnoreModelFilePaths = _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
         const string gitignore = ".gitignore";
      
@@ -242,7 +244,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         }
         
         const string react = "React";
-        return CopyGitIgnoreFile(react, _apiAppCreatorData.FrontendProjectData.SolutionFolderName);
+        return CopyGitIgnoreFile(react,
+            Path.Combine(WorkPath, _apiAppCreatorData.FrontendProjectData.SolutionFolderName));
 
 
 

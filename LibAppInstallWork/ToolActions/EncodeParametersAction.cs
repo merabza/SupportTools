@@ -12,8 +12,6 @@ using Newtonsoft.Json.Linq;
 using SystemToolsShared;
 using SystemToolsShared.Domain;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace LibAppInstallWork.ToolActions;
 
 public sealed class EncodeParametersAction : ToolAction
@@ -25,6 +23,7 @@ public sealed class EncodeParametersAction : ToolAction
     private readonly ILogger _logger;
     private readonly string _sourceJsonFileName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EncodeParametersAction(ILogger logger, string keysJsonFileName, string sourceJsonFileName,
         string encodedJsonFileName, string keyPart1, string keyPart2) : base(logger, "Encode Parameters", null, null)
     {
@@ -73,16 +72,11 @@ public sealed class EncodeParametersAction : ToolAction
             return null;
         }
 
-        //string appSetEnKeysJsonString = File.ReadAllText(_keysJsonFileName);
-        //KeysList? appSetEnKeysList = JsonConvert.DeserializeObject<KeysList>(appSetEnKeysJsonString);
-
-
         var appSetEnKeysList = KeysListDomain.LoadFromFile(_keysJsonFileName);
         if (appSetEnKeysList?.Keys is null)
             return null;
 
 
-        //string encKey = $"{_keyPart1 ?? string.Empty}{_keyPart2.Capitalize() ?? string.Empty}";
         var encKey = $"{_keyPart1}{_keyPart2.Capitalize()}";
 
         if (encKey == string.Empty)
@@ -123,19 +117,6 @@ public sealed class EncodeParametersAction : ToolAction
             }
         }
 
-        //var recountedKeys = new List<string>();
-        //foreach (var dataKey in appSetEnKeysList.Keys)
-        //{
-        //    var keys = dataKey.Split(":");
-        //    if (keys.Length == 0)
-        //        continue;
-        //    if (keys.Contains("[]") || keys.Contains("*")) 
-        //        recountedKeys.AddRange(RecountKeys(appSetJObject, keys));
-        //    else
-        //        recountedKeys.Add(dataKey);
-        //}
-
-
         foreach (var dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
                      .Where(w => w.keys.Length != 0)
                      .Where(w => !Enc(appSetJObject, encKey, w.keys))
@@ -152,77 +133,6 @@ public sealed class EncodeParametersAction : ToolAction
         appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);
     }
-
-    //private List<string> RecountKeys(JToken? val, string[] keys, int k = 0)
-    //{
-
-    //    if (val is null)
-    //        return new List<string>();
-
-    //    if (k == keys.Length)
-    //        return new List<string> { string.Join(":", keys) };
-
-    //    switch (keys[k])
-    //    {
-    //        case "[]":
-    //            return CountKList(val, keys, k);
-    //        //return val.All(v => Enc(v, encKey, keys, k + 1));
-    //        case "*":
-    //            var kList = new List<string>();
-    //            foreach (var value in val.Values())
-    //            {
-    //                kList.AddRange(CountKListAst(value, keys, k));
-    //            }
-    //            return kList;
-    //    }
-    //    var byKi = int.TryParse(keys[k], out var ki);
-
-    //    var valueByKey = byKi ? val[ki] : val[keys[k]];
-
-    //    return valueByKey == null ? new List<string>() : RecountKeys(valueByKey, keys, k + 1);
-    //}
-
-    //private List<string> CountKListAst(JToken val, string[] keys, int k)
-    //{
-    //    var kList = new List<string>();
-
-    //    foreach (var v in val)
-    //    {
-    //        Console.WriteLine(v.Path);
-    //    }
-
-
-    //    for (var i = 0; i < val.Length(); i++)
-    //    {
-    //        var newKeys = new List<string>();
-    //        for (var j = 0; j < k; j++)
-    //            newKeys.Add(keys[j]);
-    //        newKeys.Add(i.ToString());
-    //        for (var j = k + 1; j < keys.Length; j++)
-    //            newKeys.Add(keys[j]);
-    //        kList.AddRange(RecountKeys(val[i], newKeys.ToArray(), k + 1));
-    //    }
-
-    //    return kList;
-    //}
-
-    //private List<string> CountKList(JToken val, string[] keys, int k)
-    //{
-    //    var kList = new List<string>();
-
-    //    for (var i = 0; i < val.Length(); i++)
-    //    {
-    //        var newKeys = new List<string>();
-    //        for (var j = 0; j < k; j++)
-    //            newKeys.Add(keys[j]);
-    //        newKeys.Add(i.ToString());
-    //        for (var j = k + 1; j < keys.Length; j++)
-    //            newKeys.Add(keys[j]);
-    //        kList.AddRange(RecountKeys(val[i], newKeys.ToArray(), k + 1));
-    //    }
-
-    //    return kList;
-    //}
 
     private static bool Enc(JToken val, string encKey)
     {

@@ -13,20 +13,17 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly bool _useDatabase;
     private readonly bool _useFluentValidation;
     private readonly bool _useIdentity;
-    private readonly bool _useReact;
     private readonly bool _useReCounter;
     private readonly bool _useSignalR;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useReact, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation,
-        string? codeFileName = null) : base(logger, placePath, codeFileName)
+        bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
+        bool useFluentValidation, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appKey = appKey;
         _useDatabase = useDatabase;
-        _useReact = useReact;
         _useCarcass = useCarcass;
         _useIdentity = useIdentity;
         _useReCounter = useReCounter;

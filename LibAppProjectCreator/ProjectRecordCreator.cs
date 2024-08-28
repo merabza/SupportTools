@@ -192,7 +192,6 @@ internal sealed class ProjectRecordCreator
         var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
         var dbMigrationProjectName = $"{_newProjectName}DbMigration";
         const string csProjectExtension = ".csproj";
-        //string solutionExtension = ".sln";
         const string jsonExtension = ".json";
         var seedProjectName = $"Seed{_newProjectName}Db";
         var getJsonProjectName = $"GetJsonFromScaffold{_newProjectName}Db";
@@ -239,7 +238,6 @@ internal sealed class ProjectRecordCreator
             gitProjectNames.Add("DatabaseTools");
         if (_templateModel.UseReact)
         {
-            //gitProjectNames.Add($"{_newProjectName}ClientApp");
             gitProjectNames.Add("ReactAppCarcass");
             gitProjectNames.Add("WebSystemTools");
         }
@@ -340,7 +338,6 @@ internal sealed class ProjectRecordCreator
             AppSettingsEncodedJsonFileName = Path.Combine(securityFolder, _newProjectName,
                 productionServerName, $"appsettingsEncoded{jsonExtension}"),
             ServiceUserName = serverData.FilesUserName,
-            //AllowToolsList = new List<ETools> {ETools.ProgramUpdater}
             DatabasesExchangeParameters = new DatabasesExchangeParameters
             {
                 ProductionDbWebAgentName = productionServerWebAgentName,
