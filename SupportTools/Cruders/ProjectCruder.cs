@@ -34,8 +34,14 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectSecurityFolderPath)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.MainProjectName),
             nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
+
+
+
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.SpaProjectName),
             nameof(ProjectModel.GitProjectNames), EsProjExtension, parametersManager));
+
+        
+        
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
         FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
