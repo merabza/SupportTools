@@ -59,6 +59,12 @@ public class ReactEsProjectCreator
             return false;
         }
 
+        /*
+           cd {_projectName}
+           npm install
+           npm run dev
+         */
+
         //შეიქმნას .esproj ფაილი. ნიმუში:
         /*
          *<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha">

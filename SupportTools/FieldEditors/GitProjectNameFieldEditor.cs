@@ -43,7 +43,7 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
             .Select(x => x.Key).OrderBy(x => x).ToList();
 
         if (keys.Count < 1)
-            throw new DataInputEscapeException("List is empty");
+            throw new ListIsEmptyException("GitProjects List is empty");
 
 
         if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);

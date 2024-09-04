@@ -242,7 +242,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             Logger.LogError("_apiAppCreatorData.FrontendProjectData.SolutionFolderName is empty");
             return false;
         }
-        
+
         const string react = "React";
         return CopyGitIgnoreFile(react,
             Path.Combine(WorkPath, _apiAppCreatorData.FrontendProjectData.SolutionFolderName));
