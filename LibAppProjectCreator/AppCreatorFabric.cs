@@ -36,11 +36,11 @@ public static class AppCreatorFabric
             case ESupportProjectType.Api:
                 var apiAppCreatorData =
                     ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData, par.ProjectName, template);
-                if (par.ProjectShortName is null)
-                {
-                    logger.LogError("ProjectShortName is not specified");
-                    return null;
-                }
+                //if (par.ProjectShortName is null)
+                //{
+                //    logger.LogError("ProjectShortName is not specified");
+                //    return null;
+                //}
 
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,

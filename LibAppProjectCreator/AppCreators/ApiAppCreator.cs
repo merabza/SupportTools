@@ -22,10 +22,10 @@ namespace LibAppProjectCreator.AppCreators;
 public sealed class ApiAppCreator : AppCreatorBase
 {
     private readonly ApiAppCreatorData _apiAppCreatorData;
-    private readonly string _projectShortName;
+    private readonly string? _projectShortName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApiAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, string projectShortName,
+    public ApiAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, string? projectShortName,
         string projectName, int indentSize, GitProjects gitProjects, GitRepos gitRepos,
         ApiAppCreatorData apiAppCreatorData) : base(logger, httpClientFactory, projectName, indentSize, gitProjects,
         gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
@@ -282,6 +282,14 @@ public sealed class ApiAppCreator : AppCreatorBase
 
     private void MakeFilesWhenUseCarcassAndUseDatabase()
     {
+        if (_projectShortName is null)
+        {
+            Logger.LogError("ProjectShortName is not specified");
+            return;
+        }
+
+
+
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები
         //var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
         //Console.WriteLine($"Creating {masterDataRepositoryClassFileName}...");
