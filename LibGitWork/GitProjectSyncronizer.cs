@@ -126,7 +126,6 @@ public class GitProjectSyncronizer
             loopNom++;
 
             Console.WriteLine("---===---------===---");
-
         }
     }
 }

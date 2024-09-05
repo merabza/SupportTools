@@ -93,7 +93,7 @@ public abstract class AppCreatorBase
 
         //foreach (var projectBase in Projects.Where(projectBase =>
         //             !string.IsNullOrWhiteSpace(projectBase.SolutionFolderName)))
-        foreach (var createInPath in Projects.Select(x=>x.CreateInPath).Distinct())
+        foreach (var createInPath in Projects.Select(x => x.CreateInPath).Distinct())
             FoldersForCheckAndClear.Add(createInPath);
     }
 
@@ -234,8 +234,6 @@ public abstract class AppCreatorBase
                 }
                 else
                 {
-
-
                     //პროექტების შექმნა
                     if (StShared.RunProcess(true, Logger, "dotnet",
                             $"new {projectForCreate.DotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectForCreate.ProjectCreateParameters) ? string.Empty : $" {projectForCreate.ProjectCreateParameters}")} --output {projectForCreate.ProjectFullPath} --name {projectForCreate.ProjectName}")

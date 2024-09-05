@@ -64,7 +64,8 @@ public sealed class GitProjects
             var dependsOnProjectNames = value.DependsOnProjectNames;
 
             gitProjects.Add(key,
-                new GitProjectDataDomain(value.GitName, value.ProjectRelativePath, value.ProjectFileName, dependsOnProjectNames));
+                new GitProjectDataDomain(value.GitName, value.ProjectRelativePath, value.ProjectFileName,
+                    dependsOnProjectNames));
         }
 
         return new GitProjects(gitProjects);

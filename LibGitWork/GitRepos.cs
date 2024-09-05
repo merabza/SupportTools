@@ -58,7 +58,9 @@ public sealed class GitRepos
             if (gitProjectFolderName.StartsWith(GitDataModel.SpaProjectFolderRelativePathName))
             {
                 if (useGitRecordNameForComplexGitProjectFolderName)
+                {
                     gitProjectFolderName = gitProjectName;
+                }
                 else
                 {
                     if (spaProjectFolderRelativePath is null)
@@ -67,7 +69,6 @@ public sealed class GitRepos
                         gitProjectFolderName[GitDataModel.SpaProjectFolderRelativePathName.Length..]
                             .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
                 }
-
             }
 
             gits.Add(gitProjectName,

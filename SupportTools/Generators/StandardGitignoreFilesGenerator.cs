@@ -22,7 +22,6 @@ public sealed class StandardGitignoreFilesGenerator
 
     public bool Generate()
     {
-
         if (string.IsNullOrWhiteSpace(_parameters.FolderForGitignoreFiles))
         {
             _logger.LogError("supportToolsParameters.FolderForGitignoreFiles is empty");

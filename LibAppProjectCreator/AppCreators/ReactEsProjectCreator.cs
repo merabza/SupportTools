@@ -14,12 +14,12 @@ namespace LibAppProjectCreator.AppCreators;
 public class ReactEsProjectCreator
 {
     private const string SdkRef = "https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK";
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly string _createInPath;
-    private readonly string _projectFolderName;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
     private readonly string _projectFileName;
+    private readonly string _projectFolderName;
     private readonly string _projectName;
     private readonly bool _useConsole;
 
@@ -49,7 +49,6 @@ public class ReactEsProjectCreator
         //var parDirFullName = parDir.FullName;
         //შეიქმნას ფოლდერი სადაც უნდა ჩაიწეროს რეაქტის ფრონტ პროექტი
         StShared.CreateFolder(_createInPath, _useConsole);
-
 
 
         //var reactProjectName = Path.GetFileNameWithoutExtension(_projectFileName).ToLower();

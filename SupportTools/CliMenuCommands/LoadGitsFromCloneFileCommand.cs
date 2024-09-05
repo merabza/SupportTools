@@ -39,11 +39,11 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         //string? mainProjectFolderRelativePath = null;
         //if (!string.IsNullOrWhiteSpace(mainProjectName) &&
         //    parameters.GitProjects.TryGetValue(mainProjectName, out var gitProject))
-            //mainProjectRelativePath = gitProject.ProjectRelativePath;
+        //mainProjectRelativePath = gitProject.ProjectRelativePath;
         //if (!string.IsNullOrWhiteSpace(mainProjectRelativePath))
         //{
-            //var fileInfo = new FileInfo(mainProjectRelativePath);
-            //mainProjectFolderRelativePath = fileInfo.Directory?.FullName + Path.DirectorySeparatorChar;
+        //var fileInfo = new FileInfo(mainProjectRelativePath);
+        //mainProjectFolderRelativePath = fileInfo.Directory?.FullName + Path.DirectorySeparatorChar;
         //}
 
         var defCloneFile = GetDefCloneFileName(parameters, project);

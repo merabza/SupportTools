@@ -209,7 +209,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         var gitIgnoreModelFilePaths = _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
         const string gitignore = ".gitignore";
-     
+
         if (!gitIgnoreModelFilePaths.ContainsKey(gitignoreFileKey))
         {
             Logger.LogError("gitIgnoreModelFilePaths are not contains {gitignoreFileKey} key", gitignoreFileKey);
@@ -218,7 +218,8 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         if (!File.Exists(gitIgnoreModelFilePaths[gitignoreFileKey]))
         {
-            Logger.LogError("{gitIgnoreModelFilePaths[gitignoreFileKey]} file is not found", gitIgnoreModelFilePaths[gitignoreFileKey]);
+            Logger.LogError("{gitIgnoreModelFilePaths[gitignoreFileKey]} file is not found",
+                gitIgnoreModelFilePaths[gitignoreFileKey]);
             return false;
         }
 
@@ -229,7 +230,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         }
 
 
-
         File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey],
             Path.Combine(folderForGitIgnore, gitignore));
         return true;
@@ -237,7 +237,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
     private bool MakeFilesWhenUseReact()
     {
-        if ( string.IsNullOrWhiteSpace(_apiAppCreatorData.FrontendProjectData.SolutionFolderName))
+        if (string.IsNullOrWhiteSpace(_apiAppCreatorData.FrontendProjectData.SolutionFolderName))
         {
             Logger.LogError("_apiAppCreatorData.FrontendProjectData.SolutionFolderName is empty");
             return false;
@@ -246,8 +246,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         const string react = "React";
         return CopyGitIgnoreFile(react,
             Path.Combine(WorkPath, _apiAppCreatorData.FrontendProjectData.SolutionFolderName));
-
-
 
 
         //Console.WriteLine("Creating ReactInstaller.cs...");
@@ -287,7 +285,6 @@ public sealed class ApiAppCreator : AppCreatorBase
             Logger.LogError("ProjectShortName is not specified");
             return;
         }
-
 
 
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები

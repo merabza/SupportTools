@@ -1,11 +1,11 @@
-﻿using CliMenu;
+﻿using System;
+using System.IO;
+using System.Text;
+using CliMenu;
 using LibDataInput;
 using LibMenuInput;
 using LibParameters;
 using SupportToolsData.Models;
-using System;
-using System.IO;
-using System.Text;
 using SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;

@@ -13,7 +13,7 @@ public sealed class GitProjectDataModel
     public string? GitName { get; set; }
     public string? ProjectRelativePath { get; set; }
     public string? ProjectFileName { get; set; }
-    
+
     public List<string> DependsOnProjectNames { get; set; } = [];
 
     public void DependsOn(List<string> dependsOnProjectNames)

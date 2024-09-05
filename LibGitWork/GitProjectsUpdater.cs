@@ -51,7 +51,7 @@ public sealed class GitProjectsUpdater
         }
 
         var gitsFolder = Path.Combine(workFolder, "Gits");
-        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,  null, useConsole, true);
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, null, useConsole, true);
 
         var gitData = gitRepos.GetGitRepoByKey(gitName);
         if (gitData is null)
@@ -74,7 +74,7 @@ public sealed class GitProjectsUpdater
         var gitProcessor = UpdateOneGitProject(_projectFolderName, _gitData);
         if (gitProcessor is null)
             return null;
-        if (!processFolder) 
+        if (!processFolder)
             return gitProcessor;
         return !ProcessFolder(_projectFolderName, _gitName) ? null : gitProcessor;
 
@@ -206,8 +206,8 @@ public sealed class GitProjectsUpdater
         //var fileNames = Directory.GetFiles(folderPath, "*.csproj").ToList();
         //fileNames.AddRange(Directory.GetFiles(folderPath, "*.esproj"));
 
-        var fileNames = dir.GetFiles("*.csproj").Select(x=>x.Name).ToList();
-        fileNames.AddRange(dir.GetFiles("*.esproj").Select(x=>x.Name));
+        var fileNames = dir.GetFiles("*.csproj").Select(x => x.Name).ToList();
+        fileNames.AddRange(dir.GetFiles("*.esproj").Select(x => x.Name));
 
         return fileNames.All(fileName => ProcessOneFile(folderPath, fileName, gitName));
     }
