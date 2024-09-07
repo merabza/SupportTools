@@ -428,6 +428,12 @@ public sealed class ApiAppCreator : AppCreatorBase
 
     private void MakeFilesWhenUseCarcass()
     {
+        if (_projectShortName is null)
+        {
+            Logger.LogError("ProjectShortName is not specified");
+            return;
+        }
+
         var installersPath = _apiAppCreatorData.RepositoriesProjectData.FoldersForCreate["Installers"];
 
         Console.WriteLine("Creating RepositoriesInstaller.cs...");
