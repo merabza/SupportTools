@@ -71,6 +71,8 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, GitProjectSyncronizer>();
+
+
         foreach (var (projectName, project) in projectsListOrdered)
         foreach (var gitCol in Enum.GetValues<EGitCol>())
         foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
@@ -81,9 +83,19 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
         }
 
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
-            keyValuePair.Value.RunSync();
+        string? usedCommitMessage = null;
 
+        bool useSameMessageForNextCommits = false;
+
+        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
+        {
+            var syncer = keyValuePair.Value;
+            syncer.UsedCommitMessage = usedCommitMessage;
+            syncer.UseSameMessageForNextCommits = useSameMessageForNextCommits;
+            syncer.RunSync();
+            usedCommitMessage = syncer.UsedCommitMessage;
+            useSameMessageForNextCommits = syncer.UseSameMessageForNextCommits;
+        }
 
         //var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
         //{

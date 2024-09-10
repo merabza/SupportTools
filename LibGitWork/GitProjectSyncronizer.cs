@@ -17,18 +17,19 @@ public class GitProjectSyncronizer
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
 
-    private string? _usedCommitMessage;
+    public string? UsedCommitMessage { get; set; }
+
+    public bool UseSameMessageForNextCommits { get; set; }
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectSyncronizer(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
-        bool useConsole, string? commitMessage = null)
+        bool useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _gitProjectName = gitProjectName;
         _useConsole = useConsole;
-        _usedCommitMessage = commitMessage;
     }
 
     public int Count => _gitSyncToolActionList.Count;
@@ -88,10 +89,17 @@ public class GitProjectSyncronizer
                             continue;
                         case EFirstPhaseResult.NeedCommit:
                         {
-                            _usedCommitMessage ??= Inputer.InputTextRequired("Message",
-                                _usedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
 
-                            if (!gitSyncToolAction.GitProcessor.Commit(_usedCommitMessage))
+                            if (!UseSameMessageForNextCommits || UsedCommitMessage is null)
+                            {
+                                UsedCommitMessage ??= Inputer.InputTextRequired("Message",
+                                    UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
+
+                                UseSameMessageForNextCommits =
+                                    Inputer.InputBool("Use this message for next commits?", true);
+                            }
+
+                            if (!gitSyncToolAction.GitProcessor.Commit(UsedCommitMessage))
                                 continue;
 
                             haveSameChanges = true;
