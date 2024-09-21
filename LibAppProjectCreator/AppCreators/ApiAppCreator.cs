@@ -138,7 +138,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
             ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseCarcass,
             _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter, _apiAppCreatorData.UseSignalR,
-            _apiAppCreatorData.UseFluentValidation, "Program.cs");
+            _apiAppCreatorData.UseFluentValidation, _apiAppCreatorData.UseReact, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];

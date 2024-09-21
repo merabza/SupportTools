@@ -13,13 +13,14 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly bool _useDatabase;
     private readonly bool _useFluentValidation;
     private readonly bool _useIdentity;
+    private readonly bool _useReact;
     private readonly bool _useReCounter;
     private readonly bool _useSignalR;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
         bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation, string? codeFileName = null) : base(logger, placePath, codeFileName)
+        bool useFluentValidation, bool useReact, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appKey = appKey;
@@ -29,6 +30,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
         _useReCounter = useReCounter;
         _useSignalR = useSignalR;
         _useFluentValidation = useFluentValidation;
+        _useReact = useReact;
     }
 
 
@@ -66,7 +68,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                 $$"""
                   var parameters = new Dictionary<string, string>
                   {
-                      {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : "")}}
+                      {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : null)}}
                       { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
                       { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
                       { SwaggerInstaller.VersionCountKey, 1.ToString() },
@@ -86,18 +88,20 @@ public sealed class ApiProgramClassCreator : CodeCreator
                                                                 CarcassRepositories.AssemblyReference.Assembly,
                                                                 BackendCarcassApi.AssemblyReference.Assembly,
                                                                 CarcassDom.AssemblyReference.Assembly,
-                                                                {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : "")}
+                                                                {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : null)}
                                                                 """ : null)}
 
-                               //{_projectNamespace}DbPart
-                               {_projectNamespace}Db.AssemblyReference.Assembly,
-                               {_projectNamespace}Repositories.AssemblyReference.Assembly,
+                               {(_useDatabase ? $"""
+                                                 //{_projectNamespace}DbPart
+                                                 {_projectNamespace}Db.AssemblyReference.Assembly,
+                                                 {_projectNamespace}Repositories.AssemblyReference.Assembly,
+                                                 """ : null)}
 
                                //WebSystemTools
                                ApiExceptionHandler.AssemblyReference.Assembly,
                                ConfigurationEncrypt.AssemblyReference.Assembly,
-                               CorsTools.AssemblyReference.Assembly,
-                               {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : "")}
+                               {(_useReact ? "CorsTools.AssemblyReference.Assembly," : null)}
+                               {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : null)}
                                SerilogLogger.AssemblyReference.Assembly,
                                StaticFilesTools.AssemblyReference.Assembly,
                                SwaggerTools.AssemblyReference.Assembly,
@@ -106,14 +110,18 @@ public sealed class ApiProgramClassCreator : CodeCreator
                                ))
                                """, "return 2"),
                 string.Empty,
-                $$$"""
-                   builder.Services.AddMediatR(cfg =>
-                   {{
-                       //BackendCarcass
-                       cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);
-                       //{{{_projectNamespace}}}
-                   }})
-                   """,
+                _useCarcass
+                    ? $$$"""
+                         builder.Services.AddMediatR(cfg =>
+                         {{
+                             {{{(_useCarcass ? """
+                                                  //BackendCarcass
+                                                  cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);
+                                               """ : null)}}}
+                             //{{{_projectNamespace}}}
+                         }})
+                         """
+                    : null,
                 fluentValidationInstallerCodeCommands,
                 string.Empty,
                 new OneLineComment("ReSharper disable once using"),
