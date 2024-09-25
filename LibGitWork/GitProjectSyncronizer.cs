@@ -17,10 +17,6 @@ public class GitProjectSyncronizer
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
 
-    public string? UsedCommitMessage { get; set; }
-
-    public bool UseSameMessageForNextCommits { get; set; }
-
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectSyncronizer(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
@@ -31,6 +27,10 @@ public class GitProjectSyncronizer
         _gitProjectName = gitProjectName;
         _useConsole = useConsole;
     }
+
+    public string? UsedCommitMessage { get; set; }
+
+    public bool UseSameMessageForNextCommits { get; set; }
 
     public int Count => _gitSyncToolActionList.Count;
 
@@ -89,7 +89,6 @@ public class GitProjectSyncronizer
                             continue;
                         case EFirstPhaseResult.NeedCommit:
                         {
-
                             if (!UseSameMessageForNextCommits || UsedCommitMessage is null)
                             {
                                 UsedCommitMessage ??= Inputer.InputTextRequired("Message",

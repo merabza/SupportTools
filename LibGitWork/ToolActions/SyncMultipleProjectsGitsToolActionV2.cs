@@ -85,7 +85,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 
         string? usedCommitMessage = null;
 
-        bool useSameMessageForNextCommits = false;
+        var useSameMessageForNextCommits = false;
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
         {
