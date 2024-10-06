@@ -92,8 +92,10 @@ public class ReactEsProjectCreator
 
         var refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);
         const string startString = "/packages/";
-        var result = refsTitlesList.Where(x => x.Item1.StartsWith(startString)).OrderByDescending(x => x.Item2)
-            .FirstOrDefault().Item1;
+        var res = refsTitlesList.Where(x => x.Item1.StartsWith(startString))
+            .OrderByDescending(x => x.Item2, new VersionComparer());
+            
+        var result = res.FirstOrDefault().Item1;
         var javaScriptSdk = result[startString.Length..];
         CreateEsprojFile(Path.Combine(_createInPath, _projectFolderName, _projectFileName), javaScriptSdk);
 
@@ -117,19 +119,17 @@ public class ReactEsProjectCreator
 
     private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
     {
-        List<(string, string)> refsList = [];
 
         var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
         if (links is null || links.Count == 0)
             return [];
-        refsList.AddRange(from link in links
+
+        return (from link in links
             let hrefValue = link.GetAttributeValue("href", string.Empty)
             let titleValue = link.GetAttributeValue("title", string.Empty)
             where !string.IsNullOrWhiteSpace(hrefValue) && !string.IsNullOrWhiteSpace(titleValue) &&
                   char.IsDigit(titleValue[0])
-            select (hrefValue, titleValue));
-
-        return refsList;
+            select (hrefValue, titleValue)).ToList();
     }
 
 
