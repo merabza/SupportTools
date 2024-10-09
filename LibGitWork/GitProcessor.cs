@@ -165,7 +165,9 @@ fi*/
     {
         if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"")
             .IsNone)
+            //LastRemoteId = null;
             return true;
+
         StShared.WriteErrorLine($"cannot run commit for folder {_projectPath}", _useConsole, _logger);
         return false;
     }
@@ -251,7 +253,7 @@ fi*/
         return false;
     }
 
-    public bool SyncRemote()
+    public (bool, bool) SyncRemote()
     {
         //https://newbedev.com/check-if-pull-needed-in-git
         /*#!/bin/sh
@@ -270,29 +272,32 @@ echo "Need to push"
 else
 echo "Diverged"
 fi*/
+        var pushed = false;
+
         if (LastRemoteId is null && !GitRemoteUpdate())
-            return false;
+            return (false, pushed);
 
 
         while (true)
             switch (GetGitState())
             {
                 case GitState.UpToDate:
-                    return true;
+                    return (true, pushed);
                 case GitState.NeedToPull:
                     if (!Pull())
-                        return false;
+                        return (false, pushed);
                     break;
                 case GitState.NeedToPush:
                     if (!Push())
-                        return false;
+                        return (false, pushed);
+                    pushed = true;
                     break;
                 case GitState.Diverged:
                     StShared.WriteErrorLine($"{_projectPath} Diverged", _useConsole, _logger);
-                    return false;
+                    return (false, pushed);
                 case GitState.Unknown:
                     StShared.WriteErrorLine($"{_projectPath} Unknown state", _useConsole, _logger);
-                    return false;
+                    return (false, pushed);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

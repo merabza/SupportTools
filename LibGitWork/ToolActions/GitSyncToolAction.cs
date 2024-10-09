@@ -167,7 +167,7 @@ public sealed class GitSyncToolAction : ToolAction
     {
         //თუ ცვლილებები არის, მაშინ ჯერ ვაკეთებთ ქომიტს და შემდეგ სინქრონიზაციას
         if (Phase1Result != EFirstPhaseResult.NeedCommit)
-            return GitProcessor.SyncRemote();
+            return GitProcessor.SyncRemote().Item1;
 
         if (_askCommitMessage || UsedCommitMessage is null)
             UsedCommitMessage =
@@ -178,6 +178,6 @@ public sealed class GitSyncToolAction : ToolAction
 
         Changed = true;
 
-        return GitProcessor.SyncRemote();
+        return GitProcessor.SyncRemote().Item1;
     }
 }

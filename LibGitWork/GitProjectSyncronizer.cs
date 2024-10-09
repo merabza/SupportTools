@@ -75,9 +75,11 @@ public class GitProjectSyncronizer
             var lastRemoteId = gitProjectsUpdater.LastRemoteId;
 
             //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
-
+            var pushed = false;
             foreach (var gitSyncToolAction in _gitSyncToolActionList)
             {
+
+                //var committed = false;
                 if (gitCollect == EGitCollect.Collect)
                 {
                     if (!gitSyncToolAction.RunActionPhase1())
@@ -102,6 +104,7 @@ public class GitProjectSyncronizer
                                 continue;
 
                             haveSameChanges = true;
+                            //committed = true;
                             break;
                         }
                         case EFirstPhaseResult.FinishedWithErrors:
@@ -115,18 +118,18 @@ public class GitProjectSyncronizer
 
                 gitSyncToolAction.GitProcessor.CheckRemoteId();
 
-                if (gitSyncToolAction.LastRemoteId != lastRemoteId)
+                if (pushed || gitSyncToolAction.LastRemoteId != lastRemoteId)
                 {
                     //მოშორებული ინფორმაციის განახლება
                     //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
-                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) continue;
+                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) 
+                        continue;
 
                     gitSyncToolAction.GitProcessor.CheckRemoteId();
-
                     lastRemoteId = gitSyncToolAction.LastRemoteId;
                 }
 
-                gitSyncToolAction.GitProcessor.SyncRemote();
+                (_, pushed) = gitSyncToolAction.GitProcessor.SyncRemote();
             }
 
             gitCollect = EGitCollect.Usage;
