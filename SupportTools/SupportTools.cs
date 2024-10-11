@@ -70,6 +70,10 @@ public sealed class SupportTools : CliAppLoop
         var syncAllProjectsGitsV2 = new SyncAllProjectsAllGitsCliMenuCommandV2(_logger, _parametersManager);
         mainMenuSet.AddMenuItem(syncAllProjectsGitsV2);
 
+        //ყველა პროექტის პაკეტების განახლება
+        var updateOutdatedPackages = new UpdateOutdatedPackagesCliMenuCommand(_logger, _parametersManager);
+        mainMenuSet.AddMenuItem(updateOutdatedPackages);
+
         //ყველა პროექტის bin obj და სხვა ზედმეტი ფაილებისა და ფოლდერებისგან გასუფთავება
         var clearAllProjectsCliMenuCommand =
             new ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(_logger, _parametersManager);

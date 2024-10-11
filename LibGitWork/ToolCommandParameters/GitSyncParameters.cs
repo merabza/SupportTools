@@ -56,7 +56,7 @@ public class GitSyncParameters : IParameters
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
-        if (!gitRepos.Gits.TryGetValue(gitProjectName, out var value))
+        if (!gitRepos.Gits.TryGetValue(gitProjectName, out var gitDataDom))
         {
             StShared.WriteErrorLine($"Git Project with name {gitProjectName} does not exists in gits list", true,
                 logger);
@@ -66,7 +66,7 @@ public class GitSyncParameters : IParameters
         var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
 
         if (gitsFolder != null)
-            return new GitSyncParameters(value, gitsFolder);
+            return new GitSyncParameters(gitDataDom, gitsFolder);
 
         StShared.WriteErrorLine("Gits folder not found", true);
         return null;
