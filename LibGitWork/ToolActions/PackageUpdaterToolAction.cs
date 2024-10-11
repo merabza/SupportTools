@@ -1,6 +1,4 @@
 ﻿using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
@@ -13,10 +11,10 @@ namespace LibGitWork.ToolActions;
 
 public sealed class PackageUpdaterToolAction : ToolAction
 {
+    private const string CSharp = "CSharp";
+    private readonly string _gitIgnorePathName;
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
-    private readonly string _gitIgnorePathName;
-    private const string CSharp = "CSharp";
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -48,7 +46,7 @@ public sealed class PackageUpdaterToolAction : ToolAction
     {
         //_projectFolderName
 
-        if (_gitIgnorePathName != CSharp) 
+        if (_gitIgnorePathName != CSharp)
             return;
 
         var localResult =
