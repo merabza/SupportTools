@@ -26,7 +26,7 @@ public abstract class DoubleAppCreator
         _useConsole = useConsole;
     }
 
-    public List<GitCloneDataModel> GitClones => _mainAppCreator?.GitClones ?? new List<GitCloneDataModel>();
+    public List<GitCloneDataModel> GitClones => _mainAppCreator?.GitClones ?? [];
 
     public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken)
     {
