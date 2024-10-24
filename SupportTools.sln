@@ -124,6 +124,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BackendCarcassShared", "Bac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackendCarcassContracts", "..\BackendCarcassShared\BackendCarcassContracts\BackendCarcassContracts.csproj", "{4908DDAF-B6AE-443F-8EF9-7C036C1C3412}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StringMessagesApiContracts", "..\SystemTools\StringMessagesApiContracts\StringMessagesApiContracts.csproj", "{0CFBA045-DFC1-4580-A6AB-E41C52222E4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -326,6 +328,10 @@ Global
 		{4908DDAF-B6AE-443F-8EF9-7C036C1C3412}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4908DDAF-B6AE-443F-8EF9-7C036C1C3412}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4908DDAF-B6AE-443F-8EF9-7C036C1C3412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CFBA045-DFC1-4580-A6AB-E41C52222E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CFBA045-DFC1-4580-A6AB-E41C52222E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CFBA045-DFC1-4580-A6AB-E41C52222E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CFBA045-DFC1-4580-A6AB-E41C52222E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -371,6 +377,7 @@ Global
 		{6C767ABD-9A46-402E-800B-7D705F1EEB89} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 		{3C2AA966-4B59-42E7-B3F0-CF25D4A08269} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 		{4908DDAF-B6AE-443F-8EF9-7C036C1C3412} = {6F057278-3DE1-43AB-8E60-EA483CA2B645}
+		{0CFBA045-DFC1-4580-A6AB-E41C52222E4F} = {FF3F9A8A-C4E2-4D88-A35F-874A6890A87D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6088D4D5-9C94-40A5-A44F-E146E1810790}
