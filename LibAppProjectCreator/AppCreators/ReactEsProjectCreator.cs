@@ -94,7 +94,7 @@ public class ReactEsProjectCreator
         const string startString = "/packages/";
         var res = refsTitlesList.Where(x => x.Item1.StartsWith(startString))
             .OrderByDescending(x => x.Item2, new VersionComparer());
-            
+
         var result = res.FirstOrDefault().Item1;
         var javaScriptSdk = result[startString.Length..];
         CreateEsprojFile(Path.Combine(_createInPath, _projectFolderName, _projectFileName), javaScriptSdk);
@@ -119,7 +119,6 @@ public class ReactEsProjectCreator
 
     private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
     {
-
         var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
         if (links is null || links.Count == 0)
             return [];

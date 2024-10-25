@@ -78,7 +78,6 @@ public class GitProjectSyncronizer
             var pushed = false;
             foreach (var gitSyncToolAction in _gitSyncToolActionList)
             {
-
                 //var committed = false;
                 if (gitCollect == EGitCollect.Collect)
                 {
@@ -122,7 +121,7 @@ public class GitProjectSyncronizer
                 {
                     //მოშორებული ინფორმაციის განახლება
                     //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
-                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate()) 
+                    if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate())
                         continue;
 
                     gitSyncToolAction.GitProcessor.CheckRemoteId();

@@ -40,7 +40,7 @@ public class PackageUpdater
 
     public void Run()
     {
-        if (_packageUpdaterToolActionList.Count > 0) 
+        if (_packageUpdaterToolActionList.Count > 0)
             _packageUpdaterToolActionList.First().RunPackageUpdate();
     }
 }

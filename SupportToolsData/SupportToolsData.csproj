@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliParametersDataEdit\CliParametersDataEdit.csproj" />
     <ProjectReference Include="..\..\AppCliTools\CliTools\CliTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibFileParameters\LibFileParameters.csproj" />

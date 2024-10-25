@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LibAppProjectCreator.AppCreators;
 
-public class VersionComparer  : IComparer<string>
+public class VersionComparer : IComparer<string>
 {
     public int Compare(string? x, string? y)
     {
@@ -15,7 +15,7 @@ public class VersionComparer  : IComparer<string>
                 return -1;
         }
 
-        if (y == null) 
+        if (y == null)
             return 1;
 
         var xDigs = StringToDigits(x);
@@ -26,7 +26,7 @@ public class VersionComparer  : IComparer<string>
         for (var i = 0; i < minLength; i++)
         {
             var subst = xDigs[i] - yDigs[i];
-            if (subst != 0 )
+            if (subst != 0)
                 return subst;
         }
 
@@ -45,10 +45,8 @@ public class VersionComparer  : IComparer<string>
         var digits = str.Split('.', StringSplitOptions.RemoveEmptyEntries);
         var intDigits = new List<int>();
         foreach (var digit in digits)
-            if ( int.TryParse(digit, out var d) )
+            if (int.TryParse(digit, out var d))
                 intDigits.Add(d);
         return intDigits.ToArray();
     }
-
-
 }

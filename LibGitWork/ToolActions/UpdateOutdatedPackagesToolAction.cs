@@ -60,14 +60,12 @@ public class UpdateOutdatedPackagesToolAction : ToolAction
 
 
         foreach (var (projectName, project) in projectsListOrdered)
+        foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
         {
-            foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
-            {
-                if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
-                    gitSyncToolsByGitProjectNames.Add(gitProjectName,
-                        new PackageUpdater(_logger, _parametersManager, gitProjectName, true));
-                gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
-            }
+            if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
+                gitSyncToolsByGitProjectNames.Add(gitProjectName,
+                    new PackageUpdater(_logger, _parametersManager, gitProjectName, true));
+            gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
         }
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
