@@ -12,6 +12,7 @@ public sealed class IdentitySettingsCreator
     private readonly List<string> _forEncodeAppSettingsJsonKeys;
     private readonly JObject _userSecretJsonJObject;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public IdentitySettingsCreator(JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
         List<string> forEncodeAppSettingsJsonKeys)
     {

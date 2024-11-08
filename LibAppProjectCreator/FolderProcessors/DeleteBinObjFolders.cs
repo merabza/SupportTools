@@ -9,8 +9,8 @@ namespace LibAppProjectCreator.FolderProcessors;
 
 public sealed class DeleteBinObjFolders : FolderProcessor
 {
-    private readonly string[] _deleteFolderNames = { "bin", "obj" };
-    private readonly string[] _excludeFolders = { ".git", ".vs" };
+    private readonly string[] _deleteFolderNames = ["bin", "obj"];
+    private readonly string[] _excludeFolders = [".git", ".vs"];
 
 
     public DeleteBinObjFolders(FileManager fileManager) : base("Delete bin obj folders", "Delete bin obj folders",

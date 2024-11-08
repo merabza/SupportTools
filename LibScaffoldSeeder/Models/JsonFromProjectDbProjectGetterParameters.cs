@@ -7,6 +7,7 @@ namespace LibScaffoldSeeder.Models;
 
 public sealed class JsonFromProjectDbProjectGetterParameters : IParameters
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JsonFromProjectDbProjectGetterParameters(string getJsonFromScaffoldDbProjectFileFullName,
         string getJsonFromScaffoldDbProjectParametersFileFullName)
     {

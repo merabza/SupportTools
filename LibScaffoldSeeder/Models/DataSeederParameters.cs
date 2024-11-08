@@ -7,6 +7,7 @@ namespace LibScaffoldSeeder.Models;
 
 public sealed class DataSeederParameters : IParameters
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DataSeederParameters(string seedProjectFilePath, string seedProjectParametersFilePath)
     {
         SeedProjectFilePath = seedProjectFilePath;

@@ -2,6 +2,7 @@
 
 public sealed class ConstraintDataModel
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ConstraintDataModel(string tableName, string columnName, string defaultConstraintName)
     {
         TableName = tableName;

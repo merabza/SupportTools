@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -85,7 +84,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (gitProjectNames.Count != project.ScaffoldSeederGitProjectNames.Count ||
             !gitProjectNames.All(project.ScaffoldSeederGitProjectNames.Contains))
         {
-            project.ScaffoldSeederGitProjectNames = new List<string>();
+            project.ScaffoldSeederGitProjectNames = [];
             project.ScaffoldSeederGitProjectNames.AddRange(gitProjectNames);
             haveToSaveSupportToolsParameters = true;
         }

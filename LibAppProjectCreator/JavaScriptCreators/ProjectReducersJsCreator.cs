@@ -8,6 +8,7 @@ public sealed class ProjectReducersJsCreator
     private readonly string _fileName;
     private readonly string _folderPathForSave;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectReducersJsCreator(string folderPathForSave, string fileName)
     {
         _folderPathForSave = folderPathForSave;

@@ -12,7 +12,7 @@ namespace LibAppProjectCreator.FolderProcessors;
 public class CopyAndReplaceFilesAndFolders : FolderProcessor
 {
     //private readonly Dictionary<string, List<MyFileInfo>> _checkedFolderFiles = new();
-    private readonly List<string> _checkedFolders = new();
+    private readonly List<string> _checkedFolders = [];
 
     private readonly FileManager _destinationFileManager;
 

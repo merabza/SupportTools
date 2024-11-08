@@ -4,6 +4,7 @@ namespace LibAppInstallWork.Models;
 
 internal sealed class ProjectServerParameters
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectServerParameters(ProjectModel project, ServerInfoModel serverInfo, ServerDataModel serverData)
     {
         Project = project;

@@ -1,5 +1,3 @@
 ﻿namespace LibAppInstallWork.Models;
 
-public /*open*/ class ProxySettingsBase
-{
-}
+public /*open*/ class ProxySettingsBase;

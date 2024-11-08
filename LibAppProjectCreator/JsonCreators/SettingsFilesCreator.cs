@@ -49,7 +49,7 @@ public sealed class SettingsFilesCreator
         if (_forEncodeAppSettingsJsonKeys.Count <= 0)
             return true;
 
-        JArray keysJArray = new();
+        JArray keysJArray = [];
         foreach (var jsonKey in _forEncodeAppSettingsJsonKeys)
         {
             keysJArray.Add(new JValue(jsonKey));

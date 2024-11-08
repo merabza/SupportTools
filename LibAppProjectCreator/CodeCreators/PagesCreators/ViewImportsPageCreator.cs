@@ -7,6 +7,7 @@ public sealed class ViewImportsPageCreator : CodeCreator
 {
     private readonly string _projectName;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ViewImportsPageCreator(ILogger logger, string placePath, string projectName, string? codeFileName = null) :
         base(logger, placePath, codeFileName)
     {

@@ -2,6 +2,7 @@
 
 public sealed class PackageDataModel
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public PackageDataModel(string projectFilePath, string packageName, string? version)
     {
         ProjectFilePath = projectFilePath;

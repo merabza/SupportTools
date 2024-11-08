@@ -8,6 +8,7 @@ public sealed class KestrelOptionsCreator
 {
     private readonly JObject _appSettingsJsonJObject;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public KestrelOptionsCreator(JObject appSettingsJsonJObject)
     {
         _appSettingsJsonJObject = appSettingsJsonJObject;

@@ -8,6 +8,7 @@ public sealed class IndexJsCreator
     private readonly string _fileName;
     private readonly string _folderPathForSave;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public IndexJsCreator(string folderPathForSave, string fileName)
     {
         _folderPathForSave = folderPathForSave;

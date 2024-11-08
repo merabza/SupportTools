@@ -8,6 +8,7 @@ public sealed class HomeJsCreator
     private readonly string _fileName;
     private readonly string _folderPathForSave;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public HomeJsCreator(string folderPathForSave, string fileName)
     {
         _folderPathForSave = folderPathForSave;

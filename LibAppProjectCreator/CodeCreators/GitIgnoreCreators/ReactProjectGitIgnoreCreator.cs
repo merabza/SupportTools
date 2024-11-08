@@ -5,6 +5,7 @@ namespace LibAppProjectCreator.CodeCreators.GitIgnoreCreators;
 
 public sealed class ReactProjectGitIgnoreCreator : CodeCreator
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReactProjectGitIgnoreCreator(ILogger logger, string placePath, string? codeFileName = null) : base(logger,
         placePath, codeFileName)
     {
