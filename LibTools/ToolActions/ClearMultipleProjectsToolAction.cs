@@ -35,7 +35,7 @@ public class ClearMultipleProjectsToolAction : ToolAction
     public static ClearMultipleProjectsToolAction Create(ILogger logger, ParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
-        //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net8.0
+        //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net9.0
         var baseFolder = AppContext.BaseDirectory;
         string? excludeFolder = null;
         var baseDir = new DirectoryInfo(baseFolder);
