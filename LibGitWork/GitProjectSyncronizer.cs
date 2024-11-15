@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LibDataInput;
 using LibGitData;
 using LibGitWork.ToolActions;
@@ -16,6 +17,7 @@ public class GitProjectSyncronizer
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
+    public bool HasChanges { get; private set; }
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -136,5 +138,10 @@ public class GitProjectSyncronizer
 
             Console.WriteLine("---===---------===---");
         }
+    }
+
+    public void CountHasChanges()
+    {
+        HasChanges = _gitSyncToolActionList.Any(gitSyncToolAction => gitSyncToolAction.HasChanges());
     }
 }

@@ -90,6 +90,13 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
         {
             var syncer = keyValuePair.Value;
+            syncer.CountHasChanges();
+        }
+
+        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)
+                     .OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))
+        {
+            var syncer = keyValuePair.Value;
             syncer.UsedCommitMessage = usedCommitMessage;
             syncer.UseSameMessageForNextCommits = useSameMessageForNextCommits;
             syncer.RunSync();
