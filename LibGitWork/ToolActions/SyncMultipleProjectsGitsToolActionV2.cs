@@ -86,15 +86,14 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         string? usedCommitMessage = null;
 
         var useSameMessageForNextCommits = false;
-        Console.WriteLine("Count changes");
 
+        Console.WriteLine("Count changes");
+        //წინასწარ ვადგენთ, რომელიმე რეპოზიტორიაში ხომ არ გვაქვს ცვლილებები, რომ პირველ რიგში ისინი დავამუშაოვოთ
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
         {
             var syncer = keyValuePair.Value;
             syncer.CountHasChanges();
         }
-
-        Console.WriteLine("Count changes finished");
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)
                      .OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))
@@ -107,46 +106,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             useSameMessageForNextCommits = syncer.UseSameMessageForNextCommits;
         }
 
-        //var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
-        //{
-        //    [EGitCollect.Collect] = [],
-        //    [EGitCollect.Usage] = []
-        //};
-
-        //var loopNom = 0;
-        //var gitCollectUsage = EGitCollect.Collect;
-
-        //while (gitCollectUsage == EGitCollect.Collect || changedGitProjects[EGitCollect.Collect].Count > 0)
-        //{
-        //    changedGitProjects[EGitCollect.Collect] = [];
-        //    Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
-        //    //პროექტების ჩამონათვალი
-        //    foreach (var (projectName, project) in projectsListOrdered)
-        //    {
-        //        SyncAllGitsForOneProject(projectName, project, EGitCol.Main, changedGitProjects, loopNom == 0);
-        //        if (_syncMultipleProjectsGitsParametersV2.ScaffoldSeedersWorkFolder is not null)
-        //            SyncAllGitsForOneProject(projectName, project, EGitCol.ScaffoldSeed, changedGitProjects,
-        //                loopNom == 0);
-        //    }
-
-        //    Console.WriteLine("---===---------===---");
-
-        //    gitCollectUsage = EGitCollect.Usage;
-        //    loopNom++;
-        //    changedGitProjects[EGitCollect.Usage] = changedGitProjects[EGitCollect.Collect];
-        //}
-
         return Task.FromResult(true);
     }
 
-    //private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,
-    //    Dictionary<EGitCollect, Dictionary<string, List<string>>> changedGitProjects, bool isFirstSync)
-    //{
-    //    if (!GitStat.CheckGitProject(projectName, project, gitCol))
-    //        return;
-
-    //    var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
-    //        projectName, gitCol, changedGitProjects, isFirstSync, UseConsole);
-    //    syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None).Wait();
-    //}
 }
