@@ -10,7 +10,6 @@ using LibGitWork.ToolCommandParameters;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using SupportToolsData.Models;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
@@ -64,7 +63,7 @@ public sealed class GitSyncToolAction : ToolAction
     public bool HasChanges()
     {
         var haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
-        if (haveUnTrackedFilesResult.IsT0) 
+        if (haveUnTrackedFilesResult.IsT0)
             return haveUnTrackedFilesResult.AsT0;
         Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
             GitSyncToolActionErrors.HaveUnTrackedFilesError));
