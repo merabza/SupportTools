@@ -86,12 +86,15 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         string? usedCommitMessage = null;
 
         var useSameMessageForNextCommits = false;
+        Console.WriteLine("Count changes");
 
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
+        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
         {
             var syncer = keyValuePair.Value;
             syncer.CountHasChanges();
         }
+
+        Console.WriteLine("Count changes finished");
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)
                      .OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))
