@@ -14,10 +14,13 @@ try
 {
     Console.WriteLine("Loading...");
 
-    //პროგრამის ატრიბუტების დაყენება 
-    ProgramAttributes.Instance.SetAttribute("AppName", "Support Tools");
+    const string appName = "SupportTools";
 
-    var argParser = new ArgumentsParser<SupportToolsParameters>(args, "SupportTools", null);
+    //პროგრამის ატრიბუტების დაყენება 
+    ProgramAttributes.Instance.AppName = appName;
+
+    var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
+
     switch (argParser.Analysis())
     {
         case EParseResult.Ok: break;
