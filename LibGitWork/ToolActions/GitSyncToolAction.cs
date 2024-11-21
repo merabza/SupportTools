@@ -62,6 +62,9 @@ public sealed class GitSyncToolAction : ToolAction
 
     public bool HasChanges()
     {
+        if (!Directory.Exists(_projectFolderName))
+            return false;
+
         var haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT0)
             return haveUnTrackedFilesResult.AsT0;
