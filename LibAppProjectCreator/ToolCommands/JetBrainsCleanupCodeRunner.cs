@@ -20,10 +20,10 @@ public sealed class JetBrainsCleanupCodeRunner : ToolCommand
         _parameters = parameters;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
-        return Task.FromResult(StShared.RunProcess(true, _logger, "jb", $"cleanupcode {_parameters.SolutionFileName}")
-            .IsNone);
+        return ValueTask.FromResult(StShared
+            .RunProcess(true, _logger, "jb", $"cleanupcode {_parameters.SolutionFileName}").IsNone);
     }
 }

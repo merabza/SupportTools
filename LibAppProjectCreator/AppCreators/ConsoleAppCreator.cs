@@ -107,7 +107,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     }
 
     //პროექტის ტიპზე დამოკიდებული დამატებით საჭირო ფაილების შექმნა
-    protected override Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
+    protected override Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken = default)
     {
         ////---===მთავარი პროექტის ფაილები===---
 

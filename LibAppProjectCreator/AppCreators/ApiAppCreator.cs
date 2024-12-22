@@ -126,7 +126,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         return true;
     }
 
-    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
+    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken = default)
     {
         var appSettingsJsonJObject = new JObject();
         var userSecretJsonJObject = new JObject();

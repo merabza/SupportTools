@@ -169,11 +169,11 @@ public sealed class GitSyncToolAction : ToolAction
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         RunActionPhase1();
 
-        return Task.FromResult(RunActionPhase2());
+        return ValueTask.FromResult(RunActionPhase2());
     }
 
     private bool RunActionPhase2()

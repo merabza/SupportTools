@@ -25,7 +25,7 @@ public class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction
         _parametersManager = parametersManager;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -42,6 +42,6 @@ public class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction
         else
             StShared.WriteWarningLine("All Git Projects already have GitIgnorePathNames, No Changes made", true);
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

@@ -49,7 +49,7 @@ public class ClearMultipleProjectsToolAction : ToolAction
             useConsole);
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_clearAllProjectsParameters.ProjectGroupName is null &&
@@ -92,7 +92,7 @@ public class ClearMultipleProjectsToolAction : ToolAction
         //changedGitProjects[EGitCollect.Usage] = changedGitProjects[EGitCollect.Collect];
         //}
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private void ClearOneSolution(string projectName, ProjectModel project, EGitCol gitCol)
@@ -102,6 +102,6 @@ public class ClearMultipleProjectsToolAction : ToolAction
 
         var clearOneProjectAllGitsToolAction =
             ClearOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, gitCol, _excludeFolder);
-        clearOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
+        clearOneProjectAllGitsToolAction?.Run(CancellationToken.None);
     }
 }

@@ -37,7 +37,7 @@ public sealed class SettingsFilesCreator
         _keyPart1 = keyPart1;
     }
 
-    public async Task<bool> Run(CancellationToken cancellationToken)
+    public async Task<bool> Run(CancellationToken cancellationToken = default)
 
     {
         Console.WriteLine("Creating appsettings.json...");

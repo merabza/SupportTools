@@ -48,7 +48,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var constraintsForCorrect = CorrectBitConstraints();
 
@@ -64,17 +64,17 @@ public sealed class CorrectNewDatabase : ToolCommand
             {
                 var defaultConstraintName = constraintDataModel.DefaultConstraintName;
                 _logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
-                return Task.FromResult(false);
+                return ValueTask.FromResult(false);
             }
 
             if (CreateConstraint(constraintDataModel))
                 continue;
 
             _logger.LogError("Cannot Create constraint for table {tableName}", tableName);
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private bool CreateConstraint(ConstraintDataModel constraintDataModel)

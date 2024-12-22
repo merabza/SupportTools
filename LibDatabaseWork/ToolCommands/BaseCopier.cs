@@ -31,7 +31,7 @@ public sealed class BaseCopier : ToolCommand
             $"Copy Database from {CopyBaseParameters.SourceDatabaseName} to {CopyBaseParameters.DestinationDatabaseName}";
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Create Agent Client for source Database");
 
@@ -215,8 +215,8 @@ public sealed class BaseCopier : ToolCommand
 
         var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(
             backupFileParametersForSource, CopyBaseParameters.DestinationDbServerSideDataFolderPath,
-            CopyBaseParameters.DestinationDbServerSideLogFolderPath, destinationDatabaseName, CancellationToken.None,
-            CopyBaseParameters.LocalPath);
+            CopyBaseParameters.DestinationDbServerSideLogFolderPath, destinationDatabaseName,
+            CopyBaseParameters.LocalPath, CancellationToken.None);
 
         if (restoreDatabaseFromBackupResult.IsNone)
             return true;

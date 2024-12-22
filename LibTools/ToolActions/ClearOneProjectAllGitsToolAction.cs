@@ -44,7 +44,7 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
         return null;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         foreach (var gitData in _clearOneProjectAllGitsParameters.GitData.Where(x => x.GitIgnorePathName == "CSharp")
                      .OrderBy(x => x.GitProjectFolderName))

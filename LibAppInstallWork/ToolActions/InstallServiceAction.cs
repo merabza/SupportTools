@@ -55,7 +55,7 @@ public sealed class InstallServiceAction : ToolAction
 
     public string? InstallingProgramVersion { get; private set; }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,

@@ -19,7 +19,7 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
         _parametersManager = parametersManager;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
@@ -27,12 +27,12 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
         if (wrongGitIgnoreFilesList.Count == 0)
         {
             Console.WriteLine("--wrong .gitignore files are not found");
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         Console.WriteLine("wrong .gitignore files are found:");
         foreach (var (gitignoreFileName, _)in wrongGitIgnoreFilesList) Console.WriteLine(gitignoreFileName);
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

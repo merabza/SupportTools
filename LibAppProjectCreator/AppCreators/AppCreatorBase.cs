@@ -78,7 +78,7 @@ public abstract class AppCreatorBase
     }
 
     //პროექტის ტიპზე დამოკიდებული დამატებით საჭირო ფაილების შექმნა
-    protected abstract Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken);
+    protected abstract Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken = default);
 
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected virtual bool PrepareSpecific()
@@ -199,7 +199,7 @@ public abstract class AppCreatorBase
 
     //აპლიკაციის შექმნის პროცესი
     private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         if (!AppGitsSync())
             return false;

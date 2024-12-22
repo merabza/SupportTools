@@ -47,7 +47,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var encodeParametersAction = new EncodeParametersAction(_logger, _keysJsonFileName, _sourceJsonFileName,
             _encodedJsonFileName, _keyPart1, _keyPart2);

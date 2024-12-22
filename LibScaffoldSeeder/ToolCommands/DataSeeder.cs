@@ -35,10 +35,10 @@ public sealed class DataSeeder : ToolCommand
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
-        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
+        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"run --project {_parameters.SeedProjectFilePath} --use {_parameters.SeedProjectParametersFilePath}")
             .IsNone);
     }

@@ -58,7 +58,7 @@
 //        return false;
 //    }
 
-//    private Task<bool> RunAction(CancellationToken cancellationToken)
+//    private Task<bool> RunAction(CancellationToken cancellationToken = default)
 //    {
 //        var projectFolderName =
 //            Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);

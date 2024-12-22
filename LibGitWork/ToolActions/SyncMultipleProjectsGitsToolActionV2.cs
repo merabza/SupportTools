@@ -40,7 +40,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             useConsole);
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //პირველი ვერსიისგან განსხვავებით აქ აქცენტი უნდა გავაკეთოთ გიტის რეპოზიტორიების მიხედვით დაჯგუფებაზე.
         //ეს საშუალებას მოგვცემს რომ თუ დასასინქრონიზებელი იქნება ერთიდაიგივე მისამართის გიტი სხვადასხვა ფოლდერიდან,
@@ -106,7 +106,7 @@ public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             useSameMessageForNextCommits = syncer.UseSameMessageForNextCommits;
         }
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
 }

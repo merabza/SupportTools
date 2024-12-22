@@ -36,18 +36,18 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         _uploadSmartSchema = uploadSmartSchema;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
             _logger.LogError("Server name is not specified");
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
             _logger.LogError("Environment Name is not specified");
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
 
@@ -61,13 +61,13 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         if (exchangeFileManager == null)
         {
             _logger.LogError("cannot create file manager"); // for {_exchangeFileStorageName}");
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
         if (!exchangeFileManager.UploadContentToTextFile(_parametersContent, uploadFileName))
         {
             _logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
 
         _logger.LogInformation("Remove redundant files...");
@@ -79,6 +79,6 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //SmartSchema? uploadSmartSchema = _smartSchemas.GetSmartSchemaByKey(_uploadSmartSchemaName);
         exchangeFileManager.RemoveRedundantFiles(prefix, _dateMask, _parametersFileExtension, _uploadSmartSchema);
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

@@ -42,9 +42,9 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
         return false;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
+        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"run --project {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectFileFullName} --use {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName}")
             .IsNone);
     }

@@ -29,7 +29,7 @@ public sealed class ServicePublisher : ToolCommand
 
     private ProgramPublisherParameters ProgramPublisherParameters => (ProgramPublisherParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var createPackageAndUpload = new CreatePackageAndUpload(_logger, ProgramPublisherParameters.ProjectName,

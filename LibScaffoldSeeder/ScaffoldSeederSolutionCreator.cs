@@ -136,7 +136,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         return true;
     }
 
-    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken)
+    protected override async Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken = default)
     {
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Empty Console Program.cs...");

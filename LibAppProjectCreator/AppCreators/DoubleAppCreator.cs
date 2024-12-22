@@ -28,7 +28,7 @@ public abstract class DoubleAppCreator
 
     public List<GitCloneDataModel> GitClones => _mainAppCreator?.GitClones ?? [];
 
-    public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken)
+    public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken = default)
     {
         _mainAppCreator = CreateMainAppCreator();
         if (_mainAppCreator is null)

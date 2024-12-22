@@ -22,7 +22,7 @@ public class CreateCSharpGitIgnoreFile : ToolAction
         _gitIgnoreFileName = gitIgnoreFileName;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         const string code = """
                             appsettingsEncoded.json
@@ -402,10 +402,10 @@ public class CreateCSharpGitIgnoreFile : ToolAction
         if (FileStat.CreatePrevFolderIfNotExists(_gitIgnoreFileName, true, _logger))
         {
             File.WriteAllText(_gitIgnoreFileName, code.Replace("\r\n", "\n"));
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         StShared.WriteErrorLine("File did not created", true);
-        return Task.FromResult(false);
+        return ValueTask.FromResult(false);
     }
 }
