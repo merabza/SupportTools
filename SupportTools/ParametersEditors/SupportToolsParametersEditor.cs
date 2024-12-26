@@ -45,6 +45,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         //---
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger, nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
+        FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(logger, nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters),
+            parametersManager));
+
+        
+
         //AppProjectCreatorAllParameters
         FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
             parametersManager));

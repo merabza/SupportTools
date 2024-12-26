@@ -65,21 +65,21 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
             nameof(DatabasesExchangeParameters.ProductionFileStorageName), listsParametersManager));
 
         //ჩამოტვირთვისა და ატვირთვის დროებითი გაფართოებები
-        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.DownloadTempExtension)));
-        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.UploadTempExtension)));
+        //FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.DownloadTempExtension)));
+        //FieldEditors.Add(new TextFieldEditor(nameof(DatabasesExchangeParameters.UploadTempExtension)));
 
         //გაცვლის ფაილსაცავის სახელი
-        FieldEditors.Add(new FileStorageNameFieldEditor(logger,
-            nameof(DatabasesExchangeParameters.ExchangeFileStorageName), listsParametersManager));
+        //FieldEditors.Add(new FileStorageNameFieldEditor(logger,
+        //    nameof(DatabasesExchangeParameters.ExchangeFileStorageName), listsParametersManager));
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს რეზერვაციის ფაილსაცავის მხარეს)
-        FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.ExchangeSmartSchemaName),
-            listsParametersManager));
+        //FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.ExchangeSmartSchemaName),
+        //    listsParametersManager));
 
         //ლოკალური მხარე
-        FieldEditors.Add(new FolderPathFieldEditor(nameof(DatabasesExchangeParameters.LocalPath)));
+        //FieldEditors.Add(new FolderPathFieldEditor(nameof(DatabasesExchangeParameters.LocalPath)));
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს ლოკალური ფოლდერის მხარეს)
-        FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.LocalSmartSchemaName),
-            listsParametersManager));
+        //FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.LocalSmartSchemaName),
+        //    listsParametersManager));
 
         //დეველოპერ სერვერის მხარე
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,

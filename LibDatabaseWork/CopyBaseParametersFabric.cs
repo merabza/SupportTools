@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using DatabasesManagement;
 using FileManagersMain;
 using LibApiClientParameters;
@@ -16,10 +17,13 @@ namespace LibDatabaseWork;
 
 public static class CopyBaseParametersFabric
 {
-    public static CopyBaseParameters? CreateCopyBaseParameters(ILogger logger, IHttpClientFactory httpClientFactory,
-        bool fromProductionToDeveloper,
+    public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
+        IHttpClientFactory httpClientFactory, bool fromProductionToDeveloper,
         SupportToolsParameters supportToolsParameters, string projectName, ServerInfoModel serverInfo)
     {
+        var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;
+
+
         //შევამოწმოთ პროექტის პარამეტრები
         var project = supportToolsParameters.GetProject(projectName);
         if (project == null)
@@ -55,7 +59,7 @@ public static class CopyBaseParametersFabric
         ApiClients apiClients = new(supportToolsParameters.ApiClients);
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
 
-        var localPath = dep.LocalPath;
+        var localPath = databasesBackupFilesExchangeParameters?.LocalPath;
 
         if (string.IsNullOrWhiteSpace(localPath))
         {
@@ -108,18 +112,18 @@ public static class CopyBaseParametersFabric
 
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
-        var exchangeFileStorageName = dep.ExchangeFileStorageName;
+        var exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
-        var (exchangeFileStorage, exchangeFileManager) = FileManagersFabricExt.CreateFileStorageAndFileManager(true,
-            logger, localPath, exchangeFileStorageName, fileStorages, null, null, CancellationToken.None).Result;
+        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
+            true, logger, localPath, exchangeFileStorageName, fileStorages, null, null, CancellationToken.None);
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromProductionToDeveloper
             ? dep.ProductionFileStorageName
             : dep.DeveloperFileStorageName;
 
-        var (sourceFileStorage, sourceFileManager) = FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger,
-            localPath, sourceFileStorageName, fileStorages, null, null, CancellationToken.None).Result;
+        var (sourceFileStorage, sourceFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(true,
+            logger, localPath, sourceFileStorageName, fileStorages, null, null, CancellationToken.None);
 
         if (sourceFileManager == null)
         {
@@ -138,9 +142,9 @@ public static class CopyBaseParametersFabric
             fromProductionToDeveloper ? dep.DeveloperFileStorageName : dep.ProductionFileStorageName;
 
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
-        var (destinationFileStorage, destinationFileManager) = FileManagersFabricExt
-            .CreateFileStorageAndFileManager(true, logger, localPath, destinationFileStorageName, fileStorages, null,
-                null, CancellationToken.None).Result;
+        var (destinationFileStorage, destinationFileManager) =
+            await FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
+                destinationFileStorageName, fileStorages, null, null, CancellationToken.None);
 
         if (destinationFileStorage == null)
         {
@@ -167,9 +171,9 @@ public static class CopyBaseParametersFabric
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var agentClientForSource = DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
+        var agentClientForSource = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
             httpClientFactory, sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections,
-            null, null, CancellationToken.None).Result;
+            null, null, CancellationToken.None);
 
         if (agentClientForSource is null)
         {
@@ -177,9 +181,9 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var agentClientForDestination = DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
+        var agentClientForDestination = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
             httpClientFactory, destinationDbWebAgentName, apiClients, destinationDbConnectionName,
-            databaseServerConnections, null, null, CancellationToken.None).Result;
+            databaseServerConnections, null, null, CancellationToken.None);
 
         if (agentClientForDestination is null)
         {
@@ -246,7 +250,7 @@ public static class CopyBaseParametersFabric
             ? null
             : smartSchemas.GetSmartSchemaByKey(sourceSmartSchemaName);
 
-        var localSmartSchemaName = dep.LocalSmartSchemaName;
+        var localSmartSchemaName = databasesBackupFilesExchangeParameters?.LocalSmartSchemaName;
 
         var localSmartSchema = string.IsNullOrWhiteSpace(localSmartSchemaName)
             ? null
@@ -265,7 +269,7 @@ public static class CopyBaseParametersFabric
                                        !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
                                        exchangeFileStorageName != sourceFileStorageName;
 
-        var exchangeSmartSchemaName = dep.ExchangeSmartSchemaName;
+        var exchangeSmartSchemaName = databasesBackupFilesExchangeParameters?.ExchangeSmartSchemaName;
 
         var exchangeSmartSchema = string.IsNullOrWhiteSpace(exchangeSmartSchemaName)
             ? null
@@ -282,9 +286,13 @@ public static class CopyBaseParametersFabric
             destinationDbBackupParameters, needDownloadFromSource, sourceSmartSchema, localSmartSchema,
             needUploadToDestination, destinationSmartSchema, needDownloadFromExchange, exchangeSmartSchema,
             needDownloadFromDestination, needUploadDestinationToExchange,
-            string.IsNullOrWhiteSpace(dep.DownloadTempExtension) ? "down!" : dep.DownloadTempExtension,
-            string.IsNullOrWhiteSpace(dep.UploadTempExtension) ? "up!" : dep.UploadTempExtension, sourceDatabaseName,
-            destinationDbServerSideDataFolderPath, destinationDbServerSideLogFolderPath,
-            destinationDatabaseName, localPath);
+            string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.DownloadTempExtension)
+                ? "down!"
+                : databasesBackupFilesExchangeParameters.DownloadTempExtension,
+            string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
+                ? "up!"
+                : databasesBackupFilesExchangeParameters.UploadTempExtension, sourceDatabaseName,
+            destinationDbServerSideDataFolderPath, destinationDbServerSideLogFolderPath, destinationDatabaseName,
+            localPath);
     }
 }

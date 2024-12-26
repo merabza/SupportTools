@@ -182,7 +182,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.LocalBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var copyBaseParametersDevToProd = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
-                    httpClientFactory, false, supportToolsParameters, projectName, serverInfo);
+                    httpClientFactory, false, supportToolsParameters, projectName, serverInfo).Result;
                 if (copyBaseParametersDevToProd is not null)
                     return new BaseCopier(logger, copyBaseParametersDevToProd, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
@@ -272,7 +272,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.ServerBaseToLocalCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
                 var copyBaseParametersProdToDev = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
-                    httpClientFactory, true, supportToolsParameters, projectName, serverInfo);
+                    httpClientFactory, true, supportToolsParameters, projectName, serverInfo).Result;
                 if (copyBaseParametersProdToDev is not null)
                     return new BaseCopier(logger, copyBaseParametersProdToDev, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);

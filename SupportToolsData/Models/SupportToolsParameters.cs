@@ -39,6 +39,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? SmartSchemaNameForExchange { get; set; }
     public string? SmartSchemaNameForLocal { get; set; }
     public InstallerSettings? LocalInstallerSettings { get; set; }
+    public DatabasesBackupFilesExchangeParameters? DatabasesBackupFilesExchangeParameters { get; set; }
     public AppProjectCreatorAllParameters? AppProjectCreatorAllParameters { get; set; }
     public Dictionary<string, ProjectModel> Projects { get; init; } = [];
     public Dictionary<string, ServerDataModel> Servers { get; init; } = [];

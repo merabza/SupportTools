@@ -25,6 +25,6 @@ public sealed class AppProjectCreatorAllParameters : IParameters
 
     public TemplateModel? GetTemplate(string templateName)
     {
-        return !Templates.ContainsKey(templateName) ? null : Templates[templateName];
+        return Templates.GetValueOrDefault(templateName);
     }
 }

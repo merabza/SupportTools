@@ -7,6 +7,7 @@ using SupportTools.ParametersEditors;
 
 namespace SupportTools.FieldEditors;
 
+//DatabasesBackupFilesExchangeParametersFieldEditor
 public sealed class InstallerSettingsFieldEditor : FieldEditor<InstallerSettings>
 {
     private readonly ILogger _logger;
