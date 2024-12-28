@@ -325,7 +325,7 @@ fi*/
     public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
     {
         if (StShared.RunProcess(_useConsole, _logger, Git,
-                $"{_switchToProjectPath} rm --cached {redundantCachedFileName}").IsNone)
+                $"{_switchToProjectPath} rm --cached \"{redundantCachedFileName}\"").IsNone)
             return true;
         StShared.WriteErrorLine($"cannot remove file {redundantCachedFileName} from cache", _useConsole, _logger);
         return false;
