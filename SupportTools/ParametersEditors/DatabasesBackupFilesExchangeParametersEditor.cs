@@ -10,7 +10,7 @@ namespace SupportTools.ParametersEditors;
 public sealed class DatabasesBackupFilesExchangeParametersEditor : ParametersEditor
 {
     public DatabasesBackupFilesExchangeParametersEditor(ILogger logger, IParameters parameters,
-        ParametersManager parametersManager) : base("Databases Backup Files Exchange Parameters Editor", parameters,
+        IParametersManager parametersManager) : base("Databases Backup Files Exchange Parameters Editor", parameters,
         parametersManager)
     {
         //ჩამოტვირთვისა და ატვირთვის დროებითი გაფართოებები
@@ -24,14 +24,12 @@ public sealed class DatabasesBackupFilesExchangeParametersEditor : ParametersEdi
             nameof(DatabasesBackupFilesExchangeParameters.ExchangeFileStorageName), parametersManager));
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს რეზერვაციის ფაილსაცავის მხარეს)
         FieldEditors.Add(new SmartSchemaNameFieldEditor(
-            nameof(DatabasesBackupFilesExchangeParameters.ExchangeSmartSchemaName),
-            parametersManager));
+            nameof(DatabasesBackupFilesExchangeParameters.ExchangeSmartSchemaName), parametersManager));
 
         //ლოკალური მხარე
         FieldEditors.Add(new FolderPathFieldEditor(nameof(DatabasesBackupFilesExchangeParameters.LocalPath)));
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს ლოკალური ფოლდერის მხარეს)
         FieldEditors.Add(new SmartSchemaNameFieldEditor(
-            nameof(DatabasesBackupFilesExchangeParameters.LocalSmartSchemaName),
-            parametersManager));
+            nameof(DatabasesBackupFilesExchangeParameters.LocalSmartSchemaName), parametersManager));
     }
 }

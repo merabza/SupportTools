@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters.FieldEditors;
 using LibParameters;
@@ -11,20 +12,22 @@ namespace SupportTools.FieldEditors;
 
 public sealed class ProjectsFieldEditor : FieldEditor<Dictionary<string, ProjectModel>>
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
-        propertyName, false, null, true)
+    public ProjectsFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
+        ParametersManager parametersManager) : base(propertyName, false, null, true)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
     public override CliMenuSet GetSubMenu(object record)
     {
-        var projectCruder = new ProjectCruder(_logger, _parametersManager);
+        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager);
         var menuSet = projectCruder.GetListMenu();
         return menuSet;
     }

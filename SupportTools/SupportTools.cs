@@ -51,11 +51,11 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(
             new ProjectCreatorSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager));
 
-        var projectCruder = new ProjectCruder(_logger, _parametersManager);
+        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager);
 
         //ახალი პროექტის შექმნა
-        var newItemCommand =
-            new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural, $"New {projectCruder.CrudName}");
+        var newItemCommand = new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural,
+            $"New {projectCruder.CrudName}");
         mainMenuSet.AddMenuItem(newItemCommand);
 
         //პროექტის დაიმპორტება

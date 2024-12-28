@@ -10,7 +10,7 @@ namespace SupportTools.ParametersEditors;
 public sealed class InstallerSettingsParametersEditor : ParametersEditor
 {
     public InstallerSettingsParametersEditor(ILogger logger, IParameters parameters,
-        ParametersManager parametersManager) : base("Installer Settings Editor", parameters, parametersManager)
+        IParametersManager parametersManager) : base("Installer Settings Editor", parameters, parametersManager)
     {
         FieldEditors.Add(new FolderPathFieldEditor(nameof(InstallerSettings.InstallerWorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(InstallerSettings.InstallFolder)));

@@ -46,7 +46,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectSubMenuSet.AddMenuItem(exportProjectCommand);
 
         //პროექტის პარამეტრი
-        var projectCruder = new ProjectCruder(_logger, _parametersManager);
+        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager);
         var editCommand = new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _projectName);
         projectSubMenuSet.AddMenuItem(editCommand);
 
@@ -77,9 +77,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
             foreach (var tool in ToolCommandFabric.ToolsByProjects.Intersect(project.AllowToolsList))
-                projectSubMenuSet.AddMenuItem(
-                    new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName, null,
-                        _parametersManager));
+                projectSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
+                    _projectName, null, _parametersManager));
         }
 
         var serverInfoCruder = new ServerInfoCruder(_logger, _httpClientFactory, _parametersManager, _projectName);
@@ -94,8 +93,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
                 projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
-                    kvp.Value.GetItemKey(),
-                    _parametersManager, _projectName, kvp.Key));
+                    kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key));
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();

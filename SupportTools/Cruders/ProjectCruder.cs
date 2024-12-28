@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters;
 using CliParameters.CliMenuCommands;
@@ -18,8 +19,8 @@ public sealed class ProjectCruder : ParCruder
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
-    public ProjectCruder(ILogger logger, ParametersManager parametersManager) : base(parametersManager, "Project",
-        "Projects")
+    public ProjectCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) :
+        base(parametersManager, "Project", "Projects")
     {
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService), false));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
@@ -44,6 +45,8 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
         FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
             nameof(ProjectModel.DevDatabaseConnectionParameters), parametersManager));
+        FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
+            nameof(ProjectModel.DevDatabasesParameters), parametersManager));
         FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
             nameof(ProjectModel.ProdCopyDatabaseConnectionParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));

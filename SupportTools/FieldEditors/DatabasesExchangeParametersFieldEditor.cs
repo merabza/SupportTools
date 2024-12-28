@@ -1,56 +1,31 @@
 ﻿using System.Net.Http;
-using CliMenu;
+using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 
 namespace SupportTools.FieldEditors;
 
-public sealed class DatabasesExchangeParametersFieldEditor : FieldEditor<DatabasesExchangeParameters>
+public sealed class DatabasesExchangeParametersFieldEditor : ParametersFieldEditor<DatabasesExchangeParameters,
+    ServerDatabasesExchangeParametersEditor>
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger _logger;
-
-    private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DatabasesExchangeParametersFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory,
-        string databasesExchangeParametersName, ParametersManager parametersManager) : base(
-        databasesExchangeParametersName, false, null, true)
+        string propertyName, IParametersManager parametersManager) : base(logger, propertyName, parametersManager)
     {
-        _logger = logger;
         _httpClientFactory = httpClientFactory;
-        _parametersManager = parametersManager;
     }
 
-    public override string GetValueStatus(object? record)
+    protected override ServerDatabasesExchangeParametersEditor CreateEditor(DatabasesExchangeParameters currentValue)
     {
-        var val = GetValue(record);
-        if (val is null)
-            return "(empty)";
-        //EDataProvider dataProvider = val.DataProvider;
-        var status = "Some Parameters";
-        //DbConnectionParameters dbConnectionParameters =
-        //    DbConnectionFabric.GetDbConnectionParameters(dataProvider, val.ConnectionString);
-        //status +=
-        //    $", Connection: {(dbConnectionParameters == null ? "(invalid)" : dbConnectionParameters.GetStatus())}";
-        //status += $", CommandTimeOut: {val.CommandTimeOut}";
-        return status;
-    }
-
-    public override CliMenuSet GetSubMenu(object record)
-    {
-        var databasesExchangeParameters =
-            GetValue(record) ?? new DatabasesExchangeParameters();
-
         var serverDatabasesExchangeParametersManager =
-            new ServerDatabasesExchangeParametersManager(databasesExchangeParameters, _parametersManager, this,
-                record);
+            new SubParametersManager<DatabasesExchangeParameters>(currentValue, ParametersManager, this, currentValue);
 
-        var parametersEditor = new ServerDatabasesExchangeParametersEditor(_logger, _httpClientFactory,
-            serverDatabasesExchangeParametersManager, _parametersManager);
-
-        return parametersEditor.GetParametersMainMenu();
+        return new ServerDatabasesExchangeParametersEditor(Logger, _httpClientFactory,
+            serverDatabasesExchangeParametersManager, ParametersManager);
     }
 }

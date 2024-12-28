@@ -21,8 +21,7 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
 
         var environmentCruder = new EnvironmentCruder(_parametersManager);
 
-        SetValue(recordForUpdate,
-            environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName));
+        SetValue(recordForUpdate, environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName));
     }
 
     public override string GetValueStatus(object? record)

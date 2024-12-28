@@ -36,8 +36,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileExtension)));
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,
-            nameof(SupportToolsParameters.FileStorageNameForExchange),
-            parametersManager));
+            nameof(SupportToolsParameters.FileStorageNameForExchange), parametersManager));
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForLocal),
             parametersManager));
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForExchange),
@@ -45,10 +44,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         //---
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger, nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
-        FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(logger, nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters),
-            parametersManager));
+        FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(logger,
+            nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters), parametersManager));
 
-        
 
         //AppProjectCreatorAllParameters
         FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
@@ -58,14 +56,12 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new FileStoragesFieldEditor(logger, nameof(SupportToolsParameters.FileStorages),
             parametersManager));
-        FieldEditors.Add(
-            new DatabaseServerConnectionsFieldEditor(nameof(SupportToolsParameters.DatabaseServerConnections),
-                parametersManager, logger));
-        FieldEditors.Add(
-            new SmartSchemasFieldEditor(nameof(SupportToolsParameters.SmartSchemas), parametersManager));
+        FieldEditors.Add(new DatabaseServerConnectionsFieldEditor(
+            nameof(SupportToolsParameters.DatabaseServerConnections), parametersManager, logger));
+        FieldEditors.Add(new SmartSchemasFieldEditor(nameof(SupportToolsParameters.SmartSchemas), parametersManager));
         FieldEditors.Add(new ArchiversFieldEditor(nameof(SupportToolsParameters.Archivers), parametersManager));
-        FieldEditors.Add(
-            new ProjectsFieldEditor(logger, nameof(SupportToolsParameters.Projects), parametersManager));
+        FieldEditors.Add(new ProjectsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Projects),
+            parametersManager));
         FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, httpClientFactory,
             parametersManager));
         FieldEditors.Add(new RunTimesFieldEditor(nameof(SupportToolsParameters.RunTimes), parametersManager));

@@ -10,7 +10,7 @@ using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 
-namespace SupportTools;
+namespace SupportTools.ParametersEditors;
 
 public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
 {
@@ -24,7 +24,7 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), listsParametersManager, true));
         //ბექაპირების პარამეტრები პროდაქშენ სერვერის მხარეს
-        FieldEditors.Add(new DatabaseBackupParametersFieldEditor(
+        FieldEditors.Add(new DatabaseBackupParametersFieldEditor(logger,
             nameof(DatabasesExchangeParameters.ProductionDbBackupParameters), listsParametersManager));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბექაპის შენახვა
@@ -58,8 +58,8 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
             nameof(DatabasesExchangeParameters.ProductionDbWebAgentName), true));
 
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს პროდაქშენ ბაზის სერვერის მხარეს)
-        FieldEditors.Add(new SmartSchemaNameFieldEditor(
-            nameof(DatabasesExchangeParameters.ProductionSmartSchemaName), listsParametersManager));
+        FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.ProductionSmartSchemaName),
+            listsParametersManager));
         //პროდაქშენ სერვერის მხარეს ფაილსაცავის სახელი
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,
             nameof(DatabasesExchangeParameters.ProductionFileStorageName), listsParametersManager));
@@ -89,7 +89,7 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), listsParametersManager, true));
         //ბექაპირების პარამეტრები დეველოპერ სერვერის მხარეს
-        FieldEditors.Add(new DatabaseBackupParametersFieldEditor(
+        FieldEditors.Add(new DatabaseBackupParametersFieldEditor(logger,
             nameof(DatabasesExchangeParameters.DeveloperDbBackupParameters), listsParametersManager));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბექაპის შენახვა
@@ -118,7 +118,7 @@ public sealed class ServerDatabasesExchangeParametersEditor : ParametersEditor
             nameof(DatabasesExchangeParameters.DeveloperDbWebAgentName), true));
 
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს დეველოპერ ბაზის სერვერის მხარეს)
-        FieldEditors.Add(new SmartSchemaNameFieldEditor(
-            nameof(DatabasesExchangeParameters.DeveloperSmartSchemaName), listsParametersManager));
+        FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesExchangeParameters.DeveloperSmartSchemaName),
+            listsParametersManager));
     }
 }

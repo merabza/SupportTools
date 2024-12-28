@@ -30,16 +30,15 @@ public sealed class DbServerSideBackupPathFieldEditor : FieldEditor<string>
 
         if (!string.IsNullOrWhiteSpace(databaseWebAgentName))
         {
-            StShared.WriteWarningLine("Cannot set Db Server Side Backup Path, because Web Agent is used", true,
-                null, true);
+            StShared.WriteWarningLine("Cannot set Db Server Side Backup Path, because Web Agent is used", true, null,
+                true);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(currentPath) && !string.IsNullOrWhiteSpace(databaseConnectionName))
         {
             var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-            var databaseServerConnections =
-                new DatabaseServerConnections(parameters.DatabaseServerConnections);
+            var databaseServerConnections = new DatabaseServerConnections(parameters.DatabaseServerConnections);
             var databaseServerConnection =
                 databaseServerConnections.GetDatabaseServerConnectionByKey(databaseConnectionName);
             currentPath = databaseServerConnection?.BackupFolderName;

@@ -2,7 +2,7 @@
 
 namespace SupportToolsData.Models;
 
-public sealed class DatabasesBackupFilesExchangeParameters : IParameters
+public sealed class DatabasesBackupFilesExchangeParameters : ParametersWithStatus
 {
     //ჩამოტვირთვისა და ატვირთვის დროებითი გაფართოებები
     public string? DownloadTempExtension { get; set; }
@@ -19,9 +19,4 @@ public sealed class DatabasesBackupFilesExchangeParameters : IParameters
 
     //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს ლოკალური ფოლდერის მხარეს)
     public string? LocalSmartSchemaName { get; set; }
-
-    public bool CheckBeforeSave()
-    {
-        return true;
-    }
 }

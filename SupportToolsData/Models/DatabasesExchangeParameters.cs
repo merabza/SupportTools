@@ -3,7 +3,7 @@ using LibParameters;
 
 namespace SupportToolsData.Models;
 
-public sealed class DatabasesExchangeParameters : IParameters
+public sealed class DatabasesExchangeParameters : ParametersWithStatus
 {
     //პროდაქშენ სერვერის მხარე
     public string? ProductionDbConnectionName { get; set; }
