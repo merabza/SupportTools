@@ -94,11 +94,11 @@ public class WrongGitignoreFilesListCreator
                 {
                     var gitignoreFileContent = File.ReadAllText(gitignoreFileName);
                     if (gitignoreFileContent != gitIgnoreTemplateFileContent)
-                        wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                        wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, gitIgnoreTemplateFileContent);
                 }
                 else
                 {
-                    wrongGitIgnoreFilesList.Add(gitignoreFileName, gitIgnoreTemplateFileContent);
+                    wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, gitIgnoreTemplateFileContent);
                 }
             }
         }
