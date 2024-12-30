@@ -39,7 +39,7 @@ public sealed class ProjectModel : ItemData
     public string? KeyGuidPart { get; init; }
     public string? MigrationSqlFilesFolder { get; set; }
     public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; init; }
-    public DatabasesParameters? DevDatabasesParameters { get; init; }
+    public DatabasesParameters? DevDatabaseParameters { get; init; }
     public DatabaseConnectionParameters? ProdCopyDatabaseConnectionParameters { get; set; }
     public DatabasesParameters? ProdCopyDatabasesParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];

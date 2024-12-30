@@ -20,10 +20,11 @@ public sealed class DatabasesExchangeParametersFieldEditor : ParametersFieldEdit
         _httpClientFactory = httpClientFactory;
     }
 
-    protected override ServerDatabasesExchangeParametersEditor CreateEditor(DatabasesExchangeParameters currentValue)
+    protected override ServerDatabasesExchangeParametersEditor CreateEditor(object record,
+        DatabasesExchangeParameters currentValue)
     {
         var serverDatabasesExchangeParametersManager =
-            new SubParametersManager<DatabasesExchangeParameters>(currentValue, ParametersManager, this, currentValue);
+            new SubParametersManager<DatabasesExchangeParameters>(currentValue, ParametersManager, this, record);
 
         return new ServerDatabasesExchangeParametersEditor(Logger, _httpClientFactory,
             serverDatabasesExchangeParametersManager, ParametersManager);

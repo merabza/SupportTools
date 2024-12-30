@@ -15,7 +15,7 @@ public sealed class
     {
     }
 
-    protected override InstallerSettingsParametersEditor CreateEditor(InstallerSettings currentValue)
+    protected override InstallerSettingsParametersEditor CreateEditor(object record, InstallerSettings currentValue)
     {
         return new InstallerSettingsParametersEditor(Logger, currentValue, ParametersManager);
     }

@@ -15,7 +15,7 @@ public sealed class DatabasesBackupFilesExchangeParametersFieldEditor : Paramete
     {
     }
 
-    protected override DatabasesBackupFilesExchangeParametersEditor CreateEditor(
+    protected override DatabasesBackupFilesExchangeParametersEditor CreateEditor(object record,
         DatabasesBackupFilesExchangeParameters currentValue)
     {
         return new DatabasesBackupFilesExchangeParametersEditor(Logger, currentValue, ParametersManager);
