@@ -84,9 +84,4 @@ public sealed class DatabasesExchangeParameters : ParametersWithStatus
 
     //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს დეველოპერ ბაზის სერვერის მხარეს)
     public string? DeveloperSmartSchemaName { get; set; }
-
-    public bool CheckBeforeSave()
-    {
-        return true;
-    }
 }
