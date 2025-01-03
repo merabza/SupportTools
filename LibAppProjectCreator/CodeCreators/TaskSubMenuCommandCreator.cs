@@ -19,29 +19,17 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using System",
-            "using CliMenu",
-            "using LibParameters",
-            "using CliParameters.CliMenuCommands",
-            $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
-            "using LibDataInput",
-            "using Microsoft.Extensions.Logging",
-            string.Empty,
-            $"namespace {_projectNamespace}.MenuCommands",
-            string.Empty,
-            new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
-            new CodeBlock("public sealed class TaskSubMenuCommand : CliMenuCommand",
-                "private readonly ILogger _logger",
-                "private readonly ParametersManager _parametersManager",
-                string.Empty,
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System", "using CliMenu", "using LibParameters", "using CliParameters.CliMenuCommands",
+            $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models", "using LibDataInput",
+            "using Microsoft.Extensions.Logging", string.Empty, $"namespace {_projectNamespace}.MenuCommands",
+            string.Empty, new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
+            new CodeBlock("public sealed class TaskSubMenuCommand : CliMenuCommand", "private readonly ILogger _logger",
+                "private readonly ParametersManager _parametersManager", string.Empty,
                 new CodeBlock(
                     "public TaskSubMenuCommand(ILogger logger, ParametersManager parametersManager, string taskName) : base(taskName)",
-                    "_logger = logger",
-                    "_parametersManager = parametersManager"),
-                new CodeBlock("protected override void RunAction()",
-                    "MenuAction = EMenuAction.LoadSubMenu"),
+                    "_logger = logger", "_parametersManager = parametersManager"),
+                new CodeBlock("protected override bool RunBody()", "MenuAction = EMenuAction.LoadSubMenu"),
                 new CodeBlock("public override CliMenuSet GetSubmenu()",
                     "CliMenuSet taskSubMenuSet = new($\" Task => { Name}\")",
                     new CodeBlock("if (Name is not null)",
@@ -52,12 +40,9 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
                         new OneLineComment(
                             "ეს საჭირო იქნება, თუ ამ მენიუში საჭირო გახდება ამოცანის დამატებითი რედაქტორების შექმნა"),
                         $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
-                        "var task = parameters.GetTask(Name)"
-                    ),
-                    "var key = ConsoleKey.Escape.Value().ToLower()",
+                        "var task = parameters.GetTask(Name)"), "var key = ConsoleKey.Escape.Value().ToLower()",
                     "taskSubMenuSet.AddMenuItem(key, \"Exit to level up menu\", new ExitToMainMenuCliMenuCommand(null, null), key.Length)",
-                    "return taskSubMenuSet")
-            ));
+                    "return taskSubMenuSet")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

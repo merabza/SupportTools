@@ -22,11 +22,11 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var buildMainMenuBlock = new CodeBlock("protected override bool BuildMainMenu()",
+        var buildMainMenuBlock = new CodeBlock("public override CliMenuSet BuildMainMenu()",
             $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
             string.Empty,
             "var mainMenuSet = new CliMenuSet(\"Main Menu\")",
-            "AddChangeMenu(mainMenuSet)",
+            //"AddChangeMenu(mainMenuSet)",
             string.Empty,
             new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
             $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
@@ -46,11 +46,11 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         buildMainMenuBlock.AddRange(taskPart.CodeItems);
 
         var exitPart = new FlatCodeBlock(
-            new OneLineComment("გასასვლელი"),
+            new OneLineComment("პროგრამიდან გასასვლელი"),
             "var key = ConsoleKey.Escape.Value().ToLower()",
-            "mainMenuSet.AddMenuItem(key, \"Exit\", new ExitCliMenuCommand(), key.Length)",
+            "mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length)",
             string.Empty,
-            "return true");
+            "return mainMenuSet");
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
 
 
