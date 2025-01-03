@@ -144,8 +144,7 @@ internal sealed class ProjectRecordCreator
         }
 
 
-        var developerDbConnectionName =
-            supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
+        var developerDbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
 
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
 
@@ -211,15 +210,10 @@ internal sealed class ProjectRecordCreator
         if (!_templateModel.UseMenu)
         {
             var serverInfo = CreateServerInfo(productionServerName, productionEnvironmentName,
-                productionServerWebAgentName,
-                securityFolder, appSettingsFileName, jsonExtension, serverData, productionBaseName, smartSchemaName,
-                databaseExchangeFileStorageName, tempLocalPath, developerDbConnectionName);
-            serverInfos = new Dictionary<string, ServerInfoModel>
-            {
-                {
-                    serverInfo.GetItemKey(), serverInfo
-                }
-            };
+                productionServerWebAgentName, securityFolder, appSettingsFileName, jsonExtension, serverData,
+                productionBaseName, smartSchemaName, databaseExchangeFileStorageName, tempLocalPath,
+                developerDbConnectionName);
+            serverInfos = new Dictionary<string, ServerInfoModel> { { serverInfo.GetItemKey(), serverInfo } };
         }
 
         List<string> gitProjectNames = ["SystemTools", _newProjectName];
@@ -247,52 +241,54 @@ internal sealed class ProjectRecordCreator
             IsService = _templateModel.SupportProjectType == ESupportProjectType.Api,
             UseAlternativeWebAgent = false,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
-            SolutionFileName = Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
-                $"{_newProjectName}.sln"),
+            SolutionFileName =
+                Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, $"{_newProjectName}.sln"),
             ProjectSecurityFolderPath =
                 Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
                     _newProjectName),
             MainProjectName = _newProjectName,
-            MigrationStartupProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, fakeHostProjectName,
-                $"{fakeHostProjectName}{csProjectExtension}"),
-            MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
-                $"{dbMigrationProjectName}{csProjectExtension}"),
-            SeedProjectFilePath = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                    scaffoldSeederProjectName, scaffoldSeederProjectName, seedProjectName,
-                    $"{seedProjectName}{csProjectExtension}")
-                : null,
-            SeedProjectParametersFilePath = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                    scaffoldSeedSecFolderName, $"{seedProjectName}{csProjectExtension}")
-                : null,
-            GetJsonFromScaffoldDbProjectFileFullName = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                    scaffoldSeederProjectName, scaffoldSeederProjectName, getJsonProjectName,
-                    $"{getJsonProjectName}{csProjectExtension}")
-                : null,
+            MigrationStartupProjectFilePath =
+                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+                    scaffoldSeederProjectName, fakeHostProjectName, $"{fakeHostProjectName}{csProjectExtension}"),
+            MigrationProjectFilePath =
+                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+                    scaffoldSeederProjectName, dbMigrationProjectName, $"{dbMigrationProjectName}{csProjectExtension}"),
+            SeedProjectFilePath =
+                _templateModel is { UseDatabase: true, UseCarcass: true }
+                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+                        scaffoldSeederProjectName, seedProjectName, $"{seedProjectName}{csProjectExtension}")
+                    : null,
+            SeedProjectParametersFilePath =
+                _templateModel is { UseDatabase: true, UseCarcass: true }
+                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
+                        $"{seedProjectName}{csProjectExtension}")
+                    : null,
+            GetJsonFromScaffoldDbProjectFileFullName =
+                _templateModel is { UseDatabase: true, UseCarcass: true }
+                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+                        scaffoldSeederProjectName, getJsonProjectName, $"{getJsonProjectName}{csProjectExtension}")
+                    : null,
             GetJsonFromScaffoldDbProjectParametersFileFullName =
                 _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(scaffoldSeedersWorkFolder,
-                        _newProjectName, scaffoldSeedSecFolderName, $"{getJsonProjectName}{csProjectExtension}")
+                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
+                        $"{getJsonProjectName}{csProjectExtension}")
                     : null,
             DbContextName = $"{_newProjectName}DbContext",
             ProjectShortPrefix = _newProjectShortName,
             DbContextProjectName =
                 _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newProjectName}Db" : null,
-            NewDataSeedingClassLibProjectName = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? $"{_newProjectName}DbNewDataSeeding"
-                : null,
-            ExcludesRulesParametersFilePath = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? Path.Combine(projectsFolderPathReal, _newProjectName,
-                    dbPartProjectsFolderName, $"ExcludesRules{jsonExtension}")
-                : null,
-            AppSetEnKeysJsonFileName = _templateModel.SupportProjectType == ESupportProjectType.Api
-                ? Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, _newProjectName,
-                    $"appsetenkeys{jsonExtension}")
-                : null,
+            NewDataSeedingClassLibProjectName =
+                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newProjectName}DbNewDataSeeding" : null,
+            ExcludesRulesParametersFilePath =
+                _templateModel is { UseDatabase: true, UseCarcass: true }
+                    ? Path.Combine(projectsFolderPathReal, _newProjectName, dbPartProjectsFolderName,
+                        $"ExcludesRules{jsonExtension}")
+                    : null,
+            AppSetEnKeysJsonFileName =
+                _templateModel.SupportProjectType == ESupportProjectType.Api
+                    ? Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, _newProjectName,
+                        $"appsetenkeys{jsonExtension}")
+                    : null,
             KeyGuidPart = _newProjectKeyGuidPart,
             DevDatabaseConnectionParameters = new DatabaseConnectionParameters
             {
@@ -332,11 +328,13 @@ internal sealed class ProjectRecordCreator
         {
             ServerName = productionServerName,
             EnvironmentName = productionEnvironmentName,
-            WebAgentNameForCheck = productionServerWebAgentName, ApiVersionId = "1",
-            AppSettingsJsonSourceFileName = Path.Combine(securityFolder, _newProjectName,
-                productionServerName, appSettingsFileName),
-            AppSettingsEncodedJsonFileName = Path.Combine(securityFolder, _newProjectName,
-                productionServerName, $"appsettingsEncoded{jsonExtension}"),
+            WebAgentNameForCheck = productionServerWebAgentName,
+            ApiVersionId = "1",
+            AppSettingsJsonSourceFileName =
+                Path.Combine(securityFolder, _newProjectName, productionServerName, appSettingsFileName),
+            AppSettingsEncodedJsonFileName =
+                Path.Combine(securityFolder, _newProjectName, productionServerName,
+                    $"appsettingsEncoded{jsonExtension}"),
             ServiceUserName = serverData.FilesUserName,
             DatabasesExchangeParameters = new DatabasesExchangeParameters
             {
