@@ -27,21 +27,20 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
             new CodeBlock("public sealed class TaskSubMenuCommand : CliMenuCommand", "private readonly ILogger _logger",
                 "private readonly ParametersManager _parametersManager", string.Empty,
                 new CodeBlock(
-                    "public TaskSubMenuCommand(ILogger logger, ParametersManager parametersManager, string taskName) : base(taskName)",
+                    "public TaskSubMenuCommand(ILogger logger, ParametersManager parametersManager, string taskName) : base(taskName, EMenuAction.LoadSubMenu)",
                     "_logger = logger", "_parametersManager = parametersManager"),
-                new CodeBlock("protected override bool RunBody()", "MenuAction = EMenuAction.LoadSubMenu"),
+                new CodeBlock("protected override bool RunBody()", "return true"),
                 new CodeBlock("public override CliMenuSet GetSubmenu()",
                     "CliMenuSet taskSubMenuSet = new($\" Task => { Name}\")",
-                    new CodeBlock("if (Name is not null)",
-                        "var deleteTaskCommand = new DeleteTaskCommand(_parametersManager, Name)",
-                        "taskSubMenuSet.AddMenuItem(deleteTaskCommand)",
-                        "taskSubMenuSet.AddMenuItem(new EditTaskNameCommand(_parametersManager, Name), \"Edit  task Name\")",
-                        "taskSubMenuSet.AddMenuItem(new TaskCommand(_logger, _parametersManager, Name), \"Run this task\")",
-                        new OneLineComment(
-                            "ეს საჭირო იქნება, თუ ამ მენიუში საჭირო გახდება ამოცანის დამატებითი რედაქტორების შექმნა"),
-                        $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
-                        "var task = parameters.GetTask(Name)"), "var key = ConsoleKey.Escape.Value().ToLower()",
-                    "taskSubMenuSet.AddMenuItem(key, \"Exit to level up menu\", new ExitToMainMenuCliMenuCommand(null, null), key.Length)",
+                    "var deleteTaskCommand = new DeleteTaskCommand(_parametersManager, Name)",
+                    "taskSubMenuSet.AddMenuItem(deleteTaskCommand)",
+                    "taskSubMenuSet.AddMenuItem(new EditTaskNameCommand(_parametersManager, Name))",
+                    "taskSubMenuSet.AddMenuItem(new TaskCommand(_logger, _parametersManager, Name))",
+                    new OneLineComment(
+                        "ეს საჭირო იქნება, თუ ამ მენიუში საჭირო გახდება ამოცანის დამატებითი რედაქტორების შექმნა"),
+                    $"var parameters = ({_projectNamespace}Parameters)_parametersManager.Parameters",
+                    "var task = parameters.GetTask(Name)", "var key = ConsoleKey.Escape.Value().ToLower()",
+                    "taskSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand(\"Exit to level up menu\", null), key.Length)",
                     "return taskSubMenuSet")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

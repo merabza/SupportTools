@@ -49,30 +49,23 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliTools);
 
         //პაკეტების სიის შედგენა
-        AddPackage(_consoleAppCreatorData.MainProjectData,
-            NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
+        AddPackage(_consoleAppCreatorData.MainProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
 
         if (!_consoleAppCreatorData.UseDatabase)
             return true;
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
         AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliParametersDataEdit);
-        AddReference(_consoleAppCreatorData.MainProjectData,
-            _consoleAppCreatorData.DatabaseProjectData);
-        AddReference(_consoleAppCreatorData.MainProjectData,
-            _consoleAppCreatorData.DoProjectData);
-        AddReference(_consoleAppCreatorData.MainProjectData,
-            _consoleAppCreatorData.LibProjectRepositoriesProjectData);
-        AddReference(_consoleAppCreatorData.MainProjectData,
-            _consoleAppCreatorData.DbMigrationProjectData);
+        AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.DatabaseProjectData);
+        AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.DoProjectData);
+        AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.LibProjectRepositoriesProjectData);
+        AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.DbMigrationProjectData);
 
         //რეფერენსების სიის შედგენა Do პროექტისათვის
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParameters);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParametersDataEdit);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliToolsData);
-        AddReference(_consoleAppCreatorData.DoProjectData,
-            _consoleAppCreatorData.DatabaseProjectData);
-        AddReference(_consoleAppCreatorData.DoProjectData,
-            _consoleAppCreatorData.LibProjectRepositoriesProjectData);
+        AddReference(_consoleAppCreatorData.DoProjectData, _consoleAppCreatorData.DatabaseProjectData);
+        AddReference(_consoleAppCreatorData.DoProjectData, _consoleAppCreatorData.LibProjectRepositoriesProjectData);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.DbTools);
 
         //რეფერენსების სიის შედგენა LibProjectRepositories პროექტისათვის
@@ -84,24 +77,18 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         AddReference(_consoleAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsShared);
 
         //რეფერენსების სიის შედგენა DbMigration პროექტისათვის
-        AddReference(_consoleAppCreatorData.DbMigrationProjectData,
-            _consoleAppCreatorData.DatabaseProjectData);
+        AddReference(_consoleAppCreatorData.DbMigrationProjectData, _consoleAppCreatorData.DatabaseProjectData);
 
         //პაკეტების სიის შედგენა მთავარი პროექტისათვის
-        AddPackage(_consoleAppCreatorData.MainProjectData,
-            NuGetPackages.MicrosoftEntityFrameworkCoreDesign);
+        AddPackage(_consoleAppCreatorData.MainProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreDesign);
 
         //პაკეტების სიის შედგენა DoProject პროექტისათვის
-        AddPackage(_consoleAppCreatorData.DoProjectData,
-            NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
+        AddPackage(_consoleAppCreatorData.DoProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
 
         //პაკეტების სიის შედგენა Db პროექტისათვის
-        AddPackage(_consoleAppCreatorData.DatabaseProjectData,
-            NuGetPackages.MicrosoftEntityFrameworkCore);
-        AddPackage(_consoleAppCreatorData.DatabaseProjectData,
-            NuGetPackages.MicrosoftEntityFrameworkCoreRelational);
-        AddPackage(_consoleAppCreatorData.DatabaseProjectData,
-            NuGetPackages.MicrosoftEntityFrameworkCoreSqlServer);
+        AddPackage(_consoleAppCreatorData.DatabaseProjectData, NuGetPackages.MicrosoftEntityFrameworkCore);
+        AddPackage(_consoleAppCreatorData.DatabaseProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreRelational);
+        AddPackage(_consoleAppCreatorData.DatabaseProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreSqlServer);
 
         return true;
     }
@@ -129,9 +116,9 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         //შეიქმნას პროექტის პარამეტრების კლასი
         Console.WriteLine($"Creating {ProjectName}Parameters.cs...");
-        var projectParametersClassCreator = new ProjectParametersClassCreator(Logger,
-            modelsPath, ProjectName, inNameSpace, _consoleAppCreatorData.UseDatabase,
-            _consoleAppCreatorData.UseMenu, $"{ProjectName}Parameters.cs");
+        var projectParametersClassCreator = new ProjectParametersClassCreator(Logger, modelsPath, ProjectName,
+            inNameSpace, _consoleAppCreatorData.UseDatabase, _consoleAppCreatorData.UseMenu,
+            $"{ProjectName}Parameters.cs");
         projectParametersClassCreator.CreateFileStructure();
 
         if (_consoleAppCreatorData.UseDatabase)
@@ -144,16 +131,13 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         //launchSettings.json ფაილის შექმნა (პროგრამის გაშვებისას პარამეტრების მითითებისათვის
         Console.WriteLine("Creating launchSettings.json...");
-        var launchSettingsJsonCreator =
-            new ConsoleAppLaunchSettingsJsonCreator(
-                _consoleAppCreatorData.MainProjectData.FoldersForCreate["Properties"], ProjectName,
-                SecurityPath);
+        var launchSettingsJsonCreator = new ConsoleAppLaunchSettingsJsonCreator(
+            _consoleAppCreatorData.MainProjectData.FoldersForCreate["Properties"], ProjectName, SecurityPath);
         if (!launchSettingsJsonCreator.Create())
             return Task.FromResult(false);
 
         //პარამეტრების json ფაილის შექმნა
-        var projectParametersJsonCreator =
-            new ProjectParametersJsonCreator(SecurityPath, ProjectName);
+        var projectParametersJsonCreator = new ProjectParametersJsonCreator(SecurityPath, ProjectName);
         if (!projectParametersJsonCreator.Create())
             return Task.FromResult(false);
 
@@ -170,8 +154,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         //შეიქმნას პროგრამის მთავარი მუშა კლასი
         Console.WriteLine($"Creating {ProjectName}.cs...");
         var projectMainClassCreator = new ProjectMainClassCreator(Logger,
-            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName,
-            _consoleAppCreatorData.UseDatabase,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, _consoleAppCreatorData.UseDatabase,
             $"{ProjectName}.cs");
         projectMainClassCreator.CreateFileStructure();
     }
@@ -192,16 +175,15 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         //შეიქმნას პროგრამის მთავარი მუშა კლასი
         Console.WriteLine($"Creating {ProjectName}.cs...");
-        var projectWithMenuMainClassCreator =
-            new ProjectMainClassCreatorForCliAppWithMenu(Logger,
-                _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName,
-                _consoleAppCreatorData.UseDatabase, $"{ProjectName}.cs");
+        var projectWithMenuMainClassCreator = new ProjectMainClassCreatorForCliAppWithMenu(Logger,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, _consoleAppCreatorData.UseDatabase,
+            $"{ProjectName}.cs");
         projectWithMenuMainClassCreator.CreateFileStructure();
 
         //შეიქმნას ამოცანის წაშლის ბრძანების კლასი
         Console.WriteLine("Creating DeleteTaskCommand.cs...");
-        var deleteTaskCommandCreator = new DeleteTaskCommandCreator(Logger, menuCommands,
-            ProjectName, _consoleAppCreatorData.UseDatabase, "DeleteTaskCommand.cs");
+        var deleteTaskCommandCreator = new DeleteTaskCommandCreator(Logger, menuCommands, ProjectName,
+            _consoleAppCreatorData.UseDatabase, "DeleteTaskCommand.cs");
         deleteTaskCommandCreator.CreateFileStructure();
 
         //შეიქმნას ამოცანის მოდელის კლასი
@@ -215,39 +197,32 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
         //შეიქმნას ამოცანის რედაქტირების ბრძანების კლასი
         Console.WriteLine("Creating EditTaskNameCommand.cs...");
-        var editTaskNameCommandCreator =
-            new EditTaskNameCommandCreator(Logger, menuCommands, ProjectName,
-                _consoleAppCreatorData.UseDatabase,
-                "EditTaskNameCommand.cs");
+        var editTaskNameCommandCreator = new EditTaskNameCommandCreator(Logger, menuCommands, ProjectName,
+            _consoleAppCreatorData.UseDatabase, "EditTaskNameCommand.cs");
         editTaskNameCommandCreator.CreateFileStructure();
 
         //შეიქმნას ახალი ამოცანის შექმნის ბრძანების კლასი
         Console.WriteLine("Creating NewTaskCommand.cs...");
-        var newTaskCommandCreator =
-            new NewTaskCommandCreator(Logger, menuCommands, ProjectName,
-                _consoleAppCreatorData.UseDatabase, "NewTaskCommand.cs");
+        var newTaskCommandCreator = new NewTaskCommandCreator(Logger, menuCommands, ProjectName,
+            _consoleAppCreatorData.UseDatabase, "NewTaskCommand.cs");
         newTaskCommandCreator.CreateFileStructure();
 
         //შეიქმნას ახალი ამოცანის შექმნის ბრძანების კლასი
         Console.WriteLine("Creating TaskCommand.cs...");
-        var taskCommandCreator =
-            new TaskCommandCreator(Logger, menuCommands, ProjectName,
-                _consoleAppCreatorData.UseDatabase, "TaskCommand.cs");
+        var taskCommandCreator = new TaskCommandCreator(Logger, menuCommands, ProjectName,
+            _consoleAppCreatorData.UseDatabase, "TaskCommand.cs");
         taskCommandCreator.CreateFileStructure();
 
         //შეიქმნას ახალი ამოცანის შექმნის ბრძანების კლასი
         Console.WriteLine("Creating TaskSubMenuCommand.cs...");
-        var taskSubMenuCommandCreator =
-            new TaskSubMenuCommandCreator(Logger, menuCommands, ProjectName,
-                _consoleAppCreatorData.UseDatabase,
-                "TaskSubMenuCommand.cs");
+        var taskSubMenuCommandCreator = new TaskSubMenuCommandCreator(Logger, menuCommands, ProjectName,
+            _consoleAppCreatorData.UseDatabase, "TaskSubMenuCommand.cs");
         taskSubMenuCommandCreator.CreateFileStructure();
 
         //შეიქმნას ამოცანის გამშვები კლასი
         Console.WriteLine($"Creating {ProjectName}TaskRunner.cs...");
         var projectTaskRunnerCreator = new ProjectTaskRunnerCreator(Logger,
-            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName,
-            _consoleAppCreatorData.UseDatabase,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, _consoleAppCreatorData.UseDatabase,
             $"{ProjectName}TaskRunner.cs");
         projectTaskRunnerCreator.CreateFileStructure();
     }
@@ -256,36 +231,29 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     {
         //შეიქმნას აპლიკაციის სერვისების შემქმნელი კლასი StatProgramAttr.cs
         Console.WriteLine($"Creating {ProjectName}ServicesCreator.cs...");
-        var projectServicesCreatorClassCreator =
-            new ProjectServicesCreatorClassCreator(Logger,
-                _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName,
-                $"{ProjectName}ServicesCreator.cs");
+        var projectServicesCreatorClassCreator = new ProjectServicesCreatorClassCreator(Logger,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, $"{ProjectName}ServicesCreator.cs");
         projectServicesCreatorClassCreator.CreateFileStructure();
 
         Console.WriteLine($"Creating {ProjectName}DesignTimeDbContextFactory.cs...");
-        var projectDesignTimeDbContextFactoryClassCreator =
-            new ProjectDesignTimeDbContextFactoryClassCreator(Logger,
-                _consoleAppCreatorData.MainProjectData.ProjectFullPath,
-                ProjectName, $"{ProjectName}DesignTimeDbContextFactory.cs");
+        var projectDesignTimeDbContextFactoryClassCreator = new ProjectDesignTimeDbContextFactoryClassCreator(Logger,
+            _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName,
+            $"{ProjectName}DesignTimeDbContextFactory.cs");
         projectDesignTimeDbContextFactoryClassCreator.CreateFileStructure();
 
         //---===libProjectRepositories პროექტის ფაილები===---
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი ინტერფეისი
         Console.WriteLine($"Creating I{ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricInterfaceCreator =
-            new RepositoryCreatorFabricInterfaceCreator(Logger,
-                _consoleAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                ProjectName,
-                $"I{ProjectName}RepositoryCreatorFabric.cs");
+        var repositoryCreatorFabricInterfaceCreator = new RepositoryCreatorFabricInterfaceCreator(Logger,
+            _consoleAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"I{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricInterfaceCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი
         Console.WriteLine($"Creating {ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricCreator =
-            new RepositoryCreatorFabricCreator(Logger,
-                _consoleAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                ProjectName,
-                $"{ProjectName}RepositoryCreatorFabric.cs");
+        var repositoryCreatorFabricCreator = new RepositoryCreatorFabricCreator(Logger,
+            _consoleAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორია
@@ -305,15 +273,12 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         //---===ბაზის კონტექსტის პროექტის ფაილები===---
         Console.WriteLine($"Creating {ProjectName}DbContext.cs...");
         var dbContextClassCreator = new DbContextClassCreator(Logger,
-            _consoleAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName,
-            $"{ProjectName}DbContext.cs");
+            _consoleAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName, $"{ProjectName}DbContext.cs");
         dbContextClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating DesignTimeDbContextFactory.cs...");
-        var designTimeDbContextFactoryClassCreator =
-            new DesignTimeDbContextFactoryClassCreator(Logger,
-                _consoleAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName,
-                "DesignTimeDbContextFactory.cs");
+        var designTimeDbContextFactoryClassCreator = new DesignTimeDbContextFactoryClassCreator(Logger,
+            _consoleAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName, "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestModel.cs...");

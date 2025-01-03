@@ -29,7 +29,7 @@ public sealed class TaskCommandCreator : CodeCreator
                 "private readonly IParametersManager _parametersManager", "private readonly string _taskName",
                 string.Empty,
                 new CodeBlock(
-                    "public TaskCommand(ILogger logger, IParametersManager parametersManager, string taskName)",
+                    "public TaskCommand(ILogger logger, IParametersManager parametersManager, string taskName) : base(\"Task Command\")",
                     "_logger = logger", "_parametersManager = parametersManager", "_taskName = taskName"),
                 new CodeBlock("protected override bool RunBody()", "MenuAction = EMenuAction.Reload",
                     $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",

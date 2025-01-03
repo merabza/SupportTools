@@ -27,7 +27,7 @@ public sealed class EditTaskNameCommandCreator : CodeCreator
                 "private readonly ParametersManager _parametersManager", "private readonly string _taskName",
                 new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
                 new CodeBlock(
-                    "public EditTaskNameCommand(ParametersManager parametersManager, string taskName) : base(\"Edit Task\",taskName)",
+                    "public EditTaskNameCommand(ParametersManager parametersManager, string taskName) : base(\"Edit Task\", EMenuAction.LevelUp)",
                     "_parametersManager = parametersManager", "_taskName = taskName"),
                 new CodeBlock("protected override bool RunBody()",
                     $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
@@ -45,7 +45,7 @@ public sealed class EditTaskNameCommandCreator : CodeCreator
                         "StShared.WriteErrorLine($\"Cannot change  Task with name { _taskName } to { newTaskName }, because cannot add this  task\", true)",
                         "return false"), string.Empty,
                     "_parametersManager.Save(parameters, $\" Task Renamed from { _taskName } To { newTaskName }\")",
-                    string.Empty, "MenuAction = EMenuAction.LevelUp", "return true"),
+                    string.Empty, "return true"),
                 new CodeBlock("protected override string GetStatus()", "return _taskName")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

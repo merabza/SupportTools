@@ -27,7 +27,7 @@ public sealed class DeleteTaskCommandCreator : CodeCreator
             new CodeBlock("public sealed class DeleteTaskCommand : CliMenuCommand",
                 "private readonly ParametersManager _parametersManager", "private readonly string _taskName",
                 new CodeBlock(
-                    "public DeleteTaskCommand(ParametersManager parametersManager, string taskName) : base(\"Delete Task\",taskName)",
+                    "public DeleteTaskCommand(ParametersManager parametersManager, string taskName) : base(\"Delete Task\", EMenuAction.LevelUp)",
                     "_parametersManager = parametersManager", "_taskName = taskName"),
                 new CodeBlock("protected override bool RunBody()",
                     $"var parameters = ({_projectNamespace}Parameters) _parametersManager.Parameters",
@@ -37,8 +37,7 @@ public sealed class DeleteTaskCommandCreator : CodeCreator
                     new CodeBlock(
                         "if (!Inputer.InputBool($\"This will Delete  Task { _taskName }.are you sure ? \", false, false))",
                         "return false"), "parameters.RemoveTask(_taskName)",
-                    "_parametersManager.Save(parameters, $\"Task { _taskName } deleted.\")",
-                    "MenuAction = EMenuAction.LevelUp", "return true")));
+                    "_parametersManager.Save(parameters, $\"Task { _taskName } deleted.\")", "return true")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }
