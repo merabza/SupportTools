@@ -36,6 +36,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
             "using SystemToolsShared",
             "using CliParameters",
             "using LibParameters",
+            $"using {_projectNamespace}",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : null,
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using Microsoft.Extensions.DependencyInjection",
