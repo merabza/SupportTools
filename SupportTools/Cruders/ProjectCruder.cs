@@ -49,6 +49,8 @@ public sealed class ProjectCruder : ParCruder
             nameof(ProjectModel.DevDatabaseParameters), parametersManager));
         FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
             nameof(ProjectModel.ProdCopyDatabaseConnectionParameters), parametersManager));
+        FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
+            nameof(ProjectModel.ProdCopyDatabasesParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ScaffoldSeederProjectName)));
