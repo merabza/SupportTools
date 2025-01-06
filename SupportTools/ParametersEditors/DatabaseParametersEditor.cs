@@ -44,11 +44,11 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
         FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideLogFolderPath)));
 
-        //ბაზის სახელის არჩევა ხდება სერვერზე არსებული ბაზების სახელებიდან.
-        //შესაძლებელია ახალი სახელის მითითება, თუ ბაზა ჯერ არ არსებობს
-        FieldEditors.Add(new DatabaseNameFieldEditor(logger, httpClientFactory,
-            nameof(DatabasesParameters.CurrentBaseName), listsParametersManager,
-            nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName), true));
+        ////ბაზის სახელის არჩევა ხდება სერვერზე არსებული ბაზების სახელებიდან.
+        ////შესაძლებელია ახალი სახელის მითითება, თუ ბაზა ჯერ არ არსებობს
+        //FieldEditors.Add(new DatabaseNameFieldEditor(logger, httpClientFactory,
+        //    nameof(DatabasesParameters.CurrentBaseName), listsParametersManager,
+        //    nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName), true));
 
         //ბაზის სახელის არჩევა ხდება სერვერზე არსებული ბაზების სახელებიდან.
         //შესაძლებელია ახალი სახელის მითითება, თუ ბაზა ჯერ არ არსებობს
@@ -56,7 +56,7 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //თუ განსხვავდება მიმდინარე სახელისგან, ეს ნიშნავს, რომ გვჭირდება მიმდინარე ბაზის შენარჩუნება
         //ხოლო ახალი ბაზისათვის მზად არის ახალი პროგრამა.
         //მას მერე, რაც საჭიროება აღარ იქნება, CurrentBaseName და BaseName სახელები ერთმანეთს უნდა დაემთხვას.
-        FieldEditors.Add(new DatabaseNameFieldEditor(logger, httpClientFactory, nameof(DatabasesParameters.NewBaseName),
+        FieldEditors.Add(new DatabaseNameFieldEditor(logger, httpClientFactory, nameof(DatabasesParameters.DatabaseName),
             listsParametersManager, nameof(DatabasesParameters.DbConnectionName),
             nameof(DatabasesParameters.DbWebAgentName), true));
 
