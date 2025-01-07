@@ -9,7 +9,6 @@
     <ProjectReference Include="..\..\AppCliTools\CliParametersDataEdit\CliParametersDataEdit.csproj" />
     <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
     <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\LibMenuInput\LibMenuInput.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />

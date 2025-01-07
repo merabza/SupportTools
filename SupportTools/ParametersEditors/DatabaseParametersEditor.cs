@@ -7,7 +7,6 @@ using CliParametersDataEdit.FieldEditors;
 using CliParametersDataEdit.Models;
 using CliParametersEdit.FieldEditors;
 using DbTools;
-using LibDatabaseWork.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 
@@ -38,9 +37,9 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //    listsParametersManager));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბექაპის შენახვა
-        FieldEditors.Add(new DbServerSideBackupPathFieldEditor(nameof(DatabasesParameters.DbServerSideBackupPath),
-            listsParametersManager, nameof(DatabasesParameters.DbWebAgentName),
-            nameof(DatabasesParameters.DbConnectionName)));
+        //FieldEditors.Add(new DbServerSideBackupPathFieldEditor(nameof(DatabasesParameters.DbServerSideBackupPath),
+        //    listsParametersManager, nameof(DatabasesParameters.DbWebAgentName),
+        //    nameof(DatabasesParameters.DbConnectionName)));
 
         //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
         FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideDataFolderPath)));
