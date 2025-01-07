@@ -37,12 +37,12 @@ public static class ToolCommandFabric
         ETools.AppSettingsEncoder,
         ETools.AppSettingsInstaller,
         ETools.AppSettingsUpdater,
-        ETools.LocalBaseToServerCopier,
+        ETools.DevBaseToServerCopier,
         ETools.ProgPublisher,
         ETools.ProgramInstaller,
         ETools.ProgramUpdater,
         ETools.ProgRemover,
-        ETools.ServerBaseToLocalCopier,
+        ETools.ServerBaseToProdCopyCopier,
         ETools.ServiceInstallScriptCreator,
         ETools.ServiceRemoveScriptCreator,
         ETools.ServiceStarter,
@@ -57,23 +57,20 @@ public static class ToolCommandFabric
         switch (tool)
         {
             case ETools.CorrectNewDatabase:
-                var correctNewDbParameters =
-                    CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
+                var correctNewDbParameters = CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
                 if (correctNewDbParameters is not null)
                     return new CorrectNewDatabase(logger, correctNewDbParameters, parametersManager); //ახალი ბაზის 
                 StShared.WriteErrorLine("correctNewDbParameters is null", true);
                 return null;
             case ETools.CreateDevDatabaseByMigration:
-                var dmpCreator =
-                    DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpCreator = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
                 if (dmpCreator is not null)
                     return new DatabaseMigrationCreator(logger, dmpCreator,
                         parametersManager); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
                 StShared.WriteErrorLine("dmpCreator is null", true);
                 return null;
             case ETools.DropDevDatabase:
-                var dmpForDropper =
-                    DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpForDropper = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
                 if (dmpForDropper is not null)
                     return new DatabaseDropper(logger, dmpForDropper, parametersManager); //დეველოპერ ბაზის წაშლა
                 StShared.WriteErrorLine("dmpForDropper is null", true);
@@ -97,8 +94,7 @@ public static class ToolCommandFabric
                 StShared.WriteErrorLine("jsonFromProjectDbProjectGetterParameters is null", true);
                 return null;
             case ETools.RecreateDevDatabase:
-                var dmpForReCreator =
-                    DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpForReCreator = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
                 var correctNewDbParametersForRecreate =
                     CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
                 if (dmpForReCreator is null)
@@ -121,8 +117,7 @@ public static class ToolCommandFabric
                 StShared.WriteErrorLine("scaffoldSeederCreatorParameters is null", true);
                 return null;
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა
-                var dataSeederParameters =
-                    DataSeederParameters.Create(supportToolsParameters, projectName);
+                var dataSeederParameters = DataSeederParameters.Create(supportToolsParameters, projectName);
                 if (dataSeederParameters is not null)
                     return new DataSeeder(logger, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);
@@ -130,12 +125,12 @@ public static class ToolCommandFabric
             case ETools.AppSettingsEncoder:
             case ETools.AppSettingsInstaller:
             case ETools.AppSettingsUpdater:
-            case ETools.LocalBaseToServerCopier:
+            case ETools.DevBaseToServerCopier:
             case ETools.ProgPublisher:
             case ETools.ProgramInstaller:
             case ETools.ProgramUpdater:
             case ETools.ProgRemover:
-            case ETools.ServerBaseToLocalCopier:
+            case ETools.ServerBaseToProdCopyCopier:
             case ETools.ServiceInstallScriptCreator:
             case ETools.ServiceRemoveScriptCreator:
             case ETools.ServiceStarter:
@@ -151,6 +146,30 @@ public static class ToolCommandFabric
         IParametersManager parametersManager, string projectName, ServerInfoModel serverInfo)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
+
+        var project = supportToolsParameters.GetProject(projectName);
+        if (project == null)
+        {
+            StShared.WriteErrorLine($"Project with name {projectName} not found", true);
+            return null;
+        }
+
+        //შევამოწმოთ პროექტის პარამეტრები
+        if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
+            return null;
+        }
+
+        //შევამოწმოთ სერვერის პარამეტრები
+        var server = supportToolsParameters.GetServerData(serverInfo.ServerName);
+        if (server is null)
+        {
+            StShared.WriteErrorLine($"Server with name {serverInfo.ServerName} not found", true);
+            return null;
+        }
+
+
         switch (tool)
         {
             case ETools.AppSettingsEncoder: //  EncodeParameters, //პარამეტრების დაშიფვრა
@@ -158,8 +177,7 @@ public static class ToolCommandFabric
                 var appSettingsEncoderParameters =
                     AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (appSettingsEncoderParameters is not null)
-                    return new ApplicationSettingsEncoder(logger, appSettingsEncoderParameters,
-                        parametersManager);
+                    return new ApplicationSettingsEncoder(logger, appSettingsEncoderParameters, parametersManager);
                 StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
                 return null;
             case ETools.AppSettingsInstaller: //  InstallParameters, //დაშიფრული პარამეტრების განახლება
@@ -180,9 +198,23 @@ public static class ToolCommandFabric
                         parametersManager, true);
                 StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
                 return null;
-            case ETools.LocalBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+            case ETools.DevBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+                if (project.DevDatabaseParameters == null)
+                {
+                    StShared.WriteErrorLine(
+                        $"DevDatabaseParameters is not specified for Project with name {projectName}", true);
+                    return null;
+                }
+
+                if (serverInfo.NewDatabaseParameters == null)
+                {
+                    StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
+                    return null;
+                }
+
                 var copyBaseParametersDevToProd = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
-                    httpClientFactory, false, supportToolsParameters, projectName, serverInfo).Result;
+                    httpClientFactory, project.DevDatabaseParameters, serverInfo.NewDatabaseParameters,
+                    supportToolsParameters).Result;
                 if (copyBaseParametersDevToProd is not null)
                     return new BaseCopier(logger, copyBaseParametersDevToProd, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
@@ -270,9 +302,25 @@ public static class ToolCommandFabric
                         true);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
                 return null;
-            case ETools.ServerBaseToLocalCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+            case ETools.ServerBaseToProdCopyCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+
+                if (project.ProdCopyDatabasesParameters == null)
+                {
+                    StShared.WriteErrorLine(
+                        $"ProdCopyDatabasesParameters is not specified for Project with name {projectName}", true);
+                    return null;
+                }
+
+                if (serverInfo.CurrentDatabaseParameters == null)
+                {
+                    StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}", true);
+                    return null;
+                }
+
                 var copyBaseParametersProdToDev = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
-                    httpClientFactory, true, supportToolsParameters, projectName, serverInfo).Result;
+                    httpClientFactory, serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabasesParameters,
+                    supportToolsParameters).Result;
+
                 if (copyBaseParametersProdToDev is not null)
                     return new BaseCopier(logger, copyBaseParametersProdToDev, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);

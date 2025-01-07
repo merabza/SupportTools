@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DbTools;
+using LibDatabaseParameters;
 using LibFileParameters.Models;
 using LibGitData.Models;
 using LibGitWork;
@@ -14,14 +15,13 @@ namespace LibScaffoldSeeder.Models;
 public sealed class ScaffoldSeederCreatorParameters : IParameters
 {
     private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder,
-        string projectName,
-        string scaffoldSeederProjectName, string projectSecurityFolderPath, string projectShortPrefix,
-        string mainDatabaseProjectName, string projectDbContextClassName, EDataProvider devDatabaseDataProvider,
-        string devDatabaseConnectionString, EDataProvider prodCopyDatabaseDataProvider,
-        string prodCopyDatabaseConnectionString, string newDataSeedingClassLibProjectName,
-        SmartSchema smartSchemaForLocal, string excludesRulesParametersFilePath, string fakeHostProjectName,
-        string? migrationSqlFilesFolder, GitProjects gitProjects, GitRepos gitRepos,
-        Dictionary<string, string> gitIgnoreModelFilePaths)
+        string projectName, string scaffoldSeederProjectName, string projectSecurityFolderPath,
+        string projectShortPrefix, string mainDatabaseProjectName, string projectDbContextClassName,
+        EDataProvider devDatabaseDataProvider, string devDatabaseConnectionString,
+        EDataProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString,
+        string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
+        string excludesRulesParametersFilePath, string fakeHostProjectName, string? migrationSqlFilesFolder,
+        GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths)
     {
         LogFolder = logFolder;
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
@@ -146,21 +146,31 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 return null;
             }
 
-            if (string.IsNullOrWhiteSpace(project.DevDatabaseConnectionParameters?.ConnectionString))
+            if (project.DevDatabaseParameters is null)
             {
-                StShared.WriteErrorLine(
-                    $"DevDatabaseConnectionParameters.ConnectionString does not specified for Project {projectName}",
+                StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
+                return null;
+            }
+
+            var devConnectionString = project.GetDevDatabaseConnectionString(projectName,
+                new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections));
+
+            if (string.IsNullOrWhiteSpace(devConnectionString))
+                return null;
+
+
+            if (project.ProdCopyDatabasesParameters is null)
+            {
+                StShared.WriteErrorLine($"ProdCopyDatabasesParameters does not specified for Project {projectName}",
                     true);
                 return null;
             }
 
-            if (string.IsNullOrWhiteSpace(project.ProdCopyDatabaseConnectionParameters?.ConnectionString))
-            {
-                StShared.WriteErrorLine(
-                    $"ProdCopyDatabaseConnectionParameters.ConnectionString does not specified for Project {projectName}",
-                    true);
+            var prodCopyConnectionString = project.GetProdCopyDatabaseConnectionString(projectName,
+                new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections));
+
+            if (string.IsNullOrWhiteSpace(prodCopyConnectionString))
                 return null;
-            }
 
             if (string.IsNullOrWhiteSpace(project.NewDataSeedingClassLibProjectName))
             {
@@ -187,18 +197,14 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
                 supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName,
-                project.ScaffoldSeederProjectName,
-                project.ProjectSecurityFolderPath, project.ProjectShortPrefix, project.DbContextProjectName,
-                project.DbContextName, project.DevDatabaseConnectionParameters.DataProvider,
-                project.DevDatabaseConnectionParameters.ConnectionString,
-                project.DevDatabaseConnectionParameters.DataProvider,
-                project.ProdCopyDatabaseConnectionParameters.ConnectionString,
+                project.ScaffoldSeederProjectName, project.ProjectSecurityFolderPath, project.ProjectShortPrefix,
+                project.DbContextProjectName, project.DbContextName, project.DevDatabaseParameters.DataProvider,
+                devConnectionString, project.ProdCopyDatabasesParameters.DataProvider, prodCopyConnectionString,
                 project.NewDataSeedingClassLibProjectName, smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
-                    useConsole, false),
-                supportToolsParameters.GitIgnoreModelFilePaths);
+                    useConsole, false), supportToolsParameters.GitIgnoreModelFilePaths);
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

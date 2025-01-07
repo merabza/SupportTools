@@ -6,7 +6,6 @@ using CliMenu;
 using CliParameters;
 using CliParameters.CliMenuCommands;
 using CliParameters.FieldEditors;
-using CliParametersDataEdit.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.FieldEditors;
@@ -43,12 +42,12 @@ public sealed class ProjectCruder : ParCruder
 
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
-        FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
-            nameof(ProjectModel.DevDatabaseConnectionParameters), parametersManager));
+        //FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
+        //    nameof(ProjectModel.DevDatabaseConnectionParameters), parametersManager));
         FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
             nameof(ProjectModel.DevDatabaseParameters), parametersManager));
-        FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
-            nameof(ProjectModel.ProdCopyDatabaseConnectionParameters), parametersManager));
+        //FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
+        //    nameof(ProjectModel.ProdCopyDatabaseConnectionParameters), parametersManager));
         FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
             nameof(ProjectModel.ProdCopyDatabasesParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));

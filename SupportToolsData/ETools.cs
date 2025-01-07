@@ -24,10 +24,10 @@ public enum ETools
 
     //(DownloadParameters=>StopProgramIfRunning=>UpdateParameters=>StartServiceIfRequired)
     AppSettingsUpdater, //  UpdateParameters, //პარამეტრების დაშიფვრა და დაინსტალირებული პროგრამისთვის ამ დაშიფრული პარამეტრების გადაგზავნა-განახლება
-    LocalBaseToServerCopier, //ბაზის დაკოპირება ლოკალური კომპიუტერიდან მოშორებულ სერვერზე.
+    DevBaseToServerCopier, //Dev ბაზის დაკოპირება სერვერზე.
     ServiceInstallScriptCreator, //მოშორებულ სერვერზე გასაშვები საინსტალაციო სკრიპტის შექმნა
     ServiceRemoveScriptCreator, //მოშორებულ სერვერზე გასაშვები საინსტალაციო სკრიპტის შექმნა
-    ServerBaseToLocalCopier, //ბაზის დაკოპირება მოშორებული სერვერიდან ლოკალურ სერვერზე.
+    ServerBaseToProdCopyCopier, //სერვერიდან ბაზის დაკოპირება ProdCopy ბაზაში.
 
     //EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange=>
     //(RunAppSettingsInstaller)(DownloadParameters=>StopProgramIfRunning=>UpdateParameters=>StartServiceIfRequired)

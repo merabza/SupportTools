@@ -42,8 +42,6 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForExchange),
             parametersManager));
         //---
-        FieldEditors.Add(new DatabaseBackupParametersFieldEditor(logger, nameof(SupportToolsParameters.FullDbBackupParameters),
-            parametersManager));
         FieldEditors.Add(new InstallerSettingsFieldEditor(logger, nameof(SupportToolsParameters.LocalInstallerSettings),
             parametersManager));
         FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(logger,

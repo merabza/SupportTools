@@ -1,6 +1,8 @@
 //Created by ProjectParametersClassCreator at 5/9/2021 13:38:34
 
+using CliParametersDataEdit;
 using DbTools;
+using LibDatabaseParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
@@ -36,25 +38,24 @@ public sealed class CorrectNewDbParameters : IParameters
             return null;
         }
 
-        if (project.DevDatabaseConnectionParameters is null)
+        if (project.DevDatabaseParameters is null)
         {
             logger.LogError("Project with name {projectName} does not contains DevDatabaseConnectionParameters",
                 projectName);
             return null;
         }
 
-        if (project.DevDatabaseConnectionParameters.ConnectionString is null)
+        DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
+        var connectionString =
+            DbConnectionFabric.GetDbConnectionString(project.DevDatabaseParameters, databaseServerConnections);
+        if (connectionString is null)
         {
-            logger.LogError(
-                "Project with name {projectName} does not contains ConnectionString in DevDatabaseConnectionParameters",
-                projectName);
+            logger.LogError("could not Created Connection String form Project with name {projectName}", projectName);
             return null;
         }
 
-        var correctNewDbParameters = new CorrectNewDbParameters(
-            project.DevDatabaseConnectionParameters.DataProvider,
-            project.DevDatabaseConnectionParameters.ConnectionString,
-            project.DevDatabaseConnectionParameters.CommandTimeOut);
+        var correctNewDbParameters = new CorrectNewDbParameters(project.DevDatabaseParameters.DataProvider,
+            connectionString, project.DevDatabaseParameters.CommandTimeOut);
 
         return correctNewDbParameters;
     }

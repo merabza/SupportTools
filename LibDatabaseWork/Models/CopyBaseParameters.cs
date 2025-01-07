@@ -1,6 +1,5 @@
 ﻿using DatabasesManagement;
 using FileManagersMain;
-using LibDatabaseParameters;
 using LibFileParameters.Models;
 using LibParameters;
 
@@ -11,13 +10,16 @@ public sealed class CopyBaseParameters : IParameters
     // ReSharper disable once ConvertToPrimaryConstructor
     public CopyBaseParameters(IDatabaseManager databaseManagerForSource, IDatabaseManager databaseManagerForDestination,
         FileManager? exchangeFileManager, FileManager sourceFileManager, FileManager destinationFileManager,
-        FileManager localFileManager, DatabaseBackupParametersDomain sourceDbBackupParameters,
-        DatabaseBackupParametersDomain destinationDbBackupParameters, bool needDownloadFromSource,
-        SmartSchema? sourceSmartSchema, SmartSchema? localSmartSchema, bool needUploadToDestination,
-        SmartSchema? destinationSmartSchema, bool needDownloadFromExchange, SmartSchema? exchangeSmartSchema,
-        bool needDownloadFromDestination, bool needUploadDestinationToExchange, string downloadTempExtension,
-        string uploadTempExtension, string sourceDatabaseName, string? destinationDbServerSideDataFolderPath,
-        string? destinationDbServerSideLogFolderPath, string destinationDatabaseName, string localPath)
+        FileManager localFileManager,
+        //DatabaseBackupParametersDomain sourceDbBackupParameters,
+        //DatabaseBackupParametersDomain destinationDbBackupParameters, 
+        bool needDownloadFromSource, SmartSchema? sourceSmartSchema, SmartSchema? localSmartSchema,
+        bool needUploadToDestination, SmartSchema? destinationSmartSchema, bool needDownloadFromExchange,
+        SmartSchema? exchangeSmartSchema, bool needDownloadFromDestination, bool needUploadDestinationToExchange,
+        string downloadTempExtension, string uploadTempExtension, string sourceDatabaseName,
+        //string? destinationDbServerSideDataFolderPath,
+        //string? destinationDbServerSideLogFolderPath, 
+        string destinationDatabaseName, string localPath)
     {
         DatabaseManagerForSource = databaseManagerForSource;
         DatabaseManagerForDestination = databaseManagerForDestination;
@@ -25,8 +27,8 @@ public sealed class CopyBaseParameters : IParameters
         SourceFileManager = sourceFileManager;
         DestinationFileManager = destinationFileManager;
         LocalFileManager = localFileManager;
-        SourceDbBackupParameters = sourceDbBackupParameters;
-        DestinationDbBackupParameters = destinationDbBackupParameters;
+        //SourceDbBackupParameters = sourceDbBackupParameters;
+        //DestinationDbBackupParameters = destinationDbBackupParameters;
         NeedDownloadFromSource = needDownloadFromSource;
         SourceSmartSchema = sourceSmartSchema;
         LocalSmartSchema = localSmartSchema;
@@ -39,8 +41,8 @@ public sealed class CopyBaseParameters : IParameters
         DownloadTempExtension = downloadTempExtension;
         UploadTempExtension = uploadTempExtension;
         SourceDatabaseName = sourceDatabaseName;
-        DestinationDbServerSideDataFolderPath = destinationDbServerSideDataFolderPath;
-        DestinationDbServerSideLogFolderPath = destinationDbServerSideLogFolderPath;
+        //DestinationDbServerSideDataFolderPath = destinationDbServerSideDataFolderPath;
+        //DestinationDbServerSideLogFolderPath = destinationDbServerSideLogFolderPath;
         DestinationDatabaseName = destinationDatabaseName;
         LocalPath = localPath;
     }
@@ -50,12 +52,15 @@ public sealed class CopyBaseParameters : IParameters
     public FileManager? ExchangeFileManager { get; }
     public FileManager SourceFileManager { get; }
     public FileManager DestinationFileManager { get; }
+
     public FileManager LocalFileManager { get; }
-    public DatabaseBackupParametersDomain SourceDbBackupParameters { get; }
+
+    //public DatabaseBackupParametersDomain SourceDbBackupParameters { get; }
     public string SourceDatabaseName { get; }
-    public string? DestinationDbServerSideDataFolderPath { get; }
-    public string? DestinationDbServerSideLogFolderPath { get; }
-    public DatabaseBackupParametersDomain DestinationDbBackupParameters { get; }
+
+    //public string? DestinationDbServerSideDataFolderPath { get; }
+    //public string? DestinationDbServerSideLogFolderPath { get; }
+    //public DatabaseBackupParametersDomain DestinationDbBackupParameters { get; }
     public string DestinationDatabaseName { get; }
     public bool NeedDownloadFromSource { get; }
     public SmartSchema? SourceSmartSchema { get; }
