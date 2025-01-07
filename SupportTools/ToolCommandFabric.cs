@@ -313,7 +313,8 @@ public static class ToolCommandFabric
 
                 if (serverInfo.CurrentDatabaseParameters == null)
                 {
-                    StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}", true);
+                    StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}",
+                        true);
                     return null;
                 }
 

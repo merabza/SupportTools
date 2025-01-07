@@ -290,16 +290,13 @@ internal sealed class ProjectRecordCreator
                         $"appsetenkeys{jsonExtension}")
                     : null,
             KeyGuidPart = _newProjectKeyGuidPart,
-            
-            DevDatabaseParameters =
-                new DatabasesParameters
-                {
-                    DataProvider = EDataProvider.Sql,
-                    //ბაზასთან დაკავშირების პარამეტრი უნდა ავიღოთ პრექტის შემქმნელის პარამეტრებიდან
-                    DbConnectionName =
-                        supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName,
-                    DatabaseName = $"{_newProjectName}ProdCopy"
-                },
+            DevDatabaseParameters = new DatabasesParameters
+            {
+                DataProvider = EDataProvider.Sql,
+                //ბაზასთან დაკავშირების პარამეტრი უნდა ავიღოთ პრექტის შემქმნელის პარამეტრებიდან
+                DbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName,
+                DatabaseName = $"{_newProjectName}ProdCopy"
+            },
             RedundantFileNames = redundantFileNames,
             GitProjectNames = gitProjectNames,
             ScaffoldSeederGitProjectNames = _templateModel is { UseDatabase: true, UseCarcass: true }
@@ -339,7 +336,7 @@ internal sealed class ProjectRecordCreator
             AppSettingsEncodedJsonFileName =
                 Path.Combine(securityFolder, _newProjectName, productionServerName,
                     $"appsettingsEncoded{jsonExtension}"),
-            ServiceUserName = serverData.FilesUserName,
+            ServiceUserName = serverData.FilesUserName
             //DatabasesExchangeParameters = new DatabasesExchangeParameters
             //{
             //    ProductionDbWebAgentName = productionServerWebAgentName,
