@@ -40,9 +40,12 @@ public sealed class ProjectModel : ItemData
     public string? ExcludesRulesParametersFilePath { get; init; }
     public string? AppSetEnKeysJsonFileName { get; init; }
     public string? KeyGuidPart { get; init; }
+
     public string? MigrationSqlFilesFolder { get; set; }
+
     //public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; init; }
     public DatabasesParameters? DevDatabaseParameters { get; init; }
+
     //public DatabaseConnectionParameters? ProdCopyDatabaseConnectionParameters { get; set; }
     public DatabasesParameters? ProdCopyDatabasesParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];
@@ -121,9 +124,9 @@ public sealed class ProjectModel : ItemData
     }
 
 
-    public string? GetDevDatabaseConnectionString(string projectName, DatabaseServerConnections databaseServerConnections)
+    public string? GetDevDatabaseConnectionString(string projectName,
+        DatabaseServerConnections databaseServerConnections)
     {
-        
         if (DevDatabaseParameters is null)
         {
             StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
@@ -132,17 +135,16 @@ public sealed class ProjectModel : ItemData
 
         var connectionString =
             DbConnectionFabric.GetDbConnectionString(DevDatabaseParameters, databaseServerConnections);
-        if (connectionString is not null) 
+        if (connectionString is not null)
             return connectionString;
 
         StShared.WriteErrorLine($"could not Created Dev Connection String form Project with name {projectName}", true);
         return null;
-
     }
 
-    public string? GetProdCopyDatabaseConnectionString(string projectName, DatabaseServerConnections databaseServerConnections)
+    public string? GetProdCopyDatabaseConnectionString(string projectName,
+        DatabaseServerConnections databaseServerConnections)
     {
-        
         if (ProdCopyDatabasesParameters is null)
         {
             StShared.WriteErrorLine($"ProdCopyDatabasesParameters does not specified for Project {projectName}", true);
@@ -151,14 +153,11 @@ public sealed class ProjectModel : ItemData
 
         var connectionString =
             DbConnectionFabric.GetDbConnectionString(ProdCopyDatabasesParameters, databaseServerConnections);
-        if (connectionString is not null) 
+        if (connectionString is not null)
             return connectionString;
 
-        StShared.WriteErrorLine($"could not Created Prod Copy Connection String form Project with name {projectName}", true);
+        StShared.WriteErrorLine($"could not Created Prod Copy Connection String form Project with name {projectName}",
+            true);
         return null;
-
     }
-
-    
-
 }

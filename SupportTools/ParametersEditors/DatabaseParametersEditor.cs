@@ -41,11 +41,17 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //    listsParametersManager, nameof(DatabasesParameters.DbWebAgentName),
         //    nameof(DatabasesParameters.DbConnectionName)));
 
-        //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
-        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideDataFolderPath)));
 
-        //ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
-        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideLogFolderPath)));
+        //public string? DbServerFoldersSetName { get; set; }
+        FieldEditors.Add(new DbServerFoldersSetNameFieldEditor(logger, httpClientFactory,
+            nameof(DatabasesParameters.DbServerFoldersSetName), listsParametersManager,
+            nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName)));
+
+        ////ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
+        //FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideDataFolderPath)));
+
+        ////ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის ლოგების ფაილის აღდგენა
+        //FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideLogFolderPath)));
 
         ////ბაზის სახელის არჩევა ხდება სერვერზე არსებული ბაზების სახელებიდან.
         ////შესაძლებელია ახალი სახელის მითითება, თუ ბაზა ჯერ არ არსებობს
