@@ -46,16 +46,19 @@ public sealed class CorrectNewDbParameters : IParameters
         }
 
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
-        var connectionString =
-            DbConnectionFabric.GetDbConnectionString(project.DevDatabaseParameters, databaseServerConnections);
-        if (connectionString is null)
+
+        var (devDataProvider, devConnectionString) =
+            DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters, projectName,
+                databaseServerConnections);
+
+        if (devDataProvider is null || devConnectionString is null)
         {
             logger.LogError("could not Created Connection String form Project with name {projectName}", projectName);
             return null;
         }
 
-        var correctNewDbParameters = new CorrectNewDbParameters(project.DevDatabaseParameters.DataProvider,
-            connectionString, project.DevDatabaseParameters.CommandTimeOut);
+        var correctNewDbParameters = new CorrectNewDbParameters(devDataProvider.Value, devConnectionString,
+            project.DevDatabaseParameters.CommandTimeOut);
 
         return correctNewDbParameters;
     }

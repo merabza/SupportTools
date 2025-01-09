@@ -29,6 +29,11 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesParameters.DbWebAgentName), listsParametersManager, true));
 
+        //მონაცემთა ბაზასთან დამაკავშირებელი ვებაგენტის სახელი
+        FieldEditors.Add(new RemoteDbConnectionNameNameFieldEditor(logger, httpClientFactory,
+            nameof(DatabasesParameters.RemoteDbConnectionName), listsParametersManager,
+            nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName)));
+
         FieldEditors.Add(new EnumFieldEditor<EDataProvider>(nameof(DatabaseConnectionParameters.DataProvider),
             EDataProvider.Sql));
 

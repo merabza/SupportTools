@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CliParametersDataEdit;
 using CliParametersDataEdit.Models;
-using LibDatabaseParameters;
 using LibGitData;
 using LibGitData.Models;
 using LibParameters;
-using SystemToolsShared;
 
 namespace SupportToolsData.Models;
 
@@ -85,11 +82,6 @@ public sealed class ProjectModel : ItemData
             : ProjectFolderRelativePath(SpaProjectName, gitProjects);
     }
 
-    //public string? SpaProjectFileName(GitProjects gitProjects)
-    //{
-    //    return string.IsNullOrWhiteSpace(SpaProjectName) ? null : ProjectFileName(SpaProjectName, gitProjects);
-    //}
-
     private string? ProjectFileName(string projectName, GitProjects gitProjects)
     {
         if (string.IsNullOrWhiteSpace(ProjectFolderName))
@@ -107,9 +99,6 @@ public sealed class ProjectModel : ItemData
         var gitProject = gitProjects.GetGitProjectByKey(projectName);
         var projectRelativePath = gitProject.ProjectRelativePath;
         return string.IsNullOrWhiteSpace(projectRelativePath) ? null : projectRelativePath;
-        //return !projectRelativePath.Contains(Path.DirectorySeparatorChar)
-        //    ? null
-        //    : projectRelativePath[..projectRelativePath.LastIndexOf(Path.DirectorySeparatorChar)];
     }
 
 
@@ -123,41 +112,4 @@ public sealed class ProjectModel : ItemData
         };
     }
 
-
-    public string? GetDevDatabaseConnectionString(string projectName,
-        DatabaseServerConnections databaseServerConnections)
-    {
-        if (DevDatabaseParameters is null)
-        {
-            StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
-            return null;
-        }
-
-        var connectionString =
-            DbConnectionFabric.GetDbConnectionString(DevDatabaseParameters, databaseServerConnections);
-        if (connectionString is not null)
-            return connectionString;
-
-        StShared.WriteErrorLine($"could not Created Dev Connection String form Project with name {projectName}", true);
-        return null;
-    }
-
-    public string? GetProdCopyDatabaseConnectionString(string projectName,
-        DatabaseServerConnections databaseServerConnections)
-    {
-        if (ProdCopyDatabasesParameters is null)
-        {
-            StShared.WriteErrorLine($"ProdCopyDatabasesParameters does not specified for Project {projectName}", true);
-            return null;
-        }
-
-        var connectionString =
-            DbConnectionFabric.GetDbConnectionString(ProdCopyDatabasesParameters, databaseServerConnections);
-        if (connectionString is not null)
-            return connectionString;
-
-        StShared.WriteErrorLine($"could not Created Prod Copy Connection String form Project with name {projectName}",
-            true);
-        return null;
-    }
 }

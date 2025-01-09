@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CliParametersDataEdit;
 using DbTools;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
@@ -146,30 +147,21 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 return null;
             }
 
-            if (project.DevDatabaseParameters is null)
-            {
-                StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
-                return null;
-            }
+            var databaseServerConnections =
+                new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-            var devConnectionString = project.GetDevDatabaseConnectionString(projectName,
-                new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections));
+            var (devDataProvider, devConnectionString) =
+                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters, projectName,
+                    databaseServerConnections);
 
-            if (string.IsNullOrWhiteSpace(devConnectionString))
+            if (devDataProvider is null || devConnectionString is null)
                 return null;
 
+            var (prodCopyDataProvider, prodCopyConnectionString) =
+                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters, projectName,
+                    databaseServerConnections);
 
-            if (project.ProdCopyDatabasesParameters is null)
-            {
-                StShared.WriteErrorLine($"ProdCopyDatabasesParameters does not specified for Project {projectName}",
-                    true);
-                return null;
-            }
-
-            var prodCopyConnectionString = project.GetProdCopyDatabaseConnectionString(projectName,
-                new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections));
-
-            if (string.IsNullOrWhiteSpace(prodCopyConnectionString))
+            if (prodCopyDataProvider is null || prodCopyConnectionString is null)
                 return null;
 
             if (string.IsNullOrWhiteSpace(project.NewDataSeedingClassLibProjectName))
@@ -194,13 +186,14 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 return null;
             }
 
+
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
                 supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName,
                 project.ScaffoldSeederProjectName, project.ProjectSecurityFolderPath, project.ProjectShortPrefix,
-                project.DbContextProjectName, project.DbContextName, project.DevDatabaseParameters.DataProvider,
-                devConnectionString, project.ProdCopyDatabasesParameters.DataProvider, prodCopyConnectionString,
-                project.NewDataSeedingClassLibProjectName, smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
+                project.DbContextProjectName, project.DbContextName, devDataProvider.Value, devConnectionString,
+                prodCopyDataProvider.Value, prodCopyConnectionString, project.NewDataSeedingClassLibProjectName,
+                smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
@@ -213,4 +206,22 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             return null;
         }
     }
+
+    //public string? GetDevDatabaseConnectionString(string projectName,
+    //    DatabaseServerConnections databaseServerConnections)
+    //{
+    //    if (DevDatabaseParameters is null)
+    //    {
+    //        StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
+    //        return null;
+    //    }
+
+    //    var connectionString =
+    //        DbConnectionFabric.GetDbConnectionString(DevDatabaseParameters, databaseServerConnections);
+    //    if (connectionString is not null)
+    //        return connectionString;
+
+    //    StShared.WriteErrorLine($"could not Created Dev Connection String form Project with name {projectName}", true);
+    //    return null;
+    //}
 }

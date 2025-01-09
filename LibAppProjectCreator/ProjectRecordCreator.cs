@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CliParametersDataEdit.Models;
-using DbTools;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
 using LibParameters;
@@ -199,8 +198,8 @@ internal sealed class ProjectRecordCreator
         var securityFolder = supportToolsParameters.SecurityFolder;
         const string appSettingsFileName = $"appsettings{jsonExtension}";
         var productionServerWebAgentName = $"{productionServerName}.WebAgent";
-        var productionBaseName = $"{_newProjectName}Prod";
-        var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
+        //var productionBaseName = $"{_newProjectName}Prod";
+        //var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
 
         List<string> redundantFileNames =
             _templateModel.SupportProjectType == ESupportProjectType.Api ? [appSettingsFileName] : [];
@@ -210,9 +209,7 @@ internal sealed class ProjectRecordCreator
         if (!_templateModel.UseMenu)
         {
             var serverInfo = CreateServerInfo(productionServerName, productionEnvironmentName,
-                productionServerWebAgentName, securityFolder, appSettingsFileName, jsonExtension, serverData,
-                productionBaseName, smartSchemaName, databaseExchangeFileStorageName, tempLocalPath,
-                developerDbConnectionName);
+                productionServerWebAgentName, securityFolder, appSettingsFileName, jsonExtension, serverData);
             serverInfos = new Dictionary<string, ServerInfoModel> { { serverInfo.GetItemKey(), serverInfo } };
         }
 
@@ -292,7 +289,7 @@ internal sealed class ProjectRecordCreator
             KeyGuidPart = _newProjectKeyGuidPart,
             DevDatabaseParameters = new DatabasesParameters
             {
-                DataProvider = EDataProvider.Sql,
+                //DataProvider = EDataProvider.Sql,
                 //ბაზასთან დაკავშირების პარამეტრი უნდა ავიღოთ პრექტის შემქმნელის პარამეტრებიდან
                 DbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName,
                 DatabaseName = $"{_newProjectName}ProdCopy"
@@ -322,61 +319,20 @@ internal sealed class ProjectRecordCreator
 
     private ServerInfoModel CreateServerInfo(string productionServerName, string productionEnvironmentName,
         string productionServerWebAgentName, string securityFolder, string appSettingsFileName, string jsonExtension,
-        ServerDataModel serverData, string productionBaseName, string smartSchemaName,
-        string databaseExchangeFileStorageName, string tempLocalPath, string developerDbConnectionName)
+        ServerDataModel serverData)
     {
         var serverInfo = new ServerInfoModel
         {
             ServerName = productionServerName,
             EnvironmentName = productionEnvironmentName,
             WebAgentNameForCheck = productionServerWebAgentName,
-            ApiVersionId = "1",
+            ApiVersionId = "v1",
             AppSettingsJsonSourceFileName =
                 Path.Combine(securityFolder, _newProjectName, productionServerName, appSettingsFileName),
             AppSettingsEncodedJsonFileName =
                 Path.Combine(securityFolder, _newProjectName, productionServerName,
                     $"appsettingsEncoded{jsonExtension}"),
             ServiceUserName = serverData.FilesUserName
-            //DatabasesExchangeParameters = new DatabasesExchangeParameters
-            //{
-            //    ProductionDbWebAgentName = productionServerWebAgentName,
-            //    ProductionDbBackupParameters = new DatabaseBackupParametersModel
-            //    {
-            //        BackupNamePrefix = $"{productionServerName}_",
-            //        DateMask = "yyyyMMddHHmmss",
-            //        BackupFileExtension = ".bak",
-            //        BackupNameMiddlePart = "_FullDb_",
-            //        Compress = true,
-            //        Verify = true,
-            //        BackupType = EBackupType.Full
-            //    },
-            //    CurrentProductionBaseName = productionBaseName,
-            //    NewProductionBaseName = productionBaseName,
-            //    ProductionSmartSchemaName = smartSchemaName,
-            //    ProductionFileStorageName = databaseExchangeFileStorageName,
-            //    //DownloadTempExtension = ".down!",
-            //    //UploadTempExtension = ".up!",
-            //    //ExchangeFileStorageName = databaseExchangeFileStorageName,
-            //    //ExchangeSmartSchemaName = smartSchemaName,
-            //    //LocalPath = tempLocalPath,
-            //    //LocalSmartSchemaName = smartSchemaName,
-            //    DeveloperFileStorageName = databaseExchangeFileStorageName,
-            //    DeveloperDbConnectionName = developerDbConnectionName,
-            //    DeveloperDbBackupParameters = new DatabaseBackupParametersModel
-            //    {
-            //        BackupNamePrefix = $"{developerDbConnectionName}_",
-            //        DateMask = "yyyyMMddHHmmss",
-            //        BackupFileExtension = ".bak",
-            //        BackupNameMiddlePart = "_FullDb_",
-            //        Compress = true,
-            //        Verify = true,
-            //        BackupType = EBackupType.Full
-            //    },
-            //    DeveloperDbServerSideBackupPath = tempLocalPath,
-            //    ProductionBaseCopyNameForDeveloperServer = $"{_newProjectName}ProdCopy",
-            //    DeveloperBaseName = $"{_newProjectName}Development",
-            //    DeveloperSmartSchemaName = smartSchemaName
-            //}
         };
         return serverInfo;
     }
