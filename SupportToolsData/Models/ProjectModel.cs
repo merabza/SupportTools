@@ -111,5 +111,4 @@ public sealed class ProjectModel : ItemData
             _ => []
         };
     }
-
 }
