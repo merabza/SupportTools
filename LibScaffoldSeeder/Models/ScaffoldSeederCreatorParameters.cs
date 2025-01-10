@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CliParametersDataEdit;
-using DbTools;
 using LibDatabaseParameters;
 using LibFileParameters.Models;
 using LibGitData.Models;
@@ -18,8 +17,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder,
         string projectName, string scaffoldSeederProjectName, string projectSecurityFolderPath,
         string projectShortPrefix, string mainDatabaseProjectName, string projectDbContextClassName,
-        EDataProvider devDatabaseDataProvider, string devDatabaseConnectionString,
-        EDataProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString,
+        EDatabaseProvider devDatabaseDataProvider, string devDatabaseConnectionString,
+        EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString,
         string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
         string excludesRulesParametersFilePath, string fakeHostProjectName, string? migrationSqlFilesFolder,
         GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths)
@@ -56,9 +55,9 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public string ProjectShortPrefix { get; }
     public string MainDatabaseProjectName { get; }
     public string ProjectDbContextClassName { get; }
-    public EDataProvider DevDatabaseDataProvider { get; }
+    public EDatabaseProvider DevDatabaseDataProvider { get; }
     public string DevDatabaseConnectionString { get; }
-    public EDataProvider ProdCopyDatabaseDataProvider { get; }
+    public EDatabaseProvider ProdCopyDatabaseDataProvider { get; }
     public string ProdCopyDatabaseConnectionString { get; }
     public string NewDataSeedingClassLibProjectName { get; }
     public SmartSchema SmartSchemaForLocal { get; }

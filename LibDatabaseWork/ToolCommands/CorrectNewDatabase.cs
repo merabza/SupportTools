@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CliParameters;
 using DbTools;
 using DbToolsFabric;
+using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,7 @@ public sealed class CorrectNewDatabase : ToolCommand
 
     private DbManager GetDbManager()
     {
-        var dbKit = ManagerFactory.GetKit(EDataProvider.Sql);
+        var dbKit = ManagerFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
         return DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString) ??
                throw new Exception("Cannot create DbManager");
@@ -41,7 +42,7 @@ public sealed class CorrectNewDatabase : ToolCommand
 
     protected override bool CheckValidate()
     {
-        if (CorrectNewDbParameters.DataProvider != EDataProvider.None)
+        if (CorrectNewDbParameters.DataProvider != EDatabaseProvider.None)
             return true;
 
         _logger.LogError("DataProvider not specified");

@@ -85,7 +85,7 @@ public static class CopyBaseParametersFabric
         //? dep.ProductionDbConnectionName
         //: dep.DeveloperDbConnectionName;
 
-        var sourceDbWebAgentName = fromDatabaseParameters.DbWebAgentName;
+        //var sourceDbWebAgentName = fromDatabaseParameters.DbWebAgentName;
         //fromProductionToDeveloper
         //? dep.ProductionDbWebAgentName
         //: dep.DeveloperDbWebAgentName;
@@ -96,7 +96,7 @@ public static class CopyBaseParametersFabric
         //: dep.DeveloperBaseName; //ბაზის სერვერის მხარე
 
         //მიზნის სერვერის აგენტის შექმნა
-        var destinationDbWebAgentName = toDatabaseParameters.DbWebAgentName;
+        //var destinationDbWebAgentName = toDatabaseParameters.DbWebAgentName;
         //fromProductionToDeveloper
         //? dep.DeveloperDbWebAgentName
         //: dep.ProductionDbWebAgentName;
@@ -113,8 +113,7 @@ public static class CopyBaseParametersFabric
 
         //თუ წყარო და მიზანი ერთიდაიგივე არ არის ბაზების სახელები განსხვავებული უნდა იყოს.
         //ფაქტობრივად იმავე სერვერზე მოხდება ბაზის დაკოპირება
-        if ((sourceDbConnectionName == destinationDbConnectionName ||
-             sourceDbWebAgentName == destinationDbWebAgentName) && backupBaseName == destinationBaseName)
+        if (sourceDbConnectionName == destinationDbConnectionName && backupBaseName == destinationBaseName)
         {
             logger.LogError("if source and destination servers are same, base names must be different");
             return null;
@@ -179,10 +178,11 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
+        //sourceDbWebAgentName
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
         var agentClientForSource = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
-            httpClientFactory, sourceDbWebAgentName, apiClients, sourceDbConnectionName, databaseServerConnections,
+            httpClientFactory, apiClients, sourceDbConnectionName, databaseServerConnections,
             null, null, CancellationToken.None);
 
         if (agentClientForSource is null)
@@ -191,8 +191,9 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
+        //destinationDbWebAgentName
         var agentClientForDestination = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
-            httpClientFactory, destinationDbWebAgentName, apiClients, destinationDbConnectionName,
+            httpClientFactory, apiClients, destinationDbConnectionName,
             databaseServerConnections, null, null, CancellationToken.None);
 
         if (agentClientForDestination is null)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
-using DbTools;
+using LibDatabaseParameters;
 using LibParameters;
 using LibScaffoldSeeder.Models;
 using LibSeedCodeCreator;
@@ -261,10 +261,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var providerPackageName = Parameters.ProdCopyDatabaseDataProvider switch
         {
-            EDataProvider.Sql => "Microsoft.EntityFrameworkCore.SqlServer",
-            EDataProvider.None => null,
-            EDataProvider.SqLite => "Microsoft.EntityFrameworkCore.Sqlite",
-            EDataProvider.OleDb => "EntityFrameworkCore.Jet",
+            EDatabaseProvider.SqlServer => "Microsoft.EntityFrameworkCore.SqlServer",
+            EDatabaseProvider.None => null,
+            EDatabaseProvider.SqLite => "Microsoft.EntityFrameworkCore.Sqlite",
+            EDatabaseProvider.OleDb => "EntityFrameworkCore.Jet",
             _ => null
         };
 

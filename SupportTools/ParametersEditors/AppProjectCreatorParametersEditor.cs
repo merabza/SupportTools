@@ -20,7 +20,7 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
         FieldEditors.Add(new TextFieldEditor(nameof(AppProjectCreatorAllParameters.FakeHostProjectName)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.ProjectsFolderPathReal)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.SecretsFolderPathReal)));
-        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger,
+        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory,
             nameof(AppProjectCreatorAllParameters.DeveloperDbConnectionName), listsParametersManager, true));
         //გაცვლის ფაილსაცავის სახელი
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,
@@ -31,7 +31,6 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, httpClientFactory,
             nameof(AppProjectCreatorAllParameters.ProductionServerName), listsParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(
-            nameof(AppProjectCreatorAllParameters.ProductionEnvironmentName),
-            listsParametersManager));
+            nameof(AppProjectCreatorAllParameters.ProductionEnvironmentName), listsParametersManager));
     }
 }

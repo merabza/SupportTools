@@ -56,8 +56,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new FileStoragesFieldEditor(logger, nameof(SupportToolsParameters.FileStorages),
             parametersManager));
-        FieldEditors.Add(new DatabaseServerConnectionsFieldEditor(
-            nameof(SupportToolsParameters.DatabaseServerConnections), parametersManager, logger));
+        FieldEditors.Add(new DatabaseServerConnectionsFieldEditor(logger, httpClientFactory, parametersManager,
+            nameof(SupportToolsParameters.DatabaseServerConnections)));
         FieldEditors.Add(new SmartSchemasFieldEditor(nameof(SupportToolsParameters.SmartSchemas), parametersManager));
         FieldEditors.Add(new ArchiversFieldEditor(nameof(SupportToolsParameters.Archivers), parametersManager));
         FieldEditors.Add(new ProjectsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Projects),

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using CliParameters;
 using CliParameters.FieldEditors;
-using CliParametersApiClientsDbEdit;
-using CliParametersApiClientsEdit.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
 using CliParametersDataEdit.Models;
 using CliParametersEdit.FieldEditors;
-using DbTools;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 
@@ -19,24 +15,24 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         IParametersManager parametersManager, IParametersManager listsParametersManager) : base("Database Parameters",
         parametersManager)
     {
-        FieldEditors.Add(
-            new EnumFieldEditor<EDataProvider>(nameof(DatabasesParameters.DataProvider), EDataProvider.Sql));
+        //FieldEditors.Add(
+        //    new EnumFieldEditor<EDataProvider>(nameof(DatabasesParameters.DataProvider), EDataProvider.Sql));
 
         //შემდეგი 2 პარამეტრიდან გამოიყენება ერთერთი
         //ორივეს ერთდროულად შევსება არ შეიძლება.
         //ორივეს ცარელა დატოვება არ შეიძლება
         //მონაცემთა ბაზასთან კავშირის სახელი
-        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger,
+        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesParameters.DbConnectionName), listsParametersManager, true));
 
-        //მონაცემთა ბაზასთან დამაკავშირებელი ვებაგენტის სახელი
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
-            nameof(DatabasesParameters.DbWebAgentName), listsParametersManager, true));
+        ////მონაცემთა ბაზასთან დამაკავშირებელი ვებაგენტის სახელი
+        //FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
+        //    nameof(DatabasesParameters.DbWebAgentName), listsParametersManager, true));
 
-        //მონაცემთა ბაზასთან დამაკავშირებელი ვებაგენტის სახელი
-        FieldEditors.Add(new RemoteDbConnectionNameFieldEditor(logger, httpClientFactory,
-            nameof(DatabasesParameters.RemoteDbConnectionName), listsParametersManager,
-            nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName)));
+        ////მონაცემთა ბაზასთან დამაკავშირებელი ვებაგენტის სახელი
+        //FieldEditors.Add(new RemoteDbConnectionNameFieldEditor(logger, httpClientFactory,
+        //    nameof(DatabasesParameters.RemoteDbConnectionName), listsParametersManager,
+        //    nameof(DatabasesParameters.DbWebAgentName)));
 
         //FieldEditors.Add(new EnumFieldEditor<EDataProvider>(nameof(DatabaseConnectionParameters.DataProvider),
         //    EDataProvider.Sql));
@@ -54,8 +50,7 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //public string? DbServerFoldersSetName { get; set; }
         FieldEditors.Add(new DbServerFoldersSetNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesParameters.DbServerFoldersSetName), listsParametersManager,
-            nameof(DatabasesParameters.DataProvider), nameof(DatabasesParameters.DbConnectionName),
-            nameof(DatabasesParameters.DbWebAgentName)));
+            nameof(DatabasesParameters.DbConnectionName)));
 
         ////ფოლდერი სერვერის მხარეს, რომელშიც უნდა მოხდეს ბაზის მონაცემების ფაილის აღდგენა
         //FieldEditors.Add(new TextFieldEditor(nameof(DatabasesParameters.DbServerSideDataFolderPath)));
@@ -77,8 +72,7 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         //მას მერე, რაც საჭიროება აღარ იქნება, CurrentBaseName და BaseName სახელები ერთმანეთს უნდა დაემთხვას.
         FieldEditors.Add(new DatabaseNameFieldEditor(logger, httpClientFactory,
             nameof(DatabasesParameters.DatabaseName), listsParametersManager,
-            nameof(DatabasesParameters.DbConnectionName), nameof(DatabasesParameters.DbWebAgentName),
-            nameof(DatabasesParameters.DataProvider), true));
+            nameof(DatabasesParameters.DbConnectionName), true));
 
         //ჭკვიანი სქემის სახელი. გამოიყენება ძველი დასატოვებელი და წასაშლელი ფაილების განსასაზღვრად. (ეს ბაზის სერვერის მხარეს)
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(DatabasesParameters.SmartSchemaName),
@@ -87,55 +81,55 @@ public sealed class DatabaseParametersEditor : ParametersEditor
         FieldEditors.Add(new FileStorageNameFieldEditor(logger, nameof(DatabasesParameters.FileStorageName),
             listsParametersManager));
 
-        FieldEditors.Add(new IntFieldEditor(nameof(DatabaseConnectionParameters.CommandTimeOut), 10000));
+        FieldEditors.Add(new IntFieldEditor(nameof(DatabasesParameters.CommandTimeOut), 10000));
     }
 
 
-    public override void CheckFieldsEnables(object record)
-    {
-        var dataProvider = FieldEditor.GetValue<EDataProvider>(record, nameof(DatabasesParameters.DataProvider));
+    //public override void CheckFieldsEnables(object record)
+    //{
+    //    var dataProvider = FieldEditor.GetValue<EDatabaseProvider>(record, nameof(DatabasesParameters.DataProvider));
 
-        switch (dataProvider)
-        {
-            case EDataProvider.None:
-                EnableOffAllFieldButList([nameof(DatabasesParameters.DataProvider)]);
-                break;
-            case EDataProvider.Sql:
-                EnableOffAllFieldButList([
-                    nameof(DatabasesParameters.DataProvider),
-                    nameof(DatabasesParameters.DbConnectionName),
-                    nameof(DatabasesParameters.DbServerFoldersSetName),
-                    nameof(DatabasesParameters.DatabaseName),
-                    nameof(DatabasesParameters.SmartSchemaName),
-                    nameof(DatabasesParameters.FileStorageName),
-                    nameof(DatabasesParameters.CommandTimeOut)
-                ]);
-                break;
-            case EDataProvider.SqLite:
-            case EDataProvider.OleDb:
-                EnableOffAllFieldButList([
-                    nameof(DatabasesParameters.DataProvider),
-                    nameof(DatabasesParameters.DatabaseFilePath),
-                    nameof(DatabasesParameters.DatabasePassword),
-                    nameof(DatabasesParameters.SmartSchemaName),
-                    nameof(DatabasesParameters.FileStorageName),
-                    nameof(DatabasesParameters.CommandTimeOut)
-                ]);
-                break;
-            case EDataProvider.WebAgent:
-                EnableOffAllFieldButList([
-                    nameof(DatabasesParameters.DataProvider),
-                    nameof(DatabasesParameters.DbWebAgentName),
-                    nameof(DatabasesParameters.RemoteDbConnectionName),
-                    nameof(DatabasesParameters.DbServerFoldersSetName),
-                    nameof(DatabasesParameters.DatabaseName),
-                    nameof(DatabasesParameters.SmartSchemaName),
-                    nameof(DatabasesParameters.FileStorageName),
-                    nameof(DatabasesParameters.CommandTimeOut)
-                ]);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
+    //    switch (dataProvider)
+    //    {
+    //        case EDatabaseProvider.None:
+    //            EnableOffAllFieldButList([nameof(DatabasesParameters.DataProvider)]);
+    //            break;
+    //        case EDatabaseProvider.SqlServer:
+    //            EnableOffAllFieldButList([
+    //                nameof(DatabasesParameters.DataProvider),
+    //                nameof(DatabasesParameters.DbConnectionName),
+    //                nameof(DatabasesParameters.DbServerFoldersSetName),
+    //                nameof(DatabasesParameters.DatabaseName),
+    //                nameof(DatabasesParameters.SmartSchemaName),
+    //                nameof(DatabasesParameters.FileStorageName),
+    //                nameof(DatabasesParameters.CommandTimeOut)
+    //            ]);
+    //            break;
+    //        case EDatabaseProvider.SqLite:
+    //        case EDatabaseProvider.OleDb:
+    //            EnableOffAllFieldButList([
+    //                nameof(DatabasesParameters.DataProvider),
+    //                nameof(DatabasesParameters.DatabaseFilePath),
+    //                nameof(DatabasesParameters.DatabasePassword),
+    //                nameof(DatabasesParameters.SmartSchemaName),
+    //                nameof(DatabasesParameters.FileStorageName),
+    //                nameof(DatabasesParameters.CommandTimeOut)
+    //            ]);
+    //            break;
+    //        case EDatabaseProvider.WebAgent:
+    //            EnableOffAllFieldButList([
+    //                nameof(DatabasesParameters.DataProvider),
+    //                nameof(DatabasesParameters.DbWebAgentName),
+    //                nameof(DatabasesParameters.RemoteDbConnectionName),
+    //                nameof(DatabasesParameters.DbServerFoldersSetName),
+    //                nameof(DatabasesParameters.DatabaseName),
+    //                nameof(DatabasesParameters.SmartSchemaName),
+    //                nameof(DatabasesParameters.FileStorageName),
+    //                nameof(DatabasesParameters.CommandTimeOut)
+    //            ]);
+    //            break;
+    //        default:
+    //            throw new ArgumentOutOfRangeException();
+    //    }
+    //}
 }

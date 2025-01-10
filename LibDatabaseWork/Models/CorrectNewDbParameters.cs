@@ -1,7 +1,6 @@
 //Created by ProjectParametersClassCreator at 5/9/2021 13:38:34
 
 using CliParametersDataEdit;
-using DbTools;
 using LibDatabaseParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -11,14 +10,14 @@ namespace LibDatabaseWork.Models;
 
 public sealed class CorrectNewDbParameters : IParameters
 {
-    private CorrectNewDbParameters(EDataProvider dataProvider, string connectionString, int commandTimeOut)
+    private CorrectNewDbParameters(EDatabaseProvider dataProvider, string connectionString, int commandTimeOut)
     {
         DataProvider = dataProvider;
         ConnectionString = connectionString;
         CommandTimeOut = commandTimeOut;
     }
 
-    public EDataProvider DataProvider { get; }
+    public EDatabaseProvider DataProvider { get; }
     public string ConnectionString { get; }
     public int CommandTimeOut { get; }
 
