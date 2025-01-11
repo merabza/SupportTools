@@ -18,48 +18,11 @@ namespace LibDatabaseWork;
 
 public static class CopyBaseParametersFabric
 {
-    //bool fromProductionToDeveloper, 
-    //, DatabasesParameters fromDatabaseParameters,
-    // DatabasesParameters toDatabaseParameters
-    //, string projectName
-    //, ServerInfoModel serverInfo
     public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
         IHttpClientFactory httpClientFactory, DatabasesParameters fromDatabaseParameters,
         DatabasesParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters)
     {
         var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;
-
-
-        ////შევამოწმოთ პროექტის პარამეტრები
-        //var project = supportToolsParameters.GetProject(projectName);
-        //if (project == null)
-        //{
-        //    StShared.WriteErrorLine($"Project with name {projectName} not found", true);
-        //    return null;
-        //}
-
-        //if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
-        //{
-        //    StShared.WriteErrorLine("Server name is not specified", true);
-        //    return null;
-        //}
-
-        //შევამოწმოთ სერვერის პარამეტრები
-        //var server = supportToolsParameters.GetServerData(serverInfo.ServerName);
-        //if (server is null)
-        //{
-        //    StShared.WriteErrorLine($"Server with name {serverInfo.ServerName} not found", true);
-        //    return null;
-        //}
-
-        //var dep = serverInfo.DatabasesExchangeParameters;
-        //if (dep is null)
-        //{
-        //    StShared.WriteErrorLine(
-        //        $"DatabasesExchangeParameters is null for Server with name {serverInfo.GetItemKey()} for Project {projectName} not found",
-        //        true);
-        //    return null;
-        //}
 
         FileStorages fileStorages = new(supportToolsParameters.FileStorages);
         ApiClients apiClients = new(supportToolsParameters.ApiClients);
@@ -81,35 +44,10 @@ public static class CopyBaseParametersFabric
         }
 
         var sourceDbConnectionName = fromDatabaseParameters.DbConnectionName;
-        //fromProductionToDeveloper
-        //? dep.ProductionDbConnectionName
-        //: dep.DeveloperDbConnectionName;
-
-        //var sourceDbWebAgentName = fromDatabaseParameters.DbWebAgentName;
-        //fromProductionToDeveloper
-        //? dep.ProductionDbWebAgentName
-        //: dep.DeveloperDbWebAgentName;
-
         var backupBaseName = fromDatabaseParameters.DatabaseName;
-        //fromProductionToDeveloper
-        //? dep.CurrentProductionBaseName
-        //: dep.DeveloperBaseName; //ბაზის სერვერის მხარე
-
-        //მიზნის სერვერის აგენტის შექმნა
-        //var destinationDbWebAgentName = toDatabaseParameters.DbWebAgentName;
-        //fromProductionToDeveloper
-        //? dep.DeveloperDbWebAgentName
-        //: dep.ProductionDbWebAgentName;
 
         var destinationDbConnectionName = toDatabaseParameters.DbConnectionName;
-        //fromProductionToDeveloper
-        //? dep.DeveloperDbConnectionName
-        //: dep.ProductionDbConnectionName;
-
         var destinationBaseName = toDatabaseParameters.DatabaseName;
-        //fromProductionToDeveloper
-        //? dep.ProductionBaseCopyNameForDeveloperServer
-        //: dep.NewProductionBaseName;
 
         //თუ წყარო და მიზანი ერთიდაიგივე არ არის ბაზების სახელები განსხვავებული უნდა იყოს.
         //ფაქტობრივად იმავე სერვერზე მოხდება ბაზის დაკოპირება
@@ -128,9 +66,6 @@ public static class CopyBaseParametersFabric
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromDatabaseParameters.FileStorageName;
-        //fromProductionToDeveloper
-        //? dep.ProductionFileStorageName
-        //: dep.DeveloperFileStorageName;
 
         var (sourceFileStorage, sourceFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(true,
             logger, localPath, sourceFileStorageName, fileStorages, null, null, CancellationToken.None);
@@ -149,7 +84,6 @@ public static class CopyBaseParametersFabric
 
         //მიზნის ფაილსაცავი
         var destinationFileStorageName = toDatabaseParameters.FileStorageName;
-        //fromProductionToDeveloper ? dep.DeveloperFileStorageName : dep.ProductionFileStorageName;
 
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
         var (destinationFileStorage, destinationFileManager) =
@@ -181,9 +115,8 @@ public static class CopyBaseParametersFabric
         //sourceDbWebAgentName
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var agentClientForSource = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
-            httpClientFactory, apiClients, sourceDbConnectionName, databaseServerConnections,
-            null, null, CancellationToken.None);
+        var agentClientForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory, true,
+            sourceDbConnectionName, databaseServerConnections, apiClients, null, null, CancellationToken.None);
 
         if (agentClientForSource is null)
         {
@@ -192,9 +125,9 @@ public static class CopyBaseParametersFabric
         }
 
         //destinationDbWebAgentName
-        var agentClientForDestination = await DatabaseAgentClientsFabric.CreateDatabaseManager(true, logger,
-            httpClientFactory, apiClients, destinationDbConnectionName,
-            databaseServerConnections, null, null, CancellationToken.None);
+        var agentClientForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
+            true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
+            CancellationToken.None);
 
         if (agentClientForDestination is null)
         {
@@ -202,47 +135,15 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        //var sourceDbBackupParameters = DatabaseBackupParametersDomain.Create(fromDatabaseParameters.);
-        //    fromProductionToDeveloper ? dep.ProductionDbBackupParameters : dep.DeveloperDbBackupParameters,
-        //    fromProductionToDeveloper ? dep.ProductionDbServerSideBackupPath : dep.DeveloperDbServerSideBackupPath);
-
-        //if (sourceDbBackupParameters is null)
-        //{
-        //    logger.LogError("sourceDbBackupParameters does not created");
-        //    return null;
-        //}
-
         var sourceDatabaseName = fromDatabaseParameters.DatabaseName;
-            //fromProductionToDeveloper ? dep.CurrentProductionBaseName : dep.DeveloperBaseName;
+        //fromProductionToDeveloper ? dep.CurrentProductionBaseName : dep.DeveloperBaseName;
         if (string.IsNullOrWhiteSpace(sourceDatabaseName))
         {
             logger.LogError("sourceDatabaseName does not detected");
             return null;
         }
 
-        //var destinationDbBackupParameters = DatabaseBackupParametersDomain.Create(
-        //    fromProductionToDeveloper ? dep.DeveloperDbBackupParameters : dep.ProductionDbBackupParameters,
-        //    fromProductionToDeveloper ? dep.DeveloperDbServerSideBackupPath : dep.ProductionDbServerSideBackupPath);
-
-        //var destinationDbServerSideDataFolderPath = 
-        //    fromProductionToDeveloper
-        //    ? dep.DeveloperDbServerSideDataFolderPath
-        //    : dep.ProductionDbServerSideDataFolderPath;
-
-        //var destinationDbServerSideLogFolderPath = fromProductionToDeveloper
-        //    ? dep.DeveloperDbServerSideLogFolderPath
-        //    : dep.ProductionDbServerSideLogFolderPath;
-
-        //if (destinationDbBackupParameters is null)
-        //{
-        //    logger.LogError("destinationDbBackupParameters does not created");
-        //    return null;
-        //}
-
         var destinationDatabaseName = toDatabaseParameters.DatabaseName;
-        //fromProductionToDeveloper
-        //    ? dep.ProductionBaseCopyNameForDeveloperServer
-        //    : dep.NewProductionBaseName;
 
         if (string.IsNullOrWhiteSpace(destinationDatabaseName))
         {
@@ -255,7 +156,6 @@ public static class CopyBaseParametersFabric
         SmartSchemas smartSchemas = new(supportToolsParameters.SmartSchemas);
 
         var sourceSmartSchemaName = fromDatabaseParameters.SmartSchemaName;
-            //fromProductionToDeveloper ? dep.ProductionSmartSchemaName : dep.DeveloperSmartSchemaName;
 
         var sourceSmartSchema = string.IsNullOrWhiteSpace(sourceSmartSchemaName)
             ? null
@@ -270,8 +170,7 @@ public static class CopyBaseParametersFabric
         var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
                                       sourceFileStorageName != destinationFileStorageName;
 
-        var destinationSmartSchemaName =toDatabaseParameters.SmartSchemaName;
-        //fromProductionToDeveloper ? dep.DeveloperSmartSchemaName : dep.ProductionSmartSchemaName;
+        var destinationSmartSchemaName = toDatabaseParameters.SmartSchemaName;
 
         var destinationSmartSchema = string.IsNullOrWhiteSpace(destinationSmartSchemaName)
             ? null
@@ -294,20 +193,15 @@ public static class CopyBaseParametersFabric
                                               exchangeFileStorageName != destinationFileStorageName;
 
         return new CopyBaseParameters(agentClientForSource, agentClientForDestination, exchangeFileManager,
-            sourceFileManager, destinationFileManager, localFileManager, 
-            //sourceDbBackupParameters,
-            //destinationDbBackupParameters, 
-            needDownloadFromSource, sourceSmartSchema, localSmartSchema,
-            needUploadToDestination, destinationSmartSchema, needDownloadFromExchange, exchangeSmartSchema,
-            needDownloadFromDestination, needUploadDestinationToExchange,
+            sourceFileManager, destinationFileManager, localFileManager, needDownloadFromSource, sourceSmartSchema,
+            localSmartSchema, needUploadToDestination, destinationSmartSchema, needDownloadFromExchange,
+            exchangeSmartSchema, needDownloadFromDestination, needUploadDestinationToExchange,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.DownloadTempExtension)
                 ? "down!"
                 : databasesBackupFilesExchangeParameters.DownloadTempExtension,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"
                 : databasesBackupFilesExchangeParameters.UploadTempExtension, sourceDatabaseName,
-            //destinationDbServerSideDataFolderPath, destinationDbServerSideLogFolderPath, 
-            destinationDatabaseName,
-            localPath);
+            destinationDatabaseName, localPath);
     }
 }
