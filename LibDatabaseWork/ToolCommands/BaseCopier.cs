@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
 using LibDatabaseWork.Models;
@@ -28,26 +27,22 @@ public sealed class BaseCopier : ToolCommand
     private string GetActionDescription()
     {
         return
-            $"Copy Database from {CopyBaseParameters.SourceDatabaseName} to {CopyBaseParameters.DestinationDatabaseName}";
+            $"Copy Database from {CopyBaseParameters.SourceBackupRestoreParameters.DatabaseName} to {CopyBaseParameters.DestinationBackupRestoreParameters.DatabaseName}";
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Create Agent Client for source Database");
+        var sourceBackupRestoreParameters = CopyBaseParameters.SourceBackupRestoreParameters;
+        var destinationBackupRestoreParameters = CopyBaseParameters.DestinationBackupRestoreParameters;
 
-        var agentClientForSource = CopyBaseParameters.DatabaseManagerForSource;
-
-        _logger.LogInformation("Create Agent Client for destination Database");
-
-        var agentClientForDestination = CopyBaseParameters.DatabaseManagerForDestination;
-
-        Console.Write("Create File storages: ");
+        var databaseManagerForSource = sourceBackupRestoreParameters.DatabaseManager;
+        var databaseManagerForDestination = destinationBackupRestoreParameters.DatabaseManager;
 
         _logger.LogInformation("Create Backup for source Database");
 
         //ბექაპის დამზადება წყაროს მხარეს
-        var createBackupResult =
-            await agentClientForSource.CreateBackup(CopyBaseParameters.SourceDatabaseName, CancellationToken.None);
+        var createBackupResult = await databaseManagerForSource.CreateBackup(sourceBackupRestoreParameters.DatabaseName,
+            sourceBackupRestoreParameters.DbServerFoldersSetName, CancellationToken.None);
 
         //თუ ბექაპის დამზადებისას რაიმე პრობლემა დაფიქსირდა, ვჩერდებით.
         if (createBackupResult.IsT1)
@@ -73,7 +68,8 @@ public sealed class BaseCopier : ToolCommand
             _logger.LogInformation("Download File {fileName}", fileName);
 
             //წყაროდან ლოკალურ ფოლდერში მოქაჩვა
-            if (!CopyBaseParameters.SourceFileManager.DownloadFile(fileName, CopyBaseParameters.DownloadTempExtension))
+            if (!sourceBackupRestoreParameters.FileManager.DownloadFile(fileName,
+                    CopyBaseParameters.DownloadTempExtension))
             {
                 _logger.LogError("Can not Download File {fileName}", fileName);
                 return false;
@@ -81,8 +77,8 @@ public sealed class BaseCopier : ToolCommand
 
             _logger.LogInformation("Remove Redundant Files for source");
 
-            CopyBaseParameters.SourceFileManager.RemoveRedundantFiles(prefix, backupFileParametersForSource.DateMask,
-                suffix, CopyBaseParameters.SourceSmartSchema);
+            sourceBackupRestoreParameters.FileManager.RemoveRedundantFiles(prefix,
+                backupFileParametersForSource.DateMask, suffix, sourceBackupRestoreParameters.SmartSchema);
         }
 
         _logger.LogInformation("Remove Redundant Files for local");
@@ -96,7 +92,8 @@ public sealed class BaseCopier : ToolCommand
         {
             _logger.LogInformation("Upload File {fileName} to Destination", fileName);
 
-            if (!CopyBaseParameters.DestinationFileManager.UploadFile(fileName, CopyBaseParameters.UploadTempExtension))
+            if (!destinationBackupRestoreParameters.FileManager.UploadFile(fileName,
+                    CopyBaseParameters.UploadTempExtension))
             {
                 _logger.LogError("Can not Upload File {fileName}", fileName);
                 return false;
@@ -104,8 +101,8 @@ public sealed class BaseCopier : ToolCommand
 
             _logger.LogInformation("Remove Redundant Files for destination");
 
-            CopyBaseParameters.DestinationFileManager.RemoveRedundantFiles(prefix,
-                backupFileParametersForSource.DateMask, suffix, CopyBaseParameters.DestinationSmartSchema);
+            destinationBackupRestoreParameters.FileManager.RemoveRedundantFiles(prefix,
+                backupFileParametersForSource.DateMask, suffix, destinationBackupRestoreParameters.SmartSchema);
         }
 
         //ან თუ გაცვლის ფაილსაცავი არ გვაქვს, ან ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
@@ -127,12 +124,12 @@ public sealed class BaseCopier : ToolCommand
                 suffix, CopyBaseParameters.ExchangeSmartSchema);
         }
 
-        var destinationDatabaseName = CopyBaseParameters.DestinationDatabaseName;
+        var destinationDatabaseName = destinationBackupRestoreParameters.DatabaseName;
         _logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         //შევამოწმოთ მიზნის ბაზის არსებობა
         var isDatabaseExistsResult =
-            await agentClientForDestination.IsDatabaseExists(destinationDatabaseName, CancellationToken.None);
+            await databaseManagerForDestination.IsDatabaseExists(destinationDatabaseName, CancellationToken.None);
 
         if (isDatabaseExistsResult.IsT1)
         {
@@ -147,8 +144,8 @@ public sealed class BaseCopier : ToolCommand
             _logger.LogInformation("Create Backup for Destination base {destinationDatabaseName}",
                 destinationDatabaseName);
 
-            var createBackupResult2 = await agentClientForDestination.CreateBackup(
-                destinationDatabaseName, CancellationToken.None);
+            var createBackupResult2 = await databaseManagerForDestination.CreateBackup(destinationDatabaseName,
+                destinationBackupRestoreParameters.DbServerFoldersSetName, CancellationToken.None);
 
             if (createBackupResult2.IsT1)
             {
@@ -161,9 +158,9 @@ public sealed class BaseCopier : ToolCommand
 
             _logger.LogInformation("Remove Redundant Files for destination");
 
-            CopyBaseParameters.DestinationFileManager.RemoveRedundantFiles(backupFileParametersForDestination.Prefix,
-                backupFileParametersForDestination.DateMask, backupFileParametersForDestination.Suffix,
-                CopyBaseParameters.DestinationSmartSchema);
+            destinationBackupRestoreParameters.FileManager.RemoveRedundantFiles(
+                backupFileParametersForDestination.Prefix, backupFileParametersForDestination.DateMask,
+                backupFileParametersForDestination.Suffix, destinationBackupRestoreParameters.SmartSchema);
 
             //თუ მიზნის ფაილსაცავი ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს.
             //   მაშინ მოქაჩვა საჭირო აღარ არის
@@ -173,7 +170,7 @@ public sealed class BaseCopier : ToolCommand
             {
                 _logger.LogInformation("Download File {destinationFileName} from Destination", destinationFileName);
 
-                if (!CopyBaseParameters.DestinationFileManager.DownloadFile(destinationFileName,
+                if (!destinationBackupRestoreParameters.FileManager.DownloadFile(destinationFileName,
                         CopyBaseParameters.DownloadTempExtension))
                 {
                     _logger.LogError("Can not Download File {destinationFileName}", destinationFileName);
@@ -207,10 +204,8 @@ public sealed class BaseCopier : ToolCommand
         //მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
         _logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
-        var restoreDatabaseFromBackupResult = await agentClientForDestination.RestoreDatabaseFromBackup(
-            backupFileParametersForSource,
-            //CopyBaseParameters.DestinationDbServerSideDataFolderPath,
-            //CopyBaseParameters.DestinationDbServerSideLogFolderPath, 
+        var restoreDatabaseFromBackupResult = await databaseManagerForDestination.RestoreDatabaseFromBackup(
+            backupFileParametersForSource, destinationBackupRestoreParameters.DbServerFoldersSetName,
             destinationDatabaseName, CopyBaseParameters.LocalPath, CancellationToken.None);
 
         if (restoreDatabaseFromBackupResult.IsNone)

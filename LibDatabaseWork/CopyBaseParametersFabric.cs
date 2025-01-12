@@ -115,21 +115,21 @@ public static class CopyBaseParametersFabric
         //sourceDbWebAgentName
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var agentClientForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory, true,
-            sourceDbConnectionName, databaseServerConnections, apiClients, null, null, CancellationToken.None);
+        var databaseManagerForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
+            true, sourceDbConnectionName, databaseServerConnections, apiClients, null, null, CancellationToken.None);
 
-        if (agentClientForSource is null)
+        if (databaseManagerForSource is null)
         {
             logger.LogError("Can not create client for source Database server");
             return null;
         }
 
         //destinationDbWebAgentName
-        var agentClientForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
-            true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
+        var databaseManagerForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger,
+            httpClientFactory, true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
             CancellationToken.None);
 
-        if (agentClientForDestination is null)
+        if (databaseManagerForDestination is null)
         {
             logger.LogError("Can not create client for destination Database server");
             return null;
@@ -192,16 +192,34 @@ public static class CopyBaseParametersFabric
                                               !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
                                               exchangeFileStorageName != destinationFileStorageName;
 
-        return new CopyBaseParameters(agentClientForSource, agentClientForDestination, exchangeFileManager,
-            sourceFileManager, destinationFileManager, localFileManager, needDownloadFromSource, sourceSmartSchema,
-            localSmartSchema, needUploadToDestination, destinationSmartSchema, needDownloadFromExchange,
-            exchangeSmartSchema, needDownloadFromDestination, needUploadDestinationToExchange,
+        if (string.IsNullOrWhiteSpace(fromDatabaseParameters.DbServerFoldersSetName))
+        {
+            logger.LogError("fromDatabaseParameters.DbServerFoldersSetName is not specified");
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(toDatabaseParameters.DbServerFoldersSetName))
+        {
+            logger.LogError("toDatabaseParameters.DbServerFoldersSetName is not specified");
+            return null;
+        }
+
+        var sourceBackupRestoreParameters = new BackupRestoreParameters(databaseManagerForSource, sourceFileManager,
+            sourceSmartSchema, sourceDatabaseName, fromDatabaseParameters.DbServerFoldersSetName);
+
+        var destinationBackupRestoreParameters = new BackupRestoreParameters(databaseManagerForDestination,
+            destinationFileManager, destinationSmartSchema, destinationDatabaseName,
+            toDatabaseParameters.DbServerFoldersSetName);
+
+
+        return new CopyBaseParameters(sourceBackupRestoreParameters, destinationBackupRestoreParameters,
+            exchangeFileManager, localFileManager, needDownloadFromSource, localSmartSchema, needUploadToDestination,
+            needDownloadFromExchange, exchangeSmartSchema, needDownloadFromDestination, needUploadDestinationToExchange,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.DownloadTempExtension)
                 ? "down!"
                 : databasesBackupFilesExchangeParameters.DownloadTempExtension,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"
-                : databasesBackupFilesExchangeParameters.UploadTempExtension, sourceDatabaseName,
-            destinationDatabaseName, localPath);
+                : databasesBackupFilesExchangeParameters.UploadTempExtension, localPath);
     }
 }
