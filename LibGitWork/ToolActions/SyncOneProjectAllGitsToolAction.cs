@@ -44,7 +44,7 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         return null;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         string? commitMessage = null;
         var changedGitProjects = _syncOneProjectAllGitsParameters.ChangedGitProjects;

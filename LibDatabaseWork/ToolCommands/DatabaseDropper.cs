@@ -31,10 +31,10 @@ public sealed class DatabaseDropper : MigrationToolCommand
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //ბაზის წაშლა
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
+        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"ef database drop --force --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsNone);
     }

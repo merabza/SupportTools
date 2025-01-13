@@ -25,12 +25,12 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         _reactTemplateName = reactTemplateName;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (ParametersManager is null)
         {
             _logger.LogError("ParametersManager is null");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         var supportToolsParameters = (SupportToolsParameters?)ParametersManager.Parameters;
@@ -39,17 +39,17 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         if (supportToolsParameters is null)
         {
             _logger.LogError("SupportToolsParameters is null");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
             _logger.LogError("supportToolsParameters.WorkFolder is empty");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
-        var reCreateReactAppFiles = new ReCreateReactAppFiles(_logger,
-            supportToolsParameters.WorkFolder, _reactAppName.ToLower(), _reactTemplateName);
-        return ValueTask.FromResult(reCreateReactAppFiles.Run());
+        var reCreateReactAppFiles = new ReCreateReactAppFiles(_logger, supportToolsParameters.WorkFolder,
+            _reactAppName.ToLower(), _reactTemplateName);
+        return Task.FromResult(reCreateReactAppFiles.Run());
     }
 }

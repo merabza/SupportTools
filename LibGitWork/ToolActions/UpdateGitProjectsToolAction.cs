@@ -27,20 +27,20 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var workFolder = supportToolsParameters.WorkFolder;
         if (string.IsNullOrWhiteSpace(workFolder))
         {
             StShared.WriteErrorLine("supportToolsParameters.WorkFolder is not specified", true);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (!StShared.CreateFolder(workFolder, true))
         {
             StShared.WriteErrorLine($"supportToolsParameters.WorkFolder {workFolder} cannot be created", true);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         var gitsFolder = Path.Combine(workFolder, "Gits");
@@ -50,7 +50,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         {
             StShared.WriteErrorLine($"gitsFolder folder {gitsFolder} is not exists and cannot be created", true,
                 Logger);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         List<string> usedProjectNames = [];
@@ -62,12 +62,12 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
             if (gitProjectsUpdater is null)
             {
                 StShared.WriteErrorLine("gitProjectsUpdater does not created", true, Logger);
-                return ValueTask.FromResult(false);
+                return Task.FromResult(false);
             }
 
             var gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
             if (gitProcessor is null)
-                return ValueTask.FromResult(false);
+                return Task.FromResult(false);
             usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
         }
 
@@ -77,10 +77,10 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         Console.WriteLine("Find Dependencies");
 
         if (!RegisterDependenciesProjects(gitsFolder, supportToolsParameters.GitProjects))
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         _parametersManager.Save(supportToolsParameters, "Project Saved");
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 
     private static bool RegisterDependenciesProjects(string gitsFolder,

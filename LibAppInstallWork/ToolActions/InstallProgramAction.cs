@@ -45,7 +45,7 @@ public sealed class InstallProgramAction : ToolAction
         _environmentName = environmentName;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
@@ -63,8 +63,8 @@ public sealed class InstallProgramAction : ToolAction
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         var installProgramResult = await projectManager.InstallProgram(_projectName, _environmentName,
-            _programArchiveDateMask,
-            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, cancellationToken);
+            _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension,
+            cancellationToken);
 
         if (installProgramResult.IsT1)
         {

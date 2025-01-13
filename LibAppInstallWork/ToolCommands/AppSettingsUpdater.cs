@@ -34,10 +34,9 @@ public sealed class AppSettingsUpdater : ToolCommand
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var appSettingsEncoderParameters =
-            AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
+        var appSettingsEncoderParameters = AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
 
         //1. დავამზადოთ პარამეტრების ფაილი დაშიფრული და ავტვირთოთ ფაილსაცავში პარამეტრების ფაილის შიგთავსი.
         var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,

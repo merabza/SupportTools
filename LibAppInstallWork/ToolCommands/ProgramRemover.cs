@@ -35,7 +35,7 @@ public sealed class ProgramRemover : ToolCommand
         return false;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
@@ -49,8 +49,7 @@ public sealed class ProgramRemover : ToolCommand
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
         if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName,
-                _parameters.IsService,
-                CancellationToken.None))
+                _parameters.IsService, CancellationToken.None))
             return true;
 
         _logger.LogError("Project {projectName} can not removed", projectName);

@@ -36,11 +36,10 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
             SyncMultipleProjectsGitsParameters.Create(supportToolsParameters, projectGroupName, projectName);
         var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new SyncMultipleProjectsGitsToolAction(loggerOrNull, parametersManager,
-            syncMultipleProjectsGitsParameters,
-            useConsole);
+            syncMultipleProjectsGitsParameters, useConsole);
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_syncMultipleProjectsGitsParameters.ProjectGroupName is null &&
@@ -59,8 +58,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
 
         var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
         {
-            [EGitCollect.Collect] = [],
-            [EGitCollect.Usage] = []
+            [EGitCollect.Collect] = [], [EGitCollect.Usage] = []
         };
         var loopNom = 0;
         var gitCollectUsage = EGitCollect.Collect;
@@ -84,7 +82,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
             changedGitProjects[EGitCollect.Usage] = changedGitProjects[EGitCollect.Collect];
         }
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 
     private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,

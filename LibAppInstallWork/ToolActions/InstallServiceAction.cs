@@ -55,7 +55,7 @@ public sealed class InstallServiceAction : ToolAction
 
     public string? InstallingProgramVersion { get; private set; }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
@@ -63,8 +63,7 @@ public sealed class InstallServiceAction : ToolAction
 
         if (projectManager is null)
         {
-            _logger.LogError(
-                "agentClient does not created. project {_projectName}/{_environmentName} does not updated",
+            _logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
                 _projectName, _environmentName);
             return false;
         }

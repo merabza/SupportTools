@@ -54,41 +54,41 @@ public sealed class CreatePackageAndUpload : ToolAction
 
     public string? AssemblyVersion { get; private set; }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
             _logger.LogError("Server name is not specified");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
             _logger.LogError("Environment Name is not specified");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_mainProjectFileName))
         {
             _logger.LogError("Project file name is not specified");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_projectName))
         {
             _logger.LogError("Project name is not specified");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(_workFolder))
         {
             _logger.LogError("Work Folder name is not specified");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         //თუ არ არსებობს, შეიქმნას სამუშაო ფოლდერი
         if (!StShared.CreateFolder(_workFolder, true))
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         const string archiveFileExtension = ".zip";
 
@@ -107,12 +107,12 @@ public sealed class CreatePackageAndUpload : ToolAction
         if (Directory.Exists(outputFolderPath))
         {
             StShared.WriteErrorLine($"Project output folder {outputFolderPath} is already exists", true, _logger);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         //თუ არ არსებობს, შევქმნათ
         if (!StShared.CreateFolder(outputFolderPath, true))
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         _logger.LogInformation("Detecting version...");
 
@@ -151,7 +151,7 @@ public sealed class CreatePackageAndUpload : ToolAction
             .IsSome)
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         //if (_redundantFileNames != null)
@@ -189,13 +189,13 @@ public sealed class CreatePackageAndUpload : ToolAction
         if (exchangeFileManager == null)
         {
             _logger.LogError("cannot create file manager");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         if (!exchangeFileManager.UploadFile(zipFileName, _uploadTempExtension))
         {
             _logger.LogError("cannot upload file {zipFileName}", zipFileName);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         _logger.LogInformation("Remove redundant files...");
@@ -223,6 +223,6 @@ public sealed class CreatePackageAndUpload : ToolAction
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _smartSchemaForLocal);
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 }

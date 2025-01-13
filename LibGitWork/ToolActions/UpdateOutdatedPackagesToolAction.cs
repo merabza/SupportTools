@@ -38,7 +38,7 @@ public class UpdateOutdatedPackagesToolAction : ToolAction
             useConsole);
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_updateOutdatedPackagesParameters.ProjectGroupName is null &&
@@ -74,6 +74,6 @@ public class UpdateOutdatedPackagesToolAction : ToolAction
             packageUpdater.Run();
         }
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 }

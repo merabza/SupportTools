@@ -39,7 +39,7 @@ public sealed class EncodeParametersAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         EncodedJsonContent = CreateEncodedJson();
         var success = false;
@@ -51,7 +51,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (!success)
             _logger.LogWarning("Encoded file does not created");
-        return ValueTask.FromResult(success);
+        return Task.FromResult(success);
     }
 
 
@@ -118,8 +118,7 @@ public sealed class EncodeParametersAction : ToolAction
         }
 
         foreach (var dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
-                     .Where(w => w.keys.Length != 0)
-                     .Where(w => !Enc(appSetJObject, encKey, w.keys))
+                     .Where(w => w.keys.Length != 0).Where(w => !Enc(appSetJObject, encKey, w.keys))
                      .Select(s => s.dataKey))
             _logger.LogWarning("cannot found dataKey {dataKey}", dataKey);
 

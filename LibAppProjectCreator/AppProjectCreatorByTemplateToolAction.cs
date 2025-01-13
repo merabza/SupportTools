@@ -38,7 +38,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         _httpClientFactory = httpClientFactory;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
@@ -147,9 +147,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
             return true;
 
-        var projectRecordCreator =
-            new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName, projectShortName,
-                string.Empty);
+        var projectRecordCreator = new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName,
+            projectShortName, string.Empty);
 
         if (projectRecordCreator.Create())
             return true;

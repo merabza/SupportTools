@@ -30,7 +30,7 @@ public sealed class BaseCopier : ToolCommand
             $"Copy Database from {CopyBaseParameters.SourceBackupRestoreParameters.DatabaseName} to {CopyBaseParameters.DestinationBackupRestoreParameters.DatabaseName}";
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var sourceBackupRestoreParameters = CopyBaseParameters.SourceBackupRestoreParameters;
         var destinationBackupRestoreParameters = CopyBaseParameters.DestinationBackupRestoreParameters;
@@ -205,8 +205,9 @@ public sealed class BaseCopier : ToolCommand
         _logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
         var restoreDatabaseFromBackupResult = await databaseManagerForDestination.RestoreDatabaseFromBackup(
-            backupFileParametersForSource, destinationBackupRestoreParameters.DbServerFoldersSetName,
-            destinationDatabaseName, CopyBaseParameters.LocalPath, CancellationToken.None);
+            backupFileParametersForSource, destinationDatabaseName,
+            destinationBackupRestoreParameters.DbServerFoldersSetName, CopyBaseParameters.LocalPath,
+            CancellationToken.None);
 
         if (restoreDatabaseFromBackupResult.IsNone)
             return true;

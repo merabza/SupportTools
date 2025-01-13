@@ -15,14 +15,13 @@ public class CreateCSharpGitIgnoreFile : ToolAction
     private readonly ILogger _logger;
 
     public CreateCSharpGitIgnoreFile(ILogger logger, string gitIgnoreFileName) : base(logger,
-        nameof(CreateCSharpGitIgnoreFile),
-        null, null)
+        nameof(CreateCSharpGitIgnoreFile), null, null)
     {
         _logger = logger;
         _gitIgnoreFileName = gitIgnoreFileName;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         const string code = """
                             appsettingsEncoded.json
@@ -402,10 +401,10 @@ public class CreateCSharpGitIgnoreFile : ToolAction
         if (FileStat.CreatePrevFolderIfNotExists(_gitIgnoreFileName, true, _logger))
         {
             File.WriteAllText(_gitIgnoreFileName, code.Replace("\r\n", "\n"));
-            return ValueTask.FromResult(true);
+            return Task.FromResult(true);
         }
 
         StShared.WriteErrorLine("File did not created", true);
-        return ValueTask.FromResult(false);
+        return Task.FromResult(false);
     }
 }

@@ -21,8 +21,7 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
 
     private ClearOneProjectAllGitsToolAction(ILogger? logger,
         ClearOneProjectAllGitsParameters clearOneProjectAllGitsParameters, string? excludeFolder) : base(logger,
-        "Clear One Project All Gits",
-        null, null)
+        "Clear One Project All Gits", null, null)
     {
         _logger = logger;
         _clearOneProjectAllGitsParameters = clearOneProjectAllGitsParameters;
@@ -44,7 +43,7 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
         return null;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         foreach (var gitData in _clearOneProjectAllGitsParameters.GitData.Where(x => x.GitIgnorePathName == "CSharp")
                      .OrderBy(x => x.GitProjectFolderName))

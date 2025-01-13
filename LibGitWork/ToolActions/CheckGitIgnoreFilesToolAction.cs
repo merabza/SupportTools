@@ -13,13 +13,12 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckGitIgnoreFilesToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(
-        logger,
-        ActionName, null, null, useConsole)
+        logger, ActionName, null, null, useConsole)
     {
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
         var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
@@ -27,12 +26,12 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
         if (wrongGitIgnoreFilesList.Count == 0)
         {
             Console.WriteLine("--wrong .gitignore files are not found");
-            return ValueTask.FromResult(true);
+            return Task.FromResult(true);
         }
 
         Console.WriteLine("wrong .gitignore files are found:");
         foreach (var (gitignoreFileName, _)in wrongGitIgnoreFilesList) Console.WriteLine(gitignoreFileName);
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 }

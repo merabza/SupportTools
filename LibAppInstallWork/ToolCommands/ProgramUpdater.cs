@@ -20,8 +20,8 @@ public sealed class ProgramUpdater : ToolCommand
 
     public ProgramUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
         ProgramUpdaterParameters programUpdaterParameters, IParametersManager parametersManager,
-        bool useConsole) : base(logger,
-        ActionName, programUpdaterParameters, parametersManager, ActionDescription, useConsole)
+        bool useConsole) : base(logger, ActionName, programUpdaterParameters, parametersManager, ActionDescription,
+        useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -29,7 +29,7 @@ public sealed class ProgramUpdater : ToolCommand
 
     private ProgramUpdaterParameters ProgramUpdaterParameters => (ProgramUpdaterParameters)Par;
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;

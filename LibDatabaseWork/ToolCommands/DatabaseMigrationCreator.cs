@@ -27,7 +27,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //მიგრაციის პროექტის ფაილი რომელ ფოლდერშიც არის, იმავეში უნდა იყოს Migrations ფოლდერი.
         //თუ ეს ფოლდერი აღმოჩენილი არ იქნება, გამოვიდეს შენიშვნა ამის შესახებ
@@ -36,15 +36,14 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         if (migrationProjectFile.Directory == null)
         {
             _logger.LogError("Object for Migration project file directory cannot be created");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
-        var migrationsFolder =
-            migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
+        var migrationsFolder = migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
         if (migrationsFolder == null)
         {
             _logger.LogError("Object for Migrations folder cannot be created");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         var directorySeparatorChar = Path.DirectorySeparatorChar;
@@ -56,14 +55,14 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         if (StShared.RunProcess(true, _logger, "dotnet",
                 $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         _logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
         if (StShared.RunProcess(true, _logger, "dotnet",
                 $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         //იმისათვის, რომ ამ კოდმა იმუშავოს, საჭიროა შემდეგი:
         //1. მიგრაციის პროექტში უნდა დაემატოს ფოლდერი Sql
@@ -79,20 +78,20 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
 
         var sqlFolder = migrationProjectFile.Directory.GetDirectories("Sql").SingleOrDefault();
         if (sqlFolder == null)
-            return ValueTask.FromResult(true);
+            return Task.FromResult(true);
 
         _logger.LogInformation("Create sql Migration");
         //ბაზის მიგრაციის დაწყება
         if (StShared.RunProcess(true, _logger, "dotnet",
                 $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
 
         var sqlMigrationFile = migrationsFolder.GetFiles("??????????????_Sql.cs").SingleOrDefault();
         if (sqlMigrationFile == null)
         {
             _logger.LogError("sql Migration File Not found");
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
         var sqlMigrationCreator = new SqlMigrationCreator(_logger, migrationsFolder.FullName,
@@ -103,7 +102,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
 
         _logger.LogInformation("Update Database for sql Migration");
         //ბაზის განახლება
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
+        return Task.FromResult(StShared.RunProcess(true, _logger, "dotnet",
                 $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsNone);
     }

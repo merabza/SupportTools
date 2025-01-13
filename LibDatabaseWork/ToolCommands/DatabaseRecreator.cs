@@ -34,7 +34,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //წაიშალოს დეველოპერ ბაზა
         var databaseDropper = new DatabaseDropper(_logger, DatabaseMigrationParameters, ParametersManager);

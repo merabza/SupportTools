@@ -29,7 +29,7 @@ public class ServiceInstallScriptCreator : ToolCommand
     }
 
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var ftpSiteUserName = _par.FileStorageForExchange.UserName;
 

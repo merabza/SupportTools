@@ -20,8 +20,7 @@ public sealed class GitClearToolAction : ToolAction
     private readonly ILogger? _logger;
 
     public GitClearToolAction(ILogger? logger, GitClearParameters gitClearParameters, string? excludeFolder) : base(
-        logger, "Git Clear", null,
-        null)
+        logger, "Git Clear", null, null)
     {
         _logger = logger;
         _gitClearParameters = gitClearParameters;
@@ -52,13 +51,13 @@ public sealed class GitClearToolAction : ToolAction
         return false;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectFolderName =
             Path.Combine(_gitClearParameters.GitsFolder, _gitClearParameters.GitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
-            return ValueTask.FromResult(gitProcessor.Clone(_gitClearParameters.GitData.GitProjectAddress));
+            return Task.FromResult(gitProcessor.Clone(_gitClearParameters.GitData.GitProjectAddress));
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
@@ -68,15 +67,15 @@ public sealed class GitClearToolAction : ToolAction
 
         if (!gitInitialized)
         {
-            StShared.WriteErrorLine(
-                $"Git project folder exists, but not initialized. folder: {projectFolderName}.", true, _logger);
-            return ValueTask.FromResult(false);
+            StShared.WriteErrorLine($"Git project folder exists, but not initialized. folder: {projectFolderName}.",
+                true, _logger);
+            return Task.FromResult(false);
         }
 
 
         ProcessFolder(projectFolderName);
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 
     private bool ProcessFolder(string folderPath)
@@ -115,8 +114,7 @@ public sealed class GitClearToolAction : ToolAction
 
         if (Directory.GetFiles(folderPath, "*.csproj").Length == 0)
             return dir.GetDirectories().Where(x => x.Name != ".git" && x.Name != ".vs" && x.Name != "packages")
-                .Select(x => x.FullName)
-                .All(ProcessFolder);
+                .Select(x => x.FullName).All(ProcessFolder);
 
         if (folderPath.Contains(".git"))
         {

@@ -29,7 +29,7 @@ public sealed class ServiceUpdater : ToolCommand
 
     private ServiceUpdaterParameters ProgramServiceUpdaterParameters => (ServiceUpdaterParameters)Par;
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
@@ -41,8 +41,7 @@ public sealed class ServiceUpdater : ToolCommand
         }
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var programPublisherParameters =
-            ProgramServiceUpdaterParameters.ProgramPublisherParameters;
+        var programPublisherParameters = ProgramServiceUpdaterParameters.ProgramPublisherParameters;
 
         var createPackageAndUpload = new CreatePackageAndUpload(_logger, programPublisherParameters.ProjectName,
             programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
@@ -56,8 +55,7 @@ public sealed class ServiceUpdater : ToolCommand
 
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
-        var appSettingsEncoderParameters =
-            ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
+        var appSettingsEncoderParameters = ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
         string? appSettingsVersion = null;
         var installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
         if (installParameters)

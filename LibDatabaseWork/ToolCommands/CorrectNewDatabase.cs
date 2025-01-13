@@ -49,7 +49,7 @@ public sealed class CorrectNewDatabase : ToolCommand
         return false;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var constraintsForCorrect = CorrectBitConstraints();
 
@@ -65,17 +65,17 @@ public sealed class CorrectNewDatabase : ToolCommand
             {
                 var defaultConstraintName = constraintDataModel.DefaultConstraintName;
                 _logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
-                return ValueTask.FromResult(false);
+                return Task.FromResult(false);
             }
 
             if (CreateConstraint(constraintDataModel))
                 continue;
 
             _logger.LogError("Cannot Create constraint for table {tableName}", tableName);
-            return ValueTask.FromResult(false);
+            return Task.FromResult(false);
         }
 
-        return ValueTask.FromResult(true);
+        return Task.FromResult(true);
     }
 
     private bool CreateConstraint(ConstraintDataModel constraintDataModel)
@@ -138,8 +138,7 @@ public sealed class CorrectNewDatabase : ToolCommand
             using var reader = dbm.ExecuteReader(query);
             var fileNames = new List<ConstraintDataModel>();
             while (reader.Read())
-                fileNames.Add(new ConstraintDataModel((string)reader["tableName"],
-                    (string)reader["columnName"],
+                fileNames.Add(new ConstraintDataModel((string)reader["tableName"], (string)reader["columnName"],
                     (string)reader["defaultConstraintName"]));
 
             return fileNames;

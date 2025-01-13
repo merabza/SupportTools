@@ -44,13 +44,13 @@ public sealed class GitSyncToolAction : ToolAction
     public bool Changed { get; private set; }
     public string? UsedCommitMessage { get; private set; }
 
-    public static GitSyncToolAction? Create(ILogger? logger, ParametersManager parametersManager,
-        string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
+    public static GitSyncToolAction? Create(ILogger? logger, ParametersManager parametersManager, string projectName,
+        EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull,
-            supportToolsParameters, projectName, gitCol, gitProjectName, useConsole);
+        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
+            gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
             return new GitSyncToolAction(loggerOrNull, gitSyncParameters);
@@ -169,11 +169,11 @@ public sealed class GitSyncToolAction : ToolAction
         return false;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         RunActionPhase1();
 
-        return ValueTask.FromResult(RunActionPhase2());
+        return Task.FromResult(RunActionPhase2());
     }
 
     private bool RunActionPhase2()

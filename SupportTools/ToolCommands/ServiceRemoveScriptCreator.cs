@@ -28,7 +28,7 @@ public class ServiceRemoveScriptCreator : ToolCommand
     }
 
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_par.ServerInfo.ServerName))
         {

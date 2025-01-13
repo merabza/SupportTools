@@ -47,7 +47,7 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var encodeParametersAction = new EncodeParametersAction(_logger, _keysJsonFileName, _sourceJsonFileName,
             _encodedJsonFileName, _keyPart1, _keyPart2);
@@ -67,9 +67,8 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
         }
 
 
-        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(_logger, _projectName,
-            _serverInfo, _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage,
-            _uploadSmartSchema);
+        var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(_logger, _projectName, _serverInfo,
+            _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage, _uploadSmartSchema);
         return await uploadParametersToExchangeAction.Run(cancellationToken);
     }
 }
