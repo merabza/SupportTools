@@ -62,7 +62,6 @@ public sealed class BaseCopier : ToolCommand
         {
             _logger.LogInformation("Not need Download From Source");
         }
-
         else
         {
             _logger.LogInformation("Download File {fileName}", fileName);
