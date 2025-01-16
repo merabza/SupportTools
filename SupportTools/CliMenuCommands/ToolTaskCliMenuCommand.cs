@@ -55,7 +55,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        toolCommand.Run(CancellationToken.None);
+        toolCommand.Run(CancellationToken.None).Preserve().GetAwaiter().GetResult();
         return true;
     }
 }
