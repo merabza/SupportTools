@@ -52,7 +52,7 @@ public sealed class DotnetToolsManager
         }
     }
 
-    private static OneOf<DotnetToolsManager, Err[]> Create()
+    private static OneOf<DotnetToolsManager, IEnumerable<Err>> Create()
     {
         StShared.ConsoleWriteInformationLine(null, true, "Wait...");
         var necessaryToolsNames = new Dictionary<ENecessaryTools, string>
@@ -76,7 +76,7 @@ public sealed class DotnetToolsManager
         return new DotnetToolsManager(necessaryToolsNames, dotnetTools);
     }
 
-    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetTools(
+    private static OneOf<List<DotnetTool>, IEnumerable<Err>> CreateListOfDotnetTools(
         Dictionary<ENecessaryTools, string> necessaryToolsNames)
     {
         var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
@@ -102,11 +102,11 @@ public sealed class DotnetToolsManager
         return listOfTools;
     }
 
-    private static OneOf<string, Err[]> GetAvailableVersionOfTool(string toolName)
+    private static OneOf<string, IEnumerable<Err>> GetAvailableVersionOfTool(string toolName)
     {
         var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", $"tool search {toolName} --take 1");
         if (processResult.IsT1)
-            return processResult.AsT1;
+            return (Err[])processResult.AsT1;
         var outputResult = processResult.AsT0.Item1;
         var outputLines = outputResult.Split(Environment.NewLine);
         if (outputLines.Length < 3) return "N/A";
@@ -114,11 +114,11 @@ public sealed class DotnetToolsManager
         return lineParts.Length < 2 ? "N/A" : lineParts[1];
     }
 
-    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetToolsInstalled()
+    private static OneOf<List<DotnetTool>, IEnumerable<Err>> CreateListOfDotnetToolsInstalled()
     {
         var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", "tool list --global");
         if (processResult.IsT1)
-            return processResult.AsT1;
+            return (Err[])processResult.AsT1;
         var outputResult = processResult.AsT0.Item1;
         var outputLines = outputResult.Split(Environment.NewLine);
 

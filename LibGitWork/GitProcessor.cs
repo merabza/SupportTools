@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -31,7 +32,7 @@ public sealed class GitProcessor
         LastRemoteId = GitGetRemoteId();
     }
 
-    //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
+    //public OneOf<bool, IEnumerable<Err>> NeedPull(bool updateRemote = false)
     //{
     //    if (updateRemote && !GitRemoteUpdate())
     //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
@@ -152,12 +153,12 @@ fi*/
         return false;
     }
 
-    public OneOf<string, Err[]> GetRemoteOriginUrl()
+    public OneOf<string, IEnumerable<Err>> GetRemoteOriginUrl()
     {
         var result = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} config --get remote.origin.url");
         if (result.IsT1)
-            return result.AsT1;
+            return (Err[])result.AsT1;
         return result.AsT0.Item1.Trim(Environment.NewLine.ToCharArray());
     }
 
@@ -172,12 +173,12 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Err[]> NeedCommit()
+    public OneOf<bool, IEnumerable<Err>> NeedCommit()
     {
         var gitStatusOutputResult =
             StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
-            return gitStatusOutputResult.AsT1;
+            return (Err[])gitStatusOutputResult.AsT1;
         var gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
         return gitStatusOutput != string.Empty;
     }
@@ -214,14 +215,14 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Err[]> HaveUnTrackedFiles()
+    public OneOf<bool, IEnumerable<Err>> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
-            return statusCommandOutputResult.AsT1;
+            return (Err[])statusCommandOutputResult.AsT1;
         var statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
 
         return !string.IsNullOrWhiteSpace(statusCommandOutput);
@@ -305,14 +306,14 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], Err[]> GetRedundantCachedFilesList()
+    public OneOf<string[], IEnumerable<Err>> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
 
         if (statusCommandOutputResult.IsT1)
-            return statusCommandOutputResult.AsT1;
+            return (Err[])statusCommandOutputResult.AsT1;
         var statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
 
         return string.IsNullOrWhiteSpace(statusCommandOutput)

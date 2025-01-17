@@ -13,6 +13,7 @@ using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 namespace LibDatabaseWork;
 
@@ -115,22 +116,25 @@ public static class CopyBaseParametersFabric
         //sourceDbWebAgentName
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var databaseManagerForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, httpClientFactory,
-            true, sourceDbConnectionName, databaseServerConnections, apiClients, null, null, CancellationToken.None);
+        var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger,
+            httpClientFactory, true, sourceDbConnectionName, databaseServerConnections, apiClients, null, null,
+            CancellationToken.None);
 
-        if (databaseManagerForSource is null)
+        if (createDatabaseManagerResultForSource.IsT1)
         {
+            Err.PrintErrorsOnConsole(createDatabaseManagerResultForSource.AsT1);
             logger.LogError("Can not create client for source Database server");
             return null;
         }
 
         //destinationDbWebAgentName
-        var databaseManagerForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger,
+        var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger,
             httpClientFactory, true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
             CancellationToken.None);
 
-        if (databaseManagerForDestination is null)
+        if (createDatabaseManagerResultForDestination.IsT1)
         {
+            Err.PrintErrorsOnConsole(createDatabaseManagerResultForDestination.AsT1);
             logger.LogError("Can not create client for destination Database server");
             return null;
         }
@@ -204,12 +208,12 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var sourceBackupRestoreParameters = new BackupRestoreParameters(databaseManagerForSource, sourceFileManager,
-            sourceSmartSchema, sourceDatabaseName, fromDatabaseParameters.DbServerFoldersSetName);
+        var sourceBackupRestoreParameters = new BackupRestoreParameters(createDatabaseManagerResultForSource.AsT0,
+            sourceFileManager, sourceSmartSchema, sourceDatabaseName, fromDatabaseParameters.DbServerFoldersSetName);
 
-        var destinationBackupRestoreParameters = new BackupRestoreParameters(databaseManagerForDestination,
-            destinationFileManager, destinationSmartSchema, destinationDatabaseName,
-            toDatabaseParameters.DbServerFoldersSetName);
+        var destinationBackupRestoreParameters = new BackupRestoreParameters(
+            createDatabaseManagerResultForDestination.AsT0, destinationFileManager, destinationSmartSchema,
+            destinationDatabaseName, toDatabaseParameters.DbServerFoldersSetName);
 
 
         return new CopyBaseParameters(sourceBackupRestoreParameters, destinationBackupRestoreParameters,
