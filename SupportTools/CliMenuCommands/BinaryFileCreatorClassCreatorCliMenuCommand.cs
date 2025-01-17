@@ -93,8 +93,8 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             var base64String = Convert.ToBase64String(fileBytes);
 
             Console.WriteLine($"Creating {cci.DestinationCodeFileName}...");
-            var creatorClassCreator = new BinFileCreatorClassCreator(_logger, cci.DestinationFolder,
-                cci.ClassName, base64String, cci.DestinationCodeFileName);
+            var creatorClassCreator = new BinFileCreatorClassCreator(_logger, cci.DestinationFolder, cci.ClassName,
+                base64String, cci.DestinationCodeFileName);
             creatorClassCreator.CreateFileStructure();
         }
     }
@@ -107,8 +107,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
                 classCreatorInfo,
                 toGenerateFileName =
                     Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
-            })
-            .Where(x => File.Exists(x.toGenerateFileName))
+            }).Where(x => File.Exists(x.toGenerateFileName))
             .Select(sx => sx.classCreatorInfo.DestinationCodeFileName).ToList();
 
         if (existsFileNames.Count <= 0)

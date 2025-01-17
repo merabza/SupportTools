@@ -74,8 +74,7 @@ public sealed class TemplateCruder : ParCruder
         if (parameters.AppProjectCreatorAllParameters is null)
             throw new Exception(
                 "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
-        var projectTemplates =
-            parameters.AppProjectCreatorAllParameters.Templates;
+        var projectTemplates = parameters.AppProjectCreatorAllParameters.Templates;
         projectTemplates.Remove(recordKey);
     }
 

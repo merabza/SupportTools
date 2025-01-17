@@ -71,8 +71,7 @@ public class WrongGitignoreFilesListCreator
                 if (missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
                     continue;
 
-                if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName,
-                        out var gitIgnoreTemplateFileContent))
+                if (!gitIgnoreTemplateFileContents.TryGetValue(gitIgnorePathName, out var gitIgnoreTemplateFileContent))
                 {
                     if (File.Exists(gitIgnoreTemplateFileName))
                     {

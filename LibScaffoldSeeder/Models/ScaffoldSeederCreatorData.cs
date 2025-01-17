@@ -48,15 +48,13 @@ public sealed class ScaffoldSeederCreatorData
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName,
             scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName, EDotnetProjectType.Console,
-            string.Empty,
-            "Program", ["Models", "Properties"]);
+            string.Empty, "Program", ["Models", "Properties"]);
 
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName,
             scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName, EDotnetProjectType.Console, string.Empty,
-            "Program",
-            ["Models"]);
+            "Program", ["Models"]);
 
         var projectFolders = new List<string> { "Migrations" };
         var migrationSqlFilesFolder = scaffoldSeederCreatorParameters.MigrationSqlFilesFolder;
@@ -84,8 +82,8 @@ public sealed class ScaffoldSeederCreatorData
             EDotnetProjectType.Web, "--no-https", "Program", []);
 
         return new ScaffoldSeederCreatorData(databaseScaffoldClassLibProject, dataSeedingClassLibProject,
-            createProjectSeederCodeProject, getJsonFromProjectDbProject, dbMigrationProject,
-            seedDbProject, fakeHostWebApiProject, appCreatorBaseData);
+            createProjectSeederCodeProject, getJsonFromProjectDbProject, dbMigrationProject, seedDbProject,
+            fakeHostWebApiProject, appCreatorBaseData);
 
 
         //ProjectForCreate libProjectRepositoriesProjectData =

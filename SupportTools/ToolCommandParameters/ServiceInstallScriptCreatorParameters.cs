@@ -8,8 +8,8 @@ namespace SupportTools.ToolCommandParameters;
 public class ServiceInstallScriptCreatorParameters : IParameters
 {
     private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName,
-        string? serviceDescriptionSignature, ProjectModel project,
-        ServerInfoModel serverInfo, FileStorageData fileStorageForExchange)
+        string? serviceDescriptionSignature, ProjectModel project, ServerInfoModel serverInfo,
+        FileStorageData fileStorageForExchange)
     {
         SecurityFolder = securityFolder;
         ProjectName = projectName;

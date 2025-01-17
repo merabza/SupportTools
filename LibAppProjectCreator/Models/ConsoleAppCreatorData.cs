@@ -33,22 +33,20 @@ public sealed class ConsoleAppCreatorData
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
 
-    public ProjectForCreate DoProjectData => _doProjectData ??
-                                             throw new InvalidOperationException("Uninitialized property: " +
-                                                 nameof(DoProjectData));
+    public ProjectForCreate DoProjectData =>
+        _doProjectData ?? throw new InvalidOperationException("Uninitialized property: " + nameof(DoProjectData));
 
-    public ProjectForCreate LibProjectRepositoriesProjectData => _libProjectRepositoriesProjectData ??
-                                                                 throw new InvalidOperationException(
-                                                                     "Uninitialized property: " +
-                                                                     nameof(LibProjectRepositoriesProjectData));
+    public ProjectForCreate LibProjectRepositoriesProjectData =>
+        _libProjectRepositoriesProjectData ??
+        throw new InvalidOperationException("Uninitialized property: " + nameof(LibProjectRepositoriesProjectData));
 
-    public ProjectForCreate DatabaseProjectData => _databaseProjectData ??
-                                                   throw new InvalidOperationException("Uninitialized property: " +
-                                                       nameof(DatabaseProjectData));
+    public ProjectForCreate DatabaseProjectData =>
+        _databaseProjectData ??
+        throw new InvalidOperationException("Uninitialized property: " + nameof(DatabaseProjectData));
 
-    public ProjectForCreate DbMigrationProjectData => _dbMigrationProjectData ??
-                                                      throw new InvalidOperationException("Uninitialized property: " +
-                                                          nameof(DbMigrationProjectData));
+    public ProjectForCreate DbMigrationProjectData =>
+        _dbMigrationProjectData ??
+        throw new InvalidOperationException("Uninitialized property: " + nameof(DbMigrationProjectData));
 
     public static ConsoleAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
         TemplateModel template)
@@ -60,8 +58,8 @@ public sealed class ConsoleAppCreatorData
             projectFolders.Add("MenuCommands");
 
         //მთავარი პროექტი
-        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName,
-            projectName, EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
+        var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
+            EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
 
         if (!template.UseDatabase)
             return new ConsoleAppCreatorData(appCreatorBaseData, mainProjectData, null, null, null, null,

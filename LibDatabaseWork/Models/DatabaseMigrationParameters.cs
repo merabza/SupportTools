@@ -61,9 +61,8 @@ public sealed class DatabaseMigrationParameters : IParameters
             return null;
         }
 
-        var databaseMigrationParameters =
-            new DatabaseMigrationParameters(project.MigrationStartupProjectFilePath, project.MigrationProjectFilePath,
-                project.DbContextName);
+        var databaseMigrationParameters = new DatabaseMigrationParameters(project.MigrationStartupProjectFilePath,
+            project.MigrationProjectFilePath, project.DbContextName);
 
         return databaseMigrationParameters;
     }

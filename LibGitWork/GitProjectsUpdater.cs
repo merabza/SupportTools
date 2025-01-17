@@ -218,8 +218,7 @@ public sealed class GitProjectsUpdater
         Console.WriteLine($"Dependencies for {filePath}");
         var projectXml = XElement.Load(filePath);
 
-        var projectReferences =
-            projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
+        var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
 
         var projectRelativePath = Path.GetRelativePath(_gitsFolder, folderPath);
         var project = RegisterProject(projectRelativePath, fileName, gitName);
@@ -260,7 +259,9 @@ public sealed class GitProjectsUpdater
 
         _supportToolsParameters.GitProjects.TryAdd(projectName,
             new GitProjectDataModel
-                { GitName = gitName, ProjectRelativePath = projectRelativePath, ProjectFileName = projectFileName });
+            {
+                GitName = gitName, ProjectRelativePath = projectRelativePath, ProjectFileName = projectFileName
+            });
 
         var gitProject = _supportToolsParameters.GitProjects[projectName];
 

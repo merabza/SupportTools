@@ -90,8 +90,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.DbMigrationProjectData);
 
         //რეფერენსების სიის შედგენა LibProjectRepositories პროექტისათვის
-        AddReference(_apiAppCreatorData.LibProjectRepositoriesProjectData,
-            _apiAppCreatorData.DatabaseProjectData);
+        AddReference(_apiAppCreatorData.LibProjectRepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
 
         //რეფერენსების სიის შედგენა Db პროექტისათვის
         AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsShared);
@@ -230,8 +229,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         }
 
 
-        File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey],
-            Path.Combine(folderForGitIgnore, gitignore));
+        File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey], Path.Combine(folderForGitIgnore, gitignore));
         return true;
     }
 
@@ -344,14 +342,12 @@ public sealed class ApiAppCreator : AppCreatorBase
         const string assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db",
-            assemblyReferenceClassFileName);
+            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db", assemblyReferenceClassFileName);
         assemblyReferenceClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestQuery.cs...");
         var testQueryClassCreator = new TestQueryClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName,
-            "TestQuery.cs");
+            _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName, "TestQuery.cs");
         testQueryClassCreator.CreateFileStructure();
 
 
@@ -373,20 +369,16 @@ public sealed class ApiAppCreator : AppCreatorBase
         //---===libProjectRepositories პროექტის ფაილები===---
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი ინტერფეისი
         Console.WriteLine($"Creating I{ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricInterfaceCreator =
-            new RepositoryCreatorFabricInterfaceCreator(Logger,
-                _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                ProjectName,
-                $"I{ProjectName}RepositoryCreatorFabric.cs");
+        var repositoryCreatorFabricInterfaceCreator = new RepositoryCreatorFabricInterfaceCreator(Logger,
+            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"I{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricInterfaceCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი
         Console.WriteLine($"Creating {ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricCreator =
-            new RepositoryCreatorFabricCreator(Logger,
-                _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath,
-                ProjectName,
-                $"{ProjectName}RepositoryCreatorFabric.cs");
+        var repositoryCreatorFabricCreator = new RepositoryCreatorFabricCreator(Logger,
+            _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
+            $"{ProjectName}RepositoryCreatorFabric.cs");
         repositoryCreatorFabricCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორია
@@ -408,15 +400,13 @@ public sealed class ApiAppCreator : AppCreatorBase
         CodeCreator dbContextClassCreator = _apiAppCreatorData.UseCarcass
             ? new DbContextForCarcassClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath,
                 ProjectName, $"{ProjectName}DbContext.cs")
-            : new DbContextClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath,
-                ProjectName, $"{ProjectName}DbContext.cs");
+            : new DbContextClassCreator(Logger, _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName,
+                $"{ProjectName}DbContext.cs");
         dbContextClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating DesignTimeDbContextFactory.cs...");
-        var designTimeDbContextFactoryClassCreator =
-            new DesignTimeDbContextFactoryClassCreator(Logger,
-                _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName,
-                "DesignTimeDbContextFactory.cs");
+        var designTimeDbContextFactoryClassCreator = new DesignTimeDbContextFactoryClassCreator(Logger,
+            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, ProjectName, "DesignTimeDbContextFactory.cs");
         designTimeDbContextFactoryClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestModel.cs...");
@@ -446,8 +436,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         //შეიქმნას პარამეტრების მოდელის კლასი StatProgramAttr.cs
         Console.WriteLine("Creating AppSettings.cs...");
-        var appSettingsClassCreator =
-            new AppSettingsClassCreator(Logger, modelsPath, ProjectName, "AppSettings.cs");
+        var appSettingsClassCreator = new AppSettingsClassCreator(Logger, modelsPath, ProjectName, "AppSettings.cs");
         appSettingsClassCreator.CreateFileStructure();
     }
 

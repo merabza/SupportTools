@@ -37,80 +37,60 @@ public sealed class ApiProgramClassCreator : CodeCreator
     public override void CreateFileStructure()
     {
         var fluentValidationInstallerCodeCommands = _useFluentValidation
-            ? new FlatCodeBlock(string.Empty,
-                new OneLineComment("FluentValidationInstaller"),
-                string.Empty,
-                $"""
+            ? new FlatCodeBlock(string.Empty, new OneLineComment("FluentValidationInstaller"), string.Empty, $"""
                  builder.Services.InstallValidation(
                  //BackendCarcass
                  BackendCarcassApi.AssemblyReference.Assembly
                  //{_projectNamespace}
                   )
-                 """
-            )
+                 """)
             : null;
 
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using ConfigurationEncrypt",
-            _useFluentValidation ? "using FluentValidationInstaller" : null,
-            "using Microsoft.AspNetCore.Builder",
-            "using Microsoft.Extensions.DependencyInjection",
-            "using Serilog",
-            _useSignalR ? "using SignalRMessages.Installers" : null,
-            "using SwaggerTools",
-            "using System",
-            "using System.Collections.Generic",
-            "using WebInstallers",
-            "using Microsoft.Extensions.Hosting",
-            string.Empty,
-            new CodeBlock("try",
-                $$"""
-                  var parameters = new Dictionary<string, string>
-                  {
-                      {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : null)}}
-                      { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
-                      { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
-                      { SwaggerInstaller.VersionCountKey, 1.ToString() },
-                      { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
-                  }
-                  """,
-                string.Empty,
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using ConfigurationEncrypt", _useFluentValidation ? "using FluentValidationInstaller" : null,
+            "using Microsoft.AspNetCore.Builder", "using Microsoft.Extensions.DependencyInjection", "using Serilog",
+            _useSignalR ? "using SignalRMessages.Installers" : null, "using SwaggerTools", "using System",
+            "using System.Collections.Generic", "using WebInstallers", "using Microsoft.Extensions.Hosting",
+            string.Empty, new CodeBlock("try", $$"""
+                                                 var parameters = new Dictionary<string, string>
+                                                 {
+                                                     {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : null)}}
+                                                     { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
+                                                     { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
+                                                     { SwaggerInstaller.VersionCountKey, 1.ToString() },
+                                                     { SwaggerInstaller.UseSwaggerWithJwtBearerKey, string.Empty } //Allow Swagger
+                                                 }
+                                                 """, string.Empty,
                 "var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRootPath = AppContext.BaseDirectory, Args = args })",
-                string.Empty,
-                "var debugMode = builder.Environment.IsDevelopment()",
-                string.Empty,
-                new CodeBlock($"""
-                               if (!builder.InstallServices(debugMode, args, parameters, 
+                string.Empty, "var debugMode = builder.Environment.IsDevelopment()", string.Empty, new CodeBlock($"""
+                     if (!builder.InstallServices(debugMode, args, parameters, 
 
-                               {(_useCarcass && _useDatabase ? $"""
-                                                                //BackendCarcass
-                                                                CarcassRepositories.AssemblyReference.Assembly,
-                                                                BackendCarcassApi.AssemblyReference.Assembly,
-                                                                CarcassDom.AssemblyReference.Assembly,
-                                                                {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : null)}
-                                                                """ : null)}
+                     {(_useCarcass && _useDatabase ? $"""
+                                                      //BackendCarcass
+                                                      CarcassRepositories.AssemblyReference.Assembly,
+                                                      BackendCarcassApi.AssemblyReference.Assembly,
+                                                      CarcassDom.AssemblyReference.Assembly,
+                                                      {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : null)}
+                                                      """ : null)}
 
-                               {(_useDatabase ? $"""
-                                                 //{_projectNamespace}DbPart
-                                                 {_projectNamespace}Db.AssemblyReference.Assembly,
-                                                 {_projectNamespace}Repositories.AssemblyReference.Assembly,
-                                                 """ : null)}
+                     {(_useDatabase ? $"""
+                                       //{_projectNamespace}DbPart
+                                       {_projectNamespace}Db.AssemblyReference.Assembly,
+                                       {_projectNamespace}Repositories.AssemblyReference.Assembly,
+                                       """ : null)}
 
-                               //WebSystemTools
-                               ApiExceptionHandler.AssemblyReference.Assembly,
-                               ConfigurationEncrypt.AssemblyReference.Assembly,
-                               {(_useReact ? "CorsTools.AssemblyReference.Assembly," : null)}
-                               {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : null)}
-                               SerilogLogger.AssemblyReference.Assembly,
-                               StaticFilesTools.AssemblyReference.Assembly,
-                               SwaggerTools.AssemblyReference.Assembly,
-                               TestToolsApi.AssemblyReference.Assembly,
-                               WindowsServiceTools.AssemblyReference.Assembly
-                               ))
-                               """, "return 2"),
-                string.Empty,
-                _useCarcass
+                     //WebSystemTools
+                     ApiExceptionHandler.AssemblyReference.Assembly,
+                     ConfigurationEncrypt.AssemblyReference.Assembly,
+                     {(_useReact ? "CorsTools.AssemblyReference.Assembly," : null)}
+                     {(_useReCounter ? "ReCounterServiceInstaller.AssemblyReference.Assembly," : null)}
+                     SerilogLogger.AssemblyReference.Assembly,
+                     StaticFilesTools.AssemblyReference.Assembly,
+                     SwaggerTools.AssemblyReference.Assembly,
+                     TestToolsApi.AssemblyReference.Assembly,
+                     WindowsServiceTools.AssemblyReference.Assembly
+                     ))
+                     """, "return 2"), string.Empty, _useCarcass
                     ? $$$"""
                          builder.Services.AddMediatR(cfg =>
                          {{
@@ -121,22 +101,12 @@ public sealed class ApiProgramClassCreator : CodeCreator
                              //{{{_projectNamespace}}}
                          }})
                          """
-                    : null,
-                fluentValidationInstallerCodeCommands,
-                string.Empty,
-                new OneLineComment("ReSharper disable once using"),
-                string.Empty,
-                "using var app = builder.Build()",
-                string.Empty,
-                new CodeBlock("if (!app.UseServices(debugMode))", "return 1"),
-                string.Empty,
-                "app.Run()",
+                    : null, fluentValidationInstallerCodeCommands, string.Empty,
+                new OneLineComment("ReSharper disable once using"), string.Empty, "using var app = builder.Build()",
+                string.Empty, new CodeBlock("if (!app.UseServices(debugMode))", "return 1"), string.Empty, "app.Run()",
                 "return 0"),
-            new CodeBlock("catch (Exception e)",
-                "Log.Fatal(e, \"Host terminated unexpectedly\")",
-                "return 1"),
-            new CodeBlock("finally",
-                "Log.CloseAndFlush()"));
+            new CodeBlock("catch (Exception e)", "Log.Fatal(e, \"Host terminated unexpectedly\")", "return 1"),
+            new CodeBlock("finally", "Log.CloseAndFlush()"));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

@@ -42,8 +42,7 @@ public sealed class DataSeederParameters : IParameters
             }
 
             var dataSeederParameters = new DataSeederParameters(
-                project.SeedProjectFilePath,
-                project.SeedProjectParametersFilePath);
+                project.SeedProjectFilePath, project.SeedProjectParametersFilePath);
             return dataSeederParameters;
         }
         catch (Exception e)

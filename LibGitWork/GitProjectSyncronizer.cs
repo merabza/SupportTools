@@ -17,7 +17,6 @@ public class GitProjectSyncronizer
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
-    public bool HasChanges { get; private set; }
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -29,6 +28,8 @@ public class GitProjectSyncronizer
         _gitProjectName = gitProjectName;
         _useConsole = useConsole;
     }
+
+    public bool HasChanges { get; private set; }
 
     public string? UsedCommitMessage { get; set; }
 
@@ -48,8 +49,7 @@ public class GitProjectSyncronizer
     public void RunSync()
     {
         //ეს ნაწილი არის SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება
-        var gitProjectsUpdater =
-            GitProjectsUpdater.Create(_logger, _parametersManager, _gitProjectName, _useConsole);
+        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, _gitProjectName, _useConsole);
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);

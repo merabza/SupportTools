@@ -62,8 +62,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         //ახალი პროექტის შექმნა
         NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder,
-            projectCreatorTemplateCruder.CrudNamePlural,
-            $"New {projectCreatorTemplateCruder.CrudName}");
+            projectCreatorTemplateCruder.CrudNamePlural, $"New {projectCreatorTemplateCruder.CrudName}");
         projectCreatorSubMenuSet.AddMenuItem(newItemCommand);
 
         //პროექტების ჩამონათვალი

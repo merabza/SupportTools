@@ -100,8 +100,8 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
 
             var stackItems = new Stack<CodeBlockBase>();
-            var startCodeBlock =
-                new CodeBlock(string.Empty, "new OneLineComment($\"Created by {GetType().Name} at {DateTime.Now}\")");
+            var startCodeBlock = new CodeBlock(string.Empty,
+                "new OneLineComment($\"Created by {GetType().Name} at {DateTime.Now}\")");
             CodeBlockBase mainCodeBlock = startCodeBlock;
             var currentCodeBlock = mainCodeBlock;
             stackItems.Push(currentCodeBlock);
@@ -145,8 +145,8 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             }
 
             Console.WriteLine($"Creating {cci.DestinationCodeFileName}...");
-            var creatorClassCreator = new CreatorClassCreator(_logger, cci.DestinationFolder,
-                cci.ClassName, startCodeBlock, cci.DestinationCodeFileName);
+            var creatorClassCreator = new CreatorClassCreator(_logger, cci.DestinationFolder, cci.ClassName,
+                startCodeBlock, cci.DestinationCodeFileName);
             creatorClassCreator.CreateFileStructure();
         }
     }
@@ -159,8 +159,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 classCreatorInfo,
                 toGenerateFileName =
                     Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
-            })
-            .Where(x => File.Exists(x.toGenerateFileName))
+            }).Where(x => File.Exists(x.toGenerateFileName))
             .Select(sx => sx.classCreatorInfo.DestinationCodeFileName).ToList();
 
         if (existsFileNames.Count <= 0)

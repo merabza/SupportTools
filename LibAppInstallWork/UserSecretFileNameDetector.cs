@@ -14,8 +14,7 @@ public static class UserSecretFileNameDetector
 
         //  Project => PropertyGroup => UserSecretsId
         //.Descendants("Project")
-        var xmlUserSecretsId = xmlCsproj.Descendants("PropertyGroup").Descendants("UserSecretsId")
-            .SingleOrDefault();
+        var xmlUserSecretsId = xmlCsproj.Descendants("PropertyGroup").Descendants("UserSecretsId").SingleOrDefault();
 
         string? userSecretsId = null;
         if (xmlUserSecretsId != null)
@@ -27,8 +26,8 @@ public static class UserSecretFileNameDetector
             //  %APPDATA%\microsoft\UserSecrets\<userSecretsId>\secrets.json
             //C:\Users\{UserName}\AppData\Roaming\Microsoft\UserSecrets
 
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Microsoft", "UserSecrets", userSecretsId, "secrets.json");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft",
+                "UserSecrets", userSecretsId, "secrets.json");
 
         return null;
     }

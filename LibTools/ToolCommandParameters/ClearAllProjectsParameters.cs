@@ -7,8 +7,8 @@ namespace LibTools.ToolCommandParameters;
 
 public class ClearAllProjectsParameters : IParameters
 {
-    private ClearAllProjectsParameters(string? scaffoldSeedersWorkFolder,
-        Dictionary<string, ProjectModel> projects, string? projectGroupName, string? projectName)
+    private ClearAllProjectsParameters(string? scaffoldSeedersWorkFolder, Dictionary<string, ProjectModel> projects,
+        string? projectGroupName, string? projectName)
     {
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
         Projects = projects;

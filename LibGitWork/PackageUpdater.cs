@@ -17,8 +17,7 @@ public class PackageUpdater
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageUpdater(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
-        bool useConsole)
+    public PackageUpdater(ILogger? logger, ParametersManager parametersManager, string gitProjectName, bool useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -30,9 +29,8 @@ public class PackageUpdater
 
     public void Add(string projectName, EGitCol gitCol)
     {
-        var packageUpdaterToolAction =
-            PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName, gitCol, _gitProjectName,
-                _useConsole);
+        var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName, gitCol,
+            _gitProjectName, _useConsole);
         if (packageUpdaterToolAction is null)
             return;
         _packageUpdaterToolActionList.Add(packageUpdaterToolAction);

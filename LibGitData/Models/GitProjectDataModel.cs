@@ -6,9 +6,8 @@ namespace LibGitData.Models;
 
 public sealed class GitProjectDataModel
 {
-    public string? ProjectExtension => string.IsNullOrWhiteSpace(ProjectFileName)
-        ? null
-        : Path.GetExtension(ProjectFileName);
+    public string? ProjectExtension =>
+        string.IsNullOrWhiteSpace(ProjectFileName) ? null : Path.GetExtension(ProjectFileName);
 
     public string? GitName { get; set; }
     public string? ProjectRelativePath { get; set; }

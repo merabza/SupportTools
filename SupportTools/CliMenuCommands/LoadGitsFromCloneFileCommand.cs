@@ -101,13 +101,14 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             {
                 parameters.Gits.Add(gitName,
                     new GitDataModel
-                        { GitProjectFolderName = gitProjectFolderName, GitProjectAddress = gitProjectAddress });
+                    {
+                        GitProjectFolderName = gitProjectFolderName, GitProjectAddress = gitProjectAddress
+                    });
                 haveChanges = true;
             }
             else
             {
-                var gitKvp =
-                    parameters.Gits.Single(x => x.Value.GitProjectAddress == gitProjectAddress);
+                var gitKvp = parameters.Gits.Single(x => x.Value.GitProjectAddress == gitProjectAddress);
                 gitName = gitKvp.Key;
             }
 

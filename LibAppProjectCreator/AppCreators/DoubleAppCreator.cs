@@ -49,8 +49,7 @@ public abstract class DoubleAppCreator
         if (mainSolutionFileManager == null)
         {
             StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}",
-                _useConsole,
-                _logger);
+                _useConsole, _logger);
             return false;
         }
 

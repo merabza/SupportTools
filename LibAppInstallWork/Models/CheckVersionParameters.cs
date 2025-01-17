@@ -28,8 +28,8 @@ public sealed class CheckVersionParameters : IParameters
         return true;
     }
 
-    public static CheckVersionParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, ServerInfoModel serverInfo, bool checkService = true)
+    public static CheckVersionParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
+        ServerInfoModel serverInfo, bool checkService = true)
     {
         try
         {

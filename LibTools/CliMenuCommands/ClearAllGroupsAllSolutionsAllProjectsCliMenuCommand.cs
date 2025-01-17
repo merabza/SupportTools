@@ -13,8 +13,7 @@ public sealed class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand : CliMen
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(ILogger logger, ParametersManager parametersManager) :
-        base(
-            "Clear All Groups All Solutions All Projects", EMenuAction.Reload, EMenuAction.Reload, null, true)
+        base("Clear All Groups All Solutions All Projects", EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

@@ -87,32 +87,28 @@ public sealed class ServiceUpdaterParameters : IParameters
             return null;
         }
 
-        var programArchiveDateMask =
-            project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
+        var programArchiveDateMask = project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
         if (string.IsNullOrWhiteSpace(programArchiveDateMask))
         {
             StShared.WriteErrorLine("programArchiveDateMask does not specified", true);
             return null;
         }
 
-        var programArchiveExtension =
-            project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
+        var programArchiveExtension = project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
         if (string.IsNullOrWhiteSpace(programArchiveExtension))
         {
             StShared.WriteErrorLine("programArchiveExtension does not specified", true);
             return null;
         }
 
-        var parametersFileDateMask =
-            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension =
-            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);

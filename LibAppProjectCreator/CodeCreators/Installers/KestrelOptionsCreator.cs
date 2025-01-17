@@ -17,9 +17,8 @@ public sealed class KestrelOptionsCreator
 
     public void Run()
     {
-        _appSettingsJsonJObject.Add(new JProperty("Kestrel", new JObject(
-            new JProperty("Endpoints", new JObject(
-                new JProperty("Http", new JObject(
-                    new JProperty("Url", "http://*:5099"))))))));
+        _appSettingsJsonJObject.Add(new JProperty("Kestrel",
+            new JObject(new JProperty("Endpoints",
+                new JObject(new JProperty("Http", new JObject(new JProperty("Url", "http://*:5099"))))))));
     }
 }

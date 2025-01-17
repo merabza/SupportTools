@@ -31,8 +31,7 @@ public sealed class ReactAppTypeCruder : ParCruder
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
-        return GetReactAppTemplateNames()
-            .ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
+        return GetReactAppTemplateNames().ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
     }
 
     protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)

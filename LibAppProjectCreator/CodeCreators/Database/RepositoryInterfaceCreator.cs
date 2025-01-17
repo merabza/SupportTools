@@ -18,20 +18,14 @@ public sealed class RepositoryInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             //"using System.Collections.Generic",
             //"using System.Net",
             //$"using {_projectNamespace}Db.Models",
-            "using Microsoft.EntityFrameworkCore.Storage",
-            string.Empty,
-            $"namespace Lib{_projectNamespace}Repositories",
-            string.Empty,
-            new CodeBlock($"public interface I{_projectNamespace}Repository",
-                "int SaveChanges()",
-                "int SaveChangesWithTransaction()",
-                "IDbContextTransaction GetTransaction()"
-            ));
+            "using Microsoft.EntityFrameworkCore.Storage", string.Empty,
+            $"namespace Lib{_projectNamespace}Repositories", string.Empty,
+            new CodeBlock($"public interface I{_projectNamespace}Repository", "int SaveChanges()",
+                "int SaveChangesWithTransaction()", "IDbContextTransaction GetTransaction()"));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

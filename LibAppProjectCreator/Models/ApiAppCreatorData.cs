@@ -51,8 +51,8 @@ public sealed class ApiAppCreatorData
     public ProjectForCreate DbMigrationProjectData { get; }
 
 
-    public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger,
-        AppCreatorBaseData appCreatorBaseData, string projectName, TemplateModel template)
+    public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger, AppCreatorBaseData appCreatorBaseData,
+        string projectName, TemplateModel template)
     {
         if (template is { UseCarcass: true, UseDatabase: false })
         {
@@ -72,12 +72,7 @@ public sealed class ApiAppCreatorData
             return null;
         }
 
-        var projectFolders = new List<string>
-        {
-            "Properties",
-            "Models",
-            "Installers"
-        };
+        var projectFolders = new List<string> { "Properties", "Models", "Installers" };
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
@@ -86,11 +81,7 @@ public sealed class ApiAppCreatorData
         var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"Lib{projectName}Repositories", []);
 
-        var databaseProjectFolders = new List<string>
-        {
-            "Models",
-            "Installers"
-        };
+        var databaseProjectFolders = new List<string> { "Models", "Installers" };
 
         if (template.UseCarcass)
             databaseProjectFolders.Add("QueryModels");

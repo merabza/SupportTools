@@ -21,8 +21,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateGitProjectsToolAction(ILogger logger, IParametersManager parametersManager, bool useConsole) : base(
-        logger, ActionName,
-        null, null, useConsole)
+        logger, ActionName, null, null, useConsole)
     {
         _parametersManager = parametersManager;
     }
@@ -107,8 +106,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
             var filePath = Path.Combine(gitsFolder, project.ProjectRelativePath, project.ProjectFileName);
             var projectXml = XElement.Load(filePath);
 
-            var projectReferences =
-                projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
+            var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
 
             foreach (var element in projectReferences)
             {
@@ -118,8 +116,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
                     var fileFolderName = Path.GetDirectoryName(filePath);
                     if (fileFolderName == null)
                         return false;
-                    var depProjectFullPath =
-                        new DirectoryInfo(Path.Combine(fileFolderName, attr.Value)).FullName;
+                    var depProjectFullPath = new DirectoryInfo(Path.Combine(fileFolderName, attr.Value)).FullName;
 
                     var depProjectRelativePath = Path.GetRelativePath(gitsFolder, depProjectFullPath);
 

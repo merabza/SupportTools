@@ -60,8 +60,7 @@ public class ClearOneProjectAllGitsParameters : IParameters
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.SpaProjectFolderRelativePath(gitProjects),
-            true, false);
+            project.SpaProjectFolderRelativePath(gitProjects), true, false);
 
         var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 

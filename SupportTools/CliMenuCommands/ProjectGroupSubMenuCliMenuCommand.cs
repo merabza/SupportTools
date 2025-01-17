@@ -65,8 +65,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        return parameters.Projects
-            .Count(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
-            .ToString();
+        return parameters.Projects.Count(x =>
+            SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName).ToString();
     }
 }

@@ -27,8 +27,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     private readonly bool _useConsole;
 
     public ScaffoldSeederDoubleAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
-        ScaffoldSeederCreatorParameters ssParameters)
-        : base(logger, useConsole)
+        ScaffoldSeederCreatorParameters ssParameters) : base(logger, useConsole)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
@@ -56,8 +55,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         //შეიქმნას პროექტის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
         var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, string.Empty,
             ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
-            forMain ? _projectWorkFolderPath : _projectTempFolderPath,
-            SolutionSecurityFolderPath, IndentSize);
+            forMain ? _projectWorkFolderPath : _projectTempFolderPath, SolutionSecurityFolderPath, IndentSize);
 
         //შევამოწმოთ შეიქმნა თუ არა პარამეტრები და თუ არა, გამოვიტანოთ შეცდომის შესახებ ინფორმაცია
         if (appCreatorParameters is null)
@@ -103,8 +101,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         if (checkedProjectWorkFolderPath is null)
         {
             StShared.WriteErrorLine($"does not exists and can not be created work folder {_projectWorkFolderPath}",
-                true,
-                _logger);
+                true, _logger);
             return null;
         }
 

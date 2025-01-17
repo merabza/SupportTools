@@ -18,13 +18,10 @@ public sealed class RepositoryCreatorFabricInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            $"namespace Lib{_projectNamespace}Repositories",
-            string.Empty,
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            $"namespace Lib{_projectNamespace}Repositories", string.Empty,
             new CodeBlock($"public interface I{_projectNamespace}RepositoryCreatorFabric",
-                $"I{_projectNamespace}Repository Get{_projectNamespace}Repository()"
-            ));
+                $"I{_projectNamespace}Repository Get{_projectNamespace}Repository()"));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

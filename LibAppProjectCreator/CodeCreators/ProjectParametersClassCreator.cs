@@ -14,8 +14,7 @@ public sealed class ProjectParametersClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersClassCreator(ILogger logger, string placePath, string projectNames, string inNamespace,
-        bool useDatabase, bool useMenu, string? codeFileName = null) : base(logger, placePath,
-        codeFileName)
+        bool useDatabase, bool useMenu, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNames = projectNames;
         _inNamespace = inNamespace;
@@ -39,36 +38,23 @@ public sealed class ProjectParametersClassCreator : CodeCreator
             tasksBlock.Add(new CodeBlock("public TaskModel? GetTask(string taskName)",
                 "return Tasks.GetValueOrDefault(taskName)"));
             tasksBlock.Add(new CodeBlock("public bool CheckNewTaskNameValid(string oldTaskName, string newTaskName)",
-                new CodeBlock("if (oldTaskName == newTaskName)",
-                    "return true"),
-                new CodeBlock("if (!Tasks.ContainsKey(oldTaskName))",
-                    "return false"),
+                new CodeBlock("if (oldTaskName == newTaskName)", "return true"),
+                new CodeBlock("if (!Tasks.ContainsKey(oldTaskName))", "return false"),
                 "return !Tasks.ContainsKey(newTaskName)"));
             tasksBlock.Add(new CodeBlock("public bool RemoveTask(string taskName)",
-                new CodeBlock("if (!Tasks.ContainsKey(taskName))",
-                    "return false"),
-                "Tasks.Remove(taskName)",
+                new CodeBlock("if (!Tasks.ContainsKey(taskName))", "return false"), "Tasks.Remove(taskName)",
                 "return true"));
             tasksBlock.Add(new CodeBlock("public bool AddTask(string newTaskName, TaskModel task)",
                 "return Tasks.TryAdd(newTaskName, task)"));
         }
 
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using LibParameters",
-            _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
-            _useDatabase ? new CodeCommand("using CliParametersDataEdit.Models") : new CodeExtraLine(),
-            string.Empty,
-            $"namespace {_inNamespace}.Models",
-            string.Empty,
-            new CodeBlock(
-                $"public sealed class {_projectNames}Parameters : IParameters",
-                new CodeBlock("public string? LogFolder", true, "get", "set"),
-                propertiesBlock,
-                new CodeBlock("public bool CheckBeforeSave()",
-                    "return true"
-                ),
-                _useMenu ? tasksBlock : null));
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using LibParameters", _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
+            _useDatabase ? new CodeCommand("using CliParametersDataEdit.Models") : new CodeExtraLine(), string.Empty,
+            $"namespace {_inNamespace}.Models", string.Empty,
+            new CodeBlock($"public sealed class {_projectNames}Parameters : IParameters",
+                new CodeBlock("public string? LogFolder", true, "get", "set"), propertiesBlock,
+                new CodeBlock("public bool CheckBeforeSave()", "return true"), _useMenu ? tasksBlock : null));
 
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

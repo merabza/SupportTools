@@ -137,8 +137,7 @@ public abstract class AppCreatorBase
     {
         if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress))
             return;
-        GitClones.Add(new GitCloneDataModel(gitData.GitProjectAddress,
-            gitData.GitProjectFolderName));
+        GitClones.Add(new GitCloneDataModel(gitData.GitProjectAddress, gitData.GitProjectFolderName));
     }
 
     private ProjectBase? AddGitProject(string createInPath, GitProjectDataDomain? projectData)
@@ -179,9 +178,8 @@ public abstract class AppCreatorBase
 
     protected void AddReference(ProjectBase firstProjectData, GitProjectDataDomain referenceProjectData)
     {
-        var gitProject =
-            Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
-            AddGitProject(WorkPath, referenceProjectData);
+        var gitProject = Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
+                         AddGitProject(WorkPath, referenceProjectData);
         if (gitProject is not null)
             AddReference(firstProjectData, gitProject);
     }
@@ -215,8 +213,7 @@ public abstract class AppCreatorBase
         if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true)))
             return false;
         //სოლუშენის შექმნა
-        if (StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {ProjectName}")
-            .IsSome)
+        if (StShared.RunProcess(true, Logger, "dotnet", $"new sln --output {SolutionPath} --name {ProjectName}").IsSome)
             return false;
 
         //პროექტების დამატება სოლუშენში

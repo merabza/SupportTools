@@ -45,9 +45,9 @@ public sealed class JsonFromProjectDbProjectGetterParameters : IParameters
                 return null;
             }
 
-            var jsonFromProjectDbProjectGetterParameters =
-                new JsonFromProjectDbProjectGetterParameters(project.GetJsonFromScaffoldDbProjectFileFullName,
-                    project.GetJsonFromScaffoldDbProjectParametersFileFullName);
+            var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
+                project.GetJsonFromScaffoldDbProjectFileFullName,
+                project.GetJsonFromScaffoldDbProjectParametersFileFullName);
             return jsonFromProjectDbProjectGetterParameters;
         }
         catch (Exception e)

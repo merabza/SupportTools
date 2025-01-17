@@ -23,21 +23,18 @@ public sealed class ApiAppLaunchSettingsJsonCreator
     public bool Create()
     {
         var projObject = new JObject(new JProperty("commandName", "Project"),
-            new JProperty("workingDirectory", _projectFullPath),
-            new JProperty("launchBrowser", true), new JProperty("externalUrlConfiguration", true))
+            new JProperty("workingDirectory", _projectFullPath), new JProperty("launchBrowser", true),
+            new JProperty("externalUrlConfiguration", true))
         {
             //if (!_useReact)
             new JProperty("launchUrl", "swagger"),
-            new JProperty("environmentVariables",
-                new JObject(new JProperty("ASPNETCORE_ENVIRONMENT", "Development"))),
+            new JProperty("environmentVariables", new JObject(new JProperty("ASPNETCORE_ENVIRONMENT", "Development"))),
             new JProperty("applicationUrl", "http://localhost:5099")
         };
 
         var launchSettingsJObject = new JObject(
-            new JProperty("profiles", new JObject(
-                new JProperty(_projectName, projObject))));
-        var launchSettingsJsonFileName =
-            Path.Combine(_projectFullPath, "Properties", "launchSettings.json");
+            new JProperty("profiles", new JObject(new JProperty(_projectName, projObject))));
+        var launchSettingsJsonFileName = Path.Combine(_projectFullPath, "Properties", "launchSettings.json");
         File.WriteAllText(launchSettingsJsonFileName, launchSettingsJObject.ToString(Formatting.Indented));
 
         return true;

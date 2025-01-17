@@ -33,16 +33,10 @@ public sealed class ProjectMainClassCreator : CodeCreator
             propertiesBlock.Add(new CodeCommand($"using {_projectNamespace}.Models"));
         }
 
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters",
-            propertiesBlock,
-            "using Microsoft.Extensions.Logging",
-            string.Empty,
-            $"namespace {_projectNamespace}",
-            string.Empty,
-            new CodeBlock($"public sealed class {_projectNamespace} : ToolCommand",
-                "private readonly ILogger _logger",
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using CliParameters", propertiesBlock, "using Microsoft.Extensions.Logging", string.Empty,
+            $"namespace {_projectNamespace}", string.Empty, new CodeBlock(
+                $"public sealed class {_projectNamespace} : ToolCommand", "private readonly ILogger _logger",
                 _useDatabase
                     ? $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
                     : null,
@@ -59,9 +53,7 @@ public sealed class ProjectMainClassCreator : CodeCreator
                 //    _useDatabase
                 //        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric = {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
                 //        : null),
-                new CodeBlock("protected override bool RunAction()",
-                    "return true"
-                )));
+                new CodeBlock("protected override bool RunAction()", "return true")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

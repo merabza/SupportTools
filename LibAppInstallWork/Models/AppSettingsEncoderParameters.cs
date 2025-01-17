@@ -9,9 +9,8 @@ public sealed class AppSettingsEncoderParameters : IParameters
 {
     private AppSettingsEncoderParameters(string appSettingsJsonSourceFileName, string appSetEnKeysJsonFileName,
         string appSettingsEncodedJsonFileName, string keyPart1, string keyPart2, string projectName,
-        ServerInfoModel serverInfo,
-        string dateMask, string parametersFileExtension, FileStorageData fileStorageForExchange,
-        SmartSchema exchangeSmartSchema)
+        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension,
+        FileStorageData fileStorageForExchange, SmartSchema exchangeSmartSchema)
     {
         AppSettingsJsonSourceFileName = appSettingsJsonSourceFileName;
         AppSetEnKeysJsonFileName = appSetEnKeysJsonFileName;
@@ -73,8 +72,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
             return null;
         }
 
-        var parametersFileExtension =
-            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified in support tools parameters", true);

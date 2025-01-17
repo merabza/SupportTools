@@ -23,11 +23,11 @@ public sealed class IdentitySettingsCreator
 
     public void Run()
     {
-        _appSettingsJsonJObject.Add(new JProperty("IdentitySettings", new JObject(
-            new JProperty("JwtSecret", "JwtSecret"))));
+        _appSettingsJsonJObject.Add(new JProperty("IdentitySettings",
+            new JObject(new JProperty("JwtSecret", "JwtSecret"))));
 
-        _userSecretJsonJObject.Add(new JProperty("IdentitySettings", new JObject(
-            new JProperty("JwtSecret", Guid.NewGuid().ToString("N")))));
+        _userSecretJsonJObject.Add(new JProperty("IdentitySettings",
+            new JObject(new JProperty("JwtSecret", Guid.NewGuid().ToString("N")))));
 
         _forEncodeAppSettingsJsonKeys.Add("IdentitySettings:JwtSecret");
     }

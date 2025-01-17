@@ -24,32 +24,31 @@ public sealed class LoggerSettingsCreator
 
     public void Run()
     {
-        _appSettingsJsonJObject.Add(new JProperty("Logging", new JObject(
-            new JProperty("File", new JObject(
-                new JProperty("LogLevel", new JObject(
-                    new JProperty("Default", "Information"),
-                    new JProperty("Microsoft", "Warning"),
-                    new JProperty("Microsoft.Hosting.Lifetime", "Information"))))),
-            new JProperty("Console", new JObject(
-                new JProperty("IncludeScopes", true)))
-        )));
+        _appSettingsJsonJObject.Add(new JProperty("Logging",
+            new JObject(
+                new JProperty("File",
+                    new JObject(new JProperty("LogLevel",
+                        new JObject(new JProperty("Default", "Information"), new JProperty("Microsoft", "Warning"),
+                            new JProperty("Microsoft.Hosting.Lifetime", "Information"))))),
+                new JProperty("Console", new JObject(new JProperty("IncludeScopes", true))))));
 
 
-        _appSettingsJsonJObject.Add(new JProperty("Serilog", new JObject(
-            new JProperty("WriteTo", new JArray(
-                new JObject(new JProperty("Name", "Console")),
-                new JObject(new JProperty("Name", "File"),
-                    new JProperty("Args", new JObject(
-                        new JProperty("path", "PathToLogFile"),
-                        new JProperty("rollingInterval", "Day")))))))));
+        _appSettingsJsonJObject.Add(new JProperty("Serilog",
+            new JObject(new JProperty("WriteTo",
+                new JArray(new JObject(new JProperty("Name", "Console")),
+                    new JObject(new JProperty("Name", "File"),
+                        new JProperty("Args",
+                            new JObject(new JProperty("path", "PathToLogFile"),
+                                new JProperty("rollingInterval", "Day")))))))));
 
-        _userSecretJsonJObject.Add(new JProperty("Serilog", new JObject(
-            new JProperty("WriteTo", new JArray(
-                new JObject(new JProperty("Name", "Console")),
-                new JObject(new JProperty("Name", "File"),
-                    new JProperty("Args", new JObject(
-                        new JProperty("path", $@"D:\Logs\{_projectNamespace}\{_projectNamespace}-logs.txt"),
-                        new JProperty("rollingInterval", "Day")))))))));
+        _userSecretJsonJObject.Add(new JProperty("Serilog",
+            new JObject(new JProperty("WriteTo",
+                new JArray(new JObject(new JProperty("Name", "Console")),
+                    new JObject(new JProperty("Name", "File"),
+                        new JProperty("Args",
+                            new JObject(
+                                new JProperty("path", $@"D:\Logs\{_projectNamespace}\{_projectNamespace}-logs.txt"),
+                                new JProperty("rollingInterval", "Day")))))))));
 
         _forEncodeAppSettingsJsonKeys.Add("Serilog:WriteTo:1:Args:path");
     }

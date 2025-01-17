@@ -9,8 +9,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RunTimeNameFieldEditor(string propertyName,
-        IParametersManager parametersManager) : base(propertyName)
+    public RunTimeNameFieldEditor(string propertyName, IParametersManager parametersManager) : base(propertyName)
     {
         _parametersManager = parametersManager;
     }
@@ -21,8 +20,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
 
         var runTimeCruder = new RunTimeCruder(_parametersManager);
 
-        SetValue(recordForUpdate,
-            runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName));
+        SetValue(recordForUpdate, runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName));
     }
 
     public override string GetValueStatus(object? record)

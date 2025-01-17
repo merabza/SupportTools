@@ -85,16 +85,14 @@ public sealed class AppSettingsUpdaterParameters : IParameters
         if (appSettingsEncoderParameters == null)
             return null;
 
-        var parametersFileDateMask =
-            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension =
-            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);
@@ -119,8 +117,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        var fileStorageForUpload =
-            supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
+        var fileStorageForUpload = supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
 
         var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (installerBaseParameters is null)

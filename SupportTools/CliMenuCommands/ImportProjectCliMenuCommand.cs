@@ -37,8 +37,7 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 
         var settings = new JsonSerializerSettings
         {
-            NullValueHandling = NullValueHandling.Ignore,
-            MissingMemberHandling = MissingMemberHandling.Ignore
+            NullValueHandling = NullValueHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Ignore
         };
 
 

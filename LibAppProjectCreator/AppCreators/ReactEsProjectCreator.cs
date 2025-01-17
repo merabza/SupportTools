@@ -156,20 +156,14 @@ public class ReactEsProjectCreator
 
     private void CreateEsprojFile(string projectFileFullName, string javaScriptSdk)
     {
-        var project =
-            new XElement("Project", new XAttribute("Sdk", javaScriptSdk),
-                new XElement("PropertyGroup",
-                    new XElement("StartupCommand", "set BROWSER=none&amp;&amp;npm start"),
-                    new XElement("JavaScriptTestRoot", "src\\"),
-                    new XElement("JavaScriptTestFramework", "Jest"),
-                    new XComment(" Command to run on project build "),
-                    new XElement("BuildCommand"),
-                    new XComment(" Command to create an optimized build of the project that's ready for publishing "),
-                    new XElement("ProductionBuildCommand", "npm run build"),
-                    new XComment(" Folder where production build objects will be placed "),
-                    new XElement("BuildOutputFolder", "$(MSBuildProjectDirectory)\\build")
-                )
-            );
+        var project = new XElement("Project", new XAttribute("Sdk", javaScriptSdk),
+            new XElement("PropertyGroup", new XElement("StartupCommand", "set BROWSER=none&amp;&amp;npm start"),
+                new XElement("JavaScriptTestRoot", "src\\"), new XElement("JavaScriptTestFramework", "Jest"),
+                new XComment(" Command to run on project build "), new XElement("BuildCommand"),
+                new XComment(" Command to create an optimized build of the project that's ready for publishing "),
+                new XElement("ProductionBuildCommand", "npm run build"),
+                new XComment(" Folder where production build objects will be placed "),
+                new XElement("BuildOutputFolder", "$(MSBuildProjectDirectory)\\build")));
         project.Save(projectFileFullName);
     }
 }

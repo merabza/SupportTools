@@ -18,8 +18,8 @@ public sealed class PackageUpdaterToolAction : ToolAction
 
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters)
-        : base(logger, "Git Sync", null, null)
+    private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters) : base(logger, "Git Sync",
+        null, null)
     {
         _logger = logger;
         _projectFolderName = Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName);
@@ -32,8 +32,8 @@ public sealed class PackageUpdaterToolAction : ToolAction
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull,
-            supportToolsParameters, projectName, gitCol, gitProjectName, useConsole);
+        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
+            gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
             return new PackageUpdaterToolAction(loggerOrNull, gitSyncParameters);
@@ -49,8 +49,7 @@ public sealed class PackageUpdaterToolAction : ToolAction
         if (_gitIgnorePathName != CSharp)
             return;
 
-        var localResult =
-            StShared.RunProcessWithOutput(true, null, "dotnet", $"outdated -r -u {_projectFolderName}");
+        var localResult = StShared.RunProcessWithOutput(true, null, "dotnet", $"outdated -r -u {_projectFolderName}");
         if (!localResult.IsT1)
             return;
 

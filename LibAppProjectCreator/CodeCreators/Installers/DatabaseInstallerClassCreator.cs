@@ -18,9 +18,8 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseInstallerClassCreator(ILogger logger, string placePath, string projectNamespace,
-        JObject appSettingsJsonJObject, JObject userSecretJsonJObject,
-        List<string> forEncodeAppSettingsJsonKeys, bool useServerCarcass, string? codeFileName = null) :
-        base(logger, placePath, codeFileName)
+        JObject appSettingsJsonJObject, JObject userSecretJsonJObject, List<string> forEncodeAppSettingsJsonKeys,
+        bool useServerCarcass, string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appSettingsJsonJObject = appSettingsJsonJObject;
@@ -34,33 +33,21 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
         var databaseNameInParameters = _projectNamespace.Replace(".", string.Empty) + "Database";
         var connectionStringJsonKey = $"Data:{databaseNameInParameters}:ConnectionString";
 
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using System",
-            "using Microsoft.AspNetCore.Builder",
-            "using Microsoft.EntityFrameworkCore",
-            "using Microsoft.Extensions.DependencyInjection",
-            "using System.Collections.Generic",
-            "using WebInstallers",
-            _useServerCarcass ? "using CarcassDb" : null,
-            string.Empty,
-            $"namespace {_projectNamespace}Db.Installers",
-            string.Empty,
-            new OneLineComment(" ReSharper disable once UnusedType.Global"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            "using System", "using Microsoft.AspNetCore.Builder", "using Microsoft.EntityFrameworkCore",
+            "using Microsoft.Extensions.DependencyInjection", "using System.Collections.Generic", "using WebInstallers",
+            _useServerCarcass ? "using CarcassDb" : null, string.Empty, $"namespace {_projectNamespace}Db.Installers",
+            string.Empty, new OneLineComment(" ReSharper disable once UnusedType.Global"),
             new CodeBlock($"public sealed class {_projectNamespace}DatabaseInstaller : IInstaller",
-                "public int InstallPriority => 30",
-                "public int ServiceUsePriority => 30",
-                string.Empty,
+                "public int InstallPriority => 30", "public int ServiceUsePriority => 30", string.Empty,
                 new CodeBlock(
                     "public bool InstallServices(WebApplicationBuilder builder, bool debugMode, string[] args, Dictionary<string, string> parameters)",
                     new CodeBlock("if (debugMode)",
                         "Console.WriteLine($\"{GetType().Name}.{nameof(InstallServices)} Started\")"),
-                    $"var connectionString = builder.Configuration[\"{connectionStringJsonKey}\"]",
-                    string.Empty,
+                    $"var connectionString = builder.Configuration[\"{connectionStringJsonKey}\"]", string.Empty,
                     new CodeBlock("if (string.IsNullOrWhiteSpace(connectionString) && !debugMode)",
                         $"Console.WriteLine(\"{_projectNamespace}DatabaseInstaller.InstallServices connectionString is empty\")",
-                        "return false"),
-                    string.Empty,
+                        "return false"), string.Empty,
                     _useServerCarcass
                         ? "builder.Services.AddDbContext<CarcassDbContext>(options => options.UseSqlServer(connectionString))"
                         : null,

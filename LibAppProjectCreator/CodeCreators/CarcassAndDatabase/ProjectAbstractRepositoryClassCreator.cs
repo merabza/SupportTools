@@ -20,14 +20,9 @@ public sealed class ProjectAbstractRepositoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            string.Empty,
-            $"using {_projectName}Db",
-            "using RepositoriesDom",
-            string.Empty,
-            $"namespace {_projectName}Repositories",
-            string.Empty,
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            string.Empty, $"using {_projectName}Db", "using RepositoriesDom", string.Empty,
+            $"namespace {_projectName}Repositories", string.Empty,
             $"public sealed class {_projectShortName.Capitalize()}AbstractRepository({_projectName}DbContext ctx) : AbstractRepository(ctx)");
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

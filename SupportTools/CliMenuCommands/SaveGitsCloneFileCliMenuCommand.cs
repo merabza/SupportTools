@@ -70,8 +70,8 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
 
             if (string.IsNullOrWhiteSpace(gitProject.GitProjectAddress))
             {
-                StShared.WriteErrorLine(
-                    $"GitProjectAddress does not specified for project with name {gitProjectName}", true);
+                StShared.WriteErrorLine($"GitProjectAddress does not specified for project with name {gitProjectName}",
+                    true);
                 return false;
             }
 
@@ -91,8 +91,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
             //        mainProjectFolderRelativePath);
             //}
 
-            sb.AppendLine(
-                $"git clone {parameters.Gits[gitProjectName].GitProjectAddress} {gitProjectFolderName}");
+            sb.AppendLine($"git clone {parameters.Gits[gitProjectName].GitProjectAddress} {gitProjectFolderName}");
         }
 
         sb.AppendLine("cd ..");

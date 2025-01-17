@@ -18,17 +18,10 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty,
-            new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            string.Empty,
-            "using System",
-            "using System.IO",
-            "using Microsoft.EntityFrameworkCore",
-            "using Microsoft.EntityFrameworkCore.Design",
-            "using Microsoft.Extensions.Configuration",
-            string.Empty,
-            $"namespace {_projectNamespace}Db",
-            string.Empty,
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+            string.Empty, "using System", "using System.IO", "using Microsoft.EntityFrameworkCore",
+            "using Microsoft.EntityFrameworkCore.Design", "using Microsoft.Extensions.Configuration", string.Empty,
+            $"namespace {_projectNamespace}Db", string.Empty,
             new OneLineComment("ეს არის ზოგადი კლასი მიგრაციასთან სამუშაოდ"),
             new OneLineComment("თუმცა მე გადავაკეთე ისე, რომ კონსტრუქტორი ღებულობს ინფორმაციას:"),
             new OneLineComment(
@@ -41,24 +34,18 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
             new OneLineComment("3. რომელ პარამეტრში წერია ბაზასთან დასაკავშირებელი სტრიქონი"),
             new OneLineComment(
                 "ბაზასთან დაკავშირების სტრიქონის გადმოწოდება არასწორია, რადგან მომიწევდა ამ სტრიქონის გამშვები პროექტის კოდში ჩაშენება."),
-            new OneLineComment("რაც უსაფრთხოების თვალსაზრისით არასწორია"),
-            string.Empty,
+            new OneLineComment("რაც უსაფრთხოების თვალსაზრისით არასწორია"), string.Empty,
             new CodeBlock(
                 "public class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
-                string.Empty,
-                "private readonly string _assemblyName",
-                "private readonly string _connectionParamName",
-                "private readonly string? _parametersJsonFileName",
-                string.Empty,
+                string.Empty, "private readonly string _assemblyName", "private readonly string _connectionParamName",
+                "private readonly string? _parametersJsonFileName", string.Empty,
                 new CodeBlock(
                     "protected DesignTimeDbContextFactory(string assemblyName, string connectionParamName, string? parametersJsonFileName = null)",
-                    "_assemblyName = assemblyName",
-                    "_connectionParamName = connectionParamName",
+                    "_assemblyName = assemblyName", "_connectionParamName = connectionParamName",
                     "_parametersJsonFileName = parametersJsonFileName",
                     "Console.WriteLine($\"DesignTimeDbContextFactory assemblyName = {assemblyName}\")",
                     "Console.WriteLine($\"DesignTimeDbContextFactory connectionParamName = {connectionParamName}\")",
-                    "Console.WriteLine($\"DesignTimeDbContextFactory parametersJsonFileName = {parametersJsonFileName}\")"
-                ),
+                    "Console.WriteLine($\"DesignTimeDbContextFactory parametersJsonFileName = {parametersJsonFileName}\")"),
                 new CodeBlock("public T CreateDbContext(string[] args)",
                     new OneLineComment(
                         "თუ პარამეტრების json ფაილის სახელი პირდაპირ არ არის გადმოცემული, ვიყენებთ სტანდარტულ სახელს appsettings.json"),
@@ -66,17 +53,13 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
                     new OneLineComment(
                         ".AddEncryptedJsonFile(Path.Combine(pathToContentRoot, \"appsettingsEncoded.json\"), optional: false, reloadOnChange: true, Key,"),
                     new OneLineComment("  Path.Combine(pathToContentRoot, \"appsetenkeys.json\"))"),
-                    new OneLineComment(".AddUserSecrets<TSt>()"),
-                    new OneLineComment(".AddEnvironmentVariables()"),
+                    new OneLineComment(".AddUserSecrets<TSt>()"), new OneLineComment(".AddEnvironmentVariables()"),
                     "var connectionString = configuration[_connectionParamName]",
                     "Console.WriteLine($\"DesignTimeDbContextFactory CreateDbContext connectionString = {connectionString}\")",
-                    string.Empty,
-                    "var builder = new DbContextOptionsBuilder<T>()",
+                    string.Empty, "var builder = new DbContextOptionsBuilder<T>()",
                     "builder.UseSqlServer(connectionString, b => b.MigrationsAssembly(_assemblyName))",
                     "var dbContext = Activator.CreateInstance(typeof(T), builder.Options, true)",
-                    "return dbContext is null ? throw new Exception(\"dbContext does not created\") : (T)dbContext"
-                )
-            ));
+                    "return dbContext is null ? throw new Exception(\"dbContext does not created\") : (T)dbContext")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

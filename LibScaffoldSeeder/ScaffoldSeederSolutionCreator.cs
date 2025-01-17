@@ -76,10 +76,8 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         }
 
 
-        var mainDatabaseProject =
-            GitProjects.GetGitProjectByKey(_par.MainDatabaseProjectName);
-        var newDataSeedingClassLibProject =
-            GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
+        var mainDatabaseProject = GitProjects.GetGitProjectByKey(_par.MainDatabaseProjectName);
+        var newDataSeedingClassLibProject = GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
 
 
         //სკაფოლდინგის ბიბლიოთეკა
@@ -162,10 +160,10 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{jsonExt}");
 
         const string connectionStringParameterName = "ConnectionStringSeed";
-        var projectDesignTimeDbContextFactoryCreator =
-            new FakeProjectDesignTimeDbContextFactoryCreator(Logger, fakeHosProjectPath, _par.MainDatabaseProjectName,
-                _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName, _par.ProjectDbContextClassName,
-                connectionStringParameterName, parametersFileName);
+        var projectDesignTimeDbContextFactoryCreator = new FakeProjectDesignTimeDbContextFactoryCreator(Logger,
+            fakeHosProjectPath, _par.MainDatabaseProjectName,
+            _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName, _par.ProjectDbContextClassName,
+            connectionStringParameterName, parametersFileName);
 
         projectDesignTimeDbContextFactoryCreator.CreateFileStructure();
 
