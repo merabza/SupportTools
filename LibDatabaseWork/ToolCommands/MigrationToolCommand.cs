@@ -12,7 +12,7 @@ public /*open*/ class MigrationToolCommand : ToolCommand
 
     protected MigrationToolCommand(ILogger logger, string actionName,
         DatabaseMigrationParameters databaseMigrationParameters, IParametersManager? parametersManager,
-        string? actionDescription = null) : base(logger, actionName, databaseMigrationParameters, parametersManager,
+        string actionDescription) : base(logger, actionName, databaseMigrationParameters, parametersManager,
         actionDescription)
     {
         _logger = logger;

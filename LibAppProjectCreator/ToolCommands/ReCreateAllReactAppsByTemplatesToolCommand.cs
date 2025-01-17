@@ -14,7 +14,8 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateAllReactAppsByTemplatesToolCommand(ILogger logger, string actionName, IParameters par,
-        IParametersManager? parametersManager) : base(logger, actionName, par, parametersManager)
+        IParametersManager? parametersManager) : base(logger, actionName, par, parametersManager,
+        "ReCreates All React Apps By Templates")
     {
         _logger = logger;
     }

@@ -19,7 +19,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
 
     public CreateAllTemplateTestProjectsToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         string actionName, ParametersManager parametersManager, bool useConsole) : base(logger, actionName,
-        parametersManager, null, useConsole)
+        parametersManager, actionName, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

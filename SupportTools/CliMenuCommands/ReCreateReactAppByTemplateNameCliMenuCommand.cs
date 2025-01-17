@@ -21,7 +21,7 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
             parameters, parametersManager);
     }
 
-    protected override string? GetActionDescription()
+    protected override string GetActionDescription()
     {
         return _command.Description;
     }
