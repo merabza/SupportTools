@@ -144,8 +144,7 @@ public sealed class DotnetToolsManager
         var atLeastOneUpdatedOrInstalled = false;
         foreach (var tool in DotnetTools)
         {
-            if (tool.AvailableVersion is null or "N/A" ||
-                tool.Version == tool.AvailableVersion) continue;
+            if (tool.AvailableVersion is null or "N/A" || tool.Version == tool.AvailableVersion) continue;
             var command = tool.Version == "N/A" ? "install" : "update";
             StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, tool.PackageId);
             var dotnetRun = StShared.RunProcess(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
