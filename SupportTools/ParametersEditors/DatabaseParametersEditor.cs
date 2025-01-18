@@ -2,8 +2,8 @@
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
-using CliParametersDataEdit.Models;
 using CliParametersEdit.FieldEditors;
+using LibDatabaseParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 
