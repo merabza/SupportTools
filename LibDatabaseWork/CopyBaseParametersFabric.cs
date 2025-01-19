@@ -20,7 +20,8 @@ public static class CopyBaseParametersFabric
 {
     public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
         IHttpClientFactory httpClientFactory, DatabasesParameters fromDatabaseParameters,
-        DatabasesParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters)
+        DatabasesParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
+        CancellationToken cancellationToken = default)
     {
         var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;
 
@@ -34,20 +35,32 @@ public static class CopyBaseParametersFabric
         var uploadTempExtension = databasesBackupFilesExchangeParameters?.UploadTempExtension;
         var downloadTempExtension = databasesBackupFilesExchangeParameters?.DownloadTempExtension;
 
-        var sourceBaseBackupParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(logger,
-            httpClientFactory, fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages,
-            smartSchemas, localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName,
-            uploadTempExtension);
+        var createSourceBaseBackupParametersFabric = new CreateBaseBackupParametersFabric(logger, null, null, true);
+        var createSourceBaseBackupParametersResult =
+            await createSourceBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
+                fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas, localPath,
+                downloadTempExtension, localSmartSchemaName, exchangeFileStorageName, uploadTempExtension,
+                cancellationToken);
 
-        if (sourceBaseBackupParameters is null)
+        if (createSourceBaseBackupParametersResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(createSourceBaseBackupParametersResult.AsT1);
             return null;
+        }
 
-        var destinationBaseBackupParameters = await CreateBaseBackupParametersFabric.CreateBaseBackupParameters(logger,
-            httpClientFactory, toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
-            localPath, downloadTempExtension, localSmartSchemaName, exchangeFileStorageName, uploadTempExtension);
+        var createDestinationBaseBackupParametersFabric =
+            new CreateBaseBackupParametersFabric(logger, null, null, true);
+        var createDestinationBaseBackupParametersResult =
+            await createDestinationBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
+                toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas, localPath,
+                downloadTempExtension, localSmartSchemaName, exchangeFileStorageName, uploadTempExtension,
+                cancellationToken);
 
-        if (destinationBaseBackupParameters is null)
+        if (createDestinationBaseBackupParametersResult.IsT1)
+        {
+            Err.PrintErrorsOnConsole(createDestinationBaseBackupParametersResult.AsT1);
             return null;
+        }
 
 
         if (string.IsNullOrWhiteSpace(localPath))
@@ -233,8 +246,9 @@ public static class CopyBaseParametersFabric
         //    destinationDatabaseName, toDatabaseParameters.DbServerFoldersSetName, destinationFileStorage);
 
 
-        return new CopyBaseParameters(sourceBaseBackupParameters, destinationBaseBackupParameters, exchangeFileManager,
-            needUploadToDestination, needDownloadFromExchange, exchangeSmartSchema,
+        return new CopyBaseParameters(createDestinationBaseBackupParametersResult.AsT0,
+            createDestinationBaseBackupParametersResult.AsT0, exchangeFileManager, needUploadToDestination,
+            needDownloadFromExchange, exchangeSmartSchema,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"
                 : databasesBackupFilesExchangeParameters.UploadTempExtension, localPath);
