@@ -81,10 +81,9 @@ public sealed class BaseCopier : ToolCommand
 
         var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, destinationBackupParameters);
         if (!destinationBackupParameters.SkipBackupBeforeRestore)
-        {   //თუ SkipBackupBeforeRestore პარამეტრით აკრძალული არ არის
+            //თუ SkipBackupBeforeRestore პარამეტრით აკრძალული არ არის
             //სანამ გადავაწერთ არსებული ბაზა გადავინახოთ ყოველი შემთხვევისათვის
             await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
-        }
 
         return await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParametersForSource,
             cancellationToken);
