@@ -5,7 +5,6 @@ using DatabasesManagement;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -39,8 +38,8 @@ public sealed class BaseCopier : ToolCommand
 
         _logger.LogInformation("Create Backup for source Database");
 
-        var sourceBaseBackupCreator = new BaseBackupCreator(_logger, sourceBackupParameters);
-        var backupFileParametersForSource = await sourceBaseBackupCreator.RunAction(cancellationToken);
+        var sourceBaseBackupRestorer = new BaseBackupRestorer(_logger, sourceBackupParameters);
+        var backupFileParametersForSource = await sourceBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParametersForSource is null)
             return false;
@@ -52,7 +51,7 @@ public sealed class BaseCopier : ToolCommand
 
 
         //var databaseManagerForSource = sourceBackupRestoreParameters.DatabaseManager;
-        var databaseManagerForDestination = destinationBackupRestoreParameters.DatabaseManager;
+        //var databaseManagerForDestination = destinationBackupRestoreParameters.DatabaseManager;
 
         //_logger.LogInformation("Create Backup for source Database");
 
@@ -138,7 +137,7 @@ public sealed class BaseCopier : ToolCommand
                 CopyBaseParameters.ExchangeSmartSchema);
         }
 
-        var destinationDatabaseName = destinationBackupRestoreParameters.DatabaseName;
+        //var destinationDatabaseName = destinationBackupRestoreParameters.DatabaseName;
         //_logger.LogInformation("Check if Destination base {destinationDatabaseName} exists", destinationDatabaseName);
 
         ////შევამოწმოთ მიზნის ბაზის არსებობა
@@ -216,23 +215,26 @@ public sealed class BaseCopier : ToolCommand
         //}
 
         //სანამ გადავაწერთ არსებული ბაზა გადავინახოთ ყოველი შემთხვევისათვის
-        var destinationBaseBackupCreator = new BaseBackupCreator(_logger, destinationBackupParameters);
-        await destinationBaseBackupCreator.RunAction(cancellationToken);
+        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, destinationBackupParameters);
+        await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
+
+        return await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParametersForSource,
+            cancellationToken);
 
 
-        //მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
-        _logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
+        ////მიზნის ბაზის აღდგენა აქაჩული ბექაპის გამოყენებით
+        //_logger.LogInformation("Restoring database {destinationDatabaseName}", destinationDatabaseName);
 
-        var restoreDatabaseFromBackupResult = await databaseManagerForDestination.RestoreDatabaseFromBackup(
-            backupFileParametersForSource, destinationDatabaseName,
-            destinationBackupRestoreParameters.DbServerFoldersSetName, CopyBaseParameters.LocalPath,
-            CancellationToken.None);
+        //var restoreDatabaseFromBackupResult = await databaseManagerForDestination.RestoreDatabaseFromBackup(
+        //    backupFileParametersForSource, destinationDatabaseName,
+        //    destinationBackupRestoreParameters.DbServerFoldersSetName, CopyBaseParameters.LocalPath,
+        //    CancellationToken.None);
 
-        if (restoreDatabaseFromBackupResult.IsNone)
-            return true;
+        //if (restoreDatabaseFromBackupResult.IsNone)
+        //    return true;
 
-        Err.PrintErrorsOnConsole((Err[])restoreDatabaseFromBackupResult);
-        _logger.LogError("something went wrong");
-        return false;
+        //Err.PrintErrorsOnConsole((Err[])restoreDatabaseFromBackupResult);
+        //_logger.LogError("something went wrong");
+        //return false;
     }
 }
