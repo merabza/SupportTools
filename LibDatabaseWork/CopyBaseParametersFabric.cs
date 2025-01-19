@@ -144,7 +144,6 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        //sourceDbWebAgentName
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
         var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger,
@@ -158,7 +157,6 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        //destinationDbWebAgentName
         var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger,
             httpClientFactory, true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
             CancellationToken.None);
@@ -171,7 +169,6 @@ public static class CopyBaseParametersFabric
         }
 
         var sourceDatabaseName = fromDatabaseParameters.DatabaseName;
-        //fromProductionToDeveloper ? dep.CurrentProductionBaseName : dep.DeveloperBaseName;
         if (string.IsNullOrWhiteSpace(sourceDatabaseName))
         {
             logger.LogError("sourceDatabaseName does not detected");
@@ -186,28 +183,8 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        //var needDownloadFromSource = !FileStorageData.IsSameToLocal(sourceFileStorage, localPath);
-
-
-        //var sourceSmartSchemaName = fromDatabaseParameters.SmartSchemaName;
-
-        //var sourceSmartSchema = string.IsNullOrWhiteSpace(sourceSmartSchemaName)
-        //    ? null
-        //    : smartSchemas.GetSmartSchemaByKey(sourceSmartSchemaName);
-
-
-        //var localSmartSchema = string.IsNullOrWhiteSpace(localSmartSchemaName)
-        //    ? null
-        //    : smartSchemas.GetSmartSchemaByKey(localSmartSchemaName);
-
         var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
                                       sourceFileStorageName != destinationFileStorageName;
-
-        //var destinationSmartSchemaName = toDatabaseParameters.SmartSchemaName;
-
-        //var destinationSmartSchema = string.IsNullOrWhiteSpace(destinationSmartSchemaName)
-        //    ? null
-        //    : smartSchemas.GetSmartSchemaByKey(destinationSmartSchemaName);
 
         var needDownloadFromExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
                                        !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
@@ -218,12 +195,6 @@ public static class CopyBaseParametersFabric
         var exchangeSmartSchema = string.IsNullOrWhiteSpace(exchangeSmartSchemaName)
             ? null
             : smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
-
-        //var needDownloadFromDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath);
-
-        //var needUploadDestinationToExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-        //                                      !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
-        //                                      exchangeFileStorageName != destinationFileStorageName;
 
         if (string.IsNullOrWhiteSpace(fromDatabaseParameters.DbServerFoldersSetName))
         {
@@ -237,20 +208,11 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        //var sourceBackupRestoreParameters = new BackupRestoreParameters(createDatabaseManagerResultForSource.AsT0,
-        //    sourceFileManager, sourceSmartSchema, sourceDatabaseName, fromDatabaseParameters.DbServerFoldersSetName,
-        //    sourceFileStorage);
-
-        //var destinationBackupRestoreParameters = new BackupRestoreParameters(
-        //    createDatabaseManagerResultForDestination.AsT0, destinationFileManager, destinationSmartSchema,
-        //    destinationDatabaseName, toDatabaseParameters.DbServerFoldersSetName, destinationFileStorage);
-
-
         return new CopyBaseParameters(createDestinationBaseBackupParametersResult.AsT0,
             createDestinationBaseBackupParametersResult.AsT0, exchangeFileManager, needUploadToDestination,
             needDownloadFromExchange, exchangeSmartSchema,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"
-                : databasesBackupFilesExchangeParameters.UploadTempExtension, localPath);
+                : databasesBackupFilesExchangeParameters.UploadTempExtension);
     }
 }
