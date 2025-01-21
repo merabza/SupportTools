@@ -29,7 +29,7 @@ public sealed class VersionChecker : ToolCommand
 
     private CheckVersionParameters CheckVersionParameters => (CheckVersionParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია

@@ -34,7 +34,7 @@ public sealed class AppSettingsUpdater : ToolCommand
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var appSettingsEncoderParameters = AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
 

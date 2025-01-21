@@ -56,7 +56,7 @@ public class CreateServiceInstallScript : ToolAction
         _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var sf = new FileInfo(_scriptFileName);
 
@@ -370,10 +370,10 @@ public class CreateServiceInstallScript : ToolAction
         if (FileStat.CreatePrevFolderIfNotExists(_scriptFileName, true, _logger))
         {
             File.WriteAllText(_scriptFileName, code.Replace("\r\n", "\n"));
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         StShared.WriteErrorLine("File did not created", true);
-        return Task.FromResult(false);
+        return ValueTask.FromResult(false);
     }
 }

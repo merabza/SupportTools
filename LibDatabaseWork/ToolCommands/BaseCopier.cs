@@ -23,7 +23,7 @@ public sealed class BaseCopier : ToolCommand
 
     private CopyBaseParameters CopyBaseParameters => (CopyBaseParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var sourceBackupParameters = CopyBaseParameters.SourceBackupParameters;
         var destinationBackupParameters = CopyBaseParameters.DestinationBackupParameters;

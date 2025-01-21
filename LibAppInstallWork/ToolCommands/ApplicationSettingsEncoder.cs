@@ -22,7 +22,7 @@ public sealed class ApplicationSettingsEncoder : ToolCommand
 
     private AppSettingsEncoderParameters AppSetEnParameters => (AppSettingsEncoderParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
             AppSetEnParameters.AppSetEnKeysJsonFileName, AppSetEnParameters.AppSettingsJsonSourceFileName,

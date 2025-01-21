@@ -38,7 +38,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         _httpClientFactory = httpClientFactory;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var parameters = supportToolsParameters.AppProjectCreatorAllParameters;

@@ -32,7 +32,7 @@ public sealed class ProgramInstaller : ToolCommand
 
     private ProgramInstallerParameters Parameters => (ProgramInstallerParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(Parameters.ServerInfo.ServerName))
         {

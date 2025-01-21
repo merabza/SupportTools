@@ -25,7 +25,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
         _httpClientFactory = httpClientFactory;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;
 

@@ -38,7 +38,7 @@ public sealed class CheckParametersVersionAction : ToolAction
         _webAgentForCheck = webAgentForCheck;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var getVersionSuccess = false;
         var version = string.Empty;

@@ -25,7 +25,7 @@ public sealed class ProgramPublisher : ToolCommand
         _parameters = parameters;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
         var createPackageAndUpload = new CreatePackageAndUpload(_logger, _parameters.ProjectName,

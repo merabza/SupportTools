@@ -29,7 +29,7 @@ public sealed class ProgramUpdater : ToolCommand
 
     private ProgramUpdaterParameters ProgramUpdaterParameters => (ProgramUpdaterParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
         var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;

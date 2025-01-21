@@ -50,7 +50,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var scaffoldSeederDoubleAppCreator =
             new ScaffoldSeederDoubleAppCreator(_logger, _httpClientFactory, _useConsole, Parameters);

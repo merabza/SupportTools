@@ -35,7 +35,7 @@ public sealed class ProgramRemover : ToolCommand
         return false;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = _parameters.ProjectName;
         //კლიენტის შექმნა

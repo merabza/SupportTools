@@ -34,7 +34,7 @@ public sealed class ServiceStopper : ToolCommand
         return true;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectName = _parameters.ProjectName;
         var environmentName = _parameters.EnvironmentName;

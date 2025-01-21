@@ -40,7 +40,7 @@ public sealed class InstallParametersAction : ToolAction
         _appSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
     }
 
-    protected override async Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
             _fileStorageForUpload, _installerBaseParameters, UseConsole);

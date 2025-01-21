@@ -39,7 +39,7 @@ public sealed class EncodeParametersAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         EncodedJsonContent = CreateEncodedJson();
         var success = false;
@@ -51,7 +51,7 @@ public sealed class EncodeParametersAction : ToolAction
 
         if (!success)
             _logger.LogWarning("Encoded file does not created");
-        return Task.FromResult(success);
+        return ValueTask.FromResult(success);
     }
 
 

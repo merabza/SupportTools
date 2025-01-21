@@ -39,7 +39,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
             syncMultipleProjectsGitsParameters, useConsole);
     }
 
-    protected override Task<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_syncMultipleProjectsGitsParameters.ProjectGroupName is null &&
@@ -82,7 +82,7 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
             changedGitProjects[EGitCollect.Usage] = changedGitProjects[EGitCollect.Collect];
         }
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private void SyncAllGitsForOneProject(string projectName, ProjectModel project, EGitCol gitCol,
