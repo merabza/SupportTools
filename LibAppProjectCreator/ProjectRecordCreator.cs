@@ -286,7 +286,7 @@ internal sealed class ProjectRecordCreator
                         $"appsetenkeys{jsonExtension}")
                     : null,
             KeyGuidPart = _newProjectKeyGuidPart,
-            DevDatabaseParameters = new DatabasesParameters
+            DevDatabaseParameters = new DatabaseParameters
             {
                 //DataProvider = EDataProvider.Sql,
                 //ბაზასთან დაკავშირების პარამეტრი უნდა ავიღოთ პრექტის შემქმნელის პარამეტრებიდან

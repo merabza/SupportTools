@@ -21,8 +21,8 @@ public sealed class ServerInfoModel : ItemData
     public List<ETools>? AllowToolsList { get; set; }
 
     //public DatabasesExchangeParameters? DatabasesExchangeParameters { get; set; }
-    public DatabasesParameters? CurrentDatabaseParameters { get; init; }
-    public DatabasesParameters? NewDatabaseParameters { get; init; }
+    public DatabaseParameters? CurrentDatabaseParameters { get; init; }
+    public DatabaseParameters? NewDatabaseParameters { get; init; }
 
 
     public override string GetItemKey()

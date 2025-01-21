@@ -41,10 +41,10 @@ public sealed class ProjectModel : ItemData
     public string? MigrationSqlFilesFolder { get; set; }
 
     //public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; init; }
-    public DatabasesParameters? DevDatabaseParameters { get; init; }
+    public DatabaseParameters? DevDatabaseParameters { get; init; }
 
     //public DatabaseConnectionParameters? ProdCopyDatabaseConnectionParameters { get; set; }
-    public DatabasesParameters? ProdCopyDatabasesParameters { get; init; }
+    public DatabaseParameters? ProdCopyDatabaseParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];
     public List<string> GitProjectNames { get; init; } = [];
     public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];

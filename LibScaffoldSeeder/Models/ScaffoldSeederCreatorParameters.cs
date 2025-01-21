@@ -150,14 +150,14 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
             var (devDataProvider, devConnectionString) =
-                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters, projectName,
+                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
                     databaseServerConnections);
 
             if (devDataProvider is null || devConnectionString is null)
                 return null;
 
             var (prodCopyDataProvider, prodCopyConnectionString) =
-                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters, projectName,
+                DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
                     databaseServerConnections);
 
             if (prodCopyDataProvider is null || prodCopyConnectionString is null)

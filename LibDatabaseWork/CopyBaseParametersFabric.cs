@@ -19,8 +19,8 @@ namespace LibDatabaseWork;
 public static class CopyBaseParametersFabric
 {
     public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
-        IHttpClientFactory httpClientFactory, DatabasesParameters fromDatabaseParameters,
-        DatabasesParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
+        IHttpClientFactory httpClientFactory, DatabaseParameters fromDatabaseParameters,
+        DatabaseParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
         CancellationToken cancellationToken = default)
     {
         var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;

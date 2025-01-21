@@ -304,10 +304,10 @@ public static class ToolCommandFabric
                 return null;
             case ETools.ServerBaseToProdCopyCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
 
-                if (project.ProdCopyDatabasesParameters == null)
+                if (project.ProdCopyDatabaseParameters == null)
                 {
                     StShared.WriteErrorLine(
-                        $"ProdCopyDatabasesParameters is not specified for Project with name {projectName}", true);
+                        $"ProdCopyDatabaseParameters is not specified for Project with name {projectName}", true);
                     return null;
                 }
 
@@ -319,7 +319,7 @@ public static class ToolCommandFabric
                 }
 
                 var copyBaseParametersProdToDev = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
-                    httpClientFactory, serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabasesParameters,
+                    httpClientFactory, serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabaseParameters,
                     supportToolsParameters).Result;
 
                 if (copyBaseParametersProdToDev is not null)

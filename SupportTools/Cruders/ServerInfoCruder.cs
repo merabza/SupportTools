@@ -51,9 +51,9 @@ public sealed class ServerInfoCruder : ParCruder
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
         //FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
         //    nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
-        FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
             nameof(ServerInfoModel.CurrentDatabaseParameters), parametersManager));
-        FieldEditors.Add(new DatabasesParametersFieldEditor(logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
             nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
     }
 
