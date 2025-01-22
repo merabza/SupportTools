@@ -146,8 +146,8 @@ public static class CopyBaseParametersFabric
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger,
-            httpClientFactory, true, sourceDbConnectionName, databaseServerConnections, apiClients, null, null,
+        var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
+            sourceDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
             CancellationToken.None);
 
         if (createDatabaseManagerResultForSource.IsT1)
@@ -157,8 +157,8 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger,
-            httpClientFactory, true, destinationDbConnectionName, databaseServerConnections, apiClients, null, null,
+        var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
+            destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
             CancellationToken.None);
 
         if (createDatabaseManagerResultForDestination.IsT1)
