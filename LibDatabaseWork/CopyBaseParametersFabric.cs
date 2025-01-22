@@ -208,7 +208,7 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        return new CopyBaseParameters(createDestinationBaseBackupParametersResult.AsT0,
+        return new CopyBaseParameters(createSourceBaseBackupParametersResult.AsT0,
             createDestinationBaseBackupParametersResult.AsT0, exchangeFileManager, needUploadToDestination,
             needDownloadFromExchange, exchangeSmartSchema,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
