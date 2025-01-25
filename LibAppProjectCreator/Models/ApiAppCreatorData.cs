@@ -83,7 +83,7 @@ public sealed class ApiAppCreatorData
 
         var databaseProjectFolders = new List<string> { "Models", "Installers" };
 
-        if (template.UseCarcass)
+        if (template.UseDatabase)
             databaseProjectFolders.Add("QueryModels");
 
         var dbPartFolderName = $"{projectName}DbPart";

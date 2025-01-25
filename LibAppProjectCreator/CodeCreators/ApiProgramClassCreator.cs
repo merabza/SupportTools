@@ -54,7 +54,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
             string.Empty, new CodeBlock("try", $$"""
                                                  var parameters = new Dictionary<string, string>
                                                  {
-                                                     {{(_useSignalR ? "{ SignalRMessagesInstaller.SignalRReCounterKey, string.Empty }, //Allow SignalRReCounterKey" : null)}}
                                                      { ConfigurationEncryptInstaller.AppKeyKey, "{{_appKey}}" },
                                                      { SwaggerInstaller.AppNameKey, "{{string.Join(" ", _projectNamespace.SplitUpperCase())}}" },
                                                      { SwaggerInstaller.VersionCountKey, 1.ToString() },
