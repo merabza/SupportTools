@@ -88,13 +88,13 @@ public abstract class DoubleAppCreator
             copyAndReplaceFilesAndFolders.Run();
         }
 
-        if (!mainSolutionFileManager.IsFolderEmpty(null))
-        {
-            var excludeFolders = new[] { ".git", ".vs", "obj" };
-            DeleteRedundantFiles deleteRedundantFiles =
-                new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
-            deleteRedundantFiles.Run();
-        }
+        if (mainSolutionFileManager.IsFolderEmpty(null)) 
+            return true;
+
+        var excludeFolders = new[] { ".git", ".vs", "obj" };
+        DeleteRedundantFiles deleteRedundantFiles =
+            new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
+        deleteRedundantFiles.Run();
 
         return true;
     }
