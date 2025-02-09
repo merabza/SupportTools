@@ -35,7 +35,7 @@ public sealed class DatabaseDropper : MigrationToolCommand
     {
         //ბაზის წაშლა
         return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database drop --force --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+                $"ef database drop --force --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsNone);
     }
 }

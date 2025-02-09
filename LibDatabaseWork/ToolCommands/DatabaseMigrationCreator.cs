@@ -40,27 +40,26 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         }
 
         var migrationsFolder = migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
-        if (migrationsFolder == null)
+        if (migrationsFolder is not null)
         {
-            _logger.LogError("Object for Migrations folder cannot be created");
-            return ValueTask.FromResult(false);
-        }
+            var directorySeparatorChar = Path.DirectorySeparatorChar;
+            _logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
+            foreach (var csFile in migrationsFolder.GetFiles("*.cs"))
+                csFile.Delete();
 
-        var directorySeparatorChar = Path.DirectorySeparatorChar;
-        _logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
-        foreach (var csFile in migrationsFolder.GetFiles("*.cs")) csFile.Delete();
-
+        }   
         _logger.LogInformation("Create Initial Migration");
+
         //ბაზის მიგრაციის დაწყება
         if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+                $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
             return ValueTask.FromResult(false);
 
         _logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
         if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
             return ValueTask.FromResult(false);
 
@@ -83,7 +82,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         _logger.LogInformation("Create sql Migration");
         //ბაზის მიგრაციის დაწყება
         if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+                $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsSome)
             return ValueTask.FromResult(false);
 
@@ -103,7 +102,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         _logger.LogInformation("Update Database for sql Migration");
         //ბაზის განახლება
         return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.StartupProjectFileName} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
             .IsNone);
     }
 }

@@ -7,17 +7,16 @@ namespace LibDatabaseWork.Models;
 public sealed class DatabaseMigrationParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    private DatabaseMigrationParameters(string startupProjectFileName, string migrationProjectFileName,
+    private DatabaseMigrationParameters(string migrationStartupProjectFilePath, string migrationProjectFileName,
         string dbContextName)
     {
         //ProjectName = projectName;
-        StartupProjectFileName = startupProjectFileName;
+        MigrationStartupProjectFilePath = migrationStartupProjectFilePath;
         MigrationProjectFileName = migrationProjectFileName;
         DbContextName = dbContextName;
     }
 
-    //public string ProjectName { get; set; }
-    public string StartupProjectFileName { get; set; }
+    public string MigrationStartupProjectFilePath { get; set; }
     public string MigrationProjectFileName { get; set; }
     public string DbContextName { get; set; }
 

@@ -23,10 +23,10 @@ public /*open*/ class MigrationToolCommand : ToolCommand
     protected override bool CheckValidate()
     {
         //გამშვები პროექტის ფაილის გზა მითითებული უნდა იყოს.
-        if (string.IsNullOrWhiteSpace(DatabaseMigrationParameters.StartupProjectFileName) ||
-            !File.Exists(DatabaseMigrationParameters.StartupProjectFileName))
+        if (string.IsNullOrWhiteSpace(DatabaseMigrationParameters.MigrationStartupProjectFilePath) ||
+            !File.Exists(DatabaseMigrationParameters.MigrationStartupProjectFilePath))
         {
-            _logger.LogError("Main Or Seed Project file name not Specified or not found");
+            _logger.LogError("MigrationStartup Project file name not Specified or not found");
             return false;
         }
 
