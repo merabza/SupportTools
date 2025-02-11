@@ -35,20 +35,12 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectSecurityFolderPath)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.MainProjectName),
             nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
-
-
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.SpaProjectName),
             nameof(ProjectModel.GitProjectNames), EsProjExtension, parametersManager));
-
-
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
-        //FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
-        //    nameof(ProjectModel.DevDatabaseConnectionParameters), parametersManager));
         FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
             nameof(ProjectModel.DevDatabaseParameters), parametersManager));
-        //FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger,
-        //    nameof(ProjectModel.ProdCopyDatabaseConnectionParameters), parametersManager));
         FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
             nameof(ProjectModel.ProdCopyDatabaseParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));
@@ -67,9 +59,6 @@ public sealed class ProjectCruder : ParCruder
             new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectParametersFileFullName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.ExcludesRulesParametersFilePath)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.MigrationSqlFilesFolder)));
-
-        //ProjectModel.RedundantFileNames აქ არ არის ჩასმული სპეციალურად, რადგან სხვა პარამეტრებთან ერთად გაშლილად გამოვა სიის სახით როგორც მენიუს დამატებითი ელემენტები
-        //ProjectModel.ServerInfos აქ არ არის ჩასმული სპეციალურად, რადგან მისი რედაქტირება ხდება იქ სადაც ამოცანების შედგენა ხდება
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
