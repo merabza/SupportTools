@@ -1,19 +1,14 @@
 ﻿using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using DbContextAnalyzer.Domain;
-using DbContextAnalyzer.Models;
 using LibDatabaseParameters;
 using LibParameters;
 using LibScaffoldSeeder.Models;
-using LibSeedCodeCreator;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SupportToolsData.Models;
 using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
@@ -289,27 +284,27 @@ public sealed class ScaffoldDatabaseToolCommand : ToolCommand
     }
 
 
-    private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath)
-    {
-        //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
-        var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
+    //private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath)
+    //{
+    //    //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
+    //    var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
 
-        //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
-        File.WriteAllText(saveAsFilePath, paramsJsonText);
+    //    //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
+    //    File.WriteAllText(saveAsFilePath, paramsJsonText);
 
-        //launchSettings.json//"SeedGeoModelDb"
-        // ReSharper disable once CollectionNeverUpdated.Local
-        var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
-            new JObject(new JProperty(Parameters.SeedDbProjectName,
-                new JObject(new JProperty("commandName", "Project"),
-                    new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
+    //    //launchSettings.json//"SeedGeoModelDb"
+    //    // ReSharper disable once CollectionNeverUpdated.Local
+    //    var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
+    //        new JObject(new JProperty(Parameters.SeedDbProjectName,
+    //            new JObject(new JProperty("commandName", "Project"),
+    //                new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
 
-        var propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
-        StShared.CreateFolder(propertiesFolderPath, true);
+    //    var propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
+    //    StShared.CreateFolder(propertiesFolderPath, true);
 
-        File.WriteAllText(Path.Combine(propertiesFolderPath, "launchSettings.json"),
-            seedDbProjectLaunchSettings.ToString());
+    //    File.WriteAllText(Path.Combine(propertiesFolderPath, "launchSettings.json"),
+    //        seedDbProjectLaunchSettings.ToString());
 
-        return true;
-    }
+    //    return true;
+    //}
 }
