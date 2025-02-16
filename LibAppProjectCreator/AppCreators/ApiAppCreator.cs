@@ -27,7 +27,8 @@ public sealed class ApiAppCreator : AppCreatorBase
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiAppCreator(ILogger logger, IHttpClientFactory httpClientFactory, string? projectShortName,
         string projectName, int indentSize, GitProjects gitProjects, GitRepos gitRepos,
-        ApiAppCreatorData apiAppCreatorData) : base(logger, httpClientFactory, projectName, indentSize, gitProjects,
+        ApiAppCreatorData apiAppCreatorData) : base(logger, httpClientFactory, projectName,
+        indentSize, gitProjects,
         gitRepos, apiAppCreatorData.AppCreatorBaseData.WorkPath, apiAppCreatorData.AppCreatorBaseData.SecurityPath,
         apiAppCreatorData.AppCreatorBaseData.SolutionPath)
     {

@@ -11,7 +11,7 @@ public sealed class ApiAppCreatorData
 {
     private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact,
         bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter,
-        bool useSignalR, bool useFluentValidation, string? reactTemplateName, ProjectForCreate databaseProjectData,
+        bool useSignalR, bool useFluentValidation, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
         ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData)
     {
@@ -25,7 +25,7 @@ public sealed class ApiAppCreatorData
         UseReCounter = useReCounter;
         UseSignalR = useSignalR;
         UseFluentValidation = useFluentValidation;
-        ReactTemplateName = reactTemplateName;
+        //ReactTemplateName = reactTemplateName;
         DatabaseProjectData = databaseProjectData;
         DbMigrationProjectData = dbMigrationProjectData;
         LibProjectRepositoriesProjectData = libProjectRepositoriesProjectData;
@@ -33,15 +33,15 @@ public sealed class ApiAppCreatorData
         FrontendProjectData = frontendProjectData;
     }
 
-    public bool UseReact { get; set; }
-    public bool UseCarcass { get; set; }
-    public bool UseDatabase { get; set; }
+    public bool UseReact { get; }
+    public bool UseCarcass { get; }
+    public bool UseDatabase { get; }
     public bool UseDbPartFolderForDatabaseProjects { get; }
-    public bool UseIdentity { get; set; }
-    public bool UseReCounter { get; set; }
-    public bool UseSignalR { get; set; }
+    public bool UseIdentity { get; }
+    public bool UseReCounter { get; }
+    public bool UseSignalR { get; }
     public bool UseFluentValidation { get; }
-    public string? ReactTemplateName { get; }
+
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
     public ProjectForCreate LibProjectRepositoriesProjectData { get; }
@@ -52,18 +52,16 @@ public sealed class ApiAppCreatorData
 
 
     public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger, AppCreatorBaseData appCreatorBaseData,
-        string projectName, TemplateModel template)
+        string projectName, string? dbPartProjectName, TemplateModel template)
     {
-        if (template is { UseCarcass: true, UseDatabase: false })
+        switch (template)
         {
-            StShared.WriteErrorLine("Use Carcass without database is not allowed", true, logger);
-            return null;
-        }
-
-        if (template is { UseCarcass: true, UseIdentity: false })
-        {
-            StShared.WriteErrorLine("Use Carcass without Identity is not allowed", true, logger);
-            return null;
+            case { UseCarcass: true, UseDatabase: false }:
+                StShared.WriteErrorLine("Use Carcass without database is not allowed", true, logger);
+                return null;
+            case { UseCarcass: true, UseIdentity: false }:
+                StShared.WriteErrorLine("Use Carcass without Identity is not allowed", true, logger);
+                return null;
         }
 
         if (template.UseReact && string.IsNullOrWhiteSpace(template.ReactTemplateName))
@@ -76,7 +74,7 @@ public sealed class ApiAppCreatorData
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
-            EDotnetProjectType.Web, template.UseHttps ? string.Empty : "--no-https", "Program", [.. projectFolders]);
+            EDotnetProjectType.Web, template.UseHttps ? "--no-https" : string.Empty, "Program", [.. projectFolders]);
 
         var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"Lib{projectName}Repositories", []);
@@ -86,7 +84,13 @@ public sealed class ApiAppCreatorData
         if (template.UseDatabase)
             databaseProjectFolders.Add("QueryModels");
 
-        var dbPartFolderName = $"{projectName}DbPart";
+
+        var currentDbPartProjectName =
+            template.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(dbPartProjectName)
+                ? dbPartProjectName
+                : projectName;
+
+        var dbPartFolderName = $"{currentDbPartProjectName}DbPart";
 
         var dbPartPath = template.UseDbPartFolderForDatabaseProjects
             ? Path.Combine(appCreatorBaseData.WorkPath, dbPartFolderName)
@@ -94,14 +98,14 @@ public sealed class ApiAppCreatorData
 
         var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
 
-        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{projectName}Db",
+        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{currentDbPartProjectName}Db",
             [.. databaseProjectFolders], dbPartSolutionFolderName);
 
         var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{projectName}DbMigration", ["Migrations"]);
+            $"{currentDbPartProjectName}DbMigration", ["Migrations"]);
 
         var repositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{projectName}Repositories", ["Installers"]);
+            $"{currentDbPartProjectName}Repositories", ["Installers"]);
 
         var frontProjectFolderName = $"{projectName}Front";
         var frontEndProjectName = $"{projectName.ToLower()}frontend";
@@ -111,7 +115,7 @@ public sealed class ApiAppCreatorData
 
         return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
             template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
-            template.UseReCounter, template.UseSignalR, template.UseFluentValidation, template.ReactTemplateName,
+            template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
             databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData,
             frontendProjectData);
     }

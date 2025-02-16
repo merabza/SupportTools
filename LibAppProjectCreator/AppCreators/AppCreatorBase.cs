@@ -33,8 +33,10 @@ public abstract class AppCreatorBase
     protected readonly string ProjectName;
 
 
-    protected AppCreatorBase(ILogger logger, IHttpClientFactory httpClientFactory, string projectName, int indentSize,
-        GitProjects gitProjects, GitRepos gitRepos, string workPath, string securityPath, string solutionPath)
+    protected AppCreatorBase(ILogger logger, IHttpClientFactory httpClientFactory, string projectName,
+        int indentSize,
+        GitProjects gitProjects, GitRepos gitRepos, string workPath, string securityPath, string solutionPath
+    )
     {
         Logger = logger;
         _httpClientFactory = httpClientFactory;

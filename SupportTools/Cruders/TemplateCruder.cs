@@ -21,9 +21,9 @@ public sealed class TemplateCruder : ParCruder
 
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectName)));
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectShortName)));
-
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDatabase), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects), false));
+        FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestDbPartProjectName)));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseMenu), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseHttps), false));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReact), false));
@@ -114,6 +114,8 @@ public sealed class TemplateCruder : ParCruder
                 throw new ArgumentOutOfRangeException();
         }
 
+        EnableFieldByName(nameof(TemplateModel.TestDbPartProjectName),
+            templateModel.UseDbPartFolderForDatabaseProjects);
         EnableFieldByName(nameof(TemplateModel.ReactTemplateName), templateModel.UseReact);
         EnableFieldByName(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects), templateModel.UseDatabase);
     }

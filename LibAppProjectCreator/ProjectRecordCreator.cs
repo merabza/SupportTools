@@ -16,19 +16,24 @@ internal sealed class ProjectRecordCreator
     private readonly string _newProjectKeyGuidPart;
     private readonly string _newProjectName;
     private readonly string? _newProjectShortName;
+    private readonly string _newDbPartProjectName;
 
     private readonly IParametersManager _parametersManager;
     private readonly TemplateModel _templateModel;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, TemplateModel templateModel,
-        string newProjectName, string? newProjectShortName, string newProjectKeyGuidPart)
+        string newProjectName, string? newProjectShortName, string? newDbPartProjectName, string newProjectKeyGuidPart)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _templateModel = templateModel;
         _newProjectName = newProjectName;
         _newProjectShortName = newProjectShortName;
+        _newDbPartProjectName =
+            _templateModel.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(newDbPartProjectName)
+                ? newDbPartProjectName
+                : newProjectName;
         _newProjectKeyGuidPart = newProjectKeyGuidPart;
     }
 
@@ -183,17 +188,17 @@ internal sealed class ProjectRecordCreator
         }
 
 
-        var scaffoldSeederProjectName = $"{_newProjectName}ScaffoldSeeder";
+        var scaffoldSeederProjectName = $"{_newDbPartProjectName}ScaffoldSeeder";
         var fakeHostProjectName = supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName;
         var projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
         var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
-        var dbMigrationProjectName = $"{_newProjectName}DbMigration";
+        var dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
         const string csProjectExtension = ".csproj";
         const string jsonExtension = ".json";
-        var seedProjectName = $"Seed{_newProjectName}Db";
-        var getJsonProjectName = $"GetJsonFromScaffold{_newProjectName}Db";
-        var scaffoldSeedSecFolderName = $"{_newProjectName}ScaffoldSeeder.sec";
-        var dbPartProjectsFolderName = $"{_newProjectName}DbPart";
+        var seedProjectName = $"Seed{_newDbPartProjectName}Db";
+        var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
+        var scaffoldSeedSecFolderName = $"{_newDbPartProjectName}ScaffoldSeeder.sec";
+        var dbPartProjectsFolderName = $"{_newDbPartProjectName}DbPart";
         var securityFolder = supportToolsParameters.SecurityFolder;
         const string appSettingsFileName = $"appsettings{jsonExtension}";
         var productionServerWebAgentName = $"{productionServerName}.WebAgent";
@@ -269,12 +274,12 @@ internal sealed class ProjectRecordCreator
                     ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
                         $"{getJsonProjectName}{csProjectExtension}")
                     : null,
-            DbContextName = $"{_newProjectName}DbContext",
+            DbContextName = $"{_newDbPartProjectName}DbContext",
             ProjectShortPrefix = _newProjectShortName,
             DbContextProjectName =
-                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newProjectName}Db" : null,
+                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newDbPartProjectName}Db" : null,
             NewDataSeedingClassLibProjectName =
-                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newProjectName}DbNewDataSeeding" : null,
+                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newDbPartProjectName}DbNewDataSeeding" : null,
             ExcludesRulesParametersFilePath =
                 _templateModel is { UseDatabase: true, UseCarcass: true }
                     ? Path.Combine(projectsFolderPathReal, _newProjectName, dbPartProjectsFolderName,
@@ -291,7 +296,7 @@ internal sealed class ProjectRecordCreator
                 //DataProvider = EDataProvider.Sql,
                 //ბაზასთან დაკავშირების პარამეტრი უნდა ავიღოთ პრექტის შემქმნელის პარამეტრებიდან
                 DbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName,
-                DatabaseName = $"{_newProjectName}ProdCopy"
+                DatabaseName = $"{_newDbPartProjectName}ProdCopy"
             },
             RedundantFileNames = redundantFileNames,
             GitProjectNames = gitProjectNames,

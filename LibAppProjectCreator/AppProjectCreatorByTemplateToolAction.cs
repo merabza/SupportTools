@@ -78,6 +78,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         string? secretsFolderPath;
         string projectName;
         string? projectShortName;
+        string? dbPartProjectName;
         var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
         switch (_testOrReal)
         {
@@ -88,6 +89,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
                     ? templateModel.TestProjectShortName
                     : null;
+                dbPartProjectName = templateModel.TestDbPartProjectName;
                 break;
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
@@ -96,6 +98,9 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
                     ? Inputer.InputTextRequired("New project short name", string.Empty)
                     : null;
+                dbPartProjectName = templateModel.UseDbPartFolderForDatabaseProjects
+                    ? Inputer.InputTextRequired("New dbPart project name", string.Empty)
+                    : null;
                 break;
             default:
                 throw new Exception("Unknown Test or Real");
@@ -103,7 +108,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         projectName = projectName.ToNormalClassName();
 
-        var par = AppProjectCreatorData.Create(_logger, projectName, projectShortName, templateModel.SupportProjectType,
+        var par = AppProjectCreatorData.Create(_logger, projectName, projectShortName, dbPartProjectName,
+            templateModel.SupportProjectType,
             projectName, projectsFolderPath, secretsFolderPath, parameters.IndentSize);
 
         if (par is null)
@@ -148,7 +154,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return true;
 
         var projectRecordCreator = new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName,
-            projectShortName, string.Empty);
+            projectShortName, dbPartProjectName, string.Empty);
 
         if (projectRecordCreator.Create())
             return true;
