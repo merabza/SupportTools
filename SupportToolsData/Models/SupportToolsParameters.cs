@@ -70,12 +70,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return UploadTempExtension ?? DefaultUploadFileTempExtension;
     }
 
-    //public Dictionary<string, ServerInfoModel> GetServers(string projectName)
-    //{
-    //    var project = GetProject(projectName);
-    //    return project?.ServerInfos ?? [];
-    //}
-
     public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)
     {
         var project = GetProject(projectName);
@@ -93,16 +87,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
                 return false;
         }
     }
-
-    //public static Option<List<string>> GetGitProjectNames(ProjectModel project, EGitCol gitCol)
-    //{
-    //    return gitCol switch
-    //    {
-    //        EGitCol.Main => project.GitProjectNames,
-    //        EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-    //        _ => null
-    //    };
-    //}
 
     public List<string> GetGitProjectNames(string projectName, EGitCol gitCol)
     {
@@ -212,11 +196,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
                 return null;
         }
     }
-
-    //public List<string> GetProjectGroupNames()
-    //{
-    //    return [.. Projects.Select(x => FixProjectGroupName(x.Value.ProjectGroupName)).Distinct().OrderBy(x => x)];
-    //}
 
     public static string FixProjectGroupName(string? projectGroupName)
     {
