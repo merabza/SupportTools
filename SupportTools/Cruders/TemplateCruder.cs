@@ -21,17 +21,17 @@ public sealed class TemplateCruder : ParCruder
 
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectName)));
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectShortName)));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDatabase), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDatabase)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects)));
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestDbPartProjectName)));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseMenu), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseHttps), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReact), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseCarcass), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseIdentity), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReCounter), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseSignalR), false));
-        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseFluentValidation), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseMenu)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseHttps)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReact)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseCarcass)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseIdentity)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseReCounter)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseSignalR)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseFluentValidation)));
         FieldEditors.Add(new ReactAppTypeNameFieldEditor(logger, nameof(TemplateModel.ReactTemplateName),
             parametersManager));
     }

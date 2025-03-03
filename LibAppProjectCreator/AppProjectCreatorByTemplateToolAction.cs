@@ -109,8 +109,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         projectName = projectName.ToNormalClassName();
 
         var par = AppProjectCreatorData.Create(_logger, projectName, projectShortName, dbPartProjectName,
-            templateModel.SupportProjectType,
-            projectName, projectsFolderPath, secretsFolderPath, parameters.IndentSize);
+            templateModel.SupportProjectType, projectName, projectsFolderPath, secretsFolderPath,
+            parameters.IndentSize);
 
         if (par is null)
         {

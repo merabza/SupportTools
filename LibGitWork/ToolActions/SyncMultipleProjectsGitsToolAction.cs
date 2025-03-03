@@ -93,6 +93,6 @@ public class SyncMultipleProjectsGitsToolAction : ToolAction
 
         var syncAllGitsCliMenuCommandMain = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
             projectName, gitCol, changedGitProjects, isFirstSync, UseConsole);
-        syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None);
+        syncAllGitsCliMenuCommandMain?.Run(CancellationToken.None).Wait();
     }
 }

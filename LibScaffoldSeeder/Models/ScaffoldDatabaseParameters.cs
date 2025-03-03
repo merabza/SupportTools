@@ -1,17 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using LibAppProjectCreator.Models;
-using SupportToolsData;
+﻿using LibAppProjectCreator.Models;
 
 namespace LibScaffoldSeeder.Models;
 
 public sealed class ScaffoldDatabaseParameters
 {
-    public ScaffoldDatabaseParameters()
-    {
-
-    }
-
     //public ScaffoldDatabaseParameters(ProjectForCreate databaseScaffoldClassLibProject,
     //    ProjectForCreate dataSeedingClassLibProject, ProjectForCreate createProjectSeederCodeProject,
     //    ProjectForCreate getJsonFromProjectDbProject, ProjectForCreate dbMigrationProject,
@@ -29,6 +21,7 @@ public sealed class ScaffoldDatabaseParameters
 
     //public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate DatabaseScaffoldClassLibProject { get; }
+
     //public ProjectForCreate DataSeedingClassLibProject { get; }
     public ProjectForCreate CreateProjectSeederCodeProject { get; }
     //public ProjectForCreate GetJsonFromProjectDbProject { get; }

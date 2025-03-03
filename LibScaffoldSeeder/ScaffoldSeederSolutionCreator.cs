@@ -23,8 +23,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ScaffoldSeederSolutionCreator(ILogger logger, IHttpClientFactory httpClientFactory,
-        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, string projectName,
-        int indentSize,
+        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters, string projectName, int indentSize,
         ScaffoldSeederCreatorData scaffoldSeederAppCreatorData) : base(logger, httpClientFactory, projectName,
         indentSize, scaffoldSeederCreatorParameters.GitProjects, scaffoldSeederCreatorParameters.GitRepos,
         scaffoldSeederAppCreatorData.AppCreatorBaseData.WorkPath,

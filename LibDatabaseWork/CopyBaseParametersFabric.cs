@@ -24,23 +24,19 @@ public static class CopyBaseParametersFabric
         CancellationToken cancellationToken = default)
     {
         var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;
+        var localPath = databasesBackupFilesExchangeParameters?.LocalPath;
+        var exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
         var fileStorages = new FileStorages(supportToolsParameters.FileStorages);
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
-        var localPath = databasesBackupFilesExchangeParameters?.LocalPath;
-        var localSmartSchemaName = databasesBackupFilesExchangeParameters?.LocalSmartSchemaName;
-        var exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
-        var uploadTempExtension = databasesBackupFilesExchangeParameters?.UploadTempExtension;
-        var downloadTempExtension = databasesBackupFilesExchangeParameters?.DownloadTempExtension;
 
         var createSourceBaseBackupParametersFabric = new CreateBaseBackupParametersFabric(logger, null, null, true);
         var createSourceBaseBackupParametersResult =
             await createSourceBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
-                fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas, localPath,
-                downloadTempExtension, localSmartSchemaName, exchangeFileStorageName, uploadTempExtension,
-                cancellationToken);
+                fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
+                databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createSourceBaseBackupParametersResult.IsT1)
         {
@@ -52,9 +48,8 @@ public static class CopyBaseParametersFabric
             new CreateBaseBackupParametersFabric(logger, null, null, true);
         var createDestinationBaseBackupParametersResult =
             await createDestinationBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
-                toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas, localPath,
-                downloadTempExtension, localSmartSchemaName, exchangeFileStorageName, uploadTempExtension,
-                cancellationToken);
+                toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
+                databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createDestinationBaseBackupParametersResult.IsT1)
         {
@@ -94,13 +89,13 @@ public static class CopyBaseParametersFabric
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
         var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
-            true, logger, localPath, exchangeFileStorageName, fileStorages, null, null, CancellationToken.None);
+            true, logger, localPath, exchangeFileStorageName, fileStorages, null, null, cancellationToken);
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromDatabaseParameters.FileStorageName;
 
         var (sourceFileStorage, sourceFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(true,
-            logger, localPath, sourceFileStorageName, fileStorages, null, null, CancellationToken.None);
+            logger, localPath, sourceFileStorageName, fileStorages, null, null, cancellationToken);
 
         if (sourceFileManager == null)
         {
@@ -120,7 +115,7 @@ public static class CopyBaseParametersFabric
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
         var (destinationFileStorage, destinationFileManager) =
             await FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                destinationFileStorageName, fileStorages, null, null, CancellationToken.None);
+                destinationFileStorageName, fileStorages, null, null, cancellationToken);
 
         if (destinationFileStorage == null)
         {
@@ -148,7 +143,7 @@ public static class CopyBaseParametersFabric
         //წყაროს სერვერის აგენტის შექმნა
         var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
             sourceDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
-            CancellationToken.None);
+            cancellationToken);
 
         if (createDatabaseManagerResultForSource.IsT1)
         {
@@ -159,7 +154,7 @@ public static class CopyBaseParametersFabric
 
         var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
             destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
-            CancellationToken.None);
+            cancellationToken);
 
         if (createDatabaseManagerResultForDestination.IsT1)
         {

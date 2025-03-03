@@ -58,7 +58,7 @@ public sealed class InstallParametersAction : ToolAction
 
         var updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName, _environmentName,
             Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
-            CancellationToken.None);
+            cancellationToken);
 
         if (updateAppParametersFileResult.IsNone)
             return true;

@@ -13,7 +13,7 @@ public sealed class EnvironmentFieldEditor : FieldEditor<Dictionary<string, stri
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public EnvironmentFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, false,
-        null, true)
+        null, false, null, true)
     {
         _parametersManager = parametersManager;
     }

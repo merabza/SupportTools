@@ -46,8 +46,8 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
             _logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
             foreach (var csFile in migrationsFolder.GetFiles("*.cs"))
                 csFile.Delete();
+        }
 
-        }   
         _logger.LogInformation("Create Initial Migration");
 
         //ბაზის მიგრაციის დაწყება

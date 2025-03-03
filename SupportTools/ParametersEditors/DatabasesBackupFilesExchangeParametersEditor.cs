@@ -15,9 +15,9 @@ public sealed class DatabasesBackupFilesExchangeParametersEditor : ParametersEdi
     {
         //ჩამოტვირთვისა და ატვირთვის დროებითი გაფართოებები
         FieldEditors.Add(new TextFieldEditor(nameof(DatabasesBackupFilesExchangeParameters.DownloadTempExtension),
-            ".down!"));
-        FieldEditors.Add(
-            new TextFieldEditor(nameof(DatabasesBackupFilesExchangeParameters.UploadTempExtension), ".up!"));
+            DatabasesBackupFilesExchangeParameters.DefaultDownloadTempExtension));
+        FieldEditors.Add(new TextFieldEditor(nameof(DatabasesBackupFilesExchangeParameters.UploadTempExtension),
+            DatabasesBackupFilesExchangeParameters.DefaultUploadTempExtension));
 
         //გაცვლის ფაილსაცავის სახელი
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,

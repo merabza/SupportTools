@@ -22,10 +22,10 @@ public sealed class ProjectCruder : ParCruder
     public ProjectCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) :
         base(parametersManager, "Project", "Projects")
     {
-        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
-        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent), false));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveExtension)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ParametersFileDateMask)));

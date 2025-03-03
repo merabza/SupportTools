@@ -88,7 +88,7 @@ public abstract class DoubleAppCreator
             copyAndReplaceFilesAndFolders.Run();
         }
 
-        if (mainSolutionFileManager.IsFolderEmpty(null)) 
+        if (mainSolutionFileManager.IsFolderEmpty(null))
             return true;
 
         var excludeFolders = new[] { ".git", ".vs", "obj" };

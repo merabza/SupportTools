@@ -115,8 +115,7 @@ public sealed class ApiAppCreatorData
 
         return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
             template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
-            template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
-            databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData,
-            frontendProjectData);
+            template.UseReCounter, template.UseSignalR, template.UseFluentValidation, databaseProjectData,
+            dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData, frontendProjectData);
     }
 }

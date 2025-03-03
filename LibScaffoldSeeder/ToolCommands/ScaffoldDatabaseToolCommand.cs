@@ -7,8 +7,6 @@ using LibDatabaseParameters;
 using LibParameters;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
@@ -36,8 +34,7 @@ public sealed class ScaffoldDatabaseToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var scaffoldDatabaseParameters =
-            new ScaffoldDatabaseParameters();
+        var scaffoldDatabaseParameters = new ScaffoldDatabaseParameters();
         //if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         //{
         //    StShared.WriteErrorLine("solution does not created", true, _logger);
@@ -267,7 +264,6 @@ public sealed class ScaffoldDatabaseToolCommand : ToolCommand
     private bool ScaffoldDatabase(string databaseScaffoldClassLibProjectFileFullName, string databaseConnectionString,
         string startupProjectFileFullName, string providerPackageName, string dbScContextName)
     {
-
         var databaseScaffoldClassLibProjectFile = new FileInfo(databaseScaffoldClassLibProjectFileFullName);
         var databaseScaffoldClassLibProjectFullPath = databaseScaffoldClassLibProjectFile.DirectoryName;
         if (databaseScaffoldClassLibProjectFullPath is null)

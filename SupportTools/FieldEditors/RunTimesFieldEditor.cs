@@ -13,7 +13,7 @@ public sealed class RunTimesFieldEditor : FieldEditor<Dictionary<string, string>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public RunTimesFieldEditor(string propertyName, ParametersManager parametersManager) : base(propertyName, false,
-        null, true)
+        null, false, null, true)
     {
         _parametersManager = parametersManager;
     }

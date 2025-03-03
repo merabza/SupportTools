@@ -34,9 +34,8 @@ public static class AppCreatorFabric
                 return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
                     gitRepos, consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:
-                var apiAppCreatorData =
-                    ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData, par.ProjectName,
-                        par.DbPartProjectName, template);
+                var apiAppCreatorData = ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData,
+                    par.ProjectName, par.DbPartProjectName, template);
 
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,

@@ -100,6 +100,6 @@ public class ClearMultipleProjectsToolAction : ToolAction
 
         var clearOneProjectAllGitsToolAction =
             ClearOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, gitCol, _excludeFolder);
-        clearOneProjectAllGitsToolAction?.Run(CancellationToken.None);
+        clearOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
     }
 }

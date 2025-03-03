@@ -13,10 +13,10 @@ namespace LibAppProjectCreator;
 internal sealed class ProjectRecordCreator
 {
     private readonly ILogger _logger;
+    private readonly string _newDbPartProjectName;
     private readonly string _newProjectKeyGuidPart;
     private readonly string _newProjectName;
     private readonly string? _newProjectShortName;
-    private readonly string _newDbPartProjectName;
 
     private readonly IParametersManager _parametersManager;
     private readonly TemplateModel _templateModel;
@@ -279,7 +279,9 @@ internal sealed class ProjectRecordCreator
             DbContextProjectName =
                 _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newDbPartProjectName}Db" : null,
             NewDataSeedingClassLibProjectName =
-                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newDbPartProjectName}DbNewDataSeeding" : null,
+                _templateModel is { UseDatabase: true, UseCarcass: true }
+                    ? $"{_newDbPartProjectName}DbNewDataSeeding"
+                    : null,
             ExcludesRulesParametersFilePath =
                 _templateModel is { UseDatabase: true, UseCarcass: true }
                     ? Path.Combine(projectsFolderPathReal, _newProjectName, dbPartProjectsFolderName,

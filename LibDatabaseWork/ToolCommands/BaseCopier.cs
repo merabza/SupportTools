@@ -86,6 +86,6 @@ public sealed class BaseCopier : ToolCommand
             await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         return await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParametersForSource,
-            cancellationToken);
+            destinationBackupParameters.DatabaseRecoveryModel, cancellationToken);
     }
 }

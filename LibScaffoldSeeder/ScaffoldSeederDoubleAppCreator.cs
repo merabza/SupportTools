@@ -54,8 +54,7 @@ public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     {
         //შეიქმნას პროექტის შემქმნელი კლასისათვის საჭირო პარამეტრების ობიექტი
         var appCreatorParameters = AppProjectCreatorData.Create(_logger, _scaffoldSeederFolderName, string.Empty,
-            string.Empty,
-            ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
+            string.Empty, ESupportProjectType.ScaffoldSeeder, _scaffoldSeederFolderName,
             forMain ? _projectWorkFolderPath : _projectTempFolderPath, SolutionSecurityFolderPath, IndentSize);
 
         //შევამოწმოთ შეიქმნა თუ არა პარამეტრები და თუ არა, გამოვიტანოთ შეცდომის შესახებ ინფორმაცია

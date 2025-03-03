@@ -113,7 +113,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var creatorCreator = new CreatorCreator(_logger, creatorCreatorParameters);
 
-        if (!await creatorCreator.Run(CancellationToken.None))
+        if (!await creatorCreator.Run(cancellationToken))
         {
             StShared.WriteErrorLine("Creator code not created", true, _logger);
             return false;
@@ -239,7 +239,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var jsonFromProjectDbProjectGetter =
             new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
-        return await jsonFromProjectDbProjectGetter.Run(CancellationToken.None);
+        return await jsonFromProjectDbProjectGetter.Run(cancellationToken);
     }
 
 

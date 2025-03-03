@@ -6,8 +6,8 @@ namespace LibAppProjectCreator.Models;
 public sealed class AppProjectCreatorData
 {
     private AppProjectCreatorData(string projectName, string? projectShortName, string? dbPartProjectName,
-        ESupportProjectType projectType,
-        string solutionFolderName, string workFolderPath, string securityWorkFolderPath, int indentSize)
+        ESupportProjectType projectType, string solutionFolderName, string workFolderPath,
+        string securityWorkFolderPath, int indentSize)
     {
         ProjectName = projectName;
         ProjectShortName = projectShortName;
@@ -29,8 +29,7 @@ public sealed class AppProjectCreatorData
     public int IndentSize { get; }
 
     public static AppProjectCreatorData? Create(ILogger logger, string projectName, string? projectShortName,
-        string? dbPartProjectName,
-        ESupportProjectType projectType, string? solutionFolderName, string? workFolderPath,
+        string? dbPartProjectName, ESupportProjectType projectType, string? solutionFolderName, string? workFolderPath,
         string? securityWorkFolderPath, int indentSize)
     {
         if (string.IsNullOrWhiteSpace(solutionFolderName))
@@ -47,8 +46,7 @@ public sealed class AppProjectCreatorData
 
         if (!string.IsNullOrWhiteSpace(securityWorkFolderPath))
             return new AppProjectCreatorData(projectName, projectShortName, dbPartProjectName, projectType,
-                solutionFolderName,
-                workFolderPath, securityWorkFolderPath, indentSize);
+                solutionFolderName, workFolderPath, securityWorkFolderPath, indentSize);
 
         logger.LogError("securityWorkFolderPath is empty");
         return null;

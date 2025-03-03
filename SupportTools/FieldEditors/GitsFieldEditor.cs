@@ -16,7 +16,7 @@ public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataMode
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
-        propertyName, false, null, true)
+        propertyName, false, null, false, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
