@@ -1,8 +1,10 @@
 ﻿using System.Net.Http;
+using LibApiClientParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolCommands;
 using LibAppProjectCreator.Models;
 using LibAppProjectCreator.ToolCommands;
+using LibDatabaseParameters;
 using LibDatabaseWork;
 using LibDatabaseWork.Models;
 using LibDatabaseWork.ToolCommands;
@@ -103,8 +105,27 @@ public static class ToolCommandFabric
                     return null;
                 }
 
+                var project = supportToolsParameters.GetProject(projectName);
+                if (project == null)
+                {
+                    StShared.WriteErrorLine($"Project with name {projectName} not found", true);
+                    return null;
+                }
+
+                if (project.DevDatabaseParameters == null)
+                {
+                    StShared.WriteErrorLine(
+                        $"DevDatabaseParameters is not specified for Project with name {projectName}", true);
+                    return null;
+                }
+
+                var databaseServerConnections =
+                    new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
+                var apiClients = new ApiClients(supportToolsParameters.ApiClients);
+
                 if (correctNewDbParametersForRecreate is not null)
-                    return new DatabaseReCreator(logger, dmpForReCreator, correctNewDbParametersForRecreate,
+                    return new DatabaseReCreator(logger, dmpForReCreator, project.DevDatabaseParameters,
+                        correctNewDbParametersForRecreate, databaseServerConnections, apiClients, httpClientFactory,
                         parametersManager); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
                 StShared.WriteErrorLine("correctNewDbParametersForRecreate is null", true);
                 return null;

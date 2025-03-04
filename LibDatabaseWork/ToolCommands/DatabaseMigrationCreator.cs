@@ -86,7 +86,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
             .IsSome)
             return ValueTask.FromResult(false);
 
-        var sqlMigrationFile = migrationsFolder.GetFiles("??????????????_Sql.cs").SingleOrDefault();
+        var sqlMigrationFile = migrationsFolder?.GetFiles("??????????????_Sql.cs").SingleOrDefault();
         if (sqlMigrationFile == null)
         {
             _logger.LogError("sql Migration File Not found");
