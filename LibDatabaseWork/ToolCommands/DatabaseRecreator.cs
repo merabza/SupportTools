@@ -1,12 +1,16 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
+using DbTools.Errors;
+using LanguageExt;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -62,29 +66,64 @@ public sealed class DatabaseReCreator : MigrationToolCommand
         if (!await databaseMigrationCreator.Run(cancellationToken))
             return false;
 
-
-        var dbConnectionName = _devDatabaseParameters.DbConnectionName;
-
-        //DatabaseManagersFabric.CreateDatabaseManager(_logger, true, )
-
-        //DbWebAgentName
-        //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
-        //წყაროს სერვერის აგენტის შექმნა
-        var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger, true,
-            dbConnectionName, _databaseServerConnections, _apiClients, _httpClientFactory, null, null,
-            cancellationToken);
-
-        if ( createDatabaseManagerResult.IsT1)
-        {
-            _logger.LogError("Error in CreateDatabaseManager");
-            return false;
-        }
-
-        //todo აქ უნდა დავამატოთ ბაზის Recovery Model-ის ცვლილება
-
+        var changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
+        if (changeDatabaseRecoveryModelResult.IsSome)
+            _logger.LogError("Error in ChangeDatabaseRecoveryModel");
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var correctNewDatabase = new CorrectNewDatabase(_logger, _correctNewDbParameters, ParametersManager);
         return await correctNewDatabase.Run(cancellationToken);
+    }
+
+
+    private async ValueTask<Option<IEnumerable<Err>>> ChangeDatabaseRecoveryModel(
+        CancellationToken cancellationToken = default)
+    {
+        var errors = new List<Err>();
+
+        var dbConnectionName = _devDatabaseParameters.DbConnectionName;
+
+        if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
+        {
+            _logger.LogError("dev database DbConnectionName is not specified");
+            errors.Add(DbToolsErrors.DatabaseConnectionNameIsNotSpecified);
+            return errors;
+        }
+
+        var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger, true,
+            dbConnectionName, _databaseServerConnections, _apiClients, _httpClientFactory, null, null,
+            cancellationToken);
+
+        if (createDatabaseManagerResult.IsT1)
+        {
+            _logger.LogError("Error in CreateDatabaseManager");
+            errors.AddRange(createDatabaseManagerResult.AsT1);
+        }
+
+
+        if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
+        {
+            _logger.LogError("dev DatabaseName is not specified");
+            errors.Add(DbToolsErrors.DevDatabaseNameIsNotSpecified);
+        }
+
+        if (_devDatabaseParameters.DatabaseRecoveryModel is null)
+        {
+            _logger.LogError("dev DatabaseRecoveryModel is not specified");
+            errors.Add(DbToolsErrors.DevDatabaseRecoveryModelIsNotSpecified);
+        }
+
+        if (errors.Count > 0)
+            return errors;
+
+        var dbManager = createDatabaseManagerResult.AsT0;
+
+        var changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
+            _devDatabaseParameters.DatabaseName, _devDatabaseParameters.DatabaseRecoveryModel!.Value,
+            cancellationToken);
+
+        if (changeDatabaseRecoveryModelResult.IsSome)
+            return (Err[])changeDatabaseRecoveryModelResult;
+        return null;
     }
 }

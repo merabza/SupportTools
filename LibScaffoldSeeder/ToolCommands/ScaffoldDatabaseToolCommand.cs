@@ -1,306 +1,306 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CliParameters;
-using LibDatabaseParameters;
-using LibParameters;
-using LibScaffoldSeeder.Models;
-using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+﻿//using System.IO;
+//using System.Net.Http;
+//using System.Threading;
+//using System.Threading.Tasks;
+//using CliParameters;
+//using LibDatabaseParameters;
+//using LibParameters;
+//using LibScaffoldSeeder.Models;
+//using Microsoft.Extensions.Logging;
+//using SystemToolsShared;
 
-namespace LibScaffoldSeeder.ToolCommands;
+//namespace LibScaffoldSeeder.ToolCommands;
 
-public sealed class ScaffoldDatabaseToolCommand : ToolCommand
-{
-    private const string ActionDescription = "This action will scaffold Database";
+//public sealed class ScaffoldDatabaseToolCommand : ToolCommand
+//{
+//    private const string ActionDescription = "This action will scaffold Database";
 
-    private readonly IHttpClientFactory _httpClientFactory;
+//    private readonly IHttpClientFactory _httpClientFactory;
 
-    private readonly ILogger _logger;
-    private readonly bool _useConsole;
+//    private readonly ILogger _logger;
+//    private readonly bool _useConsole;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ScaffoldDatabaseToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
-        ScaffoldSeederCreatorParameters parameters, IParametersManager parametersManager) : base(logger,
-        "Scaffold Database", parameters, parametersManager, ActionDescription)
-    {
-        _logger = logger;
-        _useConsole = useConsole;
-        _httpClientFactory = httpClientFactory;
-    }
+//    // ReSharper disable once ConvertToPrimaryConstructor
+//    public ScaffoldDatabaseToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+//        ScaffoldSeederCreatorParameters parameters, IParametersManager parametersManager) : base(logger,
+//        "Scaffold Database", parameters, parametersManager, ActionDescription)
+//    {
+//        _logger = logger;
+//        _useConsole = useConsole;
+//        _httpClientFactory = httpClientFactory;
+//    }
 
-    private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
+//    private ScaffoldSeederCreatorParameters Parameters => (ScaffoldSeederCreatorParameters)Par;
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
-    {
-        var scaffoldDatabaseParameters = new ScaffoldDatabaseParameters();
-        //if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
-        //{
-        //    StShared.WriteErrorLine("solution does not created", true, _logger);
-        //    return false;
-        //}
+//    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+//    {
+//        var scaffoldDatabaseParameters = new ScaffoldDatabaseParameters();
+//        //if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
+//        //{
+//        //    StShared.WriteErrorLine("solution does not created", true, _logger);
+//        //    return false;
+//        //}
 
-        //var gitProjectNames = scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
+//        //var gitProjectNames = scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
 
-        //if (ParametersManager is null)
-        //{
-        //    StShared.WriteErrorLine("ParametersManager is null", true, _logger);
-        //    return false;
-        //}
+//        //if (ParametersManager is null)
+//        //{
+//        //    StShared.WriteErrorLine("ParametersManager is null", true, _logger);
+//        //    return false;
+//        //}
 
-        //var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
+//        //var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
 
-        //var project = supportToolsParameters.GetProject(Parameters.ProjectName);
+//        //var project = supportToolsParameters.GetProject(Parameters.ProjectName);
 
-        //if (project is null)
-        //{
-        //    StShared.WriteErrorLine($"project with name {Parameters.ProjectName} does not exists", true, _logger);
-        //    return false;
-        //}
+//        //if (project is null)
+//        //{
+//        //    StShared.WriteErrorLine($"project with name {Parameters.ProjectName} does not exists", true, _logger);
+//        //    return false;
+//        //}
 
-        //var haveToSaveSupportToolsParameters = false;
+//        //var haveToSaveSupportToolsParameters = false;
 
-        ////გიტის პროექტების გადანახვა, რომლებიც გამოიყენება სკაფოლდინგის ნაწილისთვის
-        //if (gitProjectNames.Count != project.ScaffoldSeederGitProjectNames.Count ||
-        //    !gitProjectNames.All(project.ScaffoldSeederGitProjectNames.Contains))
-        //{
-        //    project.ScaffoldSeederGitProjectNames = [];
-        //    project.ScaffoldSeederGitProjectNames.AddRange(gitProjectNames);
-        //    haveToSaveSupportToolsParameters = true;
-        //}
+//        ////გიტის პროექტების გადანახვა, რომლებიც გამოიყენება სკაფოლდინგის ნაწილისთვის
+//        //if (gitProjectNames.Count != project.ScaffoldSeederGitProjectNames.Count ||
+//        //    !gitProjectNames.All(project.ScaffoldSeederGitProjectNames.Contains))
+//        //{
+//        //    project.ScaffoldSeederGitProjectNames = [];
+//        //    project.ScaffoldSeederGitProjectNames.AddRange(gitProjectNames);
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
 
-        //if (scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData is null)
-        //    return false;
+//        //if (scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData is null)
+//        //    return false;
 
-        if (!ScaffoldProdCopyDatabase(scaffoldDatabaseParameters))
-            return false;
-
-
-        //const string jsonExt = ".json";
-
-        //var seedDbProjectNameUseJsonFilePath = Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-        //    $"{Parameters.SeedDbProjectName}{jsonExt}");
-
-        //var creatorCreatorParameters = new CreatorCreatorParameters(Parameters.ScaffoldSeederProjectName,
-        //    Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,
-        //    Parameters.CreateProjectSeederCodeProjectName,
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-        //        Parameters.CreateProjectSeederCodeProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-        //        Parameters.GetJsonFromScaffoldDbProjectName), Parameters.SeedDbProjectName,
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.SeedDbProjectName),
-        //    "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath);
-
-        //var creatorCreator = new CreatorCreator(_logger, creatorCreatorParameters);
-
-        //if (!await creatorCreator.Run(CancellationToken.None))
-        //{
-        //    StShared.WriteErrorLine("Creator code not created", true, _logger);
-        //    return false;
-        //}
+//        if (!ScaffoldProdCopyDatabase(scaffoldDatabaseParameters))
+//            return false;
 
 
-        //var seederParameters = new SeederParametersDomain(
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName,
-        //        "Json"), Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
-        //    $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.SeedDbProjectName}");
+//        //const string jsonExt = ".json";
 
-        //if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
-        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath))
-        //{
-        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
-        //    return false;
-        //}
+//        //var seedDbProjectNameUseJsonFilePath = Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
+//        //    $"{Parameters.SeedDbProjectName}{jsonExt}");
 
-        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
-        //if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) || project.SeedProjectFilePath !=
-        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFileFullName)
-        //{
-        //    project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
-        //        .ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
+//        //var creatorCreatorParameters = new CreatorCreatorParameters(Parameters.ScaffoldSeederProjectName,
+//        //    Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,
+//        //    Parameters.CreateProjectSeederCodeProjectName,
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
+//        //        Parameters.CreateProjectSeederCodeProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
+//        //        Parameters.GetJsonFromScaffoldDbProjectName), Parameters.SeedDbProjectName,
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.SeedDbProjectName),
+//        //    "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath);
 
-        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის პარამეტრების გზა
-        //if (string.IsNullOrWhiteSpace(project.SeedProjectParametersFilePath) ||
-        //    project.SeedProjectParametersFilePath != seedDbProjectNameUseJsonFilePath)
-        //{
-        //    project.SeedProjectParametersFilePath = seedDbProjectNameUseJsonFilePath;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
+//        //var creatorCreator = new CreatorCreator(_logger, creatorCreatorParameters);
 
-        //var getJsonParameters = new GetJsonParametersDomain(seederParameters.JsonFolderName, Parameters.LogFolder,
-        //    $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.GetJsonFromScaffoldDbProjectName}");
-
-        //var getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName = Path.Combine(
-        //    scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-        //    $"{Parameters.GetJsonFromScaffoldDbProjectName}{jsonExt}");
-
-        //if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
-        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
-        //            .ProjectFullPath))
-        //{
-        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
-        //    return false;
-        //}
-
-        ////json ფაილების შემქმნელი პროექტის გზა
-        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
-        //    project.GetJsonFromScaffoldDbProjectFileFullName != scaffoldSeederDoubleAppCreator
-        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
-        //{
-        //    project.GetJsonFromScaffoldDbProjectFileFullName = scaffoldSeederDoubleAppCreator
-        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        ////json ფაილების შემქმნელი პროექტის პარამეტრების გზა
-        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName) ||
-        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName !=
-        //    getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName)
-        //{
-        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName =
-        //        getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        ////მიგრაციის პროექტის გზის დაფიქსირება
-        //if (string.IsNullOrWhiteSpace(project.MigrationProjectFilePath) || project.MigrationProjectFilePath !=
-        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.DbMigrationProject.ProjectFileFullName)
-        //{
-        //    project.MigrationProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
-        //        .DbMigrationProject.ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        ////FakeHostWebApi პროექტის გზა, რომელიც გამოიყენება მიგრაციის სტარტ პროექტად
-        //if (string.IsNullOrWhiteSpace(project.MigrationStartupProjectFilePath) ||
-        //    project.MigrationStartupProjectFilePath != scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
-        //        .FakeHostWebApiProject.ProjectFileFullName)
-        //{
-        //    project.MigrationStartupProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
-        //        .FakeHostWebApiProject.ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        //var createProjectSeederCodeParameters = new CreateProjectSeederCodeParametersDomain(
-        //    Parameters.ScaffoldSeederProjectName, Parameters.ProjectShortPrefix, Parameters.LogFolder,
-        //    $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.CreateProjectSeederCodeProjectName}",
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-        //        Parameters.GetJsonFromScaffoldDbProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
-        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName),
-        //    Parameters.DataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath,
-        //    Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName);
-
-        //var createProjectSeederCodeParametersFileFullName = Path.Combine(
-        //    scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-        //    $"{Parameters.CreateProjectSeederCodeProjectName}{jsonExt}");
-
-        //if (!SaveParameters(createProjectSeederCodeParameters, createProjectSeederCodeParametersFileFullName,
-        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
-        //            .ProjectFullPath))
-        //{
-        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
-        //    return false;
-        //}
-
-        //if (haveToSaveSupportToolsParameters)
-        //    ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
-
-        //if (StShared.RunProcess(true, _logger, "dotnet",
-        //        $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}")
-        //    .IsSome)
-        //    return false;
-
-        //var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
-        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
-        //        .ProjectFileFullName, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName);
-
-        ////გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
-        //var jsonFromProjectDbProjectGetter =
-        //    new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
-        //return await jsonFromProjectDbProjectGetter.Run(CancellationToken.None);
-
-        return true;
-    }
+//        //if (!await creatorCreator.Run(CancellationToken.None))
+//        //{
+//        //    StShared.WriteErrorLine("Creator code not created", true, _logger);
+//        //    return false;
+//        //}
 
 
-    //public static void ForceDeleteDirectory(string path)
-    //{
-    //    var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
+//        //var seederParameters = new SeederParametersDomain(
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName,
+//        //        "Json"), Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
+//        //    $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.SeedDbProjectName}");
 
-    //    foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-    //        info.Attributes = FileAttributes.Normal;
+//        //if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
+//        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath))
+//        //{
+//        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
+//        //    return false;
+//        //}
 
-    //    directory.Delete(true);
-    //}
+//        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
+//        //if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) || project.SeedProjectFilePath !=
+//        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFileFullName)
+//        //{
+//        //    project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
+//        //        .ProjectFileFullName;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის პარამეტრების გზა
+//        //if (string.IsNullOrWhiteSpace(project.SeedProjectParametersFilePath) ||
+//        //    project.SeedProjectParametersFilePath != seedDbProjectNameUseJsonFilePath)
+//        //{
+//        //    project.SeedProjectParametersFilePath = seedDbProjectNameUseJsonFilePath;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        //var getJsonParameters = new GetJsonParametersDomain(seederParameters.JsonFolderName, Parameters.LogFolder,
+//        //    $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.GetJsonFromScaffoldDbProjectName}");
+
+//        //var getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName = Path.Combine(
+//        //    scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
+//        //    $"{Parameters.GetJsonFromScaffoldDbProjectName}{jsonExt}");
+
+//        //if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
+//        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
+//        //            .ProjectFullPath))
+//        //{
+//        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
+//        //    return false;
+//        //}
+
+//        ////json ფაილების შემქმნელი პროექტის გზა
+//        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
+//        //    project.GetJsonFromScaffoldDbProjectFileFullName != scaffoldSeederDoubleAppCreator
+//        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
+//        //{
+//        //    project.GetJsonFromScaffoldDbProjectFileFullName = scaffoldSeederDoubleAppCreator
+//        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        ////json ფაილების შემქმნელი პროექტის პარამეტრების გზა
+//        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName) ||
+//        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName !=
+//        //    getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName)
+//        //{
+//        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName =
+//        //        getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        ////მიგრაციის პროექტის გზის დაფიქსირება
+//        //if (string.IsNullOrWhiteSpace(project.MigrationProjectFilePath) || project.MigrationProjectFilePath !=
+//        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.DbMigrationProject.ProjectFileFullName)
+//        //{
+//        //    project.MigrationProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
+//        //        .DbMigrationProject.ProjectFileFullName;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        ////FakeHostWebApi პროექტის გზა, რომელიც გამოიყენება მიგრაციის სტარტ პროექტად
+//        //if (string.IsNullOrWhiteSpace(project.MigrationStartupProjectFilePath) ||
+//        //    project.MigrationStartupProjectFilePath != scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
+//        //        .FakeHostWebApiProject.ProjectFileFullName)
+//        //{
+//        //    project.MigrationStartupProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData
+//        //        .FakeHostWebApiProject.ProjectFileFullName;
+//        //    haveToSaveSupportToolsParameters = true;
+//        //}
+
+//        //var createProjectSeederCodeParameters = new CreateProjectSeederCodeParametersDomain(
+//        //    Parameters.ScaffoldSeederProjectName, Parameters.ProjectShortPrefix, Parameters.LogFolder,
+//        //    $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.CreateProjectSeederCodeProjectName}",
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
+//        //        Parameters.GetJsonFromScaffoldDbProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
+//        //    Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName),
+//        //    Parameters.DataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath,
+//        //    Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName);
+
+//        //var createProjectSeederCodeParametersFileFullName = Path.Combine(
+//        //    scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
+//        //    $"{Parameters.CreateProjectSeederCodeProjectName}{jsonExt}");
+
+//        //if (!SaveParameters(createProjectSeederCodeParameters, createProjectSeederCodeParametersFileFullName,
+//        //        scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
+//        //            .ProjectFullPath))
+//        //{
+//        //    StShared.WriteErrorLine("Parameters does not saved", true, _logger);
+//        //    return false;
+//        //}
+
+//        //if (haveToSaveSupportToolsParameters)
+//        //    ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
+
+//        //if (StShared.RunProcess(true, _logger, "dotnet",
+//        //        $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}")
+//        //    .IsSome)
+//        //    return false;
+
+//        //var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
+//        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
+//        //        .ProjectFileFullName, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName);
+
+//        ////გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
+//        //var jsonFromProjectDbProjectGetter =
+//        //    new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
+//        //return await jsonFromProjectDbProjectGetter.Run(CancellationToken.None);
+
+//        return true;
+//    }
 
 
-    private bool ScaffoldProdCopyDatabase(ScaffoldDatabaseParameters scaffoldDatabaseParameters)
-    {
-        //ბაზის კონტექსტის კლასის სახელი
-        var dbScContextName = $"{Parameters.ScaffoldSeederProjectName.Replace('.', '_')}DbScContext";
+//    //public static void ForceDeleteDirectory(string path)
+//    //{
+//    //    var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
 
-        var providerPackageName = Parameters.ProdCopyDatabaseDataProvider switch
-        {
-            EDatabaseProvider.SqlServer => "Microsoft.EntityFrameworkCore.SqlServer",
-            EDatabaseProvider.None => null,
-            EDatabaseProvider.SqLite => "Microsoft.EntityFrameworkCore.Sqlite",
-            EDatabaseProvider.OleDb => "EntityFrameworkCore.Jet",
-            _ => null
-        };
+//    //    foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
+//    //        info.Attributes = FileAttributes.Normal;
 
-        if (providerPackageName is not null)
-            return ScaffoldDatabase(scaffoldDatabaseParameters.DatabaseScaffoldClassLibProject.ProjectFileFullName,
-                Parameters.ProdCopyDatabaseConnectionString,
-                scaffoldDatabaseParameters.CreateProjectSeederCodeProject.ProjectFileFullName, providerPackageName,
-                dbScContextName);
-
-        StShared.WriteErrorLine("Package name for ProdCopyDatabaseDataProvider does not found", true, _logger);
-        return false;
-    }
-
-    private bool ScaffoldDatabase(string databaseScaffoldClassLibProjectFileFullName, string databaseConnectionString,
-        string startupProjectFileFullName, string providerPackageName, string dbScContextName)
-    {
-        var databaseScaffoldClassLibProjectFile = new FileInfo(databaseScaffoldClassLibProjectFileFullName);
-        var databaseScaffoldClassLibProjectFullPath = databaseScaffoldClassLibProjectFile.DirectoryName;
-        if (databaseScaffoldClassLibProjectFullPath is null)
-        {
-            StShared.WriteErrorLine("databaseScaffoldClassLibProjectFullPath is null", true, _logger);
-            return false;
-        }
-
-        var modelsFolderFullPath = Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models");
-
-        return StShared.RunProcess(true, _logger, "dotnet",
-                $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{databaseConnectionString}\" {providerPackageName} --startup-project {startupProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {modelsFolderFullPath} --force --no-pluralize --no-onconfiguring")
-            .IsNone;
-    }
+//    //    directory.Delete(true);
+//    //}
 
 
-    //private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath)
-    //{
-    //    //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
-    //    var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
+//    private bool ScaffoldProdCopyDatabase(ScaffoldDatabaseParameters scaffoldDatabaseParameters)
+//    {
+//        //ბაზის კონტექსტის კლასის სახელი
+//        var dbScContextName = $"{Parameters.ScaffoldSeederProjectName.Replace('.', '_')}DbScContext";
 
-    //    //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
-    //    File.WriteAllText(saveAsFilePath, paramsJsonText);
+//        var providerPackageName = Parameters.ProdCopyDatabaseDataProvider switch
+//        {
+//            EDatabaseProvider.SqlServer => "Microsoft.EntityFrameworkCore.SqlServer",
+//            EDatabaseProvider.None => null,
+//            EDatabaseProvider.SqLite => "Microsoft.EntityFrameworkCore.Sqlite",
+//            EDatabaseProvider.OleDb => "EntityFrameworkCore.Jet",
+//            _ => null
+//        };
 
-    //    //launchSettings.json//"SeedGeoModelDb"
-    //    // ReSharper disable once CollectionNeverUpdated.Local
-    //    var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
-    //        new JObject(new JProperty(Parameters.SeedDbProjectName,
-    //            new JObject(new JProperty("commandName", "Project"),
-    //                new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
+//        if (providerPackageName is not null)
+//            return ScaffoldDatabase(scaffoldDatabaseParameters.DatabaseScaffoldClassLibProject.ProjectFileFullName,
+//                Parameters.ProdCopyDatabaseConnectionString,
+//                scaffoldDatabaseParameters.CreateProjectSeederCodeProject.ProjectFileFullName, providerPackageName,
+//                dbScContextName);
 
-    //    var propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
-    //    StShared.CreateFolder(propertiesFolderPath, true);
+//        StShared.WriteErrorLine("Package name for ProdCopyDatabaseDataProvider does not found", true, _logger);
+//        return false;
+//    }
 
-    //    File.WriteAllText(Path.Combine(propertiesFolderPath, "launchSettings.json"),
-    //        seedDbProjectLaunchSettings.ToString());
+//    private bool ScaffoldDatabase(string databaseScaffoldClassLibProjectFileFullName, string databaseConnectionString,
+//        string startupProjectFileFullName, string providerPackageName, string dbScContextName)
+//    {
+//        var databaseScaffoldClassLibProjectFile = new FileInfo(databaseScaffoldClassLibProjectFileFullName);
+//        var databaseScaffoldClassLibProjectFullPath = databaseScaffoldClassLibProjectFile.DirectoryName;
+//        if (databaseScaffoldClassLibProjectFullPath is null)
+//        {
+//            StShared.WriteErrorLine("databaseScaffoldClassLibProjectFullPath is null", true, _logger);
+//            return false;
+//        }
 
-    //    return true;
-    //}
-}
+//        var modelsFolderFullPath = Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models");
+
+//        return StShared.RunProcess(true, _logger, "dotnet",
+//                $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{databaseConnectionString}\" {providerPackageName} --startup-project {startupProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {modelsFolderFullPath} --force --no-pluralize --no-onconfiguring")
+//            .IsNone;
+//    }
+
+
+//    //private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath)
+//    //{
+//    //    //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
+//    //    var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
+
+//    //    //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
+//    //    File.WriteAllText(saveAsFilePath, paramsJsonText);
+
+//    //    //launchSettings.json//"SeedGeoModelDb"
+//    //    // ReSharper disable once CollectionNeverUpdated.Local
+//    //    var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
+//    //        new JObject(new JProperty(Parameters.SeedDbProjectName,
+//    //            new JObject(new JProperty("commandName", "Project"),
+//    //                new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
+
+//    //    var propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
+//    //    StShared.CreateFolder(propertiesFolderPath, true);
+
+//    //    File.WriteAllText(Path.Combine(propertiesFolderPath, "launchSettings.json"),
+//    //        seedDbProjectLaunchSettings.ToString());
+
+//    //    return true;
+//    //}
+//}

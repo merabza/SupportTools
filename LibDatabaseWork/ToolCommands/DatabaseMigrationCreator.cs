@@ -93,6 +93,13 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
             return ValueTask.FromResult(false);
         }
 
+        migrationsFolder = migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
+        if (migrationsFolder is null)
+        {
+            _logger.LogError("Migrations Folder Not found");
+            return ValueTask.FromResult(false);
+        }
+
         var sqlMigrationCreator = new SqlMigrationCreator(_logger, migrationsFolder.FullName,
             Path.GetFileNameWithoutExtension(DatabaseMigrationParameters.MigrationProjectFileName),
             sqlMigrationFile.Name);
