@@ -60,7 +60,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
             var gitSync = new GitSyncToolAction(_logger,
                 new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
                 commitMessage == null);
-            await gitSync.Run(cancellationToken);
+            if (!await gitSync.Run(cancellationToken))
+                return false;
             commitMessage = gitSync.UsedCommitMessage;
             if (projectName is null || changedGitProjects is null || !gitSync.Changed)
                 continue;

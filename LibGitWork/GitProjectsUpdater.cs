@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using LibDataInput;
 using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SqlServerDbTools.Errors;
 using SupportToolsData.Models;
 using SystemToolsShared;
-using SystemToolsShared.Errors;
 
 namespace LibGitWork;
 
@@ -71,9 +68,15 @@ public sealed class GitProjectsUpdater
 
     public GitProcessor? ProcessOneGitProject(bool processFolder = true)
     {
-        var gitProcessor = UpdateOneGitProject(_projectFolderName, _gitData);
+        var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, _projectFolderName, _gitData);
+        var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
+
         if (gitProcessor is null)
             return null;
+
+        gitProcessor.CheckRemoteId();
+        LastRemoteId = gitProcessor.LastRemoteId;
+
         if (!processFolder)
             return gitProcessor;
         return !ProcessFolder(_projectFolderName, _gitName) ? null : gitProcessor;
@@ -114,83 +117,83 @@ public sealed class GitProjectsUpdater
         //შემოწმდეს Gits ფოლდერში პროექტის ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
     }
 
-    private GitProcessor? UpdateOneGitProject(string projectFolderName, GitDataDomain git)
-    {
-        var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
+    //private GitProcessor? UpdateOneGitProject(string projectFolderName, GitDataDomain git)
+    //{
+    //    var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
 
-        if (Directory.Exists(projectFolderName))
-        {
-            //თუ ფოლდერი არსებობს, მაშინ დადგინდეს შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
-            // თუ ეს ასე არ არის, წაიშალოს ფოლდერი თავისი შიგთავსით
+    //    if (Directory.Exists(projectFolderName))
+    //    {
+    //        //თუ ფოლდერი არსებობს, მაშინ დადგინდეს შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
+    //        // თუ ეს ასე არ არის, წაიშალოს ფოლდერი თავისი შიგთავსით
 
-            var getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
-            if (getRemoteOriginUrlResult.IsT1)
-            {
-                Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
-                    SqlDbClientErrors.GetRemoteOriginUrlError));
-                return null;
-            }
+    //        var getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
+    //        if (getRemoteOriginUrlResult.IsT1)
+    //        {
+    //            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+    //                SqlDbClientErrors.GetRemoteOriginUrlError));
+    //            return null;
+    //        }
 
-            var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
+    //        var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
-            if (remoteOriginUrl.Trim(Environment.NewLine.ToCharArray()) != git.GitProjectAddress)
-                Directory.Delete(projectFolderName, true);
-        }
+    //        if (remoteOriginUrl.Trim(Environment.NewLine.ToCharArray()) != git.GitProjectAddress)
+    //            Directory.Delete(projectFolderName, true);
+    //    }
 
-        //შემოწმდეს Gits ფოლდერში თუ არ არსებობს ფოლდერი gitDataModel.GitProjectFolderName სახელით,
-        if (!Directory.Exists(projectFolderName))
-        {
-            //მოხდეს ამ Git პროექტის დაკლონვა შესაბამისი ფოლდერის სახელის მითითებით
-            if (!gitProcessor.Clone(git.GitProjectAddress))
-                return null;
-        }
-        else
-        {
-            //თუ ფოლდერი არსებობს, მოხდეს სტატუსის შემოწმება (იდეაში აქ ცვლილებები არ უნდა მომხდარიყო, მაგრამ მაინც)
-            var needCommitResult = gitProcessor.NeedCommit();
-            if (needCommitResult.IsT1)
-            {
-                Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
-                return null;
-            }
+    //    //შემოწმდეს Gits ფოლდერში თუ არ არსებობს ფოლდერი gitDataModel.GitProjectFolderName სახელით,
+    //    if (!Directory.Exists(projectFolderName))
+    //    {
+    //        //მოხდეს ამ Git პროექტის დაკლონვა შესაბამისი ფოლდერის სახელის მითითებით
+    //        if (!gitProcessor.Clone(git.GitProjectAddress))
+    //            return null;
+    //    }
+    //    else
+    //    {
+    //        //თუ ფოლდერი არსებობს, მოხდეს სტატუსის შემოწმება (იდეაში აქ ცვლილებები არ უნდა მომხდარიყო, მაგრამ მაინც)
+    //        var needCommitResult = gitProcessor.NeedCommit();
+    //        if (needCommitResult.IsT1)
+    //        {
+    //            Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
+    //            return null;
+    //        }
 
-            if (needCommitResult.AsT0)
-            {
-                //  თუ აღმოჩნდა რომ ცვლილებები მომხდარა, გამოვიდეს შეტყობინება ცვლილებების გაუქმებისა და თავიდან დაკლონვის შესახებ
-                if (!Inputer.InputBool(
-                        $"{projectFolderName} Have changes it is SupportTools Work folder and must be Restored to server version. continue?",
-                        true))
-                    return null;
+    //        if (needCommitResult.AsT0)
+    //        {
+    //            //  თუ აღმოჩნდა რომ ცვლილებები მომხდარა, გამოვიდეს შეტყობინება ცვლილებების გაუქმებისა და თავიდან დაკლონვის შესახებ
+    //            if (!Inputer.InputBool(
+    //                    $"{projectFolderName} Have changes it is SupportTools Work folder and must be Restored to server version. continue?",
+    //                    true))
+    //                return null;
 
-                //     თანხმობის შემთხვევაში ან თავიდან დაიკლონოს, ან უკეთესია, თუ Checkout გაკეთდება.
-                /*შემდეგი 3 ბრძანება თანმიმდევრობით იგივეა, რომ გიტის პროექტი თავიდან დაკლონო, ოღონდ მინიმალური ჩამოტვირთვით
-                    git reset
-                    git checkout .
-                    git clean -fdx
-                     */
+    //            //     თანხმობის შემთხვევაში ან თავიდან დაიკლონოს, ან უკეთესია, თუ Checkout გაკეთდება.
+    //            /*შემდეგი 3 ბრძანება თანმიმდევრობით იგივეა, რომ გიტის პროექტი თავიდან დაკლონო, ოღონდ მინიმალური ჩამოტვირთვით
+    //                git reset
+    //                git checkout .
+    //                git clean -fdx
+    //                 */
 
-                if (!gitProcessor.Reset())
-                    return null;
-                if (!gitProcessor.Checkout())
-                    return null;
-                if (!gitProcessor.Clean_fdx())
-                    return null;
-            }
-            else
-            {
-                if (!gitProcessor.GitRemoteUpdate())
-                    return null;
+    //            if (!gitProcessor.Reset())
+    //                return null;
+    //            if (!gitProcessor.Checkout())
+    //                return null;
+    //            if (!gitProcessor.Clean_fdx())
+    //                return null;
+    //        }
+    //        else
+    //        {
+    //            if (!gitProcessor.GitRemoteUpdate())
+    //                return null;
 
-                //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
-                if (gitProcessor.GetGitState() == GitState.NeedToPull && !gitProcessor.Pull())
-                    return null;
-            }
-        }
+    //            //შემოწმდეს ლოკალური ვერსია და remote ვერსია და თუ ერთნაირი არ არის გაკეთდეს git pull
+    //            if (gitProcessor.GetGitState() == GitState.NeedToPull && !gitProcessor.Pull())
+    //                return null;
+    //        }
+    //    }
 
-        gitProcessor.CheckRemoteId();
-        LastRemoteId = gitProcessor.LastRemoteId;
-        return gitProcessor;
-    }
+    //    gitProcessor.CheckRemoteId();
+    //    LastRemoteId = gitProcessor.LastRemoteId;
+    //    return gitProcessor;
+    //}
 
 
     private bool ProcessFolder(string folderPath, string gitName)
