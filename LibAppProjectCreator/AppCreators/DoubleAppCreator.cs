@@ -61,7 +61,7 @@ public abstract class DoubleAppCreator
             return false;
 
         if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
-                ECreateAppVersions.WithoutSolutionGitInit))
+                ECreateAppVersions.Temp))
             return false;
 
         return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);

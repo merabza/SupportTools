@@ -199,7 +199,7 @@ public abstract class AppCreatorBase
     private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions,
         CancellationToken cancellationToken = default)
     {
-        if (!AppGitsSync())
+        if (!AppGitsSync(createAppVersions == ECreateAppVersions.Temp))
             return false;
 
         if (createAppVersions == ECreateAppVersions.OnlySyncGit)
@@ -300,7 +300,7 @@ public abstract class AppCreatorBase
         if (StShared.RunProcess(true, Logger, "jb", $"cleanupcode {SolutionPath}").IsSome)
             return false;
 
-        if (createAppVersions == ECreateAppVersions.WithoutSolutionGitInit)
+        if (createAppVersions == ECreateAppVersions.Temp)
             return true;
 
         if (StShared.RunProcess(true, Logger, "git", $"-C \"{SolutionPath}\" init").IsSome)
@@ -342,13 +342,13 @@ public abstract class AppCreatorBase
         }
     }
 
-    private bool AppGitsSync()
+    private bool AppGitsSync(bool useProjectUpdater)
     {
         var gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
 
         var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
             new SyncOneProjectAllGitsParameters(null, WorkPath,
-                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), null, true));
+                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), null, true, useProjectUpdater));
         return gitSyncAll.Run(CancellationToken.None).Result;
     }
 

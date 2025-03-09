@@ -21,8 +21,6 @@ public sealed class GitOneProjectUpdater
         _git = git;
     }
 
-    public string? LastRemoteId { get; private set; }
-
     public GitProcessor? UpdateOneGitProject()
     {
         var gitProcessor = new GitProcessor(true, _logger, _projectPath);

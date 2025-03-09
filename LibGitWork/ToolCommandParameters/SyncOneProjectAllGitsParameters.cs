@@ -14,12 +14,13 @@ public class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData,
-        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync)
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync, bool useProjectUpdater)
     {
         ProjectName = projectName;
         GitData = gitData;
         ChangedGitProjects = changedGitProjects;
         IsFirstSync = isFirstSync;
+        UseProjectUpdater = useProjectUpdater;
         GitsFolder = gitsFolder;
     }
 
@@ -28,6 +29,7 @@ public class SyncOneProjectAllGitsParameters : IParameters
     public Dictionary<EGitCollect, Dictionary<string, List<string>>>? ChangedGitProjects { get; }
     public string GitsFolder { get; }
     public bool IsFirstSync { get; }
+    public bool UseProjectUpdater { get; }
 
     public bool CheckBeforeSave()
     {
@@ -80,6 +82,6 @@ public class SyncOneProjectAllGitsParameters : IParameters
 
         return new SyncOneProjectAllGitsParameters(projectName, gitsFolder,
             gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), changedGitProjects,
-            isFirstSync);
+            isFirstSync, false);
     }
 }

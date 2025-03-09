@@ -52,27 +52,38 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         foreach (var gitData in _syncOneProjectAllGitsParameters.GitData.OrderBy(x => x.GitProjectFolderName))
         {
             var gitProjectFolderName = gitData.GitProjectFolderName;
-            if (projectName is not null && !_syncOneProjectAllGitsParameters.IsFirstSync &&
-                changedGitProjects is not null &&
-                (!changedGitProjects[EGitCollect.Usage].TryGetValue(gitProjectFolderName, out var proListVal) ||
-                 (proListVal.Count == 1 && proListVal[0] == projectName)))
-                continue;
-            var gitSync = new GitSyncToolAction(_logger,
-                new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
-                commitMessage == null);
-            if (!await gitSync.Run(cancellationToken))
-                return false;
-            commitMessage = gitSync.UsedCommitMessage;
-            if (projectName is null || changedGitProjects is null || !gitSync.Changed)
-                continue;
-            if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList))
+
+            if (_syncOneProjectAllGitsParameters.UseProjectUpdater)
             {
-                if (!proList.Contains(projectName))
-                    proList.Add(projectName);
+                var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolderName, gitData);
+                var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
+                if (gitProcessor is null)
+                    return false;
             }
             else
             {
-                changedGitProjects[EGitCollect.Collect].Add(gitProjectFolderName, [projectName]);
+                if (projectName is not null && !_syncOneProjectAllGitsParameters.IsFirstSync &&
+                    changedGitProjects is not null &&
+                    (!changedGitProjects[EGitCollect.Usage].TryGetValue(gitProjectFolderName, out var proListVal) ||
+                     (proListVal.Count == 1 && proListVal[0] == projectName)))
+                    continue;
+                var gitSync = new GitSyncToolAction(_logger,
+                    new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
+                    commitMessage == null);
+                if (!await gitSync.Run(cancellationToken))
+                    return false;
+                commitMessage = gitSync.UsedCommitMessage;
+                if (projectName is null || changedGitProjects is null || !gitSync.Changed)
+                    continue;
+                if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList))
+                {
+                    if (!proList.Contains(projectName))
+                        proList.Add(projectName);
+                }
+                else
+                {
+                    changedGitProjects[EGitCollect.Collect].Add(gitProjectFolderName, [projectName]);
+                }
             }
         }
 
