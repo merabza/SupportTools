@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
+using DbTools;
 using DbTools.Errors;
 using LanguageExt;
 using LibApiClientParameters;
@@ -107,11 +108,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
             errors.Add(DbToolsErrors.DevDatabaseNameIsNotSpecified);
         }
 
-        if (_devDatabaseParameters.DatabaseRecoveryModel is null)
-        {
-            _logger.LogError("dev DatabaseRecoveryModel is not specified");
-            errors.Add(DbToolsErrors.DevDatabaseRecoveryModelIsNotSpecified);
-        }
+        var databaseRecoveryModel = _devDatabaseParameters.DatabaseRecoveryModel ?? DatabaseParameters.DefaultDatabaseRecoveryModel;
 
         if (errors.Count > 0)
             return errors;
@@ -119,7 +116,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
         var dbManager = createDatabaseManagerResult.AsT0;
 
         var changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
-            _devDatabaseParameters.DatabaseName, _devDatabaseParameters.DatabaseRecoveryModel!.Value,
+            _devDatabaseParameters.DatabaseName, databaseRecoveryModel,
             cancellationToken);
 
         if (changeDatabaseRecoveryModelResult.IsSome)
