@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +56,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
 
             if (_syncOneProjectAllGitsParameters.UseProjectUpdater)
             {
-                var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolderName, gitData);
+                var gitOneProjectUpdater = new GitOneProjectUpdater(_logger,
+                    Path.Combine(_syncOneProjectAllGitsParameters.GitsFolder, gitProjectFolderName), gitData);
                 var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
                 if (gitProcessor is null)
                     return false;
