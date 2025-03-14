@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DatabasesManagement;
-using DbTools;
 using DbTools.Errors;
 using LanguageExt;
 using LibApiClientParameters;
@@ -21,13 +20,15 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 {
     private const string ActionName = "Database Recreate";
 
-    private const string ActionDescription = @"This action will do steps:
+    private const string ActionDescription = """
+                                             This action will do steps:
 
-1. Drop Existing Dev Database
-2. Create Initial Migration and create new Dev Database
-3. Correct New Database
+                                             1. Drop Existing Dev Database
+                                             2. Create Initial Migration and create new Dev Database
+                                             3. Correct New Database
 
-";
+
+                                             """;
 
     private readonly ApiClients _apiClients;
 
