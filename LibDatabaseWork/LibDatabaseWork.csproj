@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
+    <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 

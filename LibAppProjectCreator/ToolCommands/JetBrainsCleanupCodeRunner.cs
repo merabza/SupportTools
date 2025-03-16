@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using CliParameters;
 using LibAppProjectCreator.Models;
+using LibJetBrainsResharperGlobalToolsWork;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibAppProjectCreator.ToolCommands;
 
@@ -23,7 +23,7 @@ public sealed class JetBrainsCleanupCodeRunner : ToolCommand
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
-        return ValueTask.FromResult(StShared
-            .RunProcess(true, _logger, "jb", $"cleanupcode {_parameters.SolutionFileName}").IsNone);
+        var processor = new JetBrainsResharperGlobalToolsProcessor(_logger, true);
+        return ValueTask.FromResult(processor.Cleanupcode(_parameters.SolutionFileName, true).IsNone);
     }
 }

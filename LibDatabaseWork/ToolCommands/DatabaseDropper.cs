@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LibDatabaseWork.Models;
+using LibDotnetWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -12,13 +12,6 @@ public sealed class DatabaseDropper : MigrationToolCommand
     private const string ActionName = "Drop Database";
     private const string ActionDescription = "Drop Database";
     private readonly ILogger _logger;
-
-    //კონსტრუქტორი გამოიყენება, როცა პარამეტრები უნდა ჩაიტვირთოს ფაილიდან
-    //public DatabaseDropper(ILogger logger, bool useConsole, ParametersTaskInfo parametersTaskInfo) : base(logger,
-    //    useConsole, ActionName, ActionDescription, parametersTaskInfo)
-    //{
-
-    //}
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -33,9 +26,11 @@ public sealed class DatabaseDropper : MigrationToolCommand
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+
         //ბაზის წაშლა
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database drop --force --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-            .IsNone);
+        return ValueTask.FromResult(dotnetProcessor.EfDropDatabase(DatabaseMigrationParameters.DbContextName,
+            DatabaseMigrationParameters.MigrationStartupProjectFilePath,
+            DatabaseMigrationParameters.MigrationProjectFileName).IsNone);
     }
 }

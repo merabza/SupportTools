@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using LibAppProjectCreator.Models;
-using SupportToolsData;
+using LibDotnetWork;
 
 namespace LibScaffoldSeeder.Models;
 

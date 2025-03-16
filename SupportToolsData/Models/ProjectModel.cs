@@ -25,6 +25,7 @@ public sealed class ProjectModel : ItemData
     public string? ParametersFileExtension { get; set; }
     public string? MigrationStartupProjectFilePath { get; set; }
     public string? MigrationProjectFilePath { get; set; }
+    public string? SolutionFileNameWithMigrationProject { get; set; }
     public string? SeedProjectFilePath { get; set; }
     public string? SeedProjectParametersFilePath { get; set; }
     public string? GetJsonFromScaffoldDbProjectFileFullName { get; set; }

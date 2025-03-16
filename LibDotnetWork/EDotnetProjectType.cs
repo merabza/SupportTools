@@ -1,4 +1,4 @@
-﻿namespace SupportToolsData;
+﻿namespace LibDotnetWork;
 
 public enum EDotnetProjectType
 {
@@ -8,16 +8,17 @@ public enum EDotnetProjectType
     ReactEsProj
 }
 
-/* 13-aug-2024
+/*
+ 16-mar-2025
 
 dotnet --version
 
-8.0.400
+9.0.201
 
 dotnet new list
 
 These templates matched your input:
-
+   
    Template Name             Short Name                  Language    Tags
    ------------------------  --------------------------  ----------  -----------------------------------------------------------------------------
    .NET Aspire App Host      aspire-apphost              [C#]        Common/.NET Aspire/Cloud
@@ -28,6 +29,7 @@ These templates matched your input:
    .NET Aspire Test Proj...  aspire-nunit                [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
    .NET Aspire Test Proj...  aspire-xunit                [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
    .NET MAUI App             maui                        [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Mobile
+   .NET MAUI Blazor Hybr...  maui-blazor-web             [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Blazor/Blazor Hybrid/Mobile
    .NET MAUI Blazor Hybr...  maui-blazor                 [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Blazor/Blazor Hybrid/Mobile
    .NET MAUI Class Library   mauilib                     [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Mobile
    .NET MAUI ContentPage...  maui-page-csharp            [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
@@ -36,11 +38,13 @@ These templates matched your input:
    .NET MAUI ContentView...  maui-view-xaml              [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
    .NET MAUI Multi-Proje...  maui-multiproject           [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Mobile
    .NET MAUI ResourceDic...  maui-dict-xaml              [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code
-   Android Activity temp...  android-activity            [C#]        Android/Mobile
+   .NET MAUI Window (C#)     maui-window-csharp          [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
+   .NET MAUI Window (XAML)   maui-window-xaml            [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
+   Android Activity          android-activity            [C#]        Android/Mobile
    Android Application       android                     [C#]        Android/Mobile
    Android Class Library     androidlib                  [C#]        Android/Mobile
    Android Java Library ...  android-bindinglib          [C#]        Android/Mobile
-   Android Layout template   android-layout              [C#]        Android/Mobile
+   Android Layout            android-layout              [C#]        Android/Mobile
    Android Wear Application  androidwear                 [C#]        Android/Mobile
    API Controller            apicontroller               [C#]        Web/ASP.NET
    ASP.NET Core Empty        web                         [C#],F#     Web/Empty
@@ -51,6 +55,7 @@ These templates matched your input:
    ASP.NET Core Web App ...  webapp,razor                [C#]        Web/MVC/Razor Pages
    ASP.NET Core with Ang...  angular                     [C#]        Web/MVC/SPA
    ASP.NET Core with Rea...  react                       [C#]        Web/MVC/SPA
+   ASP.NET Core with Rea...  reactredux                  [C#]        Web/MVC/SPA
    Blazor Server App         blazorserver                [C#]        Web/Blazor
    Blazor Server App Empty   blazorserver-empty          [C#]        Web/Blazor/Empty
    Blazor Web App            blazor                      [C#]        Web/Blazor/WebAssembly
@@ -79,17 +84,19 @@ These templates matched your input:
    Mac Catalyst View Con...  maccatalyst-viewcontroller  [C#]        macOS/Mac Catalyst
    MSBuild Directory.Bui...  buildprops                              MSBuild/props
    MSBuild Directory.Bui...  buildtargets                            MSBuild/props
-   MSTest Playwright Tes...  mstest-playwright           [C#]        Test/MSTest/Playwright
-   MSTest Test Project       mstest                      [C#],F#,VB  Test/MSTest
+   MSBuild Directory.Pac...  packagesprops                           MSBuild/packages/props/CPM
+   MSTest Playwright Tes...  mstest-playwright           [C#]        Test/MSTest/Playwright/Desktop/Web
+   MSTest Test Class         mstest-class                [C#],F#,VB  Test/MSTest
+   MSTest Test Project       mstest                      [C#],F#,VB  Test/MSTest/Desktop/Web
    MVC Controller            mvccontroller               [C#]        Web/ASP.NET
    MVC ViewImports           viewimports                 [C#]        Web/ASP.NET
    MVC ViewStart             viewstart                   [C#]        Web/ASP.NET
    NuGet Config              nugetconfig,nuget.config                Config
    NUnit 3 Test Item         nunit-test                  [C#],F#,VB  Test/NUnit
-   NUnit 3 Test Project      nunit                       [C#],F#,VB  Test/NUnit
-   NUnit Playwright Test...  nunit-playwright            [C#]        Test/NUnit/Playwright
+   NUnit 3 Test Project      nunit                       [C#],F#,VB  Test/NUnit/Desktop/Web
+   NUnit Playwright Test...  nunit-playwright            [C#]        Test/NUnit/Playwright/Desktop/Web
    Protocol Buffer File      proto                                   Web/gRPC
-   Razor Class Library       razorclasslib               [C#]        Web/Razor/Library
+   Razor Class Library       razorclasslib               [C#]        Web/Razor/Library/Razor Class Library
    Razor Component           razorcomponent              [C#]        Web/ASP.NET
    Razor Page                page                        [C#]        Web/ASP.NET
    Razor View                view                        [C#]        Web/ASP.NET
@@ -103,5 +110,5 @@ These templates matched your input:
    WPF Class Library         wpflib                      [C#],VB     Common/WPF
    WPF Custom Control Li...  wpfcustomcontrollib         [C#],VB     Common/WPF
    WPF User Control Library  wpfusercontrollib           [C#],VB     Common/WPF
-   xUnit Test Project        xunit                       [C#],F#,VB  Test/xUnit
+   xUnit Test Project        xunit                       [C#],F#,VB  Test/xUnit/Desktop/Web
 */

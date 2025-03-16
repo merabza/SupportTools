@@ -7,6 +7,7 @@ using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
 using LibDatabaseParameters;
+using LibDotnetWork;
 using LibParameters;
 using LibScaffoldSeeder.Models;
 using LibSeedCodeCreator;
@@ -227,9 +228,11 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (haveToSaveSupportToolsParameters)
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
 
-        if (StShared.RunProcess(true, _logger, "dotnet",
-                $"run --project {scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName} --use {createProjectSeederCodeParametersFileFullName}")
-            .IsSome)
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        if (dotnetProcessor
+            .RunToolUsingParametersFile(
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
+                    .ProjectFileFullName, createProjectSeederCodeParametersFileFullName).IsSome)
             return false;
 
         var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
@@ -241,18 +244,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
         return await jsonFromProjectDbProjectGetter.Run(cancellationToken);
     }
-
-
-    //public static void ForceDeleteDirectory(string path)
-    //{
-    //    var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
-
-    //    foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-    //        info.Attributes = FileAttributes.Normal;
-
-    //    directory.Delete(true);
-    //}
-
 
     private bool ScaffoldProdCopyDatabase(ScaffoldSeederCreatorData scaffoldSeederCreatorData)
     {
@@ -283,9 +274,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         string prodCopyDatabaseConnectionString, string createProjectSeederCodeProjectFileFullName,
         string databaseScaffoldClassLibProjectFullPath, string providerPackageName, string dbScContextName)
     {
-        return StShared.RunProcess(true, _logger, "dotnet",
-                $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring")
-            .IsNone;
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        return dotnetProcessor.EfDatabaseScaffold(databaseScaffoldClassLibProjectFileFullName,
+            prodCopyDatabaseConnectionString, providerPackageName, createProjectSeederCodeProjectFileFullName,
+            dbScContextName, databaseScaffoldClassLibProjectFullPath).IsNone;
     }
 
 

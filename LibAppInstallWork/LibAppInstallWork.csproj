@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\Installer\Installer.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />
+    <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 

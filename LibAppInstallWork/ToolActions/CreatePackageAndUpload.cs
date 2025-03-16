@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using FileManagersMain;
+using LibDotnetWork;
 using LibFileParameters.Models;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -145,17 +146,15 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         _logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
 
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+
         //მთავარი პროექტის შექმნა
-        if (StShared.RunProcess(true, _logger, "dotnet",
-                $"publish --configuration Release --runtime {_runtime} --self-contained --output {outputFolderPath} {_mainProjectFileName} /p:AssemblyVersion={AssemblyVersion}")
-            .IsSome)
+        if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsSome)
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return ValueTask.FromResult(false);
         }
 
-        //if (_redundantFileNames != null)
-        //{
         _logger.LogInformation("Delete Redundant Files");
         //outputFolderPath ფოლდერიდან წაიშალოს ზედმეტი ფაილები
         foreach (var fileName in _redundantFileNames.Select(Path.GetFileName))

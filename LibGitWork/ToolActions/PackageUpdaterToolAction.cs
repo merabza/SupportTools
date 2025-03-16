@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LibDotnetWork;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
@@ -49,10 +50,12 @@ public sealed class PackageUpdaterToolAction : ToolAction
         if (_gitIgnorePathName != CSharp)
             return;
 
-        var localResult = StShared.RunProcessWithOutput(true, null, "dotnet", $"outdated -r -u {_projectFolderName}");
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+
+        var localResult = dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
         if (!localResult.IsT1)
             return;
 
-        StShared.WriteErrorLine($"dotnet $\"outdated -r -u {_projectFolderName}\")", true, _logger);
+        StShared.WriteErrorLine($"dotnet outdated finished with errors for {_projectFolderName})", true, _logger);
     }
 }

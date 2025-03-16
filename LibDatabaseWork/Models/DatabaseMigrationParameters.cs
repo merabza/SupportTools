@@ -8,17 +8,19 @@ public sealed class DatabaseMigrationParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     private DatabaseMigrationParameters(string migrationStartupProjectFilePath, string migrationProjectFileName,
-        string dbContextName)
+        string dbContextName, string solutionFileNameWithMigrationProject)
     {
         //ProjectName = projectName;
         MigrationStartupProjectFilePath = migrationStartupProjectFilePath;
         MigrationProjectFileName = migrationProjectFileName;
         DbContextName = dbContextName;
+        SolutionFileNameWithMigrationProject = solutionFileNameWithMigrationProject;
     }
 
     public string MigrationStartupProjectFilePath { get; set; }
     public string MigrationProjectFileName { get; set; }
     public string DbContextName { get; set; }
+    public string SolutionFileNameWithMigrationProject { get; }
 
     public bool CheckBeforeSave()
     {
@@ -38,6 +40,16 @@ public sealed class DatabaseMigrationParameters : IParameters
         if (project is null)
         {
             logger.LogError("Project with name {projectName} not found", projectName);
+            return null;
+        }
+
+        var solutionFileNameWithMigrationProject =
+            project.SolutionFileNameWithMigrationProject ?? project.SolutionFileName;
+        if (solutionFileNameWithMigrationProject is null)
+        {
+            logger.LogError(
+                "Project with name {projectName} does not contains SolutionFileNameWithMigrationProject and SolutionFileName",
+                projectName);
             return null;
         }
 
@@ -61,7 +73,7 @@ public sealed class DatabaseMigrationParameters : IParameters
         }
 
         var databaseMigrationParameters = new DatabaseMigrationParameters(project.MigrationStartupProjectFilePath,
-            project.MigrationProjectFilePath, project.DbContextName);
+            project.MigrationProjectFilePath, project.DbContextName, solutionFileNameWithMigrationProject);
 
         return databaseMigrationParameters;
     }

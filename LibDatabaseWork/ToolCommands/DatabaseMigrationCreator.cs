@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using LibDatabaseWork.CodeCreators;
 using LibDatabaseWork.Models;
+using LibDotnetWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -32,14 +33,17 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         //მიგრაციის პროექტის ფაილი რომელ ფოლდერშიც არის, იმავეში უნდა იყოს Migrations ფოლდერი.
         //თუ ეს ფოლდერი აღმოჩენილი არ იქნება, გამოვიდეს შენიშვნა ამის შესახებ
         //თუ Migrations ფოლდერი არის, მაშინ უნდა მოხდეს მისი შიგთავსის გასუფთავება *.cs ფაილებისაგან
-        var migrationProjectFile = new FileInfo(DatabaseMigrationParameters.MigrationProjectFileName);
-        if (migrationProjectFile.Directory == null)
+
+        var migrationProjectFileName = DatabaseMigrationParameters.MigrationProjectFileName;
+        var migrationProjectFile = new FileInfo(migrationProjectFileName);
+        if (!migrationProjectFile.Exists)
         {
-            _logger.LogError("Object for Migration project file directory cannot be created");
+            _logger.LogError("Object for Migration project file {migrationProjectFileName} does not exists",
+                migrationProjectFileName);
             return ValueTask.FromResult(false);
         }
 
-        var migrationsFolder = migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
+        var migrationsFolder = migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
         if (migrationsFolder is not null)
         {
             var directorySeparatorChar = Path.DirectorySeparatorChar;
@@ -48,19 +52,56 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
                 csFile.Delete();
         }
 
+
+        var migrationStartupProjectFilePath = DatabaseMigrationParameters.MigrationStartupProjectFilePath;
+        var migrationStartupProjectFile = new FileInfo(migrationStartupProjectFilePath);
+        if (!migrationStartupProjectFile.Exists)
+        {
+            _logger.LogError("Object for Migration startup project file {migrationStartupProjectFile} does not exists",
+                migrationStartupProjectFile);
+            return ValueTask.FromResult(false);
+        }
+
+
+        var solutionFileNameWithMigrationProject = DatabaseMigrationParameters.SolutionFileNameWithMigrationProject;
+        var solutionFileName = new FileInfo(solutionFileNameWithMigrationProject);
+        if (!solutionFileName.Exists)
+        {
+            _logger.LogError(
+                "Object for Migration startup project file {solutionFileNameWithMigrationProject} does not exists",
+                solutionFileNameWithMigrationProject);
+            return ValueTask.FromResult(false);
+        }
+
+        var projectXml = XElement.Load(migrationStartupProjectFilePath);
+        var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference");
+
+        var migrationProjectFileExistsInStartupProjectReferences = false;
+        foreach (var projectReference in projectReferences)
+            if (projectReference.Attributes().Where(w => w.Name == "Include").Any(includeAttribute =>
+                    migrationProjectFileName ==
+                    Path.Combine(solutionFileNameWithMigrationProject, includeAttribute.Value)))
+                migrationProjectFileExistsInStartupProjectReferences = true;
+
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+
+        if (!migrationProjectFileExistsInStartupProjectReferences)
+        {
+            dotnetProcessor.AddReferenceToProject(migrationStartupProjectFilePath, migrationProjectFileName);
+        }
+
         _logger.LogInformation("Create Initial Migration");
+        var dbContextName = DatabaseMigrationParameters.DbContextName;
 
         //ბაზის მიგრაციის დაწყება
-        if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef migrations add \"Initial\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-            .IsSome)
+        if (dotnetProcessor.EfAddDatabaseMigration("Initial", dbContextName, migrationStartupProjectFilePath,
+                migrationProjectFileName).IsSome)
             return ValueTask.FromResult(false);
 
         _logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
-        if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
-            .IsSome)
+        if (dotnetProcessor.EfUpdateDatabaseByMigration(dbContextName,
+                migrationStartupProjectFilePath, migrationProjectFileName).IsSome)
             return ValueTask.FromResult(false);
 
         //იმისათვის, რომ ამ კოდმა იმუშავოს, საჭიროა შემდეგი:
@@ -75,14 +116,14 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         //4. სასურველია თითოული ფაილი თითო სტორედ პროცედურას, ან ფუნქციას ემსახურებოდეს. რომ მომავალში ადვილი გახდეს მათი რედაქტირება, დამატება ან წაშლა.
         //5. შექმნის ბრძანება სასურველია იყოს CREATE OR ALTER 
 
-        var sqlFolder = migrationProjectFile.Directory.GetDirectories("Sql").SingleOrDefault();
+        var sqlFolder = migrationProjectFile.Directory?.GetDirectories("Sql").SingleOrDefault();
         if (sqlFolder == null)
             return ValueTask.FromResult(true);
 
         _logger.LogInformation("Create sql Migration");
-        //ბაზის მიგრაციის დაწყება
-        if (StShared.RunProcess(true, _logger, "dotnet",
-                $"ef migrations add \"Sql\" --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+        //ბაზის sql მიგრაციის დაწყება
+        if (dotnetProcessor
+            .EfAddDatabaseMigration("Sql", dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
             .IsSome)
             return ValueTask.FromResult(false);
 
@@ -93,7 +134,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
             return ValueTask.FromResult(false);
         }
 
-        migrationsFolder = migrationProjectFile.Directory.GetDirectories("Migrations").SingleOrDefault();
+        migrationsFolder = migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
         if (migrationsFolder is null)
         {
             _logger.LogError("Migrations Folder Not found");
@@ -101,15 +142,14 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         }
 
         var sqlMigrationCreator = new SqlMigrationCreator(_logger, migrationsFolder.FullName,
-            Path.GetFileNameWithoutExtension(DatabaseMigrationParameters.MigrationProjectFileName),
-            sqlMigrationFile.Name);
+            Path.GetFileNameWithoutExtension(migrationProjectFileName), sqlMigrationFile.Name);
 
         sqlMigrationCreator.CreateFileStructure();
 
         _logger.LogInformation("Update Database for sql Migration");
         //ბაზის განახლება
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"ef database update --context {DatabaseMigrationParameters.DbContextName} --startup-project {DatabaseMigrationParameters.MigrationStartupProjectFilePath} --project {DatabaseMigrationParameters.MigrationProjectFileName}")
+        return ValueTask.FromResult(dotnetProcessor
+            .EfUpdateDatabaseByMigration(dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
             .IsNone);
     }
 }

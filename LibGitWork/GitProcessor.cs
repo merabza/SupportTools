@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LanguageExt;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using SystemToolsShared;
@@ -166,7 +167,6 @@ fi*/
     {
         if (StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"")
             .IsNone)
-            //LastRemoteId = null;
             return true;
 
         StShared.WriteErrorLine($"cannot run commit for folder {_projectPath}", _useConsole, _logger);
@@ -331,4 +331,27 @@ fi*/
         StShared.WriteErrorLine($"cannot remove file {redundantCachedFileName} from cache", _useConsole, _logger);
         return false;
     }
+
+    public Option<IEnumerable<Err>> Initialise()
+    {
+        return StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} init");
+    }
+
+    public bool IsFolderPartOfGitWorkingTree(string appFolderForDiffFullName)
+    {
+        var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, Git,
+            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
+        if (isInsideWorkTreeResult.IsT1)
+            return false;
+        var isInsideWorkTree = isInsideWorkTreeResult.AsT0;
+
+        return ( isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine);
+    }
+
+
+    /*
+        var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",
+           $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
+     */
+
 }

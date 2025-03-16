@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
+using LibDotnetWork;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
 
@@ -38,8 +38,8 @@ public sealed class DataSeeder : ToolCommand
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"run --project {_parameters.SeedProjectFilePath} --use {_parameters.SeedProjectParametersFilePath}")
-            .IsNone);
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        return ValueTask.FromResult(dotnetProcessor.RunToolUsingParametersFile(_parameters.SeedProjectFilePath,
+            _parameters.SeedProjectParametersFilePath).IsNone);
     }
 }

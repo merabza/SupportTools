@@ -9,7 +9,6 @@ using LibAppProjectCreator.Models;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
@@ -146,7 +145,8 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         //    _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, ".gitignore");
         //mainProjectGitIgnoreCreator.CreateFileStructure();
 
-        return Task.FromResult(StShared.RunProcess(true, Logger, "git", $"init {SolutionPath}").IsNone);
+        var gitProcessor = new GitProcessor(true, Logger, SolutionPath);
+        return Task.FromResult(gitProcessor.Initialise().IsNone);
     }
 
     private void MakeFilesWhenNotUseMenu()

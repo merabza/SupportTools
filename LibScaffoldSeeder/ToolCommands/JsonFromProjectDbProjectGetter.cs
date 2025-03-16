@@ -1,10 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
+using LibDotnetWork;
 using LibParameters;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
 
@@ -44,8 +44,9 @@ public sealed class JsonFromProjectDbProjectGetter : ToolCommand
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        return ValueTask.FromResult(StShared.RunProcess(true, _logger, "dotnet",
-                $"run --project {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectFileFullName} --use {CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName}")
-            .IsNone);
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        return ValueTask.FromResult(dotnetProcessor
+            .RunToolUsingParametersFile(CorrectNewDbParameters.GetJsonFromScaffoldDbProjectFileFullName,
+                CorrectNewDbParameters.GetJsonFromScaffoldDbProjectParametersFileFullName).IsNone);
     }
 }

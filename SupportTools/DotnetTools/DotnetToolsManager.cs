@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LibDotnetWork;
 using OneOf;
 using SupportTools.Errors;
 using SupportTools.Models;
@@ -104,7 +105,8 @@ public sealed class DotnetToolsManager
 
     private static OneOf<string, IEnumerable<Err>> GetAvailableVersionOfTool(string toolName)
     {
-        var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", $"tool search {toolName} --take 1");
+        var dotnetProcessor = new DotnetProcessor(null, false);
+        var processResult = dotnetProcessor.SearchTool(toolName);
         if (processResult.IsT1)
             return (Err[])processResult.AsT1;
         var outputResult = processResult.AsT0.Item1;
@@ -116,13 +118,13 @@ public sealed class DotnetToolsManager
 
     private static OneOf<List<DotnetTool>, IEnumerable<Err>> CreateListOfDotnetToolsInstalled()
     {
-        var processResult = StShared.RunProcessWithOutput(false, null, "dotnet", "tool list --global");
-        if (processResult.IsT1)
-            return (Err[])processResult.AsT1;
-        var outputResult = processResult.AsT0.Item1;
-        var outputLines = outputResult.Split(Environment.NewLine);
+        var dotnetProcessor = new DotnetProcessor(null, false);
+        var getToolsRawListResult = dotnetProcessor.GetToolsRawList();
+        if (getToolsRawListResult.IsT1)
+            return (Err[])getToolsRawListResult.AsT1;
 
-        var listOfTools = outputLines.Skip(2).Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+        var listOfTools = getToolsRawListResult.AsT0.Skip(2)
+            .Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
             .Where(lineParts => lineParts.Length == 3)
             .Select(lineParts => new DotnetTool(lineParts[0], lineParts[1], null, lineParts[2])).ToList();
 
@@ -145,10 +147,16 @@ public sealed class DotnetToolsManager
         foreach (var tool in DotnetTools)
         {
             if (tool.AvailableVersion is null or "N/A" || tool.Version == tool.AvailableVersion) continue;
-            var command = tool.Version == "N/A" ? "install" : "update";
+            var toolInstalled = tool.Version != "N/A";
+            var command = toolInstalled ? "update": "install";
             StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, tool.PackageId);
-            var dotnetRun = StShared.RunProcess(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
-            if (dotnetRun.IsSome)
+
+            var dotnetProcessor = new DotnetProcessor(null, false);
+            var result = toolInstalled
+                ? dotnetProcessor.UpdateTool(tool.PackageId)
+                : dotnetProcessor.InstallTool(tool.PackageId);
+
+            if (result.IsSome)
                 return;
             atLeastOneUpdatedOrInstalled = true;
         }

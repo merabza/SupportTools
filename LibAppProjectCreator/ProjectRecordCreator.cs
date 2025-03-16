@@ -194,6 +194,7 @@ internal sealed class ProjectRecordCreator
         var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
         var dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
         const string csProjectExtension = ".csproj";
+        const string solutionFileExtension = ".sln";
         const string jsonExtension = ".json";
         var seedProjectName = $"Seed{_newDbPartProjectName}Db";
         var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
@@ -243,7 +244,7 @@ internal sealed class ProjectRecordCreator
             UseAlternativeWebAgent = false,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
             SolutionFileName =
-                Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, $"{_newProjectName}.sln"),
+                Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, $"{_newProjectName}{solutionFileExtension}"),
             ProjectSecurityFolderPath =
                 Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
                     _newProjectName),
@@ -251,6 +252,9 @@ internal sealed class ProjectRecordCreator
             MigrationStartupProjectFilePath =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
                     scaffoldSeederProjectName, fakeHostProjectName, $"{fakeHostProjectName}{csProjectExtension}"),
+            SolutionFileNameWithMigrationProject =
+                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+                    scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
             MigrationProjectFilePath =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
                     scaffoldSeederProjectName, dbMigrationProjectName, $"{dbMigrationProjectName}{csProjectExtension}"),

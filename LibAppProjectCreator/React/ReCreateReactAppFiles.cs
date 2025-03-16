@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using LibGitWork;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
@@ -71,20 +71,13 @@ public sealed class ReCreateReactAppFiles
         //თუ დაინიცირებულია ვჩერდებით
         //თუ არა უბრალოდ ვაინიცირებთ და ვაკომიტებთ
 
-        var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",
-            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
-        if (isInsideWorkTreeResult.IsT1)
-            return false;
-
-        var isInsideWorkTree = isInsideWorkTreeResult.AsT0;
-
-        if (isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine)
+        var gitProcessor = new GitProcessor(true, _logger, appFolderForDiffFullName);
+        if (gitProcessor.IsFolderPartOfGitWorkingTree(appFolderForDiffFullName))
             return true;
 
-        if (StShared.RunProcess(true, _logger, "git", $"-C \"{appFolderForDiffFullName}\" init").IsSome)
+        if (gitProcessor.Initialise().IsSome)
             return false;
 
-        return StShared.RunProcess(true, _logger, "git", $"-C \"{appFolderForDiffFullName}\" add .").IsNone && StShared
-            .RunProcess(true, _logger, "git", $"-C \"{appFolderForDiffFullName}\" commit -m \"Initial\"").IsNone;
+        return gitProcessor.Add() && gitProcessor.Commit("Initial");
     }
 }

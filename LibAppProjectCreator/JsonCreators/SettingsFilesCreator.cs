@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork;
 using LibAppInstallWork.ToolActions;
+using LibDotnetWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -48,19 +49,19 @@ public sealed class SettingsFilesCreator
         if (_forEncodeAppSettingsJsonKeys.Count <= 0)
             return true;
 
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+
         JArray keysJArray = [];
         foreach (var jsonKey in _forEncodeAppSettingsJsonKeys)
         {
             keysJArray.Add(new JValue(jsonKey));
-            if (StShared.RunProcess(true, _logger, "dotnet", $"user-secrets init --project {_projectFullPath}").IsSome)
+            if (dotnetProcessor.InitUserSecrets(_projectFullPath).IsSome)
                 return false;
+
             var userSecretContentFileName = UserSecretFileNameDetector.GetFileName(_projectFileFullName);
             if (userSecretContentFileName is null)
                 continue;
-            //var sf = new FileInfo(userSecretContentFileName);
-            //if (sf.DirectoryName is null)
-            //    continue;
-            //var userSecretDirectoryName = FileStat.CreateFolderIfNotExists(sf.DirectoryName, true, _logger);
+
             if (FileStat.CreatePrevFolderIfNotExists(userSecretContentFileName, true, _logger))
                 await File.WriteAllTextAsync(userSecretContentFileName, _userSecretJsonJObject.ToString(),
                     cancellationToken);
