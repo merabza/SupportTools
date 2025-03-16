@@ -60,8 +60,7 @@ public abstract class DoubleAppCreator
         if (tempAppCreator is null)
             return false;
 
-        if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
-                ECreateAppVersions.Temp))
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken, ECreateAppVersions.Temp))
             return false;
 
         return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);

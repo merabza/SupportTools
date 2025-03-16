@@ -109,7 +109,8 @@ public sealed class DatabaseReCreator : MigrationToolCommand
             errors.Add(DbToolsErrors.DevDatabaseNameIsNotSpecified);
         }
 
-        var databaseRecoveryModel = _devDatabaseParameters.DatabaseRecoveryModel ?? DatabaseParameters.DefaultDatabaseRecoveryModel;
+        var databaseRecoveryModel = _devDatabaseParameters.DatabaseRecoveryModel ??
+                                    DatabaseParameters.DefaultDatabaseRecoveryModel;
 
         if (errors.Count > 0)
             return errors;
@@ -117,8 +118,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
         var dbManager = createDatabaseManagerResult.AsT0;
 
         var changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
-            _devDatabaseParameters.DatabaseName, databaseRecoveryModel,
-            cancellationToken);
+            _devDatabaseParameters.DatabaseName, databaseRecoveryModel, cancellationToken);
 
         if (changeDatabaseRecoveryModelResult.IsSome)
             return (Err[])changeDatabaseRecoveryModelResult;

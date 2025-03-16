@@ -345,7 +345,7 @@ fi*/
             return false;
         var isInsideWorkTree = isInsideWorkTreeResult.AsT0;
 
-        return ( isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine);
+        return isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine;
     }
 
 
@@ -353,5 +353,4 @@ fi*/
         var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",
            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
      */
-
 }

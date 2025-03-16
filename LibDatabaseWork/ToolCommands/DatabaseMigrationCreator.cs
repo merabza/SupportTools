@@ -86,9 +86,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
         if (!migrationProjectFileExistsInStartupProjectReferences)
-        {
             dotnetProcessor.AddReferenceToProject(migrationStartupProjectFilePath, migrationProjectFileName);
-        }
 
         _logger.LogInformation("Create Initial Migration");
         var dbContextName = DatabaseMigrationParameters.DbContextName;

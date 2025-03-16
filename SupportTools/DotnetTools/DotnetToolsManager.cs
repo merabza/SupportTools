@@ -148,7 +148,7 @@ public sealed class DotnetToolsManager
         {
             if (tool.AvailableVersion is null or "N/A" || tool.Version == tool.AvailableVersion) continue;
             var toolInstalled = tool.Version != "N/A";
-            var command = toolInstalled ? "update": "install";
+            var command = toolInstalled ? "update" : "install";
             StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, tool.PackageId);
 
             var dotnetProcessor = new DotnetProcessor(null, false);

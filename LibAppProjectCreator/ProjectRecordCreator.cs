@@ -244,7 +244,8 @@ internal sealed class ProjectRecordCreator
             UseAlternativeWebAgent = false,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
             SolutionFileName =
-                Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, $"{_newProjectName}{solutionFileExtension}"),
+                Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
+                    $"{_newProjectName}{solutionFileExtension}"),
             ProjectSecurityFolderPath =
                 Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
                     _newProjectName),

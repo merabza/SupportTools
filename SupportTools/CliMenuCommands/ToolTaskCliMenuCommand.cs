@@ -49,11 +49,10 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     protected override bool RunBody()
     {
         var toolCommand = MemoCreateToolCommand();
-        if (toolCommand?.Par != null) 
+        if (toolCommand?.Par != null)
             return toolCommand.Run(CancellationToken.None).Result;
-        
+
         Console.WriteLine("Parameters not loaded. Tool not started.");
         return false;
-
     }
 }

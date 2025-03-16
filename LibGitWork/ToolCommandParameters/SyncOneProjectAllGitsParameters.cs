@@ -14,7 +14,8 @@ public class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData,
-        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync, bool useProjectUpdater)
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
+        bool useProjectUpdater)
     {
         ProjectName = projectName;
         GitData = gitData;
