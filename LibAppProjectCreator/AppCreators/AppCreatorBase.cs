@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using CodeTools;
+using JetBrainsResharperGlobalToolsWork;
 using LibAppProjectCreator.Models;
 using LibDataInput;
 using LibDotnetWork;
@@ -14,7 +15,6 @@ using LibGitData.Models;
 using LibGitWork;
 using LibGitWork.ToolActions;
 using LibGitWork.ToolCommandParameters;
-using LibJetBrainsResharperGlobalToolsWork;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
