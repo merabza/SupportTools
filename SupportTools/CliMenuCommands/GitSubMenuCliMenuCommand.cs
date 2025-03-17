@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
@@ -16,16 +17,18 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
     private readonly EGitCol _gitCol;
 
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+    public GitSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName,
         EGitCol gitCol) : base(gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git",
         EMenuAction.LoadSubMenu)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitCol = gitCol;
@@ -55,7 +58,7 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //მენიუს ელემენტი, რომლის საშუალებითაც შესაძლებელია პროექტში გიტის ჩაგდება
-        NewGitCliMenuCommand newGitCommand = new(_logger, _parametersManager, _projectName, _gitCol);
+        NewGitCliMenuCommand newGitCommand = new(_logger, _httpClientFactory, _parametersManager, _projectName, _gitCol);
         gitSubMenuSet.AddMenuItem(newGitCommand);
 
         //იმ გიტების ჩამონათვალი, რომლებიც ამ პროექტში შედიან

@@ -44,7 +44,7 @@ public sealed class InstallerBaseParameters
                 return null;
             }
 
-            webAgentForInstall = supportToolsParameters.GetWebAgentRequired(webAgentNameForInstall);
+            webAgentForInstall = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForInstall);
         }
         else
         {

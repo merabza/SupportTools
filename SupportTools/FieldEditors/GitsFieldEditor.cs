@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters.FieldEditors;
 using LibGitData.Models;
@@ -12,19 +13,21 @@ namespace SupportTools.FieldEditors;
 public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataModel>>
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsFieldEditor(ILogger logger, string propertyName, ParametersManager parametersManager) : base(
+    public GitsFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName, ParametersManager parametersManager) : base(
         propertyName, false, null, false, null, true)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
     public override CliMenuSet GetSubMenu(object record)
     {
-        var gitCruder = new GitCruder(_logger, _parametersManager);
+        var gitCruder = new GitCruder(_logger, _httpClientFactory, _parametersManager);
         var menuSet = gitCruder.GetListMenu();
         return menuSet;
     }

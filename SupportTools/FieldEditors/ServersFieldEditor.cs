@@ -18,7 +18,7 @@ public sealed class ServersFieldEditor : FieldEditor<Dictionary<string, ServerDa
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServersFieldEditor(string propertyName, ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager) : base(propertyName, false, null, true)
+        ParametersManager parametersManager) : base(propertyName, false, null, true, null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

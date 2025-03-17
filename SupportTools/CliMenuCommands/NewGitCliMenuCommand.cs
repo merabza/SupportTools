@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using LibGitData;
 using LibParameters;
@@ -14,15 +15,17 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NewGitCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName, EGitCol gitCol)
+    public NewGitCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName, EGitCol gitCol)
         : base("Add Git Project", EMenuAction.Reload)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitCol = gitCol;
@@ -32,7 +35,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     {
         Console.WriteLine("Add new Git started");
 
-        GitCruder gitCruder = new(_logger, _parametersManager);
+        GitCruder gitCruder = new(_logger, _httpClientFactory, _parametersManager);
         var newGitName = gitCruder.GetNameWithPossibleNewName("Git Name", null);
 
         if (string.IsNullOrWhiteSpace(newGitName))

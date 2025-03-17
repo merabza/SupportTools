@@ -16,6 +16,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
         ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
+        //SupportToolsServerWebApiClientName
+        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.SupportToolsServerWebApiClientName), parametersManager));
+
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.LogGitWork)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
@@ -51,7 +54,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         //AppProjectCreatorAllParameters
         FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
             parametersManager));
-        FieldEditors.Add(new GitsFieldEditor(logger, nameof(SupportToolsParameters.Gits), parametersManager));
+        FieldEditors.Add(new GitsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Gits), parametersManager));
         FieldEditors.Add(new ReactAppTemplatesFieldEditor(logger, nameof(SupportToolsParameters.ReactAppTemplates),
             parametersManager));
         FieldEditors.Add(new FileStoragesFieldEditor(logger, nameof(SupportToolsParameters.FileStorages),

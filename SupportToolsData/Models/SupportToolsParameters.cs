@@ -19,6 +19,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 {
     public const string DefaultUploadFileTempExtension = ".up!";
 
+    public string? SupportToolsServerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }
@@ -94,17 +95,17 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return project is null ? [] : project.GetGitProjectNames(gitCol);
     }
 
-    public ApiClientSettingsDomain GetWebAgentRequired(string webAgentKey)
+    public ApiClientSettingsDomain GetApiClientSettingsRequired(string apiClientName)
     {
-        var apiClientSettings = GetWebAgent(webAgentKey) ??
+        var apiClientSettings = GetApiClientSettings(apiClientName) ??
                                 throw new InvalidOperationException(
-                                    $"ApiClient with name {webAgentKey} does not exists");
+                                    $"ApiClient with name {apiClientName} does not exists");
         if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
-            throw new InvalidOperationException($"Server does not specified for ApiClient with name {webAgentKey}");
+            throw new InvalidOperationException($"Server does not specified for ApiClient with name {apiClientName}");
         return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
     }
 
-    private ApiClientSettings? GetWebAgent(string webAgentKey)
+    private ApiClientSettings? GetApiClientSettings(string webAgentKey)
     {
         return ApiClients.GetValueOrDefault(webAgentKey);
     }

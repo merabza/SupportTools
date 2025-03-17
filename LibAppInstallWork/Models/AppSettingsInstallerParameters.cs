@@ -63,7 +63,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentForCheck = supportToolsParameters.GetWebAgentRequired(webAgentNameForCheck);
+        var webAgentForCheck = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
 
         if (serverInfo.AppSettingsEncodedJsonFileName is null)
         {

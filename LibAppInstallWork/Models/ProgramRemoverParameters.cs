@@ -78,7 +78,7 @@ public sealed class ProgramRemoverParameters : IParameters
                     return null;
                 }
 
-                webAgentForInstall = supportToolsParameters.GetWebAgentRequired(webAgentNameForInstall);
+                webAgentForInstall = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForInstall);
             }
             else
             {

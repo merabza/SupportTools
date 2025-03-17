@@ -52,7 +52,7 @@ public sealed class AppSettingsInstaller : ToolCommand
 
         var projectName = AppSettingsInstallerParameters.ProjectName;
         //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
-        GetLatestParametersFileBodyAction getLatestParametersFileBodyAction = new(_logger, _useConsole,
+        var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(_logger, _useConsole,
             AppSettingsInstallerParameters.FileStorageForDownload, AppSettingsInstallerParameters.ProjectName,
             AppSettingsInstallerParameters.ServerInfo.ServerName,
             AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
@@ -67,7 +67,7 @@ public sealed class AppSettingsInstaller : ToolCommand
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        InstallParametersAction installParametersAction = new(_logger, _httpClientFactory,
+        var installParametersAction = new InstallParametersAction(_logger, _httpClientFactory,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,
@@ -81,7 +81,7 @@ public sealed class AppSettingsInstaller : ToolCommand
 
         //3. შევამოწმოთ, რომ გაშვებული პროგრამის პარამეტრების ვერსია ემთხვევა იმას, რის დაინსტალირებასაც ვცდილობდით
         //, AppSettingsInstallerParameters.ProjectName
-        CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
+        var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             AppSettingsInstallerParameters.WebAgentForCheck, AppSettingsInstallerParameters.ProxySettings,
             appSettingsVersion, 10, UseConsole);
 

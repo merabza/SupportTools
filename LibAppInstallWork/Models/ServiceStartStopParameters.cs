@@ -81,7 +81,7 @@ public sealed class ServiceStartStopParameters : IParameters
                     return null;
                 }
 
-                webAgentForInstall = supportToolsParameters.GetWebAgentRequired(webAgentNameForInstall);
+                webAgentForInstall = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForInstall);
             }
             else
             {

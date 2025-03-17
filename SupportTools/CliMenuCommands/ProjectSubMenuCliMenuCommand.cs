@@ -62,7 +62,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(_logger, _parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2);
 
-        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
+        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
             EGitCol.Main));
 
         var project = parameters.GetProject(_projectName);
@@ -70,7 +70,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project != null)
         {
             if (!string.IsNullOrWhiteSpace(project.SeedProjectFilePath))
-                projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
+                projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
                     EGitCol.ScaffoldSeed));
 
             //დასაშვები ინსტრუმენტების არჩევა

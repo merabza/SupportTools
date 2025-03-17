@@ -146,7 +146,7 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentForCheck = supportToolsParameters.GetWebAgentRequired(webAgentNameForCheck);
+        var webAgentForCheck = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
 
         var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
             serverInfo);

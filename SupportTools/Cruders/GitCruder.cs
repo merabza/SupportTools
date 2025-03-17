@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
@@ -19,10 +20,12 @@ namespace SupportTools.Cruders;
 public sealed class GitCruder : ParCruder
 {
     private readonly ILogger _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public GitCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager, "Git", "Gits")
+    public GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(parametersManager, "Git", "Gits")
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
         FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
@@ -133,5 +136,9 @@ public sealed class GitCruder : ParCruder
     {
         var updateGitProjectsCommand = new UpdateGitProjectsCliMenuCommand(_logger, ParametersManager);
         cruderSubMenuSet.AddMenuItem(updateGitProjectsCommand);
+
+        var uploadGitProjectsToSupportToolsServerCliMenuCommand =
+            new UploadGitProjectsToSupportToolsServerCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
+        cruderSubMenuSet.AddMenuItem(uploadGitProjectsToSupportToolsServerCliMenuCommand);
     }
 }
