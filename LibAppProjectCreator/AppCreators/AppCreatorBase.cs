@@ -240,7 +240,7 @@ public abstract class AppCreatorBase
                     {
                         //პროექტების შექმნა
                         if (dotnetProcessor.CreateNewProject(projectForCreate.DotnetProjectType,
-                                projectForCreate.ProjectCreateParameters, projectForCreate.ProjectCreateParameters,
+                                projectForCreate.ProjectCreateParameters, projectForCreate.ProjectFullPath,
                                 projectForCreate.ProjectName).IsSome)
                             return false;
 
