@@ -316,8 +316,16 @@ internal sealed class ProjectRecordCreator
                 ]
                 : [],
             AllowToolsList = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ? [ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase, ETools.SeedData]
-                : [ETools.CreateDevDatabaseByMigration, ETools.RecreateDevDatabase, ETools.JetBrainsCleanupCode],
+                ?
+                [
+                    ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase, ETools.CreateOrRecreateDevDatabase,
+                    ETools.SeedData
+                ]
+                :
+                [
+                    ETools.CreateDevDatabaseByMigration, ETools.RecreateDevDatabase, ETools.CreateOrRecreateDevDatabase,
+                    ETools.JetBrainsCleanupCode
+                ],
             ServerInfos = serverInfos
         };
 

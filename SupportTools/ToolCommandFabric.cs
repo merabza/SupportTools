@@ -30,6 +30,7 @@ public static class ToolCommandFabric
         ETools.JetBrainsCleanupCode,
         ETools.JsonFromProjectDbProjectGetter,
         ETools.RecreateDevDatabase,
+        ETools.CreateOrRecreateDevDatabase,
         ETools.ScaffoldSeederCreator,
         ETools.SeedData
     ];
@@ -95,6 +96,8 @@ public static class ToolCommandFabric
                         parametersManager);
                 StShared.WriteErrorLine("jsonFromProjectDbProjectGetterParameters is null", true);
                 return null;
+            case ETools.CreateOrRecreateDevDatabase:
+                //todo
             case ETools.RecreateDevDatabase:
                 var dmpForReCreator = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
                 var correctNewDbParametersForRecreate =
@@ -388,6 +391,7 @@ public static class ToolCommandFabric
                 StShared.WriteErrorLine("checkVersionParameters is null", true);
                 return null;
             case ETools.RecreateDevDatabase:
+            case ETools.CreateOrRecreateDevDatabase:
             case ETools.DropDevDatabase:
             case ETools.CreateDevDatabaseByMigration:
             case ETools.CorrectNewDatabase:
