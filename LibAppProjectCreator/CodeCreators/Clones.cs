@@ -1,11 +1,12 @@
-﻿using LibGitData.Domain;
+﻿using System.Threading;
+using SupportToolsServerApiContracts.Models;
 
 namespace LibAppProjectCreator.CodeCreators;
 
 public sealed class Clones
 {
     private static Clones? _pInstance;
-    private static readonly object SyncRoot = new();
+    private static readonly Lock SyncRoot = new();
 
     private Clones()
     {

@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\AppCliTools\CliMenu\CliMenu.csproj" />
     <ProjectReference Include="..\..\DatabaseTools\SqlServerDbTools\SqlServerDbTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
+    <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\LibGitData\LibGitData.csproj" />

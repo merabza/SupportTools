@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using LibDataInput;
-using LibGitData.Domain;
 using Microsoft.Extensions.Logging;
 using SqlServerDbTools.Errors;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared.Errors;
 
 namespace LibGitWork;

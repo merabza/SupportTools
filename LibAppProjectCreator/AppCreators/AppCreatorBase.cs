@@ -16,6 +16,7 @@ using LibGitWork;
 using LibGitWork.ToolActions;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor

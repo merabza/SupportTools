@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
@@ -194,7 +194,6 @@ public sealed class GitProjectsUpdater
     //    LastRemoteId = gitProcessor.LastRemoteId;
     //    return gitProcessor;
     //}
-
 
     private bool ProcessFolder(string folderPath, string gitName)
     {

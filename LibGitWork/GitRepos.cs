@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using LibGitData.Domain;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
@@ -15,7 +15,6 @@ public sealed class GitRepos
     }
 
     public Dictionary<string, GitDataDomain> Gits { get; }
-
 
     public static GitRepos Create(ILogger? logger, Dictionary<string, GitDataModel> gitRepos,
         string? spaProjectFolderRelativePath, bool useConsole, bool useGitRecordNameForComplexGitProjectFolderName)

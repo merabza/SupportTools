@@ -1,9 +1,9 @@
 ﻿using LibGitData;
-using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
@@ -19,7 +19,6 @@ public class GitSyncParameters : IParameters
 
     public GitDataDomain GitData { get; }
     public string GitsFolder { get; }
-
 
     public bool CheckBeforeSave()
     {

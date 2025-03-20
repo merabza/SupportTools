@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LibGitData;
-using LibGitData.Domain;
 using LibGitData.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
@@ -36,7 +36,6 @@ public class SyncOneProjectAllGitsParameters : IParameters
     {
         return true;
     }
-
 
     public static SyncOneProjectAllGitsParameters? Create(ILogger? logger,
         SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol,
@@ -72,7 +71,6 @@ public class SyncOneProjectAllGitsParameters : IParameters
             project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
         var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
-
 
         if (absentGitRepoNames.Count != 0)
         {

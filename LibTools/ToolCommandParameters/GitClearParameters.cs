@@ -1,5 +1,5 @@
-﻿using LibGitData.Domain;
-using LibParameters;
+﻿using LibParameters;
+using SupportToolsServerApiContracts.Models;
 
 namespace LibTools.ToolCommandParameters;
 
@@ -14,7 +14,6 @@ public class GitClearParameters : IParameters
 
     public GitDataDomain GitData { get; }
     public string GitsFolder { get; }
-
 
     public bool CheckBeforeSave()
     {

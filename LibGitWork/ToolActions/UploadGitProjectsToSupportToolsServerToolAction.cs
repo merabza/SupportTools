@@ -5,6 +5,7 @@ using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
@@ -13,14 +14,14 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
 {
     public const string ActionName = "Upload Git Projects To SupportToolsServer";
 
-    //private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public UploadGitProjectsToSupportToolsServerToolAction(ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, null, null, useConsole)
     {
-        //_httpClientFactory = httpClientFactory;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
@@ -39,15 +40,15 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
         var supportToolsServerWebApiClient =
             supportToolsParameters.GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
 
-        //var supportToolsServerApiClient = new SupportToolsServerApiClient(Logger, _httpClientFactory,
-        //    supportToolsServerWebApiClient.Server, supportToolsServerWebApiClient.ApiKey,
-        //    true);
+        var supportToolsServerApiClient = new SupportToolsServerApiClient(Logger, _httpClientFactory,
+            supportToolsServerWebApiClient.Server, supportToolsServerWebApiClient.ApiKey,
+            true);
 
 
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, false);
 
 
-        //supportToolsServerApiClient.UploadGitRepos(gitRepos);
+        supportToolsServerApiClient.UploadGitRepos(gitRepos.Gits, cancellationToken);
 
         ////თითოეული გიტის პროექტი აიტვირთოს სერვერზე
 
