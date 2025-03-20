@@ -23,7 +23,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
     private const string ActionDescription = """
                                              This action will do steps:
 
-                                             1. Drop Existing Dev Database
+                                             1. Drop Existing Dev Database (if it exists)
                                              2. Create Initial Migration and create new Dev Database
                                              3. Correct New Database
 
@@ -57,10 +57,25 @@ public sealed class DatabaseReCreator : MigrationToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        //წაიშალოს დეველოპერ ბაზა
-        var databaseDropper = new DatabaseDropper(_logger, DatabaseMigrationParameters, ParametersManager);
-        if (!await databaseDropper.Run(cancellationToken))
+        //დავადგინოთ თუ არსებობს დეველოპერ ბაზა
+        var isDatabaseExistsResult =
+            await DatabaseMigrationParameters.DatabaseManager.IsDatabaseExists(DatabaseMigrationParameters.DatabaseName,
+                cancellationToken);
+
+        if (isDatabaseExistsResult.IsT1)
+        {
+            _logger.LogInformation("The existence of the base could not be determined");
             return false;
+        }
+
+
+        if (isDatabaseExistsResult.AsT0)
+        {
+            //თუ არსებობს წაიშალოს დეველოპერ ბაზა
+            var databaseDropper = new DatabaseDropper(_logger, DatabaseMigrationParameters, ParametersManager);
+            if (!await databaseDropper.Run(cancellationToken))
+                return false;
+        }
 
         //შეიქმნას თავიდან (სტორედ პროცედურების გათვალისწინებით)
         var databaseMigrationCreator =

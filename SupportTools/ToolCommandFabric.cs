@@ -30,7 +30,6 @@ public static class ToolCommandFabric
         ETools.JetBrainsCleanupCode,
         ETools.JsonFromProjectDbProjectGetter,
         ETools.RecreateDevDatabase,
-        ETools.CreateOrRecreateDevDatabase,
         ETools.ScaffoldSeederCreator,
         ETools.SeedData
     ];
@@ -66,14 +65,16 @@ public static class ToolCommandFabric
                 StShared.WriteErrorLine("correctNewDbParameters is null", true);
                 return null;
             case ETools.CreateDevDatabaseByMigration:
-                var dmpCreator = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpCreator =
+                    DatabaseMigrationParameters.Create(logger, httpClientFactory, supportToolsParameters, projectName);
                 if (dmpCreator is not null)
                     return new DatabaseMigrationCreator(logger, dmpCreator,
                         parametersManager); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
                 StShared.WriteErrorLine("dmpCreator is null", true);
                 return null;
             case ETools.DropDevDatabase:
-                var dmpForDropper = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpForDropper =
+                    DatabaseMigrationParameters.Create(logger, httpClientFactory, supportToolsParameters, projectName);
                 if (dmpForDropper is not null)
                     return new DatabaseDropper(logger, dmpForDropper, parametersManager); //დეველოპერ ბაზის წაშლა
                 StShared.WriteErrorLine("dmpForDropper is null", true);
@@ -96,10 +97,9 @@ public static class ToolCommandFabric
                         parametersManager);
                 StShared.WriteErrorLine("jsonFromProjectDbProjectGetterParameters is null", true);
                 return null;
-            case ETools.CreateOrRecreateDevDatabase:
-                //todo
             case ETools.RecreateDevDatabase:
-                var dmpForReCreator = DatabaseMigrationParameters.Create(logger, supportToolsParameters, projectName);
+                var dmpForReCreator =
+                    DatabaseMigrationParameters.Create(logger, httpClientFactory, supportToolsParameters, projectName);
                 var correctNewDbParametersForRecreate =
                     CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
                 if (dmpForReCreator is null)
@@ -271,20 +271,6 @@ public static class ToolCommandFabric
             case ETools.ProgramInstaller:
                 //  InstallUpdate, //პროგრამის საინსტალაციო პაკეტის გამოყენებით პროგრამის დაინსტალირება-განახლება
                 //+(DownloadPackage=>UpdateProgram=>DownloadParameters=>UpdateParameters)
-
-                //var project = supportToolsParameters.GetProjectRequired(projectName);
-
-                //if (project.IsService)
-                //{
-                //    var programServiceUpdaterParameters =
-                //        ServiceInstall.Create(logger, supportToolsParameters, projectName, serverInfo);
-                //    if (programServiceUpdaterParameters is not null)
-                //        return new ServiceUpdater(logger, programServiceUpdaterParameters, parametersManager);
-                //    StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
-                //    return null;
-                //}
-
-
                 var programInstallerParameters =
                     ProgramInstallerParameters.Create(supportToolsParameters, projectName, serverInfo);
 
@@ -391,7 +377,6 @@ public static class ToolCommandFabric
                 StShared.WriteErrorLine("checkVersionParameters is null", true);
                 return null;
             case ETools.RecreateDevDatabase:
-            case ETools.CreateOrRecreateDevDatabase:
             case ETools.DropDevDatabase:
             case ETools.CreateDevDatabaseByMigration:
             case ETools.CorrectNewDatabase:

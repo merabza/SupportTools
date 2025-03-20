@@ -50,7 +50,6 @@ public class ReactEsProjectCreator
         //შეიქმნას ფოლდერი სადაც უნდა ჩაიწეროს რეაქტის ფრონტ პროექტი
         StShared.CreateFolder(_createInPath, _useConsole);
 
-
         //var reactProjectName = Path.GetFileNameWithoutExtension(_projectFileName).ToLower();
         if (!StShared.RunCmdProcess($"npm init --yes vite@latest {_projectName} -- --template=react-ts", _createInPath))
         {
@@ -99,7 +98,6 @@ public class ReactEsProjectCreator
         var javaScriptSdk = result[startString.Length..];
         CreateEsprojFile(Path.Combine(_createInPath, _projectFolderName, _projectFileName), javaScriptSdk);
 
-
         //Microsoft.VisualStudio.JavaScript.Sdk-ს ბოლო ვერსიის დასადგენად უნდა მოვქაჩოთ გვერდი 
         //https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK
         //გავაანალიზოთ მოქაჩული html დოკუმენტი.
@@ -116,11 +114,10 @@ public class ReactEsProjectCreator
         return true;
     }
 
-
     private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
     {
         var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
-        if (links is null || links.Count == 0)
+        if (links.Count == 0)
             return [];
 
         return (from link in links
@@ -130,7 +127,6 @@ public class ReactEsProjectCreator
                   char.IsDigit(titleValue[0])
             select (hrefValue, titleValue)).ToList();
     }
-
 
     private (HttpStatusCode, string?) GetOnePageContent(Uri uri)
     {
