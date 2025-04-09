@@ -12,7 +12,7 @@ using SupportToolsData.Models;
 
 namespace LibGitWork.ToolActions;
 
-public class SyncMultipleProjectsGitsToolActionV2 : ToolAction
+public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 {
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;

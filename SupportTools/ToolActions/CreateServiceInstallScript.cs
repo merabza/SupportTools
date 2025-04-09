@@ -10,7 +10,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolActions;
 
-public class CreateServiceInstallScript : ToolAction
+public sealed class CreateServiceInstallScript : ToolAction
 {
     private readonly string _environmentName;
     private readonly string _ftpSiteAddress;
@@ -34,7 +34,7 @@ public class CreateServiceInstallScript : ToolAction
         string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
         string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
         string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
-        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreator),
+        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreatorToolCommand),
         null, null)
     {
         _logger = logger;

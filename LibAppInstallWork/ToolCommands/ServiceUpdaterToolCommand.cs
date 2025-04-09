@@ -11,14 +11,14 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ServiceUpdater : ToolCommand
+public sealed class ServiceUpdaterToolCommand : ToolCommand
 {
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
 
-    public ServiceUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
+    public ServiceUpdaterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager,
         bool useConsole) : base(logger, ActionName, programServiceUpdaterParameters, parametersManager,
         ActionDescription, useConsole)

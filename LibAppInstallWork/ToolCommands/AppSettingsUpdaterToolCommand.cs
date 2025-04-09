@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class AppSettingsUpdater : ToolCommand
+public sealed class AppSettingsUpdaterToolCommand : ToolCommand
 {
     private const string ActionName = "Update Settings";
 
@@ -24,7 +24,7 @@ public sealed class AppSettingsUpdater : ToolCommand
 
     private readonly ILogger _logger;
 
-    public AppSettingsUpdater(ILogger logger, IHttpClientFactory httpClientFactory,
+    public AppSettingsUpdaterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         AppSettingsUpdaterParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
         ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {

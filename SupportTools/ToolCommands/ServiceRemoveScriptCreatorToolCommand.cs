@@ -12,7 +12,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolCommands;
 
-public class ServiceRemoveScriptCreator : ToolCommand
+public sealed class ServiceRemoveScriptCreatorToolCommand : ToolCommand
 {
     private const string ActionName = "Creating Service Remove Script";
     private const string ActionDescription = "Creating Service Remove Script";
@@ -20,7 +20,7 @@ public class ServiceRemoveScriptCreator : ToolCommand
     private readonly ServiceRemoveScriptCreatorParameters _par;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServiceRemoveScriptCreator(ILogger logger, ServiceRemoveScriptCreatorParameters par,
+    public ServiceRemoveScriptCreatorToolCommand(ILogger logger, ServiceRemoveScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
         _logger = logger;

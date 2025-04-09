@@ -14,7 +14,7 @@ using SupportToolsData.Models;
 
 namespace LibTools.ToolActions;
 
-public class ClearMultipleProjectsToolAction : ToolAction
+public sealed class ClearMultipleProjectsToolAction : ToolAction
 {
     private readonly ClearAllProjectsParameters _clearAllProjectsParameters;
     private readonly string? _excludeFolder;

@@ -9,7 +9,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolActions;
 
-public class CreateDefaultGitIgnoreFile : ToolAction
+public sealed class CreateDefaultGitIgnoreFile : ToolAction
 {
     private readonly string _gitIgnoreFileName;
     private readonly ILogger _logger;

@@ -11,7 +11,7 @@ using SystemToolsShared;
 
 namespace LibTools.ToolCommandParameters;
 
-public class ClearOneProjectAllGitsParameters : IParameters
+public sealed class ClearOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     private ClearOneProjectAllGitsParameters(string gitsFolder, List<GitDataDomain> gitData)

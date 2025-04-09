@@ -14,7 +14,7 @@ using SystemToolsShared;
 
 namespace LibScaffoldSeeder;
 
-public class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
+public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 {
     private const int IndentSize = 4;
     private readonly IHttpClientFactory _httpClientFactory;

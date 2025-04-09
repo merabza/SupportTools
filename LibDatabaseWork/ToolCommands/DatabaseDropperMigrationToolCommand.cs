@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibDatabaseWork.ToolCommands;
 
-public sealed class DatabaseDropper : MigrationToolCommand
+public sealed class DatabaseDropperMigrationToolCommand : MigrationToolCommand
 {
     private const string ActionName = "Drop Database";
     private const string ActionDescription = "Drop Database";
@@ -15,7 +15,7 @@ public sealed class DatabaseDropper : MigrationToolCommand
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseDropper(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
+    public DatabaseDropperMigrationToolCommand(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
         IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
         parametersManager, ActionDescription)
     {

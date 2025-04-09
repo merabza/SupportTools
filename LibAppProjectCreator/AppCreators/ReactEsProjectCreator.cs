@@ -11,7 +11,7 @@ using SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
 
-public class ReactEsProjectCreator
+public sealed class ReactEsProjectCreator
 {
     private const string SdkRef = "https://www.nuget.org/packages/Microsoft.VisualStudio.JavaScript.SDK";
     private readonly string _createInPath;

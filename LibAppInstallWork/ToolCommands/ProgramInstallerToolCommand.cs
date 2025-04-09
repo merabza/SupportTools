@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ProgramInstaller : ToolCommand
+public sealed class ProgramInstallerToolCommand : ToolCommand
 {
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
@@ -21,7 +21,7 @@ public sealed class ProgramInstaller : ToolCommand
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+    public ProgramInstallerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
         IParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters,
         parametersManager, ActionDescription, useConsole)
     {

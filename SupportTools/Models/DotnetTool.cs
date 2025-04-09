@@ -1,6 +1,6 @@
 ﻿namespace SupportTools.Models;
 
-public class DotnetTool
+public sealed class DotnetTool
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public DotnetTool(string packageId, string version, string? availableVersion, string commands)

@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace LibDatabaseWork.ToolCommands;
 
-public sealed class BaseCopier : ToolCommand
+public sealed class BaseCopierToolCommand : ToolCommand
 {
     private const string ActionName = "Copy Database";
     private const string ActionDescription = "Copy Database";
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public BaseCopier(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(logger,
+    public BaseCopierToolCommand(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(logger,
         ActionName, parameters, parametersManager, ActionDescription)
     {
         _logger = logger;

@@ -5,7 +5,7 @@ using SystemToolsShared;
 
 namespace LibTools.ToolCommandParameters;
 
-public class ClearAllProjectsParameters : IParameters
+public sealed class ClearAllProjectsParameters : IParameters
 {
     private ClearAllProjectsParameters(string? scaffoldSeedersWorkFolder, Dictionary<string, ProjectModel> projects,
         string? projectGroupName, string? projectName)

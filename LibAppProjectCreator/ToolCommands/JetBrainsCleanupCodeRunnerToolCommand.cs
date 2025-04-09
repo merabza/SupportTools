@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppProjectCreator.ToolCommands;
 
-public sealed class JetBrainsCleanupCodeRunner : ToolCommand
+public sealed class JetBrainsCleanupCodeRunnerToolCommand : ToolCommand
 {
     private readonly ILogger _logger;
     private readonly JetBrainsCleanupCodeRunnerParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public JetBrainsCleanupCodeRunner(ILogger logger, JetBrainsCleanupCodeRunnerParameters parameters) : base(logger,
+    public JetBrainsCleanupCodeRunnerToolCommand(ILogger logger, JetBrainsCleanupCodeRunnerParameters parameters) : base(logger,
         "jb CleanupCode", parameters, null, "Jet Brains Cleanup Code Runner")
     {
         _logger = logger;

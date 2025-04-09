@@ -5,7 +5,7 @@ using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
-public class SyncMultipleProjectsGitsParametersV2 : IParameters
+public sealed class SyncMultipleProjectsGitsParametersV2 : IParameters
 {
     private SyncMultipleProjectsGitsParametersV2(string? scaffoldSeedersWorkFolder,
         Dictionary<string, ProjectModel> projects, string? projectGroupName, string? projectName)

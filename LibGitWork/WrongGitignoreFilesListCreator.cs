@@ -11,7 +11,7 @@ using SystemToolsShared;
 
 namespace LibGitWork;
 
-public class WrongGitignoreFilesListCreator
+public sealed class WrongGitignoreFilesListCreator
 {
     private readonly ILogger? _logger;
     private readonly IParametersManager _parametersManager;

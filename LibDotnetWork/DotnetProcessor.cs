@@ -9,7 +9,7 @@ using SystemToolsShared.Errors;
 
 namespace LibDotnetWork;
 
-public class DotnetProcessor
+public sealed class DotnetProcessor
 {
     private const string Dotnet = "dotnet";
     private readonly ILogger? _logger;

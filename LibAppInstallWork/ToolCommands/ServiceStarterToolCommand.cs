@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ServiceStarter : ToolCommand
+public sealed class ServiceStarterToolCommand : ToolCommand
 {
     private const string ActionName = "Starting Service";
     private const string ActionDescription = "Starting Service";
@@ -21,7 +21,7 @@ public sealed class ServiceStarter : ToolCommand
     private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStarter(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
+    public ServiceStarterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
         IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
         ActionDescription, useConsole)
     {

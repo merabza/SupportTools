@@ -11,7 +11,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolActions;
 
-public class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction : ToolAction
+public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction : ToolAction
 {
     private readonly string _gitIgnoreFileName;
     private readonly IParametersManager _parametersManager;

@@ -5,7 +5,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolCommandParameters;
 
-public class ServiceInstallScriptCreatorParameters : IParameters
+public sealed class ServiceInstallScriptCreatorParameters : IParameters
 {
     private ServiceInstallScriptCreatorParameters(string? securityFolder, string projectName,
         string? serviceDescriptionSignature, ProjectModel project, ServerInfoModel serverInfo,

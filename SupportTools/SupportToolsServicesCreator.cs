@@ -4,7 +4,7 @@ using SystemToolsShared;
 
 namespace SupportTools;
 
-public class SupportToolsServicesCreator : ServicesCreator
+public sealed class SupportToolsServicesCreator : ServicesCreator
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServicesCreator(SupportToolsParameters par) : base(par.LogFolder, null, "SupportTools")

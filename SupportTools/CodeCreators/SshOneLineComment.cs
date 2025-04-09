@@ -2,7 +2,7 @@
 
 //namespace SupportTools.CodeCreators;
 
-//public class SshOneLineComment : OneLineComment
+//public sealed class SshOneLineComment : OneLineComment
 //{
 //    // ReSharper disable once ConvertToPrimaryConstructor
 //    public SshOneLineComment(string commentText) : base(commentText, "#")

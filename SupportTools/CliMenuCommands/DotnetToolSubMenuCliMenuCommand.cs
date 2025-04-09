@@ -6,7 +6,7 @@ using SupportTools.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
+public sealed class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly DotnetTool _tool;
 

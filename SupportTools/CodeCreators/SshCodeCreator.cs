@@ -5,7 +5,7 @@
 
 //namespace SupportTools.CodeCreators;
 
-//public class SshCodeCreator : CodeCreator
+//public sealed class SshCodeCreator : CodeCreator
 //{
 //    private readonly string _codeFileName;
 //    private readonly string _environmentName;

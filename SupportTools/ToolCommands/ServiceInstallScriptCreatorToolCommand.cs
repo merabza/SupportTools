@@ -13,7 +13,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolCommands;
 
-public class ServiceInstallScriptCreator : ToolCommand
+public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
 {
     private const string ActionName = "Creating Service Install Script";
     private const string ActionDescription = "Creating Service Install Script";
@@ -21,7 +21,7 @@ public class ServiceInstallScriptCreator : ToolCommand
     private readonly ServiceInstallScriptCreatorParameters _par;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServiceInstallScriptCreator(ILogger logger, ServiceInstallScriptCreatorParameters par,
+    public ServiceInstallScriptCreatorToolCommand(ILogger logger, ServiceInstallScriptCreatorParameters par,
         IParametersManager? parametersManager) : base(logger, ActionName, par, parametersManager, ActionDescription)
     {
         _logger = logger;

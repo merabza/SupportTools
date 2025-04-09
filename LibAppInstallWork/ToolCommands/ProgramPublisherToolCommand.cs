@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ProgramPublisher : ToolCommand
+public sealed class ProgramPublisherToolCommand : ToolCommand
 {
     private const string ActionName = "Publishing App";
     private const string ActionDescription = "Publishing App";
@@ -18,7 +18,7 @@ public sealed class ProgramPublisher : ToolCommand
     private readonly ProgramPublisherParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramPublisher(ILogger logger, ProgramPublisherParameters parameters, IParametersManager parametersManager)
+    public ProgramPublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters, IParametersManager parametersManager)
         : base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _logger = logger;

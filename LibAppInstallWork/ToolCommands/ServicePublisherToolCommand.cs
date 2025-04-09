@@ -12,14 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ServicePublisher : ToolCommand
+public sealed class ServicePublisherToolCommand : ToolCommand
 {
     private const string ActionName = "Publishing Service";
     private const string ActionDescription = "Publishing Service";
     private readonly AppSettingsEncoderParameters _appSettingsEncoderParameters;
     private readonly ILogger _logger;
 
-    public ServicePublisher(ILogger logger, ProgramPublisherParameters parameters,
+    public ServicePublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,
         AppSettingsEncoderParameters appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {

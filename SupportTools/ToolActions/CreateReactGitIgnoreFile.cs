@@ -9,7 +9,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolActions;
 
-public class CreateReactGitIgnoreFile : ToolAction
+public sealed class CreateReactGitIgnoreFile : ToolAction
 {
     private readonly string _gitIgnoreFileName;
     private readonly ILogger _logger;

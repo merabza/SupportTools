@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace LibScaffoldSeeder.ToolCommands;
 
-public sealed class DataSeeder : ToolCommand
+public sealed class DataSeederToolCommand : ToolCommand
 {
     private readonly ILogger _logger;
     private readonly DataSeederParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DataSeeder(ILogger logger, DataSeederParameters parameters) : base(logger, "Data Seeder", parameters, null,
+    public DataSeederToolCommand(ILogger logger, DataSeederParameters parameters) : base(logger, "Data Seeder", parameters, null,
         "Seeds data from existing Json files")
     {
         _logger = logger;

@@ -4,7 +4,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolCommandParameters;
 
-public class ServiceRemoveScriptCreatorParameters : IParameters
+public sealed class ServiceRemoveScriptCreatorParameters : IParameters
 {
     private ServiceRemoveScriptCreatorParameters(string? securityFolder, string projectName, ServerInfoModel serverInfo,
         ProjectModel project)

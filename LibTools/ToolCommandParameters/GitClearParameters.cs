@@ -3,7 +3,7 @@ using SupportToolsServerApiContracts.Models;
 
 namespace LibTools.ToolCommandParameters;
 
-public class GitClearParameters : IParameters
+public sealed class GitClearParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitClearParameters(GitDataDomain gitData, string gitsFolder)

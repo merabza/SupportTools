@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ServiceStopper : ToolCommand
+public sealed class ServiceStopperToolCommand : ToolCommand
 {
     private const string ActionName = "Stop Service";
     private const string ActionDescription = "Stop Service";
@@ -20,7 +20,7 @@ public sealed class ServiceStopper : ToolCommand
     private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStopper(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
+    public ServiceStopperToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
         IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
         ActionDescription, useConsole)
     {

@@ -4,7 +4,7 @@
 
 //namespace LibGitWork.ToolCommandParameters;
 
-//public class UpdateGitProjectsParameters : IParameters
+//public sealed class UpdateGitProjectsParameters : IParameters
 //{
 //    public string WorkFolder { get; }
 

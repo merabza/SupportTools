@@ -4,7 +4,7 @@ using SupportToolsData.Models;
 
 namespace LibGitWork.ToolCommandParameters;
 
-public class UpdateOutdatedPackagesParameters : IParameters
+public sealed class UpdateOutdatedPackagesParameters : IParameters
 {
     private UpdateOutdatedPackagesParameters(Dictionary<string, ProjectModel> projects, string? projectGroupName,
         string? projectName)

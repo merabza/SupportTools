@@ -9,7 +9,7 @@ using SystemToolsShared;
 
 namespace LibAppProjectCreator.FolderProcessors;
 
-public class CopyAndReplaceFilesAndFolders : FolderProcessor
+public sealed class CopyAndReplaceFilesAndFolders : FolderProcessor
 {
     //private readonly Dictionary<string, List<MyFileInfo>> _checkedFolderFiles = new();
     private readonly List<string> _checkedFolders = [];

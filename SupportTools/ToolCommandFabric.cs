@@ -61,14 +61,14 @@ public static class ToolCommandFabric
             case ETools.CorrectNewDatabase:
                 var correctNewDbParameters = CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
                 if (correctNewDbParameters is not null)
-                    return new CorrectNewDatabase(logger, correctNewDbParameters, parametersManager); //ახალი ბაზის 
+                    return new CorrectNewDatabaseToolCommand(logger, correctNewDbParameters, parametersManager); //ახალი ბაზის 
                 StShared.WriteErrorLine("correctNewDbParameters is null", true);
                 return null;
             case ETools.CreateDevDatabaseByMigration:
                 var dmpCreator =
                     DatabaseMigrationParameters.Create(logger, httpClientFactory, supportToolsParameters, projectName);
                 if (dmpCreator is not null)
-                    return new DatabaseMigrationCreator(logger, dmpCreator,
+                    return new DatabaseMigrationCreatorMigrationToolCommand(logger, dmpCreator,
                         parametersManager); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
                 StShared.WriteErrorLine("dmpCreator is null", true);
                 return null;
@@ -76,7 +76,7 @@ public static class ToolCommandFabric
                 var dmpForDropper =
                     DatabaseMigrationParameters.Create(logger, httpClientFactory, supportToolsParameters, projectName);
                 if (dmpForDropper is not null)
-                    return new DatabaseDropper(logger, dmpForDropper, parametersManager); //დეველოპერ ბაზის წაშლა
+                    return new DatabaseDropperMigrationToolCommand(logger, dmpForDropper, parametersManager); //დეველოპერ ბაზის წაშლა
                 StShared.WriteErrorLine("dmpForDropper is null", true);
                 return null;
             case ETools.JetBrainsCleanupCode
@@ -84,7 +84,7 @@ public static class ToolCommandFabric
                 var jetBrainsCleanupCodeRunnerParameters =
                     JetBrainsCleanupCodeRunnerParameters.Create(supportToolsParameters, projectName);
                 if (jetBrainsCleanupCodeRunnerParameters is not null)
-                    return new JetBrainsCleanupCodeRunner(logger, jetBrainsCleanupCodeRunnerParameters);
+                    return new JetBrainsCleanupCodeRunnerToolCommand(logger, jetBrainsCleanupCodeRunnerParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);
                 return null;
             case ETools.JsonFromProjectDbProjectGetter
@@ -127,7 +127,7 @@ public static class ToolCommandFabric
                 var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
                 if (correctNewDbParametersForRecreate is not null)
-                    return new DatabaseReCreator(logger, dmpForReCreator, project.DevDatabaseParameters,
+                    return new DatabaseReCreatorMigrationToolCommand(logger, dmpForReCreator, project.DevDatabaseParameters,
                         correctNewDbParametersForRecreate, databaseServerConnections, apiClients, httpClientFactory,
                         parametersManager); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
                 StShared.WriteErrorLine("correctNewDbParametersForRecreate is null", true);
@@ -143,7 +143,7 @@ public static class ToolCommandFabric
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა
                 var dataSeederParameters = DataSeederParameters.Create(supportToolsParameters, projectName);
                 if (dataSeederParameters is not null)
-                    return new DataSeeder(logger, dataSeederParameters);
+                    return new DataSeederToolCommand(logger, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);
                 return null;
             case ETools.AppSettingsEncoder:
@@ -201,14 +201,14 @@ public static class ToolCommandFabric
                 var appSettingsEncoderParameters =
                     AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (appSettingsEncoderParameters is not null)
-                    return new ApplicationSettingsEncoder(logger, appSettingsEncoderParameters, parametersManager);
+                    return new ApplicationSettingsEncoderToolCommand(logger, appSettingsEncoderParameters, parametersManager);
                 StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
                 return null;
             case ETools.AppSettingsInstaller: //  InstallParameters, //დაშიფრული პარამეტრების განახლება
                 var appSettingsInstallerParameters =
                     AppSettingsInstallerParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (appSettingsInstallerParameters is not null)
-                    return new AppSettingsInstaller(logger, httpClientFactory, true, appSettingsInstallerParameters,
+                    return new AppSettingsInstallerToolCommand(logger, httpClientFactory, true, appSettingsInstallerParameters,
                         parametersManager);
                 StShared.WriteErrorLine("appSettingsInstallerParameters is null", true);
                 return null;
@@ -218,7 +218,7 @@ public static class ToolCommandFabric
                 var appSettingsUpdaterParameters =
                     AppSettingsUpdaterParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (appSettingsUpdaterParameters is not null)
-                    return new AppSettingsUpdater(logger, httpClientFactory, appSettingsUpdaterParameters,
+                    return new AppSettingsUpdaterToolCommand(logger, httpClientFactory, appSettingsUpdaterParameters,
                         parametersManager, true);
                 StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
                 return null;
@@ -240,7 +240,7 @@ public static class ToolCommandFabric
                     httpClientFactory, project.DevDatabaseParameters, serverInfo.NewDatabaseParameters,
                     supportToolsParameters).Result;
                 if (copyBaseParametersDevToProd is not null)
-                    return new BaseCopier(logger, copyBaseParametersDevToProd, parametersManager);
+                    return new BaseCopierToolCommand(logger, copyBaseParametersDevToProd, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
                 return null;
             case ETools.ProgPublisher: //  Publish, //პროგრამის საინსტალაციო პაკეტის გამზადება
@@ -257,13 +257,13 @@ public static class ToolCommandFabric
                 var projectForPublish = supportToolsParameters.GetProjectRequired(projectName);
 
                 if (!projectForPublish.IsService)
-                    return new ProgramPublisher(logger, programPublisherParameters, parametersManager);
+                    return new ProgramPublisherToolCommand(logger, programPublisherParameters, parametersManager);
 
                 var appSettingsEncoderParametersForPublish =
                     AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
 
                 if (appSettingsEncoderParametersForPublish != null)
-                    return new ServicePublisher(logger, programPublisherParameters,
+                    return new ServicePublisherToolCommand(logger, programPublisherParameters,
                         appSettingsEncoderParametersForPublish, parametersManager);
 
                 StShared.WriteErrorLine("appSettingsEncoderParametersForPublish does not created", true);
@@ -275,7 +275,7 @@ public static class ToolCommandFabric
                     ProgramInstallerParameters.Create(supportToolsParameters, projectName, serverInfo);
 
                 if (programInstallerParameters is not null)
-                    return new ProgramInstaller(logger, httpClientFactory, true, programInstallerParameters,
+                    return new ProgramInstallerToolCommand(logger, httpClientFactory, true, programInstallerParameters,
                         parametersManager);
 
                 StShared.WriteErrorLine("programInstallerParameters is null", true);
@@ -291,7 +291,7 @@ public static class ToolCommandFabric
                     var programServiceUpdaterParameters =
                         ServiceUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
                     if (programServiceUpdaterParameters is not null)
-                        return new ServiceUpdater(logger, httpClientFactory, programServiceUpdaterParameters,
+                        return new ServiceUpdaterToolCommand(logger, httpClientFactory, programServiceUpdaterParameters,
                             parametersManager, true);
                     StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
                     return null;
@@ -300,7 +300,7 @@ public static class ToolCommandFabric
                 var programUpdaterParameters =
                     ProgramUpdaterParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
                 if (programUpdaterParameters is not null)
-                    return new ProgramUpdater(logger, httpClientFactory, programUpdaterParameters, parametersManager,
+                    return new ProgramUpdaterToolCommand(logger, httpClientFactory, programUpdaterParameters, parametersManager,
                         true);
                 StShared.WriteErrorLine("programUpdaterParameters is null", true);
                 return null;
@@ -308,7 +308,7 @@ public static class ToolCommandFabric
                 var serviceStartStopParameters =
                     ProgramRemoverParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStartStopParameters is not null)
-                    return new ProgramRemover(logger, httpClientFactory, serviceStartStopParameters, parametersManager,
+                    return new ProgramRemoverToolCommand(logger, httpClientFactory, serviceStartStopParameters, parametersManager,
                         true);
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
                 return null;
@@ -333,14 +333,14 @@ public static class ToolCommandFabric
                     supportToolsParameters).Result;
 
                 if (copyBaseParametersProdToDev is not null)
-                    return new BaseCopier(logger, copyBaseParametersProdToDev, parametersManager);
+                    return new BaseCopierToolCommand(logger, copyBaseParametersProdToDev, parametersManager);
                 StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);
                 return null;
             case ETools.ServiceInstallScriptCreator:
                 var serviceInstallScriptCreatorParameters =
                     ServiceInstallScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceInstallScriptCreatorParameters is not null)
-                    return new ServiceInstallScriptCreator(logger, serviceInstallScriptCreatorParameters,
+                    return new ServiceInstallScriptCreatorToolCommand(logger, serviceInstallScriptCreatorParameters,
                         parametersManager);
                 StShared.WriteErrorLine("ServiceInstallScriptCreatorParameters is not created", true);
                 return null;
@@ -348,7 +348,7 @@ public static class ToolCommandFabric
                 var serviceRemoveScriptCreatorParameters =
                     ServiceRemoveScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceRemoveScriptCreatorParameters is not null)
-                    return new ServiceRemoveScriptCreator(logger, serviceRemoveScriptCreatorParameters,
+                    return new ServiceRemoveScriptCreatorToolCommand(logger, serviceRemoveScriptCreatorParameters,
                         parametersManager);
                 StShared.WriteErrorLine("ServiceRemoveScriptCreatorParameters is not created", true);
                 return null;
@@ -356,7 +356,7 @@ public static class ToolCommandFabric
                 var serviceStartParameters =
                     ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStartParameters is not null)
-                    return new ServiceStarter(logger, httpClientFactory, serviceStartParameters, parametersManager,
+                    return new ServiceStarterToolCommand(logger, httpClientFactory, serviceStartParameters, parametersManager,
                         true);
                 StShared.WriteErrorLine("serviceStartParameters is null", true);
                 return null;
@@ -364,7 +364,7 @@ public static class ToolCommandFabric
                 var serviceStopParameters =
                     ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (serviceStopParameters is not null)
-                    return new ServiceStopper(logger, httpClientFactory, serviceStopParameters, parametersManager,
+                    return new ServiceStopperToolCommand(logger, httpClientFactory, serviceStopParameters, parametersManager,
                         true);
                 StShared.WriteErrorLine("serviceStopParameters is null", true);
                 return null;
@@ -372,7 +372,7 @@ public static class ToolCommandFabric
                 var checkVersionParameters =
                     CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
                 if (checkVersionParameters is not null)
-                    return new VersionChecker(logger, httpClientFactory, checkVersionParameters, parametersManager,
+                    return new VersionCheckerToolCommand(logger, httpClientFactory, checkVersionParameters, parametersManager,
                         true);
                 StShared.WriteErrorLine("checkVersionParameters is null", true);
                 return null;

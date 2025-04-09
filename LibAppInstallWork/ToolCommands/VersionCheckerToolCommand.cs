@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class VersionChecker : ToolCommand
+public sealed class VersionCheckerToolCommand : ToolCommand
 {
     private const string ActionName = "Check Version";
     private const string ActionDescription = "Check Version";
@@ -19,7 +19,7 @@ public sealed class VersionChecker : ToolCommand
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public VersionChecker(ILogger logger, IHttpClientFactory httpClientFactory, CheckVersionParameters parameters,
+    public VersionCheckerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, CheckVersionParameters parameters,
         IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
         ActionDescription, useConsole)
     {

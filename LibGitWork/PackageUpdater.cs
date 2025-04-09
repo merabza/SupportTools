@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibGitWork;
 
-public class PackageUpdater
+public sealed class PackageUpdater
 {
     private readonly string _gitProjectName;
     private readonly ILogger? _logger;

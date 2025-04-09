@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibDatabaseWork.ToolCommands;
 
-public sealed class DatabaseMigrationCreator : MigrationToolCommand
+public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationToolCommand
 {
     private const string ActionName = "Database Migration Initial";
     private const string ActionDescription = "Database Migration Initial";
@@ -19,7 +19,7 @@ public sealed class DatabaseMigrationCreator : MigrationToolCommand
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseMigrationCreator(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
+    public DatabaseMigrationCreatorMigrationToolCommand(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
         IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
         parametersManager, ActionDescription)
     {

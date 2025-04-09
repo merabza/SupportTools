@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LibAppProjectCreator.AppCreators;
 
-public class VersionComparer : IComparer<string>
+public sealed class VersionComparer : IComparer<string>
 {
     public int Compare(string? x, string? y)
     {

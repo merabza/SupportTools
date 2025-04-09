@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ApplicationSettingsEncoder : ToolCommand
+public sealed class ApplicationSettingsEncoderToolCommand : ToolCommand
 {
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ApplicationSettingsEncoder(ILogger logger, AppSettingsEncoderParameters appSetEnParameters,
+    public ApplicationSettingsEncoderToolCommand(ILogger logger, AppSettingsEncoderParameters appSetEnParameters,
         IParametersManager parametersManager) : base(logger, "Encode Settings", appSetEnParameters, parametersManager,
         "Encodes app settings")
     {

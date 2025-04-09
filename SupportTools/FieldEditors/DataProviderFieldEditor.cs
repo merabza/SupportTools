@@ -4,7 +4,7 @@
 
 //namespace SupportTools.FieldEditors;
 
-//public class DataProviderFieldEditor : EnumFieldEditor<EDataProvider>
+//public sealed class DataProviderFieldEditor : EnumFieldEditor<EDataProvider>
 //{
 
 //    // ReSharper disable once ConvertToPrimaryConstructor

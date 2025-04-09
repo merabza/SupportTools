@@ -112,7 +112,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.SeedDbProjectName),
             "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath);
 
-        var creatorCreator = new CreatorCreator(_logger, creatorCreatorParameters);
+        var creatorCreator = new CreatorCreatorToolCommand(_logger, creatorCreatorParameters);
 
         if (!await creatorCreator.Run(cancellationToken))
         {

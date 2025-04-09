@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class AppSettingsInstaller : ToolCommand
+public sealed class AppSettingsInstallerToolCommand : ToolCommand
 {
     private const string ActionName = "Install Application Settings";
 
@@ -24,7 +24,7 @@ public sealed class AppSettingsInstaller : ToolCommand
     private readonly ILogger _logger;
     private readonly bool _useConsole;
 
-    public AppSettingsInstaller(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+    public AppSettingsInstallerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
         AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
         parameters, parametersManager, ActionDescription, useConsole)
     {

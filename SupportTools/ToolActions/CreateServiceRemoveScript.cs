@@ -10,7 +10,7 @@ using SystemToolsShared;
 
 namespace SupportTools.ToolActions;
 
-public class CreateServiceRemoveScript : ToolAction
+public sealed class CreateServiceRemoveScript : ToolAction
 {
     private readonly string _environmentName;
     private readonly ILogger _logger;
@@ -19,7 +19,7 @@ public class CreateServiceRemoveScript : ToolAction
     private readonly string _serverSideDeployFolder;
 
     public CreateServiceRemoveScript(ILogger logger, string scriptFileName, string projectName, string environmentName,
-        string serverSideDeployFolder) : base(logger, nameof(ServiceRemoveScriptCreator), null, null)
+        string serverSideDeployFolder) : base(logger, nameof(ServiceRemoveScriptCreatorToolCommand), null, null)
     {
         _logger = logger;
         _scriptFileName = scriptFileName;

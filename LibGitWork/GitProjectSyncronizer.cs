@@ -10,7 +10,7 @@ using SystemToolsShared;
 
 namespace LibGitWork;
 
-public class GitProjectSyncronizer
+public sealed class GitProjectSyncronizer
 {
     private readonly string _gitProjectName;
     private readonly List<GitSyncToolAction> _gitSyncToolActionList = [];

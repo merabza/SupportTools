@@ -8,7 +8,7 @@ using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
-public class GitSyncParameters : IParameters
+public sealed class GitSyncParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSyncParameters(GitDataDomain gitData, string gitsFolder)

@@ -16,7 +16,7 @@ using SystemToolsShared.Errors;
 
 namespace LibDatabaseWork.ToolCommands;
 
-public sealed class DatabaseReCreator : MigrationToolCommand
+public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
 {
     private const string ActionName = "Database Recreate";
 
@@ -39,7 +39,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
     private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public DatabaseReCreator(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
+    public DatabaseReCreatorMigrationToolCommand(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
         DatabaseParameters devDatabaseParameters, CorrectNewDbParameters correctNewDbParameters,
         DatabaseServerConnections databaseServerConnections, ApiClients apiClients,
         IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(logger, ActionName,
@@ -72,14 +72,14 @@ public sealed class DatabaseReCreator : MigrationToolCommand
         if (isDatabaseExistsResult.AsT0)
         {
             //თუ არსებობს წაიშალოს დეველოპერ ბაზა
-            var databaseDropper = new DatabaseDropper(_logger, DatabaseMigrationParameters, ParametersManager);
+            var databaseDropper = new DatabaseDropperMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
             if (!await databaseDropper.Run(cancellationToken))
                 return false;
         }
 
         //შეიქმნას თავიდან (სტორედ პროცედურების გათვალისწინებით)
         var databaseMigrationCreator =
-            new DatabaseMigrationCreator(_logger, DatabaseMigrationParameters, ParametersManager);
+            new DatabaseMigrationCreatorMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
         if (!await databaseMigrationCreator.Run(cancellationToken))
             return false;
 
@@ -88,7 +88,7 @@ public sealed class DatabaseReCreator : MigrationToolCommand
             _logger.LogError("Error in ChangeDatabaseRecoveryModel");
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
-        var correctNewDatabase = new CorrectNewDatabase(_logger, _correctNewDbParameters, ParametersManager);
+        var correctNewDatabase = new CorrectNewDatabaseToolCommand(_logger, _correctNewDbParameters, ParametersManager);
         return await correctNewDatabase.Run(cancellationToken);
     }
 

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppInstallWork.ToolCommands;
 
-public sealed class ProgramRemover : ToolCommand
+public sealed class ProgramRemoverToolCommand : ToolCommand
 {
     private const string ActionName = "Remove App";
     private const string ActionDescription = "Remove App";
@@ -17,7 +17,7 @@ public sealed class ProgramRemover : ToolCommand
     private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemover(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters,
+    public ProgramRemoverToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters,
         IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
         ActionDescription, useConsole)
     {

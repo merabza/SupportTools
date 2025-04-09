@@ -10,7 +10,7 @@ using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
-public class SyncOneProjectAllGitsParameters : IParameters
+public sealed class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDomain> gitData,

@@ -15,7 +15,7 @@ using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
 
-public sealed class CorrectNewDatabase : ToolCommand
+public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 {
     private const string ActionName = "Correct new Database";
     private const string ActionDescription = "Correct new Database";
@@ -23,7 +23,7 @@ public sealed class CorrectNewDatabase : ToolCommand
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CorrectNewDatabase(ILogger logger, CorrectNewDbParameters correctNewDbParameters,
+    public CorrectNewDatabaseToolCommand(ILogger logger, CorrectNewDbParameters correctNewDbParameters,
         IParametersManager? parametersManager) : base(logger, ActionName, correctNewDbParameters, parametersManager,
         ActionDescription)
     {

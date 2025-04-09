@@ -11,7 +11,7 @@ using SupportToolsData.Models;
 
 namespace LibGitWork.ToolActions;
 
-public class UpdateOutdatedPackagesToolAction : ToolAction
+public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 {
     private readonly ILogger? _logger;
     private readonly ParametersManager _parametersManager;
