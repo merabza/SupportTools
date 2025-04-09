@@ -31,12 +31,6 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
         {
             var project = supportToolsParameters.GetProjectRequired(projectName);
 
-            if (string.IsNullOrWhiteSpace(project.DbContextProjectName))
-            {
-                StShared.WriteErrorLine($"DbContextProjectName does not specified for project {projectName}", true);
-                return null;
-            }
-
             if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
             {
                 StShared.WriteErrorLine("supportToolsParameters.ScaffoldSeedersWorkFolder does not specified", true);
@@ -50,17 +44,19 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
                 return null;
             }
 
-            var seedDbProjectName = projectNameCounter(project.DbContextProjectName); //NamingStats.SeedDbProjectName
+            var seedDbProjectName =
+                projectNameCounter(project.ScaffoldSeederProjectName);
             var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
             var scaffoldSeederProjectName = project.ScaffoldSeederProjectName;
-            var scaffoldSeederProjectName2 = projectNameCounter(scaffoldSeederProjectName);
+            var scaffoldSeederFolderName = NamingStats.ScaffoldSeederFolderName(project.ScaffoldSeederProjectName);
 
             var seedProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
-                scaffoldSeederProjectName2, scaffoldSeederProjectName2, seedDbProjectName,
+                scaffoldSeederFolderName, scaffoldSeederFolderName, seedDbProjectName,
                 $"{seedDbProjectName}{NamingStats.CsProjectExtension}");
 
             var seedProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
-                NamingStats.ScaffoldSeedSecFolderName(scaffoldSeederProjectName), $"{seedDbProjectName}{NamingStats.JsonExtension}");
+                NamingStats.ScaffoldSeedSecFolderName(scaffoldSeederProjectName),
+                $"{seedDbProjectName}{NamingStats.JsonExtension}");
 
             var dataSeederParameters =
                 new ExternalScaffoldSeedToolParameters(seedProjectFilePath, seedProjectParametersFilePath);

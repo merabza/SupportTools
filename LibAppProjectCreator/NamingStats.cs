@@ -24,7 +24,7 @@ public static class NamingStats
         return $"{scaffoldSeederProjectName}DbDataSeeding";
     }
 
-    public static string ScaffoldSeederProjectName(string scaffoldSeederProjectName)
+    public static string ScaffoldSeederFolderName(string scaffoldSeederProjectName)
     {
         return $"{scaffoldSeederProjectName}ScaffoldSeeder";
     }
