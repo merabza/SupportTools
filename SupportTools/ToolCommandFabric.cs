@@ -145,7 +145,7 @@ public static class ToolCommandFabric
                 return null;
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა
                 var dataSeederParameters = ExternalScaffoldSeedToolParameters.Create(supportToolsParameters,
-                    projectName, NamingStats.ScaffoldSeedSecFolderName);
+                    projectName, NamingStats.SeedDbProjectName);
                 if (dataSeederParameters is not null)
                     return new ExternalScaffoldSeedToolCommand(logger, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);

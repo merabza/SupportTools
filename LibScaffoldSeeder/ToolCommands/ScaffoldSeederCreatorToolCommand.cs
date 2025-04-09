@@ -100,18 +100,18 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         const string jsonExt = ".json";
 
         var seedDbProjectNameUseJsonFilePath = Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-            $"{NamingStats.SeedDbProjectName(Parameters.DbContextProjectName)}{jsonExt}");
+            $"{NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName)}{jsonExt}");
 
         var createProjectSeederCodeProjectName =
-            NamingStats.CreateProjectSeederCodeProjectName(Parameters.DbContextProjectName);
+            NamingStats.CreateProjectSeederCodeProjectName(Parameters.ScaffoldSeederProjectName);
 
         var getJsonFromScaffoldDbProjectName =
-            NamingStats.GetJsonFromScaffoldDbProjectName(Parameters.DbContextProjectName);
+            NamingStats.GetJsonFromScaffoldDbProjectName(Parameters.ScaffoldSeederProjectName);
 
         var dataSeedingClassLibProjectName =
-            NamingStats.DataSeedingClassLibProjectName(Parameters.DbContextProjectName);
+            NamingStats.DataSeedingClassLibProjectName(Parameters.ScaffoldSeederProjectName);
 
-        var seedDbProjectName = NamingStats.SeedDbProjectName(Parameters.DbContextProjectName);
+        var seedDbProjectName = NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName);
 
         var creatorCreatorParameters = new CreatorCreatorParameters(Parameters.ScaffoldSeederProjectName,
             Parameters.DbContextProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,

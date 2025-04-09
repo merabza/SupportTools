@@ -42,18 +42,18 @@ public sealed class ScaffoldSeederCreatorData
 
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
         var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            NamingStats.DataSeedingClassLibProjectName(scaffoldSeederCreatorParameters.DbContextProjectName),
+            NamingStats.DataSeedingClassLibProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName),
             ["CarcassSeeders", "ProjectSeeders", "Models", "Json"]);
 
         var createProjectSeederCodeProjectName =
-            NamingStats.CreateProjectSeederCodeProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
+            NamingStats.CreateProjectSeederCodeProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //სიდერის კოდის შემქმნელი აპლიკაცია
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             createProjectSeederCodeProjectName, createProjectSeederCodeProjectName, EDotnetProjectType.Console,
             string.Empty, "Program", ["Models", "Properties"]);
 
         var getJsonFromScaffoldDbProjectName =
-            NamingStats.GetJsonFromScaffoldDbProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
+            NamingStats.GetJsonFromScaffoldDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             getJsonFromScaffoldDbProjectName, getJsonFromScaffoldDbProjectName, EDotnetProjectType.Console,
@@ -70,12 +70,12 @@ public sealed class ScaffoldSeederCreatorData
         }
 
         var dbMigrationProjectName =
-            NamingStats.DbMigrationProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
+            NamingStats.DbMigrationProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //მიგრაციის პროექტი ბიბლიოთეკა
         var dbMigrationProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             dbMigrationProjectName, [.. projectFolders]);
 
-        var seedDbProjectName = NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
+        var seedDbProjectName = NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
         var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, seedDbProjectName,
             seedDbProjectName, EDotnetProjectType.Console, string.Empty, "Program", []);

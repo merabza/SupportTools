@@ -151,10 +151,10 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //var scaffoldSeederSecurityFolderName = $"{scaffoldSeederFolderName}.sec";
         //var projectWorkFolderPath = Path.Combine(_par.ScaffoldSeedersWorkFolder, _par.ScaffoldSeederProjectName);
         //var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
-        const string jsonExt = ".json";
+        //const string jsonExt = ".json";
 
         var parametersFileName = Path.Combine(_par.ProjectSecurityFolderPath,
-            $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{jsonExt}");
+            $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{NamingStats.JsonExtension}");
 
         const string connectionStringParameterName = "ConnectionStringSeed";
         var projectDesignTimeDbContextFactoryCreator = new FakeProjectDesignTimeDbContextFactoryCreator(Logger,
@@ -164,7 +164,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         projectDesignTimeDbContextFactoryCreator.CreateFileStructure();
 
         var fakeHostProjectParameters = new FakeHostProjectParametersDomain(_par.DevDatabaseDataProvider,
-            $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={NamingStats.SeedDbProjectName(_par.DbContextProjectName)}");
+            $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={NamingStats.SeedDbProjectName(_par.ScaffoldSeederProjectName)}");
 
         //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
         var paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
