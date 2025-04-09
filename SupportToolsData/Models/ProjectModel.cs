@@ -26,10 +26,10 @@ public sealed class ProjectModel : ItemData
     public string? MigrationStartupProjectFilePath { get; set; }
     public string? MigrationProjectFilePath { get; set; }
     public string? SolutionFileNameWithMigrationProject { get; set; }
-    public string? SeedProjectFilePath { get; set; }
-    public string? SeedProjectParametersFilePath { get; set; }
-    public string? GetJsonFromScaffoldDbProjectFileFullName { get; set; }
-    public string? GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
+    //public string? SeedProjectFilePath { get; set; }
+    //public string? SeedProjectParametersFilePath { get; set; }
+    //public string? GetJsonFromScaffoldDbProjectFileFullName { get; set; }
+    //public string? GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
     public string? DbContextName { get; init; }
     public string? ProjectShortPrefix { get; init; }
     public string? ScaffoldSeederProjectName { get; set; }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using DbContextAnalyzer.CodeCreators;
+using LibAppProjectCreator;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.CodeCreators;
 using LibScaffoldSeeder.Models;
@@ -62,7 +63,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
     {
-        if (string.IsNullOrWhiteSpace(_par.MainDatabaseProjectName))
+        if (string.IsNullOrWhiteSpace(_par.DbContextProjectName))
         {
             StShared.WriteErrorLine($"{nameof(ProjectModel.DbContextProjectName).Humanize()} not specified", true);
             return false;
@@ -75,10 +76,8 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             return false;
         }
 
-
-        var mainDatabaseProject = GitProjects.GetGitProjectByKey(_par.MainDatabaseProjectName);
+        var mainDatabaseProject = GitProjects.GetGitProjectByKey(_par.DbContextProjectName);
         var newDataSeedingClassLibProject = GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
-
 
         //სკაფოლდინგის ბიბლიოთეკა
         AddPackage(_scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject,
@@ -124,7 +123,6 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DbMigrationProject);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, newDataSeedingClassLibProject);
 
-
         //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
         //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია
         AddPackage(_scaffoldSeederCreatorData.FakeHostWebApiProject, NuGetPackages.MicrosoftEntityFrameworkCoreDesign);
@@ -141,7 +139,6 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         var emptyConsoleProgramClassCreator = new EmptyConsoleProgramClassCreator(Logger,
             _scaffoldSeederCreatorData.CreateProjectSeederCodeProject.ProjectFullPath, "Program.cs");
         emptyConsoleProgramClassCreator.CreateFileStructure();
-
 
         var fakeHosProjectPath = _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFullPath;
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
@@ -161,22 +158,19 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
 
         const string connectionStringParameterName = "ConnectionStringSeed";
         var projectDesignTimeDbContextFactoryCreator = new FakeProjectDesignTimeDbContextFactoryCreator(Logger,
-            fakeHosProjectPath, _par.MainDatabaseProjectName,
-            _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName, _par.ProjectDbContextClassName,
-            connectionStringParameterName, parametersFileName);
+            fakeHosProjectPath, _par.DbContextProjectName, _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName,
+            _par.ProjectDbContextClassName, connectionStringParameterName, parametersFileName);
 
         projectDesignTimeDbContextFactoryCreator.CreateFileStructure();
 
-
         var fakeHostProjectParameters = new FakeHostProjectParametersDomain(_par.DevDatabaseDataProvider,
-            $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={_par.SeedDbProjectName}");
+            $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={NamingStats.SeedDbProjectName(_par.DbContextProjectName)}");
 
         //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
         var paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
 
         //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
         await File.WriteAllTextAsync(parametersFileName, paramsJsonText, cancellationToken);
-
 
         var migrationSqlFilesFolder = _par.MigrationSqlFilesFolder;
         //თუ მიგრაციის sql ფაილების ფოლდერი მითითებულია პარამეტრებში, ეს ფოლდერი არსებობს და შეიცავს ერთს მაინც *.sql ფაილს,
@@ -205,7 +199,6 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //
     }
 
-
     private static bool RegisterEmbeddedResource(string projectFileFullName, string sqlFileName)
     {
         var projectXml = XElement.Load(projectFileFullName);
@@ -225,7 +218,6 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
 
         return true;
     }
-
 
     //FIXME სოლუშენის აწყობის შემდეგ გასაკეთებელი საქმეები
     //1.  უნდა გაეშვას სკაფოლდინგის პროცესი, რომელიც რეალური ბაზის ასლიდან დაამზადებს მონაცემთა ბაზის კონტექსტს (DbContext)

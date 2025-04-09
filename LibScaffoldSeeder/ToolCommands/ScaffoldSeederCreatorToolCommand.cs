@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
+using LibAppProjectCreator;
 using LibDatabaseParameters;
 using LibDotnetWork;
 using LibParameters;
@@ -96,20 +97,29 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (!ScaffoldProdCopyDatabase(scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData))
             return false;
 
-
         const string jsonExt = ".json";
 
         var seedDbProjectNameUseJsonFilePath = Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-            $"{Parameters.SeedDbProjectName}{jsonExt}");
+            $"{NamingStats.SeedDbProjectName(Parameters.DbContextProjectName)}{jsonExt}");
+
+        var createProjectSeederCodeProjectName =
+            NamingStats.CreateProjectSeederCodeProjectName(Parameters.DbContextProjectName);
+
+        var getJsonFromScaffoldDbProjectName =
+            NamingStats.GetJsonFromScaffoldDbProjectName(Parameters.DbContextProjectName);
+
+        var dataSeedingClassLibProjectName =
+            NamingStats.DataSeedingClassLibProjectName(Parameters.DbContextProjectName);
+
+        var seedDbProjectName = NamingStats.SeedDbProjectName(Parameters.DbContextProjectName);
 
         var creatorCreatorParameters = new CreatorCreatorParameters(Parameters.ScaffoldSeederProjectName,
-            Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,
-            Parameters.CreateProjectSeederCodeProjectName,
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-                Parameters.CreateProjectSeederCodeProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-                Parameters.GetJsonFromScaffoldDbProjectName), Parameters.SeedDbProjectName,
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.SeedDbProjectName),
+            Parameters.DbContextProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,
+            createProjectSeederCodeProjectName,
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, createProjectSeederCodeProjectName),
+            getJsonFromScaffoldDbProjectName,
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
+            seedDbProjectName, Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, seedDbProjectName),
             "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath);
 
         var creatorCreator = new CreatorCreatorToolCommand(_logger, creatorCreatorParameters);
@@ -120,70 +130,69 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
-
         var seederParameters = new SeederParametersDomain(
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName,
-                "Json"), Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
-            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.SeedDbProjectName}");
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName, "Json"),
+            Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
+            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}");
 
         if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
-                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath))
+                scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath,
+                seedDbProjectName))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
 
-        //ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
-        if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) || project.SeedProjectFilePath !=
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFileFullName)
-        {
-            project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
-                .ProjectFileFullName;
-            haveToSaveSupportToolsParameters = true;
-        }
+        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
+        //if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) || project.SeedProjectFilePath !=
+        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFileFullName)
+        //{
+        //    project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
+        //        .ProjectFileFullName;
+        //    haveToSaveSupportToolsParameters = true;
+        //}
 
-        //ბაზაში ინფორმაციის ჩამყრელი პროექტის პარამეტრების გზა
-        if (string.IsNullOrWhiteSpace(project.SeedProjectParametersFilePath) ||
-            project.SeedProjectParametersFilePath != seedDbProjectNameUseJsonFilePath)
-        {
-            project.SeedProjectParametersFilePath = seedDbProjectNameUseJsonFilePath;
-            haveToSaveSupportToolsParameters = true;
-        }
+        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის პარამეტრების გზა
+        //if (string.IsNullOrWhiteSpace(project.SeedProjectParametersFilePath) ||
+        //    project.SeedProjectParametersFilePath != seedDbProjectNameUseJsonFilePath)
+        //{
+        //    project.SeedProjectParametersFilePath = seedDbProjectNameUseJsonFilePath;
+        //    haveToSaveSupportToolsParameters = true;
+        //}
 
         var getJsonParameters = new GetJsonParametersDomain(seederParameters.JsonFolderName, Parameters.LogFolder,
-            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.GetJsonFromScaffoldDbProjectName}");
+            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={getJsonFromScaffoldDbProjectName}");
 
         var getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName = Path.Combine(
-            scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-            $"{Parameters.GetJsonFromScaffoldDbProjectName}{jsonExt}");
+            scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath, $"{getJsonFromScaffoldDbProjectName}{jsonExt}");
 
         if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
-                    .ProjectFullPath))
+                    .ProjectFullPath, getJsonFromScaffoldDbProjectName))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
 
-        //json ფაილების შემქმნელი პროექტის გზა
-        if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
-            project.GetJsonFromScaffoldDbProjectFileFullName != scaffoldSeederDoubleAppCreator
-                .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
-        {
-            project.GetJsonFromScaffoldDbProjectFileFullName = scaffoldSeederDoubleAppCreator
-                .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName;
-            haveToSaveSupportToolsParameters = true;
-        }
+        ////json ფაილების შემქმნელი პროექტის გზა
+        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
+        //    project.GetJsonFromScaffoldDbProjectFileFullName != scaffoldSeederDoubleAppCreator
+        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
+        //{
+        //    project.GetJsonFromScaffoldDbProjectFileFullName = scaffoldSeederDoubleAppCreator
+        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName;
+        //    haveToSaveSupportToolsParameters = true;
+        //}
 
-        //json ფაილების შემქმნელი პროექტის პარამეტრების გზა
-        if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName) ||
-            project.GetJsonFromScaffoldDbProjectParametersFileFullName !=
-            getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName)
-        {
-            project.GetJsonFromScaffoldDbProjectParametersFileFullName =
-                getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName;
-            haveToSaveSupportToolsParameters = true;
-        }
+        ////json ფაილების შემქმნელი პროექტის პარამეტრების გზა
+        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName) ||
+        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName !=
+        //    getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName)
+        //{
+        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName =
+        //        getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName;
+        //    haveToSaveSupportToolsParameters = true;
+        //}
 
         //მიგრაციის პროექტის გზის დაფიქსირება
         if (string.IsNullOrWhiteSpace(project.MigrationProjectFilePath) || project.MigrationProjectFilePath !=
@@ -206,20 +215,20 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var createProjectSeederCodeParameters = new CreateProjectSeederCodeParametersDomain(
             Parameters.ScaffoldSeederProjectName, Parameters.ProjectShortPrefix, Parameters.LogFolder,
-            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={Parameters.CreateProjectSeederCodeProjectName}",
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath,
-                Parameters.GetJsonFromScaffoldDbProjectName), Parameters.GetJsonFromScaffoldDbProjectName,
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, Parameters.DataSeedingClassLibProjectName),
-            Parameters.DataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath,
-            Parameters.MainDatabaseProjectName, Parameters.ProjectDbContextClassName);
+            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
+            getJsonFromScaffoldDbProjectName,
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName),
+            dataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
+            Parameters.ProjectDbContextClassName);
 
         var createProjectSeederCodeParametersFileFullName = Path.Combine(
             scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-            $"{Parameters.CreateProjectSeederCodeProjectName}{jsonExt}");
+            $"{createProjectSeederCodeProjectName}{jsonExt}");
 
         if (!SaveParameters(createProjectSeederCodeParameters, createProjectSeederCodeParametersFileFullName,
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
-                    .ProjectFullPath))
+                    .ProjectFullPath, createProjectSeederCodeProjectName))
         {
             StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
@@ -235,13 +244,17 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                     .ProjectFileFullName, createProjectSeederCodeParametersFileFullName).IsSome)
             return false;
 
-        var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
-            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject
-                .ProjectFileFullName, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName);
+        var jsonFromProjectDbProjectGetterParameters = ExternalScaffoldSeedToolParameters.Create(supportToolsParameters,
+            Parameters.ProjectName, NamingStats.GetJsonFromScaffoldDbProjectName);
+        if (jsonFromProjectDbProjectGetterParameters is null)
+        {
+            StShared.WriteErrorLine("jsonFromProjectDbProjectGetterParameters is null", true);
+            return false;
+        }
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var jsonFromProjectDbProjectGetter =
-            new JsonFromProjectDbProjectGetter(_logger, jsonFromProjectDbProjectGetterParameters, ParametersManager);
+            new ExternalScaffoldSeedToolCommand(_logger, jsonFromProjectDbProjectGetterParameters);
         return await jsonFromProjectDbProjectGetter.Run(cancellationToken);
     }
 
@@ -280,8 +293,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             dbScContextName, databaseScaffoldClassLibProjectFullPath).IsNone;
     }
 
-
-    private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath)
+    private bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath, string projectName)
     {
         //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
         var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
@@ -292,7 +304,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         //launchSettings.json//"SeedGeoModelDb"
         // ReSharper disable once CollectionNeverUpdated.Local
         var seedDbProjectLaunchSettings = new JObject(new JProperty("profiles",
-            new JObject(new JProperty(Parameters.SeedDbProjectName,
+            new JObject(new JProperty(projectName,
                 new JObject(new JProperty("commandName", "Project"),
                     new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
 

@@ -1,59 +1,64 @@
-﻿using System;
-using LibParameters;
-using SupportToolsData.Models;
-using SystemToolsShared;
+﻿//using System;
+//using LibParameters;
+//using SupportToolsData.Models;
+//using SystemToolsShared;
 
-namespace LibScaffoldSeeder.Models;
+//namespace LibScaffoldSeeder.Models;
 
-public sealed class JsonFromProjectDbProjectGetterParameters : IParameters
-{
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public JsonFromProjectDbProjectGetterParameters(string getJsonFromScaffoldDbProjectFileFullName,
-        string getJsonFromScaffoldDbProjectParametersFileFullName)
-    {
-        GetJsonFromScaffoldDbProjectFileFullName = getJsonFromScaffoldDbProjectFileFullName;
-        GetJsonFromScaffoldDbProjectParametersFileFullName = getJsonFromScaffoldDbProjectParametersFileFullName;
-    }
+//public sealed class JsonFromProjectDbProjectGetterParameters : IParameters
+//{
+//    // ReSharper disable once ConvertToPrimaryConstructor
+//    public JsonFromProjectDbProjectGetterParameters()
+//    {
+//        //GetJsonFromScaffoldDbProjectFileFullName = getJsonFromScaffoldDbProjectFileFullName;
+//        //GetJsonFromScaffoldDbProjectParametersFileFullName = getJsonFromScaffoldDbProjectParametersFileFullName;
+//    }
 
-    public string GetJsonFromScaffoldDbProjectFileFullName { get; set; }
-    public string GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
+//    public string DbContextProjectName { get; set; }
+//    public string ScaffoldSeedersWorkFolder { get; set; }
+//    public string ProjectName { get; set; }
+//    public string ScaffoldSeederProjectName { get; set; }
 
-    public bool CheckBeforeSave()
-    {
-        return true;
-    }
+//    //public string GetJsonFromScaffoldDbProjectFileFullName { get; set; }
+//    //public string GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
 
-    public static JsonFromProjectDbProjectGetterParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName)
-    {
-        try
-        {
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+//    public bool CheckBeforeSave()
+//    {
+//        return true;
+//    }
 
-            if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName))
-            {
-                StShared.WriteErrorLine(
-                    $"GetJsonFromScaffoldDbProjectFileFullName does not specified for project {projectName}", true);
-                return null;
-            }
+//    public static JsonFromProjectDbProjectGetterParameters? Create(SupportToolsParameters supportToolsParameters,
+//        string projectName)
+//    {
+//        try
+//        {
+//            var project = supportToolsParameters.GetProjectRequired(projectName);
 
-            if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName))
-            {
-                StShared.WriteErrorLine(
-                    $"GetJsonFromScaffoldDbProjectParametersFileFullName does not specified for project {projectName}",
-                    true);
-                return null;
-            }
+//            //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName))
+//            //{
+//            //    StShared.WriteErrorLine(
+//            //        $"GetJsonFromScaffoldDbProjectFileFullName does not specified for project {projectName}", true);
+//            //    return null;
+//            //}
 
-            var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
-                project.GetJsonFromScaffoldDbProjectFileFullName,
-                project.GetJsonFromScaffoldDbProjectParametersFileFullName);
-            return jsonFromProjectDbProjectGetterParameters;
-        }
-        catch (Exception e)
-        {
-            StShared.WriteErrorLine(e.Message, true);
-            return null;
-        }
-    }
-}
+//            //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName))
+//            //{
+//            //    StShared.WriteErrorLine(
+//            //        $"GetJsonFromScaffoldDbProjectParametersFileFullName does not specified for project {projectName}",
+//            //        true);
+//            //    return null;
+//            //}
+
+//            var jsonFromProjectDbProjectGetterParameters = new JsonFromProjectDbProjectGetterParameters(
+//                //project.GetJsonFromScaffoldDbProjectFileFullName,
+//                //project.GetJsonFromScaffoldDbProjectParametersFileFullName
+//                );
+//            return jsonFromProjectDbProjectGetterParameters;
+//        }
+//        catch (Exception e)
+//        {
+//            StShared.WriteErrorLine(e.Message, true);
+//            return null;
+//        }
+//    }
+//}

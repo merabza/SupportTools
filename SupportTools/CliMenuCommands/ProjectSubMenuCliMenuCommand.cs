@@ -69,7 +69,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         if (project != null)
         {
-            if (!string.IsNullOrWhiteSpace(project.SeedProjectFilePath))
+            if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
                 projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
                     EGitCol.ScaffoldSeed));
 

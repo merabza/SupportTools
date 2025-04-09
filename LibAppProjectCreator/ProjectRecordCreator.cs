@@ -193,12 +193,11 @@ internal sealed class ProjectRecordCreator
         var projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
         var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
         var dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
-        const string csProjectExtension = ".csproj";
         const string solutionFileExtension = ".sln";
         const string jsonExtension = ".json";
-        var seedProjectName = $"Seed{_newDbPartProjectName}Db";
-        var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
-        var scaffoldSeedSecFolderName = $"{_newDbPartProjectName}ScaffoldSeeder.sec";
+        //var seedProjectName = $"Seed{_newDbPartProjectName}Db";
+        //var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
+        //var scaffoldSeedSecFolderName = $"{_newDbPartProjectName}ScaffoldSeeder.sec";
         var dbPartProjectsFolderName = $"{_newDbPartProjectName}DbPart";
         var securityFolder = supportToolsParameters.SecurityFolder;
         const string appSettingsFileName = $"appsettings{jsonExtension}";
@@ -252,33 +251,33 @@ internal sealed class ProjectRecordCreator
             MainProjectName = _newProjectName,
             MigrationStartupProjectFilePath =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, fakeHostProjectName, $"{fakeHostProjectName}{csProjectExtension}"),
+                    scaffoldSeederProjectName, fakeHostProjectName, $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
             SolutionFileNameWithMigrationProject =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
                     scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
             MigrationProjectFilePath =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, dbMigrationProjectName, $"{dbMigrationProjectName}{csProjectExtension}"),
-            SeedProjectFilePath =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                        scaffoldSeederProjectName, seedProjectName, $"{seedProjectName}{csProjectExtension}")
-                    : null,
-            SeedProjectParametersFilePath =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
-                        $"{seedProjectName}{csProjectExtension}")
-                    : null,
-            GetJsonFromScaffoldDbProjectFileFullName =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                        scaffoldSeederProjectName, getJsonProjectName, $"{getJsonProjectName}{csProjectExtension}")
-                    : null,
-            GetJsonFromScaffoldDbProjectParametersFileFullName =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
-                        $"{getJsonProjectName}{csProjectExtension}")
-                    : null,
+                    scaffoldSeederProjectName, dbMigrationProjectName, $"{dbMigrationProjectName}{NamingStats.CsProjectExtension}"),
+            //SeedProjectFilePath =
+            //    _templateModel is { UseDatabase: true, UseCarcass: true }
+            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+            //            scaffoldSeederProjectName, seedProjectName, $"{seedProjectName}{csProjectExtension}")
+            //        : null,
+            //SeedProjectParametersFilePath =
+            //    _templateModel is { UseDatabase: true, UseCarcass: true }
+            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
+            //            $"{seedProjectName}{csProjectExtension}")
+            //        : null,
+            //GetJsonFromScaffoldDbProjectFileFullName =
+            //    _templateModel is { UseDatabase: true, UseCarcass: true }
+            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+            //            scaffoldSeederProjectName, getJsonProjectName, $"{getJsonProjectName}{NamingStats.CsProjectExtension}")
+            //        : null,
+            //GetJsonFromScaffoldDbProjectParametersFileFullName =
+            //    _templateModel is { UseDatabase: true, UseCarcass: true }
+            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
+            //            $"{getJsonProjectName}{NamingStats.CsProjectExtension}")
+            //        : null,
             DbContextName = $"{_newDbPartProjectName}DbContext",
             ProjectShortPrefix = _newProjectShortName,
             DbContextProjectName =

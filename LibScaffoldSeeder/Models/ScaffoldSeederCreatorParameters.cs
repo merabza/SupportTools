@@ -16,7 +16,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 {
     private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder,
         string projectName, string scaffoldSeederProjectName, string projectSecurityFolderPath,
-        string projectShortPrefix, string mainDatabaseProjectName, string projectDbContextClassName,
+        string projectShortPrefix, string dbContextProjectName, string projectDbContextClassName,
         EDatabaseProvider devDatabaseDataProvider, string devDatabaseConnectionString,
         EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString,
         string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
@@ -30,7 +30,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         ScaffoldSeederProjectName = scaffoldSeederProjectName;
         ProjectSecurityFolderPath = projectSecurityFolderPath;
         ProjectShortPrefix = projectShortPrefix;
-        MainDatabaseProjectName = mainDatabaseProjectName;
+        DbContextProjectName = dbContextProjectName;
         ProjectDbContextClassName = projectDbContextClassName;
         DevDatabaseDataProvider = devDatabaseDataProvider;
         DevDatabaseConnectionString = devDatabaseConnectionString;
@@ -53,7 +53,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public string ScaffoldSeederProjectName { get; }
     public string ProjectSecurityFolderPath { get; }
     public string ProjectShortPrefix { get; }
-    public string MainDatabaseProjectName { get; }
+    public string DbContextProjectName { get; }
     public string ProjectDbContextClassName { get; }
     public EDatabaseProvider DevDatabaseDataProvider { get; }
     public string DevDatabaseConnectionString { get; }
@@ -66,18 +66,17 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
-    public string CreateProjectSeederCodeProjectName => $"Create{ScaffoldSeederProjectName}SeederCode";
-    public string GetJsonFromScaffoldDbProjectName => $"GetJsonFromScaffold{MainDatabaseProjectName}";
-    public string SeedDbProjectName => $"Seed{MainDatabaseProjectName}";
+    //public string CreateProjectSeederCodeProjectName => $"Create{ScaffoldSeederProjectName}SeederCode";
+    //public string GetJsonFromScaffoldDbProjectName => $"GetJsonFromScaffold{DbContextProjectName}";
+    //public string SeedDbProjectName => $"Seed{DbContextProjectName}";
     public string FakeHostProjectName { get; }
-    public string DataSeedingClassLibProjectName => $"{MainDatabaseProjectName}DataSeeding";
-    public string DbMigrationProjectName => $"{MainDatabaseProjectName}Migration";
+    //public string DataSeedingClassLibProjectName => $"{DbContextProjectName}DataSeeding";
+    //public string DbMigrationProjectName => $"{DbContextProjectName}Migration";
 
     public bool CheckBeforeSave()
     {
         return true;
     }
-
 
     public static ScaffoldSeederCreatorParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
         string projectName, bool useConsole)
@@ -95,7 +94,6 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 StShared.WriteErrorLine("ScaffoldSeedersWorkFolder does not specified in parameters", true);
                 return null;
             }
-
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
             {
@@ -184,7 +182,6 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                     true);
                 return null;
             }
-
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,

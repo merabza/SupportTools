@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using LibAppProjectCreator;
 using LibAppProjectCreator.Models;
 using LibDotnetWork;
 
@@ -41,20 +42,22 @@ public sealed class ScaffoldSeederCreatorData
 
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
         var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.DataSeedingClassLibProjectName,
+            NamingStats.DataSeedingClassLibProjectName(scaffoldSeederCreatorParameters.DbContextProjectName),
             ["CarcassSeeders", "ProjectSeeders", "Models", "Json"]);
 
+        var createProjectSeederCodeProjectName =
+            NamingStats.CreateProjectSeederCodeProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
         //სიდერის კოდის შემქმნელი აპლიკაცია
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName,
-            scaffoldSeederCreatorParameters.CreateProjectSeederCodeProjectName, EDotnetProjectType.Console,
+            createProjectSeederCodeProjectName, createProjectSeederCodeProjectName, EDotnetProjectType.Console,
             string.Empty, "Program", ["Models", "Properties"]);
 
+        var getJsonFromScaffoldDbProjectName =
+            NamingStats.GetJsonFromScaffoldDbProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName,
-            scaffoldSeederCreatorParameters.GetJsonFromScaffoldDbProjectName, EDotnetProjectType.Console, string.Empty,
-            "Program", ["Models"]);
+            getJsonFromScaffoldDbProjectName, getJsonFromScaffoldDbProjectName, EDotnetProjectType.Console,
+            string.Empty, "Program", ["Models"]);
 
         var projectFolders = new List<string> { "Migrations" };
         var migrationSqlFilesFolder = scaffoldSeederCreatorParameters.MigrationSqlFilesFolder;
@@ -66,14 +69,16 @@ public sealed class ScaffoldSeederCreatorData
                 projectFolders.Add("Sql");
         }
 
+        var dbMigrationProjectName =
+            NamingStats.DbMigrationProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
         //მიგრაციის პროექტი ბიბლიოთეკა
         var dbMigrationProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.DbMigrationProjectName, [.. projectFolders]);
+            dbMigrationProjectName, [.. projectFolders]);
 
+        var seedDbProjectName = NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.DbContextProjectName);
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
-        var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
-            scaffoldSeederCreatorParameters.SeedDbProjectName, scaffoldSeederCreatorParameters.SeedDbProjectName,
-            EDotnetProjectType.Console, string.Empty, "Program", []);
+        var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, seedDbProjectName,
+            seedDbProjectName, EDotnetProjectType.Console, string.Empty, "Program", []);
 
         //პროექტი, რომელიც იქმნება მხოლოდ იმისათვის, რომ შესაძლებელი გახდეს dotnet EF ბრძანებების შესრულება შეცდომების გარეშე
         //მთავარი ამ პროექტში არის IHost-ის რეალიზაცია
@@ -84,7 +89,6 @@ public sealed class ScaffoldSeederCreatorData
         return new ScaffoldSeederCreatorData(databaseScaffoldClassLibProject, dataSeedingClassLibProject,
             createProjectSeederCodeProject, getJsonFromProjectDbProject, dbMigrationProject, seedDbProject,
             fakeHostWebApiProject, appCreatorBaseData);
-
 
         //ProjectForCreate libProjectRepositoriesProjectData =
         //    ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"Lib{par.ProjectName}Repositories",
