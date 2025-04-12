@@ -71,7 +71,13 @@ public sealed class GitRepos
             }
 
             gits.Add(gitProjectName,
-                new GitDataDomain(gitData.GitProjectAddress, gitProjectFolderName, gitData.GitIgnorePathName));
+                new GitDataDomain
+                {
+                    GitProjectAddress = gitData.GitProjectAddress,
+                    GitProjectFolderName = gitProjectFolderName,
+                    GitProjectName = gitProjectFolderName,
+                    GitIgnorePathName = gitData.GitIgnorePathName
+                });
         }
 
         return new GitRepos(gits);

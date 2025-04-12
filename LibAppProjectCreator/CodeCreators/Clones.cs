@@ -11,15 +11,63 @@ public sealed class Clones
     private Clones()
     {
         const string cSharp = "CSharp";
+        const string appCliTools = "AppCliTools";
+        const string backendCarcass = "BackendCarcass";
+        const string databaseTools = "DatabaseTools";
+        const string parametersManagement = "ParametersManagement";
+        const string systemTools = "SystemTools";
+        const string toolsManagement = "ToolsManagement";
+        const string webSystemTools = "WebSystemTools";
 
-        AppCliTools = new GitDataDomain("git@github.com:merabza/AppCliTools.git", "AppCliTools", cSharp);
-        BackendCarcass = new GitDataDomain("git@github.com:merabza/BackendCarcass.git", "BackendCarcass", cSharp);
-        DatabaseTools = new GitDataDomain("git@github.com:merabza/DatabaseTools.git", "DatabaseTools", cSharp);
-        ParametersManagement = new GitDataDomain("git@github.com:merabza/ParametersManagement.git",
-            "ParametersManagement", cSharp);
-        SystemTools = new GitDataDomain("git@github.com:merabza/SystemTools.git", "SystemTools", cSharp);
-        ToolsManagement = new GitDataDomain("git@github.com:merabza/ToolsManagement.git", "ToolsManagement", cSharp);
-        WebSystemTools = new GitDataDomain("git@github.com:merabza/WebSystemTools.git", "WebSystemTools", cSharp);
+        AppCliToolsGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/AppCliTools.git",
+            GitProjectFolderName = appCliTools,
+            GitProjectName = appCliTools,
+            GitIgnorePathName = cSharp
+        };
+        BackendCarcassGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/BackendCarcass.git",
+            GitProjectFolderName = backendCarcass,
+            GitProjectName = backendCarcass,
+            GitIgnorePathName = cSharp
+        };
+        DatabaseToolsGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/DatabaseTools.git",
+            GitProjectFolderName = databaseTools,
+            GitProjectName = databaseTools,
+            GitIgnorePathName = cSharp
+        };
+        ParametersManagementGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/ParametersManagement.git",
+            GitProjectFolderName = parametersManagement,
+            GitProjectName = parametersManagement,
+            GitIgnorePathName = cSharp
+        };
+        SystemToolsGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/SystemTools.git",
+            GitProjectFolderName = systemTools,
+            GitProjectName = systemTools,
+            GitIgnorePathName = cSharp
+        };
+        ToolsManagementGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/ToolsManagement.git",
+            GitProjectFolderName = toolsManagement,
+            GitProjectName = toolsManagement,
+            GitIgnorePathName = cSharp
+        };
+        WebSystemToolsGit = new GitDataDomain
+        {
+            GitProjectAddress = "git@github.com:merabza/WebSystemTools.git",
+            GitProjectFolderName = webSystemTools,
+            GitProjectName = webSystemTools,
+            GitIgnorePathName = cSharp
+        };
     }
 
     public static Clones Instance
@@ -37,11 +85,11 @@ public sealed class Clones
         }
     }
 
-    public GitDataDomain AppCliTools { get; } //ბრძანებათა სტრიქონთან სამუშაო პროექტები
-    public GitDataDomain BackendCarcass { get; } //სერვერის კარკასის პროექტები
-    public GitDataDomain DatabaseTools { get; } //მონაცემთა ბაზებთან სამუშაო პროექტები
-    public GitDataDomain ParametersManagement { get; } //პარამეტრებთან სამუშაო პროექტები
-    public GitDataDomain SystemTools { get; } //სერთო სისტემური ინსტრუმენტების ნაკრები
-    public GitDataDomain ToolsManagement { get; } //ინსტრუმენტებთან სამუშაო პროექტები
-    public GitDataDomain WebSystemTools { get; } //ინსტალერების ნაკრები
+    public GitDataDomain AppCliToolsGit { get; } //ბრძანებათა სტრიქონთან სამუშაო პროექტები
+    public GitDataDomain BackendCarcassGit { get; } //სერვერის კარკასის პროექტები
+    public GitDataDomain DatabaseToolsGit { get; } //მონაცემთა ბაზებთან სამუშაო პროექტები
+    public GitDataDomain ParametersManagementGit { get; } //პარამეტრებთან სამუშაო პროექტები
+    public GitDataDomain SystemToolsGit { get; } //სერთო სისტემური ინსტრუმენტების ნაკრები
+    public GitDataDomain ToolsManagementGit { get; } //ინსტრუმენტებთან სამუშაო პროექტები
+    public GitDataDomain WebSystemToolsGit { get; } //ინსტალერების ნაკრები
 }
