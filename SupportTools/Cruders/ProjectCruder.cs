@@ -53,8 +53,8 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileNameWithMigrationProject)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));
-        //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));
-        //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectParametersFilePath)));
+        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));
+        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectParametersFilePath)));
         //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectFileFullName)));
         //FieldEditors.Add(
         //    new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectParametersFileFullName)));
@@ -65,7 +65,7 @@ public sealed class ProjectCruder : ParCruder
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.Projects.ToDictionary(p => p.Key, p => (ItemData)p.Value);
+        return parameters.Projects.ToDictionary(p => p.Key, ItemData (p) => p.Value);
     }
 
     public override bool ContainsRecordWithKey(string recordKey)

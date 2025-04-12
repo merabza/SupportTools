@@ -57,6 +57,14 @@ public static class ToolCommandFabric
         IParametersManager parametersManager, string projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
+
+        var project = supportToolsParameters.GetProject(projectName);
+        if (project == null)
+        {
+            StShared.WriteErrorLine($"Project with name {projectName} not found", true);
+            return null;
+        }
+
         switch (tool)
         {
             case ETools.CorrectNewDatabase:
@@ -111,13 +119,6 @@ public static class ToolCommandFabric
                     return null;
                 }
 
-                var project = supportToolsParameters.GetProject(projectName);
-                if (project == null)
-                {
-                    StShared.WriteErrorLine($"Project with name {projectName} not found", true);
-                    return null;
-                }
-
                 if (project.DevDatabaseParameters == null)
                 {
                     StShared.WriteErrorLine(
@@ -145,7 +146,8 @@ public static class ToolCommandFabric
                 return null;
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა
                 var dataSeederParameters = ExternalScaffoldSeedToolParameters.Create(supportToolsParameters,
-                    projectName, NamingStats.SeedDbProjectName);
+                    projectName, NamingStats.SeedDbProjectName, project.SeedProjectFilePath,
+                    project.SeedProjectParametersFilePath);
                 if (dataSeederParameters is not null)
                     return new ExternalScaffoldSeedToolCommand(logger, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);

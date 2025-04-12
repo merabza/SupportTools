@@ -25,10 +25,18 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
     }
 
     public static ExternalScaffoldSeedToolParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, Func<string, string> projectNameCounter)
+        string projectName, Func<string, string> externalToolProjectNameCounter,
+        string? externalToolProjectDefFilePath = null, string? externalToolProjectDefParametersFilePath = null)
     {
         try
         {
+            if (!string.IsNullOrWhiteSpace(externalToolProjectDefFilePath) &&
+                File.Exists(externalToolProjectDefFilePath) &&
+                !string.IsNullOrWhiteSpace(externalToolProjectDefParametersFilePath) &&
+                File.Exists(externalToolProjectDefParametersFilePath))
+                return new ExternalScaffoldSeedToolParameters(externalToolProjectDefFilePath,
+                    externalToolProjectDefParametersFilePath);
+
             var project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
@@ -44,23 +52,22 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
                 return null;
             }
 
-            var seedDbProjectName =
-                projectNameCounter(project.ScaffoldSeederProjectName);
+            var externalToolProjectName = externalToolProjectNameCounter(project.ScaffoldSeederProjectName);
             var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
             var scaffoldSeederProjectName = project.ScaffoldSeederProjectName;
             var scaffoldSeederFolderName = NamingStats.ScaffoldSeederFolderName(project.ScaffoldSeederProjectName);
 
-            var seedProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
-                scaffoldSeederFolderName, scaffoldSeederFolderName, seedDbProjectName,
-                $"{seedDbProjectName}{NamingStats.CsProjectExtension}");
+            var externalToolProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
+                scaffoldSeederFolderName, scaffoldSeederFolderName, externalToolProjectName,
+                $"{externalToolProjectName}{NamingStats.CsProjectExtension}");
 
-            var seedProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
-                NamingStats.ScaffoldSeedSecFolderName(scaffoldSeederProjectName),
-                $"{seedDbProjectName}{NamingStats.JsonExtension}");
+            var externalToolProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder,
+                scaffoldSeederProjectName, NamingStats.ScaffoldSeedSecFolderName(scaffoldSeederProjectName),
+                $"{externalToolProjectName}{NamingStats.JsonExtension}");
 
-            var dataSeederParameters =
-                new ExternalScaffoldSeedToolParameters(seedProjectFilePath, seedProjectParametersFilePath);
-            return dataSeederParameters;
+            var externalScaffoldSeedToolParameters = new ExternalScaffoldSeedToolParameters(externalToolProjectFilePath,
+                externalToolProjectParametersFilePath);
+            return externalScaffoldSeedToolParameters;
         }
         catch (Exception e)
         {
