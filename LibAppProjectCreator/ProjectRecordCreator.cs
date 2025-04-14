@@ -318,7 +318,7 @@ internal sealed class ProjectRecordCreator
                 ?
                 [
                     ETools.ScaffoldSeederCreator, ETools.RecreateDevDatabase,
-                    ETools.SeedData
+                    ETools.SeedData, ETools.PrepareProdCopyDatabase
                 ]
                 :
                 [

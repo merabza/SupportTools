@@ -32,7 +32,8 @@ public static class ToolCommandFabric
         ETools.JsonFromProjectDbProjectGetter,
         ETools.RecreateDevDatabase,
         ETools.ScaffoldSeederCreator,
-        ETools.SeedData
+        ETools.SeedData,
+        ETools.PrepareProdCopyDatabase
     ];
 
     public static readonly ETools[] ToolsByProjectsAndServers =
@@ -143,6 +144,14 @@ public static class ToolCommandFabric
                     return new ScaffoldSeederCreatorToolCommand(logger, httpClientFactory, true,
                         scaffoldSeederCreatorParameters, parametersManager);
                 StShared.WriteErrorLine("scaffoldSeederCreatorParameters is null", true);
+                return null;
+            case ETools.PrepareProdCopyDatabase: //პროდაქშენ ბაზის ასლის მომზადება სკაფოლდით დამუშავებისათვის
+                var prepareProdCopyDatabaseParameters = ExternalScaffoldSeedToolParameters.Create(
+                    supportToolsParameters, projectName, null, project.PrepareProdCopyDatabaseProjectFilePath,
+                    project.PrepareProdCopyDatabaseProjectParametersFilePath);
+                if (prepareProdCopyDatabaseParameters is not null)
+                    return new ExternalScaffoldSeedToolCommand(logger, prepareProdCopyDatabaseParameters);
+                StShared.WriteErrorLine("dataSeederParameters is null", true);
                 return null;
             case ETools.SeedData: //json-ფაილებიდან დეველოპერ ბაზაში ინფორმაციის ჩაყრა
                 var dataSeederParameters = ExternalScaffoldSeedToolParameters.Create(supportToolsParameters,
@@ -389,6 +398,7 @@ public static class ToolCommandFabric
             case ETools.ScaffoldSeederCreator:
             case ETools.JsonFromProjectDbProjectGetter:
             case ETools.SeedData:
+            case ETools.PrepareProdCopyDatabase:
             case ETools.JetBrainsCleanupCode:
             default:
                 StShared.WriteErrorLine("Command tool does not created", true, logger);

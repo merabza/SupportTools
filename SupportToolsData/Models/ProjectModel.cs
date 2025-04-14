@@ -51,7 +51,8 @@ public sealed class ProjectModel : ItemData
     public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];
     public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
     public List<ETools> AllowToolsList { get; init; } = [];
-
+    public string? PrepareProdCopyDatabaseProjectFilePath { get; set; }
+    public string? PrepareProdCopyDatabaseProjectParametersFilePath { get; set; }
 
     public ServerInfoModel GetServerInfoRequired(string serverName)
     {

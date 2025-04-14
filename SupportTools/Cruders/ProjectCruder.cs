@@ -55,6 +55,8 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectParametersFilePath)));
+        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.PrepareProdCopyDatabaseProjectFilePath)));
+        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.PrepareProdCopyDatabaseProjectParametersFilePath)));
         //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectFileFullName)));
         //FieldEditors.Add(
         //    new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectParametersFileFullName)));

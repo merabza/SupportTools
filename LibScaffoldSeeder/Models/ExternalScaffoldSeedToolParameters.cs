@@ -25,7 +25,7 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
     }
 
     public static ExternalScaffoldSeedToolParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, Func<string, string> externalToolProjectNameCounter,
+        string projectName, Func<string, string>? externalToolProjectNameCounter,
         string? externalToolProjectDefFilePath = null, string? externalToolProjectDefParametersFilePath = null)
     {
         try
@@ -49,6 +49,12 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
             {
                 StShared.WriteErrorLine($"ScaffoldSeederProjectName does not specified for project {projectName}",
                     true);
+                return null;
+            }
+
+            if ( externalToolProjectNameCounter is null)
+            {
+                StShared.WriteErrorLine("externalToolProjectNameCounter is null", true);
                 return null;
             }
 
