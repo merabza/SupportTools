@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using LanguageExt;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -72,7 +71,6 @@ else
 echo "Diverged"
 fi*/
         //"git remote update"
-
 
         //if (!GitRemoteUpdate()) 
         //    return GitState.Unknown;
@@ -278,7 +276,6 @@ fi*/
         if (LastRemoteId is null && !GitRemoteUpdate())
             return (false, pushed);
 
-
         while (true)
             switch (GetGitState())
             {
@@ -316,9 +313,7 @@ fi*/
             return (Err[])statusCommandOutputResult.AsT1;
         var statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
 
-        return string.IsNullOrWhiteSpace(statusCommandOutput)
-            ? []
-            : statusCommandOutput.Split(Environment.NewLine).ToArray();
+        return string.IsNullOrWhiteSpace(statusCommandOutput) ? [] : statusCommandOutput.Split(Environment.NewLine);
     }
 
     //წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
@@ -347,7 +342,6 @@ fi*/
 
         return isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine;
     }
-
 
     /*
         var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",

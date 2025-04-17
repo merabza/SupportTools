@@ -28,6 +28,7 @@ public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataMode
     public override CliMenuSet GetSubMenu(object record)
     {
         var gitCruder = new GitCruder(_logger, _httpClientFactory, _parametersManager);
+        //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
         var menuSet = gitCruder.GetListMenu();
         return menuSet;
     }

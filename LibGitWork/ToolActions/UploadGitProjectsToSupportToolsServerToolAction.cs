@@ -57,7 +57,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
             gitIgnoreFiles.Add(new GitIgnoreFile { Name = key, Content = content });
         }
 
-        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, false);
+        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
         await supportToolsServerApiClient.UploadGitRepos(
             new SyncGitRequest { GitIgnoreFiles = gitIgnoreFiles, Gits = gitRepos.Gits }, cancellationToken);

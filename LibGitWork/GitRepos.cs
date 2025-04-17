@@ -45,15 +45,6 @@ public sealed class GitRepos
 
             var gitProjectFolderName = gitData.GitProjectFolderName;
 
-            //if (gitProjectFolderName.StartsWith(GitDataModel.MainProjectFolderRelativePathName))
-            //{
-            //    if (mainProjectFolderRelativePath is null)
-            //        continue;
-            //    gitProjectFolderName = Path.Combine(mainProjectFolderRelativePath,
-            //        gitProjectFolderName[GitDataModel.MainProjectFolderRelativePathName.Length..]
-            //            .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));
-            //}
-
             if (gitProjectFolderName.StartsWith(GitDataModel.SpaProjectFolderRelativePathName))
             {
                 if (useGitRecordNameForComplexGitProjectFolderName)
