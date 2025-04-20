@@ -14,15 +14,16 @@ namespace SupportTools.CliMenuCommands;
 public sealed class NewGitCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
 
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NewGitCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName, EGitCol gitCol)
-        : base("Add Git Project", EMenuAction.Reload)
+    public NewGitCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string projectName, EGitCol gitCol) : base("Add Git Project",
+        EMenuAction.Reload)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -35,7 +36,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     {
         Console.WriteLine("Add new Git started");
 
-        GitCruder gitCruder = new(_logger, _httpClientFactory, _parametersManager);
+        var gitCruder = GitCruder.Create(_logger, _httpClientFactory, _parametersManager);
         var newGitName = gitCruder.GetNameWithPossibleNewName("Git Name", null);
 
         if (string.IsNullOrWhiteSpace(newGitName))

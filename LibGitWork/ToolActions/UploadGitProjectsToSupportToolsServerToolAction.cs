@@ -7,9 +7,7 @@ using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
-using SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
 
@@ -31,20 +29,11 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var supportToolsServerApiClient =
+            supportToolsParameters.GetSupportToolsServerApiClient(Logger, _httpClientFactory);
 
-        //დავადგინოთ არის თუ არა მითითებული SupportToolsServer-ის აპი კლიენტის სახელი პარამეტრებში (SupportToolsServerWebApiClientName)
-        var supportToolsServerWebApiClientName = supportToolsParameters.SupportToolsServerWebApiClientName;
-        if (string.IsNullOrWhiteSpace(supportToolsServerWebApiClientName))
-        {
-            StShared.WriteErrorLine("supportToolsServerWebApiClientName does not specified", true);
+        if (supportToolsServerApiClient == null)
             return false;
-        }
-
-        var supportToolsServerWebApiClient =
-            supportToolsParameters.GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
-
-        var supportToolsServerApiClient = new SupportToolsServerApiClient(Logger, _httpClientFactory,
-            supportToolsServerWebApiClient.Server, supportToolsServerWebApiClient.ApiKey, true);
 
         var gitIgnoreFiles = new List<GitIgnoreFile>();
         foreach (var (key, fileName) in supportToolsParameters.GitIgnoreModelFilePaths)

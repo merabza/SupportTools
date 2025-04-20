@@ -12,13 +12,13 @@ namespace SupportTools.FieldEditors;
 
 public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataModel>>
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName, ParametersManager parametersManager) : base(
-        propertyName, false, null, false, null, true)
+    public GitsFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
+        ParametersManager parametersManager) : base(propertyName, false, null, false, null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -27,12 +27,11 @@ public sealed class GitsFieldEditor : FieldEditor<Dictionary<string, GitDataMode
 
     public override CliMenuSet GetSubMenu(object record)
     {
-        var gitCruder = new GitCruder(_logger, _httpClientFactory, _parametersManager);
+        var gitCruder = GitCruder.Create(_logger, _httpClientFactory, _parametersManager);
         //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
         var menuSet = gitCruder.GetListMenu();
         return menuSet;
     }
-
 
     public override string GetValueStatus(object? record)
     {

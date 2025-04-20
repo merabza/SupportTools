@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using ApiClientsManagement;
 using CliTools;
 using Installer.Models;
@@ -10,6 +11,8 @@ using LibFileParameters.Interfaces;
 using LibFileParameters.Models;
 using LibGitData;
 using LibGitData.Models;
+using Microsoft.Extensions.Logging;
+using SupportToolsServerApiContracts;
 using SystemToolsShared;
 
 namespace SupportToolsData.Models;
@@ -65,6 +68,23 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
+    public SupportToolsServerApiClient? GetSupportToolsServerApiClient(ILogger? logger,  IHttpClientFactory httpClientFactory)
+    {
+        
+        //დავადგინოთ არის თუ არა მითითებული SupportToolsServer-ის აპი კლიენტის სახელი პარამეტრებში (SupportToolsServerWebApiClientName)
+        var supportToolsServerWebApiClientName = SupportToolsServerWebApiClientName;
+        if (string.IsNullOrWhiteSpace(supportToolsServerWebApiClientName))
+        {
+            StShared.WriteErrorLine("supportToolsServerWebApiClientName does not specified", true);
+            return null;
+        }
+
+        var supportToolsServerWebApiClient =
+            GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
+
+        return new SupportToolsServerApiClient(logger, httpClientFactory,
+            supportToolsServerWebApiClient.Server, supportToolsServerWebApiClient.ApiKey, true);
+    }
 
     public string GetUploadTempExtension()
     {

@@ -13,29 +13,60 @@ using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 namespace SupportTools.Cruders;
 
 public sealed class GitCruder : ParCruder
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
+    private readonly List<GitDataDomain> _remoteGitRepos;
 
-    public GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(parametersManager, "Git", "Gits")
+    private GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
+        List<GitDataDomain> remoteGitRepos) : base(parametersManager, "Git", "Gits")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _remoteGitRepos = remoteGitRepos;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
         FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
             ParametersManager, true));
     }
 
+    public static GitCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager)
+    {
+        var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
+
+        var supportToolsServerApiClient =
+            supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
+
+        List<GitDataDomain> remoteGitRepos = [];
+        if (supportToolsServerApiClient is not null)
+        {
+            var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+            if (remoteGitReposResult.IsT0)
+            {
+                remoteGitRepos = remoteGitReposResult.AsT0;
+            }
+            else
+            {
+                StShared.WriteErrorLine("could not received remoteGits", true, logger);
+                Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            }
+        }
+
+        return new GitCruder(logger, httpClientFactory, parametersManager, remoteGitRepos);
+    }
+
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.Gits.ToDictionary(p => p.Key, p => (ItemData)p.Value);
+        return parameters.Gits.ToDictionary(p => p.Key, ItemData (p) => p.Value);
     }
 
     public override bool ContainsRecordWithKey(string recordKey)
@@ -106,7 +137,10 @@ public sealed class GitCruder : ParCruder
         var usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
                          projects.Values.Count(project => project.ScaffoldSeederGitProjectNames.Contains(name));
 
-        return $"{git.GitProjectAddress} Usage count is: {usageCount}";
+        var remGitRepo = _remoteGitRepos.SingleOrDefault(x => x.GitProjectAddress == git.GitProjectAddress);
+
+        return
+            $"{git.GitProjectAddress} Usage count is: {usageCount}{(remGitRepo is null ? "" : $", rem names is: {remGitRepo.GitProjectName}")}";
     }
 
     protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)

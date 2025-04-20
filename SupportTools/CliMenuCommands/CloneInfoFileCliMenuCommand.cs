@@ -10,7 +10,7 @@ public /*open*/ class CloneInfoFileCliMenuCommand : CliMenuCommand
     {
     }
 
-    protected string? GetDefCloneFileName(SupportToolsParameters parameters, ProjectModel project)
+    protected static string? GetDefCloneFileName(SupportToolsParameters parameters, ProjectModel project)
     {
         string? defCloneFile = null;
         string? projectFolderName = null;
