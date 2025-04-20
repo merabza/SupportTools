@@ -40,14 +40,16 @@ public sealed class GitCruder : ParCruder
     public static GitCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {
-        var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-
-        var supportToolsServerApiClient =
-            supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
-
         List<GitDataDomain> remoteGitRepos = [];
-        if (supportToolsServerApiClient is not null)
+        try
         {
+            var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
+
+            var supportToolsServerApiClient =
+                supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
+
+            if (supportToolsServerApiClient is null)
+                return new GitCruder(logger, httpClientFactory, parametersManager, remoteGitRepos);
             var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
@@ -58,6 +60,11 @@ public sealed class GitCruder : ParCruder
                 StShared.WriteErrorLine("could not received remoteGits", true, logger);
                 Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            //throw;
         }
 
         return new GitCruder(logger, httpClientFactory, parametersManager, remoteGitRepos);
