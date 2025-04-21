@@ -147,7 +147,7 @@ public sealed class GitCruder : ParCruder
         var remGitRepo = _remoteGitRepos.SingleOrDefault(x => x.GitProjectAddress == git.GitProjectAddress);
 
         return
-            $"{git.GitProjectAddress} Usage count is: {usageCount}{(remGitRepo is null ? "" : $", rem names is: {remGitRepo.GitProjectName}")}";
+            $"{git.GitProjectAddress} Usage count is: {usageCount}{(remGitRepo is null ? "" : $"- rem name is: {remGitRepo.GitProjectName}")}";
     }
 
     protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
