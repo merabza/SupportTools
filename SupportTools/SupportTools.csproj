@@ -18,6 +18,7 @@
     <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibScaffoldSeeder\LibScaffoldSeeder.csproj" />
+    <ProjectReference Include="..\LibSupportToolsServerWork\LibSupportToolsServerWork.csproj" />
     <ProjectReference Include="..\LibTools\LibTools.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

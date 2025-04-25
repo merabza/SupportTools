@@ -8,6 +8,7 @@ using CliTools.CliMenuCommands;
 using LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibParameters;
+using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
@@ -43,6 +44,10 @@ public sealed class SupportTools : CliAppLoop
         var supportToolsParametersEditor =
             new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
+
+        var supportToolsServerEditorCliMenuCommand =
+            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory);
+        mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
         mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
