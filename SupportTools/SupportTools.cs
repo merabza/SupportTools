@@ -46,7 +46,7 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
 
         var supportToolsServerEditorCliMenuCommand =
-            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory);
+            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
         mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
