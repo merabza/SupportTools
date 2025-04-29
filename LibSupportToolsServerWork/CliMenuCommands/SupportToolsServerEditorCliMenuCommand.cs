@@ -14,6 +14,7 @@ public class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory? _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServerEditorCliMenuCommand(ILogger logger, IHttpClientFactory? httpClientFactory, ParametersManager parametersManager) : base(
         "Support Tools Server Editor", EMenuAction.LoadSubMenu)
     {

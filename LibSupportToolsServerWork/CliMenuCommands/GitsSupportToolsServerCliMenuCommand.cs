@@ -22,7 +22,7 @@ internal class GitsSupportToolsServerCliMenuCommand : CliMenuCommand
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-    
+
     //public override CliMenuSet GetSubMenu(object record)
     //{
     //    var parameters = (SupportToolsParameters)_parametersManager.Parameters;
@@ -37,7 +37,7 @@ internal class GitsSupportToolsServerCliMenuCommand : CliMenuCommand
 
 
 
-    //    public override CliMenuSet GetSubmenu()
+    //public override CliMenuSet GetSubmenu()
     //{
     //    CliMenuSet gitSubMenuSet = new("GitProjects");
 
