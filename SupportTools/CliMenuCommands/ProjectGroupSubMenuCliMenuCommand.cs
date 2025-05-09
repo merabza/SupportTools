@@ -29,7 +29,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         _projectGroupName = projectGroupName;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         var projectGroupSubMenuSet = new CliMenuSet($"Projects Group => {_projectGroupName}");
 

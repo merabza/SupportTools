@@ -34,7 +34,7 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         CliMenuSet gitSubMenuSet = new("GitProjects");
 

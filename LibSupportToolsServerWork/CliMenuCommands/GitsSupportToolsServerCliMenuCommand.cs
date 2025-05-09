@@ -1,41 +1,89 @@
-﻿using CliMenu;
-using CliParameters.CliMenuCommands;
-using LibGitData;
-using SupportToolsData.Models;
-using System.Net.Http;
-using System;
+﻿using System.Net.Http;
+using CliMenu;
 using LibParameters;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
 internal class GitsSupportToolsServerCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
+    private readonly IMemoryCache _memoryCache;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsSupportToolsServerCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) : base("Gits from SupportToolsServer", EMenuAction.LoadSubMenu)
+    public GitsSupportToolsServerCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        IMemoryCache memoryCache, ParametersManager parametersManager) : base("Gits from SupportToolsServer",
+        EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _memoryCache = memoryCache;
         _parametersManager = parametersManager;
     }
 
-    //public override CliMenuSet GetSubMenu(object record)
+    public override CliMenuSet GetSubMenu()
+    {
+        var gitFromServerCruder =
+            GitFromServerCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+        //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
+        var menuSet = gitFromServerCruder.GetListMenu();
+        return menuSet;
+    }
+
+    //public override CliMenuSet GetSubmenu()
     //{
     //    var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
     //    var gitsFromServer = SupportToolsServerWork.GetGitRepos(_logger, _httpClientFactory, parameters);
 
-    //    var gitCruder = GitCruder.Create(_logger, _httpClientFactory, _parametersManager);
+    //    var gitCruder = GitFromServerCruder.Create(_logger, _httpClientFactory, _parametersManager);
     //    //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
     //    var menuSet = gitCruder.GetListMenu();
     //    return menuSet;
     //}
 
+    //public override CliMenuSet GetSubmenu()
+    //{
+    //    CliMenuSet gitsSupportToolsServerSubMenuSet = new("Gits from SupportTools Server");
 
+    //    //ქვემენიუს ელემენტები
+
+    //    //ყველას საჭირო ინსტრუმენტის განახლებაზე შემოწმება
+    //    //var dotnetToolsSearched = CreateListOfDotnetToolsInstalled();
+
+    //    //ყველას საჭირო ინსტრუმენტის განახლება ან დაყენება
+    //    //dotnet tool update --global dotnet-ef
+    //    //dotnet tool install --global dotnet-ef
+    //    //var dotnetAllToolsCreateOrUpdateCommand = new DotnetAllToolsCreateOrUpdateCommand();
+
+    //    //ყველა ინსტრუმენტის განახლება ბოლო ვერსიამდე
+    //    var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCliMenuCommand();
+    //    gitsSupportToolsServerSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
+
+    //    //დაინსტალირებული ინსტრუმენტების სიის დადგენა
+    //    var dotnetTools = DotnetToolsManager.Instance;
+    //    if (dotnetTools is not null)
+    //    {
+    //        var dotnetToolsInstalled = dotnetTools.DotnetTools;
+
+    //        //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
+    //        foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
+    //            gitsSupportToolsServerSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool));
+    //    }
+
+    //    //var dotnetToolCommand = new DotnetToolCliMenuCommand();
+    //    //dotnetToolsSubMenuSet.AddMenuItem(dotnetToolCommand);
+
+    //    //მთავარ მენიუში გასვლა
+    //    var key = ConsoleKey.Escape.Value().ToLower();
+    //    gitsSupportToolsServerSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
+    //        key.Length);
+
+    //    return gitsSupportToolsServerSubMenuSet;
+    //}
 
     //public override CliMenuSet GetSubmenu()
     //{
@@ -69,7 +117,6 @@ internal class GitsSupportToolsServerCliMenuCommand : CliMenuCommand
     //    //ასევე შესაძელებელი უნდა იყოს გიტის დასინქრონიზება და ძირითადი ბრძანებების გაშვება
     //    //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
 
-
     //    var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
 
     //    foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
@@ -82,6 +129,4 @@ internal class GitsSupportToolsServerCliMenuCommand : CliMenuCommand
 
     //    return gitSubMenuSet;
     //}
-
-
 }

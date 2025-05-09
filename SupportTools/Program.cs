@@ -2,6 +2,7 @@
 using System.Net.Http;
 using CliParameters;
 using LibParameters;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
@@ -61,8 +62,16 @@ try
         return 6;
     }
 
-    SupportTools.SupportTools supportTools =
-        new(logger, httpClientFactory, new ParametersManager(parametersFileName, par));
+    // ReSharper disable once using
+    using var memoryCache = serviceProvider.GetService<IMemoryCache>();
+    if (memoryCache is null)
+    {
+        StShared.WriteErrorLine("memoryCache is null", true);
+        return 6;
+    }
+
+    var supportTools = new SupportTools.SupportTools(logger, httpClientFactory, memoryCache,
+        new ParametersManager(parametersFileName, par));
     return supportTools.Run() ? 0 : 100;
 }
 catch (Exception e)

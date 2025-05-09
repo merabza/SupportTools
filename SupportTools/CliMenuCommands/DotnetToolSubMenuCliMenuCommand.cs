@@ -16,7 +16,7 @@ public sealed class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
         _tool = tool;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         CliMenuSet dotnetToolSubMenuSet = new($"Dotnet Tool => {_tool.PackageId}");
 

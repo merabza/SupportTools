@@ -28,7 +28,7 @@ public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         //git-ის პროექტის მენიუს შექმნა
         CliMenuSet gitProjectSubMenuSet = new(_gitProjectName);

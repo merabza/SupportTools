@@ -28,7 +28,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         CliMenuSet projectCreatorSubMenuSet = new("Project Creator");
 

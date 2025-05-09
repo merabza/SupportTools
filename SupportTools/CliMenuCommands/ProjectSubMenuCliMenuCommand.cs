@@ -31,7 +31,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         var projectSubMenuSet = new CliMenuSet($"Project => {_projectName}");
 

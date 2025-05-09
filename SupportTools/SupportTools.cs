@@ -10,6 +10,7 @@ using LibGitWork.CliMenuCommands;
 using LibParameters;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
@@ -22,14 +23,16 @@ public sealed class SupportTools : CliAppLoop
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
+    private readonly IMemoryCache _memoryCache;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) :
-        base((IParametersWithRecentData)parametersManager.Parameters)
+    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+        ParametersManager parametersManager) : base((IParametersWithRecentData)parametersManager.Parameters)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _memoryCache = memoryCache;
         _parametersManager = parametersManager;
     }
 
@@ -46,7 +49,7 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
 
         var supportToolsServerEditorCliMenuCommand =
-            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
         var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();

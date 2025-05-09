@@ -15,7 +15,7 @@ public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
     {
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         CliMenuSet dotnetToolsSubMenuSet = new("Dotnet Tools");
 

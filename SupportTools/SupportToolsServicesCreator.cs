@@ -15,5 +15,6 @@ public sealed class SupportToolsServicesCreator : ServicesCreator
     {
         base.ConfigureServices(services);
         services.AddHttpClient();
+        services.AddMemoryCache();
     }
 }

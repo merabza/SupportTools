@@ -5,10 +5,10 @@ using System.Net.Http;
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
-using CliTools.CliMenuCommands;
 using LibGitData.Models;
 using LibGitWork;
 using LibParameters;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
@@ -19,15 +19,18 @@ namespace LibSupportToolsServerWork;
 
 public sealed class GitFromServerCruder : Cruder
 {
+    private const string GitsList = nameof(GitsList);
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
+    private readonly IMemoryCache _memoryCache;
     private readonly IParametersManager _parametersManager;
 
-    private GitFromServerCruder(ILogger logger, IHttpClientFactory httpClientFactory,
+    private GitFromServerCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         IParametersManager parametersManager) : base("GitFromServer", "GitsFromServer")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _memoryCache = memoryCache;
         _parametersManager = parametersManager;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
@@ -37,9 +40,9 @@ public sealed class GitFromServerCruder : Cruder
     }
 
     public static GitFromServerCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager)
+        IMemoryCache memoryCache, IParametersManager parametersManager)
     {
-        return new GitFromServerCruder(logger, httpClientFactory, parametersManager);
+        return new GitFromServerCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -55,30 +58,58 @@ public sealed class GitFromServerCruder : Cruder
 
     private List<GitDataDomain> GetGitReposFromServer()
     {
-        try
+        return _memoryCache.GetOrCreate<List<GitDataDomain>>(GitsList, _ =>
         {
-            var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+            try
+            {
+                var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-            var supportToolsServerApiClient =
-                supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
+                var supportToolsServerApiClient =
+                    supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
 
-            if (supportToolsServerApiClient is null)
-                return [];
+                if (supportToolsServerApiClient is null)
+                    return [];
 
-            var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
-            if (remoteGitReposResult.IsT0)
-                return remoteGitReposResult.AsT0;
+                var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+                if (remoteGitReposResult.IsT0)
+                    return remoteGitReposResult.AsT0;
 
-            StShared.WriteErrorLine("could not received remoteGits", true, _logger);
-            Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            //throw;
-        }
+                StShared.WriteErrorLine("could not received remoteGits", true, _logger);
+                Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw;
+            }
 
-        return [];
+            return [];
+        }) ?? [];
+
+        //try
+        //{
+        //    var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        //    var supportToolsServerApiClient =
+        //        supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
+
+        //    if (supportToolsServerApiClient is null)
+        //        return [];
+
+        //    var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+        //    if (remoteGitReposResult.IsT0)
+        //        return remoteGitReposResult.AsT0;
+
+        //    StShared.WriteErrorLine("could not received remoteGits", true, _logger);
+        //    Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+        //}
+        //catch (Exception e)
+        //{
+        //    Console.WriteLine(e);
+        //    //throw;
+        //}
+
+        //return [];
     }
 
     public override bool ContainsRecordWithKey(string recordKey)

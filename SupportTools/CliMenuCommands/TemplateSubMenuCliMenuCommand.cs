@@ -28,7 +28,7 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
         _httpClientFactory = httpClientFactory;
     }
 
-    public override CliMenuSet GetSubmenu()
+    public override CliMenuSet GetSubMenu()
     {
         CliMenuSet templateSubMenuSet = new($"Template => {_templateName}");
 
