@@ -66,12 +66,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
-    //public string CreateProjectSeederCodeProjectName => $"Create{ScaffoldSeederProjectName}SeederCode";
-    //public string GetJsonFromScaffoldDbProjectName => $"GetJsonFromScaffold{DbContextProjectName}";
-    //public string SeedDbProjectName => $"Seed{DbContextProjectName}";
     public string FakeHostProjectName { get; }
-    //public string DataSeedingClassLibProjectName => $"{DbContextProjectName}DataSeeding";
-    //public string DbMigrationProjectName => $"{DbContextProjectName}Migration";
 
     public bool CheckBeforeSave()
     {
@@ -202,22 +197,4 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             return null;
         }
     }
-
-    //public string? GetDevDatabaseConnectionString(string projectName,
-    //    DatabaseServerConnections databaseServerConnections)
-    //{
-    //    if (DevDatabaseParameters is null)
-    //    {
-    //        StShared.WriteErrorLine($"DevDatabaseParameters does not specified for Project {projectName}", true);
-    //        return null;
-    //    }
-
-    //    var connectionString =
-    //        DbConnectionFabric.GetDbConnectionString(DevDatabaseParameters, databaseServerConnections);
-    //    if (connectionString is not null)
-    //        return connectionString;
-
-    //    StShared.WriteErrorLine($"could not Created Dev Connection String form Project with name {projectName}", true);
-    //    return null;
-    //}
 }

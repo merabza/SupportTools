@@ -120,7 +120,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             getJsonFromScaffoldDbProjectName,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
             seedDbProjectName, Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, seedDbProjectName),
-            "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath);
+            "ConnectionStringSeed", seedDbProjectNameUseJsonFilePath, Parameters.DbContextProjectName,
+            Parameters.ProjectDbContextClassName);
 
         var creatorCreator = new CreatorCreatorToolCommand(_logger, creatorCreatorParameters);
 
@@ -216,6 +217,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         var createProjectSeederCodeParameters = new CreateProjectSeederCodeParametersDomain(
             Parameters.ScaffoldSeederProjectName, Parameters.ProjectShortPrefix, Parameters.LogFolder,
             $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
+            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
             getJsonFromScaffoldDbProjectName,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName),
