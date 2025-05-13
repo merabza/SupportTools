@@ -1,0 +1,180 @@
+﻿using System.Net.Http;
+using CliParameters;
+using CliParameters.FieldEditors;
+using LibParameters;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
+using SupportToolsServerApiContracts;
+
+namespace LibSupportToolsServerWork.Cruders;
+
+public sealed class GitIgnoreFilePathsStsCruder : Cruder
+{
+    private const string GitIgnoreFilePathsList = nameof(GitIgnoreFilePathsList);
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    private readonly ILogger _logger;
+    private readonly IMemoryCache _memoryCache;
+    private readonly IParametersManager _parametersManager;
+
+    public GitIgnoreFilePathsStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+        IParametersManager parametersManager) : base("GitIgnore File Path", "GitIgnore File Paths")
+    {
+        _logger = logger;
+        _httpClientFactory = httpClientFactory;
+        _memoryCache = memoryCache;
+        _parametersManager = parametersManager;
+        FieldEditors.Add(new FilePathFieldEditor(nameof(TextItemData.Text), null, true));
+    }
+
+    public static GitIgnoreFilePathsStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        IMemoryCache memoryCache, IParametersManager parametersManager)
+    {
+        return new GitIgnoreFilePathsStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
+    }
+
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    return GetGitIgnoreFilePathsFromServer().ToDictionary(k => k.GitIgnorePathName,
+    //        ItemData (v) => new TextItemData { Text = v.GitIgnorePath });
+    //}
+
+    private SupportToolsServerApiClient? GetSupportToolsServerApiClient()
+    {
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
+    }
+
+    //private List<GitIgnoreFilePathDomain> GetGitIgnoreFilePathsFromServer()
+    //{
+    //    return _memoryCache.GetOrCreate(GitIgnoreFilePathsList, _ =>
+    //    {
+    //        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+    //        if (supportToolsServerApiClient is null)
+    //            return [];
+    //        try
+    //        {
+    //            var remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFilePaths().Result;
+    //            if (remoteGitReposResult.IsT0)
+    //                return remoteGitReposResult.AsT0;
+
+    //            StShared.WriteErrorLine("could not received remoteGits", true, _logger);
+    //            Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Console.WriteLine(e);
+    //            //throw;
+    //        }
+
+    //        return [];
+    //    }) ?? [];
+    //}
+
+    //private Dictionary<string, string> GetGitIgnoreFilePaths()
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    return parameters.GitIgnoreModelFilePaths;
+    //}
+
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
+    //    return gitIgnoreModelFilePaths.ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
+    //}
+
+    //public override bool ContainsRecordWithKey(string recordKey)
+    //{
+    //    var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
+    //    return gitIgnoreModelFilePaths.ContainsKey(recordKey);
+    //}
+
+    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not TextItemData newGitIgnoreModelFilePath)
+    //        throw new Exception("newRecord is null in GitIgnoreFilePathsCruder.UpdateRecordWithKey");
+    //    if (string.IsNullOrWhiteSpace(newGitIgnoreModelFilePath.Text))
+    //        throw new Exception("newRecord.Text is empty in GitIgnoreFilePathsCruder.UpdateRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.GitIgnoreModelFilePaths[recordKey] = newGitIgnoreModelFilePath.Text;
+    //}
+
+    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not TextItemData newGitIgnoreModelFilePath)
+    //        throw new Exception("newGitIgnoreModelFilePath is null in GitIgnoreFilePathsCruder.AddRecordWithKey");
+    //    if (string.IsNullOrWhiteSpace(newGitIgnoreModelFilePath.Text))
+    //        throw new Exception("newGitIgnoreModelFilePath.Text is empty in GitIgnoreFilePathsCruder.AddRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.GitIgnoreModelFilePaths.Add(recordKey, newGitIgnoreModelFilePath.Text);
+    //}
+
+    //protected override void RemoveRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var gitIgnoreModelFilePaths = parameters.GitIgnoreModelFilePaths;
+    //    gitIgnoreModelFilePaths.Remove(recordKey);
+    //}
+
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    {
+        return new TextItemData();
+    }
+
+    //protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
+    //{
+    //    var checkGitIgnoreFilesCliMenuCommand = new CheckGitIgnoreFilesCliMenuCommand(_logger, ParametersManager);
+    //    cruderSubMenuSet.AddMenuItem(checkGitIgnoreFilesCliMenuCommand);
+
+    //    var updateGitIgnoreFilesCliMenuCommand = new UpdateGitIgnoreFilesCliMenuCommand(_logger, ParametersManager);
+    //    cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
+
+    //    GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, ParametersManager);
+    //    cruderSubMenuSet.AddMenuItem(generateCommand);
+    //}
+
+    //public override string GetStatusFor(string name)
+    //{
+    //    //var git = (GitDataModel?)GetItemByName(name);
+    //    //if (git is null)
+    //    //    return "ERROR: Git address Not found";
+    //    var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var projects = supportToolsParameters.Projects;
+
+    //    var usageCount = 0;
+
+    //    foreach (var (_, project) in projects)
+    //    foreach (var gitCol in Enum.GetValues<EGitCol>())
+    //    {
+    //        var gits = supportToolsParameters.Gits;
+    //        var gitProjectNames = gitCol switch
+    //        {
+    //            EGitCol.Main => project.GitProjectNames,
+    //            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+    //            _ => null
+    //        } ?? [];
+
+    //        foreach (var gitProjectName in gitProjectNames)
+    //        {
+    //            if (!gits.TryGetValue(gitProjectName, out var git))
+    //                continue;
+    //            if (git.GitIgnorePathName == name)
+    //                usageCount++;
+    //        }
+    //    }
+
+    //    return $"Usage count is: {usageCount}";
+    //}
+
+    //public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    //{
+    //    base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+
+    //    ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand =
+    //        new(_logger, recordKey, ParametersManager);
+    //    itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand);
+    //}
+}

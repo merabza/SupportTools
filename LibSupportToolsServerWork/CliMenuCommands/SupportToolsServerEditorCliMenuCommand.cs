@@ -31,12 +31,14 @@ public class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
     {
         var mainMenuSet = new CliMenuSet();
 
-        //ყველა პროექტის git-ის სინქრონიზაცია ახალი მეთოდით V2
+        var gitIgnoreFilePathsStsCliMenuCommand =
+            new GitIgnoreFilePathsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+        mainMenuSet.AddMenuItem(gitIgnoreFilePathsStsCliMenuCommand);
+
         var gitsSupportToolsServerCliMenuCommand =
-            new GitsSupportToolsServerCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+            new GitsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitsSupportToolsServerCliMenuCommand);
 
-        //პროგრამიდან გასასვლელი
         var key = ConsoleKey.Escape.Value().ToLower();
         mainMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
         return mainMenuSet;

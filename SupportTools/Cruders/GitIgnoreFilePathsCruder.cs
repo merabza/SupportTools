@@ -32,7 +32,7 @@ public sealed class GitIgnoreFilePathsCruder : ParCruder
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
-        return gitIgnoreModelFilePaths.ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
+        return gitIgnoreModelFilePaths.ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
     }
 
     public override bool ContainsRecordWithKey(string recordKey)

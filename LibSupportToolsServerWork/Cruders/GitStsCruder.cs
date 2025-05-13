@@ -11,13 +11,15 @@ using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts;
+using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
 
-namespace LibSupportToolsServerWork;
+namespace LibSupportToolsServerWork.Cruders;
 
-public sealed class GitFromServerCruder : Cruder
+public sealed class GitStsCruder : Cruder
 {
     private const string GitsList = nameof(GitsList);
     private readonly IHttpClientFactory _httpClientFactory;
@@ -25,7 +27,7 @@ public sealed class GitFromServerCruder : Cruder
     private readonly IMemoryCache _memoryCache;
     private readonly IParametersManager _parametersManager;
 
-    private GitFromServerCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+    private GitStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         IParametersManager parametersManager) : base("GitFromServer", "GitsFromServer")
     {
         _logger = logger;
@@ -34,15 +36,14 @@ public sealed class GitFromServerCruder : Cruder
         _parametersManager = parametersManager;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
-        //todo ეს აღსაღდგენი იქნება
         //FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
         //    ParametersManager, true));
     }
 
-    public static GitFromServerCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+    public static GitStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
         IMemoryCache memoryCache, IParametersManager parametersManager)
     {
-        return new GitFromServerCruder(logger, httpClientFactory, memoryCache, parametersManager);
+        return new GitStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -56,20 +57,23 @@ public sealed class GitFromServerCruder : Cruder
             });
     }
 
+    private SupportToolsServerApiClient? GetSupportToolsServerApiClient()
+    {
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
+    }
+
     private List<GitDataDomain> GetGitReposFromServer()
     {
-        return _memoryCache.GetOrCreate<List<GitDataDomain>>(GitsList, _ =>
+        return _memoryCache.GetOrCreate(GitsList, _ =>
         {
+            var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+            if (supportToolsServerApiClient is null)
+                return [];
             try
             {
-                var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-
-                var supportToolsServerApiClient =
-                    supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
-
-                if (supportToolsServerApiClient is null)
-                    return [];
-
                 var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsT0)
                     return remoteGitReposResult.AsT0;
@@ -85,47 +89,93 @@ public sealed class GitFromServerCruder : Cruder
 
             return [];
         }) ?? [];
-
-        //try
-        //{
-        //    var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-
-        //    var supportToolsServerApiClient =
-        //        supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
-
-        //    if (supportToolsServerApiClient is null)
-        //        return [];
-
-        //    var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
-        //    if (remoteGitReposResult.IsT0)
-        //        return remoteGitReposResult.AsT0;
-
-        //    StShared.WriteErrorLine("could not received remoteGits", true, _logger);
-        //    Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
-        //}
-        //catch (Exception e)
-        //{
-        //    Console.WriteLine(e);
-        //    //throw;
-        //}
-
-        //return [];
     }
 
     public override bool ContainsRecordWithKey(string recordKey)
     {
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var gits = parameters.Gits;
-        return gits.ContainsKey(recordKey);
+        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+        if (supportToolsServerApiClient is null)
+            return false;
+
+        try
+        {
+            var getGitRepoByKeyResult = supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
+            if (getGitRepoByKeyResult.IsT0) return true;
+
+            if (getGitRepoByKeyResult.AsT1 is Err[] { Length: 1 } errors && errors[0].ErrorCode ==
+                nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound))
+                return false;
+
+            Err.PrintErrorsOnConsole(getGitRepoByKeyResult.AsT1);
+
+            return false;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
     }
 
     public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not GitDataModel newGit)
-            throw new Exception("newGit is null in GitCruder.UpdateRecordWithKey");
+        AddOrUpdateRecordWithKey(recordKey, newRecord);
+    }
 
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        parameters.Gits[recordKey] = newGit;
+    private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
+    {
+        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+        if (supportToolsServerApiClient is null)
+        {
+            StShared.WriteErrorLine("supportToolsServerApiClient is null", true);
+            return;
+        }
+
+        if (newRecord is not GitDataModel model)
+        {
+            StShared.WriteErrorLine("newRecord is not GitDataModel", true);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.GitIgnorePathName))
+        {
+            StShared.WriteErrorLine("GitIgnorePathName is not entered", true);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.GitProjectAddress))
+        {
+            StShared.WriteErrorLine("GitProjectAddress is not entered", true);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(model.GitProjectFolderName))
+        {
+            StShared.WriteErrorLine("GitProjectFolderName is not entered", true);
+            return;
+        }
+
+        var gitDataDomain = new GitDataDomain
+        {
+            GitIgnorePathName = model.GitIgnorePathName,
+            GitProjectAddress = model.GitProjectAddress,
+            GitProjectFolderName = model.GitProjectFolderName,
+            GitProjectName = recordKey
+        };
+
+        try
+        {
+            var updateGitRepoByKeyResult = supportToolsServerApiClient
+                .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
+            if (updateGitRepoByKeyResult.IsSome)
+                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
@@ -133,12 +183,30 @@ public sealed class GitFromServerCruder : Cruder
         if (newRecord is not GitDataModel newGit)
             throw new Exception("newGit is null in GitCruder.AddRecordWithKey");
 
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        parameters.Gits.Add(recordKey, newGit);
+        AddOrUpdateRecordWithKey(recordKey, newRecord);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
     {
+        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+        if (supportToolsServerApiClient is null)
+        {
+            StShared.WriteErrorLine("supportToolsServerApiClient is null", true);
+            return;
+        }
+
+        try
+        {
+            var updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitRepoByKey(recordKey).Result;
+            if (updateGitRepoByKeyResult.IsSome)
+                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var gits = parameters.Gits;
         gits.Remove(recordKey);
