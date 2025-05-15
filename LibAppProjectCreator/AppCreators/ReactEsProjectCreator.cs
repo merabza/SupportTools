@@ -117,7 +117,7 @@ public sealed class ReactEsProjectCreator
     private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
     {
         var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
-        if (links.Count == 0)
+        if (links is { Count: 0 })
             return [];
 
         return (from link in links

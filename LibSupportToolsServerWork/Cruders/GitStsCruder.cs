@@ -180,9 +180,6 @@ public sealed class GitStsCruder : Cruder
 
     protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not GitDataModel newGit)
-            throw new Exception("newGit is null in GitCruder.AddRecordWithKey");
-
         AddOrUpdateRecordWithKey(recordKey, newRecord);
     }
 
