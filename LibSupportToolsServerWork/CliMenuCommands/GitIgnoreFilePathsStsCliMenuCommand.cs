@@ -16,7 +16,7 @@ internal class GitIgnoreFilePathsStsCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitIgnoreFilePathsStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, ParametersManager parametersManager) : base("Gits from SupportToolsServer",
+        IMemoryCache memoryCache, ParametersManager parametersManager) : base("GitIgnore File Paths from SupportToolsServer",
         EMenuAction.LoadSubMenu)
     {
         _logger = logger;

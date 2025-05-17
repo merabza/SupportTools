@@ -10,6 +10,7 @@ using LibGitWork;
 using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Errors;
@@ -74,7 +75,7 @@ public sealed class GitStsCruder : Cruder
                 return [];
             try
             {
-                var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+                OneOf<List<GitDataDomain>, IEnumerable<Err>> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsT0)
                     return remoteGitReposResult.AsT0;
 

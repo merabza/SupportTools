@@ -1,11 +1,17 @@
-﻿using System.Net.Http;
-using CliParameters;
+﻿using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
+using SupportToolsServerApiContracts.Models;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
@@ -47,7 +53,7 @@ public sealed class GitIgnoreFilePathsStsCruder : Cruder
         return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
     }
 
-    //private List<GitIgnoreFilePathDomain> GetGitIgnoreFilePathsFromServer()
+    //private List<string> GetGitIgnoreFilePathsFromServer()
     //{
     //    return _memoryCache.GetOrCreate(GitIgnoreFilePathsList, _ =>
     //    {
@@ -57,7 +63,7 @@ public sealed class GitIgnoreFilePathsStsCruder : Cruder
     //            return [];
     //        try
     //        {
-    //            var remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFilePaths().Result;
+    //            OneOf<List<string>, IEnumerable<Err>> remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFilePaths().Result;
     //            if (remoteGitReposResult.IsT0)
     //                return remoteGitReposResult.AsT0;
 
@@ -67,7 +73,7 @@ public sealed class GitIgnoreFilePathsStsCruder : Cruder
     //        catch (Exception e)
     //        {
     //            Console.WriteLine(e);
-    //            //throw;
+    //            throw;
     //        }
 
     //        return [];
