@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-internal class GitIgnoreFilePathsStsCliMenuCommand : CliMenuCommand
+internal class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -15,8 +15,8 @@ internal class GitIgnoreFilePathsStsCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFilePathsStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, ParametersManager parametersManager) : base("GitIgnore File Paths from SupportToolsServer",
+    public GitIgnoreFileTypesStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        IMemoryCache memoryCache, ParametersManager parametersManager) : base("GitIgnore File Types",
         EMenuAction.LoadSubMenu)
     {
         _logger = logger;
@@ -28,10 +28,9 @@ internal class GitIgnoreFilePathsStsCliMenuCommand : CliMenuCommand
     public override CliMenuSet GetSubMenu()
     {
         var gitIgnoreFilePathsStsCruder =
-            GitIgnoreFilePathsStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+            GitIgnoreFileTypesStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
         var menuSet = gitIgnoreFilePathsStsCruder.GetListMenu();
         return menuSet;
     }
-
 }

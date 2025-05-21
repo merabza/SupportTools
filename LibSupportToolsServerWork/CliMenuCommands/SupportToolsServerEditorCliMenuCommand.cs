@@ -32,7 +32,7 @@ public class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
         var mainMenuSet = new CliMenuSet();
 
         var gitIgnoreFilePathsStsCliMenuCommand =
-            new GitIgnoreFilePathsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+            new GitIgnoreFileTypesStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitIgnoreFilePathsStsCliMenuCommand);
 
         var gitsSupportToolsServerCliMenuCommand =

@@ -3,41 +3,35 @@ using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
-using SupportToolsServerApiContracts.Models;
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
-public sealed class GitIgnoreFilePathsStsCruder : Cruder
+public sealed class GitIgnoreFileTypesStsCruder : Cruder
 {
-    private const string GitIgnoreFilePathsList = nameof(GitIgnoreFilePathsList);
+    //private const string GitIgnoreFilePathsList = nameof(GitIgnoreFilePathsList);
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
     private readonly IParametersManager _parametersManager;
 
-    public GitIgnoreFilePathsStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+    public GitIgnoreFileTypesStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         IParametersManager parametersManager) : base("GitIgnore File Path", "GitIgnore File Paths")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
         _parametersManager = parametersManager;
-        FieldEditors.Add(new FilePathFieldEditor(nameof(TextItemData.Text), null, true));
+        FieldEditors.Add(new TextFieldEditor(nameof(TextItemData.Text), null, true));
     }
 
-    public static GitIgnoreFilePathsStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+    public static GitIgnoreFileTypesStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
         IMemoryCache memoryCache, IParametersManager parametersManager)
     {
-        return new GitIgnoreFilePathsStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
+        return new GitIgnoreFileTypesStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
 
     //protected override Dictionary<string, ItemData> GetCrudersDictionary()

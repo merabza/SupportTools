@@ -37,7 +37,7 @@ public sealed class GitStsCruder : Cruder
         _parametersManager = parametersManager;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
-        //FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePathName),
+        //FieldEditors.Add(new GitIgnoreFileTypeNameFieldEditor(logger, nameof(GitDataModel.GitIgnoreFileTypeName),
         //    ParametersManager, true));
     }
 

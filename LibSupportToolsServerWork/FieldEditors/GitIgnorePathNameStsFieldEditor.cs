@@ -30,7 +30,7 @@ public sealed class GitIgnorePathNameStsFieldEditor : FieldEditor<string>
         var currentGitIgnorePathName = GetValue(recordForUpdate);
 
         var gitIgnorePathsCruder =
-            new GitIgnoreFilePathsStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+            new GitIgnoreFileTypesStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
         SetValue(recordForUpdate, gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName));
     }
@@ -43,7 +43,7 @@ public sealed class GitIgnorePathNameStsFieldEditor : FieldEditor<string>
             return string.Empty;
 
         var gitIgnorePathsCruder =
-            new GitIgnoreFilePathsStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+            new GitIgnoreFileTypesStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
         var status = gitIgnorePathsCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
