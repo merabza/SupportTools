@@ -23,10 +23,10 @@ public sealed class GitCruder : ParCruder
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly List<GitDataDomain> _remoteGitRepos;
+    private readonly List<GitDataDto> _remoteGitRepos;
 
     private GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        List<GitDataDomain> remoteGitRepos) : base(parametersManager, "Git", "Gits")
+        List<GitDataDto> remoteGitRepos) : base(parametersManager, "Git", "Gits")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -40,7 +40,7 @@ public sealed class GitCruder : ParCruder
     public static GitCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {
-        List<GitDataDomain> remoteGitRepos = [];
+        List<GitDataDto> remoteGitRepos = [];
         try
         {
             var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

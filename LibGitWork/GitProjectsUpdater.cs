@@ -14,7 +14,7 @@ namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {
-    private readonly GitDataDomain _gitData;
+    private readonly GitDataDto _gitData;
     private readonly string _gitName;
     private readonly string _gitsFolder;
     private readonly ILogger? _logger;
@@ -22,7 +22,7 @@ public sealed class GitProjectsUpdater
     private readonly SupportToolsParameters _supportToolsParameters;
 
     private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string gitsFolder,
-        GitDataDomain gitData, string projectFolderName, string gitName)
+        GitDataDto gitData, string projectFolderName, string gitName)
     {
         _logger = logger;
         _supportToolsParameters = supportToolsParameters;
@@ -96,7 +96,7 @@ public sealed class GitProjectsUpdater
     }
 
     private static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder,
-        GitDataDomain gitData)
+        GitDataDto gitData)
     {
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)

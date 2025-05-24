@@ -11,13 +11,13 @@ namespace LibGitWork.ToolCommandParameters;
 public sealed class GitSyncParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSyncParameters(GitDataDomain gitData, string gitsFolder)
+    public GitSyncParameters(GitDataDto gitData, string gitsFolder)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
 
-    public GitDataDomain GitData { get; }
+    public GitDataDto GitData { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()

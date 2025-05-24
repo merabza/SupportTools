@@ -65,7 +65,7 @@ public sealed class GitStsCruder : Cruder
         return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
     }
 
-    private List<GitDataDomain> GetGitReposFromServer()
+    private List<GitDataDto> GetGitReposFromServer()
     {
         return _memoryCache.GetOrCreate(GitsList, _ =>
         {
@@ -75,7 +75,7 @@ public sealed class GitStsCruder : Cruder
                 return [];
             try
             {
-                OneOf<List<GitDataDomain>, IEnumerable<Err>> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+                var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsT0)
                     return remoteGitReposResult.AsT0;
 
@@ -158,7 +158,7 @@ public sealed class GitStsCruder : Cruder
             return;
         }
 
-        var gitDataDomain = new GitDataDomain
+        var gitDataDomain = new GitDataDto
         {
             GitIgnorePathName = model.GitIgnorePathName,
             GitProjectAddress = model.GitProjectAddress,

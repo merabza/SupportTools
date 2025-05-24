@@ -9,17 +9,17 @@ namespace LibGitWork;
 
 public sealed class GitRepos
 {
-    private GitRepos(Dictionary<string, GitDataDomain> gitRepos)
+    private GitRepos(Dictionary<string, GitDataDto> gitRepos)
     {
         Gits = gitRepos;
     }
 
-    public Dictionary<string, GitDataDomain> Gits { get; }
+    public Dictionary<string, GitDataDto> Gits { get; }
 
     public static GitRepos Create(ILogger? logger, Dictionary<string, GitDataModel> gitRepos,
         string? spaProjectFolderRelativePath, bool useConsole, bool useGitRecordNameForComplexGitProjectFolderName)
     {
-        Dictionary<string, GitDataDomain> gits = [];
+        Dictionary<string, GitDataDto> gits = [];
         foreach (var (gitProjectName, gitData) in gitRepos)
         {
             if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
@@ -62,7 +62,7 @@ public sealed class GitRepos
             }
 
             gits.Add(gitProjectName,
-                new GitDataDomain
+                new GitDataDto
                 {
                     GitProjectAddress = gitData.GitProjectAddress,
                     GitProjectFolderName = gitProjectFolderName,
@@ -74,7 +74,7 @@ public sealed class GitRepos
         return new GitRepos(gits);
     }
 
-    public GitDataDomain? GetGitRepoByKey(string key)
+    public GitDataDto? GetGitRepoByKey(string key)
     {
         return Gits.GetValueOrDefault(key);
     }

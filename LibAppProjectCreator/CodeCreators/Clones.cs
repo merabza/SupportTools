@@ -19,49 +19,49 @@ public sealed class Clones
         const string toolsManagement = "ToolsManagement";
         const string webSystemTools = "WebSystemTools";
 
-        AppCliToolsGit = new GitDataDomain
+        AppCliToolsGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/AppCliTools.git",
             GitProjectFolderName = appCliTools,
             GitProjectName = appCliTools,
             GitIgnorePathName = cSharp
         };
-        BackendCarcassGit = new GitDataDomain
+        BackendCarcassGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/BackendCarcass.git",
             GitProjectFolderName = backendCarcass,
             GitProjectName = backendCarcass,
             GitIgnorePathName = cSharp
         };
-        DatabaseToolsGit = new GitDataDomain
+        DatabaseToolsGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/DatabaseTools.git",
             GitProjectFolderName = databaseTools,
             GitProjectName = databaseTools,
             GitIgnorePathName = cSharp
         };
-        ParametersManagementGit = new GitDataDomain
+        ParametersManagementGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/ParametersManagement.git",
             GitProjectFolderName = parametersManagement,
             GitProjectName = parametersManagement,
             GitIgnorePathName = cSharp
         };
-        SystemToolsGit = new GitDataDomain
+        SystemToolsGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/SystemTools.git",
             GitProjectFolderName = systemTools,
             GitProjectName = systemTools,
             GitIgnorePathName = cSharp
         };
-        ToolsManagementGit = new GitDataDomain
+        ToolsManagementGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/ToolsManagement.git",
             GitProjectFolderName = toolsManagement,
             GitProjectName = toolsManagement,
             GitIgnorePathName = cSharp
         };
-        WebSystemToolsGit = new GitDataDomain
+        WebSystemToolsGit = new GitDataDto
         {
             GitProjectAddress = "git@github.com:merabza/WebSystemTools.git",
             GitProjectFolderName = webSystemTools,
@@ -85,11 +85,11 @@ public sealed class Clones
         }
     }
 
-    public GitDataDomain AppCliToolsGit { get; } //ბრძანებათა სტრიქონთან სამუშაო პროექტები
-    public GitDataDomain BackendCarcassGit { get; } //სერვერის კარკასის პროექტები
-    public GitDataDomain DatabaseToolsGit { get; } //მონაცემთა ბაზებთან სამუშაო პროექტები
-    public GitDataDomain ParametersManagementGit { get; } //პარამეტრებთან სამუშაო პროექტები
-    public GitDataDomain SystemToolsGit { get; } //სერთო სისტემური ინსტრუმენტების ნაკრები
-    public GitDataDomain ToolsManagementGit { get; } //ინსტრუმენტებთან სამუშაო პროექტები
-    public GitDataDomain WebSystemToolsGit { get; } //ინსტალერების ნაკრები
+    public GitDataDto AppCliToolsGit { get; } //ბრძანებათა სტრიქონთან სამუშაო პროექტები
+    public GitDataDto BackendCarcassGit { get; } //სერვერის კარკასის პროექტები
+    public GitDataDto DatabaseToolsGit { get; } //მონაცემთა ბაზებთან სამუშაო პროექტები
+    public GitDataDto ParametersManagementGit { get; } //პარამეტრებთან სამუშაო პროექტები
+    public GitDataDto SystemToolsGit { get; } //სერთო სისტემური ინსტრუმენტების ნაკრები
+    public GitDataDto ToolsManagementGit { get; } //ინსტრუმენტებთან სამუშაო პროექტები
+    public GitDataDto WebSystemToolsGit { get; } //ინსტალერების ნაკრები
 }

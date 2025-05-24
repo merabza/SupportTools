@@ -1,17 +1,22 @@
-﻿using CliParameters;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
-using System.Net.Http;
+using SystemToolsShared;
+using SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
 public sealed class GitIgnoreFileTypesStsCruder : Cruder
 {
-    //private const string GitIgnoreFilePathsList = nameof(GitIgnoreFilePathsList);
+    private const string GitIgnoreFileTypesList = nameof(GitIgnoreFileTypesList);
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
@@ -19,7 +24,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     private readonly IParametersManager _parametersManager;
 
     public GitIgnoreFileTypesStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        IParametersManager parametersManager) : base("GitIgnore File Path", "GitIgnore File Paths")
+        IParametersManager parametersManager) : base("GitIgnore File Type", "GitIgnore File Types")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -34,11 +39,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         return new GitIgnoreFileTypesStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
 
-    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    //{
-    //    return GetGitIgnoreFilePathsFromServer().ToDictionary(k => k.GitIgnorePathName,
-    //        ItemData (v) => new TextItemData { Text = v.GitIgnorePath });
-    //}
+    protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    {
+        return GetGitIgnoreFileTypesListFromServer().Select(s => new { key = s, val = s }).ToDictionary(k => k.key,
+            ItemData (v) => new TextItemData { Text = v.val });
+    }
 
     private SupportToolsServerApiClient? GetSupportToolsServerApiClient()
     {
@@ -47,32 +52,97 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
     }
 
-    //private List<string> GetGitIgnoreFilePathsFromServer()
-    //{
-    //    return _memoryCache.GetOrCreate(GitIgnoreFilePathsList, _ =>
-    //    {
-    //        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+    private List<string> GetGitIgnoreFileTypesListFromServer()
+    {
+        return _memoryCache.GetOrCreate(GitIgnoreFileTypesList, _ =>
+        {
+            var supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
-    //        if (supportToolsServerApiClient is null)
-    //            return [];
-    //        try
-    //        {
-    //            OneOf<List<string>, IEnumerable<Err>> remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFilePaths().Result;
-    //            if (remoteGitReposResult.IsT0)
-    //                return remoteGitReposResult.AsT0;
+            if (supportToolsServerApiClient is null)
+                return [];
+            try
+            {
+                var remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
+                if (remoteGitReposResult.IsT0)
+                    return remoteGitReposResult.AsT0;
 
-    //            StShared.WriteErrorLine("could not received remoteGits", true, _logger);
-    //            Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            Console.WriteLine(e);
-    //            throw;
-    //        }
+                StShared.WriteErrorLine("could not received GitIgnore File Types List", true, _logger);
+                Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
-    //        return [];
-    //    }) ?? [];
-    //}
+            return [];
+        }) ?? [];
+    }
+
+    public override bool ContainsRecordWithKey(string recordKey)
+    {
+        var gitIgnoreModelFilePaths = GetGitIgnoreFileTypesListFromServer();
+        return gitIgnoreModelFilePaths.Contains(recordKey);
+    }
+
+    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    {
+        AddOrUpdateRecordWithKey(recordKey, newRecord);
+    }
+
+    private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
+    {
+        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+        if (supportToolsServerApiClient is null)
+        {
+            StShared.WriteErrorLine("supportToolsServerApiClient is null", true);
+            return;
+        }
+
+        try
+        {
+            var updateGitRepoByKeyResult = supportToolsServerApiClient
+                .AddGitIgnoreFileTypeNameIfNotExists(recordKey).Result;
+            if (updateGitRepoByKeyResult.IsSome)
+                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    {
+        AddOrUpdateRecordWithKey(recordKey, newRecord);
+    }
+
+    protected override void RemoveRecordWithKey(string recordKey)
+    {
+        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+        if (supportToolsServerApiClient is null)
+        {
+            StShared.WriteErrorLine("supportToolsServerApiClient is null", true);
+            return;
+        }
+
+        try
+        {
+            var updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey).Result;
+            if (updateGitRepoByKeyResult.IsSome)
+                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        //var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        //var gits = parameters.GitIgnoreModelFilePaths;
+        //gits.Remove(recordKey);
+    }
 
     //private Dictionary<string, string> GetGitIgnoreFilePaths()
     //{
@@ -84,12 +154,6 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     //{
     //    var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
     //    return gitIgnoreModelFilePaths.ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
-    //}
-
-    //public override bool ContainsRecordWithKey(string recordKey)
-    //{
-    //    var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
-    //    return gitIgnoreModelFilePaths.ContainsKey(recordKey);
     //}
 
     //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)

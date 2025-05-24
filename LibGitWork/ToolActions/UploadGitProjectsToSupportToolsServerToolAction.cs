@@ -8,6 +8,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
+using SupportToolsServerApiContracts.Requests;
 
 namespace LibGitWork.ToolActions;
 
@@ -35,7 +36,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
         if (supportToolsServerApiClient == null)
             return false;
 
-        var gitIgnoreFiles = new List<GitIgnoreFile>();
+        var gitIgnoreFiles = new List<GitIgnoreFileDto>();
         foreach (var (key, fileName) in supportToolsParameters.GitIgnoreModelFilePaths)
         {
             string content;
@@ -43,7 +44,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
                 content = await File.ReadAllTextAsync(fileName, cancellationToken);
             else
                 content = string.Empty;
-            gitIgnoreFiles.Add(new GitIgnoreFile { Name = key, Content = content });
+            gitIgnoreFiles.Add(new GitIgnoreFileDto { Name = key, Content = content });
         }
 
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
