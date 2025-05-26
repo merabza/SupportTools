@@ -28,8 +28,6 @@ public sealed class ProjectModel : ItemData
     public string? SolutionFileNameWithMigrationProject { get; set; }
     public string? SeedProjectFilePath { get; set; }
     public string? SeedProjectParametersFilePath { get; set; }
-    //public string? GetJsonFromScaffoldDbProjectFileFullName { get; set; }
-    //public string? GetJsonFromScaffoldDbProjectParametersFileFullName { get; set; }
     public string? DbContextName { get; init; }
     public string? ProjectShortPrefix { get; init; }
     public string? ScaffoldSeederProjectName { get; set; }
@@ -38,13 +36,8 @@ public sealed class ProjectModel : ItemData
     public string? ExcludesRulesParametersFilePath { get; init; }
     public string? AppSetEnKeysJsonFileName { get; init; }
     public string? KeyGuidPart { get; init; }
-
     public string? MigrationSqlFilesFolder { get; set; }
-
-    //public DatabaseConnectionParameters? DevDatabaseConnectionParameters { get; init; }
     public DatabaseParameters? DevDatabaseParameters { get; init; }
-
-    //public DatabaseConnectionParameters? ProdCopyDatabaseConnectionParameters { get; set; }
     public DatabaseParameters? ProdCopyDatabaseParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];
     public List<string> GitProjectNames { get; init; } = [];
@@ -64,13 +57,6 @@ public sealed class ProjectModel : ItemData
     {
         return ServerInfos.GetValueOrDefault(serverName);
     }
-
-    //public string? MainProjectFolderRelativePath(GitProjects gitProjects)
-    //{
-    //    return string.IsNullOrWhiteSpace(MainProjectName)
-    //        ? null
-    //        : ProjectFolderRelativePath(MainProjectName, gitProjects);
-    //}
 
     public string? MainProjectFileName(GitProjects gitProjects)
     {
@@ -102,7 +88,6 @@ public sealed class ProjectModel : ItemData
         var projectRelativePath = gitProject.ProjectRelativePath;
         return string.IsNullOrWhiteSpace(projectRelativePath) ? null : projectRelativePath;
     }
-
 
     public List<string> GetGitProjectNames(EGitCol gitCol)
     {

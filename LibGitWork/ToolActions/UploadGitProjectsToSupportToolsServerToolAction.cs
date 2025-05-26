@@ -8,7 +8,7 @@ using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
-using SupportToolsServerApiContracts.Requests;
+using SupportToolsServerApiContracts.V1.Requests;
 
 namespace LibGitWork.ToolActions;
 

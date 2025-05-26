@@ -87,10 +87,10 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        AddOrUpdateRecordWithKey(recordKey, newRecord);
+        AddOrUpdateRecordWithKey(recordKey);
     }
 
-    private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
+    private void AddOrUpdateRecordWithKey(string recordKey)
     {
         var supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -115,7 +115,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
-        AddOrUpdateRecordWithKey(recordKey, newRecord);
+        AddOrUpdateRecordWithKey(recordKey);
     }
 
     protected override void RemoveRecordWithKey(string recordKey)
