@@ -62,16 +62,20 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(_logger, _parametersManager, _projectName);
         projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2);
 
-        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
-            EGitCol.Main));
+        projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
+            _projectName, EGitCol.Main));
 
         var project = parameters.GetProject(_projectName);
 
-        if (project != null)
+        if (project is not null)
         {
             if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
-                projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName,
-                    EGitCol.ScaffoldSeed));
+                projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                    _parametersManager, _projectName, EGitCol.ScaffoldSeed));
+
+            if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
+                projectSubMenuSet.AddMenuItem(
+                    new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
 
             //დასაშვები ინსტრუმენტების არჩევა
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));

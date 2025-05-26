@@ -117,6 +117,12 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return project is null ? [] : project.GetGitProjectNames(gitCol);
     }
 
+    public List<string> GetNpmPackageNames(string projectName)
+    {
+        var project = GetProject(projectName);
+        return project is null ? [] : project.FrontNpmPackageNames;
+    }
+
     public ApiClientSettingsDomain GetApiClientSettingsRequired(string apiClientName)
     {
         var apiClientSettings = GetApiClientSettings(apiClientName) ??

@@ -44,14 +44,14 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
             return false;
 
         gitProjectNames.Remove(_gitProjectName);
-        if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
-        {
-            StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}", true);
-            return false;
-        }
+        //if (!parameters.DeleteGitFromProjectByNames(_projectName, _gitProjectName, _gitCol))
+        //{
+        //    StShared.WriteErrorLine($"git project {_gitProjectName} is not removed from project {_projectName}", true);
+        //    return false;
+        //}
 
         _parametersManager.Save(parameters,
-            $"Git Project with Name {_gitProjectName} in project {_projectName} deleted.");
+            $"Git Project with Name {_gitProjectName} in project {_projectName} is deleted.");
 
         MenuAction = EMenuAction.LevelUp;
         return true;
