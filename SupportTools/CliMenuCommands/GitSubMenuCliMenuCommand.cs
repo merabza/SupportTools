@@ -15,17 +15,17 @@ namespace SupportTools.CliMenuCommands;
 public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName,
-        EGitCol gitCol) : base(gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git",
-        EMenuAction.LoadSubMenu)
+    public GitSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
+        gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git", EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -36,7 +36,7 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        CliMenuSet gitSubMenuSet = new("GitProjects");
+        CliMenuSet gitSubMenuSet = new("Git Projects");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -58,14 +58,14 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //მენიუს ელემენტი, რომლის საშუალებითაც შესაძლებელია პროექტში გიტის ჩაგდება
-        NewGitCliMenuCommand newGitCommand = new(_logger, _httpClientFactory, _parametersManager, _projectName, _gitCol);
+        var newGitCommand =
+            new NewGitCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName, _gitCol);
         gitSubMenuSet.AddMenuItem(newGitCommand);
 
         //იმ გიტების ჩამონათვალი, რომლებიც ამ პროექტში შედიან
         //თითოეულზე უნდა შეიძლებოდეს ქვემენიუში შესვლა, რომელიც საშუალებას მოგვცემს გიტის ეს კონკრეტული ნაწილი ამოვშალოთ პროექტიდან
         //ასევე შესაძელებელი უნდა იყოს გიტის დასინქრონიზება და ძირითადი ბრძანებების გაშვება
         //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
-
 
         var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
 

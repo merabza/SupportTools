@@ -6,6 +6,7 @@ using CliParametersDataEdit.FieldEditors;
 using CliParametersEdit.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using SupportTools.Cruders;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
 
@@ -56,8 +57,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new GitsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Gits),
             parametersManager));
-        FieldEditors.Add(new ReactAppTemplatesFieldEditor(logger, nameof(SupportToolsParameters.ReactAppTemplates),
-            parametersManager));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(logger,
+            nameof(SupportToolsParameters.ReactAppTemplates), parametersManager));
+        FieldEditors.Add(
+            new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(nameof(SupportToolsParameters.NpmPackages),
+                parametersManager));
         FieldEditors.Add(new FileStoragesFieldEditor(logger, nameof(SupportToolsParameters.FileStorages),
             parametersManager));
         FieldEditors.Add(new DatabaseServerConnectionsFieldEditor(logger, httpClientFactory, parametersManager,
@@ -68,9 +72,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, httpClientFactory,
             parametersManager));
-        FieldEditors.Add(new RunTimesFieldEditor(nameof(SupportToolsParameters.RunTimes), parametersManager));
-        FieldEditors.Add(new GitIgnoreFilePathsFieldEditor(logger,
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(nameof(SupportToolsParameters.RunTimes), parametersManager));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(logger,
             nameof(SupportToolsParameters.GitIgnoreModelFilePaths), parametersManager));
-        FieldEditors.Add(new EnvironmentFieldEditor(nameof(SupportToolsParameters.Environments), parametersManager));
+        FieldEditors.Add(
+            new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(nameof(SupportToolsParameters.Environments),
+                parametersManager));
     }
 }

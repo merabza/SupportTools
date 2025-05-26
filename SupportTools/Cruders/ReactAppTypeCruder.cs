@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using CliMenu;
-using CliParameters;
-using CliParameters.FieldEditors;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
@@ -11,64 +7,20 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class ReactAppTypeCruder : ParCruder
+public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
 {
     private readonly ILogger _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
         "React App Type", "React App Types")
     {
         _logger = logger;
-        FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), true, "TemplateName"));
     }
 
-    private Dictionary<string, string> GetReactAppTemplateNames()
+    protected override Dictionary<string, string> GetDictionary()
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.ReactAppTemplates;
-    }
-
-
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    {
-        return GetReactAppTemplateNames().ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
-    }
-
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new TextItemData();
-    }
-
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var reactAppTemplateNames = GetReactAppTemplateNames();
-        return reactAppTemplateNames.ContainsKey(recordKey);
-    }
-
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var reactAppTemplateNames = GetReactAppTemplateNames();
-        reactAppTemplateNames.Remove(recordKey);
-    }
-
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newReactAppType)
-            throw new Exception("newReactAppType is null in ReactAppTypeCruder.UpdateRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newReactAppType.Text))
-            throw new Exception("newReactAppType.Description is empty in EnvironmentCruder.UpdateRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.ReactAppTemplates[recordKey] = newReactAppType.Text;
-    }
-
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newReactAppType)
-            throw new Exception("newReactAppType is null in ReactAppTypeCruder.AddRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newReactAppType.Text))
-            throw new Exception("newEnvironment.Description is empty in EnvironmentCruder.AddRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.ReactAppTemplates.Add(recordKey, newReactAppType.Text);
+        return ((SupportToolsParameters)ParametersManager.Parameters).ReactAppTemplates;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
@@ -82,12 +34,9 @@ public sealed class ReactAppTypeCruder : ParCruder
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
-        var reactAppTemplateNames = GetReactAppTemplateNames();
+        var reactAppTemplateNames = GetDictionary();
         if (!reactAppTemplateNames.TryGetValue(recordKey, out var name))
             return;
-
-        //UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
-        //itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
         ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
             new(_logger, ParametersManager, recordKey, name);

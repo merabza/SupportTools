@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CliMenu;
-using CliParameters;
-using CliParameters.FieldEditors;
 using LibGitData;
 using LibParameters;
 using Microsoft.Extensions.Logging;
@@ -12,66 +9,22 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class GitIgnoreFilePathsCruder : ParCruder
+public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
 {
     private readonly ILogger _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
-        "GitIgnore File Path", "GitIgnore File Paths")
+        "GitIgnore File Path", "GitIgnore File Paths", "Path")
     {
         _logger = logger;
-        FieldEditors.Add(new FilePathFieldEditor(nameof(TextItemData.Text), null, true));
     }
 
-    private Dictionary<string, string> GetGitIgnoreFilePaths()
+    protected override Dictionary<string, string> GetDictionary()
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.GitIgnoreModelFilePaths;
+        return ((SupportToolsParameters)ParametersManager.Parameters).GitIgnoreModelFilePaths;
     }
 
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    {
-        var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
-        return gitIgnoreModelFilePaths.ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
-    }
-
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var gitIgnoreModelFilePaths = GetGitIgnoreFilePaths();
-        return gitIgnoreModelFilePaths.ContainsKey(recordKey);
-    }
-
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newGitIgnoreModelFilePath)
-            throw new Exception("newRecord is null in GitIgnoreFilePathsCruder.UpdateRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newGitIgnoreModelFilePath.Text))
-            throw new Exception("newRecord.Text is empty in GitIgnoreFilePathsCruder.UpdateRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.GitIgnoreModelFilePaths[recordKey] = newGitIgnoreModelFilePath.Text;
-    }
-
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newGitIgnoreModelFilePath)
-            throw new Exception("newGitIgnoreModelFilePath is null in GitIgnoreFilePathsCruder.AddRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newGitIgnoreModelFilePath.Text))
-            throw new Exception("newGitIgnoreModelFilePath.Text is empty in GitIgnoreFilePathsCruder.AddRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.GitIgnoreModelFilePaths.Add(recordKey, newGitIgnoreModelFilePath.Text);
-    }
-
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var gitIgnoreModelFilePaths = parameters.GitIgnoreModelFilePaths;
-        gitIgnoreModelFilePaths.Remove(recordKey);
-    }
-
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new TextItemData();
-    }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {

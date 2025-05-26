@@ -1,70 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using CliMenu;
-using CliParameters;
-using CliParameters.FieldEditors;
 using LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class EnvironmentCruder : ParCruder
+public sealed class EnvironmentCruder : SimpleNamesWithDescriptionsCruder
 {
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EnvironmentCruder(IParametersManager parametersManager) : base(parametersManager, "Environment",
         "Environments")
     {
-        FieldEditors.Add(new TextFieldEditor(nameof(TextItemData.Text)));
     }
 
-    private Dictionary<string, string> GetEnvironments()
+    protected override Dictionary<string, string> GetDictionary()
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.Environments;
-    }
-
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    {
-        var environments = GetEnvironments();
-        return environments.ToDictionary(k => k.Key, v => (ItemData)new TextItemData { Text = v.Value });
-    }
-
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var environments = GetEnvironments();
-        return environments.ContainsKey(recordKey);
-    }
-
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newEnvironment)
-            throw new Exception("newEnvironment is null in EnvironmentCruder.UpdateRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newEnvironment.Text))
-            throw new Exception("newEnvironment.Description is empty in EnvironmentCruder.UpdateRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Environments[recordKey] = newEnvironment.Text;
-    }
-
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not TextItemData newEnvironment)
-            throw new Exception("newEnvironment is null in EnvironmentCruder.AddRecordWithKey");
-        if (string.IsNullOrWhiteSpace(newEnvironment.Text))
-            throw new Exception("newEnvironment.Description is empty in EnvironmentCruder.AddRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Environments.Add(recordKey, newEnvironment.Text);
-    }
-
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var environments = GetEnvironments();
-        environments.Remove(recordKey);
-    }
-
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new TextItemData();
+        return ((SupportToolsParameters)ParametersManager.Parameters).Environments;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

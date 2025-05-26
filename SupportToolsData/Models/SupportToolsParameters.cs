@@ -47,16 +47,18 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public AppProjectCreatorAllParameters? AppProjectCreatorAllParameters { get; set; }
     public Dictionary<string, ProjectModel> Projects { get; init; } = [];
     public Dictionary<string, ServerDataModel> Servers { get; init; } = [];
-    public Dictionary<string, string> RunTimes { get; init; } = [];
-    public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
     public Dictionary<string, GitDataModel> Gits { get; init; } = [];
-    public Dictionary<string, string> ReactAppTemplates { get; init; } = [];
     public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = [];
-    public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
     public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
+    public Dictionary<string, string> ReactAppTemplates { get; init; } = [];
+    public Dictionary<string, string> NpmPackages { get; init; } = [];
+    public Dictionary<string, string> Environments { get; init; } = [];
+    public Dictionary<string, string> RunTimes { get; init; } = [];
+    public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
+
 
     public bool CheckBeforeSave()
     {
