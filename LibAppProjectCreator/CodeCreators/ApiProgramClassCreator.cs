@@ -8,7 +8,7 @@ namespace LibAppProjectCreator.CodeCreators;
 public sealed class ApiProgramClassCreator : CodeCreator
 {
     private readonly string _appKey;
-    private readonly string _dbPartProjectName;
+    private readonly string? _dbPartProjectName;
     private readonly string _projectNamespace;
     private readonly bool _useCarcass;
     private readonly bool _useDatabase;
@@ -21,7 +21,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
         bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation, bool useReact, string dbPartProjectName, string? codeFileName = null) : base(logger,
+        bool useFluentValidation, bool useReact, string? dbPartProjectName, string? codeFileName = null) : base(logger,
         placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
@@ -35,7 +35,6 @@ public sealed class ApiProgramClassCreator : CodeCreator
         _useReact = useReact;
         _dbPartProjectName = dbPartProjectName;
     }
-
 
     public override void CreateFileStructure()
     {
@@ -76,8 +75,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
                                                       """ : null)}
 
                      {(_useDatabase ? $"""
-                                       //{_dbPartProjectName}DbPart
-                                       {_dbPartProjectName}Db.AssemblyReference.Assembly,
+                                       //{_dbPartProjectName}Part
+                                       {_dbPartProjectName}.AssemblyReference.Assembly,
                                        {_dbPartProjectName}Repositories.AssemblyReference.Assembly,
                                        """ : null)}
 

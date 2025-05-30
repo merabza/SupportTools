@@ -6,7 +6,7 @@ public sealed class TemplateModel : ItemData
 {
     public ESupportProjectType SupportProjectType { get; set; }
     public string? TestProjectName { get; set; }
-    public string? TestDbPartProjectName { get; set; }
+    //public string? TestDbPartProjectName { get; set; }
     public string? TestProjectShortName { get; set; }
 
     //Console parameters

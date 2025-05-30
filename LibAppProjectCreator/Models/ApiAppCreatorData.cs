@@ -13,7 +13,7 @@ public sealed class ApiAppCreatorData
         bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter,
         bool useSignalR, bool useFluentValidation, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
-        ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData)
+        ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData, string? dbPartProjectName)
     {
         AppCreatorBaseData = appCreatorBaseData;
         MainProjectData = mainProjectData;
@@ -25,12 +25,12 @@ public sealed class ApiAppCreatorData
         UseReCounter = useReCounter;
         UseSignalR = useSignalR;
         UseFluentValidation = useFluentValidation;
-        //ReactTemplateName = reactTemplateName;
         DatabaseProjectData = databaseProjectData;
         DbMigrationProjectData = dbMigrationProjectData;
         LibProjectRepositoriesProjectData = libProjectRepositoriesProjectData;
         RepositoriesProjectData = repositoriesProjectData;
         FrontendProjectData = frontendProjectData;
+        DbPartProjectName = dbPartProjectName;
     }
 
     public bool UseReact { get; }
@@ -47,9 +47,9 @@ public sealed class ApiAppCreatorData
     public ProjectForCreate LibProjectRepositoriesProjectData { get; }
     public ProjectForCreate RepositoriesProjectData { get; }
     public ProjectForCreate FrontendProjectData { get; }
+    public string? DbPartProjectName { get; }
     public ProjectForCreate DatabaseProjectData { get; }
     public ProjectForCreate DbMigrationProjectData { get; }
-
 
     public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger, AppCreatorBaseData appCreatorBaseData,
         string projectName, string? dbPartProjectName, TemplateModel template)
@@ -70,6 +70,12 @@ public sealed class ApiAppCreatorData
             return null;
         }
 
+        if (template.UseDatabase && string.IsNullOrWhiteSpace(dbPartProjectName))
+        {
+            StShared.WriteErrorLine("if Use Database, DbPartProjectName must be specified", true, logger);
+            return null;
+        }
+
         var projectFolders = new List<string> { "Properties", "Models", "Installers" };
 
         //მთავარი პროექტი
@@ -84,13 +90,12 @@ public sealed class ApiAppCreatorData
         if (template.UseDatabase)
             databaseProjectFolders.Add("QueryModels");
 
-
         var currentDbPartProjectName =
             template.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(dbPartProjectName)
                 ? dbPartProjectName
                 : projectName;
 
-        var dbPartFolderName = $"{currentDbPartProjectName}DbPart";
+        var dbPartFolderName = $"{currentDbPartProjectName}Part";
 
         var dbPartPath = template.UseDbPartFolderForDatabaseProjects
             ? Path.Combine(appCreatorBaseData.WorkPath, dbPartFolderName)
@@ -116,6 +121,7 @@ public sealed class ApiAppCreatorData
         return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
             template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
             template.UseReCounter, template.UseSignalR, template.UseFluentValidation, databaseProjectData,
-            dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData, frontendProjectData);
+            dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData, frontendProjectData,
+            dbPartProjectName);
     }
 }

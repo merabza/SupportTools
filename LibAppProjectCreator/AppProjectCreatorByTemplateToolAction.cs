@@ -89,7 +89,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
                     ? templateModel.TestProjectShortName
                     : null;
-                dbPartProjectName = templateModel.TestDbPartProjectName;
+                dbPartProjectName = $"{projectName}Db";
                 break;
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;

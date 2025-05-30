@@ -137,7 +137,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
             ProjectName, keyPart1, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseCarcass,
             _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter, _apiAppCreatorData.UseSignalR,
-            _apiAppCreatorData.UseFluentValidation, _apiAppCreatorData.UseReact, "Program.cs");
+            _apiAppCreatorData.UseFluentValidation, _apiAppCreatorData.UseReact, _apiAppCreatorData.DbPartProjectName,
+            "Program.cs");
         programClassCreator.CreateFileStructure();
 
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
@@ -228,7 +229,6 @@ public sealed class ApiAppCreator : AppCreatorBase
             return false;
         }
 
-
         File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey], Path.Combine(folderForGitIgnore, gitignore));
         return true;
     }
@@ -244,7 +244,6 @@ public sealed class ApiAppCreator : AppCreatorBase
         const string react = "React";
         return CopyGitIgnoreFile(react,
             Path.Combine(WorkPath, _apiAppCreatorData.FrontendProjectData.SolutionFolderName));
-
 
         //Console.WriteLine("Creating ReactInstaller.cs...");
         //var reactInstallerClassCreator = new ReactInstallerClassCreator(Logger, installersPath, Par.ProjectName,
@@ -283,7 +282,6 @@ public sealed class ApiAppCreator : AppCreatorBase
             Logger.LogError("ProjectShortName is not specified");
             return;
         }
-
 
         //მასტერდატას ჩამტვირთავების პროექტის აუცილებელი ფაილები
         //var masterDataRepositoryClassFileName = $"{_projectShortName}MasterDataRepository.cs";
@@ -342,14 +340,14 @@ public sealed class ApiAppCreator : AppCreatorBase
         const string assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
-            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, $"{ProjectName}Db", assemblyReferenceClassFileName);
+            _apiAppCreatorData.DatabaseProjectData.ProjectFullPath, _apiAppCreatorData.DbPartProjectName!,
+            assemblyReferenceClassFileName);
         assemblyReferenceClassCreator.CreateFileStructure();
 
         Console.WriteLine("Creating TestQuery.cs...");
         var testQueryClassCreator = new TestQueryClassCreator(Logger,
             _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName, "TestQuery.cs");
         testQueryClassCreator.CreateFileStructure();
-
 
         var databaseProjectInstallersPath = _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Installers"];
 
