@@ -6,10 +6,10 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ProjectForCreate : ProjectBase
 {
-    private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType, string projectCreateParameters,
-        string createInPath, string projectFolderName, string projectFileName, string? classForDelete,
-        string? solutionFolderName) : base(projectName, createInPath, projectFolderName, projectFileName,
-        solutionFolderName)
+    private ProjectForCreate(string projectName, EDotnetProjectType dotnetProjectType,
+        string projectCreateParameters, string createInPath, string projectFolderName, string projectFileName,
+        string? classForDelete, string? solutionFolderName) : base(projectName, createInPath, projectFolderName,
+        projectFileName, solutionFolderName)
     {
         DotnetProjectType = dotnetProjectType;
         ProjectCreateParameters = projectCreateParameters;
@@ -20,7 +20,6 @@ public sealed class ProjectForCreate : ProjectBase
     public string ProjectCreateParameters { get; }
     public string? ClassForDelete { get; }
     public Dictionary<string, string> FoldersForCreate { get; } = [];
-
 
     public static ProjectForCreate CreateReactProject(string createInPath, string projectName,
         string[] availableFolders, string? solutionFolderName = null)
@@ -40,7 +39,8 @@ public sealed class ProjectForCreate : ProjectBase
         EDotnetProjectType dotnetProjectType, string projectCreateParameters, string? classForDelete,
         string[] availableFolders, string? solutionFolderName = null)
     {
-        var projectFileName = $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj";
+        var projectFileName =
+            $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj";
         var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters,
             createInPath, projectFolderName, projectFileName, classForDelete, solutionFolderName);
 

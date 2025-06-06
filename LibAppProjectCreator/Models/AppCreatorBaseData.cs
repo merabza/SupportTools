@@ -22,7 +22,8 @@ public sealed class AppCreatorBaseData
     public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
 
     public static AppCreatorBaseData? Create(ILogger logger, string workFolderPath, string projectName,
-        string solutionFolderName, string securityWorkFolderPath, Dictionary<string, string> gitIgnoreModelFilePaths)
+        string solutionFolderName, string securityWorkFolderPath,
+        Dictionary<string, string> gitIgnoreModelFilePaths)
     {
         //შევამოწმოთ და თუ არ არსებობს შევქმნათ სამუშაო ფოლდერი
         if (!StShared.CreateFolder(workFolderPath, true))

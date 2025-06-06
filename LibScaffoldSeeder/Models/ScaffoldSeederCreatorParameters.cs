@@ -73,8 +73,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         return true;
     }
 
-    public static ScaffoldSeederCreatorParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, bool useConsole)
+    public static ScaffoldSeederCreatorParameters? Create(ILogger logger,
+        SupportToolsParameters supportToolsParameters, string projectName, bool useConsole)
     {
         try
         {
@@ -100,7 +100,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
             {
-                StShared.WriteErrorLine($"SmartSchemaNameForLocal does not specified for Project {projectName}", true);
+                StShared.WriteErrorLine($"SmartSchemaNameForLocal does not specified for Project {projectName}",
+                    true);
                 return null;
             }
 
@@ -147,14 +148,18 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                     databaseServerConnections);
 
             if (devDataProvider is null || devConnectionString is null)
+            {
                 return null;
+            }
 
             var (prodCopyDataProvider, prodCopyConnectionString) =
                 DbConnectionFabric.GetDataProviderAndConnectionString(project.ProdCopyDatabaseParameters,
                     databaseServerConnections);
 
             if (prodCopyDataProvider is null || prodCopyConnectionString is null)
+            {
                 return null;
+            }
 
             if (string.IsNullOrWhiteSpace(project.NewDataSeedingClassLibProjectName))
             {
@@ -165,12 +170,13 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
             if (string.IsNullOrWhiteSpace(project.ExcludesRulesParametersFilePath))
             {
-                StShared.WriteErrorLine($"ExcludesRulesParametersFilePath does not specified for Project {projectName}",
-                    true);
+                StShared.WriteErrorLine(
+                    $"ExcludesRulesParametersFilePath does not specified for Project {projectName}", true);
                 return null;
             }
 
-            if (string.IsNullOrWhiteSpace(supportToolsParameters.AppProjectCreatorAllParameters?.FakeHostProjectName))
+            if (string.IsNullOrWhiteSpace(
+                    supportToolsParameters.AppProjectCreatorAllParameters?.FakeHostProjectName))
             {
                 StShared.WriteErrorLine(
                     "supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName does not specified",
@@ -179,16 +185,18 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             }
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
-            var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
-                supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName,
-                project.ScaffoldSeederProjectName, project.ProjectSecurityFolderPath, project.ProjectShortPrefix,
-                project.DbContextProjectName, project.DbContextName, devDataProvider.Value, devConnectionString,
-                prodCopyDataProvider.Value, prodCopyConnectionString, project.NewDataSeedingClassLibProjectName,
-                smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
+            var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(
+                supportToolsParameters.LogFolder, supportToolsParameters.ScaffoldSeedersWorkFolder,
+                supportToolsParameters.TempFolder, projectName, project.ScaffoldSeederProjectName,
+                project.ProjectSecurityFolderPath, project.ProjectShortPrefix, project.DbContextProjectName,
+                project.DbContextName, devDataProvider.Value, devConnectionString, prodCopyDataProvider.Value,
+                prodCopyConnectionString, project.NewDataSeedingClassLibProjectName, smartSchemaForLocal,
+                project.ExcludesRulesParametersFilePath,
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
-                GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
-                    useConsole, false), supportToolsParameters.GitIgnoreModelFilePaths);
+                GitRepos.Create(logger, supportToolsParameters.Gits,
+                    project.SpaProjectFolderRelativePath(gitProjects), useConsole, false),
+                supportToolsParameters.GitIgnoreModelFilePaths);
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

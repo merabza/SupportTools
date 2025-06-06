@@ -31,8 +31,4 @@
     <Folder Include="CodeCreators\React\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
 </Project>

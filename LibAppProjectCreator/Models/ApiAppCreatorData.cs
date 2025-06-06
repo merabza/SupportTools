@@ -9,9 +9,9 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact,
-        bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter,
-        bool useSignalR, bool useFluentValidation, ProjectForCreate databaseProjectData,
+    private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
+        bool useReact, bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity,
+        bool useReCounter, bool useSignalR, bool useFluentValidation, ProjectForCreate databaseProjectData,
         ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
         ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData, string? dbPartProjectName)
     {
@@ -80,15 +80,19 @@ public sealed class ApiAppCreatorData
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
-            EDotnetProjectType.Web, template.UseHttps ? "--no-https" : string.Empty, "Program", [.. projectFolders]);
+            EDotnetProjectType.Web, template.UseHttps ? "--no-https" : string.Empty, "Program",
+            [.. projectFolders]);
 
-        var libProjectRepositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"Lib{projectName}Repositories", []);
+        var libProjectRepositoriesProjectData =
+            ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"Lib{projectName}Repositories",
+                []);
 
         var databaseProjectFolders = new List<string> { "Models", "Installers" };
 
         if (template.UseDatabase)
+        {
             databaseProjectFolders.Add("QueryModels");
+        }
 
         var currentDbPartProjectName =
             template.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(dbPartProjectName)
@@ -103,11 +107,11 @@ public sealed class ApiAppCreatorData
 
         var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
 
-        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, $"{currentDbPartProjectName}Db",
+        var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, currentDbPartProjectName,
             [.. databaseProjectFolders], dbPartSolutionFolderName);
 
         var dbMigrationProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
-            $"{currentDbPartProjectName}DbMigration", ["Migrations"]);
+            $"{currentDbPartProjectName}Migration", ["Migrations"]);
 
         var repositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{currentDbPartProjectName}Repositories", ["Installers"]);

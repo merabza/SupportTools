@@ -31,15 +31,18 @@ public static class AppCreatorFabric
             case ESupportProjectType.Console:
                 var consoleAppWithDatabaseCreatorData =
                     ConsoleAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
-                return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
-                    gitRepos, consoleAppWithDatabaseCreatorData);
+                return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize,
+                    gitProjects, gitRepos, consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:
                 var apiAppCreatorData = ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData,
                     par.ProjectName, par.DbPartProjectName, template);
 
                 if (apiAppCreatorData is not null)
+                {
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,
                         par.IndentSize, gitProjects, gitRepos, apiAppCreatorData);
+                }
+
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
 

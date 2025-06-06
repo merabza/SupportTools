@@ -34,8 +34,8 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         _useConsole = useConsole;
         _ssParameters = ssParameters;
         _scaffoldSeederFolderName = $"{_ssParameters.ScaffoldSeederProjectName}ScaffoldSeeder";
-        _projectWorkFolderPath =
-            Path.Combine(_ssParameters.ScaffoldSeedersWorkFolder, _ssParameters.ScaffoldSeederProjectName);
+        _projectWorkFolderPath = Path.Combine(_ssParameters.ScaffoldSeedersWorkFolder,
+            _ssParameters.ScaffoldSeederProjectName);
         var scaffoldSeederSecurityFolderName = $"{_scaffoldSeederFolderName}.sec";
         SolutionSecurityFolderPath = Path.Combine(_projectWorkFolderPath, scaffoldSeederSecurityFolderName);
         _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, _ssParameters.ScaffoldSeederProjectName);
@@ -82,10 +82,12 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
             ScaffoldSeederCreatorData.Create(appCreatorBaseData, _scaffoldSeederFolderName, _ssParameters);
 
         if (forMain)
+        {
             ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
+        }
 
-        return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters, _scaffoldSeederFolderName,
-            IndentSize, scaffoldSeederCreatorData);
+        return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters,
+            _scaffoldSeederFolderName, IndentSize, scaffoldSeederCreatorData);
     }
 
     protected override AppCreatorBase? CreateMainAppCreator()
@@ -109,19 +111,21 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reserveFolderFullName, true);
         if (checkedReserveFolderFullPath is null)
         {
-            StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}", true,
-                _logger);
+            StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}",
+                true, _logger);
             return null;
         }
 
         //შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
         if (Directory.Exists(_scaffoldSeederFolderPath))
             //თუ ფოლდერი არსებობს შევეცადოთ მის დაარქივებას სარეზერვო ფოლდერში
+        {
             if (!CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
             {
                 StShared.WriteErrorLine($"{_scaffoldSeederFolderPath} does not compressed", true, _logger);
                 return null;
             }
+        }
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
         if (Directory.Exists(SolutionSecurityFolderPath))
@@ -144,14 +148,17 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var appCreator = CreateAppCreator(false);
 
         if (appCreator is null)
+        {
             return null;
+        }
 
         if (Directory.Exists(appCreator.SolutionPath))
+        {
             Directory.Delete(appCreator.SolutionPath, true);
+        }
 
         return appCreator;
     }
-
 
     private bool CompressFolder(string sourceFolderFullPath, string localPath)
     {
@@ -175,7 +182,6 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var backupFileName = $"{backupFileNamePrefix}{DateTime.Now.ToString(dateMask)}{backupFileNameSuffix}";
         var backupFileFullName = Path.Combine(localPath, backupFileName);
         var tempFileName = $"{backupFileFullName}{tempExtension}";
-
 
         var excludes = new[] { "*.git*", "*.vs*", "*obj*" };
 
