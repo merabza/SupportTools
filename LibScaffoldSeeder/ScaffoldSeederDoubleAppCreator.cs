@@ -17,6 +17,7 @@ namespace LibScaffoldSeeder;
 public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 {
     private const int IndentSize = 4;
+    private const string ScaffoldSeederProjects = nameof(ScaffoldSeederProjects);
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly string _projectTempFolderPath;
@@ -38,7 +39,8 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
             _ssParameters.ScaffoldSeederProjectName);
         var scaffoldSeederSecurityFolderName = $"{_scaffoldSeederFolderName}.sec";
         SolutionSecurityFolderPath = Path.Combine(_projectWorkFolderPath, scaffoldSeederSecurityFolderName);
-        _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, _ssParameters.ScaffoldSeederProjectName);
+        _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, ScaffoldSeederProjects,
+            _ssParameters.ScaffoldSeederProjectName);
 
         _scaffoldSeederFolderPath = Path.Combine(_projectWorkFolderPath, _scaffoldSeederFolderName);
         SolutionFolderPath = Path.Combine(_scaffoldSeederFolderPath, _scaffoldSeederFolderName);
@@ -81,13 +83,10 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var scaffoldSeederCreatorData =
             ScaffoldSeederCreatorData.Create(appCreatorBaseData, _scaffoldSeederFolderName, _ssParameters);
 
-        if (forMain)
-        {
-            ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
-        }
+        if (forMain) ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
 
-        return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters,
-            _scaffoldSeederFolderName, IndentSize, scaffoldSeederCreatorData);
+        return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters, _scaffoldSeederFolderName,
+            IndentSize, scaffoldSeederCreatorData);
     }
 
     protected override AppCreatorBase? CreateMainAppCreator()
@@ -111,21 +110,19 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reserveFolderFullName, true);
         if (checkedReserveFolderFullPath is null)
         {
-            StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}",
-                true, _logger);
+            StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}", true,
+                _logger);
             return null;
         }
 
         //შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
         if (Directory.Exists(_scaffoldSeederFolderPath))
             //თუ ფოლდერი არსებობს შევეცადოთ მის დაარქივებას სარეზერვო ფოლდერში
-        {
             if (!CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
             {
                 StShared.WriteErrorLine($"{_scaffoldSeederFolderPath} does not compressed", true, _logger);
                 return null;
             }
-        }
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
         if (Directory.Exists(SolutionSecurityFolderPath))
@@ -147,15 +144,9 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
     {
         var appCreator = CreateAppCreator(false);
 
-        if (appCreator is null)
-        {
-            return null;
-        }
+        if (appCreator is null) return null;
 
-        if (Directory.Exists(appCreator.SolutionPath))
-        {
-            Directory.Delete(appCreator.SolutionPath, true);
-        }
+        if (Directory.Exists(appCreator.SolutionPath)) Directory.Delete(appCreator.SolutionPath, true);
 
         return appCreator;
     }

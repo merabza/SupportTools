@@ -13,11 +13,11 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateUpdateFrontSpaProjectCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager) : base("ReCreate Update Front Spa Project", EMenuAction.Reload,
-        EMenuAction.Reload, null, true)
+        IParametersManager parametersManager, string projectName) : base("ReCreate Update Front Spa Project",
+        EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _reCreateUpdateFrontSpaProjectToolAction =
-            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager);
+            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager, projectName);
     }
 
     protected override string GetActionDescription()

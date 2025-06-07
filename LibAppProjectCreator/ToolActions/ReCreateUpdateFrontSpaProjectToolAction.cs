@@ -1,6 +1,8 @@
-﻿using System.Net.Http;
+﻿using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using LibAppProjectCreator.AppCreators;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -12,17 +14,20 @@ namespace LibAppProjectCreator.ToolActions;
 public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
 {
     private const string ActionName = "ReCreate Update Front Spa Project";
+    private const string FrontSpaProjects = nameof(FrontSpaProjects);
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
+    private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateUpdateFrontSpaProjectToolAction(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager) : base(logger, ActionName, null, null)
+        IParametersManager parametersManager, string projectName) : base(logger, ActionName, null, null)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
+        _projectName = projectName;
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -38,17 +43,23 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return false;
         }
 
-        var createInPath = supportToolsParameters.TempFolder;
-        var projectFolderName = string.Empty;
-        var projectFileName = string.Empty;
-        var projectName = string.Empty;
+        var project = supportToolsParameters.GetProjectRequired(_projectName);
+
+        if (string.IsNullOrWhiteSpace(project.SpaProjectName))
+        {
+            StShared.WriteErrorLine("SpaProjectName does not specified in parameters", true);
+            return false;
+        }
+
+        var createInPath = Path.Combine(supportToolsParameters.TempFolder, FrontSpaProjects, _projectName,
+            $"{_projectName}Front");
 
         //რეაქტის პროექტის შექმნა ფრონტისთვის
-        //var reactEsProjectCreator = new ReactEsProjectCreator(_logger, _httpClientFactory,
-        //    projectForCreate.CreateInPath, projectForCreate.ProjectFolderName,
-        //    projectForCreate.ProjectFileName, projectForCreate.ProjectName, true);
-        //if (!reactEsProjectCreator.Create())
-        //    return false;
+        var reactEsProjectCreator = new ReactEsProjectCreator(_logger, _httpClientFactory, createInPath, project.SpaProjectName,
+            $"{project.SpaProjectName}.esproj", project.SpaProjectName, true);
+
+        if (!reactEsProjectCreator.Create())
+            return false;
 
         //დაინსტალირდეს პროექტის შესაბამისი npm პაკეტები
 

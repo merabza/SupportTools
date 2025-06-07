@@ -81,7 +81,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                     new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
                 projectSubMenuSet.AddMenuItem(
                     new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger, _httpClientFactory,
-                        _parametersManager));
+                        _parametersManager, _projectName));
             }
 
             //დასაშვები ინსტრუმენტების არჩევა
