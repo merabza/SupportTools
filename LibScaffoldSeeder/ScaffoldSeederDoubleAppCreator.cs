@@ -146,7 +146,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         if (appCreator is null) return null;
 
-        if (Directory.Exists(appCreator.SolutionPath)) Directory.Delete(appCreator.SolutionPath, true);
+        FileStat.DeleteDirectoryIfExists(appCreator.SolutionPath);
 
         return appCreator;
     }

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Xml.Linq;
 using HtmlAgilityPack;
+using LibNpmWork;
 using Microsoft.Extensions.Logging;
 using SystemToolsShared;
 
@@ -38,24 +39,13 @@ public sealed class ReactEsProjectCreator
 
     public bool Create()
     {
-        //var dir = new DirectoryInfo(_projectFullPath);
-        //var parDir = dir.Parent;
-        //if (parDir is null)
-        //{
-        //    StShared.WriteErrorLine($"{_projectFullPath} folder has no parent", true, _logger);
-        //    return false;
-        //}
-
-        //var parDirFullName = parDir.FullName;
         //შეიქმნას ფოლდერი სადაც უნდა ჩაიწეროს რეაქტის ფრონტ პროექტი
         StShared.CreateFolder(_createInPath, _useConsole);
 
-        //var reactProjectName = Path.GetFileNameWithoutExtension(_projectFileName).ToLower();
-        if (!StShared.RunCmdProcess($"npm init --yes vite@latest {_projectName} -- --template=react-ts", _createInPath))
-        {
-            StShared.WriteErrorLine("Error When creating react app using npm", true, _logger);
+        var npmProcessor = new NpmProcessor(_logger);
+
+        if (!npmProcessor.CreatingReactAppUsingVite(_createInPath, _projectName))
             return false;
-        }
 
         /*
            cd {_projectName}

@@ -39,7 +39,7 @@ public sealed class ReCreateReactAppFiles
         var appFolderFullName = Path.Combine(reactAppModelsFolderFullName, appName);
 
         if (Directory.Exists(appFolderFullName))
-            FileStat.DeleteDirectory(appFolderFullName);
+            FileStat.DeleteDirectoryWithNormaliseAttributes(appFolderFullName);
 
         if (!StShared.RunCmdProcess(
                 $"npx create-react-app {appFolderFullName}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? string.Empty : $" --template {_reactTemplateName}")}"))

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppProjectCreator.AppCreators;
+using LibNpmWork;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -57,11 +58,25 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         //რეაქტის პროექტის შექმნა ფრონტისთვის
         var reactEsProjectCreator = new ReactEsProjectCreator(_logger, _httpClientFactory, createInPath, project.SpaProjectName,
             $"{project.SpaProjectName}.esproj", project.SpaProjectName, true);
+        
+        if (Directory.Exists(createInPath))
+            FileStat.DeleteDirectoryWithNormaliseAttributes(createInPath);
 
         if (!reactEsProjectCreator.Create())
             return false;
 
+        var npmProcessor = new NpmProcessor(_logger);
+        var spaProjectPath = Path.Combine(createInPath, project.SpaProjectName);
+
+        if (!npmProcessor.InstallNpmPackages(spaProjectPath))
+            return false;
+
         //დაინსტალირდეს პროექტის შესაბამისი npm პაკეტები
+        foreach (var npmPackageName in project.FrontNpmPackageNames)
+        {
+            if (!npmProcessor.InstallNpmPackage(spaProjectPath, npmPackageName))
+                return false;
+        }
 
         //დაკოპირდეს პროექტის ფრონტის ფაილები დროებით ფოლდერში
 
