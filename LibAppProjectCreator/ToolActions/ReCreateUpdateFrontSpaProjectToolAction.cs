@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibNpmWork;
 using LibParameters;
@@ -16,19 +18,23 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
 {
     private const string ActionName = "ReCreate Update Front Spa Project";
     private const string FrontSpaProjects = nameof(FrontSpaProjects);
+    private const string ProjectReserves = nameof(ProjectReserves);
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
+    private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateUpdateFrontSpaProjectToolAction(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string projectName) : base(logger, ActionName, null, null)
+        IParametersManager parametersManager, string projectName, bool useConsole) : base(logger, ActionName, null,
+        null)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
+        _useConsole = useConsole;
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -37,6 +43,15 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
 
         //დავადგინოთ დროებითი ფოლდერის სახელი, სადაც უნდა შეიქმნას ფრონტის პროექტი
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
+        {
+            StShared.WriteErrorLine("SmartSchemaNameForLocal does not specified", true);
+            return false;
+        }
+
+        var smartSchemaForLocal =
+            supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForLocal);
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
         {
@@ -52,13 +67,19 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return false;
         }
 
+        if (string.IsNullOrWhiteSpace(project.ProjectFolderName))
+        {
+            StShared.WriteErrorLine($"ProjectFolderName is not specified for project {_projectName}", true);
+            return false;
+        }
+
         var createInPath = Path.Combine(supportToolsParameters.TempFolder, FrontSpaProjects, _projectName,
             $"{_projectName}Front");
 
         //რეაქტის პროექტის შექმნა ფრონტისთვის
-        var reactEsProjectCreator = new ReactEsProjectCreator(_logger, _httpClientFactory, createInPath, project.SpaProjectName,
-            $"{project.SpaProjectName}.esproj", project.SpaProjectName, true);
-        
+        var reactEsProjectCreator = new ReactEsProjectCreator(_logger, _httpClientFactory, createInPath,
+            project.SpaProjectName, $"{project.SpaProjectName}.esproj", project.SpaProjectName, true);
+
         if (Directory.Exists(createInPath))
             FileStat.DeleteDirectoryWithNormaliseAttributes(createInPath);
 
@@ -72,17 +93,30 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return false;
 
         //დაინსტალირდეს პროექტის შესაბამისი npm პაკეტები
-        foreach (var npmPackageName in project.FrontNpmPackageNames)
+        if (project.FrontNpmPackageNames.Any(npmPackageName =>
+                !npmProcessor.InstallNpmPackage(spaProjectPath, npmPackageName)))
+            return false;
+
+        var reservePath = Path.Combine(supportToolsParameters.TempFolder, ProjectReserves, _projectName);
+
+        //შევამოწმოთ არსებობს თუ არა სარეზერვო არქივებისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
+        var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reservePath, true);
+        if (checkedReserveFolderFullPath is null)
         {
-            if (!npmProcessor.InstallNpmPackage(spaProjectPath, npmPackageName))
-                return false;
+            StShared.WriteErrorLine($"does not exists and can not be created work folder {reservePath}", true, _logger);
+            return false;
         }
 
         //აქედან დაწყეებული კოდი შეიცავს ინფრომაციის დაკარგვის საშიშროებას,
         //ამიტომ წინასწარ უნდა მოხდეს არსებული პროექტის გადანახვა
         //ამისათის გამოვიყენოთ დაარქივების იგივე მეთოდი, რომელიც გამოყენებულია სკაფოლსიდერის ინსტრუმენტში
 
+        string[] excl = [".vs", ".git", "obj", "bin", "node_modules"];
 
+        var compressor = new Compressor(_useConsole, _logger, smartSchemaForLocal, "_Reserve_",
+            excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
+
+        compressor.CompressFolder(project.ProjectFolderName, checkedReserveFolderFullPath);
         //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
 
         //დაკოპირდეს დროებით ფოლდერში შექმნილი პროექტის package.json მიმდონარე პროექტრის შასაბამის ფოლდერში

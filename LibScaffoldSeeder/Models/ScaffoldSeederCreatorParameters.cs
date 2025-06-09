@@ -100,7 +100,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
             {
-                StShared.WriteErrorLine($"SmartSchemaNameForLocal does not specified for Project {projectName}",
+                StShared.WriteErrorLine("SmartSchemaNameForLocal does not specified",
                     true);
                 return null;
             }

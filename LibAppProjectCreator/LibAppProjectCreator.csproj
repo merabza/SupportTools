@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
     <ProjectReference Include="..\..\SystemTools\JetBrainsResharperGlobalToolsWork\JetBrainsResharperGlobalToolsWork.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\CompressionManagement\CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibNpmWork\LibNpmWork.csproj" />

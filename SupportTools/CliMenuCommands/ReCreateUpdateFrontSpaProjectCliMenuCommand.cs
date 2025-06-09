@@ -17,7 +17,8 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
         EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _reCreateUpdateFrontSpaProjectToolAction =
-            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager, projectName);
+            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager, projectName,
+                true);
     }
 
     protected override string GetActionDescription()

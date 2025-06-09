@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using CompressionManagement;
-using FileManagersMain;
+﻿using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -115,26 +114,31 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
             return null;
         }
 
+        string[] excl = [".vs", ".git", "obj", "bin"];
+
+        var compressor = new Compressor(_useConsole, _logger, _ssParameters.SmartSchemaForLocal, "_ScaffoldSeeder_",
+            excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
+
         //შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
         if (Directory.Exists(_scaffoldSeederFolderPath))
             //თუ ფოლდერი არსებობს შევეცადოთ მის დაარქივებას სარეზერვო ფოლდერში
-            if (!CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
+            if (!compressor.CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
             {
                 StShared.WriteErrorLine($"{_scaffoldSeederFolderPath} does not compressed", true, _logger);
                 return null;
             }
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
-        if (Directory.Exists(SolutionSecurityFolderPath))
-        {
-            if (!CompressFolder(SolutionSecurityFolderPath, checkedReserveFolderFullPath))
-            {
-                StShared.WriteErrorLine($"{SolutionSecurityFolderPath} is not compressed", true, _logger);
-                return null;
-            }
+        if (!Directory.Exists(SolutionSecurityFolderPath)) 
+            return CreateAppCreator(true);
 
-            Directory.Delete(SolutionSecurityFolderPath, true);
+        if (!compressor.CompressFolder(SolutionSecurityFolderPath, checkedReserveFolderFullPath))
+        {
+            StShared.WriteErrorLine($"{SolutionSecurityFolderPath} is not compressed", true, _logger);
+            return null;
         }
+
+        Directory.Delete(SolutionSecurityFolderPath, true);
         ///////////////////////////////////////////////////////////////////////////////////
 
         return CreateAppCreator(true);
@@ -149,53 +153,5 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         FileStat.DeleteDirectoryIfExists(appCreator.SolutionPath);
 
         return appCreator;
-    }
-
-    private bool CompressFolder(string sourceFolderFullPath, string localPath)
-    {
-        const string backupFileNameSuffix = ".zip";
-        var archiver = ArchiverFabric.CreateArchiverByType(_useConsole, _logger, EArchiveType.ZipClass, null, null,
-            backupFileNameSuffix);
-
-        if (archiver is null)
-        {
-            StShared.WriteErrorLine("archiver does not created", true, _logger);
-            return false;
-        }
-
-        const string dateMask = "yyyy_MM_dd_HHmmss";
-        const string middlePart = "_ScaffoldSeeder_";
-        const string tempExtension = ".go!";
-        var dir = new DirectoryInfo(sourceFolderFullPath);
-
-        var backupFileNamePrefix = $"{dir.Name}{middlePart}";
-
-        var backupFileName = $"{backupFileNamePrefix}{DateTime.Now.ToString(dateMask)}{backupFileNameSuffix}";
-        var backupFileFullName = Path.Combine(localPath, backupFileName);
-        var tempFileName = $"{backupFileFullName}{tempExtension}";
-
-        var excludes = new[] { "*.git*", "*.vs*", "*obj*" };
-
-        if (!archiver.SourcesToArchive([sourceFolderFullPath], tempFileName, excludes))
-        {
-            File.Delete(tempFileName);
-            return false;
-        }
-
-        File.Move(tempFileName, backupFileFullName);
-
-        var localFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, localPath);
-        //წაიშალოს ადრე შექმნილი დაძველებული ფაილები
-
-        if (localFileManager is null)
-        {
-            StShared.WriteErrorLine("localFileManager does not created", true, _logger);
-            return false;
-        }
-
-        localFileManager.RemoveRedundantFiles(backupFileNamePrefix, dateMask, backupFileNameSuffix,
-            _ssParameters.SmartSchemaForLocal);
-
-        return true;
     }
 }
