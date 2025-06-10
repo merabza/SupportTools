@@ -1,15 +1,15 @@
-﻿using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using CompressionManagement;
+﻿using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibNpmWork;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.ToolActions;
@@ -107,21 +107,40 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return false;
         }
 
+        const string nodeModulesFolderName = "node_modules";
+        const string packageJsonFileName = "package.json";
         //აქედან დაწყეებული კოდი შეიცავს ინფრომაციის დაკარგვის საშიშროებას,
         //ამიტომ წინასწარ უნდა მოხდეს არსებული პროექტის გადანახვა
         //ამისათის გამოვიყენოთ დაარქივების იგივე მეთოდი, რომელიც გამოყენებულია სკაფოლსიდერის ინსტრუმენტში
 
-        string[] excl = [".vs", ".git", "obj", "bin", "node_modules"];
+        string[] excl = [".vs", ".git", "obj", "bin", nodeModulesFolderName];
 
         var compressor = new Compressor(_useConsole, _logger, smartSchemaForLocal, "_Reserve_",
             excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
 
         compressor.CompressFolder(project.ProjectFolderName, checkedReserveFolderFullPath);
-        //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
 
-        //დაკოპირდეს დროებით ფოლდერში შექმნილი პროექტის package.json მიმდონარე პროექტრის შასაბამის ფოლდერში
+        //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
+        var frontProjectFolder = Path.Combine(project.ProjectFolderName, $"{_projectName}Front", project.SpaProjectName);
+
+        Directory.Delete(Path.Combine(frontProjectFolder, nodeModulesFolderName), true);
+        Directory.Delete(Path.Combine(frontProjectFolder, "obj"), true);
+        Directory.Delete(Path.Combine(frontProjectFolder, "build"), true);
+        File.Delete(Path.Combine(frontProjectFolder, $"{project.SpaProjectName}.esproj"));
+
+        var frontPackageJsonFileName = Path.Combine(frontProjectFolder, packageJsonFileName);
+
+        File.Delete(frontPackageJsonFileName);
+        File.Delete(Path.Combine(frontProjectFolder, "package-lock.json"));
+
+        //დაკოპირდეს დროებით ფოლდერში შექმნილი პროექტის package.json მიმდინარე პროექტრის შასაბამის ფოლდერში
+        File.Copy(Path.Combine(spaProjectPath, packageJsonFileName), frontPackageJsonFileName);
 
         //გაეშვას npm install ბრძანება მიმდინარე პროექტისათვის
+        
+        if (!npmProcessor.InstallNpmPackages(frontProjectFolder))
+            return false;
+
 
         //შემოწმდეს დროებით ფოლდერშ არსებული დანარჩენი ფაილები ემთხვევა თუ არა მიმდინარე პროექტის ფოლდერში არსებულ შესაბამის ფაილებს
 
