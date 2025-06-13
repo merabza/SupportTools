@@ -123,15 +123,17 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
         var frontProjectFolder = Path.Combine(project.ProjectFolderName, $"{_projectName}Front", project.SpaProjectName);
 
-        Directory.Delete(Path.Combine(frontProjectFolder, nodeModulesFolderName), true);
-        Directory.Delete(Path.Combine(frontProjectFolder, "obj"), true);
-        Directory.Delete(Path.Combine(frontProjectFolder, "build"), true);
-        File.Delete(Path.Combine(frontProjectFolder, $"{project.SpaProjectName}.esproj"));
+        FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, nodeModulesFolderName));
+        FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, "obj"));
+        FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, "build"));
+
+
+        FileStat.DeleteFileIfExists(Path.Combine(frontProjectFolder, $"{project.SpaProjectName}.esproj"));
 
         var frontPackageJsonFileName = Path.Combine(frontProjectFolder, packageJsonFileName);
 
-        File.Delete(frontPackageJsonFileName);
-        File.Delete(Path.Combine(frontProjectFolder, "package-lock.json"));
+        FileStat.DeleteFileIfExists(frontPackageJsonFileName);
+        FileStat.DeleteFileIfExists(Path.Combine(frontProjectFolder, "package-lock.json"));
 
         //დაკოპირდეს დროებით ფოლდერში შექმნილი პროექტის package.json მიმდინარე პროექტრის შასაბამის ფოლდერში
         File.Copy(Path.Combine(spaProjectPath, packageJsonFileName), frontPackageJsonFileName);
@@ -145,6 +147,9 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         //შემოწმდეს დროებით ფოლდერშ არსებული დანარჩენი ფაილები ემთხვევა თუ არა მიმდინარე პროექტის ფოლდერში არსებულ შესაბამის ფაილებს
 
         //აცდენის შესახებ ინფორმაცია გამოვიდეს კონსოლში
+
+
+
 
         return true;
     }
