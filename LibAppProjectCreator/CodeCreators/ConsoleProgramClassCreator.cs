@@ -59,12 +59,12 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
                 _useDatabase
                     ? new FlatCodeBlock(
                         new CodeCommand(
-                            $"var {projectLow}RepositoryCreatorFabric = serviceProvider.GetService<I{_projectNamespace}RepositoryCreatorFabric>()"),
-                        new CodeBlock($"if ({projectLow}RepositoryCreatorFabric is null)",
-                            $"StShared.WriteErrorLine(\"{projectLow}RepositoryCreatorFabric is null\", true)",
+                            $"var {projectLow}RepositoryCreatorFactory = serviceProvider.GetService<I{_projectNamespace}RepositoryCreatorFactory>()"),
+                        new CodeBlock($"if ({projectLow}RepositoryCreatorFactory is null)",
+                            $"StShared.WriteErrorLine(\"{projectLow}RepositoryCreatorFactory is null\", true)",
                             "return 6"), string.Empty)
                     : null, string.Empty,
-                $"var {projectLow} = new {_projectNamespace}.{_projectNamespace}(logger, new ParametersManager(parametersFileName, par){(_useDatabase ? $", {projectLow}RepositoryCreatorFabric" : string.Empty)})",
+                $"var {projectLow} = new {_projectNamespace}.{_projectNamespace}(logger, new ParametersManager(parametersFileName, par){(_useDatabase ? $", {projectLow}RepositoryCreatorFactory" : string.Empty)})",
                 string.Empty, $"return {projectLow}.Run() ? 0 : 1"),
             new CodeBlock("catch (Exception e)", "StShared.WriteException(e, true, logger)", "return 7"),
             new CodeBlock("finally", "Log.CloseAndFlush()"));

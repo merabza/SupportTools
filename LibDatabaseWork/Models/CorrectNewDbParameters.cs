@@ -47,7 +47,7 @@ public sealed class CorrectNewDbParameters : IParameters
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
 
         var (devDataProvider, devConnectionString) =
-            DbConnectionFabric.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
+            DbConnectionFactory.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
                 databaseServerConnections);
 
         if (devDataProvider is null || devConnectionString is null)

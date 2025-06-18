@@ -42,7 +42,7 @@ public sealed class InstallParametersAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
             _fileStorageForUpload, _installerBaseParameters, UseConsole);
         if (projectManager is null)
         {

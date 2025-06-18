@@ -59,14 +59,14 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
                     : new CodeExtraLine(),
                 _useDatabase
                     ? new CodeCommand(
-                        $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric")
+                        $"private readonly I{_projectNamespace}RepositoryCreatorFactory _{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory")
                     : new CodeExtraLine(), string.Empty,
                 new CodeBlock(
-                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : string.Empty)})",
+                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : string.Empty)})",
                     "_logger = logger", "_parametersManager = parametersManager",
                     _useDatabase
                         ? new CodeCommand(
-                            $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric = {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric")
+                            $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory = {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory")
                         : new CodeExtraLine()), buildMainMenuBlock));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

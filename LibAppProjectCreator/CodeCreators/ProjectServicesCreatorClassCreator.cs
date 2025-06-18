@@ -35,7 +35,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                     new CodeBlock("if (!string.IsNullOrEmpty(_par.DatabaseConnectionParameters?.ConnectionString))",
                         $"services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(_par.DatabaseConnectionParameters.ConnectionString))"),
                     $"services.AddScoped<I{_projectNamespace}Repository, {_projectNamespace}Repository>()",
-                    $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFabric, {_projectNamespace}RepositoryCreatorFabric>()")));
+                    $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFactory, {_projectNamespace}RepositoryCreatorFactory>()")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

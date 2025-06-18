@@ -130,7 +130,7 @@ public sealed class ServerInfoCruder : ParCruder
 
         if (server == null || project == null)
             return;
-        foreach (var tool in ToolCommandFabric.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ?? []))
+        foreach (var tool in ToolCommandFactory.ToolsByProjectsAndServers.Intersect(server.AllowToolsList ?? []))
             itemSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName,
                 server, ParametersManager));
     }

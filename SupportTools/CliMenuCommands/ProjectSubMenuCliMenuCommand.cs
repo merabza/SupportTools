@@ -88,7 +88,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             projectSubMenuSet.AddMenuItem(
                 new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
-            foreach (var tool in ToolCommandFabric.ToolsByProjects.Intersect(project.AllowToolsList))
+            foreach (var tool in ToolCommandFactory.ToolsByProjects.Intersect(project.AllowToolsList))
             {
                 projectSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
                     _projectName, null, _parametersManager));

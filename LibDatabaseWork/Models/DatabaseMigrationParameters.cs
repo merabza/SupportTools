@@ -99,7 +99,7 @@ public sealed class DatabaseMigrationParameters : IParameters
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
-        var createDatabaseManagerResult = DatabaseManagersFabric.CreateDatabaseManager(logger, true,
+        var createDatabaseManagerResult = DatabaseManagersFactory.CreateDatabaseManager(logger, true,
             devDatabaseParameters.DbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null,
             null).Result;
         if (createDatabaseManagerResult.IsT1)

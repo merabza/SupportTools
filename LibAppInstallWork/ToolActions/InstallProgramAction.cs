@@ -48,7 +48,7 @@ public sealed class InstallProgramAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFabric.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
             _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)

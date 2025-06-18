@@ -37,7 +37,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        var checks = ToolCommandFabric.ToolsByProjectsAndServers.ToDictionary(tool => tool.ToString(),
+        var checks = ToolCommandFactory.ToolsByProjectsAndServers.ToDictionary(tool => tool.ToString(),
             tool => server.AllowToolsList?.Contains(tool) ?? false);
 
         //გამოვიდეს სიიდან ამრჩევი

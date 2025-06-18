@@ -21,7 +21,7 @@ using SystemToolsShared;
 
 namespace SupportTools;
 
-public static class ToolCommandFabric
+public static class ToolCommandFactory
 {
     public static readonly ETools[] ToolsByProjects =
     [
@@ -251,7 +251,7 @@ public static class ToolCommandFabric
                     return null;
                 }
 
-                var copyBaseParametersDevToProd = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
+                var copyBaseParametersDevToProd = CopyBaseParametersFactory.CreateCopyBaseParameters(logger,
                     httpClientFactory, project.DevDatabaseParameters, serverInfo.NewDatabaseParameters,
                     supportToolsParameters).Result;
                 if (copyBaseParametersDevToProd is not null)
@@ -343,7 +343,7 @@ public static class ToolCommandFabric
                     return null;
                 }
 
-                var copyBaseParametersProdToDev = CopyBaseParametersFabric.CreateCopyBaseParameters(logger,
+                var copyBaseParametersProdToDev = CopyBaseParametersFactory.CreateCopyBaseParameters(logger,
                     httpClientFactory, serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabaseParameters,
                     supportToolsParameters).Result;
 

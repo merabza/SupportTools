@@ -44,7 +44,7 @@ public abstract class DoubleAppCreator
             return true;
 
         var mainSolutionFileManager =
-            FileManagersFabric.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
+            FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
 
         if (mainSolutionFileManager == null)
         {
@@ -69,7 +69,7 @@ public abstract class DoubleAppCreator
     private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        var sourceFileManager = FileManagersFabric.CreateFileManager(_useConsole, _logger, tempSolutionPath);
+        var sourceFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempSolutionPath);
 
         if (sourceFileManager == null)
         {

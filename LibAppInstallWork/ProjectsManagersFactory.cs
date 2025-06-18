@@ -8,7 +8,7 @@ using WebAgentProjectsApiContracts;
 
 namespace LibAppInstallWork;
 
-public static class ProjectsManagersFabric
+public static class ProjectsManagersFactory
 {
     public static IIProjectsManagerWithFileStorage? CreateProjectsManagerWithFileStorage(ILogger logger,
         IHttpClientFactory httpClientFactory, FileStorageData fileStorageForUpload,

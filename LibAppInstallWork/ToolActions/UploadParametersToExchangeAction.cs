@@ -56,7 +56,7 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //ასატვირთი ფაილის სახელის შექმნა
         var uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
 
-        var exchangeFileManager = FileManagersFabric.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
+        var exchangeFileManager = FileManagersFactory.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
 
         if (exchangeFileManager == null)
         {

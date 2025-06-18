@@ -126,7 +126,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        var appCreator = AppCreatorFabric.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
+        var appCreator = AppCreatorFactory.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
             GitRepos.Create(_logger, supportToolsParameters.Gits, null, UseConsole, false),
             supportToolsParameters.GitIgnoreModelFilePaths);

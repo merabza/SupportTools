@@ -38,20 +38,20 @@ public sealed class ProjectMainClassCreator : CodeCreator
             $"namespace {_projectNamespace}", string.Empty, new CodeBlock(
                 $"public sealed class {_projectNamespace} : ToolCommand", "private readonly ILogger _logger",
                 _useDatabase
-                    ? $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
+                    ? $"private readonly I{_projectNamespace}RepositoryCreatorFactory _{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory"
                     : null,
                 $"private {_projectNamespace}Parameters {_projectNamespace}Parameters => ({_projectNamespace}Parameters)Par",
                 new CodeBlock(
-                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : "")}) : base(logger, true, \"{_projectNamespace.SplitWithSpacesCamelParts()}\", \"{_projectNamespace.SplitWithSpacesCamelParts()}\", parametersManager)",
+                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : "")}) : base(logger, true, \"{_projectNamespace.SplitWithSpacesCamelParts()}\", \"{_projectNamespace.SplitWithSpacesCamelParts()}\", parametersManager)",
                     "_logger = logger",
                     _useDatabase
-                        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric = {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
+                        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory = {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory"
                         : null),
                 //new CodeBlock(
-                //    $"public {_projectNamespace}(ILogger logger, ParametersTaskInfo parametersTaskInfo{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : "")}) : base(logger, true, \"{_projectNamespace.SplitWithSpacesCamelParts()}\", null, parametersTaskInfo)",
+                //    $"public {_projectNamespace}(ILogger logger, ParametersTaskInfo parametersTaskInfo{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : "")}) : base(logger, true, \"{_projectNamespace.SplitWithSpacesCamelParts()}\", null, parametersTaskInfo)",
                 //    "_logger = logger",
                 //    _useDatabase
-                //        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric = {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
+                //        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory = {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory"
                 //        : null),
                 new CodeBlock("protected override bool RunAction()", "return true")));
         CodeFile.AddRange(block.CodeItems);

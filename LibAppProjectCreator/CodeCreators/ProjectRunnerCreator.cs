@@ -30,13 +30,13 @@ public sealed class ProjectRunnerCreator : CodeCreator
             $"namespace {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}", string.Empty, new CodeBlock(
                 $"public sealed class {_projectNamespace}Runner : TaskRunner", "private readonly ILogger _logger",
                 _useDatabase
-                    ? $"private readonly I{_projectNamespace}RepositoryCreatorFabric _{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
+                    ? $"private readonly I{_projectNamespace}RepositoryCreatorFactory _{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory"
                     : null, $"private readonly {_projectNamespace}Parameters _par", string.Empty,
                 new CodeBlock(
-                    $"public {_projectNamespace}Runner(ILogger logger{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFabric {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric" : null)}, {_projectNamespace}Parameters par)",
+                    $"public {_projectNamespace}Runner(ILogger logger{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : null)}, {_projectNamespace}Parameters par)",
                     "_logger = logger",
                     _useDatabase
-                        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFabric = {_projectNamespace.UnCapitalize()}RepositoryCreatorFabric"
+                        ? $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory = {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory"
                         : null, "_par = par"), string.Empty, new CodeBlock(
                     "public override bool Run()", //{(_taskWithParameters ? $"{_projectNamespace}TaskModel task" : string.Empty)}
                     new CodeBlock("try", new OneLineComment("ამოცანის შესრულება იწყება აქ"), string.Empty,

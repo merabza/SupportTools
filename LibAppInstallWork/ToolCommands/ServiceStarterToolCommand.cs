@@ -49,7 +49,7 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFabric.CreateProjectsManager(_logger, _httpClientFactory,
+        var projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
 
         if (projectManager is null)

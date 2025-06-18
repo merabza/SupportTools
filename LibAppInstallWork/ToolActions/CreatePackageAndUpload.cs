@@ -183,7 +183,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         _logger.LogInformation("Uploading {zipFileFullName}...", zipFileFullName);
         //ZIP ფაილის ატვირთვა FTP-ზე
         var exchangeFileManager =
-            FileManagersFabric.CreateFileManager(true, _logger, _workFolder, _exchangeFileStorage);
+            FileManagersFactory.CreateFileManager(true, _logger, _workFolder, _exchangeFileStorage);
 
         if (exchangeFileManager == null)
         {
@@ -216,7 +216,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         File.Delete(zipFileFullName);
 
 
-        var workFileManager = FileManagersFabric.CreateFileManager(true, _logger, _workFolder);
+        var workFileManager = FileManagersFactory.CreateFileManager(true, _logger, _workFolder);
 
         workFileManager?.RemoveRedundantFiles(
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,

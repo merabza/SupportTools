@@ -107,7 +107,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return errors;
         }
 
-        var createDatabaseManagerResult = await DatabaseManagersFabric.CreateDatabaseManager(_logger, true,
+        var createDatabaseManagerResult = await DatabaseManagersFactory.CreateDatabaseManager(_logger, true,
             dbConnectionName, _databaseServerConnections, _apiClients, _httpClientFactory, null, null,
             cancellationToken);
 

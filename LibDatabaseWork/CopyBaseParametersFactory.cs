@@ -16,7 +16,7 @@ using SystemToolsShared.Errors;
 
 namespace LibDatabaseWork;
 
-public static class CopyBaseParametersFabric
+public static class CopyBaseParametersFactory
 {
     public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
         IHttpClientFactory httpClientFactory, DatabaseParameters fromDatabaseParameters,
@@ -32,9 +32,9 @@ public static class CopyBaseParametersFabric
         var fileStorages = new FileStorages(supportToolsParameters.FileStorages);
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
-        var createSourceBaseBackupParametersFabric = new CreateBaseBackupParametersFabric(logger, null, null, true);
+        var createSourceBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(logger, null, null, true);
         var createSourceBaseBackupParametersResult =
-            await createSourceBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
+            await createSourceBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
@@ -44,10 +44,10 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var createDestinationBaseBackupParametersFabric =
-            new CreateBaseBackupParametersFabric(logger, null, null, true);
+        var createDestinationBaseBackupParametersFactory =
+            new CreateBaseBackupParametersFactory(logger, null, null, true);
         var createDestinationBaseBackupParametersResult =
-            await createDestinationBaseBackupParametersFabric.CreateBaseBackupParameters(httpClientFactory,
+            await createDestinationBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
@@ -88,13 +88,13 @@ public static class CopyBaseParametersFabric
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
-        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(
+        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFactoryExt.CreateFileStorageAndFileManager(
             true, logger, localPath, exchangeFileStorageName, fileStorages, null, null, cancellationToken);
 
         //წყაროს ფაილსაცავი
         var sourceFileStorageName = fromDatabaseParameters.FileStorageName;
 
-        var (sourceFileStorage, sourceFileManager) = await FileManagersFabricExt.CreateFileStorageAndFileManager(true,
+        var (sourceFileStorage, sourceFileManager) = await FileManagersFactoryExt.CreateFileStorageAndFileManager(true,
             logger, localPath, sourceFileStorageName, fileStorages, null, null, cancellationToken);
 
         if (sourceFileManager == null)
@@ -114,7 +114,7 @@ public static class CopyBaseParametersFabric
 
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
         var (destinationFileStorage, destinationFileManager) =
-            await FileManagersFabricExt.CreateFileStorageAndFileManager(true, logger, localPath,
+            await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath,
                 destinationFileStorageName, fileStorages, null, null, cancellationToken);
 
         if (destinationFileStorage == null)
@@ -131,7 +131,7 @@ public static class CopyBaseParametersFabric
 
         Console.WriteLine();
 
-        var localFileManager = FileManagersFabric.CreateFileManager(true, logger, localPath);
+        var localFileManager = FileManagersFactory.CreateFileManager(true, logger, localPath);
 
         if (localFileManager == null)
         {
@@ -141,7 +141,7 @@ public static class CopyBaseParametersFabric
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var createDatabaseManagerResultForSource = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
+        var createDatabaseManagerResultForSource = await DatabaseManagersFactory.CreateDatabaseManager(logger, true,
             sourceDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
             cancellationToken);
 
@@ -152,7 +152,7 @@ public static class CopyBaseParametersFabric
             return null;
         }
 
-        var createDatabaseManagerResultForDestination = await DatabaseManagersFabric.CreateDatabaseManager(logger, true,
+        var createDatabaseManagerResultForDestination = await DatabaseManagersFactory.CreateDatabaseManager(logger, true,
             destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
             cancellationToken);
 

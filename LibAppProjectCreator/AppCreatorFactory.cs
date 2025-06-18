@@ -11,7 +11,7 @@ using SupportToolsData.Models;
 
 namespace LibAppProjectCreator;
 
-public static class AppCreatorFabric
+public static class AppCreatorFactory
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, IHttpClientFactory httpClientFactory,
         AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos,

@@ -366,18 +366,18 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         //---===libProjectRepositories პროექტის ფაილები===---
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი ინტერფეისი
-        Console.WriteLine($"Creating I{ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricInterfaceCreator = new RepositoryCreatorFabricInterfaceCreator(Logger,
+        Console.WriteLine($"Creating I{ProjectName}RepositoryCreatorFactory.cs...");
+        var repositoryCreatorFactoryInterfaceCreator = new RepositoryCreatorFactoryInterfaceCreator(Logger,
             _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
-            $"I{ProjectName}RepositoryCreatorFabric.cs");
-        repositoryCreatorFabricInterfaceCreator.CreateFileStructure();
+            $"I{ProjectName}RepositoryCreatorFactory.cs");
+        repositoryCreatorFactoryInterfaceCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორიის შემქმნელი
-        Console.WriteLine($"Creating {ProjectName}RepositoryCreatorFabric.cs...");
-        var repositoryCreatorFabricCreator = new RepositoryCreatorFabricCreator(Logger,
+        Console.WriteLine($"Creating {ProjectName}RepositoryCreatorFactory.cs...");
+        var repositoryCreatorFactoryCreator = new RepositoryCreatorFactoryCreator(Logger,
             _apiAppCreatorData.LibProjectRepositoriesProjectData.ProjectFullPath, ProjectName,
-            $"{ProjectName}RepositoryCreatorFabric.cs");
-        repositoryCreatorFabricCreator.CreateFileStructure();
+            $"{ProjectName}RepositoryCreatorFactory.cs");
+        repositoryCreatorFactoryCreator.CreateFileStructure();
 
         //შეიქმნას ბაზის რეპოზიტორია
         Console.WriteLine($"Creating I{ProjectName}Repository.cs...");
