@@ -1,16 +1,16 @@
 //Created by ProjectMainClassCreator at 5/9/2021 13:38:34
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using CliParameters;
 using DbTools;
-using DbToolsFabric;
+using DbToolsFactory;
 using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
@@ -34,7 +34,7 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 
     private DbManager GetDbManager()
     {
-        var dbKit = ManagerFactory.GetKit(EDatabaseProvider.SqlServer);
+        var dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
         return DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString) ??
                throw new Exception("Cannot create DbManager");
