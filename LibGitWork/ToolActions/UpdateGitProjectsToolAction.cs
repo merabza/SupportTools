@@ -55,7 +55,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         List<string> usedProjectNames = [];
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
-        foreach (var gitProjectsUpdater in gitRepos.Gits.Select(kvp =>
+        foreach (var gitProjectsUpdater in gitRepos.Gits.OrderBy(k => k.Key).Select(kvp =>
                      GitProjectsUpdater.Create(Logger, _parametersManager, kvp.Key, UseConsole)))
         {
             if (gitProjectsUpdater is null)
@@ -128,7 +128,6 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
             }
 
             project.DependsOn(dependsOnProjectNames);
-
 
             Console.WriteLine();
             return true;

@@ -33,7 +33,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
 
         if (_useDatabase)
             fieldEditorsBlock.Add(new FlatCodeBlock(
-                $"FieldEditors.Add(new DatabaseConnectionParametersFieldEditor(logger, nameof({_projectNamespace}Parameters.DatabaseConnectionParameters), parametersManager))"));
+                $"FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory, nameof({_projectNamespace}Parameters.DatabaseConnectionName), parametersManager, true))"));
 
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),

@@ -22,14 +22,16 @@ public sealed class ProjectParametersClassCreator : CodeCreator
         _useMenu = useMenu;
     }
 
-
     public override void CreateFileStructure()
     {
         var propertiesBlock = new FlatCodeBlock();
         var tasksBlock = new FlatCodeBlock();
         if (_useDatabase)
-            propertiesBlock.Add(new CodeBlock("public DatabaseConnectionParameters? DatabaseConnectionParameters", true,
-                "get", "set"));
+        {
+            propertiesBlock.Add(new CodeBlock("public string? DatabaseConnectionName", true, "get", "set"));
+            propertiesBlock.Add(new CodeBlock(
+                "Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections", true, "get", "set"));
+        }
 
         if (_useMenu)
         {
@@ -50,8 +52,8 @@ public sealed class ProjectParametersClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using LibParameters", _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
-            _useDatabase ? new CodeCommand("using CliParametersDataEdit.Models") : new CodeExtraLine(), string.Empty,
-            $"namespace {_inNamespace}.Models", string.Empty,
+            //_useDatabase ? new CodeCommand("using CliParametersDataEdit.Models") : new CodeExtraLine(), 
+            string.Empty, $"namespace {_inNamespace}.Models", string.Empty,
             new CodeBlock($"public sealed class {_projectNames}Parameters : IParameters",
                 new CodeBlock("public string? LogFolder", true, "get", "set"), propertiesBlock,
                 new CodeBlock("public bool CheckBeforeSave()", "return true"), _useMenu ? tasksBlock : null));

@@ -15,7 +15,6 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
         _projectNamespace = projectNamespace;
     }
 
-
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
@@ -32,10 +31,19 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                     "_par = par"),
                 new CodeBlock("protected override void ConfigureServices(IServiceCollection services)",
                     "base.ConfigureServices(services)", string.Empty,
-                    new CodeBlock("if (!string.IsNullOrEmpty(_par.DatabaseConnectionParameters?.ConnectionString))",
-                        $"services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(_par.DatabaseConnectionParameters.ConnectionString))"),
+                    "DatabaseServerConnections databaseServerConnections = new(_par.DatabaseServerConnections)",
+                    string.Empty,
+                    "var (dataProvider, connectionString) = DbConnectionFactory.GetDataProviderAndConnectionString(_par.DatabaseParameters, databaseServerConnections)",
+                    string.Empty,
+                    new CodeBlock("if (!string.IsNullOrEmpty(connectionString))",
+                        new CodeBlock("switch (dataProvider)",
+                            $"case EDatabaseProvider.SqlServer: services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(connectionString))",
+                            "break",
+                            "case EDatabaseProvider.None: case EDatabaseProvider.SqLite: case EDatabaseProvider.OleDb: case EDatabaseProvider.WebAgent: case null: break",
+                            "default: throw new ArgumentOutOfRangeException(nameof(dataProvider))")),
                     $"services.AddScoped<I{_projectNamespace}Repository, {_projectNamespace}Repository>()",
-                    $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFactory, {_projectNamespace}RepositoryCreatorFactory>()")));
+                    $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFactory, {_projectNamespace}RepositoryCreatorFactory>()",
+                    "services.AddHttpClient()")));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }
