@@ -84,6 +84,15 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                         _parametersManager, _projectName));
             }
 
+            //if (project.IsService)
+            //{
+            //    projectSubMenuSet.AddMenuItem(
+            //        new EndpointNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
+            //    //projectSubMenuSet.AddMenuItem(
+            //    //    new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger, _httpClientFactory,
+            //    //        _parametersManager, _projectName));
+            //}
+
             //დასაშვები ინსტრუმენტების არჩევა
             projectSubMenuSet.AddMenuItem(
                 new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));

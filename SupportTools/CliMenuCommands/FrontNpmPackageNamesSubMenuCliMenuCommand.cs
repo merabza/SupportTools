@@ -27,7 +27,7 @@ public sealed class FrontNpmPackageNamesSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var gitSubMenuSet = new CliMenuSet("Front Npm Package Names");
+        var gitSubMenuSet = new CliMenuSet(Name);
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

@@ -23,10 +23,9 @@ public sealed class NpmPackageInProjectSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        //git-ის პროექტის მენიუს შექმნა
         CliMenuSet gitProjectSubMenuSet = new(_npmPackageName);
 
-        //გიტის პროექტის წაშლა ამ პროექტიდან
+        //Npm პროექტის წაშლა ამ პროექტიდან
         var deleteGitProjectCommand =
             new DeleteNpmPackageFromProjectCliMenuCommand(_parametersManager, _projectName, _npmPackageName);
         gitProjectSubMenuSet.AddMenuItem(deleteGitProjectCommand);

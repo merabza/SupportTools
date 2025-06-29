@@ -41,6 +41,7 @@ public sealed class ProjectModel : ItemData
     public DatabaseParameters? ProdCopyDatabaseParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];
     public List<string> FrontNpmPackageNames { get; init; } = [];
+    public Dictionary<string, EndpointModel> Endpoints { get; init; } = [];
     public List<string> GitProjectNames { get; init; } = [];
     public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];
     public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
