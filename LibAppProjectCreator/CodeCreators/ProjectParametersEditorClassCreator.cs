@@ -17,7 +17,6 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
         _useDatabase = useDatabase;
     }
 
-
     public override void CreateFileStructure()
     {
         var propertiesBlock = new FlatCodeBlock();
@@ -28,21 +27,20 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
             propertiesBlock.Add(new FlatCodeBlock("using CliParametersDataEdit.FieldEditors"));
         }
 
-
         var fieldEditorsBlock = new FlatCodeBlock();
 
         if (_useDatabase)
             fieldEditorsBlock.Add(new FlatCodeBlock(
                 $"FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory, nameof({_projectNamespace}Parameters.DatabaseConnectionName), parametersManager, true))"));
 
-
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters", "using CliParameters.FieldEditors", "using LibParameters",
-            "using Microsoft.Extensions.Logging", $"using {_projectNamespace}.Models", propertiesBlock, string.Empty,
-            $"namespace {_projectNamespace}.Models", string.Empty,
+            _useDatabase ? "using System.Net.Http" : null, "using CliParameters", "using CliParameters.FieldEditors",
+            "using LibParameters", "using Microsoft.Extensions.Logging", 
+            //$"using {_projectNamespace}.Models",
+            propertiesBlock, string.Empty, $"namespace {_projectNamespace}", string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}ParametersEditor : ParametersEditor",
                 new CodeBlock(
-                    $"public {_projectNamespace}ParametersEditor(IParameters parameters, ParametersManager parametersManager, ILogger logger) : base(\"{_projectNamespace} Parameters Editor\", parameters, parametersManager)",
+                    $"public {_projectNamespace}ParametersEditor(IParameters parameters, ParametersManager parametersManager, ILogger logger{(_useDatabase ? ", IHttpClientFactory httpClientFactory" : "")}) : base(\"{_projectNamespace} Parameters Editor\", parameters, parametersManager)",
                     $"FieldEditors.Add(new FolderPathFieldEditor(nameof({_projectNamespace}Parameters.LogFolder)))",
                     fieldEditorsBlock)));
         CodeFile.AddRange(block.CodeItems);

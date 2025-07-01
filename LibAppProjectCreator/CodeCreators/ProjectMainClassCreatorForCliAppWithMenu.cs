@@ -26,7 +26,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             "var mainMenuSet = new CliMenuSet(\"Main Menu\")",
             //"AddChangeMenu(mainMenuSet)",
             string.Empty, new OneLineComment("ძირითადი პარამეტრების რედაქტირება"),
-            $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger)",
+            $"var {_projectNamespace.UnCapitalize()}ParametersEditor = new {_projectNamespace}ParametersEditor(parameters, _parametersManager, _logger{(_useDatabase ? ", _httpClientFactory" : "")})",
             $"mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
             string.Empty, new OneLineComment("საჭირო მენიუს ელემენტები"), string.Empty);
 
@@ -42,16 +42,18 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             "mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length)", string.Empty, "return mainMenuSet");
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
 
-
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using CliMenu", "using CliParameters.CliMenuCommands", "using CliTools", "using CliTools.CliMenuCommands",
             "using LibDataInput", "using LibParameters", "using Microsoft.Extensions.Logging", "using System",
-            "using System.Linq", $"using {_projectNamespace}.MenuCommands", $"using {_projectNamespace}.Models",
+            "using System.Linq", _useDatabase ? "using System.Net.Http" : null,
+            $"using {_projectNamespace}.MenuCommands",
+            //$"using {_projectNamespace}.Models",
             _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), string.Empty,
             _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(),
             string.Empty, $"namespace {_projectNamespace}", string.Empty,
             new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock($"public sealed class {_projectNamespace} : CliAppLoop", "private readonly ILogger _logger",
+                _useDatabase ? "private readonly IHttpClientFactory _httpClientFactory" : null,
                 "private readonly ParametersManager _parametersManager",
                 _useDatabase
                     ? new OneLineComment(
@@ -62,8 +64,9 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
                         $"private readonly I{_projectNamespace}RepositoryCreatorFactory _{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory")
                     : new CodeExtraLine(), string.Empty,
                 new CodeBlock(
-                    $"public {_projectNamespace}(ILogger logger, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : string.Empty)})",
-                    "_logger = logger", "_parametersManager = parametersManager",
+                    $"public {_projectNamespace}(ILogger logger{(_useDatabase ? ", IHttpClientFactory httpClientFactory" : string.Empty)}, ParametersManager parametersManager{(_useDatabase ? $", I{_projectNamespace}RepositoryCreatorFactory {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory" : string.Empty)})",
+                    "_logger = logger", _useDatabase ? "_httpClientFactory = httpClientFactory" : null,
+                    "_parametersManager = parametersManager",
                     _useDatabase
                         ? new CodeCommand(
                             $"_{_projectNamespace.UnCapitalize()}RepositoryCreatorFactory = {_projectNamespace.UnCapitalize()}RepositoryCreatorFactory")
