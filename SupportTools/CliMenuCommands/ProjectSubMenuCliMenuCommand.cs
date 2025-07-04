@@ -9,6 +9,7 @@ using LibGitWork.CliMenuCommands;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
+using SupportToolsData;
 using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
@@ -70,18 +71,15 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project is not null)
         {
             if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
-            {
                 projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory,
                     _parametersManager, _projectName, EGitCol.ScaffoldSeed));
-            }
 
             if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
             {
                 projectSubMenuSet.AddMenuItem(
                     new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
-                projectSubMenuSet.AddMenuItem(
-                    new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger, _httpClientFactory,
-                        _parametersManager, _projectName));
+                projectSubMenuSet.AddMenuItem(new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger,
+                    _httpClientFactory, _parametersManager, _projectName));
             }
 
             //if (project.IsService)
@@ -94,14 +92,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             //}
 
             //დასაშვები ინსტრუმენტების არჩევა
-            projectSubMenuSet.AddMenuItem(
-                new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
+            projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
-            foreach (var tool in ToolCommandFactory.ToolsByProjects.Intersect(project.AllowToolsList))
-            {
+            foreach (var tool in ToolCommandFactory.ToolsByProjects.Intersect(project.AllowToolsList)
+                         .OrderBy(x => x.GetToolName()))
                 projectSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
                     _projectName, null, _parametersManager));
-            }
         }
 
         var serverInfoCruder = new ServerInfoCruder(_logger, _httpClientFactory, _parametersManager, _projectName);
@@ -113,19 +109,14 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         //სერვერების ჩამონათვალი
         if (project?.ServerInfos != null)
-        {
             foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
-            {
                 projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
                     kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key));
-            }
-        }
 
         //მთავარ მენიუში გასვლა
         var key = ConsoleKey.Escape.Value().ToLower();
-        projectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
-            key.Length);
+        projectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
 
         return projectSubMenuSet;
     }

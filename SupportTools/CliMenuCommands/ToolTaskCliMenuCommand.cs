@@ -21,9 +21,9 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     private readonly ETools _tool;
     private IToolCommand? _toolCommand;
 
-    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool,
-        string projectName, ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(
-        tool.ToString(), EMenuAction.Reload, EMenuAction.Reload, null, true)
+    public ToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, ETools tool, string projectName,
+        ServerInfoModel? serverInfo, IParametersManager parametersManager) : base(tool.GetToolName(),
+        EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -49,10 +49,7 @@ public sealed class ToolTaskCliMenuCommand : CliMenuCommand
     protected override bool RunBody()
     {
         var toolCommand = MemoCreateToolCommand();
-        if (toolCommand?.Par != null)
-        {
-            return toolCommand.Run(CancellationToken.None).Result;
-        }
+        if (toolCommand?.Par != null) return toolCommand.Run(CancellationToken.None).Result;
 
         Console.WriteLine("Parameters not loaded. Tool not started.");
         return false;
