@@ -98,6 +98,16 @@ public sealed class TemplateCruder : ParCruder
                 EnableFieldByName(nameof(TemplateModel.UseSignalR), false);
                 EnableFieldByName(nameof(TemplateModel.UseFluentValidation), false);
                 break;
+            case ESupportProjectType.Razor:
+                EnableFieldByName(nameof(TemplateModel.UseMenu), false);
+                EnableFieldByName(nameof(TemplateModel.UseHttps));
+                EnableFieldByName(nameof(TemplateModel.UseReact), false);
+                EnableFieldByName(nameof(TemplateModel.UseCarcass));
+                EnableFieldByName(nameof(TemplateModel.UseIdentity));
+                EnableFieldByName(nameof(TemplateModel.UseReCounter));
+                EnableFieldByName(nameof(TemplateModel.UseSignalR));
+                EnableFieldByName(nameof(TemplateModel.UseFluentValidation));
+                break;
             case ESupportProjectType.Api:
                 EnableFieldByName(nameof(TemplateModel.UseMenu), false);
                 EnableFieldByName(nameof(TemplateModel.UseHttps));

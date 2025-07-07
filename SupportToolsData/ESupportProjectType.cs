@@ -3,8 +3,7 @@
 public enum ESupportProjectType
 {
     Console,
-
-    //ConsoleWithMenu,
+    Razor,
     Api,
     ScaffoldSeeder
 }

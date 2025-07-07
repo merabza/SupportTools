@@ -5,7 +5,8 @@ public enum EDotnetProjectType
     ClassLib,
     Console,
     Web,
-    ReactEsProj
+    ReactEsProj,
+    webapp,//razor 
 }
 
 /*
@@ -13,7 +14,7 @@ public enum EDotnetProjectType
 
 dotnet --version
 
-9.0.300
+9.0.301
 
 dotnet new list
 
