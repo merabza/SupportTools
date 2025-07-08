@@ -134,7 +134,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         var seederParameters = new SeederParametersDomain(
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName, "Json"),
             Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
-            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}");
+            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}",
+            Parameters.ExcludesRulesParametersFilePath);
 
         if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFullPath,
