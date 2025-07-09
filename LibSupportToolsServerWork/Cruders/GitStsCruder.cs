@@ -248,7 +248,7 @@ public sealed class GitStsCruder : Cruder
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new GitDataModel();
     }

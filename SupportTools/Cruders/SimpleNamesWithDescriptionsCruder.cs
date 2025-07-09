@@ -22,7 +22,7 @@ public abstract class SimpleNamesWithDescriptionsCruder : ParCruder
         return GetDictionary().ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new TextItemData();
     }

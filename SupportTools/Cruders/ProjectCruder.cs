@@ -64,6 +64,7 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.ExcludesRulesParametersFilePath)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.MigrationSqlFilesFolder)));
         FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
+        FieldEditors.Add(new RouteClassesFieldEditor(nameof(ProjectModel.RouteClasses), parametersManager));
         FieldEditors.Add(new ProjectSimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(nameof(ProjectModel.FrontNpmPackageNames), parametersManager));
     }
 
@@ -105,7 +106,7 @@ public sealed class ProjectCruder : ParCruder
         projects.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new ProjectModel();
     }

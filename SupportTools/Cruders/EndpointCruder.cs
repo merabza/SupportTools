@@ -1,13 +1,12 @@
-﻿using CliParameters;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CliParameters;
 using CliParameters.FieldEditors;
-using LanguageExt.ClassInstances;
 using LibParameters;
 using SupportTools.Validators;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SystemToolsShared;
 
 namespace SupportTools.Cruders;
@@ -21,8 +20,22 @@ public class EndpointCruder : ParCruder
         "Endpoint", "Endpoints")
     {
         _project = project;
-        FieldEditors.Add(new BoolFieldEditor(nameof(EndpointEditModel.RequireAuthorization), true));
-        FieldEditors.Add(new TextFieldEditor(nameof(EndpointEditModel.Base)));
+        FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.EndpointName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.EndpointRoute)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(EndpointModel.RequireAuthorization), true));
+        FieldEditors.Add(new EnumFieldEditor<EHttpMethod>(nameof(EndpointModel.HttpMethod), EHttpMethod.Get));
+        FieldEditors.Add(new EnumFieldEditor<EEndpointType>(nameof(EndpointModel.EndpointType), EEndpointType.Query));
+        FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.ReturnType)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(EndpointModel.SendMessageToCurrentUser)));
+        /*
+    public string EndpointName { get; set; }
+           public string EndpointRoute { get; set; }
+           public bool RequireAuthorization { get; set; }
+           public string HttpMethod { get; set; }
+           public EEndpointType EndpointType { get; set; }
+           public string ReturnType { get; set; }
+           public bool SendMessageToCurrentUser { get; set; }
+         */
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -30,10 +43,11 @@ public class EndpointCruder : ParCruder
         return _project.Endpoints.ToDictionary(p => p.Key, ItemData (p) => p.Value);
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
-        return new EndpointEditModel();
+        return new EndpointModel();
     }
+
     public override bool ContainsRecordWithKey(string recordKey)
     {
         return _project.Endpoints.ContainsKey(recordKey);
@@ -46,55 +60,49 @@ public class EndpointCruder : ParCruder
 
     public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not EndpointEditModel endpointModel)
+        if (newRecord is not EndpointModel endpointModel)
             throw new Exception("newRecord is null in EndpointModel");
-        var adaptedModel = AdaptEndpointModel(endpointModel);
-        if (adaptedModel != null)
-            _project.Endpoints[recordKey] = adaptedModel;
+        //var adaptedModel = AdaptEndpointModel(endpointModel);
+        //if (adaptedModel != null)
+        _project.Endpoints[recordKey] = endpointModel;
     }
 
     protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
     {
-        if (newRecord is not EndpointEditModel endpointModel)
+        if (newRecord is not EndpointModel endpointModel)
             throw new Exception("newRecord is null in EndpointModel");
-        var adaptedModel = AdaptEndpointModel(endpointModel);
-        if (adaptedModel != null)
-            _project.Endpoints.Add(recordKey, adaptedModel);
+        //var adaptedModel = AdaptEndpointModel(endpointModel);
+        //if (adaptedModel != null)
+        _project.Endpoints.Add(recordKey, endpointModel);
     }
 
-    private static EndpointModel? AdaptEndpointModel(EndpointEditModel endpointEditModel)
-    {
+    //private static EndpointModel? AdaptEndpointModel(EndpointEditModel endpointEditModel)
+    //{
+    //    var validator = new EndpointModelValidator();
 
-        var validator = new EndpointModelValidator();
+    //    var validateResults = validator.Validate(endpointEditModel);
+    //    if (validateResults.IsValid)
+    //        return new EndpointModel
+    //        {
+    //            //Root = endpointEditModel.Root!,
+    //            //Version = endpointEditModel.Version!,
+    //            //Base = endpointEditModel.Base!,
+    //            EndpointName = endpointEditModel.EndpointName!,
+    //            EndpointRoute = endpointEditModel.EndpointRoute!,
+    //            RequireAuthorization = endpointEditModel.RequireAuthorization,
+    //            HttpMethod = endpointEditModel.HttpMethod!,
+    //            EndpointType = EEndpointType.Command,
+    //            ReturnType = endpointEditModel.ReturnType!,
+    //            SendMessageToCurrentUser = false
+    //        };
 
-        var validateResults = validator.Validate(endpointEditModel);
-        if (validateResults.IsValid)
-            return new EndpointModel
-            {
-                Root = endpointEditModel.Root!,
-                Version = endpointEditModel.Version!,
-                Base = endpointEditModel.Base!,
-                EndpointName = endpointEditModel.EndpointName!,
-                EndpointRoute = endpointEditModel.EndpointRoute!,
-                RequireAuthorization = endpointEditModel.RequireAuthorization,
-                HttpMethod = endpointEditModel.HttpMethod!,
-                EndpointType = EEndpointType.Command,
-                ReturnType = endpointEditModel.ReturnType!,
-                SendMessageToCurrentUser = false,
-            };
+    //    //StShared.WriteErrorLine(validateResults.ToString(), true, null, false);
+    //    return null;
+    //}
 
-        //StShared.WriteErrorLine(validateResults.ToString(), true, null, false);
-        return null;
-
-
-
-
-    }
-
-    
     public override bool CheckValidation(ItemData item)
     {
-        if (item is not EndpointEditModel endpointModel)
+        if (item is not EndpointModel endpointModel)
             throw new Exception("newRecord is null in EndpointModel");
         var validator = new EndpointModelValidator();
 
@@ -103,6 +111,4 @@ public class EndpointCruder : ParCruder
             StShared.WriteErrorLine(validateResults.ToString(), true, null, false);
         return validateResults.IsValid;
     }
-
-
 }

@@ -20,7 +20,7 @@ public abstract class SimpleNamesListCruder : ParCruder
         return GetList().ToDictionary(k => k, ItemData (_) => new ItemData());
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new TextItemData();
     }

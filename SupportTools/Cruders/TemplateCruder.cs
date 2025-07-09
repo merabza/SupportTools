@@ -78,7 +78,7 @@ public sealed class TemplateCruder : ParCruder
         projectTemplates.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new TemplateModel();
     }

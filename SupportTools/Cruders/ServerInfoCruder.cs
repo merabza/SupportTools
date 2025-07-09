@@ -105,7 +105,7 @@ public sealed class ServerInfoCruder : ParCruder
         project.ServerInfos.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new ServerInfoModel();
     }

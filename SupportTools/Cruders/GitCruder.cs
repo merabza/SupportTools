@@ -150,7 +150,7 @@ public sealed class GitCruder : ParCruder
             $"{git.GitProjectAddress} Usage count is: {usageCount}{(remGitRepo is null ? "" : $"- rem name is: {remGitRepo.GitProjectName}")}";
     }
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(ItemData? defaultItemData)
     {
         return new GitDataModel();
     }
