@@ -35,12 +35,21 @@ public sealed class ApiAppCreator : AppCreatorBase
         _apiAppCreatorData = apiAppCreatorData;
     }
 
-    //protected override void PrepareFoldersForCheckAndClear()
-    //{
-    //    base.PrepareFoldersForCheckAndClear();
-    //    if (!string.IsNullOrWhiteSpace(_apiAppCreatorData.DbPartPath))
-    //        FoldersForCheckAndClear.Add(_apiAppCreatorData.DbPartPath);
-    //}
+    //შესაქმნელი პროექტების მონაცემების სიის შექმნა
+    protected override void PrepareProjectsData()
+    {
+        AddProject(_apiAppCreatorData.MainProjectData);
+        if (!_apiAppCreatorData.UseDatabase)
+            return;
+        AddProject(_apiAppCreatorData.LibProjectRepositoriesProjectData);
+        AddProject(_apiAppCreatorData.DatabaseProjectData);
+        AddProject(_apiAppCreatorData.DbMigrationProjectData);
+        if (!_apiAppCreatorData.UseCarcass)
+            return;
+        AddProject(_apiAppCreatorData.RepositoriesProjectData);
+        if (_apiAppCreatorData.UseReact)
+            AddProject(_apiAppCreatorData.FrontendProjectData);
+    }
 
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
@@ -436,21 +445,5 @@ public sealed class ApiAppCreator : AppCreatorBase
         Console.WriteLine("Creating AppSettings.cs...");
         var appSettingsClassCreator = new AppSettingsClassCreator(Logger, modelsPath, ProjectName, "AppSettings.cs");
         appSettingsClassCreator.CreateFileStructure();
-    }
-
-    //შესაქმნელი პროექტების მონაცემების სიის შექმნა
-    protected override void PrepareProjectsData()
-    {
-        AddProject(_apiAppCreatorData.MainProjectData);
-        if (!_apiAppCreatorData.UseDatabase)
-            return;
-        AddProject(_apiAppCreatorData.LibProjectRepositoriesProjectData);
-        AddProject(_apiAppCreatorData.DatabaseProjectData);
-        AddProject(_apiAppCreatorData.DbMigrationProjectData);
-        if (!_apiAppCreatorData.UseCarcass)
-            return;
-        AddProject(_apiAppCreatorData.RepositoriesProjectData);
-        if (_apiAppCreatorData.UseReact)
-            AddProject(_apiAppCreatorData.FrontendProjectData);
     }
 }

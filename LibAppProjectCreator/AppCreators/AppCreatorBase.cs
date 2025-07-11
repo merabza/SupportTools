@@ -27,12 +27,21 @@ public abstract class AppCreatorBase
 {
     private readonly GitRepos _gitRepos;
     private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly int _indentSize;
+    private List<string> FoldersForCreate { get; } = [];//შესაქმნელი ფოლდერების სია
+    private List<string> FoldersForCheckAndClear { get; } = [];//გასაწმენდი ფოლდერების სია
+    private List<ProjectBase> Projects { get; } = [];//სოლუშენში ჩასამატებელი პროექტების სია
+    private List<ReferenceDataModel> References { get; } = [];//რეფერენსების სია
+    private List<PackageDataModel> Packages { get; } = [];//გარე პაკეტების სია
+
     protected readonly GitProjects GitProjects;
     protected readonly ILogger Logger;
-
     protected readonly string ProjectName;
+    protected string WorkPath { get; }
+    protected string SecurityPath { get; }
+
+    public string SolutionPath { get; }
+    public List<GitCloneDataModel> GitClones { get; } = [];//გიტით დასაკლონი პროექტების სია
 
     protected AppCreatorBase(ILogger logger, IHttpClientFactory httpClientFactory, string projectName,
         int indentSize, GitProjects gitProjects, GitRepos gitRepos, string workPath, string securityPath,
@@ -49,33 +58,40 @@ public abstract class AppCreatorBase
         SolutionPath = solutionPath;
     }
 
-    protected string WorkPath { get; }
+    public async Task<bool> PrepareParametersAndCreateApp(bool askForDelete, CancellationToken cancellationToken,
+        ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
+    {
+        if (!PrepareParameters())
+        {
+            StShared.WriteErrorLine("Solution Parameters does not created", true, Logger);
+            return false;
+        }
 
-    protected string SecurityPath { get; }
+        if (await CreateApp(askForDelete, createAppVersions, cancellationToken))
+        {
+            return true;
+        }
 
-    public string SolutionPath { get; }
-
-    //შესაქმნელი ფოლდერების სია
-    private List<string> FoldersForCreate { get; } = [];
-
-    //გასაწმენდი ფოლდერების სია
-    private List<string> FoldersForCheckAndClear { get; } = [];
-
-    //გიტით დასაკლონი პროექტების სია
-    public List<GitCloneDataModel> GitClones { get; } = [];
-
-    //სოლუშენში ჩასამატებელი პროექტების სია
-    private List<ProjectBase> Projects { get; } = [];
-
-    //რეფერენსების სია
-    private List<ReferenceDataModel> References { get; } = [];
-
-    //გარე პაკეტების სია
-    private List<PackageDataModel> Packages { get; } = [];
+        StShared.WriteErrorLine("Solution does not created", true, Logger);
+        return false;
+    }
 
     //სოლუშენში შემავალი პროექტების მომზადება
     protected virtual void PrepareProjectsData()
     {
+    }
+    
+    protected void AddProject(ProjectForCreate projectForCreate)
+    {
+        FoldersForCreate.Add(projectForCreate.ProjectFullPath);
+
+        foreach (var folderFullPath in projectForCreate.FoldersForCreate.Values)
+            //ჩაემატოს შესაქმნელი ფოლდერების სიაში
+        {
+            FoldersForCreate.Add(folderFullPath);
+        }
+
+        Projects.Add(projectForCreate);
     }
 
     //პროექტის ტიპზე დამოკიდებული დამატებით საჭირო ფაილების შექმნა
@@ -85,6 +101,27 @@ public abstract class AppCreatorBase
     protected virtual bool PrepareSpecific()
     {
         return true;
+    }
+
+    protected void AddReference(ProjectBase firstProjectData, GitProjectDataDomain referenceProjectData)
+    {
+        var gitProject = Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
+                         AddGitProject(WorkPath, referenceProjectData);
+        if (gitProject is not null)
+        {
+            AddReference(firstProjectData, gitProject);
+        }
+    }
+
+    protected void AddReference(ProjectBase firstProjectData, ProjectBase referenceProjectData)
+    {
+        References.Add(new ReferenceDataModel(firstProjectData.ProjectFileFullName,
+            referenceProjectData.ProjectFileFullName));
+    }
+
+    protected void AddPackage(ProjectForCreate projectData, string packageName, string? version = null)
+    {
+        Packages.Add(new PackageDataModel(projectData.ProjectFileFullName, packageName, version));
     }
 
     private void PrepareFoldersForCheckAndClear()
@@ -120,24 +157,6 @@ public abstract class AppCreatorBase
 
         //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
         return PrepareSpecific();
-    }
-
-    public async Task<bool> PrepareParametersAndCreateApp(bool askForDelete, CancellationToken cancellationToken,
-        ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
-    {
-        if (!PrepareParameters())
-        {
-            StShared.WriteErrorLine("Solution Parameters does not created", true, Logger);
-            return false;
-        }
-
-        if (await CreateApp(askForDelete, createAppVersions, cancellationToken))
-        {
-            return true;
-        }
-
-        StShared.WriteErrorLine("Solution does not created", true, Logger);
-        return false;
     }
 
     private void AddGitClone(GitDataDto gitData)
@@ -196,27 +215,6 @@ public abstract class AppCreatorBase
         AddGitClone(gitRepo);
         //დავაბრუნოთ ახლადშექმნილი პროექტი
         return projectFromGit;
-    }
-
-    protected void AddReference(ProjectBase firstProjectData, GitProjectDataDomain referenceProjectData)
-    {
-        var gitProject = Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
-                         AddGitProject(WorkPath, referenceProjectData);
-        if (gitProject is not null)
-        {
-            AddReference(firstProjectData, gitProject);
-        }
-    }
-
-    protected void AddReference(ProjectBase firstProjectData, ProjectBase referenceProjectData)
-    {
-        References.Add(new ReferenceDataModel(firstProjectData.ProjectFileFullName,
-            referenceProjectData.ProjectFileFullName));
-    }
-
-    protected void AddPackage(ProjectForCreate projectData, string packageName, string? version = null)
-    {
-        Packages.Add(new PackageDataModel(projectData.ProjectFileFullName, packageName, version));
     }
 
     //აპლიკაციის შექმნის პროცესი
@@ -320,9 +318,7 @@ public abstract class AppCreatorBase
         }
 
         if (!await MakeAdditionalFiles(cancellationToken))
-        {
             return false;
-        }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
         foreach (var refData in References)
@@ -419,18 +415,5 @@ public abstract class AppCreatorBase
                 _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), null,
                 true, useProjectUpdater));
         return gitSyncAll.Run(CancellationToken.None).Result;
-    }
-
-    protected void AddProject(ProjectForCreate projectForCreate)
-    {
-        FoldersForCreate.Add(projectForCreate.ProjectFullPath);
-
-        foreach (var folderFullPath in projectForCreate.FoldersForCreate.Values)
-            //ჩაემატოს შესაქმნელი ფოლდერების სიაში
-        {
-            FoldersForCreate.Add(folderFullPath);
-        }
-
-        Projects.Add(projectForCreate);
     }
 }

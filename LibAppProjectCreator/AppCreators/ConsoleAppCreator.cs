@@ -39,9 +39,6 @@ public sealed class ConsoleAppCreator : AppCreatorBase
 
     protected override bool PrepareSpecific()
     {
-        if (!base.PrepareSpecific())
-            return false;
-
         //რეფერენსების სიის შედგენა
         AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliParameters);
         //AddReference(_consoleAppWithDatabaseCreatorData.MainProjectData, GitProjects.CliToolsData);

@@ -45,7 +45,11 @@ public static class AppCreatorFactory
 
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
-
+            case ESupportProjectType.Razor:
+                var razorAppCreatorData =
+                    RazorAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
+                return new RazorAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize,
+                    gitProjects, gitRepos, razorAppCreatorData);
             case ESupportProjectType.ScaffoldSeeder:
                 return null;
 
