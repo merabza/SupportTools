@@ -14,7 +14,7 @@ public enum EDotnetProjectType
 
 dotnet --version
 
-9.0.301
+9.0.302
 
 dotnet new list
 
