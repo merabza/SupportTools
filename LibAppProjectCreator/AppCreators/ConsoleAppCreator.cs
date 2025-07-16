@@ -98,7 +98,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ConsoleProgramClassCreator(Logger,
             _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, null,
-            _consoleAppCreatorData.UseDatabase, _consoleAppCreatorData.UseMenu, "Program.cs");
+            _consoleAppCreatorData.UseDatabase, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         var doProject = _consoleAppCreatorData.UseDatabase
@@ -161,7 +161,6 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         //var mainProjectModelsPath =
         //    _consoleAppCreatorData.MainProjectData.FoldersForCreate["Models"];
         var menuCommands = _consoleAppCreatorData.MainProjectData.FoldersForCreate["MenuCommands"];
-
 
         //შეიქმნას პროექტის პარამეტრების რედაქტირების კლასი
         Console.WriteLine($"Creating {ProjectName}ParametersEditor.cs...");
