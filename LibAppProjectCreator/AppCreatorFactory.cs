@@ -31,25 +31,23 @@ public static class AppCreatorFactory
             case ESupportProjectType.Console:
                 var consoleAppWithDatabaseCreatorData =
                     ConsoleAppCreatorData.Create(appCreatorBaseData, par.ProjectName, template);
-                return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize,
-                    gitProjects, gitRepos, consoleAppWithDatabaseCreatorData);
+                return new ConsoleAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
+                    gitRepos, consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:
                 var apiAppCreatorData = ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData,
                     par.ProjectName, par.DbPartProjectName, template);
 
                 if (apiAppCreatorData is not null)
-                {
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,
                         par.IndentSize, gitProjects, gitRepos, apiAppCreatorData);
-                }
 
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
             case ESupportProjectType.Razor:
-                var razorAppCreatorData =
-                    RazorAppCreatorData.Create(appCreatorBaseData, par.ProjectName, par.DbPartProjectName, template);
-                return new RazorAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize,
-                    gitProjects, gitRepos, razorAppCreatorData);
+                var razorAppCreatorData = RazorAppCreatorData.Create(appCreatorBaseData, par.ProjectName,
+                    par.DbPartProjectName, template);
+                return new RazorAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
+                    gitRepos, razorAppCreatorData);
             case ESupportProjectType.ScaffoldSeeder:
                 return null;
 

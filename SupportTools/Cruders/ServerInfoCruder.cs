@@ -34,7 +34,6 @@ public sealed class ServerInfoCruder : ParCruder
         if (project is null)
             throw new ArgumentNullException(nameof(project));
 
-
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, httpClientFactory, nameof(ServerInfoModel.ServerName),
             ParametersManager));
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
@@ -105,7 +104,7 @@ public sealed class ServerInfoCruder : ParCruder
         project.ServerInfos.Remove(recordKey);
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new ServerInfoModel();
     }
@@ -117,7 +116,6 @@ public sealed class ServerInfoCruder : ParCruder
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
-
 
         //დასაშვები ინსტრუმენტების არჩევა
         itemSubMenuSet.AddMenuItem(

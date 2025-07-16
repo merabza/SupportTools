@@ -10,7 +10,8 @@ namespace SupportTools.Cruders;
 public abstract class SimpleNamesWithDescriptionsCruder : ParCruder
 {
     protected SimpleNamesWithDescriptionsCruder(IParametersManager parametersManager, string crudName,
-        string crudNamePlural, string descriptionFieldRealName = "Description") : base(parametersManager, crudName, crudNamePlural)
+        string crudNamePlural, string descriptionFieldRealName = "Description") : base(parametersManager, crudName,
+        crudNamePlural)
     {
         FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), true, descriptionFieldRealName));
     }
@@ -22,7 +23,7 @@ public abstract class SimpleNamesWithDescriptionsCruder : ParCruder
         return GetDictionary().ToDictionary(k => k.Key, ItemData (v) => new TextItemData { Text = v.Value });
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new TextItemData();
     }

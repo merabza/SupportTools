@@ -29,7 +29,7 @@ public class RouteClassCruder : ParCruder
         return _project.RouteClasses.ToDictionary(p => p.Key, ItemData (p) => p.Value);
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new RouteClassModel { Root = api, Version = v1, Base = nameof(RouteClassModel.Base) };
     }

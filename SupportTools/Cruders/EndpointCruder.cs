@@ -43,7 +43,7 @@ public class EndpointCruder : ParCruder
         return _project.Endpoints.ToDictionary(p => p.Key, ItemData (p) => p.Value);
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new EndpointModel();
     }

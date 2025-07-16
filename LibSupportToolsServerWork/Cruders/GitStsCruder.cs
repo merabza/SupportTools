@@ -40,8 +40,8 @@ public sealed class GitStsCruder : Cruder
         //    ParametersManager, true));
     }
 
-    public static GitStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, IParametersManager parametersManager)
+    public static GitStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+        IParametersManager parametersManager)
     {
         return new GitStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
@@ -248,7 +248,7 @@ public sealed class GitStsCruder : Cruder
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new GitDataModel();
     }

@@ -24,13 +24,12 @@ public sealed class RedundantFileNameCruder : ParCruder
         return project?.RedundantFileNames ?? [];
     }
 
-
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         return GetRedundantFileNames().ToDictionary(k => k, v => (ItemData)new TextItemData { Text = v });
     }
 
-    protected override ItemData CreateNewItem(ItemData? defaultItemData)
+    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
     {
         return new TextItemData();
     }
