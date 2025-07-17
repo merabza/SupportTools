@@ -1,9 +1,11 @@
 ﻿using System.Net.Http;
 using CliParameters;
 using CliParameters.FieldEditors;
+using CliParametersApiClientsEdit;
 using CliParametersApiClientsEdit.FieldEditors;
 using CliParametersDataEdit.FieldEditors;
 using CliParametersEdit.FieldEditors;
+using LibApiClientParameters;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.Cruders;
@@ -53,8 +55,12 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters), parametersManager));
 
         //AppProjectCreatorAllParameters
-        FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
-            parametersManager));
+        //FieldEditors.Add(new ApiClientsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.ApiClients),
+        //    parametersManager));
+
+        FieldEditors.Add(new DictionaryFieldEditor<ApiClientCruder, ApiClientSettings>(logger, httpClientFactory,
+            nameof(SupportToolsParameters.ApiClients), parametersManager));
+
         FieldEditors.Add(new GitsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Gits),
             parametersManager));
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(logger,
@@ -72,7 +78,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             parametersManager));
         FieldEditors.Add(new ServersFieldEditor(nameof(SupportToolsParameters.Servers), logger, httpClientFactory,
             parametersManager));
-        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(nameof(SupportToolsParameters.RunTimes), parametersManager));
+        FieldEditors.Add(
+            new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(nameof(SupportToolsParameters.RunTimes),
+                parametersManager));
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(logger,
             nameof(SupportToolsParameters.GitIgnoreModelFilePaths), parametersManager));
         FieldEditors.Add(

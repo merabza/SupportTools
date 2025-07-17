@@ -31,6 +31,18 @@ public class EndpointsFieldEditor : FieldEditor<Dictionary<string, EndpointModel
         return menuSet;
     }
 
+    public override string GetValueStatus(object? record)
+    {
+        if (record is not ProjectModel project)
+            return string.Empty;
+        return string.Empty;
+
+
+
+        //var val = GetValueOrDefault(record);
+        //return val?.ToString() ?? string.Empty;
+    }
+
 
 
 }

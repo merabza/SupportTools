@@ -66,7 +66,7 @@ public sealed class ProjectCruder : ParCruder
         FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
         FieldEditors.Add(new RouteClassesFieldEditor(nameof(ProjectModel.RouteClasses), parametersManager));
         FieldEditors.Add(
-            new ProjectSimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(
+            new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(
                 nameof(ProjectModel.FrontNpmPackageNames), parametersManager));
     }
 
