@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using CliMenu;
-using CliParameters;
+using CliParameters.Cruders;
 using CliParameters.FieldEditors;
 using LibGitData.Models;
 using LibGitWork;
