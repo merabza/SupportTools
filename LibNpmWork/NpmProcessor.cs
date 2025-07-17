@@ -19,7 +19,6 @@ public sealed class NpmProcessor
             return true;
         StShared.WriteErrorLine("Error When creating react app using npm", true, _logger);
         return false;
-
     }
 
     public bool InstallNpmPackage(string spaProjectPath, string npmPackageName)
@@ -32,7 +31,7 @@ public sealed class NpmProcessor
 
     public bool InstallNpmPackages(string spaProjectPath)
     {
-        if (StShared.RunCmdProcess($"npm install", spaProjectPath))
+        if (StShared.RunCmdProcess("npm install", spaProjectPath))
             return true;
         StShared.WriteErrorLine("Error When Installing npm packages", true, _logger);
         return false;

@@ -35,7 +35,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             _useDatabase ? "using System.Net.Http" : null, "using CliParameters", "using CliParameters.FieldEditors",
-            "using LibParameters", "using Microsoft.Extensions.Logging", 
+            "using LibParameters", "using Microsoft.Extensions.Logging",
             //$"using {_projectNamespace}.Models",
             propertiesBlock, string.Empty, $"namespace {_projectNamespace}", string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}ParametersEditor : ParametersEditor",

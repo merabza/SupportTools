@@ -67,11 +67,9 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             return true;
         }
 
-
         Console.WriteLine("File or folder with name {0} is not exists", path);
         return false;
     }
-
 
     private void ProcessFiles(List<ClassCreatorInfo> classCreatorInfos)
     {

@@ -32,7 +32,6 @@ public sealed class LoggerSettingsCreator
                             new JProperty("Microsoft.Hosting.Lifetime", "Information"))))),
                 new JProperty("Console", new JObject(new JProperty("IncludeScopes", true))))));
 
-
         _appSettingsJsonJObject.Add(new JProperty("Serilog",
             new JObject(new JProperty("WriteTo",
                 new JArray(new JObject(new JProperty("Name", "Console")),

@@ -49,16 +49,15 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ServerDataModel> Servers { get; init; } = [];
     public Dictionary<string, GitDataModel> Gits { get; init; } = [];
     public Dictionary<string, GitProjectDataModel> GitProjects { get; init; } = [];
-    public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
-    public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
-    public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
-    public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
     public Dictionary<string, string> ReactAppTemplates { get; init; } = [];
     public Dictionary<string, string> NpmPackages { get; init; } = [];
     public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
     public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
-
+    public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
+    public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
+    public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
+    public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
 
     public bool CheckBeforeSave()
     {
@@ -70,9 +69,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
-    public SupportToolsServerApiClient? GetSupportToolsServerApiClient(ILogger? logger,  IHttpClientFactory httpClientFactory)
+    public SupportToolsServerApiClient? GetSupportToolsServerApiClient(ILogger? logger,
+        IHttpClientFactory httpClientFactory)
     {
-        
         //დავადგინოთ არის თუ არა მითითებული SupportToolsServer-ის აპი კლიენტის სახელი პარამეტრებში (SupportToolsServerWebApiClientName)
         var supportToolsServerWebApiClientName = SupportToolsServerWebApiClientName;
         if (string.IsNullOrWhiteSpace(supportToolsServerWebApiClientName))
@@ -81,11 +80,10 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
             return null;
         }
 
-        var supportToolsServerWebApiClient =
-            GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
+        var supportToolsServerWebApiClient = GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
 
-        return new SupportToolsServerApiClient(logger, httpClientFactory,
-            supportToolsServerWebApiClient.Server, supportToolsServerWebApiClient.ApiKey, true);
+        return new SupportToolsServerApiClient(logger, httpClientFactory, supportToolsServerWebApiClient.Server,
+            supportToolsServerWebApiClient.ApiKey, true);
     }
 
     public string GetUploadTempExtension()

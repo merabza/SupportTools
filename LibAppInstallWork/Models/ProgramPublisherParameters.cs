@@ -74,7 +74,6 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-
             if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForExchange))
             {
                 StShared.WriteErrorLine("SmartSchemaNameForLocal does not specified", true);

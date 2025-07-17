@@ -15,7 +15,6 @@ public sealed class ProjectParametersJsonCreator
         _projectName = projectName;
     }
 
-
     public bool Create()
     {
         // ReSharper disable once CollectionNeverUpdated.Local

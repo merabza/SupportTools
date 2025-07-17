@@ -19,7 +19,6 @@ public sealed class ApiAppLaunchSettingsJsonCreator
         _projectFullPath = projectFullPath;
     }
 
-
     public bool Create()
     {
         var projObject = new JObject(new JProperty("commandName", "Project"),

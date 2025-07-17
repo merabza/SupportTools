@@ -15,9 +15,8 @@ internal class GitsStsCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitsStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, ParametersManager parametersManager) : base("Gits from SupportToolsServer",
-        EMenuAction.LoadSubMenu)
+    public GitsStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+        ParametersManager parametersManager) : base("Gits from SupportToolsServer", EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -27,11 +26,9 @@ internal class GitsStsCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var gitFromServerCruder =
-            GitStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+        var gitFromServerCruder = GitStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
         var menuSet = gitFromServerCruder.GetListMenu();
         return menuSet;
     }
-
 }

@@ -47,7 +47,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectSubMenuSet.AddMenuItem(exportProjectCommand);
 
         //პროექტის პარამეტრი
-        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager);
+        var projectCruder = ProjectCruder.Create(_logger, _httpClientFactory, _parametersManager);
         var editCommand = new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _projectName);
         projectSubMenuSet.AddMenuItem(editCommand);
 
@@ -100,7 +100,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                     _projectName, null, _parametersManager));
         }
 
-        var serverInfoCruder = new ServerInfoCruder(_logger, _httpClientFactory, _parametersManager, _projectName);
+        var serverInfoCruder = ServerInfoCruder.Create(_logger, _httpClientFactory, _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
         var newItemCommand = new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,

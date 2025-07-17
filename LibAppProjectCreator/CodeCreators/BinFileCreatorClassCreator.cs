@@ -17,7 +17,6 @@ public sealed class BinFileCreatorClassCreator : CodeCreator
         _base64String = base64String;
     }
 
-
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
@@ -29,7 +28,6 @@ public sealed class BinFileCreatorClassCreator : CodeCreator
                     string.Empty), string.Empty,
                 new CodeBlock("public override void CreateFileData()", $"BinFile.Base64String = @\"{_base64String}\"",
                     "FinishAndSave()"), string.Empty));
-
 
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

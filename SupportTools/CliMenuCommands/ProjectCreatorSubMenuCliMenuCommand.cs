@@ -18,7 +18,6 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         ParametersManager parametersManager) : base("Project Creator", EMenuAction.LoadSubMenu)
@@ -58,7 +57,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
             new CreateAllTemplateTestProjectsCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
         projectCreatorSubMenuSet.AddMenuItem(createAllTemplateTestProjectsToolCommand);
 
-        TemplateCruder projectCreatorTemplateCruder = new(_logger, _parametersManager);
+        var projectCreatorTemplateCruder = TemplateCruder.Create(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
         NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder,

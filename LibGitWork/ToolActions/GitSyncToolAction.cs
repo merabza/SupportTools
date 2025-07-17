@@ -59,7 +59,6 @@ public sealed class GitSyncToolAction : ToolAction
         return null;
     }
 
-
     public bool HasChanges()
     {
         if (!Directory.Exists(_projectFolderName))
@@ -80,7 +79,6 @@ public sealed class GitSyncToolAction : ToolAction
         StShared.WriteErrorLine("Project Folder Name not found.", true);
         return false;
     }
-
 
     public bool RunActionPhase1() //GitProcessor? gitProcessor = null
     {

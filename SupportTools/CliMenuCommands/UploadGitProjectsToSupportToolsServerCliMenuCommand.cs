@@ -9,13 +9,14 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class UploadGitProjectsToSupportToolsServerCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UploadGitProjectsToSupportToolsServerCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager) :
-        base(UploadGitProjectsToSupportToolsServerToolAction.ActionName, EMenuAction.Reload)
+    public UploadGitProjectsToSupportToolsServerCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager) : base(UploadGitProjectsToSupportToolsServerToolAction.ActionName,
+        EMenuAction.Reload)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

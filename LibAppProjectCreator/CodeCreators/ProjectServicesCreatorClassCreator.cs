@@ -19,9 +19,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             //"using CliShared",
-            "using System",
-            "using CliParametersDataEdit",
-            "using LibDatabaseParameters",
+            "using System", "using CliParametersDataEdit", "using LibDatabaseParameters",
             $"using {_projectNamespace}Db", $"using Do{_projectNamespace}.Models",
             $"using Lib{_projectNamespace}Repositories", "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection", "using SystemToolsShared", string.Empty,

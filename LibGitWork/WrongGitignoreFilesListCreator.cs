@@ -25,7 +25,6 @@ public sealed class WrongGitignoreFilesListCreator
         _useConsole = useConsole;
     }
 
-
     public Dictionary<string, string> Create()
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
@@ -52,7 +51,6 @@ public sealed class WrongGitignoreFilesListCreator
 
             var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
                 project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
-
 
             var gitProjectNames = gitCol switch
             {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
@@ -11,9 +10,10 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class TemplateCruder : ParCruder
+public sealed class TemplateCruder : ParCruder<TemplateModel>
 {
-    public TemplateCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
+    public TemplateCruder(ILogger logger, IParametersManager parametersManager,
+        Dictionary<string, TemplateModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Project Creator Template", "Project Creator Templates")
     {
         FieldEditors.Add(new EnumFieldEditor<ESupportProjectType>(nameof(TemplateModel.SupportProjectType),
@@ -36,52 +36,59 @@ public sealed class TemplateCruder : ParCruder
             parametersManager));
     }
 
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    public static TemplateCruder Create(ILogger logger, IParametersManager parametersManager)
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.AppProjectCreatorAllParameters?.Templates.ToDictionary(p => p.Key, p => (ItemData)p.Value) ??
-               [];
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        return new TemplateCruder(logger, parametersManager,
+            parameters.AppProjectCreatorAllParameters?.Templates ?? new Dictionary<string, TemplateModel>());
     }
 
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var projectTemplates = parameters.AppProjectCreatorAllParameters?.Templates;
-        return projectTemplates?.ContainsKey(recordKey) ?? false;
-    }
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    return parameters.AppProjectCreatorAllParameters?.Templates.ToDictionary(p => p.Key, p => (ItemData)p.Value) ??
+    //           [];
+    //}
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        var newProject = (TemplateModel)newRecord;
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        if (parameters.AppProjectCreatorAllParameters is null)
-            throw new Exception(
-                "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
-        parameters.AppProjectCreatorAllParameters.Templates[recordKey] = newProject;
-    }
+    //public override bool ContainsRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var projectTemplates = parameters.AppProjectCreatorAllParameters?.Templates;
+    //    return projectTemplates?.ContainsKey(recordKey) ?? false;
+    //}
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        var newProject = (TemplateModel)newRecord;
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.AppProjectCreatorAllParameters ??= new AppProjectCreatorAllParameters();
-        parameters.AppProjectCreatorAllParameters.Templates.Add(recordKey, newProject);
-    }
+    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    var newProject = (TemplateModel)newRecord;
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    if (parameters.AppProjectCreatorAllParameters is null)
+    //        throw new Exception(
+    //            "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
+    //    parameters.AppProjectCreatorAllParameters.Templates[recordKey] = newProject;
+    //}
 
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        if (parameters.AppProjectCreatorAllParameters is null)
-            throw new Exception(
-                "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
-        var projectTemplates = parameters.AppProjectCreatorAllParameters.Templates;
-        projectTemplates.Remove(recordKey);
-    }
+    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    var newProject = (TemplateModel)newRecord;
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.AppProjectCreatorAllParameters ??= new AppProjectCreatorAllParameters();
+    //    parameters.AppProjectCreatorAllParameters.Templates.Add(recordKey, newProject);
+    //}
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new TemplateModel();
-    }
+    //protected override void RemoveRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    if (parameters.AppProjectCreatorAllParameters is null)
+    //        throw new Exception(
+    //            "parameters.AppProjectCreatorAllParameters is null in TemplateCruder.UpdateRecordWithKey");
+    //    var projectTemplates = parameters.AppProjectCreatorAllParameters.Templates;
+    //    projectTemplates.Remove(recordKey);
+    //}
+
+    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    //{
+    //    return new TemplateModel();
+    //}
 
     protected override void CheckFieldsEnables(ItemData itemData, string? lastEditedFieldName = null)
     {

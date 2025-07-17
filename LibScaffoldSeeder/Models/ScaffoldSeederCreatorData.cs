@@ -75,7 +75,8 @@ public sealed class ScaffoldSeederCreatorData
         var dbMigrationProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             dbMigrationProjectName, [.. projectFolders]);
 
-        var seedDbProjectName = NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
+        var seedDbProjectName =
+            NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
         var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, seedDbProjectName,
             seedDbProjectName, EDotnetProjectType.Console, string.Empty, "Program", []);

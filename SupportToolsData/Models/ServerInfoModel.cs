@@ -24,7 +24,6 @@ public sealed class ServerInfoModel : ItemData
     public DatabaseParameters? CurrentDatabaseParameters { get; init; }
     public DatabaseParameters? NewDatabaseParameters { get; init; }
 
-
     public override string GetItemKey()
     {
         return $"{ServerName}/{EnvironmentName}";

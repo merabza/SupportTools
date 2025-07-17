@@ -15,14 +15,15 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class ServerInfoCruder : ParCruder
+public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly string _projectName;
 
     public ServerInfoCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
-        string projectName) : base(parametersManager, "Server", "Servers", true)
+        Dictionary<string, ServerInfoModel> currentValuesDictionary, string projectName) : base(parametersManager,
+        currentValuesDictionary, "Server", "Servers", true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -39,8 +40,8 @@ public sealed class ServerInfoCruder : ParCruder
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         if (project.IsService)
         {
-            FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
-                nameof(ServerInfoModel.WebAgentNameForCheck), ParametersManager));
+            FieldEditors.Add(new ApiClientNameFieldEditor(nameof(ServerInfoModel.WebAgentNameForCheck), logger,
+                httpClientFactory, ParametersManager));
             FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
@@ -56,58 +57,67 @@ public sealed class ServerInfoCruder : ParCruder
             nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
     }
 
-    private Dictionary<string, ServerInfoModel> GetServerInfos()
+    public static ServerInfoCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, string projectName)
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
-        return project?.ServerInfos ?? [];
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        var currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??
+                                      throw new ArgumentNullException(nameof(projectName));
+        return new ServerInfoCruder(logger, httpClientFactory, parametersManager, currentValuesDictionary, projectName);
     }
 
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    {
-        return GetServerInfos().ToDictionary(p => p.Key, p => (ItemData)p.Value);
-    }
+    //private Dictionary<string, ServerInfoModel> GetServerInfos()
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var project = parameters.GetProject(_projectName);
+    //    return project?.ServerInfos ?? [];
+    //}
 
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var itemDataDict = GetCrudersDictionary();
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    return GetServerInfos().ToDictionary(p => p.Key, p => (ItemData)p.Value);
+    //}
 
-        return itemDataDict.ContainsKey(recordKey);
-    }
+    //public override bool ContainsRecordWithKey(string recordKey)
+    //{
+    //    var itemDataDict = GetCrudersDictionary();
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ServerInfoModel newServer)
-            throw new Exception("newServer is null in ServerInfoCruder.UpdateRecordWithKey");
+    //    return itemDataDict.ContainsKey(recordKey);
+    //}
 
-        var crudersDictionary = GetCrudersDictionary() ??
-                                throw new Exception(
-                                    "crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
-        crudersDictionary[recordKey] = newServer;
-    }
+    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ServerInfoModel newServer)
+    //        throw new Exception("newServer is null in ServerInfoCruder.UpdateRecordWithKey");
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ServerInfoModel newServer)
-            throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName) ??
-                      throw new Exception($"Project with name {_projectName} not found");
-        project.ServerInfos.Add(recordKey, newServer);
-    }
+    //    var crudersDictionary = GetCrudersDictionary() ??
+    //                            throw new Exception(
+    //                                "crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
+    //    crudersDictionary[recordKey] = newServer;
+    //}
 
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName) ??
-                      throw new Exception($"Project with name {_projectName} not found");
-        project.ServerInfos.Remove(recordKey);
-    }
+    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ServerInfoModel newServer)
+    //        throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var project = parameters.GetProject(_projectName) ??
+    //                  throw new Exception($"Project with name {_projectName} not found");
+    //    project.ServerInfos.Add(recordKey, newServer);
+    //}
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new ServerInfoModel();
-    }
+    //protected override void RemoveRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var project = parameters.GetProject(_projectName) ??
+    //                  throw new Exception($"Project with name {_projectName} not found");
+    //    project.ServerInfos.Remove(recordKey);
+    //}
+
+    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    //{
+    //    return new ServerInfoModel();
+    //}
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {

@@ -8,12 +8,14 @@ namespace SupportTools.Cruders;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 {
+    private readonly IParametersManager _parametersManager;
     private readonly ProjectModel _project;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectNpmPackagesLisCruder(IParametersManager parametersManager, ProjectModel project) : base(
-        parametersManager, "Npm Package", "Npm Packages")
+    public ProjectNpmPackagesLisCruder(IParametersManager parametersManager, ProjectModel project) : base("Npm Package",
+        "Npm Packages")
     {
+        _parametersManager = parametersManager;
         _project = project;
     }
 
@@ -24,7 +26,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 
     protected override string? InputNewRecordName()
     {
-        var npmPackageCruder = new NpmPackagesCruder(ParametersManager);
+        var npmPackageCruder = new NpmPackagesCruder(_parametersManager);
         var newNpmPackageName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
 
         if (!string.IsNullOrWhiteSpace(newNpmPackageName))
@@ -36,7 +38,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 
     public override string? GetStatusFor(string name)
     {
-        var npmPackages = ((SupportToolsParameters)ParametersManager.Parameters).NpmPackages;
+        var npmPackages = ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
         return npmPackages.GetValueOrDefault(name);
     }
 }

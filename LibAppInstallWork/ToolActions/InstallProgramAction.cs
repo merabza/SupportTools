@@ -26,7 +26,6 @@ public sealed class InstallProgramAction : ToolAction
 
     private string? _installingProgramVersion;
 
-
     public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,

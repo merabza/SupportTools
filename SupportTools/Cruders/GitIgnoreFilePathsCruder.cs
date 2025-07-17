@@ -12,29 +12,30 @@ namespace SupportTools.Cruders;
 public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
 {
     private readonly ILogger _logger;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
-        "GitIgnore File Path", "GitIgnore File Paths", "Path")
+    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base("GitIgnore File Path",
+        "GitIgnore File Paths", "Path")
     {
         _logger = logger;
+        _parametersManager = parametersManager;
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)ParametersManager.Parameters).GitIgnoreModelFilePaths;
+        return ((SupportToolsParameters)_parametersManager.Parameters).GitIgnoreModelFilePaths;
     }
-
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        var checkGitIgnoreFilesCliMenuCommand = new CheckGitIgnoreFilesCliMenuCommand(_logger, ParametersManager);
+        var checkGitIgnoreFilesCliMenuCommand = new CheckGitIgnoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(checkGitIgnoreFilesCliMenuCommand);
 
-        var updateGitIgnoreFilesCliMenuCommand = new UpdateGitIgnoreFilesCliMenuCommand(_logger, ParametersManager);
+        var updateGitIgnoreFilesCliMenuCommand = new UpdateGitIgnoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
 
-        GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, ParametersManager);
+        GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 
@@ -43,7 +44,7 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         //var git = (GitDataModel?)GetItemByName(name);
         //if (git is null)
         //    return "ERROR: Git address Not found";
-        var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var projects = supportToolsParameters.Projects;
 
         var usageCount = 0;
@@ -76,7 +77,7 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
         ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand =
-            new(_logger, recordKey, ParametersManager);
+            new(_logger, recordKey, _parametersManager);
         itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand);
     }
 }

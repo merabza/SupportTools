@@ -10,8 +10,8 @@ public sealed class
     InstallerSettingsFieldEditor : ParametersFieldEditor<InstallerSettings, InstallerSettingsParametersEditor>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public InstallerSettingsFieldEditor(ILogger logger, string propertyName, IParametersManager parametersManager) :
-        base(logger, propertyName, parametersManager)
+    public InstallerSettingsFieldEditor(string propertyName, ILogger logger, IParametersManager parametersManager) :
+        base(propertyName, logger, parametersManager)
     {
     }
 

@@ -83,7 +83,6 @@
 //    //        createProjectSeederCodeProject, getJsonFromProjectDbProject, dbMigrationProject, seedDbProject,
 //    //        fakeHostWebApiProject, appCreatorBaseData);
 
-
 //    //    //ProjectForCreate libProjectRepositoriesProjectData =
 //    //    //    ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath, $"Lib{par.ProjectName}Repositories",
 //    //    //        Array.Empty<string>());

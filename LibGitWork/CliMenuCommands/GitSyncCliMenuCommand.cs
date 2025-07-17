@@ -31,7 +31,6 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
         return $"This process will Sync git {_gitProjectName}";
     }
 
-
     protected override bool RunBody()
     {
         var gitSyncToolAction =

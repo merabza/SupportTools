@@ -1,5 +1,9 @@
 //Created by ProjectMainClassCreator at 5/9/2021 13:38:34
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CliParameters;
 using DbTools;
 using DbToolsFactory;
@@ -7,10 +11,6 @@ using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
@@ -90,7 +90,6 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
             $"ALTER TABLE [dbo].[{constraintDataModel.TableName}] DROP CONSTRAINT [{constraintDataModel.DefaultConstraintName}]");
     }
 
-
     private bool ExecuteCommand(string strCommand)
     {
         // ReSharper disable once using
@@ -115,7 +114,6 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 
         return success;
     }
-
 
     private List<ConstraintDataModel> CorrectBitConstraints()
     {

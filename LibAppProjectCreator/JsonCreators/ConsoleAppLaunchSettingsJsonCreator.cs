@@ -18,7 +18,6 @@ public sealed class ConsoleAppLaunchSettingsJsonCreator
         _projectParametersFilePath = projectParametersFilePath;
     }
 
-
     public bool Create()
     {
         var projectParametersFileFullName = Path.Combine(_projectParametersFilePath, $"{_projectName}.json");
@@ -31,7 +30,6 @@ public sealed class ConsoleAppLaunchSettingsJsonCreator
 
         var forCreateFileName = Path.Combine(_placePath, "launchSettings.json");
         File.WriteAllText(forCreateFileName, jObject.ToString());
-
 
         return true;
     }

@@ -35,7 +35,6 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
 
         var supportToolsParameters = (SupportToolsParameters?)ParametersManager.Parameters;
 
-
         if (supportToolsParameters is null)
         {
             _logger.LogError("SupportToolsParameters is null");

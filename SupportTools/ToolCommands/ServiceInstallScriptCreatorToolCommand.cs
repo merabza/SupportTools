@@ -28,7 +28,6 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
         _par = par;
     }
 
-
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var ftpSiteUserName = _par.FileStorageForExchange.UserName;
@@ -80,7 +79,6 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             _logger.LogError("Password is not specified for File Storage {fileStoragePath}", fileStoragePath);
             return false;
         }
-
 
         if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
         {

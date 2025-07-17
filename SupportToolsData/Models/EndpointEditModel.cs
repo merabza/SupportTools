@@ -15,3 +15,4 @@
 //    public string? ReturnType { get; set; }
 //    public bool SendMessageToCurrentUser { get; set; }
 //}
+

@@ -171,7 +171,6 @@ public sealed class CreatePackageAndUpload : ToolAction
         }
         //}
 
-
         _logger.LogInformation("Archiving {zipFileFullName}...", zipFileFullName);
         //შექმნილი output ფოლდერიდან ZIP ფაილის შექმნა, იმავე სამუშაო ფოლდერში
         ZipFile.CreateFromDirectory(outputFolderPath, zipFileFullName, CompressionLevel.Optimal, false);
@@ -214,7 +213,6 @@ public sealed class CreatePackageAndUpload : ToolAction
         _logger.LogInformation("Deleting {zipFileFullName} file...", zipFileFullName);
         //წაიშალოს ლოკალური ფაილი
         File.Delete(zipFileFullName);
-
 
         var workFileManager = FileManagersFactory.CreateFileManager(true, _logger, _workFolder);
 

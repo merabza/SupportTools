@@ -92,7 +92,6 @@ public sealed class CheckProgramVersionAction : ToolAction
                     return true;
                 }
 
-
                 if (_installingProgramVersion != version)
                 {
                     _logger.LogWarning("Current version is {version}, but must be {_installingProgramVersion}", version,

@@ -31,7 +31,6 @@ public sealed class DatabaseMigrationParameters : IParameters
     public IDatabaseManager DatabaseManager { get; }
     public string DatabaseName { get; }
 
-
     public bool CheckBeforeSave()
     {
         return true;

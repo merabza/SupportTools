@@ -66,7 +66,6 @@ public sealed class EncodeParametersAndUploadAction : ToolAction
             return false;
         }
 
-
         var uploadParametersToExchangeAction = new UploadParametersToExchangeAction(_logger, _projectName, _serverInfo,
             _dateMask, _parametersFileExtension, EncodedJsonContent, _exchangeFileStorage, _uploadSmartSchema);
         return await uploadParametersToExchangeAction.Run(cancellationToken);

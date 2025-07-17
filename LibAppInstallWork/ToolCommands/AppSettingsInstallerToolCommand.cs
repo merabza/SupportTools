@@ -43,7 +43,6 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
             return false;
         }
 
-
         if (string.IsNullOrWhiteSpace(AppSettingsInstallerParameters.ServerInfo.EnvironmentName))
         {
             _logger.LogError("Environment name is not specified");

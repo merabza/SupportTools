@@ -331,8 +331,8 @@ public sealed class ApiAppCreator : AppCreatorBase
         const string assemblyReferenceClassFileName = "AssemblyReference.cs";
         Console.WriteLine($"Creating {assemblyReferenceClassFileName}...");
         var assemblyReferenceClassCreator = new AssemblyReferenceClassCreator(Logger,
-            _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, _apiAppCreatorData.RepositoriesProjectData.ProjectName,
-            assemblyReferenceClassFileName);
+            _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath,
+            _apiAppCreatorData.RepositoriesProjectData.ProjectName, assemblyReferenceClassFileName);
         assemblyReferenceClassCreator.CreateFileStructure();
 
         var projectAbstractRepositoryClassFileName = $"{_projectShortName.Capitalize()}AbstractRepository.cs";

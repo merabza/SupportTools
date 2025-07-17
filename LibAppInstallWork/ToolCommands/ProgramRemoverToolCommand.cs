@@ -17,9 +17,9 @@ public sealed class ProgramRemoverToolCommand : ToolCommand
     private readonly ProgramRemoverParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemoverToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ProgramRemoverParameters parameters,
-        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription, useConsole)
+    public ProgramRemoverToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ProgramRemoverParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

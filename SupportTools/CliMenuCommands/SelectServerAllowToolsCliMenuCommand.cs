@@ -43,7 +43,6 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         //გამოვიდეს სიიდან ამრჩევი
         MenuInputer.MultipleInputFromList("Select allow tools", checks);
 
-
         server.AllowToolsList ??= [];
 
         foreach (var kvp in checks)

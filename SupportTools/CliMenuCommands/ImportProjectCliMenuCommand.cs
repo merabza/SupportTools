@@ -34,15 +34,12 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 
         var importData = File.ReadAllText(filenameForImport);
 
-
         var settings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Ignore
         };
 
-
         var projectExportData = JsonConvert.DeserializeObject<ProjectExportData>(importData, settings);
-
 
         if (projectExportData is null)
         {

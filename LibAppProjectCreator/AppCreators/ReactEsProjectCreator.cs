@@ -150,21 +150,21 @@ public sealed class ReactEsProjectCreator
 
     //private static void CreateEsprojFileOld1(string projectFileFullName, string javaScriptSdk)
     //{
-        /*
-            <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha">
-                <PropertyGroup>
-            <StartupCommand>set BROWSER=none&amp;&amp;npm start</StartupCommand>
-            <JavaScriptTestRoot>src\</JavaScriptTestRoot>
-            <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
-            <!-- Command to run on project build -->
-            <BuildCommand></BuildCommand>
-            <!-- Command to create an optimized build of the project that's ready for publishing -->
-            <ProductionBuildCommand>npm run build</ProductionBuildCommand>
-            <!-- Folder where production build objects will be placed -->
-            <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
-            </PropertyGroup>
-            </Project>
-        */
+    /*
+        <Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.45-alpha">
+            <PropertyGroup>
+        <StartupCommand>set BROWSER=none&amp;&amp;npm start</StartupCommand>
+        <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+        <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
+        <!-- Command to run on project build -->
+        <BuildCommand></BuildCommand>
+        <!-- Command to create an optimized build of the project that's ready for publishing -->
+        <ProductionBuildCommand>npm run build</ProductionBuildCommand>
+        <!-- Folder where production build objects will be placed -->
+        <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
+        </PropertyGroup>
+        </Project>
+    */
     //    var project = new XElement("Project", new XAttribute("Sdk", javaScriptSdk),
     //        new XElement("PropertyGroup", new XElement("StartupCommand", "set BROWSER=none&amp;&amp;npm start"),
     //            new XElement("JavaScriptTestRoot", "src\\"), new XElement("JavaScriptTestFramework", "Jest"),

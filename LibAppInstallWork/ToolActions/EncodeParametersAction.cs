@@ -54,7 +54,6 @@ public sealed class EncodeParametersAction : ToolAction
         return ValueTask.FromResult(success);
     }
 
-
     private string? CreateEncodedJson()
     {
         //Get Whole json file and change only passed key with passed value.
@@ -75,7 +74,6 @@ public sealed class EncodeParametersAction : ToolAction
         var appSetEnKeysList = KeysListDomain.LoadFromFile(_keysJsonFileName);
         if (appSetEnKeysList?.Keys is null)
             return null;
-
 
         var encKey = $"{_keyPart1}{_keyPart2.Capitalize()}";
 

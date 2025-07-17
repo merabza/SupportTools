@@ -8,14 +8,12 @@ public sealed class EToolsEnumCreator : CodeCreator
 {
     private readonly string _projectName;
 
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public EToolsEnumCreator(ILogger logger, string placePath, string projectName, string? codeFileName = null) : base(
         logger, placePath, codeFileName)
     {
         _projectName = projectName;
     }
-
 
     public override void CreateFileStructure()
     {

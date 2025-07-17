@@ -7,11 +7,10 @@ using LibParameters;
 
 namespace SupportTools.Cruders;
 
-public abstract class SimpleNamesWithDescriptionsCruder : ParCruder
+public abstract class SimpleNamesWithDescriptionsCruder : Cruder
 {
-    protected SimpleNamesWithDescriptionsCruder(IParametersManager parametersManager, string crudName,
-        string crudNamePlural, string descriptionFieldRealName = "Description") : base(parametersManager, crudName,
-        crudNamePlural)
+    protected SimpleNamesWithDescriptionsCruder(string crudName, string crudNamePlural,
+        string descriptionFieldRealName = "Description") : base(crudName, crudNamePlural)
     {
         FieldEditors.Add(new OptionalTextFieldEditor(nameof(TextItemData.Text), true, descriptionFieldRealName));
     }

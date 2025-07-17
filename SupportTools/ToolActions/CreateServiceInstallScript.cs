@@ -34,8 +34,8 @@ public sealed class CreateServiceInstallScript : ToolAction
         string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
         string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
         string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
-        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger, nameof(ServiceInstallScriptCreatorToolCommand),
-        null, null)
+        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
+        nameof(ServiceInstallScriptCreatorToolCommand), null, null)
     {
         _logger = logger;
         _scriptFileName = scriptFileName;
@@ -320,7 +320,7 @@ public sealed class CreateServiceInstallScript : ToolAction
 
                      if [ ! -e $serviceConfigFileName ]; then
                        echo Service config file $serviceConfigFileName does not exists
-                     
+
                        cat >$serviceConfigFileName <<fin
                      [Unit]
                      Description=$projectName service $serviceDescriptionSignature $ProjectDescription

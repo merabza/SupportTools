@@ -45,7 +45,6 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         if (keys.Count < 1)
             throw new ListIsEmptyException("GitProjects List is empty");
 
-
         if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);
 
         foreach (var listItem in keys)

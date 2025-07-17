@@ -244,14 +244,12 @@
 //            ProjectReducersJsCreator projectReducersJsCreator = new(srcProjectStorePath, "projectReducers.js");
 //            projectReducersJsCreator.Create();
 
-
 //            //if (!RunNodeProcess("npm i", _destinationFolderPath))
 //            //{
 //            //    StShared.WriteErrorLine("Error when installing packages", true, _logger);
 //            //    return false;
 //            //}
 //        }
-
 
 //        return true;
 //    }

@@ -1,12 +1,12 @@
-﻿using CompressionManagement;
+﻿using System.IO;
+using System.Linq;
+using System.Net.Http;
+using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -129,7 +129,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
             }
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
-        if (!Directory.Exists(SolutionSecurityFolderPath)) 
+        if (!Directory.Exists(SolutionSecurityFolderPath))
             return CreateAppCreator(true);
 
         if (!compressor.CompressFolder(SolutionSecurityFolderPath, checkedReserveFolderFullPath))

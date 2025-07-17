@@ -18,8 +18,9 @@ public sealed class ProgramPublisherToolCommand : ToolCommand
     private readonly ProgramPublisherParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramPublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters, IParametersManager parametersManager)
-        : base(logger, ActionName, parameters, parametersManager, ActionDescription)
+    public ProgramPublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,
+        IParametersManager parametersManager) : base(logger, ActionName, parameters, parametersManager,
+        ActionDescription)
     {
         _logger = logger;
         _parameters = parameters;

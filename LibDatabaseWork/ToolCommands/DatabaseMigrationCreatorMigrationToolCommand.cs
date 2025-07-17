@@ -19,9 +19,9 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseMigrationCreatorMigrationToolCommand(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
-        IParametersManager? parametersManager) : base(logger, ActionName, databaseMigrationParameters,
-        parametersManager, ActionDescription)
+    public DatabaseMigrationCreatorMigrationToolCommand(ILogger logger,
+        DatabaseMigrationParameters databaseMigrationParameters, IParametersManager? parametersManager) : base(logger,
+        ActionName, databaseMigrationParameters, parametersManager, ActionDescription)
     {
         _logger = logger;
     }
@@ -52,7 +52,6 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
                 csFile.Delete();
         }
 
-
         var migrationStartupProjectFilePath = DatabaseMigrationParameters.MigrationStartupProjectFilePath;
         var migrationStartupProjectFile = new FileInfo(migrationStartupProjectFilePath);
         if (!migrationStartupProjectFile.Exists)
@@ -61,7 +60,6 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
                 migrationStartupProjectFile);
             return ValueTask.FromResult(false);
         }
-
 
         var solutionFileNameWithMigrationProject = DatabaseMigrationParameters.SolutionFileNameWithMigrationProject;
         var solutionFileName = new FileInfo(solutionFileNameWithMigrationProject);

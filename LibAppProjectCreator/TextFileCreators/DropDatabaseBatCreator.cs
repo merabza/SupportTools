@@ -14,7 +14,6 @@
 //        _projectNamespace = projectNamespace;
 //    }
 
-
 //    public override void Create()
 //    {
 //        TextBuilder.AppendLine(

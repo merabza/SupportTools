@@ -14,7 +14,6 @@ public sealed class KestrelOptionsCreator
         _appSettingsJsonJObject = appSettingsJsonJObject;
     }
 
-
     public void Run()
     {
         _appSettingsJsonJObject.Add(new JProperty("Kestrel",

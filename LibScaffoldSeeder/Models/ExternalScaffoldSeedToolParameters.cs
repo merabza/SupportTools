@@ -52,7 +52,7 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
                 return null;
             }
 
-            if ( externalToolProjectNameCounter is null)
+            if (externalToolProjectNameCounter is null)
             {
                 StShared.WriteErrorLine("externalToolProjectNameCounter is null", true);
                 return null;

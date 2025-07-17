@@ -19,7 +19,6 @@
 //        _projectShortName = projectShortName;
 //    }
 
-
 //    public override void CreateFileStructure()
 //    {
 //        var block = new CodeBlock(string.Empty,

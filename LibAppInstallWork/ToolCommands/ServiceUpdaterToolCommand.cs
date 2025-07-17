@@ -53,7 +53,6 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
         if (!await createPackageAndUpload.Run(cancellationToken))
             return false;
 
-
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         var appSettingsEncoderParameters = ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
         string? appSettingsVersion = null;

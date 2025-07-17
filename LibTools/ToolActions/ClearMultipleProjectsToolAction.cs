@@ -31,7 +31,6 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         _parametersManager = parametersManager;
     }
 
-
     public static ClearMultipleProjectsToolAction Create(ILogger logger, ParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {

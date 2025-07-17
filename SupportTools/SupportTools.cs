@@ -59,7 +59,7 @@ public sealed class SupportTools : CliAppLoop
         mainMenuSet.AddMenuItem(
             new ProjectCreatorSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager));
 
-        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager);
+        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager, parameters.Projects);
 
         //ახალი პროექტის შექმნა
         var newItemCommand = new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural,

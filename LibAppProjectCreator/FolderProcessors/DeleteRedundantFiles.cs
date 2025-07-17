@@ -40,7 +40,6 @@ public sealed class DeleteRedundantFiles : FolderProcessor
     {
         var myFileInfos = _sourceFileManager.GetFilesWithInfo(afterRootPath, null);
 
-
         if ((ExcludeSet != null && ExcludeSet.NeedExclude(FileManager.PathCombine(afterRootPath, file.FileName))) ||
             !myFileInfos.Select(x => x.FileName).Contains(file.FileName))
             return FileManager.DeleteFile(afterRootPath, file.FileName);

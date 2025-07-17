@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using CliMenu;
@@ -14,13 +13,14 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class ProjectCruder : ParCruder
+public sealed class ProjectCruder : ParCruder<ProjectModel>
 {
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
-    public ProjectCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager) :
-        base(parametersManager, "Project", "Projects")
+    public ProjectCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
+        Dictionary<string, ProjectModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
+        "Project", "Projects")
     {
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
@@ -63,55 +63,69 @@ public sealed class ProjectCruder : ParCruder
         //    new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectParametersFileFullName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.ExcludesRulesParametersFilePath)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.MigrationSqlFilesFolder)));
-        FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
-        FieldEditors.Add(new RouteClassesFieldEditor(nameof(ProjectModel.RouteClasses), parametersManager));
+
+        //FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
+        FieldEditors.Add(new DictionaryFieldEditor<EndpointCruder, EndpointModel>(nameof(ProjectModel.Endpoints),
+            parametersManager));
+
+        //FieldEditors.Add(new RouteClassesFieldEditor(nameof(ProjectModel.RouteClasses), parametersManager));
+        FieldEditors.Add(new DictionaryFieldEditor<RouteClassCruder, RouteClassModel>(
+            nameof(ProjectModel.RouteClasses), parametersManager));
+
         FieldEditors.Add(
-            new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(
-                nameof(ProjectModel.FrontNpmPackageNames), parametersManager));
+            new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(nameof(ProjectModel.FrontNpmPackageNames),
+                parametersManager));
     }
 
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    public static ProjectCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager)
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.Projects.ToDictionary(p => p.Key, ItemData (p) => p.Value);
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        return new ProjectCruder(logger, httpClientFactory, parametersManager, parameters.Projects);
     }
 
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var projects = parameters.Projects;
-        return projects.ContainsKey(recordKey);
-    }
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    return parameters.Projects.ToDictionary(p => p.Key, ItemData (p) => p.Value);
+    //}
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ProjectModel newProject)
-            throw new Exception("newProject is null in ProjectCruder.UpdateRecordWithKey");
+    //public override bool ContainsRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var projects = parameters.Projects;
+    //    return projects.ContainsKey(recordKey);
+    //}
 
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Projects[recordKey] = newProject;
-    }
+    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ProjectModel newProject)
+    //        throw new Exception("newProject is null in ProjectCruder.UpdateRecordWithKey");
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ProjectModel newProject)
-            throw new Exception("newProject is null in ProjectCruder.AddRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.Projects[recordKey] = newProject;
+    //}
 
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Projects.Add(recordKey, newProject);
-    }
+    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ProjectModel newProject)
+    //        throw new Exception("newProject is null in ProjectCruder.AddRecordWithKey");
 
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var projects = parameters.Projects;
-        projects.Remove(recordKey);
-    }
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.Projects.Add(recordKey, newProject);
+    //}
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new ProjectModel();
-    }
+    //protected override void RemoveRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var projects = parameters.Projects;
+    //    projects.Remove(recordKey);
+    //}
+
+    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    //{
+    //    return new ProjectModel();
+    //}
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {

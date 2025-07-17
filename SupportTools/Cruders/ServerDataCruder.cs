@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using CliParameters;
 using CliParameters.FieldEditors;
@@ -12,16 +10,17 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class ServerDataCruder : ParCruder
+public sealed class ServerDataCruder : ParCruder<ServerDataModel>
 {
-    public ServerDataCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
-        : base(parametersManager, "Server", "Servers")
+    public ServerDataCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
+        Dictionary<string, ServerDataModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
+        "Server", "Servers")
     {
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerDataModel.IsLocal), true));
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory, nameof(ServerDataModel.WebAgentName),
+        FieldEditors.Add(new ApiClientNameFieldEditor(nameof(ServerDataModel.WebAgentName), logger, httpClientFactory,
             ParametersManager, true));
-        FieldEditors.Add(new ApiClientNameFieldEditor(logger, httpClientFactory,
-            nameof(ServerDataModel.WebAgentInstallerName), ParametersManager, true));
+        FieldEditors.Add(new ApiClientNameFieldEditor(nameof(ServerDataModel.WebAgentInstallerName), logger,
+            httpClientFactory, ParametersManager, true));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUserName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.FilesUsersGroupName)));
         FieldEditors.Add(new RunTimeNameFieldEditor(nameof(ServerDataModel.Runtime), ParametersManager));
@@ -29,44 +28,51 @@ public sealed class ServerDataCruder : ParCruder
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.ServerSideDeployFolder)));
     }
 
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    public static ServerDataCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager)
     {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        return parameters.Servers.ToDictionary(p => p.Key, p => (ItemData)p.Value);
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        return new ServerDataCruder(logger, httpClientFactory, parametersManager, parameters.Servers);
     }
 
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var servers = parameters.Servers;
-        return servers.ContainsKey(recordKey);
-    }
+    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    return parameters.Servers.ToDictionary(p => p.Key, p => (ItemData)p.Value);
+    //}
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ServerDataModel newServer)
-            throw new Exception("newServer is null in ServerDataCruder.UpdateRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Servers[recordKey] = newServer;
-    }
+    //public override bool ContainsRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var servers = parameters.Servers;
+    //    return servers.ContainsKey(recordKey);
+    //}
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not ServerDataModel newServer)
-            throw new Exception("newServer is null in ServerDataCruder.AddRecordWithKey");
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        parameters.Servers.Add(recordKey, newServer);
-    }
+    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ServerDataModel newServer)
+    //        throw new Exception("newServer is null in ServerDataCruder.UpdateRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.Servers[recordKey] = newServer;
+    //}
 
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var servers = parameters.Servers;
-        servers.Remove(recordKey);
-    }
+    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    //{
+    //    if (newRecord is not ServerDataModel newServer)
+    //        throw new Exception("newServer is null in ServerDataCruder.AddRecordWithKey");
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    parameters.Servers.Add(recordKey, newServer);
+    //}
 
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new ServerDataModel();
-    }
+    //protected override void RemoveRecordWithKey(string recordKey)
+    //{
+    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+    //    var servers = parameters.Servers;
+    //    servers.Remove(recordKey);
+    //}
+
+    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
+    //{
+    //    return new ServerDataModel();
+    //}
 }

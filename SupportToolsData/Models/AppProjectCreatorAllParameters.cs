@@ -17,7 +17,6 @@ public sealed class AppProjectCreatorAllParameters : IParameters
 
     public Dictionary<string, TemplateModel> Templates { get; set; } = new();
 
-
     public bool CheckBeforeSave()
     {
         return true;

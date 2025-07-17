@@ -132,7 +132,6 @@ public sealed class DotnetProcessor
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool update --global  {packageId}");
     }
 
-
     /*
             var dotnetRun = StShared.RunProcess(false, null, "dotnet", $"tool {command} --global {tool.PackageId}");
      */

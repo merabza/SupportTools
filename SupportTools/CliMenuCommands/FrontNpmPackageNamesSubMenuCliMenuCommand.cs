@@ -41,7 +41,8 @@ public sealed class FrontNpmPackageNamesSubMenuCliMenuCommand : CliMenuCommand
             gitSubMenuSet.AddMenuItem(new NpmPackageInProjectSubMenuCliMenuCommand(_parametersManager, _projectName,
                 gitProjectName));
 
-        var addAllPossibleNpmPackageNames = new AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand(_parametersManager, _projectName);
+        var addAllPossibleNpmPackageNames =
+            new AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand(_parametersManager, _projectName);
         gitSubMenuSet.AddMenuItem(addAllPossibleNpmPackageNames);
 
         //მთავარ მენიუში გასვლა

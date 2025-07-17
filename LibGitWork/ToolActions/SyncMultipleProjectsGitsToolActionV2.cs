@@ -27,7 +27,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         _syncMultipleProjectsGitsParametersV2 = syncMultipleProjectsGitsParametersV2;
     }
 
-
     public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger logger, ParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
@@ -53,7 +52,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //  ოღონდ სერვერის მხარეს ინფორმაციის წამოღება უნდა მოხდეს ერთხელ თავიდან
         //  და თუ რამე დაიფუშა, ყოველი დაფუშვის მერე, ოღონდ თუ დარჩენილია დასასინქრონიზებელი ფოლდერი
 
-
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
         if (_syncMultipleProjectsGitsParametersV2.ProjectGroupName is null &&
             _syncMultipleProjectsGitsParametersV2.ProjectName is null)
@@ -70,7 +68,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, GitProjectSyncronizer>();
-
 
         foreach (var (projectName, project) in projectsListOrdered)
         foreach (var gitCol in Enum.GetValues<EGitCol>())

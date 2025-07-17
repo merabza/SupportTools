@@ -49,7 +49,6 @@
 //        return null;
 //    }
 
-
 //    private bool CheckValidate()
 //    {
 //        if (!string.IsNullOrWhiteSpace(_gitSyncParameters.GitsFolder))
@@ -126,7 +125,6 @@
 //        if (haveUnTrackedFiles)
 //            if (!gitProcessor.Add())
 //                return Task.FromResult(false);
-
 
 //        var needCommitResult = gitProcessor.NeedCommit();
 //        if (needCommitResult.IsT1)

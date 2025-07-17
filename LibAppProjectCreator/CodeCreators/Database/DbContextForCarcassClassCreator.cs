@@ -15,7 +15,6 @@ public sealed class DbContextForCarcassClassCreator : CodeCreator
         _projectNamespace = projectNamespace;
     }
 
-
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),

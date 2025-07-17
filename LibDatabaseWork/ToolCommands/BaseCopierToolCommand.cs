@@ -15,8 +15,8 @@ public sealed class BaseCopierToolCommand : ToolCommand
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public BaseCopierToolCommand(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(logger,
-        ActionName, parameters, parametersManager, ActionDescription)
+    public BaseCopierToolCommand(ILogger logger, IParameters parameters, IParametersManager parametersManager) : base(
+        logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
     }

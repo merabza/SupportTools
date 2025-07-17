@@ -15,7 +15,6 @@ public sealed class PackageUpdater
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
 
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public PackageUpdater(ILogger? logger, ParametersManager parametersManager, string gitProjectName, bool useConsole)
     {

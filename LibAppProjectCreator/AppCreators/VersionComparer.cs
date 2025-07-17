@@ -39,7 +39,6 @@ public sealed class VersionComparer : IComparer<string>
         return 0;
     }
 
-
     private static int[] StringToDigits(string str)
     {
         var digits = str.Split('.', StringSplitOptions.RemoveEmptyEntries);

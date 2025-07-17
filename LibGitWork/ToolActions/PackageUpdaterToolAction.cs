@@ -17,7 +17,6 @@ public sealed class PackageUpdaterToolAction : ToolAction
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
 
-
     // ReSharper disable once ConvertToPrimaryConstructor
     private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters) : base(logger, "Git Sync",
         null, null)
@@ -26,7 +25,6 @@ public sealed class PackageUpdaterToolAction : ToolAction
         _projectFolderName = Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName);
         _gitIgnorePathName = gitSyncParameters.GitData.GitIgnorePathName;
     }
-
 
     public static PackageUpdaterToolAction? Create(ILogger? logger, ParametersManager parametersManager,
         string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)

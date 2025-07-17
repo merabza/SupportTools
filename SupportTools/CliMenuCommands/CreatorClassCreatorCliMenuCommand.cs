@@ -68,11 +68,9 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             return true;
         }
 
-
         Console.WriteLine("File or folder with name {0} does not exists", path);
         return false;
     }
-
 
     private void ProcessFiles(List<ClassCreatorInfo> classCreatorInfos)
     {
@@ -97,7 +95,6 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
                 if (lineData[i].DryLine == string.Empty)
                     lineData[i].Indent = lineData[i - 1].Indent;
             lineData.Add(LineData.CreateEndOfFile());
-
 
             var stackItems = new Stack<CodeBlockBase>();
             var startCodeBlock = new CodeBlock(string.Empty,

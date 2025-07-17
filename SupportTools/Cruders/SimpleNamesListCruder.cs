@@ -5,11 +5,11 @@ using LibParameters;
 
 namespace SupportTools.Cruders;
 
-public abstract class SimpleNamesListCruder : ParCruder
+public abstract class SimpleNamesListCruder : Cruder
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    protected SimpleNamesListCruder(IParametersManager parametersManager, string crudName, string crudNamePlural) :
-        base(parametersManager, crudName, crudNamePlural)
+    protected SimpleNamesListCruder(string crudName, string crudNamePlural, bool fieldKeyFromItem = false,
+        bool canEditFieldsInSequence = true) : base(crudName, crudNamePlural, fieldKeyFromItem, canEditFieldsInSequence)
     {
     }
 
@@ -17,7 +17,7 @@ public abstract class SimpleNamesListCruder : ParCruder
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
-        return GetList().ToDictionary(k => k, ItemData (_) => new ItemData());
+        return GetList().ToDictionary(k => k, ItemData (v) => new TextItemData { Text = v });
     }
 
     protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)

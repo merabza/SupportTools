@@ -86,20 +86,18 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
                 projectsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Projects");
                 secretsFolderPath = Path.Combine(appCreatorDataFolderFullName, "Security");
                 projectName = templateModel.TestProjectName;
-                projectShortName =
-                    templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
-                        ? templateModel.TestProjectShortName
-                        : null;
+                projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
+                    ? templateModel.TestProjectShortName
+                    : null;
                 dbPartProjectName = $"{projectName}Db";
                 break;
             case ETestOrReal.Real:
                 projectsFolderPath = parameters.ProjectsFolderPathReal;
                 secretsFolderPath = parameters.SecretsFolderPathReal;
                 projectName = Inputer.InputTextRequired("New project name", string.Empty);
-                projectShortName =
-                    templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
-                        ? Inputer.InputTextRequired("New project short name", string.Empty)
-                        : null;
+                projectShortName = templateModel is { SupportProjectType: ESupportProjectType.Api, UseDatabase: true }
+                    ? Inputer.InputTextRequired("New project short name", string.Empty)
+                    : null;
                 dbPartProjectName = templateModel.UseDbPartFolderForDatabaseProjects
                     ? Inputer.InputTextRequired("New dbPart project name", string.Empty)
                     : null;
@@ -138,14 +136,9 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         }
 
         if (!await appCreator.PrepareParametersAndCreateApp(_testOrReal == ETestOrReal.Real, cancellationToken))
-        {
             return false;
-        }
 
-        if (_testOrReal != ETestOrReal.Real)
-        {
-            return true;
-        }
+        if (_testOrReal != ETestOrReal.Real) return true;
 
         var existingProject = supportToolsParameters.GetProject(projectName);
 
@@ -156,18 +149,12 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return true;
         }
 
-        if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
-        {
-            return true;
-        }
+        if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false)) return true;
 
         var projectRecordCreator = new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName,
             projectShortName, dbPartProjectName, string.Empty);
 
-        if (projectRecordCreator.Create())
-        {
-            return true;
-        }
+        if (projectRecordCreator.Create()) return true;
 
         StShared.ConsoleWriteInformationLine(_logger, true,
             "code for project with name {0} created, but record create failed", projectName);

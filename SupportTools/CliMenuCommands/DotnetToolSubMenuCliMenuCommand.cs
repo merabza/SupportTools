@@ -24,7 +24,6 @@ public sealed class DotnetToolSubMenuCliMenuCommand : CliMenuCommand
         //var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCommand();
         //dotnetToolSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
 
-
         //dotnetToolSubMenuSet.AddMenuItem(new DotnetToolRunCliMenuCommand(_tool, ETestOrReal.Test),
         //               "Run Test Project by this Dotnet Tool");
         //dotnetToolSubMenuSet.AddMenuItem(new DotnetToolRunCliMenuCommand(_tool, ETestOrReal.Real),

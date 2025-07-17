@@ -6,7 +6,7 @@ public enum EDotnetProjectType
     Console,
     Web,
     ReactEsProj,
-    webapp,//razor 
+    webapp //razor 
 }
 
 /*
@@ -19,7 +19,7 @@ dotnet --version
 dotnet new list
 
 These templates matched your input:
-   
+
    Template Name                                 Short Name                          Language    Tags
    --------------------------------------------  ----------------------------------  ----------  -----------------------------------------------------------------------------
    .NET Aspire App Host                          aspire-apphost                      [C#]        Common/.NET Aspire/Cloud

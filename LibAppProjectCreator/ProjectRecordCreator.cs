@@ -146,7 +146,6 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-
         var developerDbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
 
         DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
@@ -186,7 +185,6 @@ internal sealed class ProjectRecordCreator
             StShared.WriteErrorLine($"Smart Schema with name {smartSchemaName} does not exists", true, _logger);
             return false;
         }
-
 
         var scaffoldSeederProjectName = $"{_newDbPartProjectName}ScaffoldSeeder";
         var fakeHostProjectName = supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName;
@@ -251,13 +249,14 @@ internal sealed class ProjectRecordCreator
             MainProjectName = _newProjectName,
             MigrationStartupProjectFilePath =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, fakeHostProjectName, $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
+                    scaffoldSeederProjectName, fakeHostProjectName,
+                    $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
             SolutionFileNameWithMigrationProject =
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
                     scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
-            MigrationProjectFilePath =
-                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, dbMigrationProjectName, $"{dbMigrationProjectName}{NamingStats.CsProjectExtension}"),
+            MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
+                $"{dbMigrationProjectName}{NamingStats.CsProjectExtension}"),
             //SeedProjectFilePath =
             //    _templateModel is { UseDatabase: true, UseCarcass: true }
             //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,

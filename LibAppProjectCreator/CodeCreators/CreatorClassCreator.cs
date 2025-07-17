@@ -17,7 +17,6 @@ public sealed class CreatorClassCreator : CodeCreator
         _generatedCodeBlock = generatedCodeBlock;
     }
 
-
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),

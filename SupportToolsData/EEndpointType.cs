@@ -3,5 +3,5 @@
 public enum EEndpointType
 {
     Command,
-    Query,
+    Query
 }

@@ -88,12 +88,10 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             //    gitProjectFolderName = GitDataModel.MainProjectFolderRelativePathName +
             //                           gitProjectFolderName[mainProjectFolderRelativePath.Length..];
 
-
             var gitName = gitProjectFolderName;
             //თუ ფოლდერი რამდენიმე სექციით არის მოცემული, მაშინ გიტის რეპოზიტორიის სახელად დავიმახსოვროთ ბოლო სექცია
             var dir = new DirectoryInfo(gitName);
             gitName = dir.Name;
-
 
             var gitCountWithAddress = parameters.Gits.Count(x => x.Value.GitProjectAddress == gitProjectAddress);
 

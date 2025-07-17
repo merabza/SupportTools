@@ -53,17 +53,17 @@ public sealed class RazorAppCreator : AppCreatorBase
     protected override Task<bool> MakeAdditionalFiles(CancellationToken cancellationToken = default)
     {
         //---===მთავარი პროექტის ფაილები===---
-        
-        var keyPart1 = Guid.NewGuid().ToString("N");
 
+        var keyPart1 = Guid.NewGuid().ToString("N");
 
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
-        var programClassCreator = new ApiProgramClassCreator(Logger, _razorAppCreatorData.MainProjectData.ProjectFullPath,
-            ProjectName, keyPart1, _razorAppCreatorData.UseDatabase, _razorAppCreatorData.UseCarcass,
-            _razorAppCreatorData.UseIdentity, _razorAppCreatorData.UseReCounter, _razorAppCreatorData.UseSignalR,
-            _razorAppCreatorData.UseFluentValidation, _razorAppCreatorData.UseReact, _razorAppCreatorData.DbPartProjectName,
-            "Program.cs");
+        var programClassCreator = new ApiProgramClassCreator(Logger,
+            _razorAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, keyPart1,
+            _razorAppCreatorData.UseDatabase, _razorAppCreatorData.UseCarcass, _razorAppCreatorData.UseIdentity,
+            _razorAppCreatorData.UseReCounter, _razorAppCreatorData.UseSignalR,
+            _razorAppCreatorData.UseFluentValidation, _razorAppCreatorData.UseReact,
+            _razorAppCreatorData.DbPartProjectName, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         //var doProject = _razorAppCreatorData.UseDatabase

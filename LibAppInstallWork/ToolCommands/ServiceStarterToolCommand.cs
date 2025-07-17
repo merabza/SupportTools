@@ -21,9 +21,9 @@ public sealed class ServiceStarterToolCommand : ToolCommand
     private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStarterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription, useConsole)
+    public ServiceStarterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ServiceStartStopParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -76,7 +76,6 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
-
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
         CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,

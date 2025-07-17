@@ -37,7 +37,7 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
         templateSubMenuSet.AddMenuItem(deleteTemplateCommand);
 
         //პროექტის პარამეტრი
-        TemplateCruder templateCruder = new(_logger, _parametersManager);
+        var templateCruder = TemplateCruder.Create(_logger, _parametersManager);
         EditItemAllFieldsInSequenceCliMenuCommand editCommand = new(templateCruder, _templateName);
         templateSubMenuSet.AddMenuItem(editCommand);
 

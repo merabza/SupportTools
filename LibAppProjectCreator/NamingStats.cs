@@ -2,6 +2,9 @@
 
 public static class NamingStats
 {
+    public const string CsProjectExtension = ".csproj";
+    public const string JsonExtension = ".json";
+
     public static string CreateProjectSeederCodeProjectName(string scaffoldSeederProjectName)
     {
         return $"Create{scaffoldSeederProjectName}DbSeederCode";
@@ -38,8 +41,4 @@ public static class NamingStats
     {
         return $"{scaffoldSeederProjectName}ScaffoldSeeder.sec";
     }
-
-    public const string CsProjectExtension = ".csproj";
-    public const string JsonExtension = ".json";
-
 }

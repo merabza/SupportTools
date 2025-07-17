@@ -23,7 +23,7 @@ public sealed class ServerDataNameFieldEditor : FieldEditor<string>
 
     public override void UpdateField(string? recordKey, object recordForUpdate) //, object currentRecord
     {
-        ServerDataCruder serverDataCruder = new(_logger, _httpClientFactory, _parametersManager);
+        var serverDataCruder = ServerDataCruder.Create(_logger, _httpClientFactory, _parametersManager);
         SetValue(recordForUpdate, serverDataCruder.GetNameWithPossibleNewName(FieldName, GetValue(recordForUpdate)));
     }
 }

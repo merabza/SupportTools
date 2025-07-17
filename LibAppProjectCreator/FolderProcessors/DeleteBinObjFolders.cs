@@ -12,7 +12,6 @@ public sealed class DeleteBinObjFolders : FolderProcessor
     private readonly string[] _deleteFolderNames = ["bin", "obj"];
     private readonly string[] _excludeFolders = [".git", ".vs"];
 
-
     public DeleteBinObjFolders(FileManager fileManager) : base("Delete bin obj folders", "Delete bin obj folders",
         fileManager, null, false, new ExcludeSet(), true, false)
     {

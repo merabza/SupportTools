@@ -55,7 +55,6 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
         foreach (var gitName in project.GitProjectNames.Where(gitName => parameters.Gits.ContainsKey(gitName)))
             projectExportData.Gits.Add(gitName, parameters.Gits[gitName]);
 
-
         var projectJsonText = JsonConvert.SerializeObject(projectExportData, Formatting.Indented);
         File.WriteAllText(fileWithExportData, projectJsonText);
 

@@ -57,7 +57,6 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-
         if (string.IsNullOrWhiteSpace(localPath))
         {
             StShared.WriteErrorLine("localPath does not specified in databasesBackupFilesExchangeParameters", true);
@@ -152,8 +151,8 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        var createDatabaseManagerResultForDestination = await DatabaseManagersFactory.CreateDatabaseManager(logger, true,
-            destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
+        var createDatabaseManagerResultForDestination = await DatabaseManagersFactory.CreateDatabaseManager(logger,
+            true, destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
             cancellationToken);
 
         if (createDatabaseManagerResultForDestination.IsT1)

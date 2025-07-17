@@ -74,7 +74,6 @@ public sealed class SettingsFilesCreator
         await File.WriteAllTextAsync(keysJsonFileName, appSetEnKeysJObject.ToString(Formatting.Indented),
             cancellationToken);
 
-
         Console.WriteLine("Creating appsettingsEncoded.json...");
         var keyPart2 = Environment.MachineName.Capitalize();
 

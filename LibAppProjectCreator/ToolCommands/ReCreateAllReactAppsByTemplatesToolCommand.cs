@@ -20,7 +20,6 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
         _logger = logger;
     }
 
-
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;

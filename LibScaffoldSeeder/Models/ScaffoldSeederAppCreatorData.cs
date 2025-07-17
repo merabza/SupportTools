@@ -69,7 +69,6 @@
 //        return new ScaffoldSeederAppCreatorData(appCreatorBaseData);
 //    }
 
-
 //    private ScaffoldSeederAppCreatorData(AppCreatorBaseData appCreatorBaseData)
 //    {
 //        AppCreatorBaseData = appCreatorBaseData;

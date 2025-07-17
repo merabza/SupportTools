@@ -19,9 +19,9 @@ public sealed class VersionCheckerToolCommand : ToolCommand
     private readonly ILogger _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public VersionCheckerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, CheckVersionParameters parameters,
-        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription, useConsole)
+    public VersionCheckerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        CheckVersionParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -38,7 +38,6 @@ public sealed class VersionCheckerToolCommand : ToolCommand
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
-
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
         CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,

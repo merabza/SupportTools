@@ -42,7 +42,6 @@ public sealed class GitClearToolAction : ToolAction
     //    return null;
     //}
 
-
     protected override bool CheckValidate()
     {
         if (!string.IsNullOrWhiteSpace(_gitClearParameters.GitsFolder))
@@ -71,7 +70,6 @@ public sealed class GitClearToolAction : ToolAction
                 true, _logger);
             return ValueTask.FromResult(false);
         }
-
 
         ProcessFolder(projectFolderName);
 
@@ -140,7 +138,6 @@ public sealed class GitClearToolAction : ToolAction
 
         //var dir1 = new DirectoryInfo(normalizedPath1);
         //var dir2 = new DirectoryInfo(normalizedPath2);
-
 
         //if (dir1.Root.Name != dir2.Root.Name &&
         //    dir1.Root.Name.Equals(dir2.Root.Name, StringComparison.CurrentCultureIgnoreCase))

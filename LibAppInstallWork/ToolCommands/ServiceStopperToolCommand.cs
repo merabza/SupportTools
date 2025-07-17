@@ -20,9 +20,9 @@ public sealed class ServiceStopperToolCommand : ToolCommand
     private readonly ILogger _logger;
     private readonly ServiceStartStopParameters _parameters;
 
-    public ServiceStopperToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, ServiceStartStopParameters parameters,
-        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, parameters, parametersManager,
-        ActionDescription, useConsole)
+    public ServiceStopperToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        ServiceStartStopParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

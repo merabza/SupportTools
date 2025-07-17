@@ -19,14 +19,22 @@ using SystemToolsShared.Errors;
 
 namespace SupportTools.Cruders;
 
-public sealed class GitCruder : ParCruder
+public sealed class GitCruder : ParCruder<GitDataModel>
 {
     private readonly IHttpClientFactory _httpClientFactory;
+
     private readonly ILogger _logger;
     private readonly List<GitDataDto> _remoteGitRepos;
 
+    public GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
+        Dictionary<string, GitDataModel> currentValuesDictionary) : this(logger, httpClientFactory, parametersManager,
+        currentValuesDictionary, [])
+    {
+    }
+
     private GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        List<GitDataDto> remoteGitRepos) : base(parametersManager, "Git", "Gits")
+        Dictionary<string, GitDataModel> currentValuesDictionary, List<GitDataDto> remoteGitRepos) : base(
+        parametersManager, currentValuesDictionary, "Git", "Gits")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -41,15 +49,15 @@ public sealed class GitCruder : ParCruder
         IParametersManager parametersManager)
     {
         List<GitDataDto> remoteGitRepos = [];
+        var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         try
         {
-            var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-
             var supportToolsServerApiClient =
                 supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
 
             if (supportToolsServerApiClient is null)
-                return new GitCruder(logger, httpClientFactory, parametersManager, remoteGitRepos);
+                return new GitCruder(logger, httpClientFactory, parametersManager, supportToolsParameters.Gits,
+                    remoteGitRepos);
             var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
@@ -67,7 +75,7 @@ public sealed class GitCruder : ParCruder
             //throw;
         }
 
-        return new GitCruder(logger, httpClientFactory, parametersManager, remoteGitRepos);
+        return new GitCruder(logger, httpClientFactory, parametersManager, supportToolsParameters.Gits, remoteGitRepos);
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()

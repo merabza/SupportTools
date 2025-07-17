@@ -43,7 +43,6 @@ public sealed class AppSettingsUpdaterParameters : IParameters
         return true;
     }
 
-
     public static AppSettingsUpdaterParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
@@ -60,7 +59,6 @@ public sealed class AppSettingsUpdaterParameters : IParameters
         var environmentName = serverInfo.EnvironmentName;
         var serverName = serverInfo.ServerName;
 
-
         if (string.IsNullOrWhiteSpace(serverName))
         {
             StShared.WriteErrorLine("Server name is not specified", true);
@@ -72,7 +70,6 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             StShared.WriteErrorLine("Environment Name is not specified", true);
             return null;
         }
-
 
         if (!project.IsService)
         {

@@ -29,7 +29,6 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string? _serviceDescriptionSignature;
     private readonly string _serviceUserName;
 
-
     public InstallServiceAction(ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,

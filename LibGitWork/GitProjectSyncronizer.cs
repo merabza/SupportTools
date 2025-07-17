@@ -18,7 +18,6 @@ public sealed class GitProjectSyncronizer
     private readonly ParametersManager _parametersManager;
     private readonly bool _useConsole;
 
-
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectSyncronizer(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
         bool useConsole)

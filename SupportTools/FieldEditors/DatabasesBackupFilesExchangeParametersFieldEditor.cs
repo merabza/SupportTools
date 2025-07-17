@@ -10,8 +10,8 @@ public sealed class DatabasesBackupFilesExchangeParametersFieldEditor : Paramete
     DatabasesBackupFilesExchangeParameters, DatabasesBackupFilesExchangeParametersEditor>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabasesBackupFilesExchangeParametersFieldEditor(ILogger logger, string propertyName,
-        IParametersManager parametersManager) : base(logger, propertyName, parametersManager)
+    public DatabasesBackupFilesExchangeParametersFieldEditor(string propertyName, ILogger logger,
+        IParametersManager parametersManager) : base(propertyName, logger, parametersManager)
     {
     }
 

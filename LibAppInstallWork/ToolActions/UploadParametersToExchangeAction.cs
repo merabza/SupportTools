@@ -50,13 +50,13 @@ public sealed class UploadParametersToExchangeAction : ToolAction
             return ValueTask.FromResult(false);
         }
 
-
         var datePart = DateTime.Now.ToString(_dateMask);
         var prefix = $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-";
         //ასატვირთი ფაილის სახელის შექმნა
         var uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
 
-        var exchangeFileManager = FileManagersFactory.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
+        var exchangeFileManager =
+            FileManagersFactory.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
 
         if (exchangeFileManager == null)
         {

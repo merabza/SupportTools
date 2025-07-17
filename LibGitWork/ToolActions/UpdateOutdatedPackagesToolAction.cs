@@ -26,7 +26,6 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         _updateOutdatedPackagesParameters = updateOutdatedPackagesParameters;
     }
 
-
     public static UpdateOutdatedPackagesToolAction Create(ILogger logger, ParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
@@ -57,7 +56,6 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, PackageUpdater>();
         const EGitCol gitCol = EGitCol.Main;
-
 
         foreach (var (projectName, project) in projectsListOrdered)
         foreach (var gitProjectName in project.GetGitProjectNames(gitCol))

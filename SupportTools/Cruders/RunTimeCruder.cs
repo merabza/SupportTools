@@ -8,20 +8,22 @@ namespace SupportTools.Cruders;
 
 public sealed class RunTimeCruder : SimpleNamesWithDescriptionsCruder
 {
+    private readonly IParametersManager _parametersManager;
+
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RunTimeCruder(IParametersManager parametersManager) : base(parametersManager, "RunTime", "RunTimes")
+    public RunTimeCruder(IParametersManager parametersManager) : base("RunTime", "RunTimes")
     {
+        _parametersManager = parametersManager;
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)ParametersManager.Parameters).RunTimes;
+        return ((SupportToolsParameters)_parametersManager.Parameters).RunTimes;
     }
-
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        GenerateStandardRunTimesCliMenuCommand generateCommand = new(ParametersManager);
+        GenerateStandardRunTimesCliMenuCommand generateCommand = new(_parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 }

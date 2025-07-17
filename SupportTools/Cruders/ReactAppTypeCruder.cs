@@ -10,23 +10,25 @@ namespace SupportTools.Cruders;
 public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
 {
     private readonly ILogger _logger;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager) : base(parametersManager,
-        "React App Type", "React App Types")
+    public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager) : base("React App Type",
+        "React App Types")
     {
         _logger = logger;
+        _parametersManager = parametersManager;
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)ParametersManager.Parameters).ReactAppTemplates;
+        return ((SupportToolsParameters)_parametersManager.Parameters).ReactAppTemplates;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
         ReCreateAllReactAppsByTemplatesCliMenuCommand reCreateAllReactAppsByTemplatesCliMenuCommand =
-            new(_logger, ParametersManager);
+            new(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand);
     }
 
@@ -39,7 +41,7 @@ public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
             return;
 
         ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
-            new(_logger, ParametersManager, recordKey, name);
+            new(_logger, _parametersManager, recordKey, name);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand);
     }
 }

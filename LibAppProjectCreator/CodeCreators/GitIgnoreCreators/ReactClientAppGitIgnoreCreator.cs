@@ -17,7 +17,6 @@
 //# Learn more about .gitignore:
 //#     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
-
 //build/
 //src/carcass
 //src/project

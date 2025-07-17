@@ -58,7 +58,6 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
             return await installProgramAction.Run(cancellationToken);
         }
 
-
         string? appSettingsVersion = null;
         if (!string.IsNullOrWhiteSpace(Parameters.AppSettingsJsonSourceFileName) ||
             !string.IsNullOrWhiteSpace(Parameters.EncodedJsonFileName))

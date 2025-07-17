@@ -41,7 +41,6 @@
 //# Uncomment if you have tasks that create the project's static files in wwwroot
 //#wwwroot/
 
-
 //## TODO: If you have NuGet Package Restore enabled, uncomment this
 //#packages/
 
@@ -93,7 +92,6 @@
 //Backup*/
 //UpgradeLog*.XML
 
-
 //############
 //## Windows
 //############
@@ -103,7 +101,6 @@
 
 //# Folder config file
 //Desktop.ini
-
 
 //#############
 //## Python
@@ -346,7 +343,6 @@
 
 //# FAKE - F# Make
 //.fake/
-
 
 //#####################
 //*.swp

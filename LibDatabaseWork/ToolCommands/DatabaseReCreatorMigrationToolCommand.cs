@@ -39,11 +39,11 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public DatabaseReCreatorMigrationToolCommand(ILogger logger, DatabaseMigrationParameters databaseMigrationParameters,
-        DatabaseParameters devDatabaseParameters, CorrectNewDbParameters correctNewDbParameters,
-        DatabaseServerConnections databaseServerConnections, ApiClients apiClients,
-        IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(logger, ActionName,
-        databaseMigrationParameters, parametersManager, ActionDescription)
+    public DatabaseReCreatorMigrationToolCommand(ILogger logger,
+        DatabaseMigrationParameters databaseMigrationParameters, DatabaseParameters devDatabaseParameters,
+        CorrectNewDbParameters correctNewDbParameters, DatabaseServerConnections databaseServerConnections,
+        ApiClients apiClients, IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(
+        logger, ActionName, databaseMigrationParameters, parametersManager, ActionDescription)
     {
         _logger = logger;
         _devDatabaseParameters = devDatabaseParameters;
@@ -68,11 +68,11 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return false;
         }
 
-
         if (isDatabaseExistsResult.AsT0)
         {
             //თუ არსებობს წაიშალოს დეველოპერ ბაზა
-            var databaseDropper = new DatabaseDropperMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
+            var databaseDropper =
+                new DatabaseDropperMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
             if (!await databaseDropper.Run(cancellationToken))
                 return false;
         }
@@ -91,7 +91,6 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         var correctNewDatabase = new CorrectNewDatabaseToolCommand(_logger, _correctNewDbParameters, ParametersManager);
         return await correctNewDatabase.Run(cancellationToken);
     }
-
 
     private async ValueTask<Option<IEnumerable<Err>>> ChangeDatabaseRecoveryModel(
         CancellationToken cancellationToken = default)
@@ -116,7 +115,6 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             _logger.LogError("Error in CreateDatabaseManager");
             errors.AddRange(createDatabaseManagerResult.AsT1);
         }
-
 
         if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
         {

@@ -25,7 +25,6 @@ public sealed class DotnetToolsManager
         DotnetTools = dotnetTools;
     }
 
-
     public List<DotnetTool> DotnetTools { get; private set; }
 
     public static DotnetToolsManager? Instance

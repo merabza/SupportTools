@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
@@ -11,15 +9,13 @@ using SystemToolsShared;
 
 namespace SupportTools.Cruders;
 
-public class EndpointCruder : ParCruder
+public class EndpointCruder : ParCruder<EndpointModel>
 {
-    private readonly ProjectModel _project;
-
     // ReSharper disable once ConvertToPrimaryConstructor
-    public EndpointCruder(IParametersManager parametersManager, ProjectModel project) : base(parametersManager,
+    public EndpointCruder(IParametersManager parametersManager,
+        Dictionary<string, EndpointModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Endpoint", "Endpoints")
     {
-        _project = project;
         FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.EndpointName)));
         FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.EndpointRoute)));
         FieldEditors.Add(new BoolFieldEditor(nameof(EndpointModel.RequireAuthorization), true));
@@ -36,44 +32,6 @@ public class EndpointCruder : ParCruder
            public string ReturnType { get; set; }
            public bool SendMessageToCurrentUser { get; set; }
          */
-    }
-
-    protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    {
-        return _project.Endpoints.ToDictionary(p => p.Key, ItemData (p) => p.Value);
-    }
-
-    protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    {
-        return new EndpointModel();
-    }
-
-    public override bool ContainsRecordWithKey(string recordKey)
-    {
-        return _project.Endpoints.ContainsKey(recordKey);
-    }
-
-    protected override void RemoveRecordWithKey(string recordKey)
-    {
-        _project.Endpoints.Remove(recordKey);
-    }
-
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not EndpointModel endpointModel)
-            throw new Exception("newRecord is null in EndpointModel");
-        //var adaptedModel = AdaptEndpointModel(endpointModel);
-        //if (adaptedModel != null)
-        _project.Endpoints[recordKey] = endpointModel;
-    }
-
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    {
-        if (newRecord is not EndpointModel endpointModel)
-            throw new Exception("newRecord is null in EndpointModel");
-        //var adaptedModel = AdaptEndpointModel(endpointModel);
-        //if (adaptedModel != null)
-        _project.Endpoints.Add(recordKey, endpointModel);
     }
 
     //private static EndpointModel? AdaptEndpointModel(EndpointEditModel endpointEditModel)
@@ -102,8 +60,7 @@ public class EndpointCruder : ParCruder
 
     public override bool CheckValidation(ItemData item)
     {
-        if (item is not EndpointModel endpointModel)
-            throw new Exception("newRecord is null in EndpointModel");
+        var endpointModel = GetTItem(item);
         var validator = new EndpointModelValidator();
 
         var validateResults = validator.Validate(endpointModel);

@@ -1,15 +1,15 @@
-﻿using CompressionManagement;
+﻿using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibNpmWork;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemToolsShared;
 
 namespace LibAppProjectCreator.ToolActions;
@@ -37,7 +37,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         _useConsole = useConsole;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //შეიქმნას ცარელა spa front პროექტი დროებით ფოლდერში
 
@@ -47,7 +47,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
         {
             StShared.WriteErrorLine("SmartSchemaNameForLocal does not specified", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var smartSchemaForLocal =
@@ -56,7 +56,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
         {
             StShared.WriteErrorLine("TempFolder does not specified in parameters", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var project = supportToolsParameters.GetProjectRequired(_projectName);
@@ -64,13 +64,13 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         if (string.IsNullOrWhiteSpace(project.SpaProjectName))
         {
             StShared.WriteErrorLine("SpaProjectName does not specified in parameters", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         if (string.IsNullOrWhiteSpace(project.ProjectFolderName))
         {
             StShared.WriteErrorLine($"ProjectFolderName is not specified for project {_projectName}", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var createInPath = Path.Combine(supportToolsParameters.TempFolder, FrontSpaProjects, _projectName,
@@ -84,18 +84,18 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             FileStat.DeleteDirectoryWithNormaliseAttributes(createInPath);
 
         if (!reactEsProjectCreator.Create())
-            return false;
+            return ValueTask.FromResult(false);
 
         var npmProcessor = new NpmProcessor(_logger);
         var spaProjectPath = Path.Combine(createInPath, project.SpaProjectName);
 
         if (!npmProcessor.InstallNpmPackages(spaProjectPath))
-            return false;
+            return ValueTask.FromResult(false);
 
         //დაინსტალირდეს პროექტის შესაბამისი npm პაკეტები
         if (project.FrontNpmPackageNames.Any(npmPackageName =>
                 !npmProcessor.InstallNpmPackage(spaProjectPath, npmPackageName)))
-            return false;
+            return ValueTask.FromResult(false);
 
         var reservePath = Path.Combine(supportToolsParameters.TempFolder, ProjectReserves, _projectName);
 
@@ -104,7 +104,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         if (checkedReserveFolderFullPath is null)
         {
             StShared.WriteErrorLine($"does not exists and can not be created work folder {reservePath}", true, _logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         const string nodeModulesFolderName = "node_modules";
@@ -121,12 +121,12 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         compressor.CompressFolder(project.ProjectFolderName, checkedReserveFolderFullPath);
 
         //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
-        var frontProjectFolder = Path.Combine(project.ProjectFolderName, $"{_projectName}Front", project.SpaProjectName);
+        var frontProjectFolder =
+            Path.Combine(project.ProjectFolderName, $"{_projectName}Front", project.SpaProjectName);
 
         FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, nodeModulesFolderName));
         FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, "obj"));
         FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, "build"));
-
 
         FileStat.DeleteFileIfExists(Path.Combine(frontProjectFolder, $"{project.SpaProjectName}.esproj"));
 
@@ -139,18 +139,14 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         File.Copy(Path.Combine(spaProjectPath, packageJsonFileName), frontPackageJsonFileName);
 
         //გაეშვას npm install ბრძანება მიმდინარე პროექტისათვის
-        
-        if (!npmProcessor.InstallNpmPackages(frontProjectFolder))
-            return false;
 
+        if (!npmProcessor.InstallNpmPackages(frontProjectFolder))
+            return ValueTask.FromResult(false);
 
         //შემოწმდეს დროებით ფოლდერშ არსებული დანარჩენი ფაილები ემთხვევა თუ არა მიმდინარე პროექტის ფოლდერში არსებულ შესაბამის ფაილებს
 
         //აცდენის შესახებ ინფორმაცია გამოვიდეს კონსოლში
 
-
-
-
-        return true;
+        return ValueTask.FromResult(true);
     }
 }
