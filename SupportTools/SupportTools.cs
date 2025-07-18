@@ -52,8 +52,8 @@ public sealed class SupportTools : CliAppLoop
             new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
-        var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand();
-        mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
+        //var dotnetToolsSubMenuCommand = new DotnetToolsSubMenuCliMenuCommand(_parametersManager);
+        //mainMenuSet.AddMenuItem(dotnetToolsSubMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
         mainMenuSet.AddMenuItem(

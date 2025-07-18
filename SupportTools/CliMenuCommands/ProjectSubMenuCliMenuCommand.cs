@@ -94,10 +94,10 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             //დასაშვები ინსტრუმენტების არჩევა
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
-            foreach (var tool in ToolCommandFactory.ToolsByProjects.Intersect(project.AllowToolsList)
-                         .OrderBy(x => x.GetToolName()))
-                projectSubMenuSet.AddMenuItem(new ToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
-                    _projectName, null, _parametersManager));
+            foreach (var tool in Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
+                         .OrderBy(x => x.GetProjectToolName()))
+                projectSubMenuSet.AddMenuItem(new ProjectToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
+                    _projectName, _parametersManager));
         }
 
         var serverInfoCruder = ServerInfoCruder.Create(_logger, _httpClientFactory, _parametersManager, _projectName);

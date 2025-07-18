@@ -1,8 +1,8 @@
-﻿namespace SupportTools.DotnetTools;
+﻿//namespace SupportTools.DotnetTools;
 
-public enum ENecessaryTools
-{
-    DotnetEf,
-    DotnetOutdatedTool,
-    JetbrainsReSharperGlobalTools
-}
+//public enum ENecessaryTools
+//{
+//    DotnetEf,
+//    DotnetOutdatedTool,
+//    JetbrainsReSharperGlobalTools
+//}

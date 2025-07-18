@@ -58,6 +58,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
     public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
+    public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
 
     public bool CheckBeforeSave()
     {

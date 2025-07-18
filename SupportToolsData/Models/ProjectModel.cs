@@ -46,7 +46,7 @@ public sealed class ProjectModel : ItemData
     public List<string> GitProjectNames { get; init; } = [];
     public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];
     public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
-    public List<ETools> AllowToolsList { get; init; } = [];
+    public List<EProjectTools> AllowToolsList { get; init; } = [];
     public string? PrepareProdCopyDatabaseProjectFilePath { get; set; }
     public string? PrepareProdCopyDatabaseProjectParametersFilePath { get; set; }
 

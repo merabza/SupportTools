@@ -37,7 +37,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        var checks = ToolCommandFactory.ToolsByProjectsAndServers.ToDictionary(tool => tool.ToString(),
+        var checks = Enum.GetValues<EProjectServerTools>().ToDictionary(tool => tool.ToString(),
             tool => server.AllowToolsList?.Contains(tool) ?? false);
 
         //გამოვიდეს სიიდან ამრჩევი
@@ -47,7 +47,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 
         foreach (var kvp in checks)
         {
-            if (!Enum.TryParse(kvp.Key, out ETools tool))
+            if (!Enum.TryParse(kvp.Key, out EProjectServerTools tool))
                 return false;
 
             if (kvp.Value)

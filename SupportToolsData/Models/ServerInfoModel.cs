@@ -18,7 +18,7 @@ public sealed class ServerInfoModel : ItemData
     //public string? InstallScriptFileName { get; set; }
     public string? ServiceUserName { get; set; }
 
-    public List<ETools>? AllowToolsList { get; set; }
+    public List<EProjectServerTools>? AllowToolsList { get; set; }
 
     //public DatabasesExchangeParameters? DatabasesExchangeParameters { get; set; }
     public DatabaseParameters? CurrentDatabaseParameters { get; init; }

@@ -1,57 +1,61 @@
-﻿using System;
-using System.Linq;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using LibDataInput;
-using SupportTools.DotnetTools;
-using SupportTools.MenuCommands;
+﻿//using System;
+//using System.Linq;
+//using CliMenu;
+//using CliParameters.CliMenuCommands;
+//using LibDataInput;
+//using LibParameters;
+//using SupportTools.DotnetTools;
 
-namespace SupportTools.CliMenuCommands;
+//namespace SupportTools.CliMenuCommands;
 
-public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
-{
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public DotnetToolsSubMenuCliMenuCommand() : base("Dotnet Tools", EMenuAction.LoadSubMenu)
-    {
-    }
+//public sealed class DotnetToolsSubMenuCliMenuCommand : CliMenuCommand
+//{
+//    private readonly IParametersManager _parametersManager;
 
-    public override CliMenuSet GetSubMenu()
-    {
-        CliMenuSet dotnetToolsSubMenuSet = new("Dotnet Tools");
+//    // ReSharper disable once ConvertToPrimaryConstructor
+//    public DotnetToolsSubMenuCliMenuCommand(IParametersManager parametersManager) : base("Dotnet Tools",
+//        EMenuAction.LoadSubMenu)
+//    {
+//        _parametersManager = parametersManager;
+//    }
 
-        //ქვემენიუს ელემენტები
+//    public override CliMenuSet GetSubMenu()
+//    {
+//        CliMenuSet dotnetToolsSubMenuSet = new("Dotnet Tools");
 
-        //ყველას საჭირო ინსტრუმენტის განახლებაზე შემოწმება
-        //var dotnetToolsSearched = CreateListOfDotnetToolsInstalled();
+//        //ქვემენიუს ელემენტები
 
-        //ყველას საჭირო ინსტრუმენტის განახლება ან დაყენება
-        //dotnet tool update --global dotnet-ef
-        //dotnet tool install --global dotnet-ef
-        //var dotnetAllToolsCreateOrUpdateCommand = new DotnetAllToolsCreateOrUpdateCommand();
+//        //ყველას საჭირო ინსტრუმენტის განახლებაზე შემოწმება
+//        //var dotnetToolsSearched = CreateListOfDotnetToolsInstalled();
 
-        //ყველა ინსტრუმენტის განახლება ბოლო ვერსიამდე
-        var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCliMenuCommand();
-        dotnetToolsSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
+//        //ყველას საჭირო ინსტრუმენტის განახლება ან დაყენება
+//        //dotnet tool update --global dotnet-ef
+//        //dotnet tool install --global dotnet-ef
+//        //var dotnetAllToolsCreateOrUpdateCommand = new DotnetAllToolsCreateOrUpdateCommand();
 
-        //დაინსტალირებული ინსტრუმენტების სიის დადგენა
-        var dotnetTools = DotnetToolsManager.Instance;
-        if (dotnetTools is not null)
-        {
-            var dotnetToolsInstalled = dotnetTools.DotnetTools;
+//        //ყველა ინსტრუმენტის განახლება ბოლო ვერსიამდე
+//        var updateAllToolsToLatestVersionCommand = new UpdateAllToolsToLatestVersionCliMenuCommand(_parametersManager);
+//        dotnetToolsSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCommand);
 
-            //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
-            foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
-                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool));
-        }
+//        //დაინსტალირებული ინსტრუმენტების სიის დადგენა
+//        var dotnetTools = DotnetToolsManager.Instance;
+//        if (dotnetTools is not null)
+//        {
+//            var dotnetToolsInstalled = dotnetTools.DotnetTools;
 
-        //var dotnetToolCommand = new DotnetToolCliMenuCommand();
-        //dotnetToolsSubMenuSet.AddMenuItem(dotnetToolCommand);
+//            //დაინსტალირებული ინსტრუმენტების სიის გამოტანა მენიუში
+//            foreach (var tool in dotnetToolsInstalled.OrderBy(x => x.PackageId))
+//                dotnetToolsSubMenuSet.AddMenuItem(new DotnetToolSubMenuCliMenuCommand(tool));
+//        }
 
-        //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
-        dotnetToolsSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
-            key.Length);
+//        //var dotnetToolCommand = new DotnetToolCliMenuCommand();
+//        //dotnetToolsSubMenuSet.AddMenuItem(dotnetToolCommand);
 
-        return dotnetToolsSubMenuSet;
-    }
-}
+//        //მთავარ მენიუში გასვლა
+//        var key = ConsoleKey.Escape.Value().ToLower();
+//        dotnetToolsSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
+//            key.Length);
+
+//        return dotnetToolsSubMenuSet;
+//    }
+//}

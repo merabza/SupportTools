@@ -23,6 +23,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
         ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
+
+        FieldEditors.Add(
+            new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(nameof(SupportToolsParameters.DotnetTools),
+                parametersManager));
+
         //SupportToolsServerWebApiClientName
         FieldEditors.Add(new ApiClientNameFieldEditor(nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
             logger, httpClientFactory, parametersManager));
