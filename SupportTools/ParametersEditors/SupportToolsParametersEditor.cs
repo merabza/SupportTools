@@ -23,7 +23,6 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
         ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
-
         FieldEditors.Add(
             new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(nameof(SupportToolsParameters.DotnetTools),
                 parametersManager));
@@ -75,8 +74,10 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new DictionaryFieldEditor<GitCruder, GitDataModel>(nameof(SupportToolsParameters.Gits), logger,
             httpClientFactory, parametersManager));
 
-        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(logger,
-            nameof(SupportToolsParameters.ReactAppTemplates), parametersManager));
+        FieldEditors.Add(
+            new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(
+                nameof(SupportToolsParameters.ReactAppTemplates), logger, parametersManager));
+
         FieldEditors.Add(
             new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(nameof(SupportToolsParameters.NpmPackages),
                 parametersManager));
@@ -117,8 +118,10 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(
             new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(nameof(SupportToolsParameters.RunTimes),
                 parametersManager));
-        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(logger,
-            nameof(SupportToolsParameters.GitIgnoreModelFilePaths), parametersManager));
+
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(
+            nameof(SupportToolsParameters.GitIgnoreModelFilePaths), logger, parametersManager));
+
         FieldEditors.Add(
             new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(nameof(SupportToolsParameters.Environments),
                 parametersManager));

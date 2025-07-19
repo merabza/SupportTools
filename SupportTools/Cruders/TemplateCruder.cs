@@ -12,7 +12,7 @@ namespace SupportTools.Cruders;
 
 public sealed class TemplateCruder : ParCruder<TemplateModel>
 {
-    public TemplateCruder(ILogger logger, IParametersManager parametersManager,
+    private TemplateCruder(ILogger logger, IParametersManager parametersManager,
         Dictionary<string, TemplateModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Project Creator Template", "Project Creator Templates")
     {
