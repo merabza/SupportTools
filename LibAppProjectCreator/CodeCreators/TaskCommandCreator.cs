@@ -37,7 +37,7 @@ public sealed class TaskCommandCreator : CodeCreator
                     new CodeBlock("if (task == null)",
                         "StShared.WriteErrorLine($\"Task { _taskName } does not found\", true)", "return false"),
                     string.Empty,
-                    $"{_projectNamespace}TaskRunner crawlerRunner = new(_logger, parameters, _taskName, task)",
+                    $"var crawlerRunner = new {_projectNamespace}TaskRunner(_logger, parameters, _taskName, task)",
                     string.Empty, new OneLineComment("დავინიშნოთ დრო"), "var watch = Stopwatch.StartNew()",
                     "Console.WriteLine(\"Crawler is running...\")", "Console.WriteLine(\"-- - \")",
                     " crawlerRunner.Run()", "watch.Stop()", "Console.WriteLine(\"-- - \")",

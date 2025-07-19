@@ -24,7 +24,7 @@ public sealed class RunTimeCruder : SimpleNamesWithDescriptionsCruder
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        GenerateStandardRunTimesCliMenuCommand generateCommand = new(_parametersManager);
+        var generateCommand = new GenerateStandardRunTimesCliMenuCommand(_parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 }

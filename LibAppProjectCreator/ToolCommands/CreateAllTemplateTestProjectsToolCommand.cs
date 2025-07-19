@@ -43,7 +43,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
         {
             Console.WriteLine("Start create test Project: {0}", kvp.Key);
 
-            AppProjectCreatorByTemplateToolAction appProjectCreatorByTemplate = new(_logger, _httpClientFactory,
+            var appProjectCreatorByTemplate = new AppProjectCreatorByTemplateToolAction(_logger, _httpClientFactory,
                 ParametersManager, kvp.Key, ETestOrReal.Test, UseConsole);
 
             await appProjectCreatorByTemplate.Run(cancellationToken);

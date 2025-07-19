@@ -31,7 +31,7 @@ public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
     public override CliMenuSet GetSubMenu()
     {
         //git-ის პროექტის მენიუს შექმნა
-        CliMenuSet gitProjectSubMenuSet = new(_gitProjectName);
+        var gitProjectSubMenuSet = new CliMenuSet(_gitProjectName);
 
         //გიტის პროექტის წაშლა ამ პროექტიდან
         var deleteGitProjectCommand =

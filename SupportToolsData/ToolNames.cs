@@ -34,6 +34,7 @@ public static class ToolNames
             _ => throw new ArgumentOutOfRangeException(nameof(tool), tool, null)
         };
     }
+
     public static string GetProjectServerToolName(this EProjectServerTools tool)
     {
         return tool switch

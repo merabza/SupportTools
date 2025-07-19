@@ -148,7 +148,7 @@ internal sealed class ProjectRecordCreator
 
         var developerDbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
 
-        DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
+        var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
         var developerDbConnection =
             databaseServerConnections.GetDatabaseServerConnectionByKey(developerDbConnectionName);
@@ -163,7 +163,7 @@ internal sealed class ProjectRecordCreator
         var databaseExchangeFileStorageName =
             supportToolsParameters.AppProjectCreatorAllParameters.DatabaseExchangeFileStorageName;
 
-        FileStorages fileStorages = new(supportToolsParameters.FileStorages);
+        var fileStorages = new FileStorages(supportToolsParameters.FileStorages);
 
         var databaseExchangeFileStorage = fileStorages.GetFileStorageDataByKey(databaseExchangeFileStorageName);
 
@@ -176,7 +176,7 @@ internal sealed class ProjectRecordCreator
 
         var smartSchemaName = supportToolsParameters.AppProjectCreatorAllParameters.UseSmartSchema;
 
-        SmartSchemas smartSchemas = new(supportToolsParameters.SmartSchemas);
+        var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
         var smartSchema = smartSchemas.GetSmartSchemaByKey(smartSchemaName);
 

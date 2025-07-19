@@ -59,7 +59,7 @@ public sealed class ReactEsProjectCreator
         if (statusCode != HttpStatusCode.OK || string.IsNullOrWhiteSpace(content))
             return false;
 
-        HtmlDocument htmlDoc = new();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(content);
 
         var refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);

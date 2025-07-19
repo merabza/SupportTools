@@ -28,8 +28,8 @@ public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
-        ReCreateAllReactAppsByTemplatesCliMenuCommand reCreateAllReactAppsByTemplatesCliMenuCommand =
-            new(_logger, _parametersManager);
+        var reCreateAllReactAppsByTemplatesCliMenuCommand =
+            new ReCreateAllReactAppsByTemplatesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand);
     }
 
@@ -41,8 +41,8 @@ public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
         if (!reactAppTemplateNames.TryGetValue(recordKey, out var name))
             return;
 
-        ReCreateReactAppByTemplateNameCliMenuCommand reCreateReactCommand =
-            new(_logger, _parametersManager, recordKey, name);
+        var reCreateReactCommand =
+            new ReCreateReactAppByTemplateNameCliMenuCommand(_logger, _parametersManager, recordKey, name);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand);
     }
 }

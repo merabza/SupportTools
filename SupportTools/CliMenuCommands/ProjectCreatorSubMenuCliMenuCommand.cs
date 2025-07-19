@@ -29,7 +29,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        CliMenuSet projectCreatorSubMenuSet = new("Project Creator");
+        var projectCreatorSubMenuSet = new CliMenuSet("Project Creator");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
@@ -41,7 +41,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
         if (appProjectCreatorAllParameters is not null)
         {
-            AppProjectCreatorParametersEditor appProjectCreatorParametersEditor = new(_logger, _httpClientFactory,
+            var appProjectCreatorParametersEditor = new AppProjectCreatorParametersEditor(_logger, _httpClientFactory,
                 appProjectCreatorAllParameters, _parametersManager, _parametersManager);
 
             appProjectCreatorParametersEditor.FillDetailsSubMenu(projectCreatorSubMenuSet);
@@ -60,7 +60,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         var projectCreatorTemplateCruder = TemplateCruder.Create(_logger, _parametersManager);
 
         //ახალი პროექტის შექმნა
-        NewItemCliMenuCommand newItemCommand = new(projectCreatorTemplateCruder,
+        var newItemCommand = new NewItemCliMenuCommand(projectCreatorTemplateCruder,
             projectCreatorTemplateCruder.CrudNamePlural, $"New {projectCreatorTemplateCruder.CrudName}");
         projectCreatorSubMenuSet.AddMenuItem(newItemCommand);
 

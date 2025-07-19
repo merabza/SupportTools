@@ -54,8 +54,8 @@ public static class ToolCommandFactory
     //    EProjectTools.VersionChecker
     //];
 
-    public static IToolCommand? CreateProjectToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, EProjectTools tool,
-        IParametersManager parametersManager, string projectName, bool useConsole)
+    public static IToolCommand? CreateProjectToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        EProjectTools tool, IParametersManager parametersManager, string projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
@@ -181,8 +181,8 @@ public static class ToolCommandFactory
         }
     }
 
-    public static IToolCommand? CreateProjectServerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, EProjectServerTools tool,
-        IParametersManager parametersManager, string projectName, ServerInfoModel serverInfo)
+    public static IToolCommand? CreateProjectServerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        EProjectServerTools tool, IParametersManager parametersManager, string projectName, ServerInfoModel serverInfo)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 

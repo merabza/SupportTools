@@ -30,15 +30,15 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        CliMenuSet templateSubMenuSet = new($"Template => {_templateName}");
+        var templateSubMenuSet = new CliMenuSet($"Template => {_templateName}");
 
         //პროექტის წაშლა
-        DeleteTemplateCliMenuCommand deleteTemplateCommand = new(_parametersManager, _templateName);
+        var deleteTemplateCommand = new DeleteTemplateCliMenuCommand(_parametersManager, _templateName);
         templateSubMenuSet.AddMenuItem(deleteTemplateCommand);
 
         //პროექტის პარამეტრი
         var templateCruder = TemplateCruder.Create(_logger, _parametersManager);
-        EditItemAllFieldsInSequenceCliMenuCommand editCommand = new(templateCruder, _templateName);
+        var editCommand = new EditItemAllFieldsInSequenceCliMenuCommand(templateCruder, _templateName);
         templateSubMenuSet.AddMenuItem(editCommand);
 
         templateCruder.FillDetailsSubMenu(templateSubMenuSet, _templateName);

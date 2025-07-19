@@ -211,7 +211,7 @@ public sealed class GitStsCruder : Cruder
 
     public override bool CheckValidation(ItemData item)
     {
-        GitApi gitApi = new(true, _logger);
+        var gitApi = new GitApi(true, _logger);
         try
         {
             if (item is not GitDataModel gitDataModel)

@@ -24,8 +24,8 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
-        CreateAllTemplateTestProjectsToolCommand createAllTemplateTestProjectsToolCommand =
-            new(_logger, _httpClientFactory, Name, _parametersManager, true);
+        var createAllTemplateTestProjectsToolCommand =
+            new CreateAllTemplateTestProjectsToolCommand(_logger, _httpClientFactory, Name, _parametersManager, true);
         return createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Result;
     }
 }

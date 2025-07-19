@@ -56,7 +56,7 @@ public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuComman
             !Inputer.InputBool($"File {fileWithCloneCommands} exists, overwrite?", false, false))
             return false;
 
-        StringBuilder sb = new();
+        var sb = new StringBuilder();
         sb.AppendLine($"mkdir {_projectName}");
         sb.AppendLine($"cd {_projectName}");
 

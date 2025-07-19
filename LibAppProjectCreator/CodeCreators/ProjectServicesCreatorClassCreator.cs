@@ -32,7 +32,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                     "_par = par"),
                 new CodeBlock("protected override void ConfigureServices(IServiceCollection services)",
                     "base.ConfigureServices(services)", string.Empty,
-                    "DatabaseServerConnections databaseServerConnections = new(_par.DatabaseServerConnections)",
+                    "var databaseServerConnections = new DatabaseServerConnections(_par.DatabaseServerConnections)",
                     string.Empty,
                     "var (dataProvider, connectionString) = DbConnectionFactory.GetDataProviderAndConnectionString(_par.DatabaseParameters, databaseServerConnections)",
                     string.Empty,

@@ -54,11 +54,11 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
     public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
+    public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
     public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
-    public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
 
     public bool CheckBeforeSave()
     {

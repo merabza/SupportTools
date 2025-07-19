@@ -47,7 +47,8 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
         //Check versions for One Tool
-        var checkOneDotnetToolVersionsCliMenuCommand = new CheckOneDotnetToolVersionsCliMenuCommand(ParametersManager, recordKey);
+        var checkOneDotnetToolVersionsCliMenuCommand =
+            new CheckOneDotnetToolVersionsCliMenuCommand(ParametersManager, recordKey);
         itemSubMenuSet.AddMenuItem(checkOneDotnetToolVersionsCliMenuCommand);
 
         //Update One Tool To Latest Version

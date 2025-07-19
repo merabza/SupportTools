@@ -91,8 +91,8 @@ public abstract class DoubleAppCreator
             return true;
 
         var excludeFolders = new[] { ".git", ".vs", "obj" };
-        DeleteRedundantFiles deleteRedundantFiles =
-            new(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
+        var deleteRedundantFiles =
+            new DeleteRedundantFiles(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
         deleteRedundantFiles.Run();
 
         return true;

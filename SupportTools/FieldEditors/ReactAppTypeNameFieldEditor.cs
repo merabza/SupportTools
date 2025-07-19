@@ -22,7 +22,7 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
     {
         var currentReactAppTypeName = GetValue(recordForUpdate);
 
-        ReactAppTypeCruder reactAppTypeCruder = new(_logger, _parametersManager);
+        var reactAppTypeCruder = new ReactAppTypeCruder(_logger, _parametersManager);
 
         var newValue = reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true);
 
@@ -36,7 +36,7 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
         if (val == null)
             return string.Empty;
 
-        ReactAppTypeCruder reactAppTypeCruder = new(_logger, _parametersManager);
+        var reactAppTypeCruder = new ReactAppTypeCruder(_logger, _parametersManager);
 
         var status = reactAppTypeCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";

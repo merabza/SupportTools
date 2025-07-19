@@ -36,7 +36,7 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         var updateGitIgnoreFilesCliMenuCommand = new UpdateGitIgnoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
 
-        GenerateStandardGitignoreFilesCliMenuCommand generateCommand = new(_logger, _parametersManager);
+        var generateCommand = new GenerateStandardGitignoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 
@@ -77,8 +77,9 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
-        ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand getDbServerFoldersCliMenuCommand =
-            new(_logger, recordKey, _parametersManager);
+        var getDbServerFoldersCliMenuCommand =
+            new ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand(_logger, recordKey,
+                _parametersManager);
         itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand);
     }
 }

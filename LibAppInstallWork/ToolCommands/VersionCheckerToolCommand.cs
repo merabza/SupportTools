@@ -33,14 +33,14 @@ public sealed class VersionCheckerToolCommand : ToolCommand
     {
         var projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
+        var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} parameters file check failed", projectName);
         //return false;
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
-        CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
             _logger.LogError("project {projectName} version check failed", projectName);

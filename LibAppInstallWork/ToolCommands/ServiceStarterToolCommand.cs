@@ -71,14 +71,14 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         _logger.LogInformation("Service Started");
 
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
-        CheckParametersVersionAction checkParametersVersionAction = new(_logger, _httpClientFactory,
+        var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
                 environmentName);
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
-        CheckProgramVersionAction checkProgramVersionAction = new(_logger, _httpClientFactory,
+        var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             _parameters.WebAgentForCheck, _parameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
             _logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,

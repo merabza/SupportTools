@@ -135,8 +135,9 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         var projects = parameters.Projects;
         var project = projects[recordKey];
 
-        RedundantFileNameCruder detailsCruder = new(ParametersManager, recordKey);
-        NewItemCliMenuCommand newItemCommand = new(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
+        var detailsCruder = new RedundantFileNameCruder(ParametersManager, recordKey);
+        var newItemCommand =
+            new NewItemCliMenuCommand(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
         itemSubMenuSet.AddMenuItem(newItemCommand);
 
         foreach (var detailListCommand in project.RedundantFileNames.Select(mask =>

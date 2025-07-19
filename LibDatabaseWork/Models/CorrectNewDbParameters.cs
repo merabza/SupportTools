@@ -44,7 +44,7 @@ public sealed class CorrectNewDbParameters : IParameters
             return null;
         }
 
-        DatabaseServerConnections databaseServerConnections = new(supportToolsParameters.DatabaseServerConnections);
+        var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
         var (devDataProvider, devConnectionString) =
             DbConnectionFactory.GetDataProviderAndConnectionString(project.DevDatabaseParameters,

@@ -58,7 +58,7 @@ public sealed class CheckVersionParameters : IParameters
             if (proxySettings is null)
                 return null;
 
-            CheckVersionParameters checkVersionParameters = new(projectName, webAgentForCheck, proxySettings);
+            var checkVersionParameters = new CheckVersionParameters(projectName, webAgentForCheck, proxySettings);
 
             return checkVersionParameters;
         }

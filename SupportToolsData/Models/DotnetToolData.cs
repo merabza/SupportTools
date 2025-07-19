@@ -14,5 +14,4 @@ public class DotnetToolData : ItemData
     {
         return Description;
     }
-
 }

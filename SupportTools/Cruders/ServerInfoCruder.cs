@@ -1,4 +1,8 @@
-﻿using CliMenu;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
@@ -9,10 +13,6 @@ using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
 using SupportToolsData;
 using SupportToolsData.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 
 namespace SupportTools.Cruders;
 
@@ -140,7 +140,7 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         if (server == null || project == null)
             return;
         foreach (var tool in Enum.GetValues<EProjectServerTools>().Intersect(server.AllowToolsList ?? []))
-            itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(_logger, _httpClientFactory, tool, _projectName,
-                server, ParametersManager));
+            itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
+                _projectName, server, ParametersManager));
     }
 }

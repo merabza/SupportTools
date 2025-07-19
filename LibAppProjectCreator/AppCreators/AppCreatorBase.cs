@@ -177,7 +177,7 @@ public abstract class AppCreatorBase
         if (gitRepo is null) return null;
 
         //შევქმნათ პროექტის მოდელი
-        ProjectFromGit projectFromGit = new(gitRepo.GitProjectFolderName, projectData.ProjectName, createInPath,
+        var projectFromGit = new ProjectFromGit(gitRepo.GitProjectFolderName, projectData.ProjectName, createInPath,
             projectData.ProjectRelativePath, projectFile.Name);
         //დავამატოთ პროექტების სიაში
         Projects.Add(projectFromGit);

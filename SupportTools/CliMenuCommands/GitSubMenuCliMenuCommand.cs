@@ -36,7 +36,7 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        CliMenuSet gitSubMenuSet = new("Git Projects");
+        var gitSubMenuSet = new CliMenuSet("Git Projects");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

@@ -17,8 +17,7 @@ public static class DotnetToolsManagerErrors
 
     public static readonly Err PackageIdIsEmpty = new()
     {
-        ErrorCode = nameof(PackageIdIsEmpty),
-        ErrorMessage = "Package Id Is Empty"
+        ErrorCode = nameof(PackageIdIsEmpty), ErrorMessage = "Package Id Is Empty"
     };
 
     public static readonly Err GetAvailableVersionOfToolError = new()
@@ -27,11 +26,12 @@ public static class DotnetToolsManagerErrors
         ErrorMessage = "Error when detect Available Version Of Tool"
     };
 
-    public static Err CheckVersionsForOneToolError(string toolName) => new()
+    public static Err CheckVersionsForOneToolError(string toolName)
     {
-        ErrorCode = nameof(CheckVersionsForOneToolError),
-        ErrorMessage = $"Error when Check Versions Of package {toolName}"
-    };
-
-    
+        return new Err
+        {
+            ErrorCode = nameof(CheckVersionsForOneToolError),
+            ErrorMessage = $"Error when Check Versions Of package {toolName}"
+        };
+    }
 }

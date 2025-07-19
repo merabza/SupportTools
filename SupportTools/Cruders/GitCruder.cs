@@ -118,7 +118,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
 
     public override bool CheckValidation(ItemData item)
     {
-        GitApi gitApi = new(true, _logger);
+        var gitApi = new GitApi(true, _logger);
         try
         {
             if (item is not GitDataModel gitDataModel)
@@ -167,7 +167,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 
-        UpdateGitProjectCliMenuCommand updateGitProjectCommand = new(_logger, recordKey, ParametersManager);
+        var updateGitProjectCommand = new UpdateGitProjectCliMenuCommand(_logger, recordKey, ParametersManager);
         itemSubMenuSet.AddMenuItem(updateGitProjectCommand);
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;

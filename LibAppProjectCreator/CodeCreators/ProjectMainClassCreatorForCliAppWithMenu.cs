@@ -30,7 +30,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             $"mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand({_projectNamespace.UnCapitalize()}ParametersEditor))",
             string.Empty, new OneLineComment("საჭირო მენიუს ელემენტები"), string.Empty);
 
-        var taskPart = new FlatCodeBlock("NewTaskCommand newAppTaskCommand = new(_parametersManager)",
+        var taskPart = new FlatCodeBlock("var newAppTaskCommand = new NewTaskCommand(_parametersManager)",
             "mainMenuSet.AddMenuItem(newAppTaskCommand)",
             new CodeBlock("foreach (var kvp in parameters.Tasks.OrderBy(o => o.Key))",
                 "mainMenuSet.AddMenuItem(new TaskSubMenuCommand(_logger, _parametersManager, kvp.Key))"));

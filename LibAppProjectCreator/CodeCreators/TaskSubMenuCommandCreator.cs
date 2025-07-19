@@ -31,7 +31,7 @@ public sealed class TaskSubMenuCommandCreator : CodeCreator
                     "_logger = logger", "_parametersManager = parametersManager"),
                 new CodeBlock("protected override bool RunBody()", "return true"),
                 new CodeBlock("public override CliMenuSet GetSubMenu()",
-                    "CliMenuSet taskSubMenuSet = new($\" Task => { Name}\")",
+                    "var taskSubMenuSet = new CliMenuSet($\" Task => { Name}\")",
                     "var deleteTaskCommand = new DeleteTaskCommand(_parametersManager, Name)",
                     "taskSubMenuSet.AddMenuItem(deleteTaskCommand)",
                     "taskSubMenuSet.AddMenuItem(new EditTaskNameCommand(_parametersManager, Name))",
