@@ -139,8 +139,9 @@ public sealed class GitProjectSyncronizer
         }
     }
 
-    public void CountHasChanges()
+    public bool CountHasChanges()
     {
         HasChanges = _gitSyncToolActionList.Any(gitSyncToolAction => gitSyncToolAction.HasChanges());
+        return HasChanges;
     }
 }

@@ -15,6 +15,7 @@
     <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
+    <ProjectReference Include="..\LibCodeGenerator\LibCodeGenerator.csproj" />
     <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibScaffoldSeeder\LibScaffoldSeeder.csproj" />

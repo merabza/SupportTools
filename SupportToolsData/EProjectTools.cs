@@ -16,36 +16,7 @@ public enum EProjectTools
     //ScaffoldSeederGitSync, //მხოლოდ გიტის სინქრონიზაცია სკაფოლდ სიდინგ პროექტებისათვის
     ScaffoldSeederCreator, //არსებული პროდაქშენ ბაზის ასლიდან დაამზადებს სკაფოლდ პროექტს და შექმნის ჯეისონ ფაილებს, რომლებიც შემდგომში შესაძლებელი იქნება გამოვიყენოთ სიდინგისათვის. ამ შემქმნელ ამოცანაში შედის კოდის შექმნა, როგორც სკაფოლდინგისათვის, ისე სიდინგისათვის
     SeedData, //scaffold-ით მიღებული ბაზიდან მიღებულ json-ებზე დაყრდნობით ინფორმაციის ჩაყრა დეველოპერ ბაზაში.
-    PrepareProdCopyDatabase //პროდაქშენ ბაზის ასლის მომზადება სკაფოლდით დამუშავებისათვის
+    PrepareProdCopyDatabase, //პროდაქშენ ბაზის ასლის მომზადება სკაფოლდით დამუშავებისათვის
 
-    ////-------------------------------------------------------------------------------
-    ////ეს ინსტრუმენტები გამოიყენება თითოეული პროექტისათვისა და თითოეული სერვერისათვის
-    //AppSettingsEncoder, //  EncodeParameters, //პარამეტრების დაშიფვრა
-
-    //// EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange
-    //AppSettingsInstaller, //  InstallParameters, //დაშიფრული პარამეტრების განახლება
-
-    ////(DownloadParameters=>StopProgramIfRunning=>UpdateParameters=>StartServiceIfRequired)
-    //AppSettingsUpdater, //  UpdateParameters, //პარამეტრების დაშიფვრა და დაინსტალირებული პროგრამისთვის ამ დაშიფრული პარამეტრების გადაგზავნა-განახლება
-    //DevBaseToServerCopier, //Dev ბაზის დაკოპირება სერვერზე.
-    //ServiceInstallScriptCreator, //მოშორებულ სერვერზე გასაშვები საინსტალაციო სკრიპტის შექმნა
-    //ServiceRemoveScriptCreator, //მოშორებულ სერვერზე გასაშვები საინსტალაციო სკრიპტის შექმნა
-    //ServerBaseToProdCopyCopier, //სერვერიდან ბაზის დაკოპირება ProdCopy ბაზაში.
-
-    ////EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange=>
-    ////(RunAppSettingsInstaller)(DownloadParameters=>StopProgramIfRunning=>UpdateParameters=>StartServiceIfRequired)
-    //ProgPublisher, //  PublishProgram, //პროგრამის საინსტალაციო პაკეტის გამზადება
-
-    ////CreatePackage=>UploadPackage=>EncodeParameters=>UploadParameters
-    //ProgramInstaller, //  InstallProgram, //პროგრამის საინსტალაციო პაკეტის გამოყენებით პროგრამის დაინსტალირება-განახლება
-
-    ////DownloadPackage=>DownloadParameters=>StopProgramIfRunning=>UpdateProgram=>UpdateParameters=>StartServiceIfRequired
-    //ProgramUpdater, //  PublishAndInstallUpdate, //პროგრამის საინსტალაციო პაკეტის გამზადება და პროგრამის დაინსტალირება-განახლება
-
-    ////CreatePackage=>UploadPackage=>EncodeParameters=>UploadParameters=>
-    ////(RunProgramInstaller)(DownloadPackage=>DownloadParameters=>StopProgramIfRunning=>UpdateProgram=>UpdateParameters=>StartServiceIfRequired)
-    //ProgRemover, //  RemoveProgram, //პროგრამის წაშლა
-    //ServiceStarter, //უკვე დაინსტალირებული სერვისის გაშვება სერვერის მხარეს.
-    //ServiceStopper, //გაშვებული სერვისის გაჩერება სერვერის მხარეს.
-    //VersionChecker //გაშვებული სერვისის ვერსიის დადგენა. (ეს იმუშავებს მხოლოდ იმ შემთხვევაში, თუ სერვისში გამოყენებული იქნება იქნება TestTools.Controllers.TestController
+    GenerateApiRoutes, //API რაუტების გენერაცია
 }

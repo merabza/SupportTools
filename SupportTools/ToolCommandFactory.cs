@@ -5,6 +5,8 @@ using LibAppInstallWork.ToolCommands;
 using LibAppProjectCreator;
 using LibAppProjectCreator.Models;
 using LibAppProjectCreator.ToolCommands;
+using LibCodeGenerator.Models;
+using LibCodeGenerator.ToolCommands;
 using LibDatabaseParameters;
 using LibDatabaseWork;
 using LibDatabaseWork.Models;
@@ -161,7 +163,13 @@ public static class ToolCommandFactory
                     return new ExternalScaffoldSeedToolCommand(logger, dataSeederParameters);
                 StShared.WriteErrorLine("dataSeederParameters is null", true);
                 return null;
-            //case EProjectTools.AppSettingsEncoder:
+            case EProjectTools.GenerateApiRoutes:
+                var generateApiRoutesParameters =
+                    GenerateApiRoutesToolParameters.Create(supportToolsParameters, projectName);
+                if (generateApiRoutesParameters is not null)
+                    return new GenerateApiRoutesToolCommand(logger, generateApiRoutesParameters);
+                StShared.WriteErrorLine("generateApiRoutesParameters is null", true);
+                return null;
             //case EProjectTools.AppSettingsInstaller:
             //case EProjectTools.AppSettingsUpdater:
             //case EProjectTools.DevBaseToServerCopier:

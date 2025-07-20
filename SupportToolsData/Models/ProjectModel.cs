@@ -18,6 +18,7 @@ public sealed class ProjectModel : ItemData
     public string? SolutionFileName { get; init; }
     public string? ProjectSecurityFolderPath { get; init; }
     public string? MainProjectName { get; init; }
+    public string? ApiContractsProjectName { get; init; }
     public string? SpaProjectName { get; set; }
     public string? ProgramArchiveDateMask { get; set; }
     public string? ProgramArchiveExtension { get; set; }

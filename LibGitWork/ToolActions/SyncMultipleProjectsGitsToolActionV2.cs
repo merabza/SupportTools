@@ -85,11 +85,13 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 
         Console.WriteLine("Count changes");
         //წინასწარ ვადგენთ, რომელიმე რეპოზიტორიაში ხომ არ გვაქვს ცვლილებები, რომ პირველ რიგში ისინი დავამუშაოვოთ
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
+        foreach (var (key, syncer) in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
         {
-            var syncer = keyValuePair.Value;
-            syncer.CountHasChanges();
+            //Console.WriteLine($"for {key}");
+            if ( syncer.CountHasChanges() )
+                Console.WriteLine($"{key} has changes");
         }
+        Console.WriteLine("Count changes finished");
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)
                      .OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))

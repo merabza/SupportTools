@@ -17,6 +17,7 @@ public static class ToolNames
             EProjectTools.ScaffoldSeederCreator => "1 - Scaffold Seeder Creator",
             EProjectTools.SeedData => "3 - Seed Data",
             EProjectTools.PrepareProdCopyDatabase => "Prepare Prod Copy Database",
+            EProjectTools.GenerateApiRoutes => "Generate Api Routes",
             //EProjectTools.AppSettingsEncoder => "App Settings Encoder",
             //EProjectTools.AppSettingsInstaller => "App Settings Installer",
             //EProjectTools.AppSettingsUpdater => "App Settings Updater",
