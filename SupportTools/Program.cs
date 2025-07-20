@@ -70,7 +70,7 @@ try
         return 6;
     }
 
-    var supportTools = new SupportTools.SupportTools(logger, httpClientFactory, memoryCache,
+    var supportTools = new SupportToolsCliAppLoop(logger, httpClientFactory, memoryCache,
         new ParametersManager(parametersFileName, par));
     return supportTools.Run() ? 0 : 100;
 }

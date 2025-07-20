@@ -19,7 +19,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools;
 
-public sealed class SupportTools : CliAppLoop
+public sealed class SupportToolsCliAppLoop : CliAppLoop
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -27,7 +27,7 @@ public sealed class SupportTools : CliAppLoop
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportTools(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
+    public SupportToolsCliAppLoop(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         ParametersManager parametersManager) : base((IParametersWithRecentData)parametersManager.Parameters)
     {
         _logger = logger;
