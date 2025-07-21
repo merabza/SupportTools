@@ -1,10 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using LibCodeGenerator.Helpers;
 using LibCodeGenerator.Models;
+using LibGitData;
+using LibGitData.Models;
+using LibGitWork;
+using LibParameters;
 using Microsoft.Extensions.Logging;
+using SupportToolsData.Models;
+using SystemToolsShared;
 
 namespace LibCodeGenerator.ToolCommands;
 
@@ -12,13 +18,18 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
 {
     private readonly ILogger _logger;
     private readonly GenerateApiRoutesToolParameters _parameters;
+    private readonly IParametersManager _parametersManager;
+    private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateApiRoutesToolCommand(ILogger logger, GenerateApiRoutesToolParameters parameters) : base(logger,
-        "Data Seeder", parameters, null, "Seeds data from existing Json files")
+    public GenerateApiRoutesToolCommand(ILogger logger, IParametersManager parametersManager,
+        GenerateApiRoutesToolParameters parameters, bool useConsole = true) : base(logger, "ApiRoute Generator",
+        parameters, null, "Generates ApiRoute class file")
     {
         _logger = logger;
+        _parametersManager = parametersManager;
         _parameters = parameters;
+        _useConsole = useConsole;
     }
 
     protected override bool CheckValidate()
@@ -28,24 +39,49 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        //// Check if there are changes in the current project
-        //var hasChanges = await GitHelper.HasUncommittedChangesAsync(_parameters.ProjectPath);
-        //if (hasChanges)
-        //{
-        //    _logger.LogWarning("There are uncommitted changes in the project.");
-        //    Console.WriteLine("There are uncommitted changes in the project. Continue? (y/n)");
-        //    var input = Console.ReadLine();
-        //    if (!string.Equals(input, "y", StringComparison.OrdinalIgnoreCase))
-        //        return false;
-        //}
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var workFolder = supportToolsParameters.CodeGenerateTestFolder;
 
-        //// Update project files in the code generation test folder using git
-        //bool updateSuccess = await GitHelper.UpdateTestFolderAsync(_parameters.CodeGenerateTestFolder, cancellationToken);
-        //if (!updateSuccess)
-        //{
-        //    _logger.LogError("Failed to update test folder.");
-        //    return false;
-        //}
+        if (string.IsNullOrWhiteSpace(workFolder))
+        {
+            StShared.WriteErrorLine("supportToolsParameters.CodeGenerateTestFolder is not specified", true, Logger);
+            return false;
+        }
+
+        //შემოწმდეს სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
+        if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)
+        {
+            StShared.WriteErrorLine($"does not exists and cannot create work folder {workFolder}", true, Logger);
+            return false;
+        }
+
+        var project = _parameters.Project;
+
+        //შემოწმდესა და განახლდეს გიტის პროექტები
+        var gitProjects = GitProjects.Create(Logger, supportToolsParameters.GitProjects);
+        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits,
+            project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
+
+        foreach (var gitProjectName in _parameters.Project.GetGitProjectNames(EGitCol.Main))
+        {
+            var gitProjectFolder = Path.Combine(workFolder, gitProjectName);
+
+            var gitData = gitRepos.GetGitRepoByKey(gitProjectName);
+            if (gitData is null)
+            {
+                StShared.WriteErrorLine($"git with name {gitProjectName} is not exists", true, Logger);
+                return false;
+            }
+
+            Console.WriteLine($"---=== {gitProjectName} ===---");
+
+            var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolder, gitData);
+            var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
+
+            if (gitProcessor is null)
+                return false;
+        }
+
 
         //// Find the ApiRoutes class file
         //string? apiRoutesFilePath = ApiRoutesFinder.FindApiRoutesFile(_parameters.ProjectPath);

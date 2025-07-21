@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
+    <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 

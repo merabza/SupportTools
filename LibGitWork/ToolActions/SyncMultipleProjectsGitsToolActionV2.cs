@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitData;
+using LibGitWork.Helpers;
 using LibGitWork.ToolCommandParameters;
 using LibParameters;
 using LibToolActions;
@@ -52,18 +53,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //  ოღონდ სერვერის მხარეს ინფორმაციის წამოღება უნდა მოხდეს ერთხელ თავიდან
         //  და თუ რამე დაიფუშა, ყოველი დაფუშვის მერე, ოღონდ თუ დარჩენილია დასასინქრონიზებელი ფოლდერი
 
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
-        if (_syncMultipleProjectsGitsParametersV2.ProjectGroupName is null &&
-            _syncMultipleProjectsGitsParametersV2.ProjectName is null)
-            projectsList = _syncMultipleProjectsGitsParametersV2.Projects;
-        else if (_syncMultipleProjectsGitsParametersV2.ProjectGroupName is not null)
-            projectsList = _syncMultipleProjectsGitsParametersV2.Projects.Where(x =>
-                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
-                _syncMultipleProjectsGitsParametersV2.ProjectGroupName);
-        else
-            projectsList =
-                _syncMultipleProjectsGitsParametersV2.Projects.Where(x =>
-                    x.Key == _syncMultipleProjectsGitsParametersV2.ProjectName);
+        var projectsList = GitProjectListHelper.CreateProjectsList(_syncMultipleProjectsGitsParametersV2.Projects,
+            _syncMultipleProjectsGitsParametersV2.ProjectGroupName, _syncMultipleProjectsGitsParametersV2.ProjectName);
 
         var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
@@ -86,11 +77,9 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         Console.WriteLine("Count changes");
         //წინასწარ ვადგენთ, რომელიმე რეპოზიტორიაში ხომ არ გვაქვს ცვლილებები, რომ პირველ რიგში ისინი დავამუშაოვოთ
         foreach (var (key, syncer) in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
-        {
             //Console.WriteLine($"for {key}");
-            if ( syncer.CountHasChanges() )
+            if (syncer.CountHasChanges())
                 Console.WriteLine($"{key} has changes");
-        }
         Console.WriteLine("Count changes finished");
 
         foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibCodeGenerator.Helpers;
 
+//ეს არის ხელოვნური ინტელექტის მიერ დაგენერირებული კოდი
 public static class GitHelper
 {
     public static async Task<bool> HasUncommittedChangesAsync(string projectPath)

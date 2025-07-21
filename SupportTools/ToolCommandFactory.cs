@@ -167,7 +167,7 @@ public static class ToolCommandFactory
                 var generateApiRoutesParameters =
                     GenerateApiRoutesToolParameters.Create(supportToolsParameters, projectName);
                 if (generateApiRoutesParameters is not null)
-                    return new GenerateApiRoutesToolCommand(logger, generateApiRoutesParameters);
+                    return new GenerateApiRoutesToolCommand(logger, parametersManager, generateApiRoutesParameters);
                 StShared.WriteErrorLine("generateApiRoutesParameters is null", true);
                 return null;
             //case EProjectTools.AppSettingsInstaller:

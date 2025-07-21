@@ -8,20 +8,25 @@ namespace LibCodeGenerator.Models;
 public sealed class GenerateApiRoutesToolParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    private GenerateApiRoutesToolParameters()
+    private GenerateApiRoutesToolParameters(ProjectModel project)
     {
+        Project = project;
     }
+
+    public ProjectModel Project { get; set; }
 
     public bool CheckBeforeSave()
     {
         return true;
     }
 
-    public static GenerateApiRoutesToolParameters? Create(SupportToolsParameters supportToolsParameters, string projectName)
+    public static GenerateApiRoutesToolParameters? Create(SupportToolsParameters supportToolsParameters,
+        string projectName)
     {
         try
         {
-            var externalScaffoldSeedToolParameters = new GenerateApiRoutesToolParameters();
+            var externalScaffoldSeedToolParameters =
+                new GenerateApiRoutesToolParameters(supportToolsParameters.GetProjectRequired(projectName));
             return externalScaffoldSeedToolParameters;
         }
         catch (Exception e)

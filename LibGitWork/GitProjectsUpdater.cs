@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using LibGitData.Models;
+using LibGitWork.Helpers;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
@@ -57,7 +58,7 @@ public sealed class GitProjectsUpdater
             return null;
         }
 
-        var projectFolderName = GetProjectFolderName(logger, workFolder, gitsFolder, gitData);
+        var projectFolderName = GitFolderCountHelper.GetProjectFolderName(logger, workFolder, gitsFolder, gitData);
         if (!string.IsNullOrWhiteSpace(projectFolderName))
             return new GitProjectsUpdater(logger, supportToolsParameters, gitsFolder, gitData, projectFolderName,
                 gitName);
@@ -95,27 +96,6 @@ public sealed class GitProjectsUpdater
         //გავიაროთ projectFolderName ფოლდერი, თავისი ქვეფოლდერებით და მოვძებნოთ *.csproj ფაილები
     }
 
-    private static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder,
-        GitDataDto gitData)
-    {
-        //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-        if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)
-        {
-            StShared.WriteErrorLine($"does not exists and cannot create work folder {workFolder}", true, logger);
-            return null;
-        }
-
-        //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-        //_gitsFolder = Path.Combine(_workFolder, "Gits");
-        if (FileStat.CreateFolderIfNotExists(gitsFolder, true) != null)
-            return Path.Combine(gitsFolder,
-                gitData.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
-
-        StShared.WriteErrorLine($"does not exists and cannot create work folder {gitsFolder}", true, logger);
-        return null;
-
-        //შემოწმდეს Gits ფოლდერში პროექტის ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
-    }
 
     //private GitProcessor? UpdateOneGitProject(string projectFolderName, GitDataDomain git)
     //{
