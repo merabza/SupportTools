@@ -12,20 +12,28 @@ namespace SupportTools.Cruders;
 
 public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
 {
+    private readonly Dictionary<string, string> _currentValuesDict;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager) : base("GitIgnore File Path",
-        "GitIgnore File Paths", "Path")
+    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager,
+        Dictionary<string, string> currentValuesDict) : base("GitIgnore File Path", "GitIgnore File Paths", "Path")
     {
         _logger = logger;
         _parametersManager = parametersManager;
+        _currentValuesDict = currentValuesDict;
+    }
+
+    public static GitIgnoreFilePathsCruder Create(ILogger logger, IParametersManager parametersManager)
+    {
+        return new GitIgnoreFilePathsCruder(logger, parametersManager,
+            ((SupportToolsParameters)parametersManager.Parameters).GitIgnoreModelFilePaths);
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)_parametersManager.Parameters).GitIgnoreModelFilePaths;
+        return _currentValuesDict;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

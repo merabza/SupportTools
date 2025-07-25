@@ -7,12 +7,15 @@ namespace LibCodeGenerator.Models;
 
 public sealed class GenerateApiRoutesToolParameters : IParameters
 {
+
     // ReSharper disable once ConvertToPrimaryConstructor
-    private GenerateApiRoutesToolParameters(ProjectModel project)
+    private GenerateApiRoutesToolParameters(string projectName, ProjectModel project)
     {
+        ProjectName = projectName;
         Project = project;
     }
 
+    public string ProjectName { get; set; }
     public ProjectModel Project { get; set; }
 
     public bool CheckBeforeSave()
@@ -26,7 +29,7 @@ public sealed class GenerateApiRoutesToolParameters : IParameters
         try
         {
             var externalScaffoldSeedToolParameters =
-                new GenerateApiRoutesToolParameters(supportToolsParameters.GetProjectRequired(projectName));
+                new GenerateApiRoutesToolParameters(projectName, supportToolsParameters.GetProjectRequired(projectName));
             return externalScaffoldSeedToolParameters;
         }
         catch (Exception e)
