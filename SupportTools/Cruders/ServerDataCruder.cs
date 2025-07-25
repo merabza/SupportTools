@@ -12,6 +12,8 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerDataCruder : ParCruder<ServerDataModel>
 {
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით DictionaryFieldEditor-ში
+    // ReSharper disable once MemberCanBePrivate.Global
     public ServerDataCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
         Dictionary<string, ServerDataModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Server", "Servers")
@@ -34,45 +36,4 @@ public sealed class ServerDataCruder : ParCruder<ServerDataModel>
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         return new ServerDataCruder(logger, httpClientFactory, parametersManager, parameters.Servers);
     }
-
-    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    return parameters.Servers.ToDictionary(p => p.Key, p => (ItemData)p.Value);
-    //}
-
-    //public override bool ContainsRecordWithKey(string recordKey)
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var servers = parameters.Servers;
-    //    return servers.ContainsKey(recordKey);
-    //}
-
-    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ServerDataModel newServer)
-    //        throw new Exception("newServer is null in ServerDataCruder.UpdateRecordWithKey");
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    parameters.Servers[recordKey] = newServer;
-    //}
-
-    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ServerDataModel newServer)
-    //        throw new Exception("newServer is null in ServerDataCruder.AddRecordWithKey");
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    parameters.Servers.Add(recordKey, newServer);
-    //}
-
-    //protected override void RemoveRecordWithKey(string recordKey)
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var servers = parameters.Servers;
-    //    servers.Remove(recordKey);
-    //}
-
-    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    //{
-    //    return new ServerDataModel();
-    //}
 }

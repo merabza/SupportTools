@@ -9,6 +9,7 @@ using SystemToolsShared;
 
 namespace SupportTools.Cruders;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class EndpointCruder : ParCruder<EndpointModel>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -23,40 +24,7 @@ public class EndpointCruder : ParCruder<EndpointModel>
         FieldEditors.Add(new EnumFieldEditor<EEndpointType>(nameof(EndpointModel.EndpointType), EEndpointType.Query));
         FieldEditors.Add(new TextFieldEditor(nameof(EndpointModel.ReturnType)));
         FieldEditors.Add(new BoolFieldEditor(nameof(EndpointModel.SendMessageToCurrentUser)));
-        /*
-    public string EndpointName { get; set; }
-           public string EndpointRoute { get; set; }
-           public bool RequireAuthorization { get; set; }
-           public string HttpMethod { get; set; }
-           public EEndpointType EndpointType { get; set; }
-           public string ReturnType { get; set; }
-           public bool SendMessageToCurrentUser { get; set; }
-         */
     }
-
-    //private static EndpointModel? AdaptEndpointModel(EndpointEditModel endpointEditModel)
-    //{
-    //    var validator = new EndpointModelValidator();
-
-    //    var validateResults = validator.Validate(endpointEditModel);
-    //    if (validateResults.IsValid)
-    //        return new EndpointModel
-    //        {
-    //            //Root = endpointEditModel.Root!,
-    //            //Version = endpointEditModel.Version!,
-    //            //Base = endpointEditModel.Base!,
-    //            EndpointName = endpointEditModel.EndpointName!,
-    //            EndpointRoute = endpointEditModel.EndpointRoute!,
-    //            RequireAuthorization = endpointEditModel.RequireAuthorization,
-    //            HttpMethod = endpointEditModel.HttpMethod!,
-    //            EndpointType = EEndpointType.Command,
-    //            ReturnType = endpointEditModel.ReturnType!,
-    //            SendMessageToCurrentUser = false
-    //        };
-
-    //    //StShared.WriteErrorLine(validateResults.ToString(), true, null, false);
-    //    return null;
-    //}
 
     public override bool CheckValidation(ItemData item)
     {

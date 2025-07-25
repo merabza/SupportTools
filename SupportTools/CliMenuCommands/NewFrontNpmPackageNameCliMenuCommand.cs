@@ -29,7 +29,7 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
     {
         Console.WriteLine("Add new Npm Package started");
 
-        var npmPackageCruder = new NpmPackagesCruder(_parametersManager);
+        var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
         var newGitName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
 
         if (string.IsNullOrWhiteSpace(newGitName))

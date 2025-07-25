@@ -18,7 +18,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
     {
         var currentRunTimeName = GetValue(recordForUpdate);
 
-        var runTimeCruder = new RunTimeCruder(_parametersManager);
+        var runTimeCruder = RunTimeCruder.Create(_parametersManager);
 
         SetValue(recordForUpdate, runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName));
     }
@@ -30,7 +30,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
         if (val == null)
             return string.Empty;
 
-        var runTimeCruder = new RunTimeCruder(_parametersManager);
+        var runTimeCruder = RunTimeCruder.Create(_parametersManager);
 
         var status = runTimeCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";

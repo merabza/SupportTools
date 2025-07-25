@@ -19,7 +19,7 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
     {
         var currentEnvironmentName = GetValue(recordForUpdate);
 
-        var environmentCruder = new EnvironmentCruder(_parametersManager);
+        var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
         SetValue(recordForUpdate, environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName));
     }
@@ -31,7 +31,7 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
         if (val == null)
             return string.Empty;
 
-        var environmentCruder = new EnvironmentCruder(_parametersManager);
+        var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
         var status = environmentCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";

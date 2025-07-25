@@ -86,49 +86,6 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         return new ProjectCruder(logger, httpClientFactory, parametersManager, parameters.Projects);
     }
 
-    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    return parameters.Projects.ToDictionary(p => p.Key, ItemData (p) => p.Value);
-    //}
-
-    //public override bool ContainsRecordWithKey(string recordKey)
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var projects = parameters.Projects;
-    //    return projects.ContainsKey(recordKey);
-    //}
-
-    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ProjectModel newProject)
-    //        throw new Exception("newProject is null in ProjectCruder.UpdateRecordWithKey");
-
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    parameters.Projects[recordKey] = newProject;
-    //}
-
-    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ProjectModel newProject)
-    //        throw new Exception("newProject is null in ProjectCruder.AddRecordWithKey");
-
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    parameters.Projects.Add(recordKey, newProject);
-    //}
-
-    //protected override void RemoveRecordWithKey(string recordKey)
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var projects = parameters.Projects;
-    //    projects.Remove(recordKey);
-    //}
-
-    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    //{
-    //    return new ProjectModel();
-    //}
-
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
     {
         base.FillDetailsSubMenu(itemSubMenuSet, recordKey);

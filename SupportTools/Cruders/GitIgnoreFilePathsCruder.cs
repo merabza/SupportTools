@@ -16,7 +16,9 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
+    // ReSharper disable once MemberCanBePrivate.Global
     public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager,
         Dictionary<string, string> currentValuesDict) : base("GitIgnore File Path", "GitIgnore File Paths", "Path")
     {

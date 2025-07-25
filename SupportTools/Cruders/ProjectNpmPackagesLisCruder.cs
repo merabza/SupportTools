@@ -9,25 +9,32 @@ namespace SupportTools.Cruders;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 {
+    private readonly List<string> _currentValuesList;
     private readonly IParametersManager _parametersManager;
-    private readonly ProjectModel _project;
 
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesListFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectNpmPackagesLisCruder(IParametersManager parametersManager, ProjectModel project) : base("Npm Package",
-        "Npm Packages")
+    // ReSharper disable once MemberCanBePrivate.Global
+    public ProjectNpmPackagesLisCruder(IParametersManager parametersManager, List<string> currentValuesList) : base(
+        "Npm Package", "Npm Packages")
     {
         _parametersManager = parametersManager;
-        _project = project;
+        _currentValuesList = currentValuesList;
     }
+
+    //public static ProjectNpmPackagesLisCruder Create(ProjectModel project, IParametersManager parametersManager)
+    //{
+    //    return new ProjectNpmPackagesLisCruder(parametersManager, project.FrontNpmPackageNames);
+    //}
 
     protected override List<string> GetList()
     {
-        return _project.FrontNpmPackageNames;
+        return _currentValuesList;
     }
 
     protected override string? InputNewRecordName()
     {
-        var npmPackageCruder = new NpmPackagesCruder(_parametersManager);
+        var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
         var newNpmPackageName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
 
         if (!string.IsNullOrWhiteSpace(newNpmPackageName))

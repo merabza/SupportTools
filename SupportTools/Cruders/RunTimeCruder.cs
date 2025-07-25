@@ -10,16 +10,26 @@ namespace SupportTools.Cruders;
 public sealed class RunTimeCruder : SimpleNamesWithDescriptionsCruder
 {
     private readonly IParametersManager _parametersManager;
+    private readonly Dictionary<string, string> _currentValuesDict;
 
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RunTimeCruder(IParametersManager parametersManager) : base("RunTime", "RunTimes")
+    // ReSharper disable once MemberCanBePrivate.Global
+    public RunTimeCruder(IParametersManager parametersManager, Dictionary<string, string> currentValuesDict) : base("RunTime", "RunTimes")
     {
         _parametersManager = parametersManager;
+        _currentValuesDict = currentValuesDict;
+    }
+
+    public static RunTimeCruder Create(IParametersManager parametersManager)
+    {
+        return new RunTimeCruder(parametersManager,
+            ((SupportToolsParameters)parametersManager.Parameters).RunTimes);
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)_parametersManager.Parameters).RunTimes;
+        return _currentValuesDict;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

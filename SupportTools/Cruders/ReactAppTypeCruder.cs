@@ -10,20 +10,30 @@ namespace SupportTools.Cruders;
 
 public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
 {
+    private readonly Dictionary<string, string> _currentValuesDict;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager) : base("React App Type",
-        "React App Types")
+    // ReSharper disable once MemberCanBePrivate.Global
+    public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager,
+        Dictionary<string, string> currentValuesDict) : base("React App Type", "React App Types")
     {
         _logger = logger;
         _parametersManager = parametersManager;
+        _currentValuesDict = currentValuesDict;
+    }
+
+    public static ReactAppTypeCruder Create(ILogger logger, IParametersManager parametersManager)
+    {
+        return new ReactAppTypeCruder(logger, parametersManager,
+            ((SupportToolsParameters)parametersManager.Parameters).ReactAppTemplates);
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)_parametersManager.Parameters).ReactAppTemplates;
+        return _currentValuesDict;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

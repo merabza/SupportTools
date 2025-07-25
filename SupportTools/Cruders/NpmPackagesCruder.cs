@@ -8,16 +8,23 @@ namespace SupportTools.Cruders;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class NpmPackagesCruder : SimpleNamesWithDescriptionsCruder
 {
-    private readonly IParametersManager _parametersManager;
+    private readonly Dictionary<string, string> _currentValuesDict;
 
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NpmPackagesCruder(IParametersManager parametersManager) : base("Npm Package", "Npm Packages")
+    // ReSharper disable once MemberCanBePrivate.Global
+    public NpmPackagesCruder(Dictionary<string, string> currentValuesDict) : base("Npm Package", "Npm Packages")
     {
-        _parametersManager = parametersManager;
+        _currentValuesDict = currentValuesDict;
+    }
+
+    public static NpmPackagesCruder Create(IParametersManager parametersManager)
+    {
+        return new NpmPackagesCruder(((SupportToolsParameters)parametersManager.Parameters).NpmPackages);
     }
 
     protected override Dictionary<string, string> GetDictionary()
     {
-        return ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
+        return _currentValuesDict;
     }
 }
