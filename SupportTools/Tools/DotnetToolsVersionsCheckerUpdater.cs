@@ -48,13 +48,12 @@ public static class DotnetToolsVersionsCheckerUpdater
     public static bool UpdateOne(IParametersManager parametersManager, string toolKey)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
-        if (!parameters.DotnetTools.ContainsKey(toolKey))
+        if (!parameters.DotnetTools.TryGetValue(toolKey, out var dotnetTool))
         {
             StShared.WriteErrorLine($"Tool with key {toolKey} not found.", true);
             return false;
         }
 
-        var dotnetTool = parameters.DotnetTools[toolKey];
         var checkVersionsForOneToolResult = CheckVersionsForOneTool(dotnetTool, null);
         if (checkVersionsForOneToolResult.IsT1)
         {
