@@ -74,9 +74,8 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new DictionaryFieldEditor<RouteClassCruder, RouteClassModel>(
             nameof(ProjectModel.RouteClasses), parametersManager));
 
-        FieldEditors.Add(
-            new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(nameof(ProjectModel.FrontNpmPackageNames),
-                parametersManager));
+        FieldEditors.Add(new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(
+            nameof(ProjectModel.FrontNpmPackageNames), logger, httpClientFactory, parametersManager));
     }
 
     public static ProjectCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,

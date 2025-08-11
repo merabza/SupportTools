@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolActions;
@@ -13,11 +14,11 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateUpdateFrontSpaProjectCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string projectName) : base("ReCreate Update Front Spa Project",
+        IParametersManager parametersManager) : base("ReCreate Update Front Spa Project",
         EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _reCreateUpdateFrontSpaProjectToolAction =
-            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager, projectName,
+            new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager,
                 true);
     }
 
@@ -28,6 +29,14 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
 
     protected override bool RunBody()
     {
+        var projectName = menuSet?.ParentMenu?.Caption;
+        if (string.IsNullOrEmpty(projectName))
+        {
+            Console.WriteLine("Project name is not set in menu caption.");
+            return false;
+        }
+
+        _reCreateUpdateFrontSpaProjectToolAction.SetProjectName(projectName);
         return _reCreateUpdateFrontSpaProjectToolAction.Run(CancellationToken.None).Result;
     }
 }

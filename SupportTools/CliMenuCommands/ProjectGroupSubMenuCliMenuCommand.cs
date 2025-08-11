@@ -31,7 +31,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var projectGroupSubMenuSet = new CliMenuSet($"Projects Group => {_projectGroupName}");
+        var projectGroupSubMenuSet = new CliMenuSet(_projectGroupName);
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 

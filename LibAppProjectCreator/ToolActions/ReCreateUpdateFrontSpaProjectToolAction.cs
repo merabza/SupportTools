@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -22,19 +23,22 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
-    private readonly string _projectName;
     private readonly bool _useConsole;
+    private string? _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateUpdateFrontSpaProjectToolAction(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string projectName, bool useConsole) : base(logger, ActionName, null,
-        null)
+        IParametersManager parametersManager, bool useConsole) : base(logger, ActionName, null, null)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
-        _projectName = projectName;
         _useConsole = useConsole;
+    }
+
+    public void SetProjectName(string projectName)
+    {
+        _projectName = projectName;
     }
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -56,6 +60,12 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
         {
             StShared.WriteErrorLine("TempFolder does not specified in parameters", true);
+            return ValueTask.FromResult(false);
+        }
+
+        if (string.IsNullOrEmpty(_projectName))
+        {
+            Console.WriteLine("Project name is not set.");
             return ValueTask.FromResult(false);
         }
 

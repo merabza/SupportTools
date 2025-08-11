@@ -34,7 +34,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var projectSubMenuSet = new CliMenuSet($"Project => {_projectName}");
+        var projectSubMenuSet = new CliMenuSet(_projectName);
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -74,13 +74,13 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                 projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory,
                     _parametersManager, _projectName, EGitCol.ScaffoldSeed));
 
-            if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
-            {
-                //projectSubMenuSet.AddMenuItem(
-                //    new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
-                projectSubMenuSet.AddMenuItem(new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger,
-                    _httpClientFactory, _parametersManager, _projectName));
-            }
+            //if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
+            //{
+            //    //projectSubMenuSet.AddMenuItem(
+            //    //    new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
+            //    projectSubMenuSet.AddMenuItem(new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger,
+            //        _httpClientFactory, _parametersManager));
+            //}
 
             //if (project.IsService)
             //{
