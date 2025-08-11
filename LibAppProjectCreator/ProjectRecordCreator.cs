@@ -251,9 +251,9 @@ internal sealed class ProjectRecordCreator
                 Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
                     scaffoldSeederProjectName, fakeHostProjectName,
                     $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
-            SolutionFileNameWithMigrationProject =
-                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
+            //SolutionFileNameWithMigrationProject =
+            //    Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
+            //        scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
             MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
                 scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
                 $"{dbMigrationProjectName}{NamingStats.CsProjectExtension}"),

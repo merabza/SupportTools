@@ -13,21 +13,22 @@ public sealed class DatabaseMigrationParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     private DatabaseMigrationParameters(string migrationStartupProjectFilePath, string migrationProjectFileName,
-        string dbContextName, string solutionFileNameWithMigrationProject, IDatabaseManager databaseManager,
-        string databaseName)
+        string dbContextName, IDatabaseManager databaseManager, string databaseName)
     {
         MigrationStartupProjectFilePath = migrationStartupProjectFilePath;
         MigrationProjectFileName = migrationProjectFileName;
         DbContextName = dbContextName;
-        SolutionFileNameWithMigrationProject = solutionFileNameWithMigrationProject;
+        //SolutionFileNameWithMigrationProject = solutionFileNameWithMigrationProject;
         DatabaseManager = databaseManager;
         DatabaseName = databaseName;
     }
 
     public string MigrationStartupProjectFilePath { get; set; }
     public string MigrationProjectFileName { get; set; }
+
     public string DbContextName { get; set; }
-    public string SolutionFileNameWithMigrationProject { get; }
+
+    //public string SolutionFileNameWithMigrationProject { get; }
     public IDatabaseManager DatabaseManager { get; }
     public string DatabaseName { get; }
 
@@ -52,15 +53,17 @@ public sealed class DatabaseMigrationParameters : IParameters
             return null;
         }
 
-        var solutionFileNameWithMigrationProject =
-            project.SolutionFileNameWithMigrationProject ?? project.SolutionFileName;
-        if (solutionFileNameWithMigrationProject is null)
-        {
-            logger.LogError(
-                "Project with name {projectName} does not contains SolutionFileNameWithMigrationProject and SolutionFileName",
-                projectName);
-            return null;
-        }
+        //var solutionFileNameWithMigrationProject = project.SolutionFileNameWithMigrationProject;
+        //if (string.IsNullOrWhiteSpace(solutionFileNameWithMigrationProject))
+        //    solutionFileNameWithMigrationProject = project.SolutionFileName;
+
+        //if (solutionFileNameWithMigrationProject is null)
+        //{
+        //    logger.LogError(
+        //        "Project with name {projectName} does not contains SolutionFileNameWithMigrationProject and SolutionFileName",
+        //        projectName);
+        //    return null;
+        //}
 
         if (project.MigrationStartupProjectFilePath is null)
         {
@@ -108,7 +111,7 @@ public sealed class DatabaseMigrationParameters : IParameters
         }
 
         var databaseMigrationParameters = new DatabaseMigrationParameters(project.MigrationStartupProjectFilePath,
-            project.MigrationProjectFilePath, project.DbContextName, solutionFileNameWithMigrationProject,
+            project.MigrationProjectFilePath, project.DbContextName,
             createDatabaseManagerResult.AsT0, devDatabaseParameters.DatabaseName);
 
         return databaseMigrationParameters;

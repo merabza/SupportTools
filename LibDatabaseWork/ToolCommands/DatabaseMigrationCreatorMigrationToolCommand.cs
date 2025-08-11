@@ -35,6 +35,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //თუ Migrations ფოლდერი არის, მაშინ უნდა მოხდეს მისი შიგთავსის გასუფთავება *.cs ფაილებისაგან
 
         var migrationProjectFileName = DatabaseMigrationParameters.MigrationProjectFileName;
+
         var migrationProjectFile = new FileInfo(migrationProjectFileName);
         if (!migrationProjectFile.Exists)
         {
@@ -44,7 +45,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         }
 
         var migrationsFolder = migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
-        if (migrationsFolder is not null)
+        if (migrationsFolder is not null && migrationsFolder.Exists)
         {
             var directorySeparatorChar = Path.DirectorySeparatorChar;
             _logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
@@ -61,24 +62,32 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
             return ValueTask.FromResult(false);
         }
 
-        var solutionFileNameWithMigrationProject = DatabaseMigrationParameters.SolutionFileNameWithMigrationProject;
-        var solutionFileName = new FileInfo(solutionFileNameWithMigrationProject);
-        if (!solutionFileName.Exists)
-        {
-            _logger.LogError(
-                "Object for Migration startup project file {solutionFileNameWithMigrationProject} does not exists",
-                solutionFileNameWithMigrationProject);
-            return ValueTask.FromResult(false);
-        }
+        //var solutionFileNameWithMigrationProject = DatabaseMigrationParameters.SolutionFileNameWithMigrationProject;
+        //var solutionFileName = new FileInfo(solutionFileNameWithMigrationProject);
+        //if (!solutionFileName.Exists)
+        //{
+        //    _logger.LogError(
+        //        "Object for Migration startup project file {solutionFileNameWithMigrationProject} does not exists",
+        //        solutionFileNameWithMigrationProject);
+        //    return ValueTask.FromResult(false);
+        //}
 
         var projectXml = XElement.Load(migrationStartupProjectFilePath);
         var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference");
 
+        var migrationStartupProjectDirectoryName = migrationStartupProjectFile.DirectoryName;
+        if (string.IsNullOrWhiteSpace(migrationStartupProjectDirectoryName))
+        {
+            _logger.LogError(
+                "migrationStartupProjectFile.DirectoryName for Migration project file {migrationProjectFileName} does not exists",
+                migrationProjectFileName);
+            return ValueTask.FromResult(false);
+        }
+
         var migrationProjectFileExistsInStartupProjectReferences = false;
         foreach (var projectReference in projectReferences)
-            if (projectReference.Attributes().Where(w => w.Name == "Include").Any(includeAttribute =>
-                    migrationProjectFileName ==
-                    Path.Combine(solutionFileNameWithMigrationProject, includeAttribute.Value)))
+            if (projectReference.Attributes().Where(w => w.Name == "Include").Any(w => migrationProjectFileName ==
+                    Path.GetFullPath(Path.Combine(migrationStartupProjectDirectoryName, w.Value))))
                 migrationProjectFileExistsInStartupProjectReferences = true;
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
