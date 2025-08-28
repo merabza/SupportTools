@@ -54,7 +54,10 @@ public static class GitHelper
             CreateNoWindow = true
         };
 
-        using var process = new Process { StartInfo = psi };
+        // ReSharper disable once using
+        // ReSharper disable once DisposableConstructor
+        using var process = new Process();
+        process.StartInfo = psi;
         process.Start();
 
         var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);

@@ -43,7 +43,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         return true;
     }
 
-    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         var workFolder = supportToolsParameters.CodeGenerateTestFolder;
@@ -51,14 +51,14 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         if (string.IsNullOrWhiteSpace(workFolder))
         {
             StShared.WriteErrorLine("supportToolsParameters.CodeGenerateTestFolder is not specified", true, Logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         //შემოწმდეს სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)
         {
             StShared.WriteErrorLine($"does not exists and cannot create work folder {workFolder}", true, Logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var projectName = _parameters.ProjectName;
@@ -71,7 +71,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         if (FileStat.CreateFolderIfNotExists(projectFolder, true) == null)
         {
             StShared.WriteErrorLine($"does not exists and cannot create work folder {projectFolder}", true, Logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         //შემოწმდესა და განახლდეს გიტის პროექტები
@@ -87,7 +87,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             if (gitData is null)
             {
                 StShared.WriteErrorLine($"git with name {gitProjectName} is not exists", true, Logger);
-                return false;
+                return ValueTask.FromResult(false);
             }
 
             Console.WriteLine($"---=== {gitProjectName} ===---");
@@ -96,7 +96,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
 
             if (gitProcessor is null)
-                return false;
+                return ValueTask.FromResult(false);
         }
 
         // Find the ApiRoutes class file
@@ -105,7 +105,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         if (apiContractsProjectFilePath is null)
         {
             _logger.LogError("Api Contracts Project file not found.");
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var apiContractsProjectFile = new FileInfo(apiContractsProjectFilePath);
@@ -114,7 +114,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         if (apiContractsProjectFolder is null)
         {
             _logger.LogError("apiContractsProjectFolder not found.");
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         var versionsAndRoots = project.RouteClasses.Values.Select(x => new { x.Version, x.Root }).Distinct();
@@ -134,7 +134,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             {
                 StShared.WriteErrorLine($"does not exists and cannot create routes folder {versionApiRouteFolderPath}",
                     true, Logger);
-                return false;
+                return ValueTask.FromResult(false);
             }
 
             if (File.Exists(versionApiRouteClassFilePath))
@@ -162,6 +162,6 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         //// Show success message
         //Console.WriteLine("ApiRoutes code successfully generated.");
 
-        return true;
+        return ValueTask.FromResult(true);
     }
 }
