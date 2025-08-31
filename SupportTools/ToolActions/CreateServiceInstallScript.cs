@@ -194,7 +194,7 @@ public sealed class CreateServiceInstallScript : ToolAction
                      ftp -n $ftpSite > directory_listing <<fin
                      quote USER $user
                      quote PASS $pass
-                     passive
+                     passive on
                      cd $directory
                      ls -lt
                      quit
@@ -250,7 +250,7 @@ public sealed class CreateServiceInstallScript : ToolAction
                      ftp -n $ftpSite <<fin
                      quote USER $user
                      quote PASS $pass
-                     passive
+                     passive on
                      cd $directory
                      binary
                      $cmd
@@ -300,7 +300,7 @@ public sealed class CreateServiceInstallScript : ToolAction
                      ftp -n $ftpSite <<fin
                      quote USER $user
                      quote PASS $pass
-                     passive
+                     passive on
                      cd $directory
                      binary
                      $cmd
