@@ -6,9 +6,9 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class RazorAppCreatorData
 {
-    private RazorAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact,
-        bool useCarcass, bool useDatabase, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation, string? dbPartProjectName)
+    private RazorAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
+        string mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase, bool useIdentity, bool useReCounter,
+        bool useSignalR, bool useFluentValidation, string? dbPartProjectName)
     {
         MainProjectData = mainProjectData;
         AppCreatorBaseData = appCreatorBaseData;
@@ -20,10 +20,13 @@ public sealed class RazorAppCreatorData
         UseSignalR = useSignalR;
         UseFluentValidation = useFluentValidation;
         DbPartProjectName = dbPartProjectName;
+        MediatRLicenseKey = mediatRLicenseKey;
     }
 
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
+
+    public string MediatRLicenseKey { get; }
     public bool UseReact { get; }
     public bool UseCarcass { get; }
     public bool UseDatabase { get; }
@@ -46,8 +49,8 @@ public sealed class RazorAppCreatorData
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
             EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
 
-        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
-            template.UseDatabase, template.UseIdentity, template.UseReCounter, template.UseSignalR,
-            template.UseFluentValidation, dbPartProjectName);
+        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, template.MediatRLicenseKey,
+            template.UseReact, template.UseCarcass, template.UseDatabase, template.UseIdentity, template.UseReCounter,
+            template.UseSignalR, template.UseFluentValidation, dbPartProjectName);
     }
 }

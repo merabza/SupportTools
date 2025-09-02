@@ -20,9 +20,9 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter, bool useSignalR,
-        bool useFluentValidation, bool useReact, string? dbPartProjectName, string? codeFileName = null) : base(logger,
-        placePath, codeFileName)
+        string mediatRLicenseKey, bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter,
+        bool useSignalR, bool useFluentValidation, bool useReact, string? dbPartProjectName,
+        string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appKey = appKey;
@@ -95,6 +95,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
                     ? $$$"""
                          builder.Services.AddMediatR(cfg =>
                          {{
+                             cfg.LicenseKey = "";
+                             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
                              {{{(_useCarcass ? """
                                                   //BackendCarcass
                                                   cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);

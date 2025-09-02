@@ -21,6 +21,7 @@ public sealed class TemplateCruder : ParCruder<TemplateModel>
 
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectName)));
         FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestProjectShortName)));
+        FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.MediatRLicenseKey)));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDatabase)));
         FieldEditors.Add(new BoolFieldEditor(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects)));
         //FieldEditors.Add(new TextFieldEditor(nameof(TemplateModel.TestDbPartProjectName)));

@@ -9,11 +9,12 @@ namespace LibAppProjectCreator.Models;
 
 public sealed class ApiAppCreatorData
 {
-    private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData, bool useReact,
-        bool useCarcass, bool useDatabase, bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter,
-        bool useSignalR, bool useFluentValidation, ProjectForCreate databaseProjectData,
-        ProjectForCreate dbMigrationProjectData, ProjectForCreate libProjectRepositoriesProjectData,
-        ProjectForCreate repositoriesProjectData, ProjectForCreate frontendProjectData, string? dbPartProjectName)
+    private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
+        string mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase,
+        bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
+        bool useFluentValidation, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
+        ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate repositoriesProjectData,
+        ProjectForCreate frontendProjectData, string? dbPartProjectName)
     {
         AppCreatorBaseData = appCreatorBaseData;
         MainProjectData = mainProjectData;
@@ -31,8 +32,10 @@ public sealed class ApiAppCreatorData
         RepositoriesProjectData = repositoriesProjectData;
         FrontendProjectData = frontendProjectData;
         DbPartProjectName = dbPartProjectName;
+        MediatRLicenseKey = mediatRLicenseKey;
     }
 
+    public string MediatRLicenseKey { get; }
     public bool UseReact { get; }
     public bool UseCarcass { get; }
     public bool UseDatabase { get; }
@@ -117,7 +120,7 @@ public sealed class ApiAppCreatorData
         var frontendProjectData =
             ProjectForCreate.CreateReactProject(createInPath, frontEndProjectName, [], frontProjectFolderName);
 
-        return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.UseReact, template.UseCarcass,
+        return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.MediatRLicenseKey, template.UseReact, template.UseCarcass,
             template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
             template.UseReCounter, template.UseSignalR, template.UseFluentValidation, databaseProjectData,
             dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData, frontendProjectData,

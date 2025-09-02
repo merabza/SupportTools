@@ -17,6 +17,7 @@ public sealed class TemplateModel : ItemData
     public bool UseMenu { get; set; }
 
     //Api parameters
+    public string MediatRLicenseKey { get; set; }
     public bool UseHttps { get; set; }
     public bool UseReact { get; set; }
     public bool UseCarcass { get; set; }

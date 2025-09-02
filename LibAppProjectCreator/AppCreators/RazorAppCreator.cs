@@ -60,7 +60,7 @@ public sealed class RazorAppCreator : AppCreatorBase
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ApiProgramClassCreator(Logger,
             _razorAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, keyPart1,
-            _razorAppCreatorData.UseDatabase, _razorAppCreatorData.UseCarcass, _razorAppCreatorData.UseIdentity,
+            _razorAppCreatorData.MediatRLicenseKey, _razorAppCreatorData.UseDatabase, _razorAppCreatorData.UseCarcass, _razorAppCreatorData.UseIdentity,
             _razorAppCreatorData.UseReCounter, _razorAppCreatorData.UseSignalR,
             _razorAppCreatorData.UseFluentValidation, _razorAppCreatorData.UseReact,
             _razorAppCreatorData.DbPartProjectName, "Program.cs");
