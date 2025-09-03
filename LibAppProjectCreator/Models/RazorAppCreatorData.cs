@@ -7,7 +7,7 @@ namespace LibAppProjectCreator.Models;
 public sealed class RazorAppCreatorData
 {
     private RazorAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
-        string mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase, bool useIdentity, bool useReCounter,
+        string? mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase, bool useIdentity, bool useReCounter,
         bool useSignalR, bool useFluentValidation, string? dbPartProjectName)
     {
         MainProjectData = mainProjectData;
@@ -26,7 +26,7 @@ public sealed class RazorAppCreatorData
     public AppCreatorBaseData AppCreatorBaseData { get; }
     public ProjectForCreate MainProjectData { get; }
 
-    public string MediatRLicenseKey { get; }
+    public string? MediatRLicenseKey { get; }
     public bool UseReact { get; }
     public bool UseCarcass { get; }
     public bool UseDatabase { get; }
@@ -37,7 +37,7 @@ public sealed class RazorAppCreatorData
     public string? DbPartProjectName { get; }
 
     public static RazorAppCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
-        string? dbPartProjectName, TemplateModel template)
+        string? dbPartProjectName, string? mediatRLicenseKey, TemplateModel template)
     {
         var projectFolders = new List<string> { "Properties" };
         if (!template.UseDatabase)
@@ -49,7 +49,7 @@ public sealed class RazorAppCreatorData
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
             EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
 
-        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, template.MediatRLicenseKey,
+        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, mediatRLicenseKey,
             template.UseReact, template.UseCarcass, template.UseDatabase, template.UseIdentity, template.UseReCounter,
             template.UseSignalR, template.UseFluentValidation, dbPartProjectName);
     }

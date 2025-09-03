@@ -10,7 +10,7 @@ namespace LibAppProjectCreator.Models;
 public sealed class ApiAppCreatorData
 {
     private ApiAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
-        string mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase,
+        string? mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase,
         bool useDbPartFolderForDatabaseProjects, bool useIdentity, bool useReCounter, bool useSignalR,
         bool useFluentValidation, ProjectForCreate databaseProjectData, ProjectForCreate dbMigrationProjectData,
         ProjectForCreate libProjectRepositoriesProjectData, ProjectForCreate repositoriesProjectData,
@@ -35,7 +35,7 @@ public sealed class ApiAppCreatorData
         MediatRLicenseKey = mediatRLicenseKey;
     }
 
-    public string MediatRLicenseKey { get; }
+    public string? MediatRLicenseKey { get; }
     public bool UseReact { get; }
     public bool UseCarcass { get; }
     public bool UseDatabase { get; }
@@ -55,7 +55,7 @@ public sealed class ApiAppCreatorData
     public ProjectForCreate DbMigrationProjectData { get; }
 
     public static ApiAppCreatorData? CreateApiAppCreatorData(ILogger logger, AppCreatorBaseData appCreatorBaseData,
-        string projectName, string? dbPartProjectName, TemplateModel template)
+        string projectName, string? dbPartProjectName, string? mediatRLicenseKey, TemplateModel template)
     {
         switch (template)
         {
@@ -120,10 +120,10 @@ public sealed class ApiAppCreatorData
         var frontendProjectData =
             ProjectForCreate.CreateReactProject(createInPath, frontEndProjectName, [], frontProjectFolderName);
 
-        return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, template.MediatRLicenseKey, template.UseReact, template.UseCarcass,
-            template.UseDatabase, template.UseDbPartFolderForDatabaseProjects, template.UseIdentity,
-            template.UseReCounter, template.UseSignalR, template.UseFluentValidation, databaseProjectData,
-            dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData, frontendProjectData,
-            dbPartProjectName);
+        return new ApiAppCreatorData(appCreatorBaseData, mainProjectData, mediatRLicenseKey, template.UseReact,
+            template.UseCarcass, template.UseDatabase, template.UseDbPartFolderForDatabaseProjects,
+            template.UseIdentity, template.UseReCounter, template.UseSignalR, template.UseFluentValidation,
+            databaseProjectData, dbMigrationProjectData, libProjectRepositoriesProjectData, repositoriesProjectData,
+            frontendProjectData, dbPartProjectName);
     }
 }

@@ -9,6 +9,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 {
     private readonly string _appKey;
     private readonly string? _dbPartProjectName;
+    private readonly string? _mediatRLicenseKey;
     private readonly string _projectNamespace;
     private readonly bool _useCarcass;
     private readonly bool _useDatabase;
@@ -20,12 +21,13 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApiProgramClassCreator(ILogger logger, string placePath, string projectNamespace, string appKey,
-        string mediatRLicenseKey, bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter,
+        string? mediatRLicenseKey, bool useDatabase, bool useCarcass, bool useIdentity, bool useReCounter,
         bool useSignalR, bool useFluentValidation, bool useReact, string? dbPartProjectName,
         string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
         _appKey = appKey;
+        _mediatRLicenseKey = mediatRLicenseKey;
         _useDatabase = useDatabase;
         _useCarcass = useCarcass;
         _useIdentity = useIdentity;
@@ -47,6 +49,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
                   )
                  """)
             : null;
+
+        var useMediatRLicenseKey = !string.IsNullOrWhiteSpace(_mediatRLicenseKey);
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using ConfigurationEncrypt", _useFluentValidation ? "using FluentValidationInstaller" : null,
@@ -91,10 +95,16 @@ public sealed class ApiProgramClassCreator : CodeCreator
                      TestToolsApi.AssemblyReference.Assembly,
                      WindowsServiceTools.AssemblyReference.Assembly
                      ))
-                     """, "return 2"), string.Empty, _useCarcass
+                     """, "return 2"), string.Empty,
+                _useCarcass && useMediatRLicenseKey
+                    ? "var mediatRSettings = builder.Configuration.GetSection(\"MediatRLicenseKey\")"
+                    : null,
+                _useCarcass && useMediatRLicenseKey ? "var mediatRLicenseKey = mediatRSettings.Get<string>()" : null,
+                _useCarcass
                     ? $$$"""
                          builder.Services.AddMediatR(cfg =>
                          {{
+                         {{{(useMediatRLicenseKey ? "cfg.LicenseKey = mediatRLicenseKey;" : null)}}}
                              cfg.LicenseKey = "";
                              cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
                              {{{(_useCarcass ? """

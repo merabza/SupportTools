@@ -49,6 +49,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ProgramArchiveExtension)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileExtension)));
+        FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.MediatRLicenseKey)));
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,
             nameof(SupportToolsParameters.FileStorageNameForExchange), parametersManager));
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForLocal),

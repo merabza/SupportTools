@@ -80,6 +80,9 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         string? projectShortName;
         string? dbPartProjectName;
         var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
+
+        var mediatRLicenseKey = supportToolsParameters.MediatRLicenseKey;
+
         switch (_testOrReal)
         {
             case ETestOrReal.Test:
@@ -126,7 +129,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         var appCreator = AppCreatorFactory.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
-            GitRepos.Create(_logger, supportToolsParameters.Gits, null, UseConsole, false),
+            GitRepos.Create(_logger, supportToolsParameters.Gits, null, UseConsole, false), mediatRLicenseKey,
             supportToolsParameters.GitIgnoreModelFilePaths);
 
         if (appCreator is null)

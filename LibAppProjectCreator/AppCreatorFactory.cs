@@ -15,7 +15,7 @@ public static class AppCreatorFactory
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, IHttpClientFactory httpClientFactory,
         AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos,
-        Dictionary<string, string> gitIgnoreModelFilePaths)
+        string? mediatRLicenseKey, Dictionary<string, string> gitIgnoreModelFilePaths)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
             par.SolutionFolderName, par.SecurityWorkFolderPath, gitIgnoreModelFilePaths);
@@ -35,7 +35,7 @@ public static class AppCreatorFactory
                     gitRepos, consoleAppWithDatabaseCreatorData);
             case ESupportProjectType.Api:
                 var apiAppCreatorData = ApiAppCreatorData.CreateApiAppCreatorData(logger, appCreatorBaseData,
-                    par.ProjectName, par.DbPartProjectName, template);
+                    par.ProjectName, par.DbPartProjectName, mediatRLicenseKey, template);
 
                 if (apiAppCreatorData is not null)
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,
@@ -45,7 +45,7 @@ public static class AppCreatorFactory
                 return null;
             case ESupportProjectType.Razor:
                 var razorAppCreatorData = RazorAppCreatorData.Create(appCreatorBaseData, par.ProjectName,
-                    par.DbPartProjectName, template);
+                    par.DbPartProjectName, mediatRLicenseKey, template);
                 return new RazorAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
                     gitRepos, razorAppCreatorData);
             case ESupportProjectType.ScaffoldSeeder:

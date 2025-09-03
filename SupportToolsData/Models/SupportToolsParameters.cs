@@ -38,6 +38,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? ProgramArchiveExtension { get; set; }
     public string? ParametersFileDateMask { get; set; }
     public string? ParametersFileExtension { get; set; }
+    public string? MediatRLicenseKey { get; set; }
 
     //ეს არის იმ ადგილის სახელი, სადაც უნდა მოხდეს პროგრამის დაზიპული ფაილების ატვირთვა
     public string? FileStorageNameForExchange { get; set; }
