@@ -26,6 +26,6 @@ public sealed class ServerInfoModel : ItemData
 
     public override string GetItemKey()
     {
-        return $"{ServerName}/{EnvironmentName}";
+        return $"{ServerName}|{EnvironmentName}";
     }
 }
