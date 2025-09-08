@@ -31,7 +31,7 @@ public sealed class BaseCopierToolCommand : ToolCommand
 
         _logger.LogInformation("Create Backup for source Database");
 
-        var sourceBaseBackupRestorer = new BaseBackupRestorer(_logger, sourceBackupParameters);
+        var sourceBaseBackupRestorer = new BaseBackupRestoreTool(_logger, sourceBackupParameters);
         var backupFileParametersForSource = await sourceBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParametersForSource is null)
@@ -79,7 +79,7 @@ public sealed class BaseCopierToolCommand : ToolCommand
                 CopyBaseParameters.ExchangeSmartSchema);
         }
 
-        var destinationBaseBackupRestorer = new BaseBackupRestorer(_logger, destinationBackupParameters);
+        var destinationBaseBackupRestorer = new BaseBackupRestoreTool(_logger, destinationBackupParameters);
         if (!destinationBackupParameters.SkipBackupBeforeRestore)
             //თუ SkipBackupBeforeRestore პარამეტრით აკრძალული არ არის
             //სანამ გადავაწერთ არსებული ბაზა გადავინახოთ ყოველი შემთხვევისათვის
