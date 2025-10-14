@@ -134,7 +134,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         var seederParameters = new SeederParametersDomain(
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName, "Json"),
             Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
-            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}",
+            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}", Parameters.DevCommandTimeout,
             Parameters.ExcludesRulesParametersFilePath);
 
         if (!SaveParameters(seederParameters, seedDbProjectNameUseJsonFilePath,
@@ -217,8 +217,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var createProjectSeederCodeParameters = new CreateProjectSeederCodeParametersDomain(
             Parameters.ScaffoldSeederProjectName, Parameters.ProjectShortPrefix, Parameters.LogFolder,
-            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
-            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
+            $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}", Parameters.ProdCommandTimeout,
+            $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}", Parameters.DevCommandTimeout,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
             getJsonFromScaffoldDbProjectName,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName),

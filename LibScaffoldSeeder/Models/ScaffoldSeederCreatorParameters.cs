@@ -17,8 +17,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     private ScaffoldSeederCreatorParameters(string logFolder, string scaffoldSeedersWorkFolder, string tempFolder,
         string projectName, string scaffoldSeederProjectName, string projectSecurityFolderPath,
         string projectShortPrefix, string dbContextProjectName, string projectDbContextClassName,
-        EDatabaseProvider devDatabaseDataProvider, string devDatabaseConnectionString,
-        EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString,
+        EDatabaseProvider devDatabaseDataProvider, string devDatabaseConnectionString, int devCommandTimeout,
+        EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString, int prodCommandTimeout,
         string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
         string excludesRulesParametersFilePath, string fakeHostProjectName, string? migrationSqlFilesFolder,
         GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths)
@@ -34,8 +34,10 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         ProjectDbContextClassName = projectDbContextClassName;
         DevDatabaseDataProvider = devDatabaseDataProvider;
         DevDatabaseConnectionString = devDatabaseConnectionString;
+        DevCommandTimeout = devCommandTimeout;
         ProdCopyDatabaseDataProvider = prodCopyDatabaseDataProvider;
         ProdCopyDatabaseConnectionString = prodCopyDatabaseConnectionString;
+        ProdCommandTimeout = prodCommandTimeout;
         NewDataSeedingClassLibProjectName = newDataSeedingClassLibProjectName;
         SmartSchemaForLocal = smartSchemaForLocal;
         ExcludesRulesParametersFilePath = excludesRulesParametersFilePath;
@@ -57,8 +59,10 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public string ProjectDbContextClassName { get; }
     public EDatabaseProvider DevDatabaseDataProvider { get; }
     public string DevDatabaseConnectionString { get; }
+    public int DevCommandTimeout { get; }
     public EDatabaseProvider ProdCopyDatabaseDataProvider { get; }
     public string ProdCopyDatabaseConnectionString { get; }
+    public int ProdCommandTimeout { get; }
     public string NewDataSeedingClassLibProjectName { get; }
     public SmartSchema SmartSchemaForLocal { get; }
     public GitProjects GitProjects { get; }
@@ -142,14 +146,14 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             var databaseServerConnections =
                 new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-            var (devDataProvider, devConnectionString) =
-                DbConnectionFactory.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
+            var (devDataProvider, devConnectionString, devCommandTimeout) =
+                DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.DevDatabaseParameters,
                     databaseServerConnections);
 
             if (devDataProvider is null || devConnectionString is null) return null;
 
-            var (prodCopyDataProvider, prodCopyConnectionString) =
-                DbConnectionFactory.GetDataProviderAndConnectionString(project.ProdCopyDatabaseParameters,
+            var (prodCopyDataProvider, prodCopyConnectionString, prodCommandTimeout) =
+                DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.ProdCopyDatabaseParameters,
                     databaseServerConnections);
 
             if (prodCopyDataProvider is null || prodCopyConnectionString is null) return null;
@@ -180,8 +184,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             var scaffoldSeederCreatorParameters = new ScaffoldSeederCreatorParameters(supportToolsParameters.LogFolder,
                 supportToolsParameters.ScaffoldSeedersWorkFolder, supportToolsParameters.TempFolder, projectName,
                 project.ScaffoldSeederProjectName, project.ProjectSecurityFolderPath, project.ProjectShortPrefix,
-                project.DbContextProjectName, project.DbContextName, devDataProvider.Value, devConnectionString,
-                prodCopyDataProvider.Value, prodCopyConnectionString, project.NewDataSeedingClassLibProjectName,
+                project.DbContextProjectName, project.DbContextName, devDataProvider.Value, devConnectionString,devCommandTimeout,
+                prodCopyDataProvider.Value, prodCopyConnectionString, prodCommandTimeout, project.NewDataSeedingClassLibProjectName,
                 smartSchemaForLocal, project.ExcludesRulesParametersFilePath,
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,

@@ -46,8 +46,8 @@ public sealed class CorrectNewDbParameters : IParameters
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-        var (devDataProvider, devConnectionString) =
-            DbConnectionFactory.GetDataProviderAndConnectionString(project.DevDatabaseParameters,
+        var (devDataProvider, devConnectionString, commandTimeout) =
+            DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.DevDatabaseParameters,
                 databaseServerConnections);
 
         if (devDataProvider is null || devConnectionString is null)
@@ -57,7 +57,7 @@ public sealed class CorrectNewDbParameters : IParameters
         }
 
         var correctNewDbParameters = new CorrectNewDbParameters(devDataProvider.Value, devConnectionString,
-            project.DevDatabaseParameters.CommandTimeOut);
+            commandTimeout);
 
         return correctNewDbParameters;
     }
