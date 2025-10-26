@@ -32,7 +32,7 @@ public sealed class GitProcessor
         LastRemoteId = GitGetRemoteId();
     }
 
-    //public OneOf<bool, IEnumerable<Err>> NeedPull(bool updateRemote = false)
+    //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
     //{
     //    if (updateRemote && !GitRemoteUpdate())
     //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
@@ -152,7 +152,7 @@ fi*/
         return false;
     }
 
-    public OneOf<string, IEnumerable<Err>> GetRemoteOriginUrl()
+    public OneOf<string, Err[]> GetRemoteOriginUrl()
     {
         var result = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} config --get remote.origin.url");
@@ -171,7 +171,7 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, IEnumerable<Err>> NeedCommit()
+    public OneOf<bool, Err[]> NeedCommit()
     {
         var gitStatusOutputResult =
             StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} status --porcelain");
@@ -213,7 +213,7 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, IEnumerable<Err>> HaveUnTrackedFiles()
+    public OneOf<bool, Err[]> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
@@ -303,7 +303,7 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], IEnumerable<Err>> GetRedundantCachedFilesList()
+    public OneOf<string[], Err[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         var statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
@@ -327,7 +327,7 @@ fi*/
         return false;
     }
 
-    public Option<IEnumerable<Err>> Initialise()
+    public Option<Err[]> Initialise()
     {
         return StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} init");
     }

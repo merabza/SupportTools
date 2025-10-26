@@ -92,8 +92,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         return await correctNewDatabase.Run(cancellationToken);
     }
 
-    private async ValueTask<Option<IEnumerable<Err>>> ChangeDatabaseRecoveryModel(
-        CancellationToken cancellationToken = default)
+    private async ValueTask<Option<Err[]>> ChangeDatabaseRecoveryModel(CancellationToken cancellationToken = default)
     {
         var errors = new List<Err>();
 
@@ -103,7 +102,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         {
             _logger.LogError("dev database DbConnectionName is not specified");
             errors.Add(DbToolsErrors.DatabaseConnectionNameIsNotSpecified);
-            return errors;
+            return errors.ToArray();
         }
 
         var createDatabaseManagerResult = await DatabaseManagersFactory.CreateDatabaseManager(_logger, true,
@@ -126,7 +125,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
                                     DatabaseParameters.DefaultDatabaseRecoveryModel;
 
         if (errors.Count > 0)
-            return errors;
+            return errors.ToArray();
 
         var dbManager = createDatabaseManagerResult.AsT0;
 

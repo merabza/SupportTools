@@ -125,7 +125,7 @@ public static class DotnetToolsVersionsCheckerUpdater
         return true;
     }
 
-    private static OneOf<bool, IEnumerable<Err>> UpdateOneToolToLatestVersion(DotnetToolData dotnetToolData)
+    private static OneOf<bool, Err[]> UpdateOneToolToLatestVersion(DotnetToolData dotnetToolData)
     {
         if (string.IsNullOrWhiteSpace(dotnetToolData.PackageId) ||
             string.IsNullOrWhiteSpace(dotnetToolData.LatestVersion) || dotnetToolData.LatestVersion == "N/A" ||
@@ -139,11 +139,10 @@ public static class DotnetToolsVersionsCheckerUpdater
         var result = toolInstalled
             ? dotnetProcessor.UpdateTool(dotnetToolData.PackageId)
             : dotnetProcessor.InstallTool(dotnetToolData.PackageId);
-        return result.Match<OneOf<bool, IEnumerable<Err>>>(some => (Err[])some, true);
+        return result.Match<OneOf<bool, Err[]>>(some => some, true);
     }
 
-    private static OneOf<bool, IEnumerable<Err>> CheckVersionsForAllTools(
-        Dictionary<string, DotnetToolData> necessaryDotnetTools)
+    private static OneOf<bool, Err[]> CheckVersionsForAllTools(Dictionary<string, DotnetToolData> necessaryDotnetTools)
     {
         StShared.ConsoleWriteInformationLine(null, true, "Create List of Installed tools...");
         var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
@@ -165,11 +164,11 @@ public static class DotnetToolsVersionsCheckerUpdater
         }
 
         if (errors.Count > 0)
-            return errors;
+            return errors.ToArray();
         return madeChanges;
     }
 
-    private static OneOf<bool, IEnumerable<Err>> CheckVersionsForOneTool(DotnetToolData dotnetToolData,
+    private static OneOf<bool, Err[]> CheckVersionsForOneTool(DotnetToolData dotnetToolData,
         List<DotnetToolData>? listOfToolsInstalled)
     {
         var packageId = dotnetToolData.PackageId;
@@ -224,11 +223,11 @@ public static class DotnetToolsVersionsCheckerUpdater
         return haveChanges;
     }
 
-    private static OneOf<string, IEnumerable<Err>> GetAvailableVersionOfTool(string toolName)
+    private static OneOf<string, Err[]> GetAvailableVersionOfTool(string toolName)
     {
         var dotnetProcessor = new DotnetProcessor(null, false);
         var processResult = dotnetProcessor.SearchTool(toolName);
-        return processResult.Match<OneOf<string, IEnumerable<Err>>>(t0 =>
+        return processResult.Match<OneOf<string, Err[]>>(t0 =>
         {
             var outputResult = t0.Item1;
             var outputLines = outputResult.Split(Environment.NewLine);
@@ -238,11 +237,11 @@ public static class DotnetToolsVersionsCheckerUpdater
         }, t1 => t1.ToArray());
     }
 
-    private static OneOf<List<DotnetToolData>, IEnumerable<Err>> CreateListOfDotnetToolsInstalled()
+    private static OneOf<List<DotnetToolData>, Err[]> CreateListOfDotnetToolsInstalled()
     {
         var dotnetProcessor = new DotnetProcessor(null, false);
         var getToolsRawListResult = dotnetProcessor.GetToolsRawList();
-        return getToolsRawListResult.Match<OneOf<List<DotnetToolData>, IEnumerable<Err>>>(t0 =>
+        return getToolsRawListResult.Match<OneOf<List<DotnetToolData>, Err[]>>(t0 =>
         {
             var listOfTools = t0.Skip(2).Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
                 .Where(lineParts => lineParts.Length == 3).Select(lineParts => new DotnetToolData
