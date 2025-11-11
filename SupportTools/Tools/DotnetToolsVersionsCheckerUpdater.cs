@@ -137,8 +137,8 @@ public static class DotnetToolsVersionsCheckerUpdater
 
         var dotnetProcessor = new DotnetProcessor(null, false);
         var result = toolInstalled
-            ? dotnetProcessor.UpdateTool(dotnetToolData.PackageId)
-            : dotnetProcessor.InstallTool(dotnetToolData.PackageId);
+            ? dotnetProcessor.UpdateTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion)
+            : dotnetProcessor.InstallTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion);
         return result.Match<OneOf<bool, Err[]>>(some => some, true);
     }
 

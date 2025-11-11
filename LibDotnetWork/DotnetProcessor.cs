@@ -122,14 +122,14 @@ public sealed class DotnetProcessor
         return outputResult.Split(Environment.NewLine);
     }
 
-    public Option<Err[]> InstallTool(string packageId)
+    public Option<Err[]> InstallTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool install --global  {packageId}");
+        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool install --global {packageId}{(version is not null ? $" --version {version}" : "")}");
     }
 
-    public Option<Err[]> UpdateTool(string packageId)
+    public Option<Err[]> UpdateTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool update --global  {packageId}");
+        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool update --global {packageId}{(version is not null ? $" --version {version}" : "")}");
     }
 
     /*
