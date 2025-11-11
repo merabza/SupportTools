@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using CliMenu;
+﻿using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
 using LibParameters;
 using SupportTools.CliMenuCommands;
+using SupportTools.Tools;
 using SupportToolsData.Models;
+using System.Collections.Generic;
 
 namespace SupportTools.Cruders;
 
@@ -18,8 +19,14 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.PackageId)));
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.InstalledVersion)));
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.LatestVersion)));
+        FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.MaxVersion)));
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.CommandName)));
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.Description)));
+    }
+
+    protected override void BeforeGetListMenu()
+    {
+        DotnetToolsVersionsCheckerUpdater.Check(ParametersManager);
     }
 
     public override string? GetStatusFor(string name)
