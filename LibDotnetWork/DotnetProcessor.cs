@@ -35,8 +35,8 @@ public sealed class DotnetProcessor
             $"new sln --output {solutionPath} --name {solutionName}");
     }
 
-    public Option<Err[]> CreateNewProject(EDotnetProjectType dotnetProjectType,
-        string? projectCreateParameters, string projectFullPath, string projectName)
+    public Option<Err[]> CreateNewProject(EDotnetProjectType dotnetProjectType, string? projectCreateParameters,
+        string projectFullPath, string projectName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"new {dotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
@@ -55,8 +55,7 @@ public sealed class DotnetProcessor
             $"add {projectFilePath} reference {referenceProjectFilePath}");
     }
 
-    public Option<Err[]> AddPackageToProject(string projectFilePath, string packageName,
-        string? packageVersion)
+    public Option<Err[]> AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}");
@@ -81,8 +80,8 @@ public sealed class DotnetProcessor
             $"ef migrations add \"{migrationName}\" --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
-    public Option<Err[]> EfUpdateDatabaseByMigration(string dbContextName,
-        string migrationStartupProjectFilePath, string migrationProjectFileName)
+    public Option<Err[]> EfUpdateDatabaseByMigration(string dbContextName, string migrationStartupProjectFilePath,
+        string migrationProjectFileName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"ef database update --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
@@ -117,19 +116,21 @@ public sealed class DotnetProcessor
     {
         var processResult = StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
         if (processResult.IsT1)
-            return (Err[])processResult.AsT1;
+            return processResult.AsT1;
         var outputResult = processResult.AsT0.Item1;
         return outputResult.Split(Environment.NewLine);
     }
 
     public Option<Err[]> InstallTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool install --global {packageId}{(version is not null ? $" --version {version}" : "")}");
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"tool install --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");
     }
 
     public Option<Err[]> UpdateTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"tool update --global {packageId}{(version is not null ? $" --version {version}" : "")}");
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"tool update --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");
     }
 
     /*
