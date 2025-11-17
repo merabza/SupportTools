@@ -10,37 +10,30 @@ public enum EDotnetProjectType
 }
 
 /*
- 25-may-2025
+17-nov-2025
 
 dotnet --version
-
-9.0.302
+   
+10.0.100
 
 dotnet new list
-
-These templates matched your input:
-
+   These templates matched your input:
+   
    Template Name                                 Short Name                          Language    Tags
    --------------------------------------------  ----------------------------------  ----------  -----------------------------------------------------------------------------
-   .NET Aspire App Host                          aspire-apphost                      [C#]        Common/.NET Aspire/Cloud
-   .NET Aspire Empty App                         aspire                              [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service
-   .NET Aspire Service Defaults                  aspire-servicedefaults              [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service
-   .NET Aspire Starter App                       aspire-starter                      [C#]        Common/.NET Aspire/Blazor/Web/Web API/API/Service/Cloud
-   .NET Aspire Test Project (MSTest)             aspire-mstest                       [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
-   .NET Aspire Test Project (NUnit)              aspire-nunit                        [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
-   .NET Aspire Test Project (xUnit)              aspire-xunit                        [C#]        Common/.NET Aspire/Cloud/Web/Web API/API/Service/Test
-   .NET MAUI App                                 maui                                [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Mobile
-   .NET MAUI Blazor Hybrid and Web App           maui-blazor-web                     [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Blazor/Blazor Hybrid/Mobile
-   .NET MAUI Blazor Hybrid App                   maui-blazor                         [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Blazor/Blazor Hybrid/Mobile
-   .NET MAUI Class Library                       mauilib                             [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Tizen/Mobile
-   .NET MAUI ContentPage (C#)                    maui-page-csharp                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
-   .NET MAUI ContentPage (XAML)                  maui-page-xaml                      [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
-   .NET MAUI ContentView (C#)                    maui-view-csharp                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
-   .NET MAUI ContentView (XAML)                  maui-view-xaml                      [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
+   .NET MAUI App                                 maui                                [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Mobile/Tizen
+   .NET MAUI Blazor Hybrid and Web App           maui-blazor-web                     [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Blazor/Blazor Hybrid/Mobile/Tizen
+   .NET MAUI Blazor Hybrid App                   maui-blazor                         [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Blazor/Blazor Hybrid/Mobile/Tizen
+   .NET MAUI Class Library                       mauilib                             [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Mobile/Tizen
+   .NET MAUI ContentPage (C#)                    maui-page-csharp                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
+   .NET MAUI ContentPage (XAML)                  maui-page-xaml                      [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
+   .NET MAUI ContentView (C#)                    maui-view-csharp                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
+   .NET MAUI ContentView (XAML)                  maui-view-xaml                      [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
+   .NET MAUI for .NET Aspire Service Defaults    maui-aspire-servicedefaults         [C#]        MAUI/.NET Aspire/Cloud/Web/Web API/API/Service
    .NET MAUI Multi-Project App                   maui-multiproject                   [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Mobile
    .NET MAUI ResourceDictionary (XAML)           maui-dict-xaml                      [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code
-   .NET MAUI Window (C#)                         maui-window-csharp                  [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
-   .NET MAUI Window (XAML)                       maui-window-xaml                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Tizen/Xaml/Code
+   .NET MAUI Window (C#)                         maui-window-csharp                  [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
+   .NET MAUI Window (XAML)                       maui-window-xaml                    [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/WinUI/Xaml/Code/Tizen
    Android Activity                              android-activity                    [C#]        Android/Mobile
    Android Application                           android                             [C#]        Android/Mobile
    Android Class Library                         androidlib                          [C#]        Android/Mobile
@@ -50,7 +43,7 @@ These templates matched your input:
    API Controller                                apicontroller                       [C#]        Web/ASP.NET
    ASP.NET Core Empty                            web                                 [C#],F#     Web/Empty
    ASP.NET Core gRPC Service                     grpc                                [C#]        Web/gRPC/API/Service
-   ASP.NET Core Web API                          webapi                              [C#],F#     Web/WebAPI/Web API/API/Service
+   ASP.NET Core Web API                          webapi                              [C#],F#     Web/Web API/API/Service/WebAPI
    ASP.NET Core Web API (native AOT)             webapiaot                           [C#]        Web/Web API/API/Service
    ASP.NET Core Web App (Model-View-Controller)  mvc                                 [C#],F#     Web/MVC
    ASP.NET Core Web App (Razor Pages)            webapp,razor                        [C#]        Web/MVC/Razor Pages
@@ -64,6 +57,7 @@ These templates matched your input:
    Blazor WebAssembly Standalone App             blazorwasm                          [C#]        Web/Blazor/WebAssembly/PWA
    Class Library                                 classlib                            [C#],F#,VB  Common/Library
    Console App                                   console                             [C#],F#,VB  Common/Console
+   dotnet gitattributes file                     gitattributes,.gitattributes                    Config
    dotnet gitignore file                         gitignore,.gitignore                            Config
    Dotnet local tool manifest file               tool-manifest                                   Config
    EditorConfig file                             editorconfig,.editorconfig                      Config
@@ -96,8 +90,8 @@ These templates matched your input:
    MVC ViewStart                                 viewstart                           [C#]        Web/ASP.NET
    NuGet Config                                  nugetconfig,nuget.config                        Config
    NUnit 3 Test Item                             nunit-test                          [C#],F#,VB  Test/NUnit
-   NUnit 3 Test Project                          nunit                               [C#],F#,VB  Test/NUnit/Desktop/Web
    NUnit Playwright Test Project                 nunit-playwright                    [C#]        Test/NUnit/Playwright/Desktop/Web
+   NUnit Test Project                            nunit                               [C#],F#,VB  Test/NUnit/Desktop/Web
    Protocol Buffer File                          proto                                           Web/gRPC
    Razor Class Library                           razorclasslib                       [C#]        Web/Razor/Library/Razor Class Library
    Razor Component                               razorcomponent                      [C#]        Web/ASP.NET
