@@ -98,6 +98,11 @@ public sealed class DotnetProcessor
             $"run --project {projectFilePath} --use {projectParametersFilePath}");
     }
 
+    public Option<Err[]> Restore(string projectFileFullName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
+    }
+
     public Option<Err[]> EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
         string prodCopyDatabaseConnectionString, string providerPackageName,
         string createProjectSeederCodeProjectFileFullName, string dbScContextName,
