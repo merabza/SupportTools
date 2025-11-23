@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using DatabasesManagement;
+﻿using DatabasesManagement;
 using DbTools.Errors;
 using LanguageExt;
 using LibApiClientParameters;
 using LibDatabaseParameters;
 using LibDatabaseWork.Models;
+using LibDotnetWork;
 using LibParameters;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemToolsShared.Errors;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -67,6 +68,10 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             _logger.LogInformation("The existence of the base could not be determined");
             return false;
         }
+
+        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        dotnetProcessor.Restore(DatabaseMigrationParameters.MigrationProjectFileName);
+        dotnetProcessor.Restore(DatabaseMigrationParameters.MigrationStartupProjectFilePath);
 
         if (isDatabaseExistsResult.AsT0)
         {
