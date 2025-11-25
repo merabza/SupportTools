@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-public class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
+public sealed class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;

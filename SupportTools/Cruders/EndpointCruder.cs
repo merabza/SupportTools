@@ -10,7 +10,7 @@ using SystemToolsShared;
 namespace SupportTools.Cruders;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class EndpointCruder : ParCruder<EndpointModel>
+public sealed class EndpointCruder : ParCruder<EndpointModel>
 {
     // ReSharper disable once ConvertToPrimaryConstructor
     public EndpointCruder(IParametersManager parametersManager,

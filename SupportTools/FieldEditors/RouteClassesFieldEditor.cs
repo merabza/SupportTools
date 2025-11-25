@@ -8,7 +8,7 @@
 
 //namespace SupportTools.FieldEditors;
 
-//public class RouteClassesFieldEditor : FieldEditor<Dictionary<string, RouteClassModel>>
+//public sealed class RouteClassesFieldEditor : FieldEditor<Dictionary<string, RouteClassModel>>
 //{
 //    private readonly ParametersManager _parametersManager;
 

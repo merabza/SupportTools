@@ -9,7 +9,7 @@
 //namespace SupportTools.FieldEditors;
 
 ////RouteClassesFieldEditor
-//public class EndpointsFieldEditor : FieldEditor<Dictionary<string, EndpointModel>>
+//public sealed class EndpointsFieldEditor : FieldEditor<Dictionary<string, EndpointModel>>
 //{
 //    private readonly ParametersManager _parametersManager;
 

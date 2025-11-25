@@ -2,7 +2,7 @@
 
 namespace SupportToolsData.Models;
 
-public class EndpointModel : ItemData
+public sealed class EndpointModel : ItemData
 {
     public string EndpointName { get; set; }
     public string EndpointRoute { get; set; }

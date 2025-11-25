@@ -2,7 +2,7 @@
 
 namespace SupportToolsData.Models;
 
-public class DotnetToolData : ItemData
+public sealed class DotnetToolData : ItemData
 {
     public string? PackageId { get; set; }
     public string? InstalledVersion { get; set; }

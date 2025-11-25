@@ -3,7 +3,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Validators;
 
-public class EndpointModelValidator : AbstractValidator<EndpointModel>
+public sealed class EndpointModelValidator : AbstractValidator<EndpointModel>
 {
     public EndpointModelValidator()
     {

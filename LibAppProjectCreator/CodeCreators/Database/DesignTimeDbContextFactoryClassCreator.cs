@@ -35,7 +35,7 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
                 "ბაზასთან დაკავშირების სტრიქონის გადმოწოდება არასწორია, რადგან მომიწევდა ამ სტრიქონის გამშვები პროექტის კოდში ჩაშენება."),
             new OneLineComment("რაც უსაფრთხოების თვალსაზრისით არასწორია"), string.Empty,
             new CodeBlock(
-                "public class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
+                "public sealed class DesignTimeDbContextFactory<T> : IDesignTimeDbContextFactory<T> where T : DbContext",
                 string.Empty, "private readonly string _assemblyName", "private readonly string _connectionParamName",
                 "private readonly string? _parametersJsonFileName", string.Empty,
                 new CodeBlock(

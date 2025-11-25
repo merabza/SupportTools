@@ -7,7 +7,7 @@ using SupportToolsData.Models;
 namespace SupportTools.Cruders;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class RouteClassCruder : ParCruder<RouteClassModel>
+public sealed class RouteClassCruder : ParCruder<RouteClassModel>
 {
     // ReSharper disable once InconsistentNaming
     private const string api = nameof(api);

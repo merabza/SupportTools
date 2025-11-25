@@ -5,7 +5,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;
 
-public class AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand : CliMenuCommand
+public sealed class AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand : CliMenuCommand
 {
     private readonly ParametersManager _parametersManager;
     private readonly string _projectName;
