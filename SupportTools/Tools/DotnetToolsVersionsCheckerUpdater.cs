@@ -129,7 +129,9 @@ public static class DotnetToolsVersionsCheckerUpdater
     {
         if (string.IsNullOrWhiteSpace(dotnetToolData.PackageId) ||
             string.IsNullOrWhiteSpace(dotnetToolData.LatestVersion) || dotnetToolData.LatestVersion == "N/A" ||
-            dotnetToolData.InstalledVersion == (dotnetToolData.MaxVersion ?? dotnetToolData.LatestVersion))
+            dotnetToolData.InstalledVersion == (string.IsNullOrWhiteSpace(dotnetToolData.MaxVersion)
+                ? dotnetToolData.LatestVersion
+                : dotnetToolData.MaxVersion))
             return false;
         var toolInstalled = dotnetToolData.InstalledVersion != "N/A";
         var command = toolInstalled ? "update" : "install";
