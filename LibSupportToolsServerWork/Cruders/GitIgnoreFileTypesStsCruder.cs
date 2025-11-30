@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using CliParameters;
 using CliParameters.Cruders;
 using CliParameters.FieldEditors;
@@ -103,8 +104,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient
-                .AddGitIgnoreFileTypeNameIfNotExists(recordKey).Result;
+            var updateGitRepoByKeyResult = supportToolsServerApiClient.UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
             if (updateGitRepoByKeyResult.IsSome)
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
         }

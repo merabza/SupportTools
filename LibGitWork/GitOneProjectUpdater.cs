@@ -10,12 +10,12 @@ namespace LibGitWork;
 
 public sealed class GitOneProjectUpdater
 {
-    private readonly GitDataDto _git;
+    private readonly StsGitDataModel _git;
     private readonly ILogger? _logger;
     private readonly string _projectPath;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitOneProjectUpdater(ILogger? logger, string projectPath, GitDataDto git)
+    public GitOneProjectUpdater(ILogger? logger, string projectPath, StsGitDataModel git)
     {
         _logger = logger;
         _projectPath = projectPath;

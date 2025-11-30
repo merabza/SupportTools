@@ -8,7 +8,7 @@ namespace LibGitWork.Helpers;
 public static class GitFolderCountHelper
 {
     public static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder,
-        GitDataDto gitData)
+        StsGitDataModel gitData)
     {
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)

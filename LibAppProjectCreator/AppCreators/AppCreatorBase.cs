@@ -146,7 +146,7 @@ public abstract class AppCreatorBase
         return PrepareSpecific();
     }
 
-    private void AddGitClone(GitDataDto gitData)
+    private void AddGitClone(StsGitDataModel gitData)
     {
         if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress)) return;
 

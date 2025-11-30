@@ -64,7 +64,7 @@ public sealed class GitStsCruder : Cruder
         return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
     }
 
-    private List<GitDataDto> GetGitReposFromServer()
+    private List<StsGitDataModel> GetGitReposFromServer()
     {
         return _memoryCache.GetOrCreate(GitsList, _ =>
         {
@@ -157,7 +157,7 @@ public sealed class GitStsCruder : Cruder
             return;
         }
 
-        var gitDataDomain = new GitDataDto
+        var gitDataDomain = new StsGitDataModel
         {
             GitIgnorePathName = model.GitIgnorePathName,
             GitProjectAddress = model.GitProjectAddress,

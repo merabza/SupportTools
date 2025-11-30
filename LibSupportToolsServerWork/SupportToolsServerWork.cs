@@ -11,7 +11,7 @@ namespace LibSupportToolsServerWork;
 
 public static class SupportToolsServerWork
 {
-    public static List<GitDataDto> GetGitRepos(ILogger logger, IHttpClientFactory httpClientFactory,
+    public static List<StsGitDataModel> GetGitRepos(ILogger logger, IHttpClientFactory httpClientFactory,
         SupportToolsParameters supportToolsParameters)
     {
         try

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
         if (supportToolsServerApiClient == null)
             return false;
 
-        var gitIgnoreFiles = new List<GitIgnoreFileDto>();
+        var gitIgnoreFiles = new List<StsGitIgnoreFileTypeDataModel>();
         foreach (var (key, fileName) in supportToolsParameters.GitIgnoreModelFilePaths)
         {
             string content;
@@ -44,13 +45,13 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
                 content = await File.ReadAllTextAsync(fileName, cancellationToken);
             else
                 content = string.Empty;
-            gitIgnoreFiles.Add(new GitIgnoreFileDto { Name = key, Content = content });
+            gitIgnoreFiles.Add(new StsGitIgnoreFileTypeDataModel { Name = key, Content = content });
         }
 
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
         await supportToolsServerApiClient.UploadGitRepos(
-            new SyncGitRequest { GitIgnoreFiles = gitIgnoreFiles, Gits = gitRepos.Gits }, cancellationToken);
+            new SyncGitRequest { GitIgnoreFiles = gitIgnoreFiles, Gits = gitRepos.Gits.Values.ToList() }, cancellationToken);
 
         ////თითოეული გიტის პროექტი აიტვირთოს სერვერზე
 

@@ -24,7 +24,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
-    private readonly List<GitDataDto> _remoteGitRepos;
+    private readonly List<StsGitDataModel> _remoteGitRepos;
 
     public GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
         Dictionary<string, GitDataModel> currentValuesDictionary) : this(logger, httpClientFactory, parametersManager,
@@ -33,7 +33,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
     }
 
     private GitCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        Dictionary<string, GitDataModel> currentValuesDictionary, List<GitDataDto> remoteGitRepos) : base(
+        Dictionary<string, GitDataModel> currentValuesDictionary, List<StsGitDataModel> remoteGitRepos) : base(
         parametersManager, currentValuesDictionary, "Git", "Gits")
     {
         _logger = logger;
@@ -48,7 +48,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
     public static GitCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {
-        List<GitDataDto> remoteGitRepos = [];
+        List<StsGitDataModel> remoteGitRepos = [];
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         try
         {

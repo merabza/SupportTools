@@ -15,7 +15,7 @@ namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {
-    private readonly GitDataDto _gitData;
+    private readonly StsGitDataModel _gitData;
     private readonly string _gitName;
     private readonly string _gitsFolder;
     private readonly ILogger? _logger;
@@ -23,7 +23,7 @@ public sealed class GitProjectsUpdater
     private readonly SupportToolsParameters _supportToolsParameters;
 
     private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string gitsFolder,
-        GitDataDto gitData, string projectFolderName, string gitName)
+        StsGitDataModel gitData, string projectFolderName, string gitName)
     {
         _logger = logger;
         _supportToolsParameters = supportToolsParameters;

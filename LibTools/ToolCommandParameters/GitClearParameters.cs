@@ -6,13 +6,13 @@ namespace LibTools.ToolCommandParameters;
 public sealed class GitClearParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitClearParameters(GitDataDto gitData, string gitsFolder)
+    public GitClearParameters(StsGitDataModel gitData, string gitsFolder)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
 
-    public GitDataDto GitData { get; }
+    public StsGitDataModel GitData { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()

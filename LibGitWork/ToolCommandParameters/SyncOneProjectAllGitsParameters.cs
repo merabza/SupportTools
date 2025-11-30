@@ -13,7 +13,7 @@ namespace LibGitWork.ToolCommandParameters;
 public sealed class SyncOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitDataDto> gitData,
+    public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<StsGitDataModel> gitData,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
         bool useProjectUpdater)
     {
@@ -26,7 +26,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
     }
 
     public string? ProjectName { get; }
-    public List<GitDataDto> GitData { get; }
+    public List<StsGitDataModel> GitData { get; }
     public Dictionary<EGitCollect, Dictionary<string, List<string>>>? ChangedGitProjects { get; }
     public string GitsFolder { get; }
     public bool IsFirstSync { get; }
