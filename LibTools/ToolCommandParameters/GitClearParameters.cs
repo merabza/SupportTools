@@ -1,18 +1,18 @@
-﻿using LibParameters;
-using SupportToolsServerApiContracts.Models;
+﻿using LibGitWork.Models;
+using LibParameters;
 
 namespace LibTools.ToolCommandParameters;
 
 public sealed class GitClearParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitClearParameters(StsGitDataModel gitData, string gitsFolder)
+    public GitClearParameters(GitData gitData, string gitsFolder)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
 
-    public StsGitDataModel GitData { get; }
+    public GitData GitData { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()

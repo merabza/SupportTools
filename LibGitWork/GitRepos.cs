@@ -2,25 +2,25 @@
 using System.IO;
 using System.Linq;
 using LibGitData.Models;
+using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
 
 public sealed class GitRepos
 {
-    private GitRepos(Dictionary<string, StsGitDataModel> gitRepos)
+    private GitRepos(Dictionary<string, GitData> gitRepos)
     {
         Gits = gitRepos;
     }
 
-    public Dictionary<string, StsGitDataModel> Gits { get; }
+    public Dictionary<string, GitData> Gits { get; }
 
     public static GitRepos Create(ILogger? logger, Dictionary<string, GitDataModel> gitRepos,
         string? spaProjectFolderRelativePath, bool useConsole, bool useGitRecordNameForComplexGitProjectFolderName)
     {
-        Dictionary<string, StsGitDataModel> gits = new();
+        Dictionary<string, GitData> gits = new();
         foreach (var (gitProjectName, gitData) in gitRepos)
         {
             if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
@@ -62,8 +62,8 @@ public sealed class GitRepos
                 }
             }
 
-            gits.Add(
-                gitProjectName, new StsGitDataModel
+            gits.Add(gitProjectName,
+                new GitData
                 {
                     GitProjectAddress = gitData.GitProjectAddress,
                     GitProjectFolderName = gitProjectFolderName,
@@ -75,7 +75,7 @@ public sealed class GitRepos
         return new GitRepos(gits);
     }
 
-    public StsGitDataModel? GetGitRepoByKey(string key)
+    public GitData? GetGitRepoByKey(string key)
     {
         return Gits.FirstOrDefault(git => git.Value.GitProjectName == key).Value;
     }

@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using CodeTools;
+﻿using CodeTools;
 using JetBrainsResharperGlobalToolsWork;
 using LibAppProjectCreator.Models;
 using LibDataInput;
@@ -13,10 +6,17 @@ using LibDotnetWork;
 using LibGitData.Domain;
 using LibGitData.Models;
 using LibGitWork;
+using LibGitWork.Models;
 using LibGitWork.ToolActions;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
-using SupportToolsServerApiContracts.Models;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -146,7 +146,7 @@ public abstract class AppCreatorBase
         return PrepareSpecific();
     }
 
-    private void AddGitClone(StsGitDataModel gitData)
+    private void AddGitClone(GitData gitData)
     {
         if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress)) return;
 

@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 using LibDataInput;
+using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using SqlServerDbTools.Errors;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared.Errors;
 
 namespace LibGitWork;
 
 public sealed class GitOneProjectUpdater
 {
-    private readonly StsGitDataModel _git;
+    private readonly GitData _git;
     private readonly ILogger? _logger;
     private readonly string _projectPath;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitOneProjectUpdater(ILogger? logger, string projectPath, StsGitDataModel git)
+    public GitOneProjectUpdater(ILogger? logger, string projectPath, GitData git)
     {
         _logger = logger;
         _projectPath = projectPath;

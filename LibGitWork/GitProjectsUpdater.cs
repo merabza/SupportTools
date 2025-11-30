@@ -5,17 +5,17 @@ using System.Linq;
 using System.Xml.Linq;
 using LibGitData.Models;
 using LibGitWork.Helpers;
+using LibGitWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork;
 
 public sealed class GitProjectsUpdater
 {
-    private readonly StsGitDataModel _gitData;
+    private readonly GitData _gitData;
     private readonly string _gitName;
     private readonly string _gitsFolder;
     private readonly ILogger? _logger;
@@ -23,7 +23,7 @@ public sealed class GitProjectsUpdater
     private readonly SupportToolsParameters _supportToolsParameters;
 
     private GitProjectsUpdater(ILogger? logger, SupportToolsParameters supportToolsParameters, string gitsFolder,
-        StsGitDataModel gitData, string projectFolderName, string gitName)
+        GitData gitData, string projectFolderName, string gitName)
     {
         _logger = logger;
         _supportToolsParameters = supportToolsParameters;
@@ -95,7 +95,6 @@ public sealed class GitProjectsUpdater
 
         //გავიაროთ projectFolderName ფოლდერი, თავისი ქვეფოლდერებით და მოვძებნოთ *.csproj ფაილები
     }
-
 
     //private GitProcessor? UpdateOneGitProject(string projectFolderName, GitDataDomain git)
     //{

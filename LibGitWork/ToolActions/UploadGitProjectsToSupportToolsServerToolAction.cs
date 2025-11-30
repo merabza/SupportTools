@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using LibGitWork.Mappers;
 using LibParameters;
 using LibToolActions;
 using Microsoft.Extensions.Logging;
@@ -51,7 +52,11 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
         await supportToolsServerApiClient.UploadGitRepos(
-            new SyncGitRequest { GitIgnoreFiles = gitIgnoreFiles, Gits = gitRepos.Gits.Values.ToList() }, cancellationToken);
+            new SyncGitRequest
+            {
+                GitIgnoreFiles = gitIgnoreFiles,
+                Gits = gitRepos.Gits.Values.Select(g => g.ToContractModel()).ToList()
+            }, cancellationToken);
 
         ////თითოეული გიტის პროექტი აიტვირთოს სერვერზე
 

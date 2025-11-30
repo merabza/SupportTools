@@ -1,14 +1,13 @@
 ﻿using System.IO;
+using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork.Helpers;
 
 public static class GitFolderCountHelper
 {
-    public static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder,
-        StsGitDataModel gitData)
+    public static string? GetProjectFolderName(ILogger? logger, string workFolder, string gitsFolder, GitData gitData)
     {
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         if (FileStat.CreateFolderIfNotExists(workFolder, true) == null)

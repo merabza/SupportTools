@@ -1,9 +1,9 @@
 ﻿using LibGitData;
 using LibGitData.Models;
+using LibGitWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
@@ -11,13 +11,13 @@ namespace LibGitWork.ToolCommandParameters;
 public sealed class GitSyncParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSyncParameters(StsGitDataModel gitData, string gitsFolder)
+    public GitSyncParameters(GitData gitData, string gitsFolder)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
     }
 
-    public StsGitDataModel GitData { get; }
+    public GitData GitData { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()

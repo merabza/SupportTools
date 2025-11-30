@@ -3,10 +3,10 @@ using System.Linq;
 using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
+using LibGitWork.Models;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
-using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 
 namespace LibTools.ToolCommandParameters;
@@ -14,7 +14,7 @@ namespace LibTools.ToolCommandParameters;
 public sealed class ClearOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    private ClearOneProjectAllGitsParameters(string gitsFolder, List<StsGitDataModel> gitData)
+    private ClearOneProjectAllGitsParameters(string gitsFolder, List<GitData> gitData)
     {
         //ProjectName = projectName;
         GitData = gitData;
@@ -22,7 +22,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
     }
 
     //public string? ProjectName { get; }
-    public List<StsGitDataModel> GitData { get; }
+    public List<GitData> GitData { get; }
     public string GitsFolder { get; }
 
     public bool CheckBeforeSave()
