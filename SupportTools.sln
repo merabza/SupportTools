@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11222.15 d18.0
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConnectionTools", "ConnectionTools", "{0A12B1B2-6614-4BD3-A5A3-419895E665A9}"
 EndProject
@@ -148,8 +148,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibCodeGenerator", "LibCodeGenerator\LibCodeGenerator.csproj", "{C60025BE-8491-40A2-9007-7E3A8890E57B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliParameters.Tests", "..\AppCliTools\CliParameters.Tests\CliParameters.Tests.csproj", "{04AA605F-2CA0-350E-547A-50125C14EA34}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibGitMappers", "LibGitMappers\LibGitMappers.csproj", "{224EB0D6-BAAB-4D4F-9A46-DB9F63E30CD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -409,10 +407,6 @@ Global
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Release|Any CPU.Build.0 = Release|Any CPU
-		{224EB0D6-BAAB-4D4F-9A46-DB9F63E30CD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{224EB0D6-BAAB-4D4F-9A46-DB9F63E30CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{224EB0D6-BAAB-4D4F-9A46-DB9F63E30CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{224EB0D6-BAAB-4D4F-9A46-DB9F63E30CD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
