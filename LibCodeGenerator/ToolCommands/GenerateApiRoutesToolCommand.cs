@@ -143,7 +143,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             var classNamespace = $"{apiContractsProjectName}.{versionFolderName}.{Routes}";
 
             var routesClassCreator = new RoutesClassCreator(_logger, versionApiRouteFolderPath, classNamespace,
-                versionApiRouteClassFileName, versionApiRouteClassFileName, version,root,
+                versionApiRouteClassFileName, versionApiRouteClassFileName, version, root,
                 project.RouteClasses.Values.Where(x => x.Version == version && x.Root == root), project.Endpoints);
             routesClassCreator.CreateFileStructure();
         }

@@ -144,10 +144,10 @@ public sealed class ApiAppCreator : AppCreatorBase
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
         var programClassCreator = new ApiProgramClassCreator(Logger, _apiAppCreatorData.MainProjectData.ProjectFullPath,
-            ProjectName, keyPart1, _apiAppCreatorData.MediatRLicenseKey, _apiAppCreatorData.UseDatabase, _apiAppCreatorData.UseCarcass,
-            _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter, _apiAppCreatorData.UseSignalR,
-            _apiAppCreatorData.UseFluentValidation, _apiAppCreatorData.UseReact, _apiAppCreatorData.DbPartProjectName,
-            "Program.cs");
+            ProjectName, keyPart1, _apiAppCreatorData.MediatRLicenseKey, _apiAppCreatorData.UseDatabase,
+            _apiAppCreatorData.UseCarcass, _apiAppCreatorData.UseIdentity, _apiAppCreatorData.UseReCounter,
+            _apiAppCreatorData.UseSignalR, _apiAppCreatorData.UseFluentValidation, _apiAppCreatorData.UseReact,
+            _apiAppCreatorData.DbPartProjectName, "Program.cs");
         programClassCreator.CreateFileStructure();
 
         var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];

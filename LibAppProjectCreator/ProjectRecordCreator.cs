@@ -247,10 +247,9 @@ internal sealed class ProjectRecordCreator
                 Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
                     _newProjectName),
             MainProjectName = _newProjectName,
-            MigrationStartupProjectFilePath =
-                Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-                    scaffoldSeederProjectName, fakeHostProjectName,
-                    $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
+            MigrationStartupProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
+                scaffoldSeederProjectName, scaffoldSeederProjectName, fakeHostProjectName,
+                $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
             //SolutionFileNameWithMigrationProject =
             //    Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
             //        scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),

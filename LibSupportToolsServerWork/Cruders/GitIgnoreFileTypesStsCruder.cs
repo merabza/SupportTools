@@ -104,7 +104,8 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient.UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
+            var updateGitRepoByKeyResult = supportToolsServerApiClient
+                .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
             if (updateGitRepoByKeyResult.IsSome)
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
         }

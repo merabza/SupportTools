@@ -13,8 +13,8 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
     private readonly JObject _appSettingsJsonJObject;
     private readonly List<string> _forEncodeAppSettingsJsonKeys;
     private readonly string _projectNamespace;
-    private readonly JObject _userSecretJsonJObject;
     private readonly bool _useServerCarcass;
+    private readonly JObject _userSecretJsonJObject;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseInstallerClassCreator(ILogger logger, string placePath, string projectNamespace,

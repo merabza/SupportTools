@@ -22,8 +22,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public ProjectNpmPackagesLisCruder(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, List<string> currentValuesList) : base("Npm Package",
-        "Npm Packages")
+        IParametersManager parametersManager, List<string> currentValuesList) : base("Npm Package", "Npm Packages")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -62,7 +61,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
         cruderSubMenuSet.AddMenuItem(new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger, _httpClientFactory,
-            _parametersManager));//_projectName
+            _parametersManager)); //_projectName
 
         ////Check versions for All Tools
         //var checkDotnetToolsVersionsCommand = new CheckDotnetToolsVersionsCliMenuCommand(ParametersManager);

@@ -18,7 +18,8 @@ public static class GitHelper
         return !string.IsNullOrWhiteSpace(result);
     }
 
-    public static async Task<bool> UpdateTestFolderAsync(string testFolderPath, CancellationToken cancellationToken = default)
+    public static async Task<bool> UpdateTestFolderAsync(string testFolderPath,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(testFolderPath) || !Directory.Exists(testFolderPath))
             throw new ArgumentException("Invalid test folder path.", nameof(testFolderPath));
@@ -41,7 +42,8 @@ public static class GitHelper
         return diffResult;
     }
 
-    private static async Task<string> RunGitCommandAsync(string arguments, string workingDirectory, CancellationToken cancellationToken = default)
+    private static async Task<string> RunGitCommandAsync(string arguments, string workingDirectory,
+        CancellationToken cancellationToken = default)
     {
         var psi = new ProcessStartInfo
         {

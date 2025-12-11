@@ -295,7 +295,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         //dotnetProcessor.Restore(databaseScaffoldClassLibProjectFileFullName);
         var restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
-        if (restoreResult.IsSome) 
+        if (restoreResult.IsSome)
             return false;
         return dotnetProcessor.EfDatabaseScaffold(databaseScaffoldClassLibProjectFileFullName,
             prodCopyDatabaseConnectionString, providerPackageName, createProjectSeederCodeProjectFileFullName,

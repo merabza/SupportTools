@@ -17,8 +17,8 @@ public static class ApiContractsProjectFinder
         var csprojFiles = Directory.GetFiles(projectFolder, "*.csproj", SearchOption.AllDirectories);
 
         // Find the first .csproj file matching the projectApiContractsProjectName
-        var targetCsproj = csprojFiles
-            .FirstOrDefault(f => Path.GetFileNameWithoutExtension(f)
+        var targetCsproj = csprojFiles.FirstOrDefault(f =>
+            Path.GetFileNameWithoutExtension(f)
                 .Equals(projectApiContractsProjectName, StringComparison.OrdinalIgnoreCase));
 
         return targetCsproj;

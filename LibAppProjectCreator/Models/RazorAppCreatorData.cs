@@ -7,8 +7,8 @@ namespace LibAppProjectCreator.Models;
 public sealed class RazorAppCreatorData
 {
     private RazorAppCreatorData(AppCreatorBaseData appCreatorBaseData, ProjectForCreate mainProjectData,
-        string? mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase, bool useIdentity, bool useReCounter,
-        bool useSignalR, bool useFluentValidation, string? dbPartProjectName)
+        string? mediatRLicenseKey, bool useReact, bool useCarcass, bool useDatabase, bool useIdentity,
+        bool useReCounter, bool useSignalR, bool useFluentValidation, string? dbPartProjectName)
     {
         MainProjectData = mainProjectData;
         AppCreatorBaseData = appCreatorBaseData;
@@ -49,8 +49,8 @@ public sealed class RazorAppCreatorData
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,
             EDotnetProjectType.Console, string.Empty, "Program", [.. projectFolders]);
 
-        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, mediatRLicenseKey,
-            template.UseReact, template.UseCarcass, template.UseDatabase, template.UseIdentity, template.UseReCounter,
-            template.UseSignalR, template.UseFluentValidation, dbPartProjectName);
+        return new RazorAppCreatorData(appCreatorBaseData, mainProjectData, mediatRLicenseKey, template.UseReact,
+            template.UseCarcass, template.UseDatabase, template.UseIdentity, template.UseReCounter, template.UseSignalR,
+            template.UseFluentValidation, dbPartProjectName);
     }
 }

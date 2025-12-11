@@ -93,3 +93,4 @@
 //    public StsGitDataModel ToolsManagementGit { get; } //ინსტრუმენტებთან სამუშაო პროექტები
 //    public StsGitDataModel WebSystemToolsGit { get; } //ინსტალერების ნაკრები
 //}
+

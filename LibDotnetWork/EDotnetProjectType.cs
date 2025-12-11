@@ -13,12 +13,12 @@ public enum EDotnetProjectType
 17-nov-2025
 
 dotnet --version
-   
+
 10.0.100
 
 dotnet new list
    These templates matched your input:
-   
+
    Template Name                                 Short Name                          Language    Tags
    --------------------------------------------  ----------------------------------  ----------  -----------------------------------------------------------------------------
    .NET MAUI App                                 maui                                [C#]        MAUI/Android/iOS/macOS/Mac Catalyst/Windows/Mobile/Tizen

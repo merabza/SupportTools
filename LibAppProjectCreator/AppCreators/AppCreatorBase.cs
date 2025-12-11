@@ -1,4 +1,11 @@
-﻿using CodeTools;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using CodeTools;
 using JetBrainsResharperGlobalToolsWork;
 using LibAppProjectCreator.Models;
 using LibDataInput;
@@ -10,13 +17,6 @@ using LibGitWork.Models;
 using LibGitWork.ToolActions;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -25,13 +25,12 @@ namespace LibAppProjectCreator.AppCreators;
 
 public abstract class AppCreatorBase
 {
-    private readonly GitRepos _gitRepos;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly int _indentSize;
-
     protected readonly GitProjects GitProjects;
     protected readonly ILogger Logger;
     protected readonly string ProjectName;
+    private readonly GitRepos _gitRepos;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly int _indentSize;
 
     protected AppCreatorBase(ILogger logger, IHttpClientFactory httpClientFactory, string projectName, int indentSize,
         GitProjects gitProjects, GitRepos gitRepos, string workPath, string securityPath, string solutionPath)
