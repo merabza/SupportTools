@@ -11,8 +11,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
+using SupportToolsServerApiContracts.Models;
 using SystemToolsShared;
 using SystemToolsShared.Errors;
+using Enumerable = System.Linq.Enumerable;
 
 namespace LibSupportToolsServerWork.Cruders;
 
@@ -43,8 +45,8 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
-        return GetGitIgnoreFileTypesListFromServer().Select(s => new { key = s, val = s }).ToDictionary(k => k.key,
-            ItemData (v) => new TextItemData { Text = v.val });
+        return Enumerable.ToDictionary(GetGitIgnoreFileTypesListFromServer(), k => k.Name,
+            ItemData (v) => new TextItemData { Text = v.Name });
     }
 
     private SupportToolsServerApiClient? GetSupportToolsServerApiClient()
@@ -54,7 +56,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         return supportToolsParameters.GetSupportToolsServerApiClient(_logger, _httpClientFactory);
     }
 
-    private List<string> GetGitIgnoreFileTypesListFromServer()
+    private List<StsGitIgnoreFileTypeDataModel> GetGitIgnoreFileTypesListFromServer()
     {
         return _memoryCache.GetOrCreate(GitIgnoreFileTypesList, _ =>
         {
@@ -84,7 +86,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     public override bool ContainsRecordWithKey(string recordKey)
     {
         var gitIgnoreModelFilePaths = GetGitIgnoreFileTypesListFromServer();
-        return gitIgnoreModelFilePaths.Contains(recordKey);
+        return gitIgnoreModelFilePaths.Any(x=>x.Name == recordKey);
     }
 
     public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
