@@ -30,6 +30,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? TempFolder { get; set; }
     public string? CodeGenerateTestFolder { get; set; }
     public string? SecurityFolder { get; set; }
+    public string? GitIgnoreFilesFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }
     public string? PublisherWorkFolder { get; set; }
     public string? ServiceDescriptionSignature { get; set; }

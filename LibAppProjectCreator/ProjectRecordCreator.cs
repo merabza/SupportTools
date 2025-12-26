@@ -91,7 +91,7 @@ internal sealed class ProjectRecordCreator
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.WorkFolder))
         {
-            StShared.WriteErrorLine("supportToolsParameters.SecurityFolder is empty", true, _logger);
+            StShared.WriteErrorLine("supportToolsParameters.WorkFolder is empty", true, _logger);
             return false;
         }
 
