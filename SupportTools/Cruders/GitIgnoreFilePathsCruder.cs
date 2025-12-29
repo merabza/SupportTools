@@ -6,6 +6,7 @@ using LibGitData;
 using LibParameters;
 using Microsoft.Extensions.Logging;
 using SupportTools.CliMenuCommands;
+using SupportTools.CliMenuCommands.GitIgnoreFileTypes;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -47,6 +48,9 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         cruderSubMenuSet.AddMenuItem(updateGitIgnoreFilesCliMenuCommand);
 
         var generateCommand = new GenerateStandardGitignoreFilesCliMenuCommand(_logger, _parametersManager);
+        cruderSubMenuSet.AddMenuItem(generateCommand);
+
+        var syncUpCommand = new SyncUpGitignoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
     }
 

@@ -5,16 +5,16 @@ using Microsoft.Extensions.Logging;
 using SupportTools.Generators;
 using SupportToolsData.Models;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.CliMenuCommands.GitIgnoreFileTypes;
 
-public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuCommand
+public sealed class SyncUpGitignoreFilesCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateStandardGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        "Generate standard .gitignore files...", EMenuAction.Reload)
+    public SyncUpGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
+        "Sync Up .gitignore files...", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -22,7 +22,9 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
 
     protected override bool RunBody()
     {
-        if (!Inputer.InputBool("This process will change .gitignore records, are you sure?", false, false))
+        if (!Inputer.InputBool(
+                "This process will upload .gitignore records to server. Not Match records on the server will be deleted, New records will be created. Existing records will be modified as needed. are you sure?",
+                false, false))
             return false;
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;

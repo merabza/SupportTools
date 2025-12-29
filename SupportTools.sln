@@ -149,6 +149,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibCodeGenerator", "LibCode
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliParameters.Tests", "..\AppCliTools\CliParameters.Tests\CliParameters.Tests.csproj", "{04AA605F-2CA0-350E-547A-50125C14EA34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportTools.Domain", "SupportTools.Domain\SupportTools.Domain.csproj", "{8D3F07CB-A509-4D90-9551-B225D2989DA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportTools.Repositories", "SupportTools.Repositories\SupportTools.Repositories.csproj", "{BB2C9D09-8CAC-473F-841D-1E607B29DDC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -407,6 +411,14 @@ Global
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04AA605F-2CA0-350E-547A-50125C14EA34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D3F07CB-A509-4D90-9551-B225D2989DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D3F07CB-A509-4D90-9551-B225D2989DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D3F07CB-A509-4D90-9551-B225D2989DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D3F07CB-A509-4D90-9551-B225D2989DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB2C9D09-8CAC-473F-841D-1E607B29DDC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB2C9D09-8CAC-473F-841D-1E607B29DDC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB2C9D09-8CAC-473F-841D-1E607B29DDC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB2C9D09-8CAC-473F-841D-1E607B29DDC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
