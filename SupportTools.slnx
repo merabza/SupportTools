@@ -1,0 +1,87 @@
+<Solution>
+  <Folder Name="/AppCliTools/">
+    <Project Path="../AppCliTools/CliMenu.Tests/CliMenu.Tests.csproj" />
+    <Project Path="../AppCliTools/CliMenu/CliMenu.csproj" />
+    <Project Path="../AppCliTools/CliParameters.Tests/CliParameters.Tests.csproj" />
+    <Project Path="../AppCliTools/CliParameters/CliParameters.csproj" />
+    <Project Path="../AppCliTools/CliParametersApiClientsEdit/CliParametersApiClientsEdit.csproj" />
+    <Project Path="../AppCliTools/CliParametersDataEdit/CliParametersDataEdit.csproj" />
+    <Project Path="../AppCliTools/CliParametersEdit/CliParametersEdit.csproj" />
+    <Project Path="../AppCliTools/CliTools/CliTools.csproj" />
+    <Project Path="../AppCliTools/CodeTools/CodeTools.csproj" />
+    <Project Path="../AppCliTools/DbContextAnalyzer/DbContextAnalyzer.csproj" />
+    <Project Path="../AppCliTools/LibDataInput/LibDataInput.csproj" />
+    <Project Path="../AppCliTools/LibMenuInput/LibMenuInput.csproj" />
+    <Project Path="../AppCliTools/LibSeedCodeCreator/LibSeedCodeCreator.csproj" />
+  </Folder>
+  <Folder Name="/BackendCarcass/">
+    <Project Path="../BackendCarcass/CarcassDb/CarcassDb.csproj" />
+    <Project Path="../BackendCarcass/CarcassMasterDataDom/CarcassMasterDataDom.csproj" />
+    <Project Path="../BackendCarcass/LibCrud/LibCrud.csproj" />
+  </Folder>
+  <Folder Name="/BackendCarcassShared/">
+    <Project Path="../BackendCarcassShared/BackendCarcassContracts/BackendCarcassContracts.csproj" />
+  </Folder>
+  <Folder Name="/ConnectionTools/">
+    <Project Path="../ConnectionTools/ConnectTools/ConnectTools.csproj" />
+    <Project Path="../ConnectionTools/CToolsFactory/CToolsFactory.csproj" />
+    <Project Path="../ConnectionTools/FTPTools/FTPTools.csproj" />
+  </Folder>
+  <Folder Name="/DatabaseTools/">
+    <Project Path="../DatabaseTools/DbTools/DbTools.csproj" />
+    <Project Path="../DatabaseTools/DbToolsFactory/DbToolsFactory.csproj" />
+    <Project Path="../DatabaseTools/OleDbTools/OleDbTools.csproj" />
+    <Project Path="../DatabaseTools/SqLiteDbTools/SqLiteDbTools.csproj" />
+    <Project Path="../DatabaseTools/SqlServerDbTools/SqlServerDbTools.csproj" />
+  </Folder>
+  <Folder Name="/ParametersManagement/">
+    <Project Path="../ParametersManagement/LibApiClientParameters/LibApiClientParameters.csproj" />
+    <Project Path="../ParametersManagement/LibDatabaseParameters/LibDatabaseParameters.csproj" />
+    <Project Path="../ParametersManagement/LibFileParameters/LibFileParameters.csproj" />
+    <Project Path="../ParametersManagement/LibParameters/LibParameters.csproj" />
+  </Folder>
+  <Folder Name="/SupportToolsServerShared/">
+    <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
+  </Folder>
+  <Folder Name="/SystemTools/">
+    <Project Path="../SystemTools/ApiContracts/ApiContracts.csproj" />
+    <Project Path="../SystemTools/DatabaseToolsShared.Tests/DatabaseToolsShared.Tests.csproj" />
+    <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
+    <Project Path="../SystemTools/JetBrainsResharperGlobalToolsWork/JetBrainsResharperGlobalToolsWork.csproj" />
+    <Project Path="../SystemTools/ReCounterContracts/ReCounterContracts.csproj" />
+    <Project Path="../SystemTools/RepositoriesDom.Tests/RepositoriesDom.Tests.csproj" />
+    <Project Path="../SystemTools/RepositoriesDom/RepositoriesDom.csproj" />
+    <Project Path="../SystemTools/StringMessagesApiContracts.Tests/StringMessagesApiContracts.Tests.csproj" />
+    <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
+    <Project Path="../SystemTools/SystemToolsShared.Tests/SystemToolsShared.Tests.csproj" />
+    <Project Path="../SystemTools/SystemToolsShared/SystemToolsShared.csproj" />
+    <Project Path="../SystemTools/TestApiContracts/TestApiContracts.csproj" />
+  </Folder>
+  <Folder Name="/ToolsManagement/">
+    <Project Path="../ToolsManagement/ApiClientsManagement/ApiClientsManagement.csproj" />
+    <Project Path="../ToolsManagement/CompressionManagement/CompressionManagement.csproj" />
+    <Project Path="../ToolsManagement/DatabasesManagement/DatabasesManagement.csproj" />
+    <Project Path="../ToolsManagement/FileManagersMain/FileManagersMain.csproj" />
+    <Project Path="../ToolsManagement/Installer/Installer.csproj" />
+    <Project Path="../ToolsManagement/LibToolActions/LibToolActions.csproj" />
+  </Folder>
+  <Folder Name="/WebAgentContracts/">
+    <Project Path="../WebAgentContracts/WebAgentDatabasesApiContracts/WebAgentDatabasesApiContracts.csproj" />
+    <Project Path="../WebAgentContracts/WebAgentProjectsApiContracts/WebAgentProjectsApiContracts.csproj" />
+  </Folder>
+  <Project Path="LibAppInstallWork/LibAppInstallWork.csproj" />
+  <Project Path="LibAppProjectCreator/LibAppProjectCreator.csproj" />
+  <Project Path="LibCodeGenerator/LibCodeGenerator.csproj" />
+  <Project Path="LibDatabaseWork/LibDatabaseWork.csproj" />
+  <Project Path="LibDotnetWork/LibDotnetWork.csproj" />
+  <Project Path="LibGitData/LibGitData.csproj" />
+  <Project Path="LibGitWork/LibGitWork.csproj" />
+  <Project Path="LibNpmWork/LibNpmWork.csproj" />
+  <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
+  <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
+  <Project Path="LibTools/LibTools.csproj" />
+  <Project Path="SupportTools.Domain/SupportTools.Domain.csproj" />
+  <Project Path="SupportTools.Repositories/SupportTools.Repositories.csproj" />
+  <Project Path="SupportTools/SupportTools.csproj" />
+  <Project Path="SupportToolsData/SupportToolsData.csproj" />
+</Solution>
