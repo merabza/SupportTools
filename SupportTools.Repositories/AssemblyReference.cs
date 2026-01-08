@@ -1,7 +1,7 @@
 
 using System.Reflection;
 
-namespace SupportToolsServer.Repositories;
+namespace SupportTools.Repositories;
 
 public static class AssemblyReference
 {

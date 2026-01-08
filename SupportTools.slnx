@@ -16,7 +16,7 @@
   </Folder>
   <Folder Name="/BackendCarcass/">
     <Project Path="../BackendCarcass/CarcassDb/CarcassDb.csproj" />
-    <Project Path="../BackendCarcass/CarcassMasterDataDom/CarcassMasterDataDom.csproj" />
+    <Project Path="../BackendCarcass/CarcassMasterData/CarcassMasterData.csproj" />
     <Project Path="../BackendCarcass/LibCrud/LibCrud.csproj" />
   </Folder>
   <Folder Name="/BackendCarcassShared/">
@@ -49,8 +49,7 @@
     <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/JetBrainsResharperGlobalToolsWork/JetBrainsResharperGlobalToolsWork.csproj" />
     <Project Path="../SystemTools/ReCounterContracts/ReCounterContracts.csproj" />
-    <Project Path="../SystemTools/RepositoriesDom.Tests/RepositoriesDom.Tests.csproj" />
-    <Project Path="../SystemTools/RepositoriesDom/RepositoriesDom.csproj" />
+    <Project Path="../SystemTools/RepositoriesAbstraction/RepositoriesAbstraction.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts.Tests/StringMessagesApiContracts.Tests.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
     <Project Path="../SystemTools/SystemToolsShared.Tests/SystemToolsShared.Tests.csproj" />
