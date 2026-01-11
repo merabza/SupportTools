@@ -51,7 +51,6 @@
     <Project Path="../SystemTools/DomainShared/DomainShared.csproj" />
     <Project Path="../SystemTools/JetBrainsResharperGlobalToolsWork/JetBrainsResharperGlobalToolsWork.csproj" />
     <Project Path="../SystemTools/ReCounterContracts/ReCounterContracts.csproj" />
-    <Project Path="../SystemTools/RepositoriesAbstraction/RepositoriesAbstraction.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts.Tests/StringMessagesApiContracts.Tests.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
     <Project Path="../SystemTools/SystemToolsShared.Tests/SystemToolsShared.Tests.csproj" />
