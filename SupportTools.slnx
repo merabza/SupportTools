@@ -1,8 +1,6 @@
 <Solution>
   <Folder Name="/AppCliTools/">
-    <Project Path="../AppCliTools/CliMenu.Tests/CliMenu.Tests.csproj" />
     <Project Path="../AppCliTools/CliMenu/CliMenu.csproj" />
-    <Project Path="../AppCliTools/CliParameters.Tests/CliParameters.Tests.csproj" />
     <Project Path="../AppCliTools/CliParameters/CliParameters.csproj" />
     <Project Path="../AppCliTools/CliParametersApiClientsEdit/CliParametersApiClientsEdit.csproj" />
     <Project Path="../AppCliTools/CliParametersDataEdit/CliParametersDataEdit.csproj" />
@@ -46,14 +44,11 @@
   </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/ApiContracts/ApiContracts.csproj" />
-    <Project Path="../SystemTools/DatabaseToolsShared.Tests/DatabaseToolsShared.Tests.csproj" />
     <Project Path="../SystemTools/DatabaseToolsShared/DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/DomainShared/DomainShared.csproj" />
     <Project Path="../SystemTools/JetBrainsResharperGlobalToolsWork/JetBrainsResharperGlobalToolsWork.csproj" />
     <Project Path="../SystemTools/ReCounterContracts/ReCounterContracts.csproj" />
-    <Project Path="../SystemTools/StringMessagesApiContracts.Tests/StringMessagesApiContracts.Tests.csproj" />
     <Project Path="../SystemTools/StringMessagesApiContracts/StringMessagesApiContracts.csproj" />
-    <Project Path="../SystemTools/SystemToolsShared.Tests/SystemToolsShared.Tests.csproj" />
     <Project Path="../SystemTools/SystemToolsShared/SystemToolsShared.csproj" />
     <Project Path="../SystemTools/TestApiContracts/TestApiContracts.csproj" />
   </Folder>
