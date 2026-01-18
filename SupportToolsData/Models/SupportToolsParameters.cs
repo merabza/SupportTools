@@ -76,18 +76,20 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public SupportToolsServerApiClient? GetSupportToolsServerApiClient(ILogger? logger,
         IHttpClientFactory httpClientFactory)
     {
-        //დავადგინოთ არის თუ არა მითითებული SupportToolsServer-ის აპი კლიენტის სახელი პარამეტრებში (SupportToolsServerWebApiClientName)
-        var supportToolsServerWebApiClientName = SupportToolsServerWebApiClientName;
-        if (string.IsNullOrWhiteSpace(supportToolsServerWebApiClientName))
-        {
-            StShared.WriteErrorLine("supportToolsServerWebApiClientName does not specified", true);
-            return null;
-        }
+        ////დავადგინოთ არის თუ არა მითითებული SupportToolsServer-ის აპი კლიენტის სახელი პარამეტრებში (SupportToolsServerWebApiClientName)
+        //var supportToolsServerWebApiClientName = SupportToolsServerWebApiClientName;
+        //if (string.IsNullOrWhiteSpace(supportToolsServerWebApiClientName))
+        //{
+        //    StShared.WriteErrorLine("supportToolsServerWebApiClientName does not specified", true);
+        //    return null;
+        //}
 
-        var supportToolsServerWebApiClient = GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
+        //var supportToolsServerWebApiClient = GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
 
-        return new SupportToolsServerApiClient(logger, httpClientFactory, supportToolsServerWebApiClient.Server,
-            supportToolsServerWebApiClient.ApiKey, true);
+        //return new SupportToolsServerApiClient(logger, httpClientFactory, supportToolsServerWebApiClient.Server,
+        //    supportToolsServerWebApiClient.ApiKey, true);
+
+        return null;
     }
 
     public string GetUploadTempExtension()

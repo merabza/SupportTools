@@ -52,7 +52,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         try
         {
-            var supportToolsServerApiClient =
+            var supportToolsServerApiClient = 
                 supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
 
             if (supportToolsServerApiClient is null)
