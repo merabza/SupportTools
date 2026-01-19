@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CliMenu;
+using AppCliTools.CliMenu;
+using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibAppProjectCreator.CodeCreators;
-using LibDataInput;
-using LibMenuInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.Models;
 

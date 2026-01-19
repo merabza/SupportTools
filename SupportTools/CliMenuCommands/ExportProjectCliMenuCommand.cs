@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
-using CliMenu;
-using LibDataInput;
-using LibMenuInput;
+using AppCliTools.CliMenu;
+using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using Newtonsoft.Json;
 using ParametersManagement.LibParameters;
 using SupportTools.Models;

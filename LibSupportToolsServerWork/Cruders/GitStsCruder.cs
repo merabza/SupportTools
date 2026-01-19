@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using CliMenu;
-using CliParameters.Cruders;
-using CliParameters.FieldEditors;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.Cruders;
+using AppCliTools.CliParameters.FieldEditors;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Caching.Memory;

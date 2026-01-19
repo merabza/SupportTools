@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using CliMenu;
-using LibMenuInput;
+using AppCliTools.CliMenu;
+using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;

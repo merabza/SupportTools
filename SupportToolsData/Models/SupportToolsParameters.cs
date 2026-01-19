@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using CliTools;
+using AppCliTools.CliTools;
 using LibGitData;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;

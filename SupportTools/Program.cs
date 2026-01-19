@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net.Http;
-using CliParameters;
+using AppCliTools.CliParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

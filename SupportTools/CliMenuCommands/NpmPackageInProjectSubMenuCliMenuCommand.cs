@@ -1,7 +1,7 @@
 ﻿using System;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using LibDataInput;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.LibDataInput;
 using ParametersManagement.LibParameters;
 
 namespace SupportTools.CliMenuCommands;

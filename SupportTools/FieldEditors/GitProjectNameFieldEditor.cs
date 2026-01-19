@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using CliParameters.FieldEditors;
-using LibDataInput;
-using LibMenuInput;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 

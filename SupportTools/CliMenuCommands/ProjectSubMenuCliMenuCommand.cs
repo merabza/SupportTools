@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using LibDataInput;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;

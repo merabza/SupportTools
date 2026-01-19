@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliParameters;
-using CliParameters.FieldEditors;
+using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;

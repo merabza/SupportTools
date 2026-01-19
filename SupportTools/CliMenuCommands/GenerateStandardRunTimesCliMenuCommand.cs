@@ -1,5 +1,5 @@
-﻿using CliMenu;
-using LibDataInput;
+﻿using AppCliTools.CliMenu;
+using AppCliTools.LibDataInput;
 using ParametersManagement.LibFileParameters.Interfaces;
 using ParametersManagement.LibParameters;
 using SupportTools.Generators;

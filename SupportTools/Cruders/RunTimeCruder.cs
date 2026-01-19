@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using CliMenu;
-using CliParameters.Cruders;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.Cruders;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;

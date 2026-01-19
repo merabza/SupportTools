@@ -1,6 +1,6 @@
 //Created by ProjectParametersClassCreator at 5/9/2021 13:38:34
 
-using CliParametersDataEdit;
+using AppCliTools.CliParametersDataEdit;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;

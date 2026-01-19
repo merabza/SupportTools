@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Threading;
-using LibDataInput;
+using AppCliTools.LibDataInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.ToolActions;
 using SupportToolsData.Models;

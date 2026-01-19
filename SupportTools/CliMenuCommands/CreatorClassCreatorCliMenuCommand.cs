@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CliMenu;
-using CodeTools;
+using AppCliTools.CliMenu;
+using AppCliTools.CodeTools;
+using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibAppProjectCreator.CodeCreators;
-using LibDataInput;
-using LibMenuInput;
 using Microsoft.Extensions.Logging;
 using SupportTools.Models;
 

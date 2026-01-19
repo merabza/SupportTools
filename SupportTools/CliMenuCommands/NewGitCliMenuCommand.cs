@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using CliMenu;
+using AppCliTools.CliMenu;
 using LibGitData;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;

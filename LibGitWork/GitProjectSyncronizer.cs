@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LibDataInput;
+using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;

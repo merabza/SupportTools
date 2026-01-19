@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using CliMenu;
-using LibDataInput;
-using LibMenuInput;
+using AppCliTools.CliMenu;
+using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;

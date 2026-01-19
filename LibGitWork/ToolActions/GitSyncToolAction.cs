@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibDataInput;
+using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;

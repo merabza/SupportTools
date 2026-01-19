@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CliParameters;
+using AppCliTools.CliParameters;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.Models;

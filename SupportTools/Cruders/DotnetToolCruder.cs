@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using CliMenu;
-using CliParameters;
-using CliParameters.FieldEditors;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.Tools;

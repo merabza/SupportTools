@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using CliMenu;
-using CliParameters;
-using CliParameters.FieldEditors;
-using CliTools.CliMenuCommands;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.CliTools.CliMenuCommands;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
-using CliMenu;
+using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;

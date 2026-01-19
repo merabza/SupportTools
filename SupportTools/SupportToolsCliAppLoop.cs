@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using CliTools;
-using CliTools.CliMenuCommands;
-using LibDataInput;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.CliTools;
+using AppCliTools.CliTools.CliMenuCommands;
+using AppCliTools.LibDataInput;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;

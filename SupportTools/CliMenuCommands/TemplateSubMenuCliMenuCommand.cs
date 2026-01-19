@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using CliMenu;
-using CliParameters.CliMenuCommands;
-using LibDataInput;
+using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.LibDataInput;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;

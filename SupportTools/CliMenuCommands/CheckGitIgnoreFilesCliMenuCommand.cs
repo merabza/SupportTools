@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using CliMenu;
+using AppCliTools.CliMenu;
 using LibGitWork;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliParametersDataEdit;
+using AppCliTools.CliParametersDataEdit;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CliParameters;
+using AppCliTools.CliParameters;
 using LibCodeGenerator.CodeCreators;
 using LibCodeGenerator.Helpers;
 using LibCodeGenerator.Models;

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using CliParameters;
-using LibMenuInput;
+using AppCliTools.CliParameters;
+using AppCliTools.LibMenuInput;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.ToolActions;

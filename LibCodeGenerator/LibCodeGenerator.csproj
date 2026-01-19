@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
-    <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

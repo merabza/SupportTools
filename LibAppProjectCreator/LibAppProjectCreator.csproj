@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
     <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
     <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />

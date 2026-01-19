@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\CliParametersDataEdit\CliParametersDataEdit.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CodeTools\CodeTools.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\DatabasesManagement\DatabasesManagement.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParametersDataEdit\AppCliTools.CliParametersDataEdit.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

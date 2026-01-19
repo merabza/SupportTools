@@ -1,5 +1,5 @@
-﻿using CliMenu;
-using LibDataInput;
+﻿using AppCliTools.CliMenu;
+using AppCliTools.LibDataInput;
 using LibGitData;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;

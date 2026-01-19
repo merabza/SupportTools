@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using CodeTools;
+using AppCliTools.CodeTools;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
@@ -13,8 +13,8 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
     private readonly JObject _appSettingsJsonJObject;
     private readonly List<string> _forEncodeAppSettingsJsonKeys;
     private readonly string _projectNamespace;
-    private readonly bool _useServerCarcass;
     private readonly JObject _userSecretJsonJObject;
+    private readonly bool _useServerCarcass;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseInstallerClassCreator(ILogger logger, string placePath, string projectNamespace,

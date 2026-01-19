@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using CliParameters;
-using CliParameters.FieldEditors;
+using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 

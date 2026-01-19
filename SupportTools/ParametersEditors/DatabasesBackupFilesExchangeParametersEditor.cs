@@ -1,6 +1,6 @@
-﻿using CliParameters;
-using CliParameters.FieldEditors;
-using CliParametersEdit.FieldEditors;
+﻿using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.CliParametersEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
