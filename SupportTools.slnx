@@ -13,10 +13,10 @@
     <Project Path="../AppCliTools/AppCliTools.LibSeedCodeCreator/AppCliTools.LibSeedCodeCreator.csproj" />
   </Folder>
   <Folder Name="/BackendCarcass/">
-    <Project Path="../BackendCarcass/Carcass.Database/Carcass.Database.csproj" />
-    <Project Path="../BackendCarcass/CarcassDb/CarcassDb.csproj" />
-    <Project Path="../BackendCarcass/CarcassMasterData/CarcassMasterData.csproj" />
-    <Project Path="../BackendCarcass/LibCrud/LibCrud.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.Database/BackendCarcass.Database.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.Db/BackendCarcass.Db.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.LibCrud/BackendCarcass.LibCrud.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.MasterData/BackendCarcass.MasterData.csproj" />
   </Folder>
   <Folder Name="/BackendCarcassShared/">
     <Project Path="../BackendCarcassShared/BackendCarcassContracts/BackendCarcassContracts.csproj" />
