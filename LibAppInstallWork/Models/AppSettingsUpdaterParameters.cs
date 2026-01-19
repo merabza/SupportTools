@@ -1,12 +1,12 @@
 //Created by ProjectParametersClassCreator at 1/11/2021 20:04:36
 
 using System.Threading;
-using Installer.Domain;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
+using ToolsManagement.Installer.Domain;
 
 namespace LibAppInstallWork.Models;
 
