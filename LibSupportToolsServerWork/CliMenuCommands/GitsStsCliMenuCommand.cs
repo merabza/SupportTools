@@ -1,9 +1,9 @@
 ﻿using System.Net.Http;
 using CliMenu;
-using LibParameters;
 using LibSupportToolsServerWork.Cruders;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 

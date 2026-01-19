@@ -9,9 +9,13 @@
     <ProjectReference Include="..\..\AppCliTools\CliTools\CliTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibDatabaseParameters\LibDatabaseParameters.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibFileParameters\LibFileParameters.csproj" />
+    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibDatabaseParameters\ParametersManagement.LibDatabaseParameters.csproj" />
+    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibFileParameters\ParametersManagement.LibFileParameters.csproj" />
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ApiClientsManagement\ApiClientsManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\Installer\Installer.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.ApiClientsManagement\ToolsManagement.ApiClientsManagement.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
     <ProjectReference Include="..\LibGitData\LibGitData.csproj" />
   </ItemGroup>
 

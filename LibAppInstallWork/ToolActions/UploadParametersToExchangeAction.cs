@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using FileManagersMain;
-using LibFileParameters.Models;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibFileParameters.Models;
 using SupportToolsData.Models;
+using ToolsManagement.FileManagersMain;
+using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

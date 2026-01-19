@@ -1,5 +1,5 @@
 ﻿using LibGitWork.Models;
-using LibParameters;
+using ParametersManagement.LibParameters;
 
 namespace LibTools.ToolCommandParameters;
 

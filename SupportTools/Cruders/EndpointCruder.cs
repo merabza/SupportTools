@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using CliParameters;
 using CliParameters.FieldEditors;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.Validators;
 using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Cruders;
 

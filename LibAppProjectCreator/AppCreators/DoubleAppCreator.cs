@@ -2,12 +2,12 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using FileManagersMain;
 using LibAppProjectCreator.FolderProcessors;
 using LibAppProjectCreator.Models;
-using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using ParametersManagement.LibFileParameters.Models;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.FileManagersMain;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

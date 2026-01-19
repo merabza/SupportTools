@@ -2,7 +2,7 @@
 using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
-using LibParameters;
+using ParametersManagement.LibParameters;
 
 namespace SupportTools.CliMenuCommands;
 

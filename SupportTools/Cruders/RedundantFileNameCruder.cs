@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CliParameters.Cruders;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;

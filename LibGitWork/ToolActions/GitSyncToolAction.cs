@@ -7,12 +7,12 @@ using LibDataInput;
 using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

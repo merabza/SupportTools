@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CliMenu;
 using CliParameters.Cruders;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
 

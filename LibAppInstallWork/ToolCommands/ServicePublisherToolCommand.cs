@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using CliParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

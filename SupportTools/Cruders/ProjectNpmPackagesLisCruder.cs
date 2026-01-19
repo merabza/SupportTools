@@ -2,11 +2,11 @@
 using System.Net.Http;
 using CliMenu;
 using CliParameters.Cruders;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Cruders;
 

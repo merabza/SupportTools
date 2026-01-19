@@ -1,6 +1,6 @@
-﻿using LibToolActions;
-using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+﻿using Microsoft.Extensions.Logging;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

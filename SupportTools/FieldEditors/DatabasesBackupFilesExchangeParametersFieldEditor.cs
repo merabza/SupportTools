@@ -1,7 +1,7 @@
 ﻿using CliParameters.FieldEditors;
-using LibDatabaseParameters;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.ParametersEditors;
 
 namespace SupportTools.FieldEditors;

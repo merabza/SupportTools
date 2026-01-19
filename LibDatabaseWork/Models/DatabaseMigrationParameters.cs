@@ -1,11 +1,11 @@
 ﻿using System.Net.Http;
-using DatabasesManagement;
-using DatabasesManagement.Errors;
-using LibApiClientParameters;
-using LibDatabaseParameters;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
+using ToolsManagement.DatabasesManagement;
+using ToolsManagement.DatabasesManagement.Errors;
 
 namespace LibDatabaseWork.Models;
 

@@ -3,11 +3,11 @@ using System.Linq;
 using CliMenu;
 using LibDataInput;
 using LibMenuInput;
-using LibParameters;
 using Newtonsoft.Json;
+using ParametersManagement.LibParameters;
 using SupportTools.Models;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

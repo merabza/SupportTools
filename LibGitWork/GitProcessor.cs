@@ -2,8 +2,8 @@
 using LanguageExt;
 using Microsoft.Extensions.Logging;
 using OneOf;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibGitWork;
 

@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using LibGitData;
 using LibGitData.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibGitWork;
 

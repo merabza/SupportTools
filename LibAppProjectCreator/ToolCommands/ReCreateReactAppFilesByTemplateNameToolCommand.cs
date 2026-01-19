@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using CliParameters;
 using LibAppProjectCreator.React;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 // ReSharper disable ConvertToPrimaryConstructor

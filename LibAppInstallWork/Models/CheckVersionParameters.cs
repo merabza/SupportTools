@@ -1,10 +1,10 @@
 //Created by ProjectParametersClassCreator at 5/11/2021 08:52:10
 
 using System;
-using ApiClientsManagement;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.ApiClientsManagement;
 
 namespace LibAppInstallWork.Models;
 

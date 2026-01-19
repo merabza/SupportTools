@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolCommands;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

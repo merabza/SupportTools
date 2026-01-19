@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using LibDatabaseParameters;
-using LibParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 
 namespace SupportToolsData.Models;
 

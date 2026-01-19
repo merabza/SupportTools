@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using LibDatabaseParameters;
-using LibFileParameters.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibAppProjectCreator;
 

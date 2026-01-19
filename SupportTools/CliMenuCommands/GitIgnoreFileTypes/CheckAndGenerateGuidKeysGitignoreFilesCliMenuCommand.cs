@@ -1,8 +1,7 @@
 ﻿using CliMenu;
 using LibDataInput;
-using LibParameters;
 using Microsoft.Extensions.Logging;
-using SupportTools.Generators;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands.GitIgnoreFileTypes;

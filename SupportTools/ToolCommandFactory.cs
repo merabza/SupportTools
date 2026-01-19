@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using LibApiClientParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolCommands;
 using LibAppProjectCreator;
@@ -7,19 +6,20 @@ using LibAppProjectCreator.Models;
 using LibAppProjectCreator.ToolCommands;
 using LibCodeGenerator.Models;
 using LibCodeGenerator.ToolCommands;
-using LibDatabaseParameters;
 using LibDatabaseWork;
 using LibDatabaseWork.Models;
 using LibDatabaseWork.ToolCommands;
-using LibParameters;
 using LibScaffoldSeeder.Models;
 using LibScaffoldSeeder.ToolCommands;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.ToolCommandParameters;
 using SupportTools.ToolCommands;
 using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools;
 

@@ -3,10 +3,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
-using LibFileParameters.Models;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared.Errors;
+using ParametersManagement.LibFileParameters.Models;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

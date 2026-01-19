@@ -2,11 +2,11 @@
 using LibDotnetWork;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

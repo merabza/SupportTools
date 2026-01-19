@@ -2,7 +2,7 @@
 using CliMenu;
 using CliParameters;
 using CliParameters.FieldEditors;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.Tools;
 using SupportToolsData.Models;

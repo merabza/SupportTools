@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using CliParameters.FieldEditors;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
 namespace SupportTools.FieldEditors;

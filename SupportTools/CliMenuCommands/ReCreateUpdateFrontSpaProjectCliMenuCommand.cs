@@ -3,8 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using CliMenu;
 using LibAppProjectCreator.ToolActions;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace SupportTools.CliMenuCommands;
 

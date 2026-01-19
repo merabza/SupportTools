@@ -1,8 +1,8 @@
 ﻿using System.Threading;
-using ApiClientsManagement;
 using Installer.Domain;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.ApiClientsManagement;
 
 namespace LibAppInstallWork.Models;
 

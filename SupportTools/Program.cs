@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net.Http;
 using CliParameters;
-using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using Serilog.Events;
 using SupportTools;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 ILogger<Program>? logger = null;
 try

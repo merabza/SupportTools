@@ -1,9 +1,9 @@
 ﻿using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersEdit.FieldEditors;
-using Installer.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
+using ToolsManagement.Installer.Models;
 
 namespace SupportTools.ParametersEditors;
 

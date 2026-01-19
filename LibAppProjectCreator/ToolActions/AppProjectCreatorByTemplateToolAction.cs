@@ -7,12 +7,12 @@ using LibAppProjectCreator.Models;
 using LibDataInput;
 using LibGitData.Models;
 using LibGitWork;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 namespace LibAppProjectCreator.ToolActions;
 

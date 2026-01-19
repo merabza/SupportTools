@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CliParameters;
 using CliParameters.FieldEditors;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;

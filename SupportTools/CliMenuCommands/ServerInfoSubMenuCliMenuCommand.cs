@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using CliMenu;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
 namespace SupportTools.CliMenuCommands;

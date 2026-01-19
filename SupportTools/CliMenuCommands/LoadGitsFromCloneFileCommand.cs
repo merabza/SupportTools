@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using LibGitData.Models;
 using LibMenuInput;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

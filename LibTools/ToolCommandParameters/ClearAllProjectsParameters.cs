@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibTools.ToolCommandParameters;
 

@@ -7,16 +7,16 @@ using CliParameters;
 using DbContextAnalyzer.Domain;
 using DbContextAnalyzer.Models;
 using LibAppProjectCreator;
-using LibDatabaseParameters;
 using LibDotnetWork;
-using LibParameters;
 using LibScaffoldSeeder.Models;
 using LibSeedCodeCreator;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands;
 

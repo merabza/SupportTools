@@ -1,13 +1,13 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Net.Http;
-using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.CompressionManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

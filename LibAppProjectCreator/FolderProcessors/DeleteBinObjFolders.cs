@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using ConnectTools;
-using FileManagersMain;
-using LibFileParameters.Models;
+using ConnectionTools.ConnectTools;
+using ParametersManagement.LibFileParameters.Models;
+using ToolsManagement.FileManagersMain;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

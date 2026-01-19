@@ -4,8 +4,8 @@ using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork;
 

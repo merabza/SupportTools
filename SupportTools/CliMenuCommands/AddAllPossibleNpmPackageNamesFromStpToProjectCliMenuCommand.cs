@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using CliMenu;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace SupportTools.CliMenuCommands;

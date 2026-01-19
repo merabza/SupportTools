@@ -1,8 +1,8 @@
-using ApiClientsManagement;
-using LibFileParameters.Models;
-using LibParameters;
+using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.ApiClientsManagement;
 
 namespace LibAppInstallWork.Models;
 

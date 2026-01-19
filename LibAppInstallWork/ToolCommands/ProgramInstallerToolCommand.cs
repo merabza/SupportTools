@@ -4,11 +4,11 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using Installer.ToolActions;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
+using ToolsManagement.Installer.ToolActions;
 
 namespace LibAppInstallWork.ToolCommands;
 

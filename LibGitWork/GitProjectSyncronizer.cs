@@ -4,9 +4,9 @@ using System.Linq;
 using LibDataInput;
 using LibGitData;
 using LibGitWork.ToolActions;
-using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using ParametersManagement.LibParameters;
+using SystemTools.SystemToolsShared;
 
 namespace LibGitWork;
 

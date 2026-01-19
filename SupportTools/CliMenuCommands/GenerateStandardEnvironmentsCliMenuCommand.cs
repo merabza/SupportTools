@@ -1,7 +1,7 @@
 ﻿using CliMenu;
 using LibDataInput;
-using LibFileParameters.Interfaces;
-using LibParameters;
+using ParametersManagement.LibFileParameters.Interfaces;
+using ParametersManagement.LibParameters;
 using SupportTools.Generators;
 
 namespace SupportTools.CliMenuCommands;

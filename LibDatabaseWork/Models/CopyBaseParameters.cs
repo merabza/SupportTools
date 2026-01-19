@@ -1,7 +1,7 @@
-﻿using DatabasesManagement.Models;
-using FileManagersMain;
-using LibFileParameters.Models;
-using LibParameters;
+﻿using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
+using ToolsManagement.DatabasesManagement.Models;
+using ToolsManagement.FileManagersMain;
 
 namespace LibDatabaseWork.Models;
 

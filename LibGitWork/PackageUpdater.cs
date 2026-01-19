@@ -2,8 +2,8 @@
 using System.Linq;
 using LibGitData;
 using LibGitWork.ToolActions;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace LibGitWork;
 

@@ -3,8 +3,8 @@ using System.Net.Http;
 using CliMenu;
 using CliParameters.CliMenuCommands;
 using LibDataInput;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 using SupportToolsData;
 

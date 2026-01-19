@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using DatabasesManagement;
 using LibDatabaseWork.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
+using ToolsManagement.DatabasesManagement;
 
 namespace LibDatabaseWork.ToolCommands;
 

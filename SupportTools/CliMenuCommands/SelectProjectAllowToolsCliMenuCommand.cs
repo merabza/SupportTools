@@ -2,10 +2,10 @@
 using System.Linq;
 using CliMenu;
 using LibMenuInput;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

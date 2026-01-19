@@ -5,12 +5,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitWork.Mappers;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

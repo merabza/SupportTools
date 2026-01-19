@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

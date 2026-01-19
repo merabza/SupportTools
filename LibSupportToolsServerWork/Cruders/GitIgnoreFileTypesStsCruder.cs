@@ -6,15 +6,14 @@ using System.Threading;
 using CliParameters;
 using CliParameters.Cruders;
 using CliParameters.FieldEditors;
-using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
-using Enumerable = System.Linq.Enumerable;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
@@ -45,7 +44,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
-        return Enumerable.ToDictionary(GetGitIgnoreFileTypesListFromServer(), k => k.Name,
+        return GetGitIgnoreFileTypesListFromServer().ToDictionary(k => k.Name,
             ItemData (v) => new TextItemData { Text = v.Name });
     }
 
@@ -86,7 +85,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     public override bool ContainsRecordWithKey(string recordKey)
     {
         var gitIgnoreModelFilePaths = GetGitIgnoreFileTypesListFromServer();
-        return gitIgnoreModelFilePaths.Any(x=>x.Name == recordKey);
+        return gitIgnoreModelFilePaths.Any(x => x.Name == recordKey);
     }
 
     public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)

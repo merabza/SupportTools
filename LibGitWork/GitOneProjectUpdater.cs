@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
+using DatabaseTools.SqlServerDbTools.Errors;
 using LibDataInput;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
-using SqlServerDbTools.Errors;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibGitWork;
 

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CompressionManagement;
 using LibAppProjectCreator.AppCreators;
 using LibNpmWork;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.CompressionManagement;
+using ToolsManagement.LibToolActions;
 
 namespace LibAppProjectCreator.ToolActions;
 

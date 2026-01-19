@@ -1,4 +1,4 @@
-﻿using SystemToolsShared.Errors;
+﻿using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportTools.Errors;
 

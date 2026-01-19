@@ -1,10 +1,10 @@
 ﻿using System;
 using CliMenu;
 using LibGitWork;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

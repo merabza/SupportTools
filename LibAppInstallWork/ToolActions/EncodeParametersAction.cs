@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SystemToolsShared;
-using SystemToolsShared.Domain;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Domain;
+using ToolsManagement.LibToolActions;
 
 namespace LibAppInstallWork.ToolActions;
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ConnectTools;
-using FileManagersMain;
-using LibFileParameters.Models;
-using SystemToolsShared;
+using ConnectionTools.ConnectTools;
+using ParametersManagement.LibFileParameters.Models;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.FileManagersMain;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

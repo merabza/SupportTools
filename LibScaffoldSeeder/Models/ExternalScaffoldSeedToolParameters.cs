@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using LibAppProjectCreator;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibScaffoldSeeder.Models;
 

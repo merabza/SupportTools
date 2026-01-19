@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

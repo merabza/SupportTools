@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\CliMenu\CliMenu.csproj" />
+    <ProjectReference Include="..\..\DatabaseTools\DatabaseTools.SqlServerDbTools\DatabaseTools.SqlServerDbTools.csproj" />
     <ProjectReference Include="..\..\DatabaseTools\SqlServerDbTools\SqlServerDbTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />

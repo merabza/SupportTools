@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using CliParametersDataEdit;
-using LibDatabaseParameters;
-using LibFileParameters.Models;
 using LibGitData.Models;
 using LibGitWork;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibScaffoldSeeder.Models;
 

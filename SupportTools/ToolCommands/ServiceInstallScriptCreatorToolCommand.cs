@@ -4,12 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
 using LibMenuInput;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.ToolActions;
 using SupportTools.ToolCommandParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.ToolCommands;
 

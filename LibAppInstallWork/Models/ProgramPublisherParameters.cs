@@ -2,12 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using LibFileParameters.Models;
 using LibGitData.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibAppInstallWork.Models;
 

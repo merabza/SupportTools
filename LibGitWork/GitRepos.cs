@@ -4,7 +4,7 @@ using System.Linq;
 using LibGitData.Models;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibGitWork;
 

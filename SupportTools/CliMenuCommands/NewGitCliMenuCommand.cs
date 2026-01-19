@@ -3,11 +3,11 @@ using System.Linq;
 using System.Net.Http;
 using CliMenu;
 using LibGitData;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 

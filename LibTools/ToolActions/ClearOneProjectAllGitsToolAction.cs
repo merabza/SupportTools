@@ -2,12 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitData;
-using LibParameters;
-using LibToolActions;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

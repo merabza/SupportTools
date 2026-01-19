@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using ApiClientsManagement;
 using CliTools;
-using Installer.Models;
-using LibApiClientParameters;
-using LibDatabaseParameters;
-using LibFileParameters.Interfaces;
-using LibFileParameters.Models;
 using LibGitData;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibFileParameters.Interfaces;
+using ParametersManagement.LibFileParameters.Models;
 using SupportToolsServerApiContracts;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.ApiClientsManagement;
+using ToolsManagement.Installer.Models;
 
 namespace SupportToolsData.Models;
 
@@ -132,9 +132,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         var apiClientSettings = GetApiClientSettings(apiClientName) ??
                                 throw new InvalidOperationException(
                                     $"ApiClient with name {apiClientName} does not exists");
-        if (string.IsNullOrWhiteSpace(apiClientSettings.Server))
-            throw new InvalidOperationException($"Server does not specified for ApiClient with name {apiClientName}");
-        return new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
+        return string.IsNullOrWhiteSpace(apiClientSettings.Server)
+            ? throw new InvalidOperationException($"Server does not specified for ApiClient with name {apiClientName}")
+            : new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
     }
 
     private ApiClientSettings? GetApiClientSettings(string webAgentKey)

@@ -1,10 +1,10 @@
 ﻿using System.Net.Http;
-using ApiClientsManagement;
-using Installer.ProjectManagers;
 using LibAppInstallWork.Models;
-using LibFileParameters.Models;
 using Microsoft.Extensions.Logging;
-using WebAgentProjectsApiContracts;
+using ParametersManagement.LibFileParameters.Models;
+using ToolsManagement.ApiClientsManagement;
+using ToolsManagement.Installer.ProjectManagers;
+using WebAgentContracts.WebAgentProjectsApiContracts;
 
 namespace LibAppInstallWork;
 

@@ -7,15 +7,15 @@ using CliParameters.Cruders;
 using CliParameters.FieldEditors;
 using LibGitData.Models;
 using LibGitWork;
-using LibParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 

@@ -1,4 +1,4 @@
-﻿using LibParameters;
+﻿using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace SupportTools.Generators;

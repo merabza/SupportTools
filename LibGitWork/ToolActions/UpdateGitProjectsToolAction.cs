@@ -6,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using LibGitData.Models;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

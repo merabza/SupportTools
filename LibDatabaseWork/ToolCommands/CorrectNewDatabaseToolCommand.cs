@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using DbTools;
-using DbToolsFactory;
-using LibDatabaseParameters;
+using DatabaseTools.DbTools;
+using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
+using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands;
 

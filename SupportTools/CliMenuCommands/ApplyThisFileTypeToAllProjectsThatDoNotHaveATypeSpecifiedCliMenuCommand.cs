@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using CliMenu;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.ToolActions;
 
 namespace SupportTools.CliMenuCommands;

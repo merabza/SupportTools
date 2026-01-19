@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using LibDotnetWork;
-using LibParameters;
 using OneOf;
+using ParametersManagement.LibParameters;
 using SupportTools.Errors;
 using SupportToolsData.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportTools.Tools;
 

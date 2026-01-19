@@ -1,9 +1,9 @@
 //Created by ProjectParametersClassCreator at 5/9/2021 13:38:34
 
 using CliParametersDataEdit;
-using LibDatabaseParameters;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
 namespace LibDatabaseWork.Models;

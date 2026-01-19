@@ -1,8 +1,8 @@
 ﻿using CliParameters.FieldEditors;
-using Installer.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.ParametersEditors;
+using ToolsManagement.Installer.Models;
 
 namespace SupportTools.FieldEditors;
 

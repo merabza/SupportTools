@@ -1,6 +1,6 @@
 ﻿using LibAppInstallWork.Models;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibAppInstallWork;
 

@@ -8,14 +8,14 @@ using CliParameters.FieldEditors;
 using CliTools.CliMenuCommands;
 using LibGitData.Models;
 using LibGitWork;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
-using SystemToolsShared;
-using SystemToolsShared.Errors;
+using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportTools.Cruders;
 
@@ -52,7 +52,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         try
         {
-            var supportToolsServerApiClient = 
+            var supportToolsServerApiClient =
                 supportToolsParameters.GetSupportToolsServerApiClient(logger, httpClientFactory);
 
             if (supportToolsServerApiClient is null)

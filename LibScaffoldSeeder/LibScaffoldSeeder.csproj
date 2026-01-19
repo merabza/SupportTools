@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\AppCliTools\DbContextAnalyzer\DbContextAnalyzer.csproj" />
     <ProjectReference Include="..\..\AppCliTools\LibSeedCodeCreator\LibSeedCodeCreator.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\CompressionManagement\CompressionManagement.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.CompressionManagement\ToolsManagement.CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />

@@ -3,8 +3,8 @@ using System.Net.Http;
 using CliParameters;
 using CliParameters.FieldEditors;
 using CliParametersApiClientsEdit.FieldEditors;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
 

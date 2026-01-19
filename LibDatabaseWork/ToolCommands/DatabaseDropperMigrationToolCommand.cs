@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using LibDotnetWork;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace LibDatabaseWork.ToolCommands;
 

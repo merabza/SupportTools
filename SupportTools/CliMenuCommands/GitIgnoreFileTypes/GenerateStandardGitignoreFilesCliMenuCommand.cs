@@ -1,7 +1,7 @@
 ﻿using CliMenu;
 using LibDataInput;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportTools.Generators;
 using SupportToolsData.Models;
 

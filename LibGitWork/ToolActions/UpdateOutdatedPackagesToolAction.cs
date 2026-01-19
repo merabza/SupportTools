@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
-using LibParameters;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
+using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
 

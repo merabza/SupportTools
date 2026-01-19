@@ -2,16 +2,16 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using DatabasesManagement;
-using DbTools.Errors;
+using DatabaseTools.DbTools.Errors;
 using LanguageExt;
-using LibApiClientParameters;
-using LibDatabaseParameters;
 using LibDatabaseWork.Models;
 using LibDotnetWork;
-using LibParameters;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared.Errors;
+using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.DatabasesManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

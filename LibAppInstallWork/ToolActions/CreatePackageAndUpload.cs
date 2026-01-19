@@ -7,13 +7,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using FileManagersMain;
 using LibDotnetWork;
-using LibFileParameters.Models;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibFileParameters.Models;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
+using ToolsManagement.FileManagersMain;
+using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

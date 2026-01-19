@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CliParameters;
-using JetBrainsResharperGlobalToolsWork;
 using LibAppProjectCreator.Models;
 using Microsoft.Extensions.Logging;
+using SystemTools.JetBrainsResharperGlobalToolsWork;
 
 namespace LibAppProjectCreator.ToolCommands;
 

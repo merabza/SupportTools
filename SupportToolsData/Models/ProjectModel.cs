@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using LibDatabaseParameters;
 using LibGitData;
 using LibGitData.Models;
-using LibParameters;
+using ParametersManagement.LibDatabaseParameters;
+using ParametersManagement.LibParameters;
 
 namespace SupportToolsData.Models;
 

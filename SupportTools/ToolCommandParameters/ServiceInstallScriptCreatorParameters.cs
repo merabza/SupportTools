@@ -1,7 +1,7 @@
-﻿using LibFileParameters.Models;
-using LibParameters;
+﻿using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.ToolCommandParameters;
 

@@ -4,8 +4,8 @@ using CliParameters.CliMenuCommands;
 using LibDataInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace SupportTools.CliMenuCommands;
 

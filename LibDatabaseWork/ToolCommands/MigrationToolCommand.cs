@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using CliParameters;
 using LibDatabaseWork.Models;
-using LibParameters;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
 
 namespace LibDatabaseWork.ToolCommands;
 

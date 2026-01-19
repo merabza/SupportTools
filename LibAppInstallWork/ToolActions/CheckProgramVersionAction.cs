@@ -2,13 +2,13 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ApiClientsManagement;
 using LibAppInstallWork.Models;
-using LibToolActions;
 using Microsoft.Extensions.Logging;
-using SystemToolsShared.Errors;
-using TestApiContracts;
-using WebAgentProjectsApiContracts;
+using SystemTools.SystemToolsShared.Errors;
+using SystemTools.TestApiContracts;
+using ToolsManagement.ApiClientsManagement;
+using ToolsManagement.LibToolActions;
+using WebAgentContracts.WebAgentProjectsApiContracts;
 
 // ReSharper disable ConvertToPrimaryConstructor
 

@@ -1,6 +1,6 @@
 ﻿using CliMenu;
 using LibDataInput;
-using LibParameters;
+using ParametersManagement.LibParameters;
 using SupportTools.Tools;
 
 namespace SupportTools.CliMenuCommands;
