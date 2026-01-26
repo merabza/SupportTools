@@ -12,8 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliMenu\CliMenu.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

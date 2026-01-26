@@ -7,14 +7,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibFileParameters\ParametersManagement.LibFileParameters.csproj" />
     <ProjectReference Include="..\..\SystemTools\SystemTools.TestApiContracts\SystemTools.TestApiContracts.csproj" />
-    <ProjectReference Include="..\..\SystemTools\TestApiContracts\TestApiContracts.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ApiClientsManagement\ApiClientsManagement.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\FileManagersMain\FileManagersMain.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\Installer\Installer.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.ApiClientsManagement\ToolsManagement.ApiClientsManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.FileManagersMain\ToolsManagement.FileManagersMain.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\CliMenu\CliMenu.csproj" />
-    <ProjectReference Include="..\..\ParametersManagement\LibParameters\LibParameters.csproj" />
-    <ProjectReference Include="..\..\SystemTools\SystemToolsShared\SystemToolsShared.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\LibToolActions\LibToolActions.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

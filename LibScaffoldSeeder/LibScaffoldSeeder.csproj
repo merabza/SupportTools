@@ -9,11 +9,6 @@
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParametersDataEdit\AppCliTools.CliParametersDataEdit.csproj" />
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.DbContextAnalyzer\AppCliTools.DbContextAnalyzer.csproj" />
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.LibSeedCodeCreator\AppCliTools.LibSeedCodeCreator.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliParametersDataEdit\CliParametersDataEdit.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\CliParameters\CliParameters.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\DbContextAnalyzer\DbContextAnalyzer.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\LibSeedCodeCreator\LibSeedCodeCreator.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\CompressionManagement\CompressionManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.CompressionManagement\ToolsManagement.CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
