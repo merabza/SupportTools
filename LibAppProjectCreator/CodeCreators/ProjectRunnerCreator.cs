@@ -23,7 +23,7 @@ public sealed class ProjectRunnerCreator : CodeCreator
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             string.Empty, "using CliParameters.Tasks",
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
-            "using Microsoft.Extensions.Logging", "using System", "using SystemToolsShared",
+            "using Microsoft.Extensions.Logging", "using System", "using SystemTools.SystemToolsShared",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : string.Empty, string.Empty,
             //new CodeBlock($"namespace Do{_projectNamespace}",
             $"namespace {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}", string.Empty, new CodeBlock(

@@ -73,9 +73,9 @@ public sealed class GitProjects
 
     public GitProjectDataDomain GetGitProjectByKey(string key)
     {
-        if (_gitProjects.TryGetValue(key, out var byKey))
-            return byKey;
-        throw new Exception($"GitProject With Key {key} does not found");
+        return _gitProjects.TryGetValue(key, out var byKey)
+            ? byKey
+            : throw new Exception($"GitProject With Key {key} does not found");
     }
 
     public GitProjectDataDomain? GetGitProjectIfExistsByKey(string key)

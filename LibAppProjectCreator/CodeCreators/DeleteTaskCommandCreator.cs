@@ -22,7 +22,7 @@ public sealed class DeleteTaskCommandCreator : CodeCreator
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System", "using CliMenu", "using LibParameters",
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models", "using LibDataInput",
-            "using SystemToolsShared", string.Empty, $"namespace {_projectNamespace}.MenuCommands", string.Empty,
+            "using SystemTools.SystemToolsShared", string.Empty, $"namespace {_projectNamespace}.MenuCommands", string.Empty,
             new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),
             new CodeBlock("public sealed class DeleteTaskCommand : CliMenuCommand",
                 "private readonly ParametersManager _parametersManager", "private readonly string _taskName",

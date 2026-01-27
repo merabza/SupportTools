@@ -27,7 +27,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
         var projectLow = _projectNamespace.UnCapitalize();
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using System", _useDatabase ? "using System.Net.Http" : null, "using SystemToolsShared",
+            "using System", _useDatabase ? "using System.Net.Http" : null, "using SystemTools.SystemToolsShared",
             "using CliParameters", "using LibParameters", $"using {_projectNamespace}",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : null,
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",

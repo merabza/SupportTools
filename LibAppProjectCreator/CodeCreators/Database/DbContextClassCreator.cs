@@ -18,7 +18,7 @@ public sealed class DbContextClassCreator : CodeCreator
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            string.Empty, $"using {_projectNamespace}Db.Models", "using SystemToolsShared",
+            string.Empty, $"using {_projectNamespace}Db.Models", "using SystemTools.SystemToolsShared",
             "using Microsoft.EntityFrameworkCore", string.Empty, $"namespace {_projectNamespace}Db", string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}DbContext : DbContext", string.Empty,
                 new CodeBlock(
