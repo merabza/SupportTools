@@ -43,10 +43,10 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliMenu", "using CliParameters.CliMenuCommands", "using CliTools", "using CliTools.CliMenuCommands",
-            "using LibDataInput", "using LibParameters", "using Microsoft.Extensions.Logging", "using System",
-            "using System.Linq", _useDatabase ? "using System.Net.Http" : null,
-            $"using {_projectNamespace}.MenuCommands",
+            "using CliMenu", "using AppCliTools.CliParameters.CliMenuCommands", "using CliTools",
+            "using CliTools.CliMenuCommands", "using LibDataInput", "using LibParameters",
+            "using Microsoft.Extensions.Logging", "using System", "using System.Linq",
+            _useDatabase ? "using System.Net.Http" : null, $"using {_projectNamespace}.MenuCommands",
             //$"using {_projectNamespace}.Models",
             _useDatabase ? new CodeCommand($"using Do{_projectNamespace}.Models") : new CodeExtraLine(), string.Empty,
             _useDatabase ? new CodeCommand($"using Lib{_projectNamespace}Repositories") : new CodeExtraLine(),

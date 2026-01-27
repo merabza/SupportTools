@@ -33,7 +33,7 @@ public sealed class RazorAppCreator : AppCreatorBase
     protected override bool PrepareSpecific()
     {
         //რეფერენსების სიის შედგენა
-        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.CliParameters);
+        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.AppCliToolsCliParameters);
         //AddReference(_razorAppWithDatabaseCreatorData.MainProjectData, GitProjects.CliToolsData);
         AddReference(_razorAppCreatorData.MainProjectData, GitProjects.CliTools);
 

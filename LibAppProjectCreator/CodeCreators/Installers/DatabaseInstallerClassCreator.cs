@@ -36,8 +36,9 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System", "using Microsoft.AspNetCore.Builder", "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection", "using System.Collections.Generic", "using WebInstallers",
-            _useServerCarcass ? "using CarcassDb" : null, string.Empty, $"namespace {_projectNamespace}Db.Installers",
-            string.Empty, new OneLineComment(" ReSharper disable once UnusedType.Global"),
+            _useServerCarcass ? "using BackendCarcass.Db" : null, string.Empty,
+            $"namespace {_projectNamespace}Db.Installers", string.Empty,
+            new OneLineComment(" ReSharper disable once UnusedType.Global"),
             new CodeBlock($"public sealed class {_projectNamespace}DatabaseInstaller : IInstaller",
                 "public int InstallPriority => 30", "public int ServiceUsePriority => 30", string.Empty,
                 new CodeBlock(

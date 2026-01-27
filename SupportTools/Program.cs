@@ -22,14 +22,8 @@ try
 
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
 
-    switch (argParser.Analysis())
-    {
-        case EParseResult.Ok: break;
-        case EParseResult.Usage: return 1;
-        case EParseResult.Error: return 2;
-        default:
-            throw new ArgumentOutOfRangeException();
-    }
+    if (argParser.Analysis() != EParseResult.Ok)
+        return 1;
 
     var par = (SupportToolsParameters?)argParser.Par;
     if (par is null)

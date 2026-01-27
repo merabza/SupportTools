@@ -28,7 +28,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System", _useDatabase ? "using System.Net.Http" : null, "using SystemTools.SystemToolsShared",
-            "using CliParameters", "using LibParameters", $"using {_projectNamespace}",
+            "using AppCliToolsCliParameters", "using LibParameters", $"using {_projectNamespace}",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : null,
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using Microsoft.Extensions.DependencyInjection", "using Microsoft.Extensions.Logging", "using Serilog",

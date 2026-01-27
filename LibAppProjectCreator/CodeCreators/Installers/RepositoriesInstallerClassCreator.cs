@@ -24,7 +24,7 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using Microsoft.AspNetCore.Builder", "using Microsoft.Extensions.DependencyInjection", "using System",
-            "using System.Collections.Generic", string.Empty, "using CarcassDom", "using CarcassMasterDataDom",
+            "using System.Collections.Generic", string.Empty, "using CarcassDom", "using BackendCarcass.MasterData",
             "using CarcassRepositories", "using RepositoriesDom", "using WebInstallers", string.Empty,
             $"namespace {_projectNamespace}Repositories.Installers", string.Empty,
             new OneLineComment(" ReSharper disable once UnusedType.Global"),

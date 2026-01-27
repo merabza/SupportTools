@@ -21,7 +21,7 @@ public sealed class ProjectRunnerCreator : CodeCreator
     public override void CreateFileStructure()
     {
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            string.Empty, "using CliParameters.Tasks",
+            string.Empty, "using AppCliTools.CliParameters.Tasks",
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using Microsoft.Extensions.Logging", "using System", "using SystemTools.SystemToolsShared",
             _useDatabase ? $"using Lib{_projectNamespace}Repositories" : string.Empty, string.Empty,

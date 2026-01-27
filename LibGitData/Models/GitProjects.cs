@@ -14,29 +14,63 @@ public sealed class GitProjects
         _gitProjects = gitProjects;
     }
 
-    public GitProjectDataDomain CarcassDb => GetGitProjectByKey(nameof(CarcassDb));
-    public GitProjectDataDomain CarcassDataSeeding => GetGitProjectByKey(nameof(CarcassDataSeeding));
-    public GitProjectDataDomain CarcassIdentity => GetGitProjectByKey(nameof(CarcassIdentity));
-    public GitProjectDataDomain CarcassRepositories => GetGitProjectByKey(nameof(CarcassRepositories));
-    public GitProjectDataDomain CliParameters => GetGitProjectByKey(nameof(CliParameters));
-    public GitProjectDataDomain CliTools => GetGitProjectByKey(nameof(CliTools));
-    public GitProjectDataDomain CliParametersDataEdit => GetGitProjectByKey(nameof(CliParametersDataEdit));
-    public GitProjectDataDomain CliToolsData => GetGitProjectByKey(nameof(CliToolsData));
-    public GitProjectDataDomain DbTools => GetGitProjectByKey(nameof(DbTools));
-    public GitProjectDataDomain DbContextAnalyzer => GetGitProjectByKey(nameof(DbContextAnalyzer));
-    public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey(nameof(SystemToolsShared));
+    private const string BackendCarcass = nameof(BackendCarcass);
+
+    private const string Db = nameof(Db);
+    public GitProjectDataDomain BackendCarcassDb => GetGitProjectByKey($"{BackendCarcass}.{Db}");
+    
+    private const string DataSeeding = nameof(DataSeeding);
+    public GitProjectDataDomain BackendCarcassDataSeeding => GetGitProjectByKey($"{BackendCarcass}.{DataSeeding}");
+    
+    private const string Identity = nameof(Identity);
+    public GitProjectDataDomain BackendCarcassIdentity => GetGitProjectByKey($"{BackendCarcass}.{nameof(Identity)}");
+    
+    private const string Repositories = nameof(Repositories);
+    public GitProjectDataDomain BackendCarcassRepositories => GetGitProjectByKey($"{BackendCarcass}.{nameof(Repositories)}");
+
+    private const string Api = nameof(Api);
+    public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey($"{BackendCarcass}.{nameof(Api)}");
+
+
+
+    private const string AppCliTools = nameof(AppCliTools);
+
+    private const string CliParameters = nameof(CliParameters);
+    public GitProjectDataDomain AppCliToolsCliParameters => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParameters)}");
+    public GitProjectDataDomain CliTools => GetGitProjectByKey($"{AppCliTools}.{nameof(CliTools)}");
+    public GitProjectDataDomain CliParametersDataEdit => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParametersDataEdit)}");
+    public GitProjectDataDomain CliToolsData => GetGitProjectByKey($"{AppCliTools}.{nameof(CliToolsData)}");
+
+    private const string DbContextAnalyzer = nameof(DbContextAnalyzer);
+    public GitProjectDataDomain AppCliToolsDbContextAnalyzer => GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
+
+
+
+    private const string DatabaseTools = nameof(DatabaseTools);
+
+    public GitProjectDataDomain DbTools => GetGitProjectByKey($"{DatabaseTools}.{nameof(DbTools)}");
+
+
+
+    private const string SystemTools = nameof(SystemTools);
+
+    public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey($"{SystemTools}.{nameof(SystemToolsShared)}");
+
+
+
+    private const string WebSystemTools = nameof(WebSystemTools);
+
     public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
-    public GitProjectDataDomain ReCounterServiceInstaller => GetGitProjectByKey(nameof(ReCounterServiceInstaller));
-    public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey(nameof(StaticFilesTools));
+
+    //public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey($"{SystemTools}.{nameof(StaticFilesTools)}");
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
-    public GitProjectDataDomain WebInstallers => GetGitProjectByKey(nameof(WebInstallers));
+    //public GitProjectDataDomain WebInstallers => GetGitProjectByKey($"{SystemTools}.{nameof(WebInstallers)}");
     public GitProjectDataDomain ConfigurationEncrypt => GetGitProjectByKey(nameof(ConfigurationEncrypt));
     public GitProjectDataDomain SerilogLogger => GetGitProjectByKey(nameof(SerilogLogger));
     public GitProjectDataDomain SwaggerTools => GetGitProjectByKey(nameof(SwaggerTools));
     public GitProjectDataDomain WindowsServiceTools => GetGitProjectByKey(nameof(WindowsServiceTools));
     public GitProjectDataDomain SignalRMessages => GetGitProjectByKey(nameof(SignalRMessages));
     public GitProjectDataDomain FluentValidationInstaller => GetGitProjectByKey(nameof(FluentValidationInstaller));
-    public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey(nameof(BackendCarcassApi));
 
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
@@ -73,9 +107,9 @@ public sealed class GitProjects
 
     public GitProjectDataDomain GetGitProjectByKey(string key)
     {
-        return _gitProjects.TryGetValue(key, out var byKey)
-            ? byKey
-            : throw new Exception($"GitProject With Key {key} does not found");
+        if (_gitProjects.TryGetValue(key, out var byKey))
+            return byKey;
+        throw new Exception($"GitProject With Key {key} does not found");
     }
 
     public GitProjectDataDomain? GetGitProjectIfExistsByKey(string key)

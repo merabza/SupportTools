@@ -20,8 +20,8 @@ public sealed class DbContextForCarcassClassCreator : CodeCreator
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             string.Empty, "using Microsoft.EntityFrameworkCore",
             "using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal", "using System",
-            "using System.Linq", string.Empty, "using CarcassDb", $"using {_projectNamespace}Db.Models", string.Empty,
-            $"namespace {_projectNamespace}Db", string.Empty,
+            "using System.Linq", string.Empty, "using BackendCarcass.Db", $"using {_projectNamespace}Db.Models",
+            string.Empty, $"namespace {_projectNamespace}Db", string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}DbContext : CarcassDbContext", string.Empty,
                 new CodeBlock(
                     $"public {_projectNamespace}DbContext(DbContextOptions<{_projectNamespace}DbContext> options, bool isDesignTime) : base(options, isDesignTime)",

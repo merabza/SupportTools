@@ -55,7 +55,7 @@ public sealed class ApiAppCreator : AppCreatorBase
     protected override bool PrepareSpecific()
     {
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassIdentity);
 
         if (_apiAppCreatorData.UseReact)
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
@@ -69,12 +69,12 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
 
-        if (_apiAppCreatorData.UseReCounter)
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReCounterServiceInstaller);
+        //if (_apiAppCreatorData.UseReCounter)
+        //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReCounterServiceInstaller);
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
+        //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
+        //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SerilogLogger);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
@@ -82,9 +82,9 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         if (_apiAppCreatorData.UseCarcass)
         {
-            AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassIdentity);
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.CarcassRepositories);
+            AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.BackendCarcassDb);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassIdentity);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassRepositories);
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassApi);
         }
 
@@ -103,7 +103,7 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         //რეფერენსების სიის შედგენა Db პროექტისათვის
         AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsShared);
-        AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.WebInstallers);
+        //AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.WebInstallers);
 
         if (!_apiAppCreatorData.UseDbPartFolderForDatabaseProjects)
             //რეფერენსების სიის შედგენა DbMigration პროექტისათვის
@@ -121,9 +121,9 @@ public sealed class ApiAppCreator : AppCreatorBase
             return true;
 
         AddReference(_apiAppCreatorData.RepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
-        AddReference(_apiAppCreatorData.RepositoriesProjectData, GitProjects.CarcassRepositories);
+        AddReference(_apiAppCreatorData.RepositoriesProjectData, GitProjects.BackendCarcassRepositories);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.RepositoriesProjectData);
-        AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.CarcassDb);
+        AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.BackendCarcassDb);
 
         if (!_apiAppCreatorData.UseReact)
             return true;

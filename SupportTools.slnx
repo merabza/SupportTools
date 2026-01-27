@@ -14,6 +14,7 @@
   </Folder>
   <Folder Name="/BackendCarcass/">
     <Project Path="../BackendCarcass/BackendCarcass.Database/BackendCarcass.Database.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.DatabaseConfiguration/BackendCarcass.DatabaseConfiguration.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.Db/BackendCarcass.Db.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.LibCrud/BackendCarcass.LibCrud.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.MasterData/BackendCarcass.MasterData.csproj" />

@@ -40,7 +40,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     protected override bool PrepareSpecific()
     {
         //რეფერენსების სიის შედგენა
-        AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliParameters);
+        AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.AppCliToolsCliParameters);
         //AddReference(_consoleAppWithDatabaseCreatorData.MainProjectData, GitProjects.CliToolsData);
         AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliTools);
 
@@ -57,7 +57,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.DbMigrationProjectData);
 
         //რეფერენსების სიის შედგენა Do პროექტისათვის
-        AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParameters);
+        AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.AppCliToolsCliParameters);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliParametersDataEdit);
         AddReference(_consoleAppCreatorData.DoProjectData, GitProjects.CliToolsData);
         AddReference(_consoleAppCreatorData.DoProjectData, _consoleAppCreatorData.DatabaseProjectData);
@@ -69,7 +69,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
             _consoleAppCreatorData.DatabaseProjectData);
 
         //რეფერენსების სიის შედგენა Db პროექტისათვის
-        AddReference(_consoleAppCreatorData.DatabaseProjectData, GitProjects.CliParameters);
+        AddReference(_consoleAppCreatorData.DatabaseProjectData, GitProjects.AppCliToolsCliParameters);
         AddReference(_consoleAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsShared);
 
         //რეფერენსების სიის შედგენა DbMigration პროექტისათვის

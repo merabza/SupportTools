@@ -34,7 +34,7 @@ public sealed class ProjectMainClassCreator : CodeCreator
         }
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
-            "using CliParameters", propertiesBlock, "using Microsoft.Extensions.Logging", string.Empty,
+            "using AppCliTools.CliParameters", propertiesBlock, "using Microsoft.Extensions.Logging", string.Empty,
             $"namespace {_projectNamespace}", string.Empty, new CodeBlock(
                 $"public sealed class {_projectNamespace} : ToolCommand", "private readonly ILogger _logger",
                 _useDatabase

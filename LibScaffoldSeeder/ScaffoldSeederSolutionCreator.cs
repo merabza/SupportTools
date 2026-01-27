@@ -86,17 +86,17 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
         AddPackage(_scaffoldSeederCreatorData.DataSeedingClassLibProject,
             NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
-        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassDb);
-        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassDataSeeding);
-        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassIdentity);
-        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.CarcassRepositories);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.BackendCarcassDb);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.BackendCarcassDataSeeding);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.BackendCarcassIdentity);
+        AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, GitProjects.BackendCarcassRepositories);
         AddReference(_scaffoldSeederCreatorData.DataSeedingClassLibProject, mainDatabaseProject);
 
         //სიდერის კოდის შემქმნელი აპლიკაცია
         AddPackage(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
             NuGetPackages.MicrosoftEntityFrameworkCoreDesign); //, "5"
-        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.CliParameters);
-        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.AppCliToolsCliParameters);
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.AppCliToolsDbContextAnalyzer);
         AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, mainDatabaseProject);
         AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
             _scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);
@@ -104,8 +104,8 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         AddPackage(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject,
             NuGetPackages.MicrosoftExtensionsLoggingAbstractions); //, "5"
-        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.CliParameters);
-        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.AppCliToolsCliParameters);
+        AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject, GitProjects.AppCliToolsDbContextAnalyzer);
         AddReference(_scaffoldSeederCreatorData.GetJsonFromProjectDbProject,
             _scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);
 
@@ -116,9 +116,9 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         AddPackage(_scaffoldSeederCreatorData.SeedDbProject, NuGetPackages.MicrosoftEntityFrameworkCoreDesign); //, "5"
         AddPackage(_scaffoldSeederCreatorData.SeedDbProject, NuGetPackages.MicrosoftExtensionsConfigurationUserSecrets);
 
-        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.CliParameters);
-        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.CarcassDataSeeding);
-        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.DbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.AppCliToolsCliParameters);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.BackendCarcassDataSeeding);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.AppCliToolsDbContextAnalyzer);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, mainDatabaseProject);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DataSeedingClassLibProject);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DbMigrationProject);
