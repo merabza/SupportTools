@@ -28,9 +28,8 @@ public sealed class DeleteRedundantFiles : FolderProcessor
 
         if (folders.Contains(folderName))
             return (true, false, true);
-        if (_excludeFolders.Length > 0 && _excludeFolders.Contains(folderName))
-            return (true, false, false);
-        if (ExcludeSet is not null && ExcludeSet.NeedExclude(FileManager.PathCombine(afterRootPath, folderName)))
+        if ((_excludeFolders.Length > 0 && _excludeFolders.Contains(folderName)) || (ExcludeSet is not null &&
+                ExcludeSet.NeedExclude(FileManager.PathCombine(afterRootPath, folderName))))
             return (true, false, false);
         var deleted = FileManager.DeleteDirectory(afterRootPath, folderName, true);
         return deleted ? (true, true, true) : (false, false, true);

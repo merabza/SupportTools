@@ -145,23 +145,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
-        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის გზა
-        //if (string.IsNullOrWhiteSpace(project.SeedProjectFilePath) || project.SeedProjectFilePath !=
-        //    scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject.ProjectFileFullName)
-        //{
-        //    project.SeedProjectFilePath = scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.SeedDbProject
-        //        .ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        ////ბაზაში ინფორმაციის ჩამყრელი პროექტის პარამეტრების გზა
-        //if (string.IsNullOrWhiteSpace(project.SeedProjectParametersFilePath) ||
-        //    project.SeedProjectParametersFilePath != seedDbProjectNameUseJsonFilePath)
-        //{
-        //    project.SeedProjectParametersFilePath = seedDbProjectNameUseJsonFilePath;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
         var getJsonParameters = new GetJsonParametersDomain(seederParameters.JsonFolderName, Parameters.LogFolder,
             $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={getJsonFromScaffoldDbProjectName}");
 
@@ -175,26 +158,6 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             StShared.WriteErrorLine("Parameters does not saved", true, _logger);
             return false;
         }
-
-        ////json ფაილების შემქმნელი პროექტის გზა
-        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectFileFullName) ||
-        //    project.GetJsonFromScaffoldDbProjectFileFullName != scaffoldSeederDoubleAppCreator
-        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName)
-        //{
-        //    project.GetJsonFromScaffoldDbProjectFileFullName = scaffoldSeederDoubleAppCreator
-        //        .ScaffoldSeederMainCreatorData.GetJsonFromProjectDbProject.ProjectFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
-
-        ////json ფაილების შემქმნელი პროექტის პარამეტრების გზა
-        //if (string.IsNullOrWhiteSpace(project.GetJsonFromScaffoldDbProjectParametersFileFullName) ||
-        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName !=
-        //    getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName)
-        //{
-        //    project.GetJsonFromScaffoldDbProjectParametersFileFullName =
-        //        getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName;
-        //    haveToSaveSupportToolsParameters = true;
-        //}
 
         //მიგრაციის პროექტის გზის დაფიქსირება
         if (string.IsNullOrWhiteSpace(project.MigrationProjectFilePath) || project.MigrationProjectFilePath !=
