@@ -22,6 +22,10 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         Dictionary<string, ProjectModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Project", "Projects")
     {
+        var gitProjectNamesParameterNames = new[]
+        {
+            nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)
+        };
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
@@ -34,11 +38,11 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileName)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectSecurityFolderPath)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.MainProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
+            gitProjectNamesParameterNames, CsProjExtension, parametersManager));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.ApiContractsProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager));
+            gitProjectNamesParameterNames, CsProjExtension, parametersManager));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.SpaProjectName),
-            nameof(ProjectModel.GitProjectNames), EsProjExtension, parametersManager));
+            gitProjectNamesParameterNames, EsProjExtension, parametersManager));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
         FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
@@ -49,9 +53,9 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ScaffoldSeederProjectName)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.DbContextProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager, true));
+            gitProjectNamesParameterNames, CsProjExtension, parametersManager, true));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.NewDataSeedingClassLibProjectName),
-            nameof(ProjectModel.GitProjectNames), CsProjExtension, parametersManager, true));
+            gitProjectNamesParameterNames, CsProjExtension, parametersManager, true));
         //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileNameWithMigrationProject)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));

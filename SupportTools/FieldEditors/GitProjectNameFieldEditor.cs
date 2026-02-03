@@ -12,19 +12,19 @@ namespace SupportTools.FieldEditors;
 
 public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 {
-    private readonly string _gitProjectNamesParameterName;
+    private readonly string[] _gitProjectNamesParameterNames;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectExtension;
     private readonly bool _useNone;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitProjectNameFieldEditor(string propertyName, string gitProjectNamesParameterName, string projectExtension,
-        IParametersManager parametersManager, bool useNone = false) : base(propertyName)
+    public GitProjectNameFieldEditor(string propertyName, string[] gitProjectNamesParameterNames,
+        string projectExtension, IParametersManager parametersManager, bool useNone = false) : base(propertyName)
     {
         _parametersManager = parametersManager;
         _useNone = useNone;
         _projectExtension = projectExtension;
-        _gitProjectNamesParameterName = gitProjectNamesParameterName;
+        _gitProjectNamesParameterNames = gitProjectNamesParameterNames;
     }
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
@@ -33,14 +33,19 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 
         var currentGitProjectName = GetValue(recordForUpdate);
 
-        var projectGitNames = GetValue<List<string>?>(recordForUpdate, _gitProjectNamesParameterName);
+        List<string> projectGitNames = [];
+        foreach (var gitProjectNamesParameterName in _gitProjectNamesParameterNames)
+        {
+            var pgn = GetValue<List<string>?>(recordForUpdate, gitProjectNamesParameterName);
+            if (pgn is not null)
+                projectGitNames.AddRange(pgn);
+        }
 
         var gitProjectNamesMenuSet = new CliMenuSet();
 
         var keys = parameters.GitProjects
-            .Where(x => projectGitNames is not null && x.Value.GitName is not null &&
-                        x.Value.ProjectExtension == _projectExtension && projectGitNames.Contains(x.Value.GitName))
-            .Select(x => x.Key).OrderBy(x => x).ToList();
+            .Where(x => x.Value.GitName is not null && x.Value.ProjectExtension == _projectExtension &&
+                        projectGitNames.Contains(x.Value.GitName)).Select(x => x.Key).OrderBy(x => x).ToList();
 
         if (keys.Count < 1)
             throw new ListIsEmptyException("GitProjects List is empty");

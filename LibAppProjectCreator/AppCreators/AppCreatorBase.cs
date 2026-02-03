@@ -117,18 +117,13 @@ public abstract class AppCreatorBase
 
     private void PrepareFoldersForCheckAndClear()
     {
-        //FoldersForCheckAndClear.Add(SolutionPath);
         FoldersForCheckAndClear.Add(SecurityPath);
-
-        //foreach (var projectBase in Projects.Where(projectBase =>
-        //             !string.IsNullOrWhiteSpace(projectBase.SolutionFolderName)))
         foreach (var createInPath in Projects.Select(x => x.CreateInPath).Distinct())
             FoldersForCheckAndClear.Add(createInPath);
     }
 
     private void PrepareFoldersForCreate()
     {
-        //FoldersForCreate.Add(WorkPath);
         FoldersForCreate.Add(SolutionPath);
         FoldersForCreate.Add(SecurityPath);
         foreach (var folder in FoldersForCheckAndClear) FoldersForCreate.Add(folder);
@@ -207,6 +202,7 @@ public abstract class AppCreatorBase
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
+        {
             switch (prj)
             {
                 case ProjectForCreate projectForCreate:
@@ -259,6 +255,7 @@ public abstract class AppCreatorBase
                     break;
                 }
             }
+        }
 
         if (!await MakeAdditionalFiles(cancellationToken))
             return false;

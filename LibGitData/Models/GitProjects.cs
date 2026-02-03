@@ -7,6 +7,29 @@ namespace LibGitData.Models;
 
 public sealed class GitProjects
 {
+    private const string BackendCarcass = nameof(BackendCarcass);
+
+    private const string Db = nameof(Db);
+
+    private const string DataSeeding = nameof(DataSeeding);
+
+    private const string Identity = nameof(Identity);
+
+    private const string Repositories = nameof(Repositories);
+
+    private const string Api = nameof(Api);
+
+    private const string AppCliTools = nameof(AppCliTools);
+
+    private const string CliParameters = nameof(CliParameters);
+
+    private const string DbContextAnalyzer = nameof(DbContextAnalyzer);
+
+    private const string DatabaseTools = nameof(DatabaseTools);
+
+    private const string SystemTools = nameof(SystemTools);
+
+    private const string WebSystemTools = nameof(WebSystemTools);
     private readonly Dictionary<string, GitProjectDataDomain> _gitProjects;
 
     private GitProjects(Dictionary<string, GitProjectDataDomain> gitProjects)
@@ -14,56 +37,37 @@ public sealed class GitProjects
         _gitProjects = gitProjects;
     }
 
-    private const string BackendCarcass = nameof(BackendCarcass);
-
-    private const string Db = nameof(Db);
     public GitProjectDataDomain BackendCarcassDb => GetGitProjectByKey($"{BackendCarcass}.{Db}");
-    
-    private const string DataSeeding = nameof(DataSeeding);
     public GitProjectDataDomain BackendCarcassDataSeeding => GetGitProjectByKey($"{BackendCarcass}.{DataSeeding}");
-    
-    private const string Identity = nameof(Identity);
     public GitProjectDataDomain BackendCarcassIdentity => GetGitProjectByKey($"{BackendCarcass}.{nameof(Identity)}");
-    
-    private const string Repositories = nameof(Repositories);
-    public GitProjectDataDomain BackendCarcassRepositories => GetGitProjectByKey($"{BackendCarcass}.{nameof(Repositories)}");
 
-    private const string Api = nameof(Api);
+    public GitProjectDataDomain BackendCarcassRepositories =>
+        GetGitProjectByKey($"{BackendCarcass}.{nameof(Repositories)}");
+
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey($"{BackendCarcass}.{nameof(Api)}");
 
+    public GitProjectDataDomain AppCliToolsCliParameters =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(CliParameters)}");
 
-
-    private const string AppCliTools = nameof(AppCliTools);
-
-    private const string CliParameters = nameof(CliParameters);
-    public GitProjectDataDomain AppCliToolsCliParameters => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParameters)}");
     public GitProjectDataDomain CliTools => GetGitProjectByKey($"{AppCliTools}.{nameof(CliTools)}");
-    public GitProjectDataDomain CliParametersDataEdit => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParametersDataEdit)}");
+
+    public GitProjectDataDomain CliParametersDataEdit =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(CliParametersDataEdit)}");
+
     public GitProjectDataDomain CliToolsData => GetGitProjectByKey($"{AppCliTools}.{nameof(CliToolsData)}");
 
-    private const string DbContextAnalyzer = nameof(DbContextAnalyzer);
-    public GitProjectDataDomain AppCliToolsDbContextAnalyzer => GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
-
-
-
-    private const string DatabaseTools = nameof(DatabaseTools);
+    public GitProjectDataDomain AppCliToolsDbContextAnalyzer =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
 
     public GitProjectDataDomain DbTools => GetGitProjectByKey($"{DatabaseTools}.{nameof(DbTools)}");
 
-
-
-    private const string SystemTools = nameof(SystemTools);
-
     public GitProjectDataDomain SystemToolsShared => GetGitProjectByKey($"{SystemTools}.{nameof(SystemToolsShared)}");
-
-
-
-    private const string WebSystemTools = nameof(WebSystemTools);
 
     public GitProjectDataDomain ApiExceptionHandler => GetGitProjectByKey(nameof(ApiExceptionHandler));
 
     //public GitProjectDataDomain StaticFilesTools => GetGitProjectByKey($"{SystemTools}.{nameof(StaticFilesTools)}");
     public GitProjectDataDomain TestToolsApi => GetGitProjectByKey(nameof(TestToolsApi));
+
     //public GitProjectDataDomain WebInstallers => GetGitProjectByKey($"{SystemTools}.{nameof(WebInstallers)}");
     public GitProjectDataDomain ConfigurationEncrypt => GetGitProjectByKey(nameof(ConfigurationEncrypt));
     public GitProjectDataDomain SerilogLogger => GetGitProjectByKey(nameof(SerilogLogger));
@@ -107,9 +111,9 @@ public sealed class GitProjects
 
     public GitProjectDataDomain GetGitProjectByKey(string key)
     {
-        if (_gitProjects.TryGetValue(key, out var byKey))
-            return byKey;
-        throw new Exception($"GitProject With Key {key} does not found");
+        return _gitProjects.TryGetValue(key, out var byKey)
+            ? byKey
+            : throw new Exception($"GitProject With Key {key} does not found");
     }
 
     public GitProjectDataDomain? GetGitProjectIfExistsByKey(string key)
