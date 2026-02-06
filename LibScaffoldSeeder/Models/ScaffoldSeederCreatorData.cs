@@ -47,7 +47,8 @@ public sealed class ScaffoldSeederCreatorData
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
         var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(dataSeedingPackageFolder,
             NamingStats.DataSeedingClassLibProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName),
-            ["CarcassSeeders", "ProjectSeeders", "Models", "Json"]);
+            ["CarcassSeeders", "ProjectSeeders", "Models", "Json"],
+            NamingStats.DataSeedingPackageName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName));
 
         var createProjectSeederCodeProjectName =
             NamingStats.CreateProjectSeederCodeProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);

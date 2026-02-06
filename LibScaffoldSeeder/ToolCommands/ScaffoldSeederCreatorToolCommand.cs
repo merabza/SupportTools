@@ -189,8 +189,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             Parameters.DevCommandTimeout,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
             getJsonFromScaffoldDbProjectName, Path.Combine(dataSeedingPackageFolder, dataSeedingClassLibProjectName),
-            dataSeedingClassLibProjectName, NamingStats.DataSeedingPackageName(Parameters.ScaffoldSeederProjectName),
-            Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
+            dataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
             Parameters.ProjectDbContextClassName);
 
         var createProjectSeederCodeParametersFileFullName = Path.Combine(
