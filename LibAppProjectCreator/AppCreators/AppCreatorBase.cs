@@ -118,7 +118,8 @@ public abstract class AppCreatorBase
     private void PrepareFoldersForCheckAndClear()
     {
         FoldersForCheckAndClear.Add(SecurityPath);
-        foreach (var createInPath in Projects.Select(x => x.CreateInPath).Distinct())
+        FoldersForCheckAndClear.Add(SolutionPath);
+        foreach (var createInPath in Projects.Select(x => x.ProjectFullPath).Distinct())
             FoldersForCheckAndClear.Add(createInPath);
     }
 
@@ -126,7 +127,7 @@ public abstract class AppCreatorBase
     {
         FoldersForCreate.Add(SolutionPath);
         FoldersForCreate.Add(SecurityPath);
-        foreach (var folder in FoldersForCheckAndClear) FoldersForCreate.Add(folder);
+        //foreach (var folder in FoldersForCheckAndClear) FoldersForCreate.Add(folder);
     }
 
     private bool PrepareParameters()
@@ -287,14 +288,14 @@ public abstract class AppCreatorBase
 
         var jb = new JetBrainsResharperGlobalToolsProcessor(Logger, true);
 
-        if (jb.Cleanupcode(SolutionPath).IsSome) return false;
+        return !jb.Cleanupcode(SolutionPath).IsSome;
 
-        if (createAppVersions == ECreateAppVersions.Temp) return true;
+        //if (createAppVersions == ECreateAppVersions.Temp) return true;
 
-        var gitProcessor = new GitProcessor(true, Logger, SolutionPath);
-        if (gitProcessor.Initialise().IsSome) return false;
+        //var gitProcessor = new GitProcessor(true, Logger, SolutionPath);
+        //if (gitProcessor.Initialise().IsSome) return false;
 
-        return gitProcessor.Add() && gitProcessor.Commit("Initial");
+        //return gitProcessor.Add() && gitProcessor.Commit("Initial");
     }
 
     private static void AddProjectParametersWithCheck(XElement projectXml, string groupName, string propertyName,

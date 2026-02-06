@@ -32,16 +32,20 @@ public sealed class ScaffoldSeederCreatorData
     public ProjectForCreate SeedDbProject { get; }
     public ProjectForCreate FakeHostWebApiProject { get; }
 
-    public static ScaffoldSeederCreatorData Create(AppCreatorBaseData appCreatorBaseData, string projectName,
-        ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters)
+    public static ScaffoldSeederCreatorData Create(AppCreatorBaseData appCreatorBaseData,
+        string scaffoldSeederProjectName, ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters)
     {
         //სკაფოლდინგის ბიბლიოთეკა
-        var databaseScaffoldClassLibProjectName = $"{projectName}DbSc";
+        var databaseScaffoldClassLibProjectName =
+            NamingStats.DatabaseScaffoldClassLibProjectName(scaffoldSeederProjectName);
         var databaseScaffoldClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             databaseScaffoldClassLibProjectName, []);
 
+        var dataSeedingPackageFolder =
+            NamingStats.DataSeedingPackageFolder(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName,
+                appCreatorBaseData.WorkPath);
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
-        var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
+        var dataSeedingClassLibProject = ProjectForCreate.CreateClassLibProject(dataSeedingPackageFolder,
             NamingStats.DataSeedingClassLibProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName),
             ["CarcassSeeders", "ProjectSeeders", "Models", "Json"]);
 

@@ -131,8 +131,11 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
+        var dataSeedingPackageFolder = NamingStats.DataSeedingPackageFolder(Parameters.ScaffoldSeederProjectName,
+            scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.AppCreatorBaseData.WorkPath);
+
         var seederParameters = new SeederParametersDomain(
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName, "Json"),
+            Path.Combine(dataSeedingPackageFolder, dataSeedingClassLibProjectName, "Json"),
             Parameters.ProjectSecurityFolderPath, Parameters.LogFolder, Parameters.DevDatabaseDataProvider,
             $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={seedDbProjectName}",
             Parameters.DevCommandTimeout, Parameters.ExcludesRulesParametersFilePath);
@@ -185,9 +188,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             $"{Parameters.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={createProjectSeederCodeProjectName}",
             Parameters.DevCommandTimeout,
             Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, getJsonFromScaffoldDbProjectName),
-            getJsonFromScaffoldDbProjectName,
-            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionFolderPath, dataSeedingClassLibProjectName),
-            dataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
+            getJsonFromScaffoldDbProjectName, Path.Combine(dataSeedingPackageFolder, dataSeedingClassLibProjectName),
+            dataSeedingClassLibProjectName, NamingStats.DataSeedingPackageName(Parameters.ScaffoldSeederProjectName),
+            Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
             Parameters.ProjectDbContextClassName);
 
         var createProjectSeederCodeParametersFileFullName = Path.Combine(
@@ -205,6 +208,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (haveToSaveSupportToolsParameters)
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
 
+        //აქედან ეშვება კონკრეტული პროექტის მონაცემების ჩამყრელი კოდის შემქმნელი პროგრამა
+        //რეალურად ამ პროგრამის საშუალებით ხდება ბაზების გაანალიზება და საჭირო კოდის გენერაცია
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         if (dotnetProcessor
             .RunToolUsingParametersFile(

@@ -1,9 +1,30 @@
-﻿namespace LibAppProjectCreator;
+﻿using System.IO;
+
+namespace LibAppProjectCreator;
 
 public static class NamingStats
 {
     public const string CsProjectExtension = ".csproj";
     public const string JsonExtension = ".json";
+
+    public static string DatabaseScaffoldClassLibProjectName(string scaffoldSeederProjectName)
+    {
+        return $"{scaffoldSeederProjectName}DbSc";
+    }
+
+    public static string DataSeedingPackageName(string projectName)
+    {
+        return $"{projectName}DataSeeding";
+    }
+
+    public static string DataSeedingPackageFolder(string scaffoldSeederProjectName, string workPath)
+    {
+
+        var dataSeedingPackageName =
+            DataSeedingPackageName(scaffoldSeederProjectName);
+        return Path.Combine(workPath, dataSeedingPackageName);
+    }
+
 
     public static string CreateProjectSeederCodeProjectName(string scaffoldSeederProjectName)
     {
@@ -20,7 +41,7 @@ public static class NamingStats
         return $"Seed{scaffoldSeederProjectName}Db";
     }
 
-//
+    //
 
     public static string DataSeedingClassLibProjectName(string scaffoldSeederProjectName)
     {
