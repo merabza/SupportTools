@@ -30,40 +30,52 @@ public abstract class DoubleAppCreator
 
     public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken = default)
     {
+        //ძირითადი აპის შემქმნელის შექმნა
         _mainAppCreator = CreateMainAppCreator();
         if (_mainAppCreator is null)
             return false;
 
-        var solutionPathExists = Directory.Exists(_mainAppCreator.SolutionPath);
+        //შევამოწმოთ არსებობს თუ არა ძირითადი აპის სამუშაო ფოლდერი.
+        var isWorkPathExists = Directory.Exists(_mainAppCreator.WorkPath);
 
+        //თუ სამუშაო ფოლდერი არ არსებობს, მაშინ შევქმნათ სამუშაო ფოლდერი და შევქმნათ აპი.
+        //თუ სამუშაო ფოლდერი არსებობს, მაშინ მხოლოდ სინქრონიზაცია გავაკეთოთ გიტის.
         if (!await _mainAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
-                solutionPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
+                isWorkPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
             return false;
 
-        if (!solutionPathExists)
+        //თუ სამუშაო ფოლდერი არ არსებობდა აპლიკაციის შექმნის პროცესის გაშვებამდე,
+        //მაშინ აპის შეიქმნებოდა მთლიანად და ამიტომ პროცესი დასრულებულია
+        if (!isWorkPathExists)
             return true;
 
-        var mainSolutionFileManager =
-            FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
+        //შევქმნათ ფაილმენეჯერი ძირითადი აპის სამუშაო ფოლდერისთვის
+        var mainWorkPathFileManager =
+            FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.WorkPath);
 
-        if (mainSolutionFileManager == null)
+        if (mainWorkPathFileManager == null)
         {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}",
-                _useConsole, _logger);
+            StShared.WriteErrorLine($"FileManager does not created for folder {_mainAppCreator.WorkPath}", _useConsole,
+                _logger);
             return false;
         }
 
-        var deleteBinObjFolders = new DeleteBinObjFolders(mainSolutionFileManager);
+        //წავშალოთ ყველა ბინარული ფაილები და მისი შემცველი ფოლდერები,
+        //რადგან ისინი არ გვჭირდება სინქრონიზაციისთვის და მხოლოდ პრობლემებს შექმნიან
+        var deleteBinObjFolders = new DeleteBinObjFolders(mainWorkPathFileManager);
         deleteBinObjFolders.Run();
 
+        //შევქმნათ დროებითი აპის შემქმნელი
         var tempAppCreator = CreateTempAppCreator();
         if (tempAppCreator is null)
             return false;
 
-        if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken, ECreateAppVersions.Temp))
+        //შევქმნათ დროებითი აპი და მოვამზადოთ მისი პარამეტრები
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(false, cancellationToken, ECreateAppVersions.Temp))
             return false;
 
-        return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);
+
+        return SyncSolution(tempAppCreator.WorkPath, mainWorkPathFileManager);
     }
 
     private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)

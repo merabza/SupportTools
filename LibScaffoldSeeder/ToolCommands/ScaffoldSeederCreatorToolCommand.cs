@@ -54,8 +54,10 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        //აპლიკაციის შემქმნელის შექმნა. მუშაობს როგორც ორმაგი შემქმნელი.
         var scaffoldSeederDoubleAppCreator =
             new ScaffoldSeederDoubleAppCreator(_logger, _httpClientFactory, _useConsole, Parameters);
+
         if (!await scaffoldSeederDoubleAppCreator.CreateDoubleApp(cancellationToken))
         {
             StShared.WriteErrorLine("solution does not created", true, _logger);

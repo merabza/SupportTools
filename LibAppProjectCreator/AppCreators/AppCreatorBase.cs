@@ -48,10 +48,11 @@ public abstract class AppCreatorBase
 
     private List<string> FoldersForCreate { get; } = []; //შესაქმნელი ფოლდერების სია
     private List<string> FoldersForCheckAndClear { get; } = []; //გასაწმენდი ფოლდერების სია
+    private List<string> FilesForDelete { get; } = []; //წასაშლელი ფოლდერების სია
     private List<ProjectBase> Projects { get; } = []; //სოლუშენში ჩასამატებელი პროექტების სია
     private List<ReferenceDataModel> References { get; } = []; //რეფერენსების სია
     private List<PackageDataModel> Packages { get; } = []; //გარე პაკეტების სია
-    protected string WorkPath { get; }
+    public string WorkPath { get; }
     protected string SecurityPath { get; }
 
     public string SolutionPath { get; }
@@ -118,7 +119,8 @@ public abstract class AppCreatorBase
     private void PrepareFoldersForCheckAndClear()
     {
         FoldersForCheckAndClear.Add(SecurityPath);
-        //FoldersForCheckAndClear.Add(SolutionPath);
+        FilesForDelete.Add(Path.Combine(SolutionPath, $"{ProjectName}.sln"));
+        FilesForDelete.Add(Path.Combine(SolutionPath, $"{ProjectName}.slnx"));
         foreach (var createInPath in Projects.Select(x => x.ProjectFullPath).Distinct())
             FoldersForCheckAndClear.Add(createInPath);
     }
@@ -193,6 +195,13 @@ public abstract class AppCreatorBase
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
         if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete))) return false;
 
+        foreach (var fileName in FilesForDelete)
+        {
+            File.Delete(fileName);
+        }
+
+
+
         //შევქმნათ ფოლდერების სიაში არსებული ყველა ფოლდერი
         if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true))) return false;
 
@@ -203,7 +212,6 @@ public abstract class AppCreatorBase
 
         //პროექტების დამატება სოლუშენში
         foreach (var prj in Projects)
-        {
             switch (prj)
             {
                 case ProjectForCreate projectForCreate:
@@ -256,7 +264,6 @@ public abstract class AppCreatorBase
                     break;
                 }
             }
-        }
 
         if (!await MakeAdditionalFiles(cancellationToken))
             return false;
