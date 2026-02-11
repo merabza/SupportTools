@@ -118,7 +118,7 @@ public abstract class AppCreatorBase
     private void PrepareFoldersForCheckAndClear()
     {
         FoldersForCheckAndClear.Add(SecurityPath);
-        FoldersForCheckAndClear.Add(SolutionPath);
+        //FoldersForCheckAndClear.Add(SolutionPath);
         foreach (var createInPath in Projects.Select(x => x.ProjectFullPath).Distinct())
             FoldersForCheckAndClear.Add(createInPath);
     }
