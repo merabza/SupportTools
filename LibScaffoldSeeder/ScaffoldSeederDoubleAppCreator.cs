@@ -146,12 +146,6 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
     protected override AppCreatorBase? CreateTempAppCreator()
     {
-        var appCreator = CreateAppCreator(false);
-
-        if (appCreator is null) return null;
-
-        //FileStat.DeleteDirectoryIfExists(appCreator.WorkPath);
-
-        return appCreator;
+        return CreateAppCreator(false);
     }
 }
