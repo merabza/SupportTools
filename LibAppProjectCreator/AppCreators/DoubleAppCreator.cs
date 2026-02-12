@@ -74,37 +74,36 @@ public abstract class DoubleAppCreator
         if (!await tempAppCreator.PrepareParametersAndCreateApp(false, cancellationToken, ECreateAppVersions.Temp))
             return false;
 
-
         return SyncSolution(tempAppCreator.WorkPath, mainWorkPathFileManager);
     }
 
-    private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)
+    private bool SyncSolution(string tempWorkPath, FileManager mainWorkFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        var sourceFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempSolutionPath);
+        var tempWorkFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempWorkPath);
 
-        if (sourceFileManager == null)
+        if (tempWorkFileManager == null)
         {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {tempSolutionPath}", _useConsole,
+            StShared.WriteErrorLine($"tempWorkFileManager does not created for folder {tempWorkPath}", _useConsole,
                 _logger);
             return false;
         }
 
         var excludeSet = new ExcludeSet { FolderFileMasks = [@"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*"] };
 
-        if (!sourceFileManager.IsFolderEmpty(null))
+        if (!tempWorkFileManager.IsFolderEmpty(null))
         {
             var copyAndReplaceFilesAndFolders =
-                new CopyAndReplaceFilesAndFolders(sourceFileManager, mainSolutionFileManager, excludeSet);
+                new CopyAndReplaceFilesAndFolders(tempWorkFileManager, mainWorkFileManager, excludeSet);
             copyAndReplaceFilesAndFolders.Run();
         }
 
-        if (mainSolutionFileManager.IsFolderEmpty(null))
+        if (mainWorkFileManager.IsFolderEmpty(null))
             return true;
 
         var excludeFolders = new[] { ".git", ".vs", "obj" };
         var deleteRedundantFiles =
-            new DeleteRedundantFiles(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
+            new DeleteRedundantFiles(tempWorkFileManager, mainWorkFileManager, excludeSet, excludeFolders);
         deleteRedundantFiles.Run();
 
         return true;
