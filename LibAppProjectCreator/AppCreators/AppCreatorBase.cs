@@ -195,12 +195,7 @@ public abstract class AppCreatorBase
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
         if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete))) return false;
 
-        foreach (var fileName in FilesForDelete)
-        {
-            File.Delete(fileName);
-        }
-
-
+        foreach (var fileName in FilesForDelete) File.Delete(fileName);
 
         //შევქმნათ ფოლდერების სიაში არსებული ყველა ფოლდერი
         if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true))) return false;

@@ -76,8 +76,6 @@
   <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
   <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
   <Project Path="LibTools/LibTools.csproj" />
-  <Project Path="SupportTools.Domain/SupportTools.Domain.csproj" />
-  <Project Path="SupportTools.Repositories/SupportTools.Repositories.csproj" />
   <Project Path="SupportTools/SupportTools.csproj" />
   <Project Path="SupportToolsData/SupportToolsData.csproj" />
 </Solution>

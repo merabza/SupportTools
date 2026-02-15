@@ -96,7 +96,8 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         AddPackage(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
             NuGetPackages.MicrosoftEntityFrameworkCoreDesign); //, "5"
         AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.AppCliToolsCliParameters);
-        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, GitProjects.AppCliToolsDbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
+            GitProjects.AppCliToolsDbContextAnalyzer);
         AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject, mainDatabaseProject);
         AddReference(_scaffoldSeederCreatorData.CreateProjectSeederCodeProject,
             _scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject);

@@ -54,8 +54,8 @@ public sealed class ProjectParametersClassCreator : CodeCreator
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using LibParameters", _useMenu ? new CodeCommand("using System.Collections.Generic") : new CodeExtraLine(),
-            _useDatabase ? new CodeCommand("using ParametersManagement.LibDatabaseParameters") : new CodeExtraLine(), string.Empty,
-            $"namespace {_inNamespace}.Models", string.Empty,
+            _useDatabase ? new CodeCommand("using ParametersManagement.LibDatabaseParameters") : new CodeExtraLine(),
+            string.Empty, $"namespace {_inNamespace}.Models", string.Empty,
             new CodeBlock($"public sealed class {_projectNames}Parameters : IParameters",
                 new CodeBlock("public string? LogFolder", true, "get", "set"), propertiesBlock,
                 new CodeBlock("public bool CheckBeforeSave()", "return true"), _useMenu ? tasksBlock : null));
