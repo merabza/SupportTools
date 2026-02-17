@@ -4,10 +4,13 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
+using LanguageExt;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -37,10 +40,14 @@ public sealed class ServiceStarterToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = _parameters.ProjectName;
-        var environmentName = _parameters.EnvironmentName;
+        string projectName = _parameters.ProjectName;
+        string environmentName = _parameters.EnvironmentName;
 
-        _logger.LogInformation("Try to start service {projectName}/{environmentName}...", projectName, environmentName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Try to start service {ProjectName}/{EnvironmentName}...", projectName,
+                environmentName);
+        }
 
         if (string.IsNullOrWhiteSpace(projectName))
         {
@@ -49,22 +56,27 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
+        IProjectsManager? projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
 
         if (projectManager is null)
         {
-            _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not started",
-                projectName, environmentName);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogError(
+                    "agentClient does not created. Service {ProjectName}/{EnvironmentName} can not started",
+                    projectName, environmentName);
+            }
+
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        var startServiceResult = await projectManager.StartService(_parameters.ProjectName, _parameters.EnvironmentName,
-            CancellationToken.None);
+        Option<Err[]> startServiceResult = await projectManager.StartService(_parameters.ProjectName,
+            _parameters.EnvironmentName, CancellationToken.None);
         if (startServiceResult.IsSome)
         {
-            _logger.LogError("Service {projectName}/{environmentName} can not started", projectName, environmentName);
+            _logger.LogError("Service {ProjectName}/{EnvironmentName} can not started", projectName, environmentName);
             return false;
         }
 
@@ -74,15 +86,19 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             _parameters.WebAgentForCheck, _parameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
-            _logger.LogError("Service {projectName}/{environmentName} parameters file check failed", projectName,
+        {
+            _logger.LogError("Service {ProjectName}/{EnvironmentName} parameters file check failed", projectName,
                 environmentName);
+        }
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია
         var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             _parameters.WebAgentForCheck, _parameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
-            _logger.LogError("Service {projectName}/{environmentName} version check failed", projectName,
+        {
+            _logger.LogError("Service {ProjectName}/{EnvironmentName} version check failed", projectName,
                 environmentName);
+        }
 
         return true;
     }

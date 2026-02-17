@@ -5,6 +5,7 @@ using AppCliTools.CliParameters;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using ToolsManagement.Installer.ProjectManagers;
 
 namespace LibAppInstallWork.ToolCommands;
 
@@ -29,7 +30,9 @@ public sealed class ProgramRemoverToolCommand : ToolCommand
     protected override bool CheckValidate()
     {
         if (!string.IsNullOrWhiteSpace(_parameters.ProjectName))
+        {
             return true;
+        }
 
         _logger.LogError("Project Name not specified");
         return false;
@@ -37,22 +40,24 @@ public sealed class ProgramRemoverToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = _parameters.ProjectName;
+        string projectName = _parameters.ProjectName;
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
+        IProjectsManager? projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
         if (projectManager is null)
         {
-            _logger.LogError("agentClient does not created, Project {projectName} can not removed", projectName);
+            _logger.LogError("agentClient does not created, Project {ProjectName} can not removed", projectName);
             return false;
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
         if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName,
                 _parameters.IsService, CancellationToken.None))
+        {
             return true;
+        }
 
-        _logger.LogError("Project {projectName} can not removed", projectName);
+        _logger.LogError("Project {ProjectName} can not removed", projectName);
         return false;
     }
 }

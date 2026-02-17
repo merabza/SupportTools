@@ -46,9 +46,11 @@ public sealed class ProgramRemoverParameters : IParameters
         {
             var checkVersionParameters = CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
             if (checkVersionParameters is null)
+            {
                 return null;
+            }
 
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
             {
@@ -62,13 +64,13 @@ public sealed class ProgramRemoverParameters : IParameters
                 return null;
             }
 
-            var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
+            ServerDataModel server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
             ApiClientSettingsDomain? webAgentForInstall = null;
             string? installFolder = null;
             if (!server.IsLocal)
             {
-                var webAgentNameForInstall =
+                string? webAgentNameForInstall =
                     project.UseAlternativeWebAgent ? server.WebAgentInstallerName : server.WebAgentName;
                 if (string.IsNullOrWhiteSpace(webAgentNameForInstall))
                 {
@@ -92,8 +94,8 @@ public sealed class ProgramRemoverParameters : IParameters
                 }
             }
 
-            var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId,
-                projectName, serverInfo);
+            ProxySettingsBase? proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort,
+                serverInfo.ApiVersionId, projectName, serverInfo);
 
             return proxySettings is null
                 ? null

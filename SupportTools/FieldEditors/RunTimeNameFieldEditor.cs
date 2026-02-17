@@ -16,7 +16,7 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
     {
-        var currentRunTimeName = GetValue(recordForUpdate);
+        string? currentRunTimeName = GetValue(recordForUpdate);
 
         var runTimeCruder = RunTimeCruder.Create(_parametersManager);
 
@@ -25,14 +25,16 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var runTimeCruder = RunTimeCruder.Create(_parametersManager);
 
-        var status = runTimeCruder.GetStatusFor(val);
+        string? status = runTimeCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

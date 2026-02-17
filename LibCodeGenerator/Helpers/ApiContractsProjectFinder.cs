@@ -9,15 +9,20 @@ public static class ApiContractsProjectFinder
     public static string? FindApiContractsProject(string projectFolder, string? projectApiContractsProjectName)
     {
         if (string.IsNullOrWhiteSpace(projectFolder) || !Directory.Exists(projectFolder))
+        {
             return null;
+        }
+
         if (string.IsNullOrWhiteSpace(projectApiContractsProjectName))
+        {
             return null;
+        }
 
         // Find all .csproj files recursively
-        var csprojFiles = Directory.GetFiles(projectFolder, "*.csproj", SearchOption.AllDirectories);
+        string[] csprojFiles = Directory.GetFiles(projectFolder, "*.csproj", SearchOption.AllDirectories);
 
         // Find the first .csproj file matching the projectApiContractsProjectName
-        var targetCsproj = csprojFiles.FirstOrDefault(f =>
+        string? targetCsproj = csprojFiles.FirstOrDefault(f =>
             Path.GetFileNameWithoutExtension(f)
                 .Equals(projectApiContractsProjectName, StringComparison.OrdinalIgnoreCase));
 

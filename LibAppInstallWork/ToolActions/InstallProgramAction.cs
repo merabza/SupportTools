@@ -3,8 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.Installer.ProjectManagers;
 using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -24,7 +26,7 @@ public sealed class InstallProgramAction : ToolAction
     private readonly string _programArchiveExtension;
     private readonly string _projectName;
 
-    private string? _installingProgramVersion;
+    //private string? _installingProgramVersion;
 
     public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
@@ -47,38 +49,42 @@ public sealed class InstallProgramAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForDownload, _installerBaseParameters, UseConsole);
+        IIProjectsManagerWithFileStorage? projectManager =
+            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+                _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)
         {
-            _logger.LogError("agentClient does not created. project {_projectName}/{_environmentName} does not updated",
+            _logger.LogError("agentClient does not created. project {ProjectName}/{EnvironmentName} does not updated",
                 _projectName, _environmentName);
             return false;
         }
 
-        _logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
-            _environmentName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Installing {ProjectName}/{EnvironmentName} by web agent...", _projectName,
+                _environmentName);
+        }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        var installProgramResult = await projectManager.InstallProgram(_projectName, _environmentName,
+        OneOf<string, Err[]> installProgramResult = await projectManager.InstallProgram(_projectName, _environmentName,
             _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension,
             cancellationToken);
 
         if (installProgramResult.IsT1)
         {
-            _logger.LogError("Error when Install program project {_projectName}/{_environmentName}", _projectName,
+            _logger.LogError("Error when Install program project {ProjectName}/{EnvironmentName}", _projectName,
                 _environmentName);
             Err.PrintErrorsOnConsole(installProgramResult.AsT1);
             return false;
         }
 
-        _installingProgramVersion = installProgramResult.AsT0;
-
-        if (_installingProgramVersion != null)
+        if (installProgramResult.AsT0 is not null)
+        {
             return true;
+        }
 
-        _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
+        _logger.LogError("project {ProjectName}/{EnvironmentName} does not updated", _projectName, _environmentName);
         return false;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,30 +35,37 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //თუ ეს ფოლდერი აღმოჩენილი არ იქნება, გამოვიდეს შენიშვნა ამის შესახებ
         //თუ Migrations ფოლდერი არის, მაშინ უნდა მოხდეს მისი შიგთავსის გასუფთავება *.cs ფაილებისაგან
 
-        var migrationProjectFileName = DatabaseMigrationParameters.MigrationProjectFileName;
+        string migrationProjectFileName = DatabaseMigrationParameters.MigrationProjectFileName;
 
         var migrationProjectFile = new FileInfo(migrationProjectFileName);
         if (!migrationProjectFile.Exists)
         {
-            _logger.LogError("Object for Migration project file {migrationProjectFileName} does not exists",
+            _logger.LogError("Object for Migration project file {MigrationProjectFileName} does not exists",
                 migrationProjectFileName);
             return ValueTask.FromResult(false);
         }
 
-        var migrationsFolder = migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
+        DirectoryInfo? migrationsFolder =
+            migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
         if (migrationsFolder is not null && migrationsFolder.Exists)
         {
-            var directorySeparatorChar = Path.DirectorySeparatorChar;
-            _logger.LogInformation("Delete Migrations{directorySeparatorChar}*.cs files", directorySeparatorChar);
-            foreach (var csFile in migrationsFolder.GetFiles("*.cs"))
+            char directorySeparatorChar = Path.DirectorySeparatorChar;
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Delete Migrations{DirectorySeparatorChar}*.cs files", directorySeparatorChar);
+            }
+
+            foreach (FileInfo csFile in migrationsFolder.GetFiles("*.cs"))
+            {
                 csFile.Delete();
+            }
         }
 
-        var migrationStartupProjectFilePath = DatabaseMigrationParameters.MigrationStartupProjectFilePath;
+        string migrationStartupProjectFilePath = DatabaseMigrationParameters.MigrationStartupProjectFilePath;
         var migrationStartupProjectFile = new FileInfo(migrationStartupProjectFilePath);
         if (!migrationStartupProjectFile.Exists)
         {
-            _logger.LogError("Object for Migration startup project file {migrationStartupProjectFile} does not exists",
+            _logger.LogError("Object for Migration startup project file {MigrationStartupProjectFile} does not exists",
                 migrationStartupProjectFile);
             return ValueTask.FromResult(false);
         }
@@ -72,42 +80,52 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //    return ValueTask.FromResult(false);
         //}
 
-        var projectXml = XElement.Load(migrationStartupProjectFilePath);
-        var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference");
+        XElement projectXml = XElement.Load(migrationStartupProjectFilePath);
+        IEnumerable<XElement> projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference");
 
-        var migrationStartupProjectDirectoryName = migrationStartupProjectFile.DirectoryName;
+        string? migrationStartupProjectDirectoryName = migrationStartupProjectFile.DirectoryName;
         if (string.IsNullOrWhiteSpace(migrationStartupProjectDirectoryName))
         {
             _logger.LogError(
-                "migrationStartupProjectFile.DirectoryName for Migration project file {migrationProjectFileName} does not exists",
+                "migrationStartupProjectFile.DirectoryName for Migration project file {MigrationProjectFileName} does not exists",
                 migrationProjectFileName);
             return ValueTask.FromResult(false);
         }
 
-        var migrationProjectFileExistsInStartupProjectReferences = false;
-        foreach (var projectReference in projectReferences)
+        bool migrationProjectFileExistsInStartupProjectReferences = false;
+        foreach (XElement projectReference in projectReferences)
+        {
             if (projectReference.Attributes().Where(w => w.Name == "Include").Any(w => migrationProjectFileName ==
                     Path.GetFullPath(Path.Combine(migrationStartupProjectDirectoryName, w.Value))))
+            {
                 migrationProjectFileExistsInStartupProjectReferences = true;
+            }
+        }
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
         if (!migrationProjectFileExistsInStartupProjectReferences)
+        {
             dotnetProcessor.AddReferenceToProject(migrationStartupProjectFilePath, migrationProjectFileName);
+        }
 
         _logger.LogInformation("Create Initial Migration");
-        var dbContextName = DatabaseMigrationParameters.DbContextName;
+        string dbContextName = DatabaseMigrationParameters.DbContextName;
 
         //ბაზის მიგრაციის დაწყება
         if (dotnetProcessor.EfAddDatabaseMigration("Initial", dbContextName, migrationStartupProjectFilePath,
                 migrationProjectFileName).IsSome)
+        {
             return ValueTask.FromResult(false);
+        }
 
         _logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
         if (dotnetProcessor.EfUpdateDatabaseByMigration(dbContextName,
                 migrationStartupProjectFilePath, migrationProjectFileName).IsSome)
+        {
             return ValueTask.FromResult(false);
+        }
 
         //იმისათვის, რომ ამ კოდმა იმუშავოს, საჭიროა შემდეგი:
         //1. მიგრაციის პროექტში უნდა დაემატოს ფოლდერი Sql
@@ -121,18 +139,22 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //4. სასურველია თითოული ფაილი თითო სტორედ პროცედურას, ან ფუნქციას ემსახურებოდეს. რომ მომავალში ადვილი გახდეს მათი რედაქტირება, დამატება ან წაშლა.
         //5. შექმნის ბრძანება სასურველია იყოს CREATE OR ALTER 
 
-        var sqlFolder = migrationProjectFile.Directory?.GetDirectories("Sql").SingleOrDefault();
+        DirectoryInfo? sqlFolder = migrationProjectFile.Directory?.GetDirectories("Sql").SingleOrDefault();
         if (sqlFolder == null)
+        {
             return ValueTask.FromResult(true);
+        }
 
         _logger.LogInformation("Create sql Migration");
         //ბაზის sql მიგრაციის დაწყება
         if (dotnetProcessor
             .EfAddDatabaseMigration("Sql", dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
             .IsSome)
+        {
             return ValueTask.FromResult(false);
+        }
 
-        var sqlMigrationFile = migrationsFolder?.GetFiles("??????????????_Sql.cs").SingleOrDefault();
+        FileInfo? sqlMigrationFile = migrationsFolder?.GetFiles("??????????????_Sql.cs").SingleOrDefault();
         if (sqlMigrationFile == null)
         {
             _logger.LogError("sql Migration File Not found");

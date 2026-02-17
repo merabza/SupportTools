@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -22,10 +23,10 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2 : C
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var syncOneGroupAllProjectsGitsToolAction =
             SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, _projectName, true);
-        return syncOneGroupAllProjectsGitsToolAction.Run(CancellationToken.None).Result;
+        return await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
     }
 }

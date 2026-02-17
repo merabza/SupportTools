@@ -31,19 +31,23 @@ public sealed class VersionCheckerToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = CheckVersionParameters.ProjectName;
+        string projectName = CheckVersionParameters.ProjectName;
         //შევამოწმოთ გაშვებული პროგრამის პარამეტრების ვერსია
         var checkParametersVersionAction = new CheckParametersVersionAction(_logger, _httpClientFactory,
             CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, 1, UseConsole);
         if (!await checkParametersVersionAction.Run(cancellationToken))
-            _logger.LogError("project {projectName} parameters file check failed", projectName);
+        {
+            _logger.LogError("project {ProjectName} parameters file check failed", projectName);
+        }
         //return false;
 
         //შევამოწმოთ გაშვებული პროგრამის ვერსია 
         var checkProgramVersionAction = new CheckProgramVersionAction(_logger, _httpClientFactory,
             CheckVersionParameters.WebAgentForCheck, CheckVersionParameters.ProxySettings, null, UseConsole, 1);
         if (!await checkProgramVersionAction.Run(cancellationToken))
-            _logger.LogError("project {projectName} version check failed", projectName);
+        {
+            _logger.LogError("project {ProjectName} version check failed", projectName);
+        }
         //return false;
 
         return true;

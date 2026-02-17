@@ -20,7 +20,7 @@ public sealed class ConsoleAppLaunchSettingsJsonCreator
 
     public bool Create()
     {
-        var projectParametersFileFullName = Path.Combine(_projectParametersFilePath, $"{_projectName}.json");
+        string projectParametersFileFullName = Path.Combine(_projectParametersFilePath, $"{_projectName}.json");
 
         // ReSharper disable once CollectionNeverUpdated.Local
         var jObject = new JObject(new JProperty("profiles",
@@ -28,7 +28,7 @@ public sealed class ConsoleAppLaunchSettingsJsonCreator
                 new JObject(new JProperty("commandName", "Project"),
                     new JProperty("commandLineArgs", $"--use \"{projectParametersFileFullName}\""))))));
 
-        var forCreateFileName = Path.Combine(_placePath, "launchSettings.json");
+        string forCreateFileName = Path.Combine(_placePath, "launchSettings.json");
         File.WriteAllText(forCreateFileName, jObject.ToString());
 
         return true;

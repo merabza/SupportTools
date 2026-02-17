@@ -39,7 +39,9 @@ public sealed class ServicePublisherToolCommand : ToolCommand
             ProgramPublisherParameters.UploadTempExtension, ProgramPublisherParameters.FileStorageForExchange,
             ProgramPublisherParameters.SmartSchemaForLocal, ProgramPublisherParameters.SmartSchemaForExchange);
         if (!await createPackageAndUpload.Run(cancellationToken))
+        {
             return false;
+        }
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         //AppSettingsEncoderParameters appSettingsEncoderParameters =

@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -18,18 +21,21 @@ public sealed class AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand 
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var npmPackageNamesFromProject = parameters.GetNpmPackageNames(_projectName);
+        List<string> npmPackageNamesFromProject = parameters.GetNpmPackageNames(_projectName);
 
-        foreach (var kvp in parameters.NpmPackages.Where(kvp => !npmPackageNamesFromProject.Contains(kvp.Key)))
+        foreach (KeyValuePair<string, string> kvp in parameters.NpmPackages.Where(kvp =>
+                     !npmPackageNamesFromProject.Contains(kvp.Key)))
+        {
             npmPackageNamesFromProject.Add(kvp.Key);
+        }
 
         //ცვლილებების შენახვა
         _parametersManager.Save(parameters, "Add Npm Packages Finished");
 
-        return true;
+        return new ValueTask<bool>(true);
     }
 }

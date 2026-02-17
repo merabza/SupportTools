@@ -32,46 +32,60 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var updateOutdatedPackagesParameters =
             UpdateOutdatedPackagesParameters.Create(supportToolsParameters, projectGroupName, projectName);
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new UpdateOutdatedPackagesToolAction(loggerOrNull, parametersManager, updateOutdatedPackagesParameters,
             useConsole);
     }
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
-        if (_updateOutdatedPackagesParameters.ProjectGroupName is null &&
-            _updateOutdatedPackagesParameters.ProjectName is null)
-            projectsList = _updateOutdatedPackagesParameters.Projects;
-        else if (_updateOutdatedPackagesParameters.ProjectGroupName is not null)
-            projectsList = _updateOutdatedPackagesParameters.Projects.Where(x =>
-                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
-                _updateOutdatedPackagesParameters.ProjectGroupName);
-        else
-            projectsList =
-                _updateOutdatedPackagesParameters.Projects.Where(x =>
-                    x.Key == _updateOutdatedPackagesParameters.ProjectName);
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
 
-        var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, PackageUpdater>();
         const EGitCol gitCol = EGitCol.Main;
 
-        foreach (var (projectName, project) in projectsListOrdered)
-        foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
+        foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
-                gitSyncToolsByGitProjectNames.Add(gitProjectName,
-                    new PackageUpdater(_logger, _parametersManager, gitProjectName, true));
-            gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
+            foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+            {
+                if (!gitSyncToolsByGitProjectNames.TryGetValue(gitProjectName, out PackageUpdater? value))
+                {
+                    value = new PackageUpdater(_logger, _parametersManager, gitProjectName, true);
+                    gitSyncToolsByGitProjectNames.Add(gitProjectName, value);
+                }
+
+                value.Add(projectName, gitCol);
+            }
         }
 
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
+        foreach (KeyValuePair<string, PackageUpdater> keyValuePair in gitSyncToolsByGitProjectNames
+                     .Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
         {
-            var packageUpdater = keyValuePair.Value;
+            PackageUpdater packageUpdater = keyValuePair.Value;
             packageUpdater.Run();
         }
 
         return ValueTask.FromResult(true);
+    }
+
+    private IEnumerable<KeyValuePair<string, ProjectModel>> GetProjectsList()
+    {
+        if (_updateOutdatedPackagesParameters.ProjectGroupName is null &&
+            _updateOutdatedPackagesParameters.ProjectName is null)
+        {
+            return _updateOutdatedPackagesParameters.Projects;
+        }
+
+        if (_updateOutdatedPackagesParameters.ProjectGroupName is not null)
+        {
+            return _updateOutdatedPackagesParameters.Projects.Where(x =>
+                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
+                _updateOutdatedPackagesParameters.ProjectGroupName);
+        }
+
+        return _updateOutdatedPackagesParameters.Projects.Where(x =>
+            x.Key == _updateOutdatedPackagesParameters.ProjectName);
     }
 }

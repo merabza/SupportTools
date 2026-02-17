@@ -4,8 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.Installer.ProjectManagers;
 using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -57,8 +59,9 @@ public sealed class InstallServiceAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForDownload, _installerBaseParameters, UseConsole);
+        IIProjectsManagerWithFileStorage? projectManager =
+            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+                _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)
         {
@@ -67,12 +70,15 @@ public sealed class InstallServiceAction : ToolAction
             return false;
         }
 
-        _logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
-            _environmentName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Installing {_projectName}/{_environmentName} by web agent...", _projectName,
+                _environmentName);
+        }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        var installServiceResult = await projectManager.InstallService(_projectName, _environmentName, _serviceUserName,
-            Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
+        OneOf<string, Err[]> installServiceResult = await projectManager.InstallService(_projectName, _environmentName,
+            _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
             _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
             cancellationToken);
 
@@ -87,7 +93,9 @@ public sealed class InstallServiceAction : ToolAction
         InstallingProgramVersion = installServiceResult.AsT0;
 
         if (InstallingProgramVersion != null)
+        {
             return true;
+        }
 
         _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;

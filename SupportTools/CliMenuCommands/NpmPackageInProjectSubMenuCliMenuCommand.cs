@@ -31,7 +31,7 @@ public sealed class NpmPackageInProjectSubMenuCliMenuCommand : CliMenuCommand
         gitProjectSubMenuSet.AddMenuItem(deleteGitProjectCommand);
 
         //პროექტის მენიუში დაბრუნება
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         gitProjectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to Git menu", null), key.Length);
 
         return gitProjectSubMenuSet;

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.LibDataInput;
+using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibGitData.Models;
 using LibGitWork;
@@ -41,7 +42,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
+        AppProjectCreatorAllParameters? parameters = supportToolsParameters.AppProjectCreatorAllParameters;
 
         if (parameters is null)
         {
@@ -55,7 +56,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        var templateModel = parameters.GetTemplate(_templateName);
+        TemplateModel? templateModel = parameters.GetTemplate(_templateName);
         if (templateModel is null)
         {
             _logger.LogError("templateModel is null");
@@ -79,9 +80,9 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         string projectName;
         string? projectShortName;
         string? dbPartProjectName;
-        var appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
+        string appCreatorDataFolderFullName = Path.Combine(supportToolsParameters.WorkFolder, "AppCreatorData");
 
-        var mediatRLicenseKey = supportToolsParameters.MediatRLicenseKey;
+        string? mediatRLicenseKey = supportToolsParameters.MediatRLicenseKey;
 
         switch (_testOrReal)
         {
@@ -117,7 +118,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
 
         if (par is null)
         {
-            _logger.LogError("AppProjectCreatorData does not created for project {projectName}", projectName);
+            _logger.LogError("AppProjectCreatorData does not created for project {ProjectName}", projectName);
             return false;
         }
 
@@ -127,23 +128,28 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
-        var appCreator = AppCreatorFactory.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
+        AppCreatorBase? appCreator = AppCreatorFactory.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
             GitRepos.Create(_logger, supportToolsParameters.Gits, null, UseConsole, false), mediatRLicenseKey,
             supportToolsParameters.GitIgnoreModelFilePaths);
 
         if (appCreator is null)
         {
-            _logger.LogError("appCreator does not created for project {projectName}", projectName);
+            _logger.LogError("appCreator does not created for project {ProjectName}", projectName);
             return false;
         }
 
         if (!await appCreator.PrepareParametersAndCreateApp(_testOrReal == ETestOrReal.Real, cancellationToken))
+        {
             return false;
+        }
 
-        if (_testOrReal != ETestOrReal.Real) return true;
+        if (_testOrReal != ETestOrReal.Real)
+        {
+            return true;
+        }
 
-        var existingProject = supportToolsParameters.GetProject(projectName);
+        ProjectModel? existingProject = supportToolsParameters.GetProject(projectName);
 
         if (existingProject is not null)
         {
@@ -152,12 +158,18 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return true;
         }
 
-        if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false)) return true;
+        if (!Inputer.InputBool($"Create record for project with name {projectName}?", true, false))
+        {
+            return true;
+        }
 
         var projectRecordCreator = new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName,
             projectShortName, dbPartProjectName, string.Empty);
 
-        if (projectRecordCreator.Create()) return true;
+        if (projectRecordCreator.Create())
+        {
+            return true;
+        }
 
         StShared.ConsoleWriteInformationLine(_logger, true,
             "code for project with name {0} created, but record create failed", projectName);

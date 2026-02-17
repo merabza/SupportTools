@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using ParametersManagement.LibParameters;
 using SupportTools.Tools;
@@ -18,9 +20,10 @@ public sealed class UpdateOneToolToLatestVersionCliMenuCommand : CliMenuCommand
         _toolKey = toolKey;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        return Inputer.InputBool("Are you sure, you want to Update All Tools To Latest Version?", true, false) &&
-               DotnetToolsVersionsCheckerUpdater.UpdateOne(_parametersManager, _toolKey);
+        return ValueTask.FromResult(
+            Inputer.InputBool("Are you sure, you want to Update All Tools To Latest Version?", true, false) &&
+            DotnetToolsVersionsCheckerUpdater.UpdateOne(_parametersManager, _toolKey));
     }
 }

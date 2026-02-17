@@ -92,16 +92,19 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return null;
     }
 
-    public string GetUploadTempExtension()
+    public string GetUploadTempExtensionOrDefault()
     {
         return UploadTempExtension ?? DefaultUploadFileTempExtension;
     }
 
     public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)
     {
-        var project = GetProject(projectName);
+        ProjectModel? project = GetProject(projectName);
         if (project is null)
+        {
             return false;
+        }
+
         switch (gitCol)
         {
             case EGitCol.Main:
@@ -117,21 +120,21 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public List<string> GetGitProjectNames(string projectName, EGitCol gitCol)
     {
-        var project = GetProject(projectName);
-        return project is null ? [] : project.GetGitProjectNames(gitCol);
+        ProjectModel? project = GetProject(projectName);
+        return project is null ? [] : project.GetGitProjectNamesByGitCollectionType(gitCol);
     }
 
     public List<string> GetNpmPackageNames(string projectName)
     {
-        var project = GetProject(projectName);
+        ProjectModel? project = GetProject(projectName);
         return project is null ? [] : project.FrontNpmPackageNames;
     }
 
     public ApiClientSettingsDomain GetApiClientSettingsRequired(string apiClientName)
     {
-        var apiClientSettings = GetApiClientSettings(apiClientName) ??
-                                throw new InvalidOperationException(
-                                    $"ApiClient with name {apiClientName} does not exists");
+        ApiClientSettings apiClientSettings = GetApiClientSettings(apiClientName) ??
+                                              throw new InvalidOperationException(
+                                                  $"ApiClient with name {apiClientName} does not exists");
         return string.IsNullOrWhiteSpace(apiClientSettings.Server)
             ? throw new InvalidOperationException($"Server does not specified for ApiClient with name {apiClientName}")
             : new ApiClientSettingsDomain(apiClientSettings.Server, apiClientSettings.ApiKey);
@@ -167,10 +170,16 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public ServerInfoModel? GetServerByProject(string projectName, string serverName)
     {
         if (!Projects.ContainsKey(projectName))
+        {
             return null;
-        var project = GetProject(projectName);
-        if (project?.ServerInfos == null || !project.ServerInfos.TryGetValue(serverName, out var value))
+        }
+
+        ProjectModel? project = GetProject(projectName);
+        if (project?.ServerInfos == null || !project.ServerInfos.TryGetValue(serverName, out ServerInfoModel? value))
+        {
             return null;
+        }
+
         return value;
     }
 
@@ -206,21 +215,28 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public string? GetGitsFolder(string projectName, EGitCol gitCol)
     {
-        var project = GetProject(projectName);
+        ProjectModel? project = GetProject(projectName);
         if (project is null)
+        {
             return null;
+        }
+
         switch (gitCol)
         {
             case EGitCol.Main:
                 if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
+                {
                     return project.ProjectFolderName;
+                }
 
                 StShared.WriteErrorLine("ProjectFolderName must be specified", true);
                 return null;
 
             case EGitCol.ScaffoldSeed:
                 if (project.ScaffoldSeederProjectName != null)
+                {
                     return GetProjectScaffoldSeederPath(project.ScaffoldSeederProjectName);
+                }
 
                 StShared.WriteErrorLine("ScaffoldSeederProjectName must be specified", true);
                 return null;

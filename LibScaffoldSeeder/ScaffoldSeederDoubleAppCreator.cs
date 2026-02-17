@@ -36,7 +36,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         _scaffoldSeederFolderName = $"{_ssParameters.ScaffoldSeederProjectName}ScaffoldSeeder";
         _projectWorkFolderPath = Path.Combine(_ssParameters.ScaffoldSeedersWorkFolder,
             _ssParameters.ScaffoldSeederProjectName);
-        var scaffoldSeederSecurityFolderName = $"{_scaffoldSeederFolderName}.sec";
+        string scaffoldSeederSecurityFolderName = $"{_scaffoldSeederFolderName}.sec";
         SolutionSecurityFolderPath = Path.Combine(_projectWorkFolderPath, scaffoldSeederSecurityFolderName);
         _projectTempFolderPath = Path.Combine(_ssParameters.TempFolder, ScaffoldSeederProjects,
             _ssParameters.ScaffoldSeederProjectName);
@@ -62,7 +62,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         if (appCreatorParameters is null)
         {
             _logger.LogError(
-                "AppProjectCreatorData does not created for project {Parameters.ScaffoldSeederProjectName} ScaffoldSeeder",
+                "AppProjectCreatorData does not created for project {ScaffoldSeederProjectName} ScaffoldSeeder",
                 _ssParameters.ScaffoldSeederProjectName);
             return null;
         }
@@ -82,7 +82,10 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var scaffoldSeederCreatorData =
             ScaffoldSeederCreatorData.Create(appCreatorBaseData, _scaffoldSeederFolderName, _ssParameters);
 
-        if (forMain) ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
+        if (forMain)
+        {
+            ScaffoldSeederMainCreatorData = scaffoldSeederCreatorData;
+        }
 
         return new ScaffoldSeederSolutionCreator(_logger, _httpClientFactory, _ssParameters, _scaffoldSeederFolderName,
             IndentSize, scaffoldSeederCreatorData);
@@ -94,10 +97,10 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         const string reserveFolderName = "Reserve";
 
-        var reserveFolderFullName = Path.Combine(_projectWorkFolderPath, reserveFolderName);
+        string reserveFolderFullName = Path.Combine(_projectWorkFolderPath, reserveFolderName);
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
-        var checkedProjectWorkFolderPath = FileStat.CreateFolderIfNotExists(_projectWorkFolderPath, true);
+        string? checkedProjectWorkFolderPath = FileStat.CreateFolderIfNotExists(_projectWorkFolderPath, true);
         if (checkedProjectWorkFolderPath is null)
         {
             StShared.WriteErrorLine($"does not exists and can not be created work folder {_projectWorkFolderPath}",
@@ -106,7 +109,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         }
 
         //შევამოწმოთ არსებობს თუ არა სარეზერვო არქივებისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
-        var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reserveFolderFullName, true);
+        string? checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reserveFolderFullName, true);
         if (checkedReserveFolderFullPath is null)
         {
             StShared.WriteErrorLine($"does not exists and can not be created work folder {reserveFolderFullName}", true,
@@ -120,17 +123,19 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
             excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
 
         //შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
-        if (Directory.Exists(_scaffoldSeederFolderPath))
+        if (Directory.Exists(_scaffoldSeederFolderPath) &&
+            !compressor.CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
+        {
             //თუ ფოლდერი არსებობს შევეცადოთ მის დაარქივებას სარეზერვო ფოლდერში
-            if (!compressor.CompressFolder(_scaffoldSeederFolderPath, checkedReserveFolderFullPath))
-            {
-                StShared.WriteErrorLine($"{_scaffoldSeederFolderPath} does not compressed", true, _logger);
-                return null;
-            }
+            StShared.WriteErrorLine($"{_scaffoldSeederFolderPath} does not compressed", true, _logger);
+            return null;
+        }
 
         //შევამოწმოთ არსებობს თუ არა ამ პროექტის სექურითი ფოლდერი და თუ არსებობს შევეცადოთ მისი დაარქივება სარეზერვო ფოლდერში
         if (!Directory.Exists(SolutionSecurityFolderPath))
+        {
             return CreateAppCreator(true);
+        }
 
         if (!compressor.CompressFolder(SolutionSecurityFolderPath, checkedReserveFolderFullPath))
         {

@@ -43,10 +43,12 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
     protected override string? InputNewRecordName()
     {
         var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        var newNpmPackageName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
+        string? newNpmPackageName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
 
         if (!string.IsNullOrWhiteSpace(newNpmPackageName))
+        {
             return newNpmPackageName;
+        }
 
         StShared.WriteErrorLine("Name is empty", true);
         return null;
@@ -54,7 +56,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 
     public override string? GetStatusFor(string name)
     {
-        var npmPackages = ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
+        Dictionary<string, string> npmPackages = ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
         return npmPackages.GetValueOrDefault(name);
     }
 

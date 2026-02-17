@@ -9,6 +9,7 @@ using AppCliTools.DbContextAnalyzer.CodeCreators;
 using LibAppProjectCreator;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.CodeCreators;
+using LibGitData.Domain;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -76,8 +77,9 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             return false;
         }
 
-        var mainDatabaseProject = GitProjects.GetGitProjectByKey(_par.DbContextProjectName);
-        var newDataSeedingClassLibProject = GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
+        GitProjectDataDomain mainDatabaseProject = GitProjects.GetGitProjectByKey(_par.DbContextProjectName);
+        GitProjectDataDomain newDataSeedingClassLibProject =
+            GitProjects.GetGitProjectByKey(_par.NewDataSeedingClassLibProjectName);
 
         //სკაფოლდინგის ბიბლიოთეკა
         AddPackage(_scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject,
@@ -142,7 +144,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             _scaffoldSeederCreatorData.CreateProjectSeederCodeProject.ProjectFullPath, "Program.cs");
         emptyConsoleProgramClassCreator.CreateFileStructure();
 
-        var fakeHosProjectPath = _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFullPath;
+        string fakeHosProjectPath = _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectFullPath;
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Fake Host Program.cs...");
         var fakeHostProgramClassCreator =
@@ -155,7 +157,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //var solutionSecurityFolderPath = Path.Combine(projectWorkFolderPath, scaffoldSeederSecurityFolderName);
         //const string jsonExt = ".json";
 
-        var parametersFileName = Path.Combine(_par.ProjectSecurityFolderPath,
+        string parametersFileName = Path.Combine(_par.ProjectSecurityFolderPath,
             $"{_scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName}{NamingStats.JsonExtension}");
 
         const string connectionStringParameterName = "ConnectionStringSeed";
@@ -169,23 +171,29 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
             $"{_par.DevDatabaseConnectionString.AddNeedLastPart(';')}Application Name={NamingStats.SeedDbProjectName(_par.ScaffoldSeederProjectName)}");
 
         //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
-        var paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
+        string paramsJsonText = JsonConvert.SerializeObject(fakeHostProjectParameters, Formatting.Indented);
 
         //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
         await File.WriteAllTextAsync(parametersFileName, paramsJsonText, cancellationToken);
 
-        var migrationSqlFilesFolder = _par.MigrationSqlFilesFolder;
+        string? migrationSqlFilesFolder = _par.MigrationSqlFilesFolder;
         //თუ მიგრაციის sql ფაილების ფოლდერი მითითებულია პარამეტრებში, ეს ფოლდერი არსებობს და შეიცავს ერთს მაინც *.sql ფაილს,
         if (string.IsNullOrWhiteSpace(migrationSqlFilesFolder) || !Directory.Exists(migrationSqlFilesFolder))
+        {
             return true;
+        }
+
         var sqlDir = new DirectoryInfo(migrationSqlFilesFolder);
-        var sqlFiles = sqlDir.GetFiles("*.sql");
+        FileInfo[] sqlFiles = sqlDir.GetFiles("*.sql");
         if (sqlFiles.Length == 0)
+        {
             return true;
-        var projectPath = Path.Combine(SolutionPath, _scaffoldSeederCreatorData.DbMigrationProject.ProjectName);
-        var projectFileFullName = Path.Combine(projectPath,
+        }
+
+        string projectPath = Path.Combine(SolutionPath, _scaffoldSeederCreatorData.DbMigrationProject.ProjectName);
+        string projectFileFullName = Path.Combine(projectPath,
             $"{_scaffoldSeederCreatorData.DbMigrationProject.ProjectName}.csproj");
-        var migrationProjectSqlFilesFolderPath = Path.Combine(projectPath, "Sql");
+        string migrationProjectSqlFilesFolderPath = Path.Combine(projectPath, "Sql");
 
         //მაშინ მიგრაციის პროექტის ფოლდერში დაემატოს Sql ფოლდერი და მასში დაკოპირდეს *.sql ფაილები migrationSqlFilesFolder ფოლდერიდან
         //მიგრაციის პროექტის ფაილში <ItemGroup>-ის შიგნით თითოეული *.sql ფაილისთვის უნდა გაკეთდეს ასეთი ჩანაწერი
@@ -194,19 +202,24 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         //  </ItemGroup>
         if (sqlFiles.Select(sqlFile => sqlFile.CopyTo(Path.Combine(migrationProjectSqlFilesFolderPath, sqlFile.Name)))
             .All(newFile => RegisterEmbeddedResource(projectFileFullName, newFile.Name)))
+        {
             return true;
+        }
+
         StShared.WriteErrorLine("EmbeddedResource does not Registered", true);
         return false;
-
-        //
     }
 
     private static bool RegisterEmbeddedResource(string projectFileFullName, string sqlFileName)
     {
-        var projectXml = XElement.Load(projectFileFullName);
+        XElement projectXml = XElement.Load(projectFileFullName);
 
-        var firstItemGroup = projectXml.Descendants("ItemGroup").FirstOrDefault();
-        if (firstItemGroup == null) projectXml.Add(new XElement("ItemGroup"));
+        XElement? firstItemGroup = projectXml.Descendants("ItemGroup").FirstOrDefault();
+        if (firstItemGroup == null)
+        {
+            projectXml.Add(new XElement("ItemGroup"));
+        }
+
         firstItemGroup = projectXml.Descendants("ItemGroup").FirstOrDefault();
         if (firstItemGroup == null)
         {
@@ -221,7 +234,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         return true;
     }
 
-    //FIXME სოლუშენის აწყობის შემდეგ გასაკეთებელი საქმეები
+    //სოლუშენის აწყობის შემდეგ გასაკეთებელი საქმეები
     //1.  უნდა გაეშვას სკაფოლდინგის პროცესი, რომელიც რეალური ბაზის ასლიდან დაამზადებს მონაცემთა ბაზის კონტექსტს (DbContext)
     //#dotnet ef dbcontext scaffold "$ConnectionStringProd" Microsoft.EntityFrameworkCore.SqlServer --startup-project "..\$CreateProjectSeederCodeProjectName\$CreateProjectSeederCodeProjectName.csproj" --context $DbScContextName --context-dir . --output-dir $modelsFolderName -f
     //dotnet ef dbcontext scaffold "$ConnectionStringProd" Microsoft.EntityFrameworkCore.SqlServer --startup-project $projects[$CreateProjectSeederCodeProjectName] --context $DbScContextName --context-dir . --output-dir $modelsFolderName -f --no-pluralize

@@ -40,7 +40,9 @@ public /*open*/ class MigrationToolCommand : ToolCommand
 
         //ბაზის კონტექსტის სახელი მითითებული უნდა იყოს.
         if (!string.IsNullOrWhiteSpace(DatabaseMigrationParameters.DbContextName))
+        {
             return true;
+        }
 
         _logger.LogError("Database Context Name not Specified");
         return false;

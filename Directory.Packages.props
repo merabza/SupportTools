@@ -1,0 +1,15 @@
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
+    <ItemGroup>
+        <!-- Static code analysis -->
+        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.18.0.131500" />
+        <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
+        <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+        <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.2" />
+        <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    </ItemGroup>
+</Project>

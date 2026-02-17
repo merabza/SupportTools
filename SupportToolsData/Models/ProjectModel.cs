@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using LibGitData;
+using LibGitData.Domain;
 using LibGitData.Models;
 using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
@@ -79,10 +80,13 @@ public sealed class ProjectModel : ItemData
     private string? ProjectFileName(string projectName, GitProjects gitProjects)
     {
         if (string.IsNullOrWhiteSpace(ProjectFolderName))
+        {
             return null;
-        var gitProject = gitProjects.GetGitProjectByKey(projectName);
-        var projectRelativePath = gitProject.ProjectRelativePath;
-        var projectFileName = gitProject.ProjectFileName;
+        }
+
+        GitProjectDataDomain gitProject = gitProjects.GetGitProjectByKey(projectName);
+        string projectRelativePath = gitProject.ProjectRelativePath;
+        string projectFileName = gitProject.ProjectFileName;
         return string.IsNullOrWhiteSpace(projectRelativePath) || string.IsNullOrWhiteSpace(projectFileName)
             ? null
             : Path.Combine(ProjectFolderName, projectRelativePath, projectFileName);
@@ -90,12 +94,12 @@ public sealed class ProjectModel : ItemData
 
     private static string? ProjectFolderRelativePath(string projectName, GitProjects gitProjects)
     {
-        var gitProject = gitProjects.GetGitProjectByKey(projectName);
-        var projectRelativePath = gitProject.ProjectRelativePath;
+        GitProjectDataDomain gitProject = gitProjects.GetGitProjectByKey(projectName);
+        string projectRelativePath = gitProject.ProjectRelativePath;
         return string.IsNullOrWhiteSpace(projectRelativePath) ? null : projectRelativePath;
     }
 
-    public List<string> GetGitProjectNames(EGitCol gitCol)
+    public List<string> GetGitProjectNamesByGitCollectionType(EGitCol gitCol)
     {
         return gitCol switch
         {

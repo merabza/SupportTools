@@ -30,30 +30,30 @@ public sealed class CorrectNewDbParameters : IParameters
     public static CorrectNewDbParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
         string projectName)
     {
-        var project = supportToolsParameters.GetProject(projectName);
+        ProjectModel? project = supportToolsParameters.GetProject(projectName);
 
         if (project is null)
         {
-            logger.LogError("Project with name {projectName} not found", projectName);
+            logger.LogError("Project with name {ProjectName} not found", projectName);
             return null;
         }
 
         if (project.DevDatabaseParameters is null)
         {
-            logger.LogError("Project with name {projectName} does not contains DevDatabaseConnectionParameters",
+            logger.LogError("Project with name {ProjectName} does not contains DevDatabaseConnectionParameters",
                 projectName);
             return null;
         }
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-        var (devDataProvider, devConnectionString, commandTimeout) =
+        (EDatabaseProvider? devDataProvider, string? devConnectionString, int commandTimeout) =
             DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.DevDatabaseParameters,
                 databaseServerConnections);
 
         if (devDataProvider is null || devConnectionString is null)
         {
-            logger.LogError("could not Created Connection String form Project with name {projectName}", projectName);
+            logger.LogError("could not Created Connection String form Project with name {ProjectName}", projectName);
             return null;
         }
 

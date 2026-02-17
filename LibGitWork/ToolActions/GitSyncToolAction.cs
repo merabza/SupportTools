@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -8,6 +9,7 @@ using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -48,12 +50,14 @@ public sealed class GitSyncToolAction : ToolAction
         EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
             gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
+        {
             return new GitSyncToolAction(loggerOrNull, gitSyncParameters);
+        }
 
         StShared.WriteErrorLine("GitSyncParameters is not created", true);
         return null;
@@ -62,11 +66,16 @@ public sealed class GitSyncToolAction : ToolAction
     public bool HasChanges()
     {
         if (!Directory.Exists(_projectFolderName))
+        {
             return false;
+        }
 
-        var haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        OneOf<bool, Err[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT0)
+        {
             return haveUnTrackedFilesResult.AsT0;
+        }
+
         Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
             GitSyncToolActionErrors.HaveUnTrackedFilesError));
         return false;
@@ -75,7 +84,10 @@ public sealed class GitSyncToolAction : ToolAction
     protected override bool CheckValidate()
     {
         if (!string.IsNullOrWhiteSpace(_gitSyncParameters.GitsFolder))
+        {
             return true;
+        }
+
         StShared.WriteErrorLine("Project Folder Name not found.", true);
         return false;
     }
@@ -86,21 +98,21 @@ public sealed class GitSyncToolAction : ToolAction
 
         Phase1Result = EFirstPhaseResult.FinishedWithErrors;
         if (!Directory.Exists(_projectFolderName))
+        {
             if (GitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
             {
                 Phase1Result = EFirstPhaseResult.Cloned;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
+        }
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
         // თუ რომელიმე არ სრულდება გამოვიდეს შესაბამისი შეტყობინება
 
-        var gitInitialized = GitProcessor.IsGitInitialized();
+        bool gitInitialized = GitProcessor.IsGitInitialized();
 
         if (!gitInitialized)
         {
@@ -109,7 +121,7 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        var getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
+        OneOf<string, Err[]> getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
         if (getRemoteOriginUrlResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
@@ -117,7 +129,7 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        var remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
+        string? remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
 
         if (remoteOriginUrl != _gitSyncParameters.GitData.GitProjectAddress)
         {
@@ -127,7 +139,7 @@ public sealed class GitSyncToolAction : ToolAction
 
         //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
         //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-        var getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
+        OneOf<string[], Err[]> getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
         if (getRedundantCachedFilesListResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
@@ -135,15 +147,17 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        var redundantCachedFilesList = getRedundantCachedFilesListResult.AsT0;
+        string[]? redundantCachedFilesList = getRedundantCachedFilesListResult.AsT0;
 
         //და წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
         //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
         if (redundantCachedFilesList.Where(x => !string.IsNullOrWhiteSpace(x)).Any(redundantCachedFileName =>
                 !GitProcessor.RemoveFromCacheRedundantCachedFile(redundantCachedFileName)))
+        {
             return false;
+        }
 
-        var haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        OneOf<bool, Err[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT1)
         {
             Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
@@ -151,12 +165,14 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        var haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
+        bool haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
 
         if (haveUnTrackedFiles && !GitProcessor.Add())
+        {
             return false;
+        }
 
-        var needCommitResult = GitProcessor.NeedCommit();
+        OneOf<bool, Err[]> needCommitResult = GitProcessor.NeedCommit();
         if (needCommitResult.IsT0)
         {
             Phase1Result = needCommitResult.AsT0 ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
@@ -176,14 +192,20 @@ public sealed class GitSyncToolAction : ToolAction
     {
         //თუ ცვლილებები არის, მაშინ ჯერ ვაკეთებთ ქომიტს და შემდეგ სინქრონიზაციას
         if (Phase1Result != EFirstPhaseResult.NeedCommit)
+        {
             return GitProcessor.SyncRemote().Item1;
+        }
 
         if (_askCommitMessage || UsedCommitMessage is null)
-            UsedCommitMessage =
-                Inputer.InputTextRequired("Message", UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
+        {
+            UsedCommitMessage = Inputer.InputTextRequired("Message",
+                UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture));
+        }
 
         if (!GitProcessor.Commit(UsedCommitMessage))
+        {
             return false;
+        }
 
         Changed = true;
 

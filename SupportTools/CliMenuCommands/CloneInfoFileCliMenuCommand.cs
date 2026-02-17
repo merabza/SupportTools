@@ -17,21 +17,31 @@ public /*open*/ class CloneInfoFileCliMenuCommand : CliMenuCommand
         if (!string.IsNullOrWhiteSpace(project.ProjectFolderName) &&
             !string.IsNullOrWhiteSpace(project.MainProjectName))
         {
-            var gitName = parameters.GitProjects[project.MainProjectName].GitName;
+            string? gitName = parameters.GitProjects[project.MainProjectName].GitName;
             if (string.IsNullOrWhiteSpace(gitName))
+            {
                 return null;
-            var gitProjectFolderName = parameters.Gits[gitName].GitProjectFolderName;
+            }
+
+            string? gitProjectFolderName = parameters.Gits[gitName].GitProjectFolderName;
             if (string.IsNullOrWhiteSpace(gitProjectFolderName))
+            {
                 return null;
+            }
+
             projectFolderName = Path.Combine(project.ProjectFolderName, gitProjectFolderName);
         }
 
         if (projectFolderName == null)
+        {
             return null;
+        }
 
         var projectFolder = new DirectoryInfo(projectFolderName);
         if (projectFolder.Exists)
+        {
             defCloneFile = Path.Combine(projectFolder.FullName, "CloneInfo.txt");
+        }
 
         return defCloneFile;
     }

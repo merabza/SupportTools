@@ -67,7 +67,10 @@ public abstract class AppCreatorBase
             return false;
         }
 
-        if (await CreateApp(askForDelete, createAppVersions, cancellationToken)) return true;
+        if (await CreateApp(askForDelete, createAppVersions, cancellationToken))
+        {
+            return true;
+        }
 
         StShared.WriteErrorLine("Solution does not created", true, Logger);
         return false;
@@ -82,9 +85,11 @@ public abstract class AppCreatorBase
     {
         FoldersForCreate.Add(projectForCreate.ProjectFullPath);
 
-        foreach (var folderFullPath in projectForCreate.FoldersForCreate.Values)
+        foreach (string folderFullPath in projectForCreate.FoldersForCreate.Values)
             //ჩაემატოს შესაქმნელი ფოლდერების სიაში
+        {
             FoldersForCreate.Add(folderFullPath);
+        }
 
         Projects.Add(projectForCreate);
     }
@@ -100,9 +105,12 @@ public abstract class AppCreatorBase
 
     protected void AddReference(ProjectBase firstProjectData, GitProjectDataDomain referenceProjectData)
     {
-        var gitProject = Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
-                         AddGitProject(WorkPath, referenceProjectData);
-        if (gitProject is not null) AddReference(firstProjectData, gitProject);
+        ProjectBase? gitProject = Projects.SingleOrDefault(x => x.ProjectName == referenceProjectData.ProjectName) ??
+                                  AddGitProject(WorkPath, referenceProjectData);
+        if (gitProject is not null)
+        {
+            AddReference(firstProjectData, gitProject);
+        }
     }
 
     protected void AddReference(ProjectBase firstProjectData, ProjectBase referenceProjectData)
@@ -121,8 +129,10 @@ public abstract class AppCreatorBase
         FoldersForCheckAndClear.Add(SecurityPath);
         FilesForDelete.Add(Path.Combine(SolutionPath, $"{ProjectName}.sln"));
         FilesForDelete.Add(Path.Combine(SolutionPath, $"{ProjectName}.slnx"));
-        foreach (var createInPath in Projects.Select(x => x.ProjectFullPath).Distinct())
+        foreach (string createInPath in Projects.Select(x => x.ProjectFullPath).Distinct())
+        {
             FoldersForCheckAndClear.Add(createInPath);
+        }
     }
 
     private void PrepareFoldersForCreate()
@@ -145,33 +155,50 @@ public abstract class AppCreatorBase
 
     private void AddGitClone(GitData gitData)
     {
-        if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress)) return;
+        if (GitClones.Any(x => x.GitProjectName == gitData.GitProjectAddress))
+        {
+            return;
+        }
 
         GitClones.Add(new GitCloneDataModel(gitData.GitProjectAddress, gitData.GitProjectFolderName));
     }
 
     private ProjectBase? AddGitProject(string createInPath, GitProjectDataDomain? projectData)
     {
-        if (projectData == null) return null;
+        if (projectData == null)
+        {
+            return null;
+        }
 
         //გავიაროთ დამოკიდებული პროექტები, თუკი არსებობს ისინი
-        foreach (var gitProjectName in projectData.DependsOnProjectNames)
+        foreach (string gitProjectName in projectData.DependsOnProjectNames)
+        {
             AddGitProject(createInPath, GitProjects.GetGitProjectIfExistsByKey(gitProjectName));
+        }
 
         //თუ სიაში უკვე გვაქვს ეს პროექტი, აღარ ვამატებთ
-        var foundedProjectDataModel = Projects.SingleOrDefault(x => x.ProjectName == projectData.ProjectName);
+        ProjectBase? foundedProjectDataModel = Projects.SingleOrDefault(x => x.ProjectName == projectData.ProjectName);
 
-        if (foundedProjectDataModel is not null) return foundedProjectDataModel;
+        if (foundedProjectDataModel is not null)
+        {
+            return foundedProjectDataModel;
+        }
 
         //დავიანგარიშოთ პროექტის ფაილის გზა
-        var projectFileFullName =
+        string projectFileFullName =
             Path.Combine(createInPath, projectData.ProjectRelativePath, projectData.ProjectFileName);
         var projectFile = new FileInfo(projectFileFullName);
-        var projectPath = projectFile.DirectoryName;
-        if (projectPath is null) return null;
+        string? projectPath = projectFile.DirectoryName;
+        if (projectPath is null)
+        {
+            return null;
+        }
 
-        var gitRepo = _gitRepos.GetGitRepoByKey(projectData.GitName);
-        if (gitRepo is null) return null;
+        GitData? gitRepo = _gitRepos.GetGitRepoByKey(projectData.GitName);
+        if (gitRepo is null)
+        {
+            return null;
+        }
 
         //შევქმნათ პროექტის მოდელი
         var projectFromGit = new ProjectFromGit(gitRepo.GitProjectFolderName, projectData.ProjectName, createInPath,
@@ -188,83 +215,114 @@ public abstract class AppCreatorBase
     private async Task<bool> CreateApp(bool askForDelete, ECreateAppVersions createAppVersions,
         CancellationToken cancellationToken = default)
     {
-        if (!AppGitsSync(createAppVersions == ECreateAppVersions.Temp)) return false;
+        if (!AppGitsSync(createAppVersions == ECreateAppVersions.Temp))
+        {
+            return false;
+        }
 
-        if (createAppVersions == ECreateAppVersions.OnlySyncGit) return true;
+        if (createAppVersions == ECreateAppVersions.OnlySyncGit)
+        {
+            return true;
+        }
 
         //შევამოწმოთ და თუ შესაძლებელია წავშალოთ გასასუფთავებელი ფოლდერები
-        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete))) return false;
+        if (FoldersForCheckAndClear.Any(folder => !Stat.CheckRequiredFolder(true, folder, askForDelete)))
+        {
+            return false;
+        }
 
-        foreach (var fileName in FilesForDelete) File.Delete(fileName);
+        foreach (string fileName in FilesForDelete)
+        {
+            File.Delete(fileName);
+        }
 
         //შევქმნათ ფოლდერების სიაში არსებული ყველა ფოლდერი
-        if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true))) return false;
+        if (FoldersForCreate.Any(folder => !StShared.CreateFolder(folder, true)))
+        {
+            return false;
+        }
 
         //სოლუშენის შექმნა
         var dotnetProcessor = new DotnetProcessor(Logger, true);
 
-        if (dotnetProcessor.CreateNewSolution(SolutionPath, ProjectName).IsSome) return false;
+        if (dotnetProcessor.CreateNewSolution(SolutionPath, ProjectName).IsSome)
+        {
+            return false;
+        }
 
         //პროექტების დამატება სოლუშენში
-        foreach (var prj in Projects)
+        foreach (ProjectBase prj in Projects)
+        {
             switch (prj)
             {
                 case ProjectForCreate projectForCreate:
-                {
-                    if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
                     {
-                        //რეაქტის პროექტის შექმნა ფრონტისთვის
-                        var reactEsProjectCreator = new ReactEsProjectCreator(Logger, _httpClientFactory,
-                            projectForCreate.CreateInPath, projectForCreate.ProjectFolderName,
-                            projectForCreate.ProjectFileName, projectForCreate.ProjectName, true);
-                        if (!reactEsProjectCreator.Create()) return false;
-                    }
-                    else
-                    {
-                        //პროექტების შექმნა
-                        if (dotnetProcessor.CreateNewProject(projectForCreate.DotnetProjectType,
-                                projectForCreate.ProjectCreateParameters, projectForCreate.ProjectFullPath,
-                                projectForCreate.ProjectName).IsSome)
-                            return false;
-
-                        var projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
-
-                        AddProjectParametersWithCheck(projectXml, "PropertyGroup", "ImplicitUsings", "disable");
-
-                        projectXml.Save(projectForCreate.ProjectFileFullName);
-
-                        if (projectForCreate.ClassForDelete != null)
+                        if (projectForCreate.DotnetProjectType == EDotnetProjectType.ReactEsProj)
                         {
-                            //წაიშალოს არსებული ავტომატურად შექმნილი Program.cs
-                            var programCs = Path.Combine(projectForCreate.ProjectFullPath,
-                                $"{projectForCreate.ClassForDelete}.cs");
-                            File.Delete(programCs);
+                            //რეაქტის პროექტის შექმნა ფრონტისთვის
+                            var reactEsProjectCreator = new ReactEsProjectCreator(Logger, _httpClientFactory,
+                                projectForCreate.CreateInPath, projectForCreate.ProjectFolderName,
+                                projectForCreate.ProjectFileName, projectForCreate.ProjectName, true);
+                            if (!reactEsProjectCreator.Create())
+                            {
+                                return false;
+                            }
                         }
+                        else
+                        {
+                            //პროექტების შექმნა
+                            if (dotnetProcessor.CreateNewProject(projectForCreate.DotnetProjectType,
+                                    projectForCreate.ProjectCreateParameters, projectForCreate.ProjectFullPath,
+                                    projectForCreate.ProjectName).IsSome)
+                            {
+                                return false;
+                            }
+
+                            XElement projectXml = XElement.Load(projectForCreate.ProjectFileFullName);
+
+                            AddProjectParametersWithCheck(projectXml, "PropertyGroup", "ImplicitUsings", "disable");
+
+                            projectXml.Save(projectForCreate.ProjectFileFullName);
+
+                            if (projectForCreate.ClassForDelete != null)
+                            {
+                                //წაიშალოს არსებული ავტომატურად შექმნილი Program.cs
+                                string programCs = Path.Combine(projectForCreate.ProjectFullPath,
+                                    $"{projectForCreate.ClassForDelete}.cs");
+                                File.Delete(programCs);
+                            }
+                        }
+
+                        if (dotnetProcessor.AddProjectToSolution(SolutionPath, projectForCreate.SolutionFolderName,
+                                projectForCreate.ProjectFileFullName).IsSome)
+                        {
+                            return false;
+                        }
+
+                        break;
                     }
-
-                    if (dotnetProcessor.AddProjectToSolution(SolutionPath, projectForCreate.SolutionFolderName,
-                            projectForCreate.ProjectFileFullName).IsSome)
-                        return false;
-
-                    break;
-                }
                 case ProjectFromGit projectFromGit:
-                {
-                    var projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName,
-                        projectFromGit.ProjectName, $"{projectFromGit.ProjectName}.csproj");
-                    if (dotnetProcessor.AddProjectToSolution(SolutionPath, projectFromGit.SolutionFolderName, projPath)
-                        .IsSome)
-                        return false;
+                    {
+                        string projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName,
+                            projectFromGit.ProjectName, $"{projectFromGit.ProjectName}.csproj");
+                        if (dotnetProcessor
+                            .AddProjectToSolution(SolutionPath, projectFromGit.SolutionFolderName, projPath).IsSome)
+                        {
+                            return false;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
+        }
 
         if (!await MakeAdditionalFiles(cancellationToken))
+        {
             return false;
+        }
 
         //რეფერენსების მიერთება პროექტებში, სიის მიხედვით
-        foreach (var refData in References)
+        foreach (ReferenceDataModel refData in References)
         {
             if (!File.Exists(refData.ProjectFilePath))
             {
@@ -279,14 +337,18 @@ public abstract class AppCreatorBase
             }
 
             if (dotnetProcessor.AddReferenceToProject(refData.ProjectFilePath, refData.ReferenceProjectFilePath).IsSome)
+            {
                 return false;
+            }
         }
 
         //პაკეტების მიერთება პროექტებში, სიის მიხედვით
         if (!Packages.All(packageData =>
                 dotnetProcessor.AddPackageToProject(packageData.ProjectFilePath, packageData.PackageName,
                     packageData.Version).IsNone))
+        {
             return false;
+        }
 
         var jb = new JetBrainsResharperGlobalToolsProcessor(Logger, true);
 
@@ -303,14 +365,17 @@ public abstract class AppCreatorBase
     private static void AddProjectParametersWithCheck(XElement projectXml, string groupName, string propertyName,
         string propertyValue)
     {
-        var grpXml = CheckAddProjectGroup(projectXml, groupName);
+        XElement grpXml = CheckAddProjectGroup(projectXml, groupName);
         AddProjectParametersWithCheck(grpXml, propertyName, propertyValue);
     }
 
     private static XElement CheckAddProjectGroup(XElement projectXml, string groupName)
     {
-        var grpXml = projectXml.Descendants(groupName).SingleOrDefault();
-        if (grpXml is not null) return grpXml;
+        XElement? grpXml = projectXml.Descendants(groupName).SingleOrDefault();
+        if (grpXml is not null)
+        {
+            return grpXml;
+        }
 
         grpXml = new XElement(groupName);
         projectXml.Add(grpXml);
@@ -320,7 +385,7 @@ public abstract class AppCreatorBase
 
     private static void AddProjectParametersWithCheck(XElement grpXml, string propertyName, string propertyValue)
     {
-        var propXml = grpXml.Descendants(propertyName).SingleOrDefault();
+        XElement? propXml = grpXml.Descendants(propertyName).SingleOrDefault();
         if (propXml is null)
         {
             propXml = new XElement(propertyName, propertyValue);
@@ -334,7 +399,7 @@ public abstract class AppCreatorBase
 
     private bool AppGitsSync(bool useProjectUpdater)
     {
-        var gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
+        List<string> gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
 
         var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
             new SyncOneProjectAllGitsParameters(null, WorkPath,

@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -20,17 +22,22 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         if (!Inputer.InputBool("This process will change .gitignore records, are you sure?", false, false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var standardGitignoreFilesGenerator = new StandardGitignoreFilesGenerator(_logger, parameters);
         if (!standardGitignoreFilesGenerator.Generate() && Inputer.InputBool("Continue ans Save Changes?", false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
+
         //შენახვა
         _parametersManager.Save(parameters, "RunTimes generated success");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

@@ -19,22 +19,22 @@ public sealed class ProjectProviderJsCreator
 
     public bool Create()
     {
-        var code = """
-                   import React from 'react';
+        string code = """
+                      import React from 'react';
 
-                   import TopNavRoutes from './TopNavRoutes';
-                   import AuthAppRoutes from './AuthAppRoutes';
+                      import TopNavRoutes from './TopNavRoutes';
+                      import AuthAppRoutes from './AuthAppRoutes';
 
-                   const ProjectContext = React.createContext();
+                      const ProjectContext = React.createContext();
 
-                   const ProjectProvider = (props) => {
-                   const appName = "ენის მოდელის რედაქტორი";
-                         const baseUrl = process.env.NODE_ENV === 'development'
-                           //? window.location.origin + '/api'
-                           // ? 'http://192.168.10.119:5011/api'
-                           ? 'http://cyberia.ge:5011/api'
-                           : 'https://www.
-                   """ + _projectNamespace + @"/api';
+                      const ProjectProvider = (props) => {
+                      const appName = "ენის მოდელის რედაქტორი";
+                            const baseUrl = process.env.NODE_ENV === 'development'
+                              //? window.location.origin + '/api'
+                              // ? 'http://192.168.10.119:5011/api'
+                              ? 'http://cyberia.ge:5011/api'
+                              : 'https://www.
+                      """ + _projectNamespace + @"/api';
 
       // console.log(""ProjectProvider baseUrl="", baseUrl);
 

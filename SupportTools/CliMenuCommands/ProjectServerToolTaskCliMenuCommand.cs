@@ -1,6 +1,6 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -34,23 +34,20 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    private IToolCommand? MemoCreateToolCommand()
+    private async ValueTask<IToolCommand> MemoCreateToolCommand()
     {
-        return _toolCommand ??= ToolCommandFactory.CreateProjectServerToolCommand(_logger, _httpClientFactory, _tool,
-            _parametersManager, _projectName, _serverInfo);
+        return _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_logger, _httpClientFactory,
+            _tool, _parametersManager, _projectName, _serverInfo);
     }
 
-    protected override string? GetActionDescription()
+    protected override async ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return MemoCreateToolCommand()?.Description;
+        return (await MemoCreateToolCommand()).Description;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        var toolCommand = MemoCreateToolCommand();
-        if (toolCommand?.Par != null) return toolCommand.Run(CancellationToken.None).Result;
-
-        Console.WriteLine("Parameters not loaded. Tool not started.");
-        return false;
+        IToolCommand toolCommand = await MemoCreateToolCommand();
+        return await toolCommand.Run(cancellationToken);
     }
 }

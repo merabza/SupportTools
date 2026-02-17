@@ -30,8 +30,11 @@ public static class ProjectsManagersFactory
         }
 
         if (installerBaseParameters.LocalInstallerSettings is not null)
+        {
             return new ProjectsManagerLocalWithFileStorage(logger, false, fileStorageForUpload,
                 installerBaseParameters.LocalInstallerSettings, null, null);
+        }
+
         logger.LogError("Both ApiClient Settings and Installer Settings are not specified");
         return null;
     }
@@ -53,7 +56,10 @@ public static class ProjectsManagersFactory
         }
 
         if (!string.IsNullOrWhiteSpace(installFolder))
+        {
             return new ProjectsManagerLocal(logger, false, installFolder, null, null);
+        }
+
         logger.LogError("Both ApiClient Settings and install Folder are not specified");
         return null;
     }

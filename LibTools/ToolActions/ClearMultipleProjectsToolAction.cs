@@ -35,11 +35,13 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         string? projectGroupName, string? projectName, bool useConsole)
     {
         //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net9.0
-        var baseFolder = AppContext.BaseDirectory;
+        string baseFolder = AppContext.BaseDirectory;
         string? excludeFolder = null;
         var baseDir = new DirectoryInfo(baseFolder);
         if (baseDir.Parent is { Name: "Debug", Parent.Name: "bin" })
+        {
             excludeFolder = baseDir.Parent.Parent.Parent?.FullName;
+        }
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var clearAllProjectsParameters =
@@ -50,18 +52,9 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList;
-        if (_clearAllProjectsParameters.ProjectGroupName is null && _clearAllProjectsParameters.ProjectName is null)
-            projectsList = _clearAllProjectsParameters.Projects;
-        else if (_clearAllProjectsParameters.ProjectGroupName is not null)
-            projectsList = _clearAllProjectsParameters.Projects.Where(x =>
-                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
-                _clearAllProjectsParameters.ProjectGroupName);
-        else
-            projectsList =
-                _clearAllProjectsParameters.Projects.Where(x => x.Key == _clearAllProjectsParameters.ProjectName);
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
 
-        var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
         //var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
         //{
@@ -75,11 +68,13 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         //changedGitProjects[EGitCollect.Collect] = [];
         //Console.WriteLine($"---=== {gitCollectUsage} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
         //პროექტების ჩამონათვალი
-        foreach (var (projectName, project) in projectsListOrdered)
+        foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
             ClearOneSolution(projectName, project, EGitCol.Main);
             if (_clearAllProjectsParameters.ScaffoldSeedersWorkFolder is not null)
+            {
                 ClearOneSolution(projectName, project, EGitCol.ScaffoldSeed);
+            }
         }
 
         //Console.WriteLine("---===---------===---");
@@ -92,10 +87,29 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         return ValueTask.FromResult(true);
     }
 
+    private IEnumerable<KeyValuePair<string, ProjectModel>> GetProjectsList()
+    {
+        if (_clearAllProjectsParameters.ProjectGroupName is null && _clearAllProjectsParameters.ProjectName is null)
+        {
+            return _clearAllProjectsParameters.Projects;
+        }
+
+        if (_clearAllProjectsParameters.ProjectGroupName is not null)
+        {
+            return _clearAllProjectsParameters.Projects.Where(x =>
+                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
+                _clearAllProjectsParameters.ProjectGroupName);
+        }
+
+        return _clearAllProjectsParameters.Projects.Where(x => x.Key == _clearAllProjectsParameters.ProjectName);
+    }
+
     private void ClearOneSolution(string projectName, ProjectModel project, EGitCol gitCol)
     {
         if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
+        {
             return;
+        }
 
         var clearOneProjectAllGitsToolAction =
             ClearOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, gitCol, _excludeFolder);

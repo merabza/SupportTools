@@ -50,7 +50,7 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
             _templateName, ETestOrReal.Real));
 
         //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         templateSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 

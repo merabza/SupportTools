@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,15 +32,21 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;
 
         if (ParametersManager is null)
+        {
             return false;
+        }
 
         if (parameters is null)
+        {
             return false;
+        }
 
         if (parameters.AppProjectCreatorAllParameters is null)
+        {
             return true;
+        }
 
-        foreach (var kvp in parameters.AppProjectCreatorAllParameters.Templates)
+        foreach (KeyValuePair<string, TemplateModel> kvp in parameters.AppProjectCreatorAllParameters.Templates)
         {
             Console.WriteLine("Start create test Project: {0}", kvp.Key);
 

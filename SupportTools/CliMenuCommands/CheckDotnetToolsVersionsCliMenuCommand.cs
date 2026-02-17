@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportTools.Tools;
 using SupportToolsData.Models;
@@ -16,13 +18,16 @@ public sealed class CheckDotnetToolsVersionsCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         if (DotnetToolsVersionsCheckerUpdater.Check(_parametersManager))
             //შენახვა
+        {
             _parametersManager.Save(parameters, "Dotnet Tools versions checked success");
-        return true;
+        }
+
+        return new ValueTask<bool>(true);
     }
 }

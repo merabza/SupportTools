@@ -25,20 +25,26 @@ public sealed class LineData
 
     public static LineData Create(string line)
     {
-        var indent = CountIndent(line);
-        var trimLine = line.Trim();
-        var dryLine = trimLine.Replace(" ", string.Empty);
+        int indent = CountIndent(line);
+        string trimLine = line.Trim();
+        string dryLine = trimLine.Replace(" ", string.Empty);
         return new LineData(line, trimLine, dryLine, indent, false);
     }
 
     private static int CountIndent(string line)
     {
-        var indent = 0;
-        foreach (var c in line)
+        int indent = 0;
+        foreach (char c in line)
+        {
             if (c == ' ')
+            {
                 indent++;
+            }
             else
+            {
                 break;
+            }
+        }
 
         return indent / 4;
     }

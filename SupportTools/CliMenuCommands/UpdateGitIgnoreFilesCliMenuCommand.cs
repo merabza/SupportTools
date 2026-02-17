@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -19,9 +20,9 @@ public sealed class UpdateGitIgnoreFilesCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var updateGitProjectsToolAction = new UpdateGitIgnoreFilesToolAction(_logger, _parametersManager, true);
-        return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
+        return await updateGitProjectsToolAction.Run(cancellationToken);
     }
 }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
@@ -24,20 +27,20 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         _serverName = serverName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var server = parameters.GetServerByProject(_projectName, _serverName);
+        ServerInfoModel? server = parameters.GetServerByProject(_projectName, _serverName);
 
         if (server is null)
         {
             StShared.WriteErrorLine($"Server with name {_serverName} is not exists 2", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        var checks = Enum.GetValues<EProjectServerTools>().ToDictionary(tool => tool.ToString(),
+        Dictionary<string, bool> checks = Enum.GetValues<EProjectServerTools>().ToDictionary(tool => tool.ToString(),
             tool => server.AllowToolsList?.Contains(tool) ?? false);
 
         //გამოვიდეს სიიდან ამრჩევი
@@ -45,16 +48,20 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 
         server.AllowToolsList ??= [];
 
-        foreach (var kvp in checks)
+        foreach (KeyValuePair<string, bool> kvp in checks)
         {
             if (!Enum.TryParse(kvp.Key, out EProjectServerTools tool))
-                return false;
+            {
+                return ValueTask.FromResult(false);
+            }
 
             if (kvp.Value)
             {
                 //ჩართული ჩავამატოთ თუ არ არსებობს
                 if (!server.AllowToolsList.Contains(tool))
+                {
                     server.AllowToolsList.Add(tool);
+                }
             }
             else
             {
@@ -64,6 +71,6 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         _parametersManager.Save(parameters, "Changes saved");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
@@ -67,14 +69,16 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         //ასევე შესაძელებელი უნდა იყოს გიტის დასინქრონიზება და ძირითადი ბრძანებების გაშვება
         //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
 
-        var gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
+        List<string> gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
 
-        foreach (var gitProjectName in gitProjectNames.OrderBy(o => o))
+        foreach (string gitProjectName in gitProjectNames.OrderBy(o => o))
+        {
             gitSubMenuSet.AddMenuItem(new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
                 gitProjectName, _gitCol));
+        }
 
         //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToLower(CultureInfo.CurrentCulture);
         gitSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
 
         return gitSubMenuSet;

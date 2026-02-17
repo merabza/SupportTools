@@ -39,7 +39,7 @@ public sealed class DotnetProcessor
         string projectFullPath, string projectName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"new {dotnetProjectType.ToString().ToLower()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
+            $"new {dotnetProjectType.ToString().ToUpperInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
     }
 
     public Option<Err[]> AddProjectToSolution(string solutionPath, string? solutionFolderName,
@@ -119,10 +119,14 @@ public sealed class DotnetProcessor
 
     public OneOf<IEnumerable<string>, Err[]> GetToolsRawList()
     {
-        var processResult = StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
+        OneOf<(string, int), Err[]> processResult =
+            StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
         if (processResult.IsT1)
+        {
             return processResult.AsT1;
-        var outputResult = processResult.AsT0.Item1;
+        }
+
+        string outputResult = processResult.AsT0.Item1;
         return outputResult.Split(Environment.NewLine);
     }
 

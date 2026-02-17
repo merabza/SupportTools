@@ -49,7 +49,7 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
             return false;
         }
 
-        var projectName = AppSettingsInstallerParameters.ProjectName;
+        string projectName = AppSettingsInstallerParameters.ProjectName;
         //1. მოვქაჩოთ ფაილსაცავში არსებული უახლესი პარამეტრების ფაილის შიგთავსი.
         var getLatestParametersFileBodyAction = new GetLatestParametersFileBodyAction(_logger, _useConsole,
             AppSettingsInstallerParameters.FileStorageForDownload, AppSettingsInstallerParameters.ProjectName,
@@ -57,8 +57,8 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
             AppSettingsInstallerParameters.ServerInfo.EnvironmentName,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension, null, null);
-        var result = await getLatestParametersFileBodyAction.Run(cancellationToken);
-        var appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
+        bool result = await getLatestParametersFileBodyAction.Run(cancellationToken);
+        string? appSettingsVersion = getLatestParametersFileBodyAction.AppSettingsVersion;
         if (!result || string.IsNullOrWhiteSpace(appSettingsVersion))
         {
             _logger.LogError("Parameters version does not detected");
@@ -74,7 +74,7 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
             AppSettingsInstallerParameters.AppSettingsEncodedJsonFileName, UseConsole);
         if (!await installParametersAction.Run(cancellationToken))
         {
-            _logger.LogError("project {projectName} parameters file is not updated", projectName);
+            _logger.LogError("project {ProjectName} parameters file is not updated", projectName);
             return false;
         }
 
@@ -85,9 +85,11 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
             appSettingsVersion, 10, UseConsole);
 
         if (await checkParametersVersionAction.Run(cancellationToken))
+        {
             return true;
+        }
 
-        _logger.LogError("project {projectName} parameters file check failed", projectName);
+        _logger.LogError("project {ProjectName} parameters file check failed", projectName);
         return false;
     }
 }

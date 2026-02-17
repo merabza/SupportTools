@@ -45,8 +45,10 @@ public sealed class AppProjectCreatorData
         }
 
         if (!string.IsNullOrWhiteSpace(securityWorkFolderPath))
+        {
             return new AppProjectCreatorData(projectName, projectShortName, dbPartProjectName, projectType,
                 solutionFolderName, workFolderPath, securityWorkFolderPath, indentSize);
+        }
 
         logger.LogError("securityWorkFolderPath is empty");
         return null;

@@ -1,4 +1,7 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -19,29 +22,31 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
         _templateName = templateName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var parameters = supportToolsParameters.AppProjectCreatorAllParameters;
+        AppProjectCreatorAllParameters? parameters = supportToolsParameters.AppProjectCreatorAllParameters;
         if (parameters == null)
         {
             StShared.WriteErrorLine("Support Tools Parameters not found", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
-        var templates = parameters.Templates;
+        Dictionary<string, TemplateModel> templates = parameters.Templates;
         if (!templates.ContainsKey(_templateName))
         {
             StShared.WriteErrorLine($"Template {_templateName} not found", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         templates.Remove(_templateName);
         _parametersManager.Save(parameters, $"Template {_templateName} Deleted");
         MenuAction = EMenuAction.LevelUp;
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

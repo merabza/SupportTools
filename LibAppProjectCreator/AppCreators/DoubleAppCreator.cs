@@ -33,24 +33,30 @@ public abstract class DoubleAppCreator
         //ძირითადი აპის შემქმნელის შექმნა
         _mainAppCreator = CreateMainAppCreator();
         if (_mainAppCreator is null)
+        {
             return false;
+        }
 
         //შევამოწმოთ არსებობს თუ არა ძირითადი აპის სამუშაო ფოლდერი.
-        var isWorkPathExists = Directory.Exists(_mainAppCreator.WorkPath);
+        bool isWorkPathExists = Directory.Exists(_mainAppCreator.WorkPath);
 
         //თუ სამუშაო ფოლდერი არ არსებობს, მაშინ შევქმნათ სამუშაო ფოლდერი და შევქმნათ აპი.
         //თუ სამუშაო ფოლდერი არსებობს, მაშინ მხოლოდ სინქრონიზაცია გავაკეთოთ გიტის.
         if (!await _mainAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
                 isWorkPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
+        {
             return false;
+        }
 
         //თუ სამუშაო ფოლდერი არ არსებობდა აპლიკაციის შექმნის პროცესის გაშვებამდე,
         //მაშინ აპის შეიქმნებოდა მთლიანად და ამიტომ პროცესი დასრულებულია
         if (!isWorkPathExists)
+        {
             return true;
+        }
 
         //შევქმნათ ფაილმენეჯერი ძირითადი აპის სამუშაო ფოლდერისთვის
-        var mainWorkPathFileManager =
+        FileManager? mainWorkPathFileManager =
             FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.WorkPath);
 
         if (mainWorkPathFileManager == null)
@@ -66,13 +72,17 @@ public abstract class DoubleAppCreator
         deleteBinObjFolders.Run();
 
         //შევქმნათ დროებითი აპის შემქმნელი
-        var tempAppCreator = CreateTempAppCreator();
+        AppCreatorBase? tempAppCreator = CreateTempAppCreator();
         if (tempAppCreator is null)
+        {
             return false;
+        }
 
         //შევქმნათ დროებითი აპი და მოვამზადოთ მისი პარამეტრები
         if (!await tempAppCreator.PrepareParametersAndCreateApp(false, cancellationToken, ECreateAppVersions.Temp))
+        {
             return false;
+        }
 
         return SyncSolution(tempAppCreator.WorkPath, mainWorkPathFileManager);
     }
@@ -80,7 +90,7 @@ public abstract class DoubleAppCreator
     private bool SyncSolution(string tempWorkPath, FileManager mainWorkFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        var tempWorkFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempWorkPath);
+        FileManager? tempWorkFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempWorkPath);
 
         if (tempWorkFileManager == null)
         {
@@ -99,9 +109,11 @@ public abstract class DoubleAppCreator
         }
 
         if (mainWorkFileManager.IsFolderEmpty(null))
+        {
             return true;
+        }
 
-        var excludeFolders = new[] { ".git", ".vs", "obj" };
+        string[] excludeFolders = [".git", ".vs", "obj"];
         var deleteRedundantFiles =
             new DeleteRedundantFiles(tempWorkFileManager, mainWorkFileManager, excludeSet, excludeFolders);
         deleteRedundantFiles.Run();

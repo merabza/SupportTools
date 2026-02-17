@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -22,11 +23,11 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCli
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var getDbServerFoldersToolAction =
             new ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToolAction(_logger, _gitIgnoreFileName,
                 _parametersManager);
-        return getDbServerFoldersToolAction.Run(CancellationToken.None).Result;
+        return await getDbServerFoldersToolAction.Run(cancellationToken);
     }
 }

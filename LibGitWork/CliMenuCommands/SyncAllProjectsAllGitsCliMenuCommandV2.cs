@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -19,10 +20,10 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV2 : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var syncOneProjectAllGitsToolAction =
             SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true);
-        return syncOneProjectAllGitsToolAction.Run(CancellationToken.None).Result;
+        return await syncOneProjectAllGitsToolAction.Run(cancellationToken);
     }
 }

@@ -23,8 +23,8 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var parametersClassName = $"{_projectNamespace}Parameters";
-        var projectLow = _projectNamespace.UnCapitalize();
+        string parametersClassName = $"{_projectNamespace}Parameters";
+        string projectLow = _projectNamespace.UnCapitalize();
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System", _useDatabase ? "using System.Net.Http" : null, "using SystemTools.SystemToolsShared",

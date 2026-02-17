@@ -10,6 +10,7 @@ using LibCodeGenerator.Models;
 using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
+using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -46,7 +47,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var workFolder = supportToolsParameters.CodeGenerateTestFolder;
+        string? workFolder = supportToolsParameters.CodeGenerateTestFolder;
 
         if (string.IsNullOrWhiteSpace(workFolder))
         {
@@ -61,11 +62,11 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             return ValueTask.FromResult(false);
         }
 
-        var projectName = _parameters.ProjectName;
-        var project = _parameters.Project;
-        var apiContractsProjectName = project.ApiContractsProjectName;
+        string projectName = _parameters.ProjectName;
+        ProjectModel project = _parameters.Project;
+        string? apiContractsProjectName = project.ApiContractsProjectName;
 
-        var projectFolder = Path.Combine(workFolder, projectName);
+        string projectFolder = Path.Combine(workFolder, projectName);
 
         //შემოწმდეს სამუშაო ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         if (FileStat.CreateFolderIfNotExists(projectFolder, true) == null)
@@ -79,11 +80,11 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
 
-        foreach (var gitProjectName in _parameters.Project.GetGitProjectNames(EGitCol.Main))
+        foreach (string gitProjectName in _parameters.Project.GetGitProjectNamesByGitCollectionType(EGitCol.Main))
         {
-            var gitProjectFolder = Path.Combine(projectFolder, gitProjectName);
+            string gitProjectFolder = Path.Combine(projectFolder, gitProjectName);
 
-            var gitData = gitRepos.GetGitRepoByKey(gitProjectName);
+            GitData? gitData = gitRepos.GetGitRepoByKey(gitProjectName);
             if (gitData is null)
             {
                 StShared.WriteErrorLine($"git with name {gitProjectName} is not exists", true, Logger);
@@ -93,14 +94,16 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             Console.WriteLine($"---=== {gitProjectName} ===---");
 
             var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolder, gitData);
-            var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
+            GitProcessor? gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
 
             if (gitProcessor is null)
+            {
                 return ValueTask.FromResult(false);
+            }
         }
 
         // Find the ApiRoutes class file
-        var apiContractsProjectFilePath =
+        string? apiContractsProjectFilePath =
             ApiContractsProjectFinder.FindApiContractsProject(projectFolder, apiContractsProjectName);
         if (apiContractsProjectFilePath is null)
         {
@@ -110,7 +113,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
 
         var apiContractsProjectFile = new FileInfo(apiContractsProjectFilePath);
 
-        var apiContractsProjectFolder = apiContractsProjectFile.Directory?.FullName;
+        string? apiContractsProjectFolder = apiContractsProjectFile.Directory?.FullName;
         if (apiContractsProjectFolder is null)
         {
             _logger.LogError("apiContractsProjectFolder not found.");
@@ -121,13 +124,13 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
 
         foreach (var versionAndRoot in versionsAndRoots)
         {
-            var version = versionAndRoot.Version;
-            var root = versionAndRoot.Root;
-            var versionFolderName = version.Capitalize();
-            var versionApiRouteFolderPath = Path.Combine(apiContractsProjectFolder, versionFolderName, Routes);
-            var versionApiRouteClassName = $"{projectName}{ApiRoutes}";
-            var versionApiRouteClassFileName = $"{versionApiRouteClassName}{CsFileExtension}";
-            var versionApiRouteClassFilePath = Path.Combine(versionApiRouteFolderPath, versionApiRouteClassFileName);
+            string version = versionAndRoot.Version;
+            string root = versionAndRoot.Root;
+            string versionFolderName = version.Capitalize();
+            string versionApiRouteFolderPath = Path.Combine(apiContractsProjectFolder, versionFolderName, Routes);
+            string versionApiRouteClassName = $"{projectName}{ApiRoutes}";
+            string versionApiRouteClassFileName = $"{versionApiRouteClassName}{CsFileExtension}";
+            string versionApiRouteClassFilePath = Path.Combine(versionApiRouteFolderPath, versionApiRouteClassFileName);
 
             //შემოწმდეს როუტების ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
             if (FileStat.CreateFolderIfNotExists(versionApiRouteFolderPath, true) == null)
@@ -138,13 +141,14 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
             }
 
             if (File.Exists(versionApiRouteClassFilePath))
+            {
                 File.Delete(versionApiRouteClassFilePath);
+            }
 
-            var classNamespace = $"{apiContractsProjectName}.{versionFolderName}.{Routes}";
+            string classNamespace = $"{apiContractsProjectName}.{versionFolderName}.{Routes}";
 
             var routesClassCreator = new RoutesClassCreator(_logger, versionApiRouteFolderPath, classNamespace,
-                versionApiRouteClassFileName, versionApiRouteClassFileName, version, root,
-                project.RouteClasses.Values.Where(x => x.Version == version && x.Root == root), project.Endpoints);
+                versionApiRouteClassFileName, versionApiRouteClassFileName, version, root);
             routesClassCreator.CreateFileStructure();
         }
 

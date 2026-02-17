@@ -95,7 +95,17 @@ public sealed class TemplateCruder : ParCruder<TemplateModel>
     protected override void CheckFieldsEnables(ItemData itemData, string? lastEditedFieldName = null)
     {
         var templateModel = (TemplateModel)itemData;
-        switch (templateModel.SupportProjectType)
+        EnableFieldsByProjectType(templateModel.SupportProjectType);
+
+        //EnableFieldByName(nameof(TemplateModel.TestDbPartProjectName),
+        //    templateModel.UseDbPartFolderForDatabaseProjects);
+        EnableFieldByName(nameof(TemplateModel.ReactTemplateName), templateModel.UseReact);
+        EnableFieldByName(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects), templateModel.UseDatabase);
+    }
+
+    private void EnableFieldsByProjectType(ESupportProjectType supportProjectType)
+    {
+        switch (supportProjectType)
         {
             case ESupportProjectType.Console:
                 EnableFieldByName(nameof(TemplateModel.UseMenu));
@@ -130,12 +140,8 @@ public sealed class TemplateCruder : ParCruder<TemplateModel>
             case ESupportProjectType.ScaffoldSeeder:
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(supportProjectType), supportProjectType,
+                    "Unsupported project type");
         }
-
-        //EnableFieldByName(nameof(TemplateModel.TestDbPartProjectName),
-        //    templateModel.UseDbPartFolderForDatabaseProjects);
-        EnableFieldByName(nameof(TemplateModel.ReactTemplateName), templateModel.UseReact);
-        EnableFieldByName(nameof(TemplateModel.UseDbPartFolderForDatabaseProjects), templateModel.UseDatabase);
     }
 }

@@ -55,96 +55,111 @@ public sealed class CreatePackageAndUpload : ToolAction
 
     public string? AssemblyVersion { get; private set; }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
             _logger.LogError("Server name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
             _logger.LogError("Environment Name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(_mainProjectFileName))
         {
             _logger.LogError("Project file name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(_projectName))
         {
             _logger.LogError("Project name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(_workFolder))
         {
             _logger.LogError("Work Folder name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //თუ არ არსებობს, შეიქმნას სამუშაო ფოლდერი
         if (!StShared.CreateFolder(_workFolder, true))
-            return ValueTask.FromResult(false);
+        {
+            return false;
+        }
 
         const string archiveFileExtension = ".zip";
 
-        var datePart = DateTime.Now.ToString(_dateMask);
+        string datePart = DateTime.Now.ToString(_dateMask, CultureInfo.InvariantCulture);
         //სახელის შექმნა output ფოლდერისათვის
-        var outputFolderName =
+        string outputFolderName =
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-{datePart}";
-        var outputFolderPath = Path.Combine(_workFolder, outputFolderName);
+        string outputFolderPath = Path.Combine(_workFolder, outputFolderName);
         //სახელის შექმნა ZIP ფაილისათვის
-        var zipFileName =
+        string zipFileName =
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-{datePart}{archiveFileExtension}";
-        var zipFileFullName = Path.Combine(_workFolder, zipFileName);
+        string zipFileFullName = Path.Combine(_workFolder, zipFileName);
 
         //შევამოწმოთ შემთხვევით ხომ არ არსებობს output ფოლდერი
         //თუ არსებობს გამოვიტანოთ შეცდომა და დავასრულოთ პროცესი
         if (Directory.Exists(outputFolderPath))
         {
             StShared.WriteErrorLine($"Project output folder {outputFolderPath} is already exists", true, _logger);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //თუ არ არსებობს, შევქმნათ
         if (!StShared.CreateFolder(outputFolderPath, true))
-            return ValueTask.FromResult(false);
+        {
+            return false;
+        }
 
         _logger.LogInformation("Detecting version...");
 
-        var projectXml = XElement.Load(_mainProjectFileName);
+        XElement projectXml = XElement.Load(_mainProjectFileName);
 
-        var xmlVersionId = projectXml.Descendants("PropertyGroup").Descendants("Version").SingleOrDefault();
+        XElement? xmlVersionId = projectXml.Descendants("PropertyGroup").Descendants("Version").SingleOrDefault();
 
         string? versionId = null;
         if (xmlVersionId != null)
+        {
             versionId = xmlVersionId.Value;
+        }
 
         //თუ ასეთი მნიშვნელობის ამოღება მოხერხდა, მაშინ
         versionId ??= "1.0.0";
 
-        var verNumbers = versionId.Split('.');
+        string[] verNumbers = versionId.Split('.');
         var assemblyVersionNumbers = new List<string>();
         assemblyVersionNumbers.AddRange(verNumbers.Take(2));
         if (assemblyVersionNumbers.Count == 0)
+        {
             assemblyVersionNumbers.Add("1");
+        }
+
         if (assemblyVersionNumbers.Count == 1)
+        {
             assemblyVersionNumbers.Add("0");
+        }
 
-        var todayDate = DateTime.Today;
+        DateTime todayDate = DateTime.Today;
+        DateTime now = DateTime.Now;
 
         assemblyVersionNumbers.Add(
-            (todayDate - new DateTime(2000, 1, 1)).TotalDays.ToString(CultureInfo.InvariantCulture));
-        assemblyVersionNumbers.Add(
-            ((int)(DateTime.Now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
+            (todayDate - new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalDays.ToString(CultureInfo
+                .InvariantCulture));
+        assemblyVersionNumbers.Add(((int)(now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
         AssemblyVersion = string.Join('.', assemblyVersionNumbers);
 
-        _logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
+        }
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
@@ -152,48 +167,66 @@ public sealed class CreatePackageAndUpload : ToolAction
         if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsSome)
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         _logger.LogInformation("Delete Redundant Files");
         //outputFolderPath ფოლდერიდან წაიშალოს ზედმეტი ფაილები
-        foreach (var fileName in _redundantFileNames.Select(Path.GetFileName))
+        foreach (string? fileName in _redundantFileNames.Select(Path.GetFileName))
         {
             if (string.IsNullOrWhiteSpace(fileName))
-                continue;
-            var di = new DirectoryInfo(outputFolderPath);
-            foreach (var file in di.GetFiles(fileName))
             {
-                var fName = file.Name;
-                _logger.LogInformation("Delete {fName}", fName);
+                continue;
+            }
+
+            var di = new DirectoryInfo(outputFolderPath);
+            foreach (FileInfo file in di.GetFiles(fileName))
+            {
+                string fName = file.Name;
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Delete {FileName}", fName);
+                }
+
                 file.Delete();
             }
         }
+
         //}
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Archiving {ZipFileFullName}...", zipFileFullName);
+        }
 
-        _logger.LogInformation("Archiving {zipFileFullName}...", zipFileFullName);
         //შექმნილი output ფოლდერიდან ZIP ფაილის შექმნა, იმავე სამუშაო ფოლდერში
-        ZipFile.CreateFromDirectory(outputFolderPath, zipFileFullName, CompressionLevel.Optimal, false);
+        await ZipFile.CreateFromDirectoryAsync(outputFolderPath, zipFileFullName, CompressionLevel.Optimal, false,
+            cancellationToken);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Removing folder {OutputFolderPath}...", outputFolderPath);
+        }
 
-        _logger.LogInformation("Removing folder {outputFolderPath}...", outputFolderPath);
         //output ფოლდერის წაშლა
         Directory.Delete(outputFolderPath, true);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Uploading {ZipFileFullName}...", zipFileFullName);
+        }
 
-        _logger.LogInformation("Uploading {zipFileFullName}...", zipFileFullName);
         //ZIP ფაილის ატვირთვა FTP-ზე
-        var exchangeFileManager =
+        FileManager? exchangeFileManager =
             FileManagersFactory.CreateFileManager(true, _logger, _workFolder, _exchangeFileStorage);
 
         if (exchangeFileManager == null)
         {
             _logger.LogError("cannot create file manager");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (!exchangeFileManager.UploadFile(zipFileName, _uploadTempExtension))
         {
-            _logger.LogError("cannot upload file {zipFileName}", zipFileName);
-            return ValueTask.FromResult(false);
+            _logger.LogError("cannot upload file {ZipFileName}", zipFileName);
+            return false;
         }
 
         _logger.LogInformation("Remove redundant files...");
@@ -209,17 +242,20 @@ public sealed class CreatePackageAndUpload : ToolAction
         exchangeFileManager.RemoveRedundantFiles(
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _uploadSmartSchema);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Deleting {ZipFileFullName} file...", zipFileFullName);
+        }
 
-        _logger.LogInformation("Deleting {zipFileFullName} file...", zipFileFullName);
         //წაიშალოს ლოკალური ფაილი
         File.Delete(zipFileFullName);
 
-        var workFileManager = FileManagersFactory.CreateFileManager(true, _logger, _workFolder);
+        FileManager? workFileManager = FileManagersFactory.CreateFileManager(true, _logger, _workFolder);
 
         workFileManager?.RemoveRedundantFiles(
             $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-{_runtime}-", _dateMask,
             archiveFileExtension, _smartSchemaForLocal);
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

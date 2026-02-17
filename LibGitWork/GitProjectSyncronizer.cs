@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.ToolActions;
@@ -41,7 +43,10 @@ public sealed class GitProjectSyncronizer
         var gitSyncToolAction = GitSyncToolAction.Create(_logger, _parametersManager, projectName, gitCol,
             _gitProjectName, true);
         if (gitSyncToolAction is null)
+        {
             return;
+        }
+
         _gitSyncToolActionList.Add(gitSyncToolAction);
     }
 
@@ -55,8 +60,8 @@ public sealed class GitProjectSyncronizer
             return;
         }
 
-        var haveSameChanges = false;
-        var loopNom = 0;
+        bool haveSameChanges = false;
+        int loopNom = 0;
 
         var gitCollect = EGitCollect.Collect;
         while (gitCollect == EGitCollect.Collect || haveSameChanges)
@@ -65,7 +70,7 @@ public sealed class GitProjectSyncronizer
             Console.WriteLine(
                 $"---=== {_gitProjectName} {gitCollect} {(loopNom == 0 ? string.Empty : loopNom)} ===---");
 
-            var gitProjectsUpdaterGitProcessor = gitProjectsUpdater.ProcessOneGitProject(false);
+            GitProcessor? gitProjectsUpdaterGitProcessor = gitProjectsUpdater.ProcessOneGitProject(false);
 
             if (gitProjectsUpdaterGitProcessor is null)
             {
@@ -73,46 +78,51 @@ public sealed class GitProjectSyncronizer
                 return;
             }
 
-            var lastRemoteId = gitProjectsUpdater.LastRemoteId;
+            string? lastRemoteId = gitProjectsUpdater.LastRemoteId;
 
             //SupportTools-ის სამუშაო ფოლდერში არსებული კლონის გაახლება დასრულდა აქ
-            var pushed = false;
-            foreach (var gitSyncToolAction in _gitSyncToolActionList)
+            bool pushed = false;
+            foreach (GitSyncToolAction gitSyncToolAction in _gitSyncToolActionList)
             {
                 //var committed = false;
                 if (gitCollect == EGitCollect.Collect)
                 {
                     if (!gitSyncToolAction.RunActionPhase1())
+                    {
                         continue;
+                    }
 
                     switch (gitSyncToolAction.Phase1Result)
                     {
                         case EFirstPhaseResult.Cloned:
                             continue;
                         case EFirstPhaseResult.NeedCommit:
-                        {
-                            if (!UseSameMessageForNextCommits || UsedCommitMessage is null)
                             {
-                                UsedCommitMessage ??= Inputer.InputTextRequired("Message",
-                                    UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm"));
+                                if (!UseSameMessageForNextCommits || UsedCommitMessage is null)
+                                {
+                                    UsedCommitMessage ??= Inputer.InputTextRequired("Message",
+                                        UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm",
+                                            CultureInfo.InvariantCulture));
 
-                                UseSameMessageForNextCommits =
-                                    Inputer.InputBool("Use this message for next commits?", true);
+                                    UseSameMessageForNextCommits =
+                                        Inputer.InputBool("Use this message for next commits?", true);
+                                }
+
+                                if (!gitSyncToolAction.GitProcessor.Commit(UsedCommitMessage))
+                                {
+                                    continue;
+                                }
+
+                                haveSameChanges = true;
+                                //committed = true;
+                                break;
                             }
-
-                            if (!gitSyncToolAction.GitProcessor.Commit(UsedCommitMessage))
-                                continue;
-
-                            haveSameChanges = true;
-                            //committed = true;
-                            break;
-                        }
                         case EFirstPhaseResult.FinishedWithErrors:
                             continue;
                         case EFirstPhaseResult.NotNeedCommit:
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            throw new SwitchExpressionException();
                     }
                 }
 
@@ -123,7 +133,9 @@ public sealed class GitProjectSyncronizer
                     //მოშორებული ინფორმაციის განახლება
                     //თუ განახლებისას მოხდა შეცდომა, ამ ფოლდერს თავს ვანებებთ
                     if (!gitSyncToolAction.GitProcessor.GitRemoteUpdate())
+                    {
                         continue;
+                    }
 
                     gitSyncToolAction.GitProcessor.CheckRemoteId();
                     lastRemoteId = gitSyncToolAction.LastRemoteId;

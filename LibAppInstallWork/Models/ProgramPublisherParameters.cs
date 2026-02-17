@@ -55,7 +55,7 @@ public sealed class ProgramPublisherParameters : IParameters
     {
         try
         {
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
@@ -65,9 +65,9 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
+            ServerDataModel server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
 
-            var mainProjectFileName = project.MainProjectFileName(gitProjects);
+            string? mainProjectFileName = project.MainProjectFileName(gitProjects);
             if (mainProjectFileName == null)
             {
                 StShared.WriteErrorLine($"Main project does not specified for {projectName}", true, null, false);
@@ -80,7 +80,7 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var smartSchemaForExchange =
+            SmartSchema smartSchemaForExchange =
                 supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForExchange);
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
@@ -89,7 +89,7 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var smartSchemaForLocal =
+            SmartSchema smartSchemaForLocal =
                 supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForLocal);
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.FileStorageNameForExchange))
@@ -98,7 +98,7 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var fileStorageForUpload =
+            FileStorageData fileStorageForUpload =
                 supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
             if (string.IsNullOrWhiteSpace(server.Runtime))
@@ -113,7 +113,7 @@ public sealed class ProgramPublisherParameters : IParameters
                 return null;
             }
 
-            var parametersFileDateMask =
+            string? parametersFileDateMask =
                 project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
             if (string.IsNullOrWhiteSpace(parametersFileDateMask))
             {
@@ -123,7 +123,7 @@ public sealed class ProgramPublisherParameters : IParameters
 
             var programPublisherParameters = new ProgramPublisherParameters(server.Runtime, projectName,
                 mainProjectFileName, serverInfo, supportToolsParameters.PublisherWorkFolder,
-                supportToolsParameters.GetUploadTempExtension(), parametersFileDateMask, fileStorageForUpload,
+                supportToolsParameters.GetUploadTempExtensionOrDefault(), parametersFileDateMask, fileStorageForUpload,
                 smartSchemaForExchange, smartSchemaForLocal, project.RedundantFileNames);
 
             return programPublisherParameters;

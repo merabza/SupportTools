@@ -33,7 +33,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
     public static ClearOneProjectAllGitsParameters? Create(ILogger? logger,
         SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol)
     {
-        var project = supportToolsParameters.GetProject(projectName);
+        ProjectModel? project = supportToolsParameters.GetProject(projectName);
 
         if (project == null)
         {
@@ -41,7 +41,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
 
         if (gitsFolder == null)
         {
@@ -49,7 +49,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        var gitProjectNames = gitCol switch
+        List<string> gitProjectNames = gitCol switch
         {
             EGitCol.Main => project.GitProjectNames,
             EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
@@ -61,12 +61,15 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), true, false);
 
-        var absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
+        List<string> absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
 
         if (absentGitRepoNames.Count != 0)
         {
-            foreach (var absentGitRepoName in absentGitRepoNames)
+            foreach (string absentGitRepoName in absentGitRepoNames)
+            {
                 StShared.WriteErrorLine(absentGitRepoName, true, null, false);
+            }
+
             StShared.WriteErrorLine("Gits with this names are absent", true);
         }
 

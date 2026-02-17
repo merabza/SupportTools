@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using LibGitData;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -31,13 +30,18 @@ public sealed class PackageUpdater
         var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName, gitCol,
             _gitProjectName, _useConsole);
         if (packageUpdaterToolAction is null)
+        {
             return;
+        }
+
         _packageUpdaterToolActionList.Add(packageUpdaterToolAction);
     }
 
     public void Run()
     {
         if (_packageUpdaterToolActionList.Count > 0)
-            _packageUpdaterToolActionList.First().RunPackageUpdate();
+        {
+            _packageUpdaterToolActionList[0].RunPackageUpdate();
+        }
     }
 }

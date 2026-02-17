@@ -20,12 +20,16 @@ public sealed class DeleteBinObjFolders : FolderProcessor
     protected override (bool, bool, bool) ProcessOneFolder(string? afterRootPath, string folderName)
     {
         if (_excludeFolders.Length > 0 && _excludeFolders.Contains(folderName))
+        {
             return (true, false, false);
+        }
 
         if (!_deleteFolderNames.Contains(folderName))
+        {
             return (true, false, true);
+        }
 
-        var deleted = FileManager.DeleteDirectory(afterRootPath, folderName, true);
+        bool deleted = FileManager.DeleteDirectory(afterRootPath, folderName, true);
         return deleted ? (true, true, true) : (false, false, true);
     }
 

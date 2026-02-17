@@ -1,6 +1,7 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 
@@ -8,28 +9,28 @@ namespace SupportTools.CliMenuCommands.GitIgnoreFileTypes;
 
 public sealed class CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand : CliMenuCommand
 {
-    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand(ILogger logger, IParametersManager parametersManager) :
-        base("Check And Generate Guid Keys for .gitignore file types...", EMenuAction.Reload)
+    public CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand(IParametersManager parametersManager) : base(
+        "Check And Generate Guid Keys for .gitignore file types...", EMenuAction.Reload)
     {
-        _logger = logger;
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         if (!Inputer.InputBool(
                 "This will Check And if any not have, will Generate Guid Keys for .gitignore file types. are you sure?",
                 false, false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //შენახვა
         _parametersManager.Save(parameters, "Check And Generate Guid Keys success");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

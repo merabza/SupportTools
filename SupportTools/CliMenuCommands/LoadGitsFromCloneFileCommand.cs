@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.LibMenuInput;
 using LibGitData.Models;
 using ParametersManagement.LibParameters;
@@ -22,11 +25,11 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is null)
         {
@@ -46,11 +49,11 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         //mainProjectFolderRelativePath = fileInfo.Directory?.FullName + Path.DirectorySeparatorChar;
         //}
 
-        var defCloneFile = GetDefCloneFileName(parameters, project);
+        string? defCloneFile = GetDefCloneFileName(parameters, project);
 
-        var haveChanges = false;
+        bool haveChanges = false;
 
-        var fileWithCloneCommands = MenuInputer.InputFilePath("Enter file name with clone commands", defCloneFile);
+        string? fileWithCloneCommands = MenuInputer.InputFilePath("Enter file name with clone commands", defCloneFile);
 
         if (!File.Exists(fileWithCloneCommands))
         {
@@ -58,20 +61,25 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             return false;
         }
 
-        var lines = File.ReadLines(fileWithCloneCommands);
+        IEnumerable<string> lines = await File.ReadAllLinesAsync(fileWithCloneCommands, cancellationToken);
         const string gitCloneCommandStart = "git clone ";
-        foreach (var line in lines)
+        foreach (string line in lines)
         {
-            var lineTrimmed = line.Trim();
-            if (!lineTrimmed.StartsWith(gitCloneCommandStart))
+            string lineTrimmed = line.Trim();
+            if (!lineTrimmed.StartsWith(gitCloneCommandStart, StringComparison.OrdinalIgnoreCase))
+            {
                 continue;
+            }
 
-            var cloneParameters = lineTrimmed[gitCloneCommandStart.Length..].Trim();
+            string cloneParameters = lineTrimmed[gitCloneCommandStart.Length..].Trim();
 
-            var pars = cloneParameters.Split(' ').Select(x => x.Trim()).Where(x => x != string.Empty).ToArray();
+            string[] pars = cloneParameters.Split(' ').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x))
+                .ToArray();
 
             if (pars.Length != 2)
+            {
                 continue;
+            }
 
             //pars[0] გიტ პროექტის მოშორებული მისამართი
             //pars[1] ფოლდერის სახელი გიტის პროექტისთვის
@@ -79,8 +87,8 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             //პროექტის გიტის დასახელებებში დაემატოს ამ გიტის სახელი, ანუ pars[1]
             //დავიმახსოვროთ საჭიროა თუ არა შენახვა
 
-            var gitProjectAddress = pars[0];
-            var gitProjectFolderName = pars[1];
+            string gitProjectAddress = pars[0];
+            string gitProjectFolderName = pars[1];
 
             ////თუ ფოლდერი რამდენიმე სექციით არის მოცემული, მაშინ დავადგინოთ მასში მთავარი პროექტის ფოლდერის მონაწილეობა და მის ადგილას ჩავწეროთ {MainProjectPath}
             //if (!string.IsNullOrWhiteSpace(mainProjectFolderRelativePath) &&
@@ -88,12 +96,12 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             //    gitProjectFolderName = GitDataModel.MainProjectFolderRelativePathName +
             //                           gitProjectFolderName[mainProjectFolderRelativePath.Length..];
 
-            var gitName = gitProjectFolderName;
+            string gitName = gitProjectFolderName;
             //თუ ფოლდერი რამდენიმე სექციით არის მოცემული, მაშინ გიტის რეპოზიტორიის სახელად დავიმახსოვროთ ბოლო სექცია
             var dir = new DirectoryInfo(gitName);
             gitName = dir.Name;
 
-            var gitCountWithAddress = parameters.Gits.Count(x => x.Value.GitProjectAddress == gitProjectAddress);
+            int gitCountWithAddress = parameters.Gits.Count(x => x.Value.GitProjectAddress == gitProjectAddress);
 
             if (gitCountWithAddress == 0)
             {
@@ -106,12 +114,15 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
             }
             else
             {
-                var gitKvp = parameters.Gits.Single(x => x.Value.GitProjectAddress == gitProjectAddress);
+                KeyValuePair<string, GitDataModel> gitKvp =
+                    parameters.Gits.Single(x => x.Value.GitProjectAddress == gitProjectAddress);
                 gitName = gitKvp.Key;
             }
 
             if (project.GitProjectNames.Contains(gitName))
+            {
                 continue;
+            }
 
             project.GitProjectNames.Add(gitName);
             haveChanges = true;
@@ -120,7 +131,9 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         //შევამოწმოთ აღმოჩენილია თუ არა ერთი მაინც გიტი, რომელიც ჩაემატა პროექტში.
         //თუ აღმოჩენილია, მოხდეს პარამეტრების ფაილის შენახვა.
         if (haveChanges)
+        {
             _parametersManager.Save(parameters, "Changed git projects");
+        }
 
         //GitSyncAll gitSyncAll = new GitSyncAll(_logger, project.ProjectFolderName,
         //    parameters.Gits.Where(x => project.GitProjectNames.Contains(x.Key)).Select(x => x.Value));

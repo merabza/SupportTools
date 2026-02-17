@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
@@ -33,7 +34,7 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 
     private DbManager GetDbManager()
     {
-        var dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
+        DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
         return DbManager.Create(dbKit, CorrectNewDbParameters.ConnectionString) ??
                throw new Exception("Cannot create DbManager");
@@ -42,7 +43,9 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
     protected override bool CheckValidate()
     {
         if (CorrectNewDbParameters.DataProvider != EDatabaseProvider.None)
+        {
             return true;
+        }
 
         _logger.LogError("DataProvider not specified");
         return false;
@@ -50,27 +53,40 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var constraintsForCorrect = CorrectBitConstraints();
+        List<ConstraintDataModel> constraintsForCorrect = CorrectBitConstraints();
 
-        var constraintsForCorrectCount = constraintsForCorrect.Count;
-        _logger.LogInformation("Correction needs {constraintsForCorrectCount} constraints", constraintsForCorrectCount);
-
-        foreach (var constraintDataModel in constraintsForCorrect)
+        int constraintsForCorrectCount = constraintsForCorrect.Count;
+        if (_logger.IsEnabled(LogLevel.Information))
         {
-            var tableName = constraintDataModel.TableName;
-            _logger.LogInformation("Correcting table {tableName}", tableName);
+            _logger.LogInformation("Correction needs {ConstraintsForCorrectCount} constraints",
+                constraintsForCorrectCount);
+        }
+
+        foreach (ConstraintDataModel constraintDataModel in constraintsForCorrect)
+        {
+            string tableName = constraintDataModel.TableName;
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Correcting table {TableName}", tableName);
+            }
 
             if (!DeleteConstraint(constraintDataModel))
             {
-                var defaultConstraintName = constraintDataModel.DefaultConstraintName;
-                _logger.LogError("Cannot Delete constraint {defaultConstraintName}", defaultConstraintName);
+                string defaultConstraintName = constraintDataModel.DefaultConstraintName;
+                _logger.LogError("Cannot Delete constraint {DefaultConstraintName}", defaultConstraintName);
                 return ValueTask.FromResult(false);
             }
 
             if (CreateConstraint(constraintDataModel))
+            {
                 continue;
+            }
 
-            _logger.LogError("Cannot Create constraint for table {tableName}", tableName);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogError("Cannot Create constraint for table {TableName}", tableName);
+            }
+
             return ValueTask.FromResult(false);
         }
 
@@ -92,9 +108,9 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
     private bool ExecuteCommand(string strCommand)
     {
         // ReSharper disable once using
-        using var dbm = GetDbManager();
+        using DbManager dbm = GetDbManager();
 
-        var success = false;
+        bool success = false;
 
         try
         {
@@ -104,7 +120,7 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error when execute command {strCommand}", strCommand);
+            _logger.LogError(ex, "Error when execute command {StrCommand}", strCommand);
         }
         finally
         {
@@ -118,7 +134,7 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
     {
         // ReSharper disable once using
 
-        using var dbm = GetDbManager();
+        using DbManager dbm = GetDbManager();
         try
         {
             const string query = """
@@ -132,11 +148,13 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
                                  """;
             dbm.Open();
             // ReSharper disable once using
-            using var reader = dbm.ExecuteReader(query);
+            using IDataReader reader = dbm.ExecuteReader(query);
             var fileNames = new List<ConstraintDataModel>();
             while (reader.Read())
+            {
                 fileNames.Add(new ConstraintDataModel((string)reader["tableName"], (string)reader["columnName"],
                     (string)reader["defaultConstraintName"]));
+            }
 
             return fileNames;
         }

@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork;
 using LibGitWork.ToolActions;
@@ -20,18 +23,18 @@ public sealed class CheckGitIgnoreFilesCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var updateGitProjectsToolAction = new CheckGitIgnoreFilesToolAction(_logger, _parametersManager, true);
-        return updateGitProjectsToolAction.Run(CancellationToken.None).Result;
+        return await updateGitProjectsToolAction.Run(cancellationToken);
     }
 
     protected override string GetStatus()
     {
         MenuAction = EMenuAction.Reload;
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(_logger, _parametersManager, true);
-        var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
+        Dictionary<string, string> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
-        return wrongGitIgnoreFilesList.Count.ToString();
+        return wrongGitIgnoreFilesList.Count.ToString(CultureInfo.InvariantCulture);
     }
 }

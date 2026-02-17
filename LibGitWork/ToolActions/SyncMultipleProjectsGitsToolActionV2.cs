@@ -34,7 +34,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var syncMultipleProjectsGitsParametersV2 =
             SyncMultipleProjectsGitsParametersV2.Create(supportToolsParameters, projectGroupName, projectName);
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new SyncMultipleProjectsGitsToolActionV2(loggerOrNull, parametersManager,
             syncMultipleProjectsGitsParametersV2, useConsole);
     }
@@ -53,39 +53,54 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //  ოღონდ სერვერის მხარეს ინფორმაციის წამოღება უნდა მოხდეს ერთხელ თავიდან
         //  და თუ რამე დაიფუშა, ყოველი დაფუშვის მერე, ოღონდ თუ დარჩენილია დასასინქრონიზებელი ფოლდერი
 
-        var projectsList = GitProjectListHelper.CreateProjectsList(_syncMultipleProjectsGitsParametersV2.Projects,
-            _syncMultipleProjectsGitsParametersV2.ProjectGroupName, _syncMultipleProjectsGitsParametersV2.ProjectName);
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList =
+            GitProjectListHelper.CreateProjectsList(_syncMultipleProjectsGitsParametersV2.Projects,
+                _syncMultipleProjectsGitsParametersV2.ProjectGroupName,
+                _syncMultipleProjectsGitsParametersV2.ProjectName);
 
-        var projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, GitProjectSyncronizer>();
 
-        foreach (var (projectName, project) in projectsListOrdered)
-        foreach (var gitCol in Enum.GetValues<EGitCol>())
-        foreach (var gitProjectName in project.GetGitProjectNames(gitCol))
+        foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            if (!gitSyncToolsByGitProjectNames.ContainsKey(gitProjectName))
-                gitSyncToolsByGitProjectNames.Add(gitProjectName,
-                    new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true));
-            gitSyncToolsByGitProjectNames[gitProjectName].Add(projectName, gitCol);
+            foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())
+            {
+                foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+                {
+                    if (!gitSyncToolsByGitProjectNames.TryGetValue(gitProjectName, out GitProjectSyncronizer? value))
+                    {
+                        value = new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true);
+                        gitSyncToolsByGitProjectNames.Add(gitProjectName, value);
+                    }
+
+                    value.Add(projectName, gitCol);
+                }
+            }
         }
 
         string? usedCommitMessage = null;
 
-        var useSameMessageForNextCommits = false;
+        bool useSameMessageForNextCommits = false;
 
         Console.WriteLine("Count changes");
         //წინასწარ ვადგენთ, რომელიმე რეპოზიტორიაში ხომ არ გვაქვს ცვლილებები, რომ პირველ რიგში ისინი დავამუშაოვოთ
-        foreach (var (key, syncer) in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0))
+        foreach ((string key, GitProjectSyncronizer syncer) in gitSyncToolsByGitProjectNames.Where(x =>
+                     x.Value.Count > 0))
             //Console.WriteLine($"for {key}");
+        {
             if (syncer.CountHasChanges())
+            {
                 Console.WriteLine($"{key} has changes");
+            }
+        }
+
         Console.WriteLine("Count changes finished");
 
-        foreach (var keyValuePair in gitSyncToolsByGitProjectNames.Where(x => x.Value.Count > 0)
-                     .OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))
+        foreach (KeyValuePair<string, GitProjectSyncronizer> keyValuePair in gitSyncToolsByGitProjectNames
+                     .Where(x => x.Value.Count > 0).OrderBy(x => x.Value.HasChanges ? 0 : 1).ThenBy(x => x.Key))
         {
-            var syncer = keyValuePair.Value;
+            GitProjectSyncronizer syncer = keyValuePair.Value;
             syncer.UsedCommitMessage = usedCommitMessage;
             syncer.UseSameMessageForNextCommits = useSameMessageForNextCommits;
             syncer.RunSync();

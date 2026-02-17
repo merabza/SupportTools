@@ -30,7 +30,7 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var ftpSiteUserName = _par.FileStorageForExchange.UserName;
+        string? ftpSiteUserName = _par.FileStorageForExchange.UserName;
 
         if (string.IsNullOrWhiteSpace(ftpSiteUserName))
         {
@@ -38,51 +38,51 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var fileStoragePath = _par.FileStorageForExchange.FileStoragePath;
+        string? fileStoragePath = _par.FileStorageForExchange.FileStoragePath;
 
-        var isFtp = _par.FileStorageForExchange.IsFtp();
+        bool? isFtp = _par.FileStorageForExchange.IsFtp();
         if (isFtp is null)
         {
-            _logger.LogError("could not be determined File Storage {fileStoragePath} is ftp file storage or not",
+            _logger.LogError("could not be determined File Storage {FileStoragePath} is ftp file storage or not",
                 fileStoragePath);
             return false;
         }
 
         if (!isFtp.Value)
         {
-            _logger.LogError("File Storage {fileStoragePath} is not ftp file storage", fileStoragePath);
+            _logger.LogError("File Storage {FileStoragePath} is not ftp file storage", fileStoragePath);
             return false;
         }
 
-        if (!Uri.TryCreate(fileStoragePath, UriKind.Absolute, out var uri))
+        if (!Uri.TryCreate(fileStoragePath, UriKind.Absolute, out Uri? uri))
         {
-            _logger.LogError("Invalid File Storage Path {fileStoragePath}", fileStoragePath);
+            _logger.LogError("Invalid File Storage Path {FileStoragePath}", fileStoragePath);
             return false;
         }
 
-        var hostName = uri.Host;
-        var startPath = uri.AbsolutePath;
-        var port = uri.Port;
+        string hostName = uri.Host;
+        string startPath = uri.AbsolutePath;
+        int port = uri.Port;
 
-        var ftpSiteAddress = port == 21 ? hostName : $"\"{hostName} {port}\"";
+        string ftpSiteAddress = port == 21 ? hostName : $"\"{hostName} {port}\"";
 
-        var userName = _par.FileStorageForExchange.UserName;
+        string? userName = _par.FileStorageForExchange.UserName;
         if (string.IsNullOrWhiteSpace(userName))
         {
-            _logger.LogError("User Name is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("User Name is not specified for File Storage {FileStoragePath}", fileStoragePath);
             return false;
         }
 
-        var password = _par.FileStorageForExchange.Password;
+        string? password = _par.FileStorageForExchange.Password;
         if (string.IsNullOrWhiteSpace(password))
         {
-            _logger.LogError("Password is not specified for File Storage {fileStoragePath}", fileStoragePath);
+            _logger.LogError("Password is not specified for File Storage {FileStoragePath}", fileStoragePath);
             return false;
         }
 
         if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
         {
-            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {fileStoragePath}",
+            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {FileStoragePath}",
                 fileStoragePath);
             return false;
         }
@@ -119,12 +119,15 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var securityFolder = _par.SecurityFolder;
+        string? securityFolder = _par.SecurityFolder;
         string? defCloneFile = null;
         if (securityFolder is not null)
+        {
             defCloneFile = Path.Combine(securityFolder, _par.ProjectName, _par.ServerInfo.ServerName,
                 _par.ServerInfo.EnvironmentName, $"{_par.ProjectName}Install.sh");
-        var scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
+        }
+
+        string? scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
         if (scriptFileNameForSave is null)
         {
             StShared.WriteErrorLine("file name for Generate is not specified", true);
@@ -138,7 +141,7 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
         }
 
         var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
+        ServerDataModel serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
 
         if (string.IsNullOrWhiteSpace(serverData.Runtime))
         {

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
@@ -22,46 +25,49 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is null)
         {
             StShared.WriteErrorLine($"Project with name {_projectName} does not exists", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        var checks = Enum.GetValues<EProjectTools>().ToDictionary(tool => tool.ToString(),
+        Dictionary<string, bool> checks = Enum.GetValues<EProjectTools>().ToDictionary(tool => tool.ToString(),
             tool => project.AllowToolsList.Contains(tool));
 
         //გამოვიდეს სიიდან ამრჩევი
         MenuInputer.MultipleInputFromList("Select allow tools", checks);
 
-        foreach (var kvp in checks)
+        foreach (KeyValuePair<string, bool> kvp in checks)
         {
             if (!Enum.TryParse(kvp.Key, out EProjectTools tool))
-                return false;
+            {
+                return ValueTask.FromResult(false);
+            }
 
             if (kvp.Value)
             {
                 //ჩართული ჩავამატოთ თუ არ არსებობს
                 if (!project.AllowToolsList.Contains(tool))
+                {
                     project.AllowToolsList.Add(tool);
+                }
             }
             else
             {
                 //გამორთული ამოვაკლოთ თუ არსებობს
-                if (project.AllowToolsList.Contains(tool))
-                    project.AllowToolsList.Remove(tool);
+                project.AllowToolsList.Remove(tool);
             }
         }
 
         _parametersManager.Save(parameters, "Changes saved");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

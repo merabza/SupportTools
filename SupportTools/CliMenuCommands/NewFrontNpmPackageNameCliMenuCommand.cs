@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -25,38 +27,38 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Add new Npm Package started");
 
         var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        var newGitName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
+        string? newGitName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
 
         if (string.IsNullOrWhiteSpace(newGitName))
         {
             StShared.WriteErrorLine("Name is empty", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         //მიმდინარე პარამეტრები
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
-        var npmPackageNames = project.FrontNpmPackageNames;
+        List<string> npmPackageNames = project.FrontNpmPackageNames;
 
         //გადავამოწმოთ ხომ არ არსებობს იგივე სახელით სხვა პროექტი.
-        if (npmPackageNames.Any(a => a == newGitName))
+        if (npmPackageNames.Contains(newGitName))
         {
             StShared.WriteErrorLine(
                 $"Npm Package with Name {newGitName} in project {_projectName} is already exists. cannot create new record.",
                 true, _logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         npmPackageNames.Add(newGitName);
@@ -64,6 +66,6 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         //ცვლილებების შენახვა
         _parametersManager.Save(parameters, "Add Npm Package Finished");
 
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

@@ -16,36 +16,49 @@ public sealed class VersionComparer : IComparer<string>
         }
 
         if (y == null)
-            return 1;
-
-        var xDigs = StringToDigits(x);
-        var yDigs = StringToDigits(y);
-
-        var minLength = xDigs.Length < yDigs.Length ? xDigs.Length : yDigs.Length;
-
-        for (var i = 0; i < minLength; i++)
         {
-            var subst = xDigs[i] - yDigs[i];
+            return 1;
+        }
+
+        int[] xDigs = StringToDigits(x);
+        int[] yDigs = StringToDigits(y);
+
+        int minLength = xDigs.Length < yDigs.Length ? xDigs.Length : yDigs.Length;
+
+        for (int i = 0; i < minLength; i++)
+        {
+            int subst = xDigs[i] - yDigs[i];
             if (subst != 0)
+            {
                 return subst;
+            }
         }
 
         if (xDigs.Length > minLength)
+        {
             return 1;
+        }
 
         if (yDigs.Length > minLength)
+        {
             return -1;
+        }
 
         return 0;
     }
 
     private static int[] StringToDigits(string str)
     {
-        var digits = str.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        string[] digits = str.Split('.', StringSplitOptions.RemoveEmptyEntries);
         var intDigits = new List<int>();
-        foreach (var digit in digits)
-            if (int.TryParse(digit, out var d))
+        foreach (string digit in digits)
+        {
+            if (int.TryParse(digit, out int d))
+            {
                 intDigits.Add(d);
+            }
+        }
+
         return intDigits.ToArray();
     }
 }

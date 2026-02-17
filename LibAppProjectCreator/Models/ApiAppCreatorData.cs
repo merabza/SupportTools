@@ -90,20 +90,23 @@ public sealed class ApiAppCreatorData
 
         var databaseProjectFolders = new List<string> { "Models", "Installers" };
 
-        if (template.UseDatabase) databaseProjectFolders.Add("QueryModels");
+        if (template.UseDatabase)
+        {
+            databaseProjectFolders.Add("QueryModels");
+        }
 
-        var currentDbPartProjectName =
+        string currentDbPartProjectName =
             template.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(dbPartProjectName)
                 ? dbPartProjectName
                 : projectName;
 
-        var dbPartFolderName = $"{currentDbPartProjectName}Part";
+        string dbPartFolderName = $"{currentDbPartProjectName}Part";
 
-        var dbPartPath = template.UseDbPartFolderForDatabaseProjects
+        string dbPartPath = template.UseDbPartFolderForDatabaseProjects
             ? Path.Combine(appCreatorBaseData.WorkPath, dbPartFolderName)
             : appCreatorBaseData.SolutionPath;
 
-        var dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
+        string? dbPartSolutionFolderName = template.UseDbPartFolderForDatabaseProjects ? dbPartFolderName : null;
 
         var databaseProjectData = ProjectForCreate.CreateClassLibProject(dbPartPath, currentDbPartProjectName,
             [.. databaseProjectFolders], dbPartSolutionFolderName);
@@ -114,9 +117,12 @@ public sealed class ApiAppCreatorData
         var repositoriesProjectData = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             $"{currentDbPartProjectName}Repositories", ["Installers"]);
 
-        var frontProjectFolderName = $"{projectName}Front";
-        var frontEndProjectName = $"{projectName.ToLower()}frontend";
-        var createInPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
+        string frontProjectFolderName = $"{projectName}Front";
+#pragma warning disable CA1308
+        string projectNameLower = projectName.ToLowerInvariant();
+#pragma warning restore CA1308
+        string frontEndProjectName = $"{projectNameLower}frontend";
+        string createInPath = Path.Combine(appCreatorBaseData.WorkPath, frontProjectFolderName);
         var frontendProjectData =
             ProjectForCreate.CreateReactProject(createInPath, frontEndProjectName, [], frontProjectFolderName);
 

@@ -79,27 +79,27 @@ public sealed class GitProjects
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {
         Dictionary<string, GitProjectDataDomain> gitProjects = [];
-        foreach (var (key, value) in gitPrs)
+        foreach ((string key, GitProjectDataModel value) in gitPrs)
         {
             if (string.IsNullOrWhiteSpace(value.GitName))
             {
-                logger?.LogError("GitName is empty for Git Project with key {key})", key);
+                logger?.LogError("GitName is empty for Git Project with key {Key})", key);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(value.ProjectRelativePath))
             {
-                logger?.LogError("ProjectRelativePath is empty for Git Project with key {key})", key);
+                logger?.LogError("ProjectRelativePath is empty for Git Project with key {Key})", key);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(value.ProjectFileName))
             {
-                logger?.LogError("ProjectFileName is empty for Git Project with key {key})", key);
+                logger?.LogError("ProjectFileName is empty for Git Project with key {Key})", key);
                 continue;
             }
 
-            var dependsOnProjectNames = value.DependsOnProjectNames;
+            List<string> dependsOnProjectNames = value.DependsOnProjectNames;
 
             gitProjects.Add(key,
                 new GitProjectDataDomain(value.GitName, value.ProjectRelativePath, value.ProjectFileName,
@@ -111,7 +111,7 @@ public sealed class GitProjects
 
     public GitProjectDataDomain GetGitProjectByKey(string key)
     {
-        return _gitProjects.TryGetValue(key, out var byKey)
+        return _gitProjects.TryGetValue(key, out GitProjectDataDomain? byKey)
             ? byKey
             : throw new Exception($"GitProject With Key {key} does not found");
     }

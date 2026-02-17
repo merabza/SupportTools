@@ -42,6 +42,11 @@
   <Folder Name="/SupportToolsServerShared/">
     <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />

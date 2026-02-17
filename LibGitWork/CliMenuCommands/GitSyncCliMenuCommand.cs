@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitData;
 using LibGitWork.ToolActions;
@@ -26,15 +27,20 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override string GetActionDescription()
+    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return $"This process will Sync git {_gitProjectName}";
+        return ValueTask.FromResult<string?>($"This process will Sync git {_gitProjectName}");
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var gitSyncToolAction =
             GitSyncToolAction.Create(_logger, _parametersManager, _projectName, _gitCol, _gitProjectName, true);
-        return gitSyncToolAction?.Run(CancellationToken.None).Result ?? false;
+        if (gitSyncToolAction is null)
+        {
+            return false;
+        }
+
+        return await gitSyncToolAction.Run(cancellationToken);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
@@ -46,15 +47,17 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGitsV2);
 
         //პროექტების ჩამონათვალი
-        foreach (var (projectName, _) in parameters.Projects
+        foreach ((string projectName, ProjectModel _) in parameters.Projects
                      .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                                  _projectGroupName).OrderBy(o => o.Key))
             //projectName
+        {
             projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory,
                 _parametersManager, projectName));
+        }
 
         //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         projectGroupSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 
@@ -66,6 +69,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         return parameters.Projects.Count(x =>
-            SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName).ToString();
+                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+            .ToString(CultureInfo.InvariantCulture);
     }
 }

@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using AppCliTools.LibMenuInput;
@@ -24,22 +27,22 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var projects = parameters.Projects;
-        if (!projects.TryGetValue(_projectName, out var project))
+        Dictionary<string, ProjectModel> projects = parameters.Projects;
+        if (!projects.TryGetValue(_projectName, out ProjectModel? project))
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
             return false;
         }
 
-        var defCloneFile = project.ProjectFolderName is null
+        string? defCloneFile = project.ProjectFolderName is null
             ? null
             : Path.Combine(project.ProjectFolderName, $"Export{_projectName}.json");
 
-        var fileWithExportData = MenuInputer.InputFilePath("File name for Export", defCloneFile, false);
+        string? fileWithExportData = MenuInputer.InputFilePath("File name for Export", defCloneFile, false);
 
         if (string.IsNullOrWhiteSpace(fileWithExportData))
         {
@@ -49,14 +52,18 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
 
         if (File.Exists(fileWithExportData) &&
             !Inputer.InputBool($"File {fileWithExportData} exists, overwrite?", false, false))
+        {
             return false;
+        }
 
         var projectExportData = new ProjectExportData(_projectName, project);
-        foreach (var gitName in project.GitProjectNames.Where(gitName => parameters.Gits.ContainsKey(gitName)))
+        foreach (string gitName in project.GitProjectNames.Where(gitName => parameters.Gits.ContainsKey(gitName)))
+        {
             projectExportData.Gits.Add(gitName, parameters.Gits[gitName]);
+        }
 
-        var projectJsonText = JsonConvert.SerializeObject(projectExportData, Formatting.Indented);
-        File.WriteAllText(fileWithExportData, projectJsonText);
+        string projectJsonText = JsonConvert.SerializeObject(projectExportData, Formatting.Indented);
+        await File.WriteAllTextAsync(fileWithExportData, projectJsonText, cancellationToken);
 
         return true;
     }

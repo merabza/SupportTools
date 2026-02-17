@@ -20,12 +20,20 @@ public static class AppCreatorFactory
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
             par.SolutionFolderName, par.SecurityWorkFolderPath, gitIgnoreModelFilePaths);
 
-        if (appCreatorBaseData is null)
+        if (appCreatorBaseData is not null)
         {
-            logger.LogError("appCreatorBaseData does not created");
-            return null;
+            return CreatorAppByProjectType(logger, httpClientFactory, par, template, gitProjects, gitRepos,
+                mediatRLicenseKey, appCreatorBaseData);
         }
 
+        logger.LogError("appCreatorBaseData does not created");
+        return null;
+    }
+
+    private static AppCreatorBase? CreatorAppByProjectType(ILogger logger, IHttpClientFactory httpClientFactory,
+        AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos,
+        string? mediatRLicenseKey, AppCreatorBaseData appCreatorBaseData)
+    {
         switch (par.ProjectType)
         {
             case ESupportProjectType.Console:
@@ -38,8 +46,10 @@ public static class AppCreatorFactory
                     par.ProjectName, par.DbPartProjectName, mediatRLicenseKey, template);
 
                 if (apiAppCreatorData is not null)
+                {
                     return new ApiAppCreator(logger, httpClientFactory, par.ProjectShortName, par.ProjectName,
                         par.IndentSize, gitProjects, gitRepos, apiAppCreatorData);
+                }
 
                 logger.LogError("apiAppCreatorData is not created");
                 return null;
@@ -52,7 +62,7 @@ public static class AppCreatorFactory
                 return null;
 
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(par), par.ProjectType, "Unsupported project type");
         }
     }
 }

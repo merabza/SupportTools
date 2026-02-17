@@ -30,8 +30,10 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
         var fieldEditorsBlock = new FlatCodeBlock();
 
         if (_useDatabase)
+        {
             fieldEditorsBlock.Add(new FlatCodeBlock(
                 $"FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory, nameof({_projectNamespace}Parameters.DatabaseConnectionName), parametersManager, true))"));
+        }
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             _useDatabase ? "using System.Net.Http" : null, "using AppCliTools.CliParameters",

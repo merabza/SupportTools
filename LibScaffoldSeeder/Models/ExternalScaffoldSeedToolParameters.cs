@@ -34,10 +34,12 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
                 File.Exists(externalToolProjectDefFilePath) &&
                 !string.IsNullOrWhiteSpace(externalToolProjectDefParametersFilePath) &&
                 File.Exists(externalToolProjectDefParametersFilePath))
+            {
                 return new ExternalScaffoldSeedToolParameters(externalToolProjectDefFilePath,
                     externalToolProjectDefParametersFilePath);
+            }
 
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
             {
@@ -58,16 +60,16 @@ public sealed class ExternalScaffoldSeedToolParameters : IParameters
                 return null;
             }
 
-            var externalToolProjectName = externalToolProjectNameCounter(project.ScaffoldSeederProjectName);
-            var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
-            var scaffoldSeederProjectName = project.ScaffoldSeederProjectName;
-            var scaffoldSeederFolderName = NamingStats.ScaffoldSeederFolderName(project.ScaffoldSeederProjectName);
+            string externalToolProjectName = externalToolProjectNameCounter(project.ScaffoldSeederProjectName);
+            string? scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
+            string? scaffoldSeederProjectName = project.ScaffoldSeederProjectName;
+            string scaffoldSeederFolderName = NamingStats.ScaffoldSeederFolderName(project.ScaffoldSeederProjectName);
 
-            var externalToolProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
+            string externalToolProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, scaffoldSeederProjectName,
                 scaffoldSeederFolderName, scaffoldSeederFolderName, externalToolProjectName,
                 $"{externalToolProjectName}{NamingStats.CsProjectExtension}");
 
-            var externalToolProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder,
+            string externalToolProjectParametersFilePath = Path.Combine(scaffoldSeedersWorkFolder,
                 scaffoldSeederProjectName, NamingStats.ScaffoldSeedSecFolderName(scaffoldSeederProjectName),
                 $"{externalToolProjectName}{NamingStats.JsonExtension}");
 

@@ -29,7 +29,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var workFolder = supportToolsParameters.WorkFolder;
+        string? workFolder = supportToolsParameters.WorkFolder;
         if (string.IsNullOrWhiteSpace(workFolder))
         {
             StShared.WriteErrorLine("supportToolsParameters.WorkFolder is not specified", true);
@@ -42,7 +42,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
             return ValueTask.FromResult(false);
         }
 
-        var gitsFolder = Path.Combine(workFolder, "Gits");
+        string gitsFolder = Path.Combine(workFolder, "Gits");
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         //_gitsFolder = Path.Combine(_workFolder, "Gits");
         if (!StShared.CreateFolder(gitsFolder, true))
@@ -55,7 +55,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
         List<string> usedProjectNames = [];
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
 
-        foreach (var gitProjectsUpdater in gitRepos.Gits.OrderBy(k => k.Key).Select(kvp =>
+        foreach (GitProjectsUpdater? gitProjectsUpdater in gitRepos.Gits.OrderBy(k => k.Key).Select(kvp =>
                      GitProjectsUpdater.Create(Logger, _parametersManager, kvp.Key, UseConsole)))
         {
             if (gitProjectsUpdater is null)
@@ -64,19 +64,26 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
                 return ValueTask.FromResult(false);
             }
 
-            var gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
+            GitProcessor? gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
             if (gitProcessor is null)
+            {
                 return ValueTask.FromResult(false);
+            }
+
             usedProjectNames.AddRange(gitProjectsUpdater.UsedProjectNames.Except(usedProjectNames));
         }
 
-        foreach (var projectName in supportToolsParameters.GitProjects.Keys.Except(usedProjectNames))
+        foreach (string projectName in supportToolsParameters.GitProjects.Keys.Except(usedProjectNames))
+        {
             supportToolsParameters.GitProjects.Remove(projectName);
+        }
 
         Console.WriteLine("Find Dependencies");
 
         if (!RegisterDependenciesProjects(gitsFolder, supportToolsParameters.GitProjects))
+        {
             return ValueTask.FromResult(false);
+        }
 
         _parametersManager.Save(supportToolsParameters, "Project Saved");
         return ValueTask.FromResult(true);
@@ -85,7 +92,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
     private static bool RegisterDependenciesProjects(string gitsFolder,
         Dictionary<string, GitProjectDataModel> gitProjects)
     {
-        foreach (var (key, project) in gitProjects)
+        foreach ((string key, GitProjectDataModel project) in gitProjects)
         {
             Console.WriteLine($"Dependencies for {key}");
 
@@ -103,27 +110,33 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
 
             List<string> dependsOnProjectNames = [];
 
-            var filePath = Path.Combine(gitsFolder, project.ProjectRelativePath, project.ProjectFileName);
-            var projectXml = XElement.Load(filePath);
+            string filePath = Path.Combine(gitsFolder, project.ProjectRelativePath, project.ProjectFileName);
+            XElement projectXml = XElement.Load(filePath);
 
-            var projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
+            List<XElement> projectReferences =
+                projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
 
-            foreach (var element in projectReferences)
+            foreach (XElement element in projectReferences)
             {
-                var attributes = element.Attributes("Include");
-                foreach (var attr in attributes)
+                IEnumerable<XAttribute> attributes = element.Attributes("Include");
+                foreach (XAttribute attr in attributes)
                 {
-                    var fileFolderName = Path.GetDirectoryName(filePath);
+                    string? fileFolderName = Path.GetDirectoryName(filePath);
                     if (fileFolderName == null)
+                    {
                         return false;
-                    var depProjectFullPath = new DirectoryInfo(Path.Combine(fileFolderName, attr.Value)).FullName;
+                    }
 
-                    var depProjectRelativePath = Path.GetRelativePath(gitsFolder, depProjectFullPath);
+                    string depProjectFullPath = new DirectoryInfo(Path.Combine(fileFolderName, attr.Value)).FullName;
 
-                    var projectName = Path.GetFileNameWithoutExtension(depProjectRelativePath);
+                    string depProjectRelativePath = Path.GetRelativePath(gitsFolder, depProjectFullPath);
+
+                    string projectName = Path.GetFileNameWithoutExtension(depProjectRelativePath);
 
                     if (!dependsOnProjectNames.Contains(projectName))
+                    {
                         dependsOnProjectNames.Add(projectName);
+                    }
                 }
             }
 

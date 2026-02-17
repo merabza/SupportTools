@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitData;
 using LibGitWork.ToolActions;
@@ -25,10 +26,15 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var syncOneProjectAllGitsToolAction = SyncOneProjectAllGitsToolAction.Create(_logger, _parametersManager,
             _projectName, _gitCol, null, true, true);
-        return syncOneProjectAllGitsToolAction?.Run(CancellationToken.None).Result ?? false;
+        if (syncOneProjectAllGitsToolAction is null)
+        {
+            return false;
+        }
+
+        return await syncOneProjectAllGitsToolAction.Run(cancellationToken);
     }
 }

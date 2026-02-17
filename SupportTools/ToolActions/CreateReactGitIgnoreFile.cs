@@ -21,7 +21,7 @@ public sealed class CreateReactGitIgnoreFile : ToolAction
         _gitIgnoreFileName = gitIgnoreFileName;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         const string code = """
                             # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
@@ -74,11 +74,11 @@ public sealed class CreateReactGitIgnoreFile : ToolAction
 
         if (FileStat.CreatePrevFolderIfNotExists(_gitIgnoreFileName, true, _logger))
         {
-            File.WriteAllText(_gitIgnoreFileName, code.Replace("\r\n", "\n"));
-            return ValueTask.FromResult(true);
+            await File.WriteAllTextAsync(_gitIgnoreFileName, code.Replace("\r\n", "\n"), cancellationToken);
+            return true;
         }
 
         StShared.WriteErrorLine("File did not created", true);
-        return ValueTask.FromResult(false);
+        return false;
     }
 }

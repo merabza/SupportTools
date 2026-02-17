@@ -17,15 +17,21 @@ public sealed class GitProjectDataModel
 
     public void DependsOn(List<string> dependsOnProjectNames)
     {
-        var newProjects = dependsOnProjectNames.Except(DependsOnProjectNames).ToList();
+        List<string> newProjects = dependsOnProjectNames.Except(DependsOnProjectNames).ToList();
         if (newProjects.Count > 0)
+        {
             DependsOnProjectNames.AddRange(newProjects);
+        }
 
-        var forDeleteProjects = DependsOnProjectNames.Except(dependsOnProjectNames).ToList();
+        List<string> forDeleteProjects = DependsOnProjectNames.Except(dependsOnProjectNames).ToList();
         if (forDeleteProjects.Count == 0)
+        {
             return;
+        }
 
-        foreach (var forDeleteProject in forDeleteProjects)
+        foreach (string forDeleteProject in forDeleteProjects)
+        {
             DependsOnProjectNames.Remove(forDeleteProject);
+        }
     }
 }

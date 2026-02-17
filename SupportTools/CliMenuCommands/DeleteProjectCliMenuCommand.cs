@@ -1,4 +1,7 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -19,23 +22,25 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var projects = parameters.Projects;
+        Dictionary<string, ProjectModel> projects = parameters.Projects;
         if (!projects.ContainsKey(_projectName))
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
         if (!Inputer.InputBool($"This will Delete Project {_projectName}. are you sure?", false, false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         projects.Remove(_projectName);
         _parametersManager.Save(parameters, $"Project {_projectName} Deleted");
         MenuAction = EMenuAction.LevelUp;
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

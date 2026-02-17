@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
@@ -32,20 +33,17 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         var projectCreatorSubMenuSet = new CliMenuSet("Project Creator");
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
+        AppProjectCreatorAllParameters? appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
         if (appProjectCreatorAllParameters is null)
         {
             parameters.AppProjectCreatorAllParameters = new AppProjectCreatorAllParameters();
             appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
         }
 
-        if (appProjectCreatorAllParameters is not null)
-        {
-            var appProjectCreatorParametersEditor = new AppProjectCreatorParametersEditor(_logger, _httpClientFactory,
-                appProjectCreatorAllParameters, _parametersManager, _parametersManager);
+        var appProjectCreatorParametersEditor = new AppProjectCreatorParametersEditor(_logger, _httpClientFactory,
+            appProjectCreatorAllParameters, _parametersManager, _parametersManager);
 
-            appProjectCreatorParametersEditor.FillDetailsSubMenu(projectCreatorSubMenuSet);
-        }
+        appProjectCreatorParametersEditor.FillDetailsSubMenu(projectCreatorSubMenuSet);
 
         var creatorClassCreatorToolCommand = new CreatorClassCreatorCliMenuCommand(_logger);
         projectCreatorSubMenuSet.AddMenuItem(creatorClassCreatorToolCommand);
@@ -65,13 +63,15 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         projectCreatorSubMenuSet.AddMenuItem(newItemCommand);
 
         //პროექტების ჩამონათვალი
-        if (appProjectCreatorAllParameters is not null)
-            foreach (var kvp in appProjectCreatorAllParameters.Templates.OrderBy(o => o.Key))
-                projectCreatorSubMenuSet.AddMenuItem(
-                    new TemplateSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, kvp.Key));
+        foreach (KeyValuePair<string, TemplateModel> kvp in
+                 appProjectCreatorAllParameters.Templates.OrderBy(o => o.Key))
+        {
+            projectCreatorSubMenuSet.AddMenuItem(
+                new TemplateSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager, kvp.Key));
+        }
 
         //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         projectCreatorSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
             key.Length);
 

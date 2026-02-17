@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using AppCliTools.LibMenuInput;
@@ -22,11 +24,13 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
         _logger = logger;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        var path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
+        string? path = MenuInputer.InputFileOrFolderPath("File or folder path with binary files", null);
         if (path is null)
-            return false;
+        {
+            return new ValueTask<bool>(false);
+        }
 
         if (File.Exists(path))
         {
@@ -37,16 +41,18 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             if (file.DirectoryName is null)
             {
                 Console.WriteLine("file.DirectoryName is null");
-                return false;
+                return new ValueTask<bool>(false);
             }
 
             var classCreatorInfo = ClassCreatorInfo.Create(path, false);
             if (classCreatorInfo is null)
-                return false;
+            {
+                return new ValueTask<bool>(false);
+            }
 
             ProcessFiles([classCreatorInfo]);
 
-            return true;
+            return new ValueTask<bool>(true);
         }
 
         if (Directory.Exists(path))
@@ -55,20 +61,23 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
             var infos = new List<ClassCreatorInfo>();
             var dir = new DirectoryInfo(path);
-            foreach (var file in dir.GetFiles())
+            foreach (FileInfo file in dir.GetFiles())
             {
                 var classCreatorInfo = ClassCreatorInfo.Create(file.FullName, false);
                 if (classCreatorInfo is null)
-                    return false;
+                {
+                    return new ValueTask<bool>(false);
+                }
+
                 infos.Add(classCreatorInfo);
             }
 
             ProcessFiles(infos);
-            return true;
+            return new ValueTask<bool>(true);
         }
 
         Console.WriteLine("File or folder with name {0} is not exists", path);
-        return false;
+        return new ValueTask<bool>(false);
     }
 
     private void ProcessFiles(List<ClassCreatorInfo> classCreatorInfos)
@@ -84,11 +93,11 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
     private void CreateCodeFiles(List<ClassCreatorInfo> classCreatorInfos)
     {
-        foreach (var cci in classCreatorInfos)
+        foreach (ClassCreatorInfo cci in classCreatorInfos)
         {
             Console.WriteLine($"Loading {cci.SourceFileFullPath}...");
-            var fileBytes = File.ReadAllBytes(cci.SourceFileFullPath);
-            var base64String = Convert.ToBase64String(fileBytes);
+            byte[] fileBytes = File.ReadAllBytes(cci.SourceFileFullPath);
+            string base64String = Convert.ToBase64String(fileBytes);
 
             Console.WriteLine($"Creating {cci.DestinationCodeFileName}...");
             var creatorClassCreator = new BinFileCreatorClassCreator(_logger, cci.DestinationFolder, cci.ClassName,
@@ -99,7 +108,7 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
 
     private static bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
     {
-        var existsFileNames = classCreatorInfos
+        List<string> existsFileNames = classCreatorInfos
             .Select(classCreatorInfo => new
             {
                 classCreatorInfo,
@@ -109,10 +118,15 @@ public sealed class BinaryFileCreatorClassCreatorCliMenuCommand : CliMenuCommand
             .Select(sx => sx.classCreatorInfo.DestinationCodeFileName).ToList();
 
         if (existsFileNames.Count <= 0)
+        {
             return false;
+        }
 
         Console.WriteLine("Destination Files already exists: ");
-        foreach (var fileName in existsFileNames) Console.WriteLine($"    {fileName}");
+        foreach (string fileName in existsFileNames)
+        {
+            Console.WriteLine($"    {fileName}");
+        }
 
         return true;
     }

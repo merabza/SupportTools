@@ -5,6 +5,8 @@ using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using ToolsManagement.DatabasesManagement;
+using ToolsManagement.DatabasesManagement.Models;
+using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
 
 namespace LibDatabaseWork.ToolCommands;
 
@@ -25,33 +27,40 @@ public sealed class BaseCopierToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var sourceBackupParameters = CopyBaseParameters.SourceBackupParameters;
-        var destinationBackupParameters = CopyBaseParameters.DestinationBackupParameters;
-        var destinationBackupRestoreParameters = destinationBackupParameters.BackupRestoreParameters;
+        BaseBackupParameters sourceBackupParameters = CopyBaseParameters.SourceBackupParameters;
+        BaseBackupParameters destinationBackupParameters = CopyBaseParameters.DestinationBackupParameters;
+        BackupRestoreParameters destinationBackupRestoreParameters =
+            destinationBackupParameters.BackupRestoreParameters;
 
         _logger.LogInformation("Create Backup for source Database");
 
         var sourceBaseBackupRestorer = new BaseBackupRestoreTool(_logger, sourceBackupParameters);
-        var backupFileParametersForSource = await sourceBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
+        BackupFileParameters? backupFileParametersForSource =
+            await sourceBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
 
         if (backupFileParametersForSource is null)
+        {
             return false;
+        }
 
-        var fileName = backupFileParametersForSource.Name;
-        var prefix = backupFileParametersForSource.Prefix;
-        var suffix = backupFileParametersForSource.Suffix;
-        var dateMask = backupFileParametersForSource.DateMask;
+        string fileName = backupFileParametersForSource.Name;
+        string prefix = backupFileParametersForSource.Prefix;
+        string suffix = backupFileParametersForSource.Suffix;
+        string dateMask = backupFileParametersForSource.DateMask;
 
         //თუ მიზნის ფაილსაცავი ლოკალურია და მისი ფოლდერი ემთხვევა პარამეტრების ლოკალურ ფოლდერს ან თუ წყაროს და მიზნის ფაილსაცავები ემთხვევა
         //   მაშინ მოქაჩვა საჭირო აღარ არის
         if (CopyBaseParameters.NeedUploadToDestination)
         {
-            _logger.LogInformation("Upload File {fileName} to Destination", fileName);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Upload File {FileName} to Destination", fileName);
+            }
 
             if (!destinationBackupRestoreParameters.FileManager.UploadFile(fileName,
                     CopyBaseParameters.UploadTempExtension))
             {
-                _logger.LogError("Can not Upload File {fileName}", fileName);
+                _logger.LogError("Can not Upload File {FileName}", fileName);
                 return false;
             }
 
@@ -65,11 +74,14 @@ public sealed class BaseCopierToolCommand : ToolCommand
         //   მაშინ მოქაჩვა საჭირო აღარ არის
         if (CopyBaseParameters is { NeedDownloadFromExchange: true, ExchangeFileManager: not null })
         {
-            _logger.LogInformation("Upload File {fileName} to Exchange", fileName);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Upload File {FileName} to Exchange", fileName);
+            }
 
             if (!CopyBaseParameters.ExchangeFileManager.UploadFile(fileName, CopyBaseParameters.UploadTempExtension))
             {
-                _logger.LogError("Can not Upload File {fileName}", fileName);
+                _logger.LogError("Can not Upload File {FileName}", fileName);
                 return false;
             }
 
@@ -83,7 +95,9 @@ public sealed class BaseCopierToolCommand : ToolCommand
         if (!destinationBackupParameters.SkipBackupBeforeRestore)
             //თუ SkipBackupBeforeRestore პარამეტრით აკრძალული არ არის
             //სანამ გადავაწერთ არსებული ბაზა გადავინახოთ ყოველი შემთხვევისათვის
+        {
             await destinationBaseBackupRestorer.CreateDatabaseBackup(cancellationToken);
+        }
 
         return await destinationBaseBackupRestorer.RestoreDatabaseFromBackup(backupFileParametersForSource,
             destinationBackupParameters.DatabaseRecoveryModel, cancellationToken);

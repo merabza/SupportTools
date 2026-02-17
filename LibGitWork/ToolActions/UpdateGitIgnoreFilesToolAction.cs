@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,24 +21,24 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
-        var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
+        Dictionary<string, string> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         if (wrongGitIgnoreFilesList.Count == 0)
         {
             Console.WriteLine("--wrong .gitignore files are not found");
-            return ValueTask.FromResult(true);
+            return true;
         }
 
         Console.WriteLine("Update wrong .gitignore files");
-        foreach (var (gitignoreFileName, gitignoreFileContent)in wrongGitIgnoreFilesList)
+        foreach ((string gitignoreFileName, string gitignoreFileContent)in wrongGitIgnoreFilesList)
         {
             Console.WriteLine($"Update {gitignoreFileName}");
-            File.WriteAllText(gitignoreFileName, gitignoreFileContent);
+            await File.WriteAllTextAsync(gitignoreFileName, gitignoreFileContent, cancellationToken);
         }
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

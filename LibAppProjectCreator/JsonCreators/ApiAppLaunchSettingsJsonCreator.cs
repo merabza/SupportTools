@@ -33,7 +33,7 @@ public sealed class ApiAppLaunchSettingsJsonCreator
 
         var launchSettingsJObject = new JObject(
             new JProperty("profiles", new JObject(new JProperty(_projectName, projObject))));
-        var launchSettingsJsonFileName = Path.Combine(_projectFullPath, "Properties", "launchSettings.json");
+        string launchSettingsJsonFileName = Path.Combine(_projectFullPath, "Properties", "launchSettings.json");
         File.WriteAllText(launchSettingsJsonFileName, launchSettingsJObject.ToString(Formatting.Indented));
 
         return true;

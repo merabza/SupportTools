@@ -8,6 +8,7 @@ using LibGitWork.Mappers;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
+using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
 using ToolsManagement.LibToolActions;
@@ -32,20 +33,21 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var supportToolsServerApiClient =
+        SupportToolsServerApiClient? supportToolsServerApiClient =
             supportToolsParameters.GetSupportToolsServerApiClient(Logger, _httpClientFactory);
 
         if (supportToolsServerApiClient == null)
+        {
             return false;
+        }
 
         var gitIgnoreFiles = new List<StsGitIgnoreFileTypeDataModel>();
-        foreach (var (key, fileName) in supportToolsParameters.GitIgnoreModelFilePaths)
+        foreach ((string key, string fileName) in supportToolsParameters.GitIgnoreModelFilePaths)
         {
-            string content;
-            if (File.Exists(fileName))
-                content = await File.ReadAllTextAsync(fileName, cancellationToken);
-            else
-                content = string.Empty;
+            string content = File.Exists(fileName)
+                ? await File.ReadAllTextAsync(fileName, cancellationToken)
+                : string.Empty;
+
             gitIgnoreFiles.Add(new StsGitIgnoreFileTypeDataModel { Name = key, Content = content });
         }
 

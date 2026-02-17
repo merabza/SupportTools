@@ -6,8 +6,10 @@ using System.Threading;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
+using LanguageExt;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
@@ -59,15 +61,21 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     {
         return _memoryCache.GetOrCreate(GitIgnoreFileTypesList, _ =>
         {
-            var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+            SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
             if (supportToolsServerApiClient is null)
+            {
                 return [];
+            }
+
             try
             {
-                var remoteGitReposResult = supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
+                OneOf<List<StsGitIgnoreFileTypeDataModel>, Err[]> remoteGitReposResult =
+                    supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
                 if (remoteGitReposResult.IsT0)
+                {
                     return remoteGitReposResult.AsT0;
+                }
 
                 StShared.WriteErrorLine("could not received GitIgnore File Types List", true, _logger);
                 Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
@@ -84,7 +92,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     public override bool ContainsRecordWithKey(string recordKey)
     {
-        var gitIgnoreModelFilePaths = GetGitIgnoreFileTypesListFromServer();
+        List<StsGitIgnoreFileTypeDataModel> gitIgnoreModelFilePaths = GetGitIgnoreFileTypesListFromServer();
         return gitIgnoreModelFilePaths.Any(x => x.Name == recordKey);
     }
 
@@ -95,7 +103,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     private void AddOrUpdateRecordWithKey(string recordKey)
     {
-        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
         {
@@ -105,10 +113,12 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient
+            Option<Err[]> updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
             if (updateGitRepoByKeyResult.IsSome)
+            {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+            }
         }
         catch (Exception e)
         {
@@ -123,7 +133,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     protected override void RemoveRecordWithKey(string recordKey)
     {
-        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
         {
@@ -133,9 +143,12 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey).Result;
+            Option<Err[]> updateGitRepoByKeyResult =
+                supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey).Result;
             if (updateGitRepoByKeyResult.IsSome)
+            {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+            }
         }
         catch (Exception e)
         {

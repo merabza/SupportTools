@@ -19,8 +19,10 @@ public static class GitFolderCountHelper
         //შემოწმდეს ინსტრუმენტების სამუშაო ფოლდერში Gits ფოლდერი თუ არსებობს და თუ არ არსებობს, შეიქმნას
         //_gitsFolder = Path.Combine(_workFolder, "Gits");
         if (FileStat.CreateFolderIfNotExists(gitsFolder, true) != null)
+        {
             return Path.Combine(gitsFolder,
                 gitData.GitProjectFolderName.Replace($"{Path.DirectorySeparatorChar}", "."));
+        }
 
         StShared.WriteErrorLine($"does not exists and cannot create work folder {gitsFolder}", true, logger);
         return null;

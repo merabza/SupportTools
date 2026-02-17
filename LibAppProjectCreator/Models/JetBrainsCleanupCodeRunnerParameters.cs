@@ -26,7 +26,7 @@ public sealed class JetBrainsCleanupCodeRunnerParameters : IParameters
     {
         try
         {
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (string.IsNullOrWhiteSpace(project.SolutionFileName))
             {

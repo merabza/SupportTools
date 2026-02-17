@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -23,10 +24,10 @@ public sealed class UploadGitProjectsToSupportToolsServerCliMenuCommand : CliMen
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var uploadGitProjectsToSupportToolsServerToolAction =
             new UploadGitProjectsToSupportToolsServerToolAction(_logger, _httpClientFactory, _parametersManager, true);
-        return uploadGitProjectsToSupportToolsServerToolAction.Run(CancellationToken.None).Result;
+        return await uploadGitProjectsToSupportToolsServerToolAction.Run(cancellationToken);
     }
 }

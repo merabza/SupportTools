@@ -48,7 +48,9 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
         }
 
         var reCreateReactAppFiles = new ReCreateReactAppFiles(_logger, supportToolsParameters.WorkFolder,
-            _reactAppName.ToLower(), _reactTemplateName);
+#pragma warning disable CA1308
+            _reactAppName.ToLowerInvariant(), _reactTemplateName);
+#pragma warning restore CA1308
         return ValueTask.FromResult(reCreateReactAppFiles.Run());
     }
 }

@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using SystemTools.SystemToolsShared.Errors;
 using SystemTools.TestApiContracts;
 using ToolsManagement.ApiClientsManagement;
@@ -40,21 +42,24 @@ public sealed class CheckParametersVersionAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var getVersionSuccess = false;
-        var version = string.Empty;
-        var tryCount = 0;
+        bool getVersionSuccess = false;
+        string? version = string.Empty;
+        int tryCount = 0;
         while (!getVersionSuccess && tryCount < _maxTryCount)
         {
             if (tryCount > 0)
             {
                 _logger.LogInformation("waiting for 3 second...");
-                Thread.Sleep(3000);
+                await Task.Delay(3000, cancellationToken);
             }
 
             tryCount++;
             try
             {
-                _logger.LogInformation("Try to get parameters Version {tryCount}...", tryCount);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Try to get parameters Version {TryCount}...", tryCount);
+                }
 
                 var errors = new List<Err>();
 
@@ -63,24 +68,33 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, UseConsole);
-                    var getAppSettingsVersionByProxyResult =
+                    OneOf<string, Err[]> getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
+                    {
                         errors.AddRange(getAppSettingsVersionByProxyResult.AsT1);
+                    }
                     else
+                    {
                         version = getAppSettingsVersionByProxyResult.AsT0;
+                    }
                 }
                 else
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient =
                         new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
-                    var getAppSettingsVersionResult = await testApiClient.GetAppSettingsVersion(cancellationToken);
+                    OneOf<string, Err[]> getAppSettingsVersionResult =
+                        await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
+                    {
                         errors.AddRange(getAppSettingsVersionResult.AsT1);
+                    }
                     else
+                    {
                         version = getAppSettingsVersionResult.AsT0;
+                    }
                 }
 
                 if (errors.Count > 0)
@@ -93,23 +107,31 @@ public sealed class CheckParametersVersionAction : ToolAction
 
                     if (_appSettingsVersion == null)
                     {
-                        _logger.LogInformation("{ProjectName} is running on parameters version {version}", ProjectName,
-                            version);
+                        if (_logger.IsEnabled(LogLevel.Information))
+                        {
+                            _logger.LogInformation("{ProjectName} is running on parameters version {Version}",
+                                ProjectName, version);
+                        }
+
                         return true;
                     }
 
                     if (_appSettingsVersion != version)
                     {
-                        _logger.LogWarning("Current Parameters version is {version}, but must be {_appSettingsVersion}",
+                        _logger.LogWarning("Current Parameters version is {Version}, but must be {ExpectedVersion}",
                             version, _appSettingsVersion);
                         getVersionSuccess = false;
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                _logger.LogWarning("could not get Parameters version for project {ProjectName} on try {tryCount}",
-                    ProjectName, tryCount);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                {
+                    _logger.LogWarning(e,
+                        "could not get Parameters version for project {ProjectName} on try {TryCount}", ProjectName,
+                        tryCount);
+                }
             }
         }
 
@@ -121,12 +143,17 @@ public sealed class CheckParametersVersionAction : ToolAction
 
         if (_appSettingsVersion != version)
         {
-            _logger.LogError("Current parameters version is {version}, but must be {_appSettingsVersion}", version,
+            _logger.LogError("Current parameters version is {Version}, but must be {AppSettingsVersion}", version,
                 _appSettingsVersion);
             return false;
         }
 
-        _logger.LogInformation("{ProjectName} now is running on parameters version {version}", ProjectName, version);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("{ProjectName} now is running on parameters version {Version}", ProjectName,
+                version);
+        }
+
         return true;
     }
 }

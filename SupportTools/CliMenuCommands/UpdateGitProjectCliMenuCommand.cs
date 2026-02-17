@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
@@ -40,7 +42,7 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         ////https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
         ////https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
@@ -53,16 +55,18 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
-            return false;
+            return ValueTask.FromResult(false);
         }
 
-        var gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
+        GitProcessor? gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
         if (gitProcessor is null)
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         _parametersManager.Save(_supportToolsParameters, "Project Saved");
 
         Console.WriteLine("Success");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

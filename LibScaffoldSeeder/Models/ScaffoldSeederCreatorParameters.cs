@@ -100,7 +100,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 return null;
             }
 
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForLocal))
             {
@@ -108,7 +108,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 return null;
             }
 
-            var smartSchemaForLocal =
+            SmartSchema smartSchemaForLocal =
                 supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForLocal);
 
             if (string.IsNullOrWhiteSpace(project.ProjectSecurityFolderPath))
@@ -146,17 +146,23 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
             var databaseServerConnections =
                 new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-            var (devDataProvider, devConnectionString, devCommandTimeout) =
+            (EDatabaseProvider? devDataProvider, string? devConnectionString, int devCommandTimeout) =
                 DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.DevDatabaseParameters,
                     databaseServerConnections);
 
-            if (devDataProvider is null || devConnectionString is null) return null;
+            if (devDataProvider is null || devConnectionString is null)
+            {
+                return null;
+            }
 
-            var (prodCopyDataProvider, prodCopyConnectionString, prodCommandTimeout) =
+            (EDatabaseProvider? prodCopyDataProvider, string? prodCopyConnectionString, int prodCommandTimeout) =
                 DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.ProdCopyDatabaseParameters,
                     databaseServerConnections);
 
-            if (prodCopyDataProvider is null || prodCopyConnectionString is null) return null;
+            if (prodCopyDataProvider is null || prodCopyConnectionString is null)
+            {
+                return null;
+            }
 
             if (string.IsNullOrWhiteSpace(project.NewDataSeedingClassLibProjectName))
             {

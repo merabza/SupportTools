@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -36,15 +37,18 @@ public sealed class ProjectToolTaskCliMenuCommand : CliMenuCommand
             _parametersManager, _projectName, true);
     }
 
-    protected override string? GetActionDescription()
+    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return MemoCreateToolCommand()?.Description;
+        return ValueTask.FromResult(MemoCreateToolCommand()?.Description);
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        var toolCommand = MemoCreateToolCommand();
-        if (toolCommand?.Par != null) return toolCommand.Run(CancellationToken.None).Result;
+        IToolCommand? toolCommand = MemoCreateToolCommand();
+        if (toolCommand?.Par != null)
+        {
+            return await toolCommand.Run(cancellationToken);
+        }
 
         Console.WriteLine("Parameters not loaded. Tool not started.");
         return false;

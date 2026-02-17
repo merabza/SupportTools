@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -28,8 +29,8 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToo
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var isAnyChanged = false;
-        foreach (var (_, git) in parameters.Gits.Where(x => x.Value.GitIgnorePathName is null))
+        bool isAnyChanged = false;
+        foreach ((string _, GitDataModel git) in parameters.Gits.Where(x => x.Value.GitIgnorePathName is null))
         {
             isAnyChanged = true;
             git.GitIgnorePathName = _gitIgnoreFileName;
@@ -37,9 +38,13 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToo
 
         if (isAnyChanged)
             //შენახვა
+        {
             _parametersManager.Save(parameters, "GitIgnorePathNames applied success");
+        }
         else
+        {
             StShared.WriteWarningLine("All Git Projects already have GitIgnorePathNames, No Changes made", true);
+        }
 
         return ValueTask.FromResult(true);
     }

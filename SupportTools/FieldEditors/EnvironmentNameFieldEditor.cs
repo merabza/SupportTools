@@ -17,7 +17,7 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
     {
-        var currentEnvironmentName = GetValue(recordForUpdate);
+        string? currentEnvironmentName = GetValue(recordForUpdate);
 
         var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
@@ -26,14 +26,16 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
-        var status = environmentCruder.GetStatusFor(val);
+        string? status = environmentCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

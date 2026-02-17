@@ -27,7 +27,7 @@ public sealed class GitIgnorePathNameStsFieldEditor : FieldEditor<string>
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
     {
-        var currentGitIgnorePathName = GetValue(recordForUpdate);
+        string? currentGitIgnorePathName = GetValue(recordForUpdate);
 
         var gitIgnorePathsCruder =
             new GitIgnoreFileTypesStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
@@ -37,15 +37,17 @@ public sealed class GitIgnorePathNameStsFieldEditor : FieldEditor<string>
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var gitIgnorePathsCruder =
             new GitIgnoreFileTypesStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
-        var status = gitIgnorePathsCruder.GetStatusFor(val);
+        string? status = gitIgnorePathsCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

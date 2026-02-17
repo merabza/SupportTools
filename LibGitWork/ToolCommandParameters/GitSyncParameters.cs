@@ -1,4 +1,5 @@
-﻿using LibGitData;
+﻿using System.Collections.Generic;
+using LibGitData;
 using LibGitData.Models;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
@@ -28,14 +29,14 @@ public sealed class GitSyncParameters : IParameters
     public static GitSyncParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters,
         string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
-        var project = supportToolsParameters.GetProject(projectName);
+        ProjectModel? project = supportToolsParameters.GetProject(projectName);
         if (project is null)
         {
             StShared.WriteErrorLine($"Git Project with name {projectName} does not exists", true);
             return null;
         }
 
-        var gitProjectNames = project.GetGitProjectNames(gitCol);
+        List<string> gitProjectNames = project.GetGitProjectNamesByGitCollectionType(gitCol);
 
         if (!gitProjectNames.Contains(gitProjectName))
         {
@@ -55,17 +56,19 @@ public sealed class GitSyncParameters : IParameters
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
-        if (!gitRepos.Gits.TryGetValue(gitProjectName, out var gitDataDom))
+        if (!gitRepos.Gits.TryGetValue(gitProjectName, out GitData? gitDataDom))
         {
             StShared.WriteErrorLine($"Git Project with name {gitProjectName} does not exists in gits list", true,
                 logger);
             return null;
         }
 
-        var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
 
         if (gitsFolder != null)
+        {
             return new GitSyncParameters(gitDataDom, gitsFolder);
+        }
 
         StShared.WriteErrorLine("Gits folder not found", true);
         return null;

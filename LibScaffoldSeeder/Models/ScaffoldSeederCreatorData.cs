@@ -36,12 +36,12 @@ public sealed class ScaffoldSeederCreatorData
         string scaffoldSeederProjectName, ScaffoldSeederCreatorParameters scaffoldSeederCreatorParameters)
     {
         //სკაფოლდინგის ბიბლიოთეკა
-        var databaseScaffoldClassLibProjectName =
+        string databaseScaffoldClassLibProjectName =
             NamingStats.DatabaseScaffoldClassLibProjectName(scaffoldSeederProjectName);
         var databaseScaffoldClassLibProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             databaseScaffoldClassLibProjectName, []);
 
-        var dataSeedingPackageFolder =
+        string dataSeedingPackageFolder =
             NamingStats.DataSeedingPackageFolder(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName,
                 appCreatorBaseData.WorkPath);
         //ბაზაში ინფორმაციის ჩამყრელი ბიბლიოთეკა
@@ -50,14 +50,14 @@ public sealed class ScaffoldSeederCreatorData
             ["CarcassSeeders", "ProjectSeeders", "Models", "Json"],
             NamingStats.DataSeedingPackageName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName));
 
-        var createProjectSeederCodeProjectName =
+        string createProjectSeederCodeProjectName =
             NamingStats.CreateProjectSeederCodeProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //სიდერის კოდის შემქმნელი აპლიკაცია
         var createProjectSeederCodeProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
             createProjectSeederCodeProjectName, createProjectSeederCodeProjectName, EDotnetProjectType.Console,
             string.Empty, "Program", ["Models", "Properties"]);
 
-        var getJsonFromScaffoldDbProjectName =
+        string getJsonFromScaffoldDbProjectName =
             NamingStats.GetJsonFromScaffoldDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //ბაზიდან ცხრილების შიგთავსის json-ის სახით წამოღებისათვის საჭირო პროექტი
         var getJsonFromProjectDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath,
@@ -65,22 +65,24 @@ public sealed class ScaffoldSeederCreatorData
             string.Empty, "Program", ["Models"]);
 
         var projectFolders = new List<string> { "Migrations" };
-        var migrationSqlFilesFolder = scaffoldSeederCreatorParameters.MigrationSqlFilesFolder;
+        string? migrationSqlFilesFolder = scaffoldSeederCreatorParameters.MigrationSqlFilesFolder;
         //თუ მიგრაციის sql ფაილების ფოლდერი მითითებულია პარამეტრებში, ეს ფოლდერი არსებობს და შეიცავს ერთს მაინც *.sql ფაილს, მაშინ მიგრაციის პროექტში დაემატოს Sql ფოლდერი
         if (!string.IsNullOrWhiteSpace(migrationSqlFilesFolder) && Directory.Exists(migrationSqlFilesFolder))
         {
             var sqlDir = new DirectoryInfo(migrationSqlFilesFolder);
             if (sqlDir.GetFiles("*.sql").Length > 0)
+            {
                 projectFolders.Add("Sql");
+            }
         }
 
-        var dbMigrationProjectName =
+        string dbMigrationProjectName =
             NamingStats.DbMigrationProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //მიგრაციის პროექტი ბიბლიოთეკა
         var dbMigrationProject = ProjectForCreate.CreateClassLibProject(appCreatorBaseData.SolutionPath,
             dbMigrationProjectName, [.. projectFolders]);
 
-        var seedDbProjectName =
+        string seedDbProjectName =
             NamingStats.SeedDbProjectName(scaffoldSeederCreatorParameters.ScaffoldSeederProjectName);
         //ინფორმაციის ბაზაში ჩაყრის პროცესის გამშვები პროექტი
         var seedDbProject = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, seedDbProjectName,

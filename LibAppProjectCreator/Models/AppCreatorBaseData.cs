@@ -32,7 +32,7 @@ public sealed class AppCreatorBaseData
         }
 
         //პროექტის ფოლდერი
-        var workPath = Path.Combine(workFolderPath, projectName);
+        string workPath = Path.Combine(workFolderPath, projectName);
 
         //შევამოწმოთ და თუ არ არსებობს შევქმნათ სამუშაო ფოლდერი
         if (!StShared.CreateFolder(securityWorkFolderPath, true))
@@ -42,10 +42,10 @@ public sealed class AppCreatorBaseData
         }
 
         //პროექტის ფოლდერი
-        var securityPath = Path.Combine(securityWorkFolderPath, projectName);
+        string securityPath = Path.Combine(securityWorkFolderPath, projectName);
 
         //დავიანგარიშოთ სოლუშენის ფოლდერის სრული გზა
-        var solutionPath = Path.Combine(workPath, solutionFolderName);
+        string solutionPath = Path.Combine(workPath, solutionFolderName);
 
         return new AppCreatorBaseData(workPath, securityPath, solutionPath, gitIgnoreModelFilePaths);
     }

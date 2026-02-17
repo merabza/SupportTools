@@ -36,7 +36,8 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var appSettingsEncoderParameters = AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
+        AppSettingsEncoderParameters appSettingsEncoderParameters =
+            AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
 
         //1. დავამზადოთ პარამეტრების ფაილი დაშიფრული და ავტვირთოთ ფაილსაცავში პარამეტრების ფაილის შიგთავსი.
         var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
@@ -47,9 +48,9 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
             appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
             appSettingsEncoderParameters.ParametersFileExtension, appSettingsEncoderParameters.FileStorageForExchange,
             appSettingsEncoderParameters.ExchangeSmartSchema);
-        var result = await encodeParametersAndUploadAction.Run(cancellationToken);
-        var encodedJson = encodeParametersAndUploadAction.EncodedJsonContent;
-        var checkForVersion = encodeParametersAndUploadAction.AppSettingsVersion;
+        bool result = await encodeParametersAndUploadAction.Run(cancellationToken);
+        string? encodedJson = encodeParametersAndUploadAction.EncodedJsonContent;
+        string? checkForVersion = encodeParametersAndUploadAction.AppSettingsVersion;
 
         if (!result || string.IsNullOrWhiteSpace(encodedJson) || string.IsNullOrWhiteSpace(checkForVersion))
         {
@@ -63,10 +64,10 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
             AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName, UseConsole);
-        var projectName = AppSettingsUpdaterParameters.ProjectName;
+        string projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!await installParametersAction.Run(cancellationToken))
         {
-            _logger.LogError("project {projectName} parameters file is not updated", projectName);
+            _logger.LogError("project {ProjectName} parameters file is not updated", projectName);
             return false;
         }
 
@@ -76,9 +77,11 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
             10, UseConsole);
 
         if (await checkParametersVersionAction.Run(cancellationToken))
+        {
             return true;
+        }
 
-        _logger.LogError("project {projectName} parameters file check failed", projectName);
+        _logger.LogError("project {ProjectName} parameters file check failed", projectName);
         return false;
     }
 }

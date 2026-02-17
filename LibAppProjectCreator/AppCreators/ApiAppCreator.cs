@@ -40,31 +40,47 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         AddProject(_apiAppCreatorData.MainProjectData);
         if (!_apiAppCreatorData.UseDatabase)
+        {
             return;
+        }
+
         AddProject(_apiAppCreatorData.LibProjectRepositoriesProjectData);
         AddProject(_apiAppCreatorData.DatabaseProjectData);
         AddProject(_apiAppCreatorData.DbMigrationProjectData);
         if (!_apiAppCreatorData.UseCarcass)
+        {
             return;
+        }
+
         AddProject(_apiAppCreatorData.RepositoriesProjectData);
         if (_apiAppCreatorData.UseReact)
+        {
             AddProject(_apiAppCreatorData.FrontendProjectData);
+        }
     }
 
     //პროექტის ტიპისათვის დამახასიათებელი დამატებითი პარამეტრების გამოანგარიშება
     protected override bool PrepareSpecific()
     {
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: true })
+        {
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.BackendCarcassIdentity);
+        }
 
         if (_apiAppCreatorData.UseReact)
+        {
             AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftAspNetCoreSpaServicesExtensions);
+        }
 
         if (_apiAppCreatorData.UseSignalR)
+        {
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
+        }
 
         if (_apiAppCreatorData.UseFluentValidation)
+        {
             AddReference(_apiAppCreatorData.MainProjectData, GitProjects.FluentValidationInstaller);
+        }
 
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
         AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
@@ -89,14 +105,18 @@ public sealed class ApiAppCreator : AppCreatorBase
         }
 
         if (!_apiAppCreatorData.UseDatabase)
+        {
             return true;
+        }
 
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.DatabaseProjectData);
         AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.LibProjectRepositoriesProjectData);
 
         if (!_apiAppCreatorData.UseDbPartFolderForDatabaseProjects)
+        {
             AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.DbMigrationProjectData);
+        }
 
         //რეფერენსების სიის შედგენა LibProjectRepositories პროექტისათვის
         AddReference(_apiAppCreatorData.LibProjectRepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
@@ -107,7 +127,9 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         if (!_apiAppCreatorData.UseDbPartFolderForDatabaseProjects)
             //რეფერენსების სიის შედგენა DbMigration პროექტისათვის
+        {
             AddReference(_apiAppCreatorData.DbMigrationProjectData, _apiAppCreatorData.DatabaseProjectData);
+        }
 
         //პაკეტების სიის შედგენა მთავარი პროექტისათვის
         AddPackage(_apiAppCreatorData.MainProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreDesign);
@@ -118,7 +140,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddPackage(_apiAppCreatorData.DatabaseProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreSqlServer);
 
         if (!_apiAppCreatorData.UseCarcass)
+        {
             return true;
+        }
 
         AddReference(_apiAppCreatorData.RepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
         AddReference(_apiAppCreatorData.RepositoriesProjectData, GitProjects.BackendCarcassRepositories);
@@ -126,7 +150,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.BackendCarcassDb);
 
         if (!_apiAppCreatorData.UseReact)
+        {
             return true;
+        }
 
         //ფრონტის რეფერენსის დამატება ჯერ ვერ მოვახერხე. ეს არ მუშაობს და ამიტომ დავაკომენტარე
         //AddReference(_apiAppCreatorData.MainProjectData, _apiAppCreatorData.FrontendProjectData);
@@ -139,7 +165,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         var appSettingsJsonJObject = new JObject();
         var userSecretJsonJObject = new JObject();
         var forEncodeAppSettingsJsonKeys = new List<string>();
-        var keyPart1 = Guid.NewGuid().ToString("N");
+        string keyPart1 = Guid.NewGuid().ToString("N");
 
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
@@ -150,30 +176,41 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.DbPartProjectName, "Program.cs");
         programClassCreator.CreateFileStructure();
 
-        var modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
+        string modelsPath = _apiAppCreatorData.MainProjectData.FoldersForCreate["Models"];
 
         if (_apiAppCreatorData is { UseIdentity: true, UseCarcass: false })
+        {
             MakeFilesWhenUseIdentityAndNotUseCarcass(modelsPath);
+        }
 
         if (_apiAppCreatorData.UseCarcass)
+        {
             MakeFilesWhenUseCarcass();
+        }
 
         if (_apiAppCreatorData.UseDatabase)
+        {
             MakeFilesWhenUseDatabase(appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
+        }
 
         if (_apiAppCreatorData is { UseCarcass: true, UseDatabase: true })
+        {
             MakeFilesWhenUseCarcassAndUseDatabase();
+        }
 
         if (_apiAppCreatorData.UseIdentity)
+        {
             MakeFilesWhenUseIdentity(appSettingsJsonJObject, userSecretJsonJObject, forEncodeAppSettingsJsonKeys);
+        }
 
         Console.WriteLine("Creating KestrelOptions...");
         var kestrelOptionsCreator = new KestrelOptionsCreator(appSettingsJsonJObject);
         kestrelOptionsCreator.Run();
 
-        if (_apiAppCreatorData.UseReact)
-            if (!MakeFilesWhenUseReact())
-                return false;
+        if (_apiAppCreatorData.UseReact && !MakeFilesWhenUseReact())
+        {
+            return false;
+        }
 
         Console.WriteLine("Creating LoggerProperties...");
         var loggerSettingsCreator = new LoggerSettingsCreator(ProjectName, appSettingsJsonJObject,
@@ -199,14 +236,18 @@ public sealed class ApiAppCreator : AppCreatorBase
             forEncodeAppSettingsJsonKeys, userSecretJsonJObject, keyPart1);
 
         if (!await settingsFilesCreator.Run(cancellationToken))
+        {
             return false;
+        }
 
         Console.WriteLine("Creating launchSettings.json...");
         var apiAppLaunchSettingsJsonCreator =
             new ApiAppLaunchSettingsJsonCreator(ProjectName, _apiAppCreatorData.MainProjectData.ProjectFullPath);
 
         if (!apiAppLaunchSettingsJsonCreator.Create())
+        {
             return false;
+        }
 
         const string cSharp = "CSharp";
         return CopyGitIgnoreFile(cSharp, _apiAppCreatorData.AppCreatorBaseData.SolutionPath);
@@ -216,29 +257,29 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         Console.WriteLine("Coping .gitignore file...");
 
-        var gitIgnoreModelFilePaths = _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
+        Dictionary<string, string> gitIgnoreModelFilePaths =
+            _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
         const string gitignore = ".gitignore";
 
-        if (!gitIgnoreModelFilePaths.ContainsKey(gitignoreFileKey))
+        if (!gitIgnoreModelFilePaths.TryGetValue(gitignoreFileKey, out string? value))
         {
-            Logger.LogError("gitIgnoreModelFilePaths are not contains {gitignoreFileKey} key", gitignoreFileKey);
+            Logger.LogError("gitIgnoreModelFilePaths are not contains {GitignoreFileKey} key", gitignoreFileKey);
             return false;
         }
 
-        if (!File.Exists(gitIgnoreModelFilePaths[gitignoreFileKey]))
+        if (!File.Exists(value))
         {
-            Logger.LogError("{gitIgnoreModelFilePaths[gitignoreFileKey]} file is not found",
-                gitIgnoreModelFilePaths[gitignoreFileKey]);
+            Logger.LogError("{GitIgnoreModelFilePathsGitignoreFileKey} file is not found", value);
             return false;
         }
 
         if (!Directory.Exists(folderForGitIgnore))
         {
-            Logger.LogError("folder {folderForGitIgnore} is not found", folderForGitIgnore);
+            Logger.LogError("folder {FolderForGitIgnore} is not found", folderForGitIgnore);
             return false;
         }
 
-        File.Copy(gitIgnoreModelFilePaths[gitignoreFileKey], Path.Combine(folderForGitIgnore, gitignore));
+        File.Copy(value, Path.Combine(folderForGitIgnore, gitignore));
         return true;
     }
 
@@ -335,7 +376,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.RepositoriesProjectData.ProjectName, assemblyReferenceClassFileName);
         assemblyReferenceClassCreator.CreateFileStructure();
 
-        var projectAbstractRepositoryClassFileName = $"{_projectShortName.Capitalize()}AbstractRepository.cs";
+        string projectAbstractRepositoryClassFileName = $"{_projectShortName.Capitalize()}AbstractRepository.cs";
         Console.WriteLine($"Creating {projectAbstractRepositoryClassFileName}...");
         var projectAbstractRepositoryClassCreator = new ProjectAbstractRepositoryClassCreator(Logger,
             _apiAppCreatorData.RepositoriesProjectData.ProjectFullPath, ProjectName, _projectShortName,
@@ -358,7 +399,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["QueryModels"], ProjectName, "TestQuery.cs");
         testQueryClassCreator.CreateFileStructure();
 
-        var databaseProjectInstallersPath = _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Installers"];
+        string databaseProjectInstallersPath = _apiAppCreatorData.DatabaseProjectData.FoldersForCreate["Installers"];
 
         Console.WriteLine("Creating DatabaseInstaller.cs...");
         var databaseInstallerClassCreator = new DatabaseInstallerClassCreator(Logger, databaseProjectInstallersPath,
@@ -431,7 +472,7 @@ public sealed class ApiAppCreator : AppCreatorBase
             return;
         }
 
-        var installersPath = _apiAppCreatorData.RepositoriesProjectData.FoldersForCreate["Installers"];
+        string installersPath = _apiAppCreatorData.RepositoriesProjectData.FoldersForCreate["Installers"];
 
         Console.WriteLine("Creating RepositoriesInstaller.cs...");
         var repositoriesInstallerClassCreator = new RepositoriesInstallerClassCreator(Logger, installersPath,

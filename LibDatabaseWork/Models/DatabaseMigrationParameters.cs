@@ -1,9 +1,11 @@
 ﻿using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Errors;
 
@@ -40,7 +42,7 @@ public sealed class DatabaseMigrationParameters : IParameters
     public static DatabaseMigrationParameters? Create(ILogger logger, IHttpClientFactory httpClientFactory,
         SupportToolsParameters supportToolsParameters, string projectName)
     {
-        var project = supportToolsParameters.GetProject(projectName);
+        ProjectModel? project = supportToolsParameters.GetProject(projectName);
 
         //პროექტების მიხედვით სწორი პროექტის ფაილის დადგენა მომავლისთვის გადავდე
         //GitProjects gitProjects = new GitProjects(supportToolsParameters.GitProjects);
@@ -49,7 +51,7 @@ public sealed class DatabaseMigrationParameters : IParameters
 
         if (project is null)
         {
-            logger.LogError("Project with name {projectName} not found", projectName);
+            logger.LogError("Project with name {ProjectName} not found", projectName);
             return null;
         }
 
@@ -67,46 +69,48 @@ public sealed class DatabaseMigrationParameters : IParameters
 
         if (project.MigrationStartupProjectFilePath is null)
         {
-            logger.LogError("Project with name {projectName} does not contains MigrationStartupProjectFilePath",
+            logger.LogError("Project with name {ProjectName} does not contains MigrationStartupProjectFilePath",
                 projectName);
             return null;
         }
 
         if (project.MigrationProjectFilePath is null)
         {
-            logger.LogError("Project with name {projectName} does not contains MigrationProjectFilePath", projectName);
+            logger.LogError("Project with name {ProjectName} does not contains MigrationProjectFilePath", projectName);
             return null;
         }
 
         if (project.DbContextName is null)
         {
-            logger.LogError("Project with name {projectName} does not contains DbContextName", projectName);
+            logger.LogError("Project with name {ProjectName} does not contains DbContextName", projectName);
             return null;
         }
 
-        var devDatabaseParameters = project.DevDatabaseParameters;
+        DatabaseParameters? devDatabaseParameters = project.DevDatabaseParameters;
 
         if (devDatabaseParameters is null)
         {
-            logger.LogError("DevDatabaseParameters is not specified for Project {projectName}", projectName);
+            logger.LogError("DevDatabaseParameters is not specified for Project {ProjectName}", projectName);
             return null;
         }
 
         if (string.IsNullOrWhiteSpace(devDatabaseParameters.DatabaseName))
         {
-            logger.LogError("DatabaseName is not specified for Project {projectName}", projectName);
+            logger.LogError("DatabaseName is not specified for Project {ProjectName}", projectName);
             return null;
         }
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
-        var createDatabaseManagerResult = DatabaseManagersFactory.CreateDatabaseManager(logger, true,
-            devDatabaseParameters.DbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null,
-            null).Result;
+        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResult = DatabaseManagersFactory
+            .CreateDatabaseManager(logger, true, devDatabaseParameters.DbConnectionName, databaseServerConnections,
+                apiClients, httpClientFactory, null, null).Result;
         if (createDatabaseManagerResult.IsT1)
         {
+#pragma warning disable CA2254
             logger.LogError(DatabaseManagerErrors.CanNotCreateDatabaseServerClient.ErrorMessage);
+#pragma warning restore CA2254
             return null;
         }
 

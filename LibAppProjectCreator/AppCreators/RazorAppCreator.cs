@@ -54,7 +54,7 @@ public sealed class RazorAppCreator : AppCreatorBase
     {
         //---===მთავარი პროექტის ფაილები===---
 
-        var keyPart1 = Guid.NewGuid().ToString("N");
+        string keyPart1 = Guid.NewGuid().ToString("N");
 
         //შეიქმნას Program.cs. პროგრამის გამშვები კლასი
         Console.WriteLine("Creating Program.cs...");
@@ -99,7 +99,9 @@ public sealed class RazorAppCreator : AppCreatorBase
         //პარამეტრების json ფაილის შექმნა
         var projectParametersJsonCreator = new ProjectParametersJsonCreator(SecurityPath, ProjectName);
         if (!projectParametersJsonCreator.Create())
+        {
             return Task.FromResult(false);
+        }
 
         //Console.WriteLine("Creating main project .gitignore...");
         //var mainProjectGitIgnoreCreator = new MainProjectGitIgnoreCreator(Logger,

@@ -30,8 +30,8 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var databaseNameInParameters = _projectNamespace.Replace(".", string.Empty) + "Database";
-        var connectionStringJsonKey = $"Data:{databaseNameInParameters}:ConnectionString";
+        string databaseNameInParameters = _projectNamespace.Replace(".", string.Empty) + "Database";
+        string connectionStringJsonKey = $"Data:{databaseNameInParameters}:ConnectionString";
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using System", "using Microsoft.AspNetCore.Builder", "using Microsoft.EntityFrameworkCore",

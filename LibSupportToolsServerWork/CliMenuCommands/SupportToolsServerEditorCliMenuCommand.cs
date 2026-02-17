@@ -39,7 +39,7 @@ public sealed class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
             new GitsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitsSupportToolsServerCliMenuCommand);
 
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         mainMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
         return mainMenuSet;
     }

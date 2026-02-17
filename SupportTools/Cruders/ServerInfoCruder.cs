@@ -31,10 +31,8 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         _projectName = projectName;
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
-
-        if (project is null)
-            throw new ArgumentNullException(nameof(project));
+        ProjectModel project =
+            parameters.GetProject(_projectName) ?? throw new ArgumentNullException(nameof(projectName));
 
         FieldEditors.Add(new ServerDataNameFieldEditor(logger, httpClientFactory, nameof(ServerInfoModel.ServerName),
             ParametersManager));
@@ -62,8 +60,9 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         ParametersManager parametersManager, string projectName)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
-        var currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??
-                                      throw new ArgumentNullException(nameof(projectName));
+        Dictionary<string, ServerInfoModel> currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??
+                                                                      throw new ArgumentNullException(
+                                                                          nameof(projectName));
         return new ServerInfoCruder(logger, httpClientFactory, parametersManager, currentValuesDictionary, projectName);
     }
 
@@ -120,27 +119,31 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
     //    return new ServerInfoModel();
     //}
 
-    protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
-    {
-    }
+    //protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
+    //{
+    //}
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         //დასაშვები ინსტრუმენტების არჩევა
-        itemSubMenuSet.AddMenuItem(
-            new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, recordKey));
-
+        itemSubMenuSet.AddMenuItem(new SelectServerAllowToolsCliMenuCommand(ParametersManager, _projectName, itemName));
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var server = parameters.GetServerByProject(_projectName, recordKey);
-        var project = parameters.GetProject(_projectName);
+        ServerInfoModel? server = parameters.GetServerByProject(_projectName, itemName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (server == null || project == null)
+        {
             return;
-        foreach (var tool in Enum.GetValues<EProjectServerTools>().Intersect(server.AllowToolsList ?? []))
+        }
+
+        foreach (EProjectServerTools tool in Enum.GetValues<EProjectServerTools>()
+                     .Intersect(server.AllowToolsList ?? []))
+        {
             itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
                 _projectName, server, ParametersManager));
+        }
     }
 }

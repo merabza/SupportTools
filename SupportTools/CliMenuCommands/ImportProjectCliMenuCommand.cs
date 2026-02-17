@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibMenuInput;
+using LibGitData.Models;
 using Newtonsoft.Json;
 using ParametersManagement.LibParameters;
 using SupportTools.Models;
@@ -20,11 +24,11 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var filenameForImport = MenuInputer.InputFilePath("File name for Import", null);
+        string? filenameForImport = MenuInputer.InputFilePath("File name for Import", null);
 
         if (!File.Exists(filenameForImport))
         {
@@ -32,7 +36,7 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        var importData = File.ReadAllText(filenameForImport);
+        string importData = await File.ReadAllTextAsync(filenameForImport, cancellationToken);
 
         var settings = new JsonSerializerSettings
         {
@@ -47,21 +51,24 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        var projectName = projectExportData.ProjectName;
+        string projectName = projectExportData.ProjectName;
         if (parameters.Projects.ContainsKey(projectName))
         {
             StShared.WriteErrorLine($"Project with name {projectName} already exists", true);
             return false;
         }
 
-        var project = projectExportData.Project;
+        ProjectModel project = projectExportData.Project;
         project.ServerInfos.Clear();
         project.AllowToolsList.Clear();
 
         parameters.Projects.Add(projectName, projectExportData.Project);
 
-        foreach (var git in projectExportData.Gits.Where(git => !parameters.Gits.ContainsKey(git.Key)))
+        foreach (KeyValuePair<string, GitDataModel> git in projectExportData.Gits.Where(git =>
+                     !parameters.Gits.ContainsKey(git.Key)))
+        {
             parameters.Gits.Add(git.Key, git.Value);
+        }
 
         _parametersManager.Save(parameters, $"Project {projectName} Added");
         return true;

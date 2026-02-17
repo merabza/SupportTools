@@ -22,7 +22,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         Dictionary<string, ProjectModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Project", "Projects")
     {
-        var gitProjectNamesParameterNames = new[]
+        string[] gitProjectNamesParameterNames = new[]
         {
             nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)
         };
@@ -89,21 +89,22 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         return new ProjectCruder(logger, httpClientFactory, parametersManager, parameters.Projects);
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var projects = parameters.Projects;
-        var project = projects[recordKey];
+        Dictionary<string, ProjectModel> projects = parameters.Projects;
+        ProjectModel project = projects[itemName];
 
-        var detailsCruder = new RedundantFileNameCruder(ParametersManager, recordKey);
-        var newItemCommand =
-            new NewItemCliMenuCommand(detailsCruder, recordKey, $"Create New {detailsCruder.CrudName}");
+        var detailsCruder = new RedundantFileNameCruder(ParametersManager, itemName);
+        var newItemCommand = new NewItemCliMenuCommand(detailsCruder, itemName, $"Create New {detailsCruder.CrudName}");
         itemSubMenuSet.AddMenuItem(newItemCommand);
 
-        foreach (var detailListCommand in project.RedundantFileNames.Select(mask =>
-                     new ItemSubMenuCliMenuCommand(detailsCruder, mask, recordKey, true)))
+        foreach (ItemSubMenuCliMenuCommand detailListCommand in project.RedundantFileNames.Select(mask =>
+                     new ItemSubMenuCliMenuCommand(detailsCruder, mask, itemName, true)))
+        {
             itemSubMenuSet.AddMenuItem(detailListCommand);
+        }
     }
 }

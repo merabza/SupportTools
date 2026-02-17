@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
@@ -66,13 +67,15 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
             _projectName, EGitCol.Main));
 
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is not null)
         {
             if (!string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
+            {
                 projectSubMenuSet.AddMenuItem(new GitSubMenuCliMenuCommand(_logger, _httpClientFactory,
                     _parametersManager, _projectName, EGitCol.ScaffoldSeed));
+            }
 
             //if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
             //{
@@ -94,10 +97,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             //დასაშვები ინსტრუმენტების არჩევა
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
-            foreach (var tool in Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
+            foreach (EProjectTools tool in Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
                          .OrderBy(x => x.GetProjectToolName()))
+            {
                 projectSubMenuSet.AddMenuItem(new ProjectToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
                     _projectName, _parametersManager));
+            }
         }
 
         var serverInfoCruder = ServerInfoCruder.Create(_logger, _httpClientFactory, _parametersManager, _projectName);
@@ -109,13 +114,18 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         //სერვერების ჩამონათვალი
         if (project?.ServerInfos != null)
-            foreach (var kvp in project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
+        {
+            foreach (KeyValuePair<string, ServerInfoModel> kvp in
+                     project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
+            {
                 projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
                     kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key));
+            }
+        }
 
         //მთავარ მენიუში გასვლა
-        var key = ConsoleKey.Escape.Value().ToLower();
+        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
         projectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
 
         return projectSubMenuSet;

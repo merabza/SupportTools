@@ -20,25 +20,28 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
 
     public override void UpdateField(string? recordKey, object recordForUpdate)
     {
-        var currentReactAppTypeName = GetValue(recordForUpdate);
+        string? currentReactAppTypeName = GetValue(recordForUpdate);
 
         var reactAppTypeCruder = ReactAppTypeCruder.Create(_logger, _parametersManager);
 
-        var newValue = reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true);
+        string? newValue =
+            reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true);
 
         SetValue(recordForUpdate, newValue);
     }
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var reactAppTypeCruder = ReactAppTypeCruder.Create(_logger, _parametersManager);
 
-        var status = reactAppTypeCruder.GetStatusFor(val);
+        string? status = reactAppTypeCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

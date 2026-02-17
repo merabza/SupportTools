@@ -31,9 +31,9 @@ public sealed class ClassCreatorInfo
             return null;
         }
 
-        var className = Path.GetFileNameWithoutExtension(file.Name).Replace(".", string.Empty).Capitalize() +
-                        (creatorCreatesClass ? "Class" : string.Empty) + "Creator";
-        var codeFileName = className + ".cs";
+        string className = Path.GetFileNameWithoutExtension(file.Name).Replace(".", string.Empty).Capitalize() +
+                           (creatorCreatesClass ? "Class" : string.Empty) + "Creator";
+        string codeFileName = className + ".cs";
         return new ClassCreatorInfo(path, Path.Combine(file.DirectoryName, "CodeCreators"), className, codeFileName);
     }
 }

@@ -32,9 +32,13 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
     public override string? GetStatusFor(string name)
     {
         var dotnetToolData = (DotnetToolData?)GetItemByName(name);
-        return dotnetToolData is null
-            ? null
-            : $" {dotnetToolData.InstalledVersion} {(dotnetToolData.InstalledVersion == dotnetToolData.LatestVersion ? string.Empty : $"({dotnetToolData.LatestVersion})")} {dotnetToolData.Description} ";
+        if (dotnetToolData is null)
+        {
+            return null;
+        }
+
+        return
+            $" {dotnetToolData.InstalledVersion} {(dotnetToolData.InstalledVersion == dotnetToolData.LatestVersion ? string.Empty : $"({dotnetToolData.LatestVersion})")} {dotnetToolData.Description} ";
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
@@ -49,18 +53,18 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
         cruderSubMenuSet.AddMenuItem(updateAllToolsToLatestVersionCliMenuCommand);
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         //Check versions for One Tool
         var checkOneDotnetToolVersionsCliMenuCommand =
-            new CheckOneDotnetToolVersionsCliMenuCommand(ParametersManager, recordKey);
+            new CheckOneDotnetToolVersionsCliMenuCommand(ParametersManager, itemName);
         itemSubMenuSet.AddMenuItem(checkOneDotnetToolVersionsCliMenuCommand);
 
         //Update One Tool To Latest Version
         var updateOneToolToLatestVersionCliMenuCommand =
-            new UpdateOneToolToLatestVersionCliMenuCommand(ParametersManager, recordKey);
+            new UpdateOneToolToLatestVersionCliMenuCommand(ParametersManager, itemName);
         itemSubMenuSet.AddMenuItem(updateOneToolToLatestVersionCliMenuCommand);
     }
 }

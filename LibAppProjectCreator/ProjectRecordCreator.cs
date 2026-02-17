@@ -41,7 +41,7 @@ internal sealed class ProjectRecordCreator
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var existingProject = supportToolsParameters.GetProject(_newProjectName);
+        ProjectModel? existingProject = supportToolsParameters.GetProject(_newProjectName);
 
         if (existingProject is not null)
         {
@@ -126,7 +126,7 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var productionServerName = supportToolsParameters.AppProjectCreatorAllParameters.ProductionServerName;
+        string? productionServerName = supportToolsParameters.AppProjectCreatorAllParameters.ProductionServerName;
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName))
         {
@@ -136,9 +136,10 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var productionEnvironmentName = supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName;
+        string? productionEnvironmentName =
+            supportToolsParameters.AppProjectCreatorAllParameters.ProductionEnvironmentName;
 
-        var serverData = supportToolsParameters.GetServerData(productionServerName);
+        ServerDataModel? serverData = supportToolsParameters.GetServerData(productionServerName);
 
         if (serverData is null)
         {
@@ -146,11 +147,12 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var developerDbConnectionName = supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
+        string? developerDbConnectionName =
+            supportToolsParameters.AppProjectCreatorAllParameters.DeveloperDbConnectionName;
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
-        var developerDbConnection =
+        DatabaseServerConnectionData? developerDbConnection =
             databaseServerConnections.GetDatabaseServerConnectionByKey(developerDbConnectionName);
 
         if (developerDbConnection is null)
@@ -160,12 +162,13 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var databaseExchangeFileStorageName =
+        string? databaseExchangeFileStorageName =
             supportToolsParameters.AppProjectCreatorAllParameters.DatabaseExchangeFileStorageName;
 
         var fileStorages = new FileStorages(supportToolsParameters.FileStorages);
 
-        var databaseExchangeFileStorage = fileStorages.GetFileStorageDataByKey(databaseExchangeFileStorageName);
+        FileStorageData? databaseExchangeFileStorage =
+            fileStorages.GetFileStorageDataByKey(databaseExchangeFileStorageName);
 
         if (databaseExchangeFileStorage is null)
         {
@@ -174,11 +177,11 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var smartSchemaName = supportToolsParameters.AppProjectCreatorAllParameters.UseSmartSchema;
+        string? smartSchemaName = supportToolsParameters.AppProjectCreatorAllParameters.UseSmartSchema;
 
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
-        var smartSchema = smartSchemas.GetSmartSchemaByKey(smartSchemaName);
+        SmartSchema? smartSchema = smartSchemas.GetSmartSchemaByKey(smartSchemaName);
 
         if (smartSchema is null)
         {
@@ -186,20 +189,20 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        var scaffoldSeederProjectName = $"{_newDbPartProjectName}ScaffoldSeeder";
-        var fakeHostProjectName = supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName;
-        var projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
-        var scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
-        var dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
+        string scaffoldSeederProjectName = $"{_newDbPartProjectName}ScaffoldSeeder";
+        string? fakeHostProjectName = supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName;
+        string? projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
+        string? scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
+        string dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
         const string solutionFileExtension = ".sln";
         const string jsonExtension = ".json";
         //var seedProjectName = $"Seed{_newDbPartProjectName}Db";
         //var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
         //var scaffoldSeedSecFolderName = $"{_newDbPartProjectName}ScaffoldSeeder.sec";
-        var dbPartProjectsFolderName = $"{_newDbPartProjectName}DbPart";
-        var securityFolder = supportToolsParameters.SecurityFolder;
+        string dbPartProjectsFolderName = $"{_newDbPartProjectName}DbPart";
+        string? securityFolder = supportToolsParameters.SecurityFolder;
         const string appSettingsFileName = $"appsettings{jsonExtension}";
-        var productionServerWebAgentName = $"{productionServerName}.WebAgent";
+        string productionServerWebAgentName = $"{productionServerName}.WebAgent";
         //var productionBaseName = $"{_newProjectName}Prod";
         //var tempLocalPath = Path.Combine(supportToolsParameters.WorkFolder, "Bak");
 
@@ -210,7 +213,7 @@ internal sealed class ProjectRecordCreator
 
         if (!_templateModel.UseMenu)
         {
-            var serverInfo = CreateServerInfo(productionServerName, productionEnvironmentName,
+            ServerInfoModel serverInfo = CreateServerInfo(productionServerName, productionEnvironmentName,
                 productionServerWebAgentName, securityFolder, appSettingsFileName, jsonExtension, serverData);
             serverInfos = new Dictionary<string, ServerInfoModel> { { serverInfo.GetItemKey(), serverInfo } };
         }
@@ -224,11 +227,20 @@ internal sealed class ProjectRecordCreator
         }
 
         if (_templateModel.UseDbPartFolderForDatabaseProjects)
+        {
             gitProjectNames.Add(dbPartProjectsFolderName);
+        }
+
         if (_templateModel.UseCarcass)
+        {
             gitProjectNames.Add("BackendCarcass");
+        }
+
         if (_templateModel.UseDatabase)
+        {
             gitProjectNames.Add("DatabaseTools");
+        }
+
         if (_templateModel.UseReact)
         {
             gitProjectNames.Add("ReactAppCarcass");

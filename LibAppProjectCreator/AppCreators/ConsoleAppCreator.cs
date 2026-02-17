@@ -30,7 +30,10 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     {
         AddProject(_consoleAppCreatorData.MainProjectData);
         if (!_consoleAppCreatorData.UseDatabase)
+        {
             return;
+        }
+
         AddProject(_consoleAppCreatorData.DoProjectData);
         AddProject(_consoleAppCreatorData.LibProjectRepositoriesProjectData);
         AddProject(_consoleAppCreatorData.DatabaseProjectData);
@@ -48,7 +51,10 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         AddPackage(_consoleAppCreatorData.MainProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
 
         if (!_consoleAppCreatorData.UseDatabase)
+        {
             return true;
+        }
+
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
         AddReference(_consoleAppCreatorData.MainProjectData, GitProjects.CliParametersDataEdit);
         AddReference(_consoleAppCreatorData.MainProjectData, _consoleAppCreatorData.DatabaseProjectData);
@@ -101,14 +107,14 @@ public sealed class ConsoleAppCreator : AppCreatorBase
             _consoleAppCreatorData.UseDatabase, "Program.cs");
         programClassCreator.CreateFileStructure();
 
-        var doProject = _consoleAppCreatorData.UseDatabase
+        ProjectForCreate doProject = _consoleAppCreatorData.UseDatabase
             ? _consoleAppCreatorData.DoProjectData
             : _consoleAppCreatorData.MainProjectData;
 
-        var modelsPath = doProject.FoldersForCreate["Models"];
+        string modelsPath = doProject.FoldersForCreate["Models"];
 
         //თუ ბაზა გვჭირდება, ვიყენებთ do პროექტს
-        var inNameSpace = doProject.ProjectName;
+        string inNameSpace = doProject.ProjectName;
 
         //შეიქმნას პროექტის პარამეტრების კლასი
         Console.WriteLine($"Creating {ProjectName}Parameters.cs...");
@@ -118,24 +124,34 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         projectParametersClassCreator.CreateFileStructure();
 
         if (_consoleAppCreatorData.UseDatabase)
+        {
             MakeFilesWhenUseDatabase();
+        }
 
         if (_consoleAppCreatorData.UseMenu)
+        {
             MakeFilesWhenUseMenu();
+        }
         else
+        {
             MakeFilesWhenNotUseMenu();
+        }
 
         //launchSettings.json ფაილის შექმნა (პროგრამის გაშვებისას პარამეტრების მითითებისათვის
         Console.WriteLine("Creating launchSettings.json...");
         var launchSettingsJsonCreator = new ConsoleAppLaunchSettingsJsonCreator(
             _consoleAppCreatorData.MainProjectData.FoldersForCreate["Properties"], ProjectName, SecurityPath);
         if (!launchSettingsJsonCreator.Create())
+        {
             return Task.FromResult(false);
+        }
 
         //პარამეტრების json ფაილის შექმნა
         var projectParametersJsonCreator = new ProjectParametersJsonCreator(SecurityPath, ProjectName);
         if (!projectParametersJsonCreator.Create())
+        {
             return Task.FromResult(false);
+        }
 
         //Console.WriteLine("Creating main project .gitignore...");
         //var mainProjectGitIgnoreCreator = new MainProjectGitIgnoreCreator(Logger,
@@ -160,7 +176,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
     {
         //var mainProjectModelsPath =
         //    _consoleAppCreatorData.MainProjectData.FoldersForCreate["Models"];
-        var menuCommands = _consoleAppCreatorData.MainProjectData.FoldersForCreate["MenuCommands"];
+        string menuCommands = _consoleAppCreatorData.MainProjectData.FoldersForCreate["MenuCommands"];
 
         //შეიქმნას პროექტის პარამეტრების რედაქტირების კლასი
         Console.WriteLine($"Creating {ProjectName}ParametersEditor.cs...");

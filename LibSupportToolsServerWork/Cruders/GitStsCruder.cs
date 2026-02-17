@@ -5,10 +5,12 @@ using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
+using LanguageExt;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
@@ -68,15 +70,21 @@ public sealed class GitStsCruder : Cruder
     {
         return _memoryCache.GetOrCreate(GitsList, _ =>
         {
-            var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+            SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
             if (supportToolsServerApiClient is null)
+            {
                 return [];
+            }
+
             try
             {
-                var remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+                OneOf<List<StsGitDataModel>, Err[]> remoteGitReposResult =
+                    supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsT0)
+                {
                     return remoteGitReposResult.AsT0;
+                }
 
                 StShared.WriteErrorLine("could not received remoteGits", true, _logger);
                 Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
@@ -93,19 +101,27 @@ public sealed class GitStsCruder : Cruder
 
     public override bool ContainsRecordWithKey(string recordKey)
     {
-        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
+        {
             return false;
+        }
 
         try
         {
-            var getGitRepoByKeyResult = supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
-            if (getGitRepoByKeyResult.IsT0) return true;
+            OneOf<StsGitDataModel, Err[]> getGitRepoByKeyResult =
+                supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
+            if (getGitRepoByKeyResult.IsT0)
+            {
+                return true;
+            }
 
-            if (getGitRepoByKeyResult.AsT1 is Err[] { Length: 1 } errors && errors[0].ErrorCode ==
-                nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound))
+            if (getGitRepoByKeyResult.AsT1 is
+                [{ ErrorCode: nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound) } _])
+            {
                 return false;
+            }
 
             Err.PrintErrorsOnConsole(getGitRepoByKeyResult.AsT1);
 
@@ -125,7 +141,7 @@ public sealed class GitStsCruder : Cruder
 
     private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
-        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
         {
@@ -167,10 +183,12 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient
+            Option<Err[]> updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
             if (updateGitRepoByKeyResult.IsSome)
+            {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+            }
         }
         catch (Exception e)
         {
@@ -185,7 +203,7 @@ public sealed class GitStsCruder : Cruder
 
     protected override void RemoveRecordWithKey(string recordKey)
     {
-        var supportToolsServerApiClient = GetSupportToolsServerApiClient();
+        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
         {
@@ -195,9 +213,11 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            var updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitRepoByKey(recordKey).Result;
+            Option<Err[]> updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitRepoByKey(recordKey).Result;
             if (updateGitRepoByKeyResult.IsSome)
+            {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+            }
         }
         catch (Exception e)
         {
@@ -205,7 +225,7 @@ public sealed class GitStsCruder : Cruder
         }
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var gits = parameters.Gits;
+        Dictionary<string, GitDataModel> gits = parameters.Gits;
         gits.Remove(recordKey);
     }
 
@@ -221,7 +241,9 @@ public sealed class GitStsCruder : Cruder
             }
 
             if (gitDataModel.GitProjectAddress is not null)
+            {
                 return gitApi.IsGitRemoteAddressValid(gitDataModel.GitProjectAddress);
+            }
 
             StShared.WriteErrorLine("gitDataModel.GitProjectAddress is null in GitCruder.CheckValidation", true,
                 _logger);
@@ -229,7 +251,7 @@ public sealed class GitStsCruder : Cruder
         }
         catch (Exception e)
         {
-            _logger.LogError(e, null);
+            _logger.LogError(e, "Error occurred while validating GitDataModel");
             return false;
         }
     }
@@ -238,11 +260,14 @@ public sealed class GitStsCruder : Cruder
     {
         var git = (GitDataModel?)GetItemByName(name);
         if (git is null)
+        {
             return "ERROR: Git address Not found";
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var projects = parameters.Projects;
+        }
 
-        var usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        Dictionary<string, ProjectModel> projects = parameters.Projects;
+
+        int usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
                          projects.Values.Count(project => project.ScaffoldSeederGitProjectNames.Contains(name));
 
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
@@ -253,7 +278,7 @@ public sealed class GitStsCruder : Cruder
         return new GitDataModel();
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
         //base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
 

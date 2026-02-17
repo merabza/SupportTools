@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -7,6 +8,7 @@ using AppCliTools.CliParameters;
 using AppCliTools.DbContextAnalyzer.Domain;
 using AppCliTools.DbContextAnalyzer.Models;
 using AppCliTools.LibSeedCodeCreator;
+using LanguageExt;
 using LibAppProjectCreator;
 using LibDotnetWork;
 using LibScaffoldSeeder.Models;
@@ -16,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 
 namespace LibScaffoldSeeder.ToolCommands;
 
@@ -63,7 +66,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var gitProjectNames = scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
+        List<string> gitProjectNames =
+            scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
 
         if (ParametersManager is null)
         {
@@ -73,7 +77,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
 
-        var project = supportToolsParameters.GetProject(Parameters.ProjectName);
+        ProjectModel? project = supportToolsParameters.GetProject(Parameters.ProjectName);
 
         if (project is null)
         {
@@ -81,7 +85,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var haveToSaveSupportToolsParameters = false;
+        bool haveToSaveSupportToolsParameters = false;
 
         //გიტის პროექტების გადანახვა, რომლებიც გამოიყენება სკაფოლდინგის ნაწილისთვის
         if (gitProjectNames.Count != project.ScaffoldSeederGitProjectNames.Count ||
@@ -93,26 +97,31 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         }
 
         if (scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData is null)
+        {
             return false;
+        }
 
         if (!ScaffoldProdCopyDatabase(scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData))
+        {
             return false;
+        }
 
         const string jsonExt = ".json";
 
-        var seedDbProjectNameUseJsonFilePath = Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
-            $"{NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName)}{jsonExt}");
+        string seedDbProjectNameUseJsonFilePath =
+            Path.Combine(scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
+                $"{NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName)}{jsonExt}");
 
-        var createProjectSeederCodeProjectName =
+        string createProjectSeederCodeProjectName =
             NamingStats.CreateProjectSeederCodeProjectName(Parameters.ScaffoldSeederProjectName);
 
-        var getJsonFromScaffoldDbProjectName =
+        string getJsonFromScaffoldDbProjectName =
             NamingStats.GetJsonFromScaffoldDbProjectName(Parameters.ScaffoldSeederProjectName);
 
-        var dataSeedingClassLibProjectName =
+        string dataSeedingClassLibProjectName =
             NamingStats.DataSeedingClassLibProjectName(Parameters.ScaffoldSeederProjectName);
 
-        var seedDbProjectName = NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName);
+        string seedDbProjectName = NamingStats.SeedDbProjectName(Parameters.ScaffoldSeederProjectName);
 
         var creatorCreatorParameters = new CreatorCreatorParameters(Parameters.ScaffoldSeederProjectName,
             Parameters.DbContextProjectName, Parameters.ProjectDbContextClassName, Parameters.ProjectShortPrefix,
@@ -132,7 +141,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var dataSeedingPackageFolder = NamingStats.DataSeedingPackageFolder(Parameters.ScaffoldSeederProjectName,
+        string dataSeedingPackageFolder = NamingStats.DataSeedingPackageFolder(Parameters.ScaffoldSeederProjectName,
             scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.AppCreatorBaseData.WorkPath);
 
         var seederParameters = new SeederParametersDomain(
@@ -152,7 +161,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         var getJsonParameters = new GetJsonParametersDomain(seederParameters.JsonFolderName, Parameters.LogFolder,
             $"{Parameters.ProdCopyDatabaseConnectionString.AddNeedLastPart(';')}Application Name={getJsonFromScaffoldDbProjectName}");
 
-        var getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName = Path.Combine(
+        string getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName = Path.Combine(
             scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath, $"{getJsonFromScaffoldDbProjectName}{jsonExt}");
 
         if (!SaveParameters(getJsonParameters, getJsonFromScaffoldDbProjectSeederCodeParametersFileFullName,
@@ -193,7 +202,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             dataSeedingClassLibProjectName, Parameters.ExcludesRulesParametersFilePath, Parameters.DbContextProjectName,
             Parameters.ProjectDbContextClassName);
 
-        var createProjectSeederCodeParametersFileFullName = Path.Combine(
+        string createProjectSeederCodeParametersFileFullName = Path.Combine(
             scaffoldSeederDoubleAppCreator.SolutionSecurityFolderPath,
             $"{createProjectSeederCodeProjectName}{jsonExt}");
 
@@ -206,7 +215,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         }
 
         if (haveToSaveSupportToolsParameters)
+        {
             ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
+        }
 
         //აქედან ეშვება კონკრეტული პროექტის მონაცემების ჩამყრელი კოდის შემქმნელი პროგრამა
         //რეალურად ამ პროგრამის საშუალებით ხდება ბაზების გაანალიზება და საჭირო კოდის გენერაცია
@@ -215,7 +226,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
             .RunToolUsingParametersFile(
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
                     .ProjectFileFullName, createProjectSeederCodeParametersFileFullName).IsSome)
+        {
             return false;
+        }
 
         var jsonFromProjectDbProjectGetterParameters = ExternalScaffoldSeedToolParameters.Create(supportToolsParameters,
             Parameters.ProjectName, NamingStats.GetJsonFromScaffoldDbProjectName);
@@ -234,9 +247,9 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     private bool ScaffoldProdCopyDatabase(ScaffoldSeederCreatorData scaffoldSeederCreatorData)
     {
         //ბაზის კონტექსტის კლასის სახელი
-        var dbScContextName = $"{Parameters.ScaffoldSeederProjectName.Replace('.', '_')}DbScContext";
+        string dbScContextName = $"{Parameters.ScaffoldSeederProjectName.Replace('.', '_')}DbScContext";
 
-        var providerPackageName = Parameters.ProdCopyDatabaseDataProvider switch
+        string? providerPackageName = Parameters.ProdCopyDatabaseDataProvider switch
         {
             EDatabaseProvider.SqlServer => "Microsoft.EntityFrameworkCore.SqlServer",
             EDatabaseProvider.None => null,
@@ -246,11 +259,13 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         };
 
         if (providerPackageName is not null)
+        {
             return ScaffoldDatabase(scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject.ProjectFileFullName,
                 Parameters.ProdCopyDatabaseConnectionString,
                 scaffoldSeederCreatorData.CreateProjectSeederCodeProject.ProjectFileFullName,
                 scaffoldSeederCreatorData.DatabaseScaffoldClassLibProject.ProjectFullPath, providerPackageName,
                 dbScContextName);
+        }
 
         StShared.WriteErrorLine("Package name for ProdCopyDatabaseDataProvider does not found", true, _logger);
         return false;
@@ -262,9 +277,12 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     {
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         //dotnetProcessor.Restore(databaseScaffoldClassLibProjectFileFullName);
-        var restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
+        Option<Err[]> restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
         if (restoreResult.IsSome)
+        {
             return false;
+        }
+
         return dotnetProcessor.EfDatabaseScaffold(databaseScaffoldClassLibProjectFileFullName,
             prodCopyDatabaseConnectionString, providerPackageName, createProjectSeederCodeProjectFileFullName,
             dbScContextName, databaseScaffoldClassLibProjectFullPath).IsNone;
@@ -274,7 +292,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         string projectName)
     {
         //seederParameters შევინახოთ json-ის სახით პარამეტრების ფოლდერში შესაბამისი პროექტისათვის
-        var paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
+        string paramsJsonText = JsonConvert.SerializeObject(parameters, Formatting.Indented);
 
         //აქ შეიძლება დაშიფვრა დაგვჭირდეს.
         File.WriteAllText(saveAsFilePath, paramsJsonText);
@@ -286,7 +304,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
                 new JObject(new JProperty("commandName", "Project"),
                     new JProperty("commandLineArgs", $"--use \"{saveAsFilePath}\""))))));
 
-        var propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
+        string propertiesFolderPath = Path.Combine(projectFullPath, "Properties");
         StShared.CreateFolder(propertiesFolderPath, true);
 
         File.WriteAllText(Path.Combine(propertiesFolderPath, "launchSettings.json"),

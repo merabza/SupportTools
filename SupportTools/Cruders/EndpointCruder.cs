@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
+using FluentValidation.Results;
 using ParametersManagement.LibParameters;
 using SupportTools.Validators;
 using SupportToolsData;
@@ -28,12 +29,15 @@ public sealed class EndpointCruder : ParCruder<EndpointModel>
 
     public override bool CheckValidation(ItemData item)
     {
-        var endpointModel = GetTItem(item);
+        EndpointModel endpointModel = GetTItem(item);
         var validator = new EndpointModelValidator();
 
-        var validateResults = validator.Validate(endpointModel);
+        ValidationResult? validateResults = validator.Validate(endpointModel);
         if (!validateResults.IsValid)
+        {
             StShared.WriteErrorLine(validateResults.ToString(), true, null, false);
+        }
+
         return validateResults.IsValid;
     }
 }

@@ -45,35 +45,38 @@ public sealed class GitClearToolAction : ToolAction
     protected override bool CheckValidate()
     {
         if (!string.IsNullOrWhiteSpace(_gitClearParameters.GitsFolder))
+        {
             return true;
+        }
+
         StShared.WriteErrorLine("Project Folder Name not found.", true);
         return false;
     }
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectFolderName =
+        string projectFolderName =
             Path.Combine(_gitClearParameters.GitsFolder, _gitClearParameters.GitData.GitProjectFolderName);
         var gitProcessor = new GitProcessor(true, _logger, projectFolderName);
         if (!Directory.Exists(projectFolderName))
+        {
             return ValueTask.FromResult(gitProcessor.Clone(_gitClearParameters.GitData.GitProjectAddress));
+        }
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
         //2. შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
         // თუ რომელიმე არ სრულდება გამოვიდეს შესაბამისი შეტყობინება
 
-        var gitInitialized = gitProcessor.IsGitInitialized();
+        bool gitInitialized = gitProcessor.IsGitInitialized();
 
-        if (!gitInitialized)
+        if (gitInitialized)
         {
-            StShared.WriteErrorLine($"Git project folder exists, but not initialized. folder: {projectFolderName}.",
-                true, _logger);
-            return ValueTask.FromResult(false);
+            return ValueTask.FromResult(ProcessFolder(projectFolderName));
         }
 
-        ProcessFolder(projectFolderName);
-
-        return ValueTask.FromResult(true);
+        StShared.WriteErrorLine($"Git project folder exists, but not initialized. folder: {projectFolderName}.", true,
+            _logger);
+        return ValueTask.FromResult(false);
     }
 
     private bool ProcessFolder(string folderPath)
@@ -81,17 +84,23 @@ public sealed class GitClearToolAction : ToolAction
         Console.WriteLine($"Process Folder {folderPath}");
 
         if (_excludeFolder is not null && AreFolderNamesEqual(folderPath, _excludeFolder))
+        {
             return true;
+        }
 
         if (folderPath == _excludeFolder)
+        {
             return true;
+        }
 
         if (Directory.GetFiles(folderPath, "*.esproj").Length != 0)
+        {
             return true;
+        }
 
         var dir = new DirectoryInfo(folderPath);
-        var subDirs = dir.GetDirectories().OrderBy(x => x.Name).ToArray();
-        var subFiles = dir.GetFiles();
+        DirectoryInfo[] subDirs = dir.GetDirectories().OrderBy(x => x.Name).ToArray();
+        FileInfo[] subFiles = dir.GetFiles();
         if (subDirs is [{ Name: "bin" }, { Name: "obj" }] && subFiles.Length == 0 && MustBeDeleted(folderPath))
         {
             Directory.Delete(folderPath, true);
@@ -111,8 +120,10 @@ public sealed class GitClearToolAction : ToolAction
         }
 
         if (Directory.GetFiles(folderPath, "*.csproj").Length == 0)
+        {
             return dir.GetDirectories().Where(x => x.Name != ".git" && x.Name != ".vs" && x.Name != "packages")
                 .Select(x => x.FullName).All(ProcessFolder);
+        }
 
         if (folderPath.Contains(".git"))
         {
@@ -126,15 +137,17 @@ public sealed class GitClearToolAction : ToolAction
         DeleteFolderIfExists(folderPath, "obj");
 
         if (MustBeDeleted(folderPath))
+        {
             Directory.Delete(folderPath, true);
+        }
 
         return true;
     }
 
     private static bool AreFolderNamesEqual(string folderPath1, string folderPath2)
     {
-        var normalizedPath1 = Path.GetFullPath(folderPath1).TrimEnd(Path.DirectorySeparatorChar);
-        var normalizedPath2 = Path.GetFullPath(folderPath2).TrimEnd(Path.DirectorySeparatorChar);
+        string normalizedPath1 = Path.GetFullPath(folderPath1).TrimEnd(Path.DirectorySeparatorChar);
+        string normalizedPath2 = Path.GetFullPath(folderPath2).TrimEnd(Path.DirectorySeparatorChar);
 
         //var dir1 = new DirectoryInfo(normalizedPath1);
         //var dir2 = new DirectoryInfo(normalizedPath2);
@@ -149,15 +162,20 @@ public sealed class GitClearToolAction : ToolAction
         //}
 
         if (SystemStat.IsWindows())
+        {
             return string.Equals(normalizedPath1, normalizedPath2, StringComparison.OrdinalIgnoreCase);
+        }
+
         return normalizedPath1 == normalizedPath2;
     }
 
     private static void DeleteFolderIfExists(string fromFolderPath, string folderNameForDelete)
     {
-        var binFolderPath = Path.Combine(fromFolderPath, folderNameForDelete);
+        string binFolderPath = Path.Combine(fromFolderPath, folderNameForDelete);
         if (Directory.Exists(binFolderPath))
+        {
             Directory.Delete(binFolderPath, true);
+        }
     }
 
     private static bool MustBeDeleted(string folderPath)
@@ -166,10 +184,14 @@ public sealed class GitClearToolAction : ToolAction
             Directory.GetFiles(folderPath, "*.AssemblyInfo.cs").Length +
             Directory.GetFiles(folderPath, "*.AssemblyAttributes.cs").Length +
             Directory.GetFiles(folderPath, "*.GlobalUsings.g.cs").Length)
+        {
             return false;
+        }
 
         if (Directory.GetDirectories(folderPath, ".git").Length != 0)
+        {
             return false;
+        }
 
         var dir = new DirectoryInfo(folderPath);
         return dir.GetDirectories().Where(x => x.Name != ".git").Select(x => x.FullName).All(MustBeDeleted);

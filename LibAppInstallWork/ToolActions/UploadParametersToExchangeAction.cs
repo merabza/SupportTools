@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -36,38 +37,39 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         _uploadSmartSchema = uploadSmartSchema;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_serverInfo.ServerName))
         {
             _logger.LogError("Server name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(_serverInfo.EnvironmentName))
         {
             _logger.LogError("Environment Name is not specified");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        var datePart = DateTime.Now.ToString(_dateMask);
-        var prefix = $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-";
+        string datePart = DateTime.Now.ToString(_dateMask, CultureInfo.InvariantCulture);
+        string prefix = $"{_serverInfo.ServerName}-{_serverInfo.EnvironmentName}-{_projectName}-";
         //ასატვირთი ფაილის სახელის შექმნა
-        var uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
+        string uploadFileName = $"{prefix}{datePart}{_parametersFileExtension}";
 
-        var exchangeFileManager =
+        FileManager? exchangeFileManager =
             FileManagersFactory.CreateFileManager(true, _logger, null, _exchangeFileStorage, true);
 
         if (exchangeFileManager == null)
         {
             _logger.LogError("cannot create file manager"); // for {_exchangeFileStorageName}");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        if (!exchangeFileManager.UploadContentToTextFile(_parametersContent, uploadFileName))
+        if (!await exchangeFileManager.UploadContentToTextFileAsync(_parametersContent, uploadFileName,
+                cancellationToken))
         {
-            _logger.LogError("cannot upload parameters content to file {uploadFileName}", uploadFileName);
-            return ValueTask.FromResult(false);
+            _logger.LogError("cannot upload parameters content to file {UploadFileName}", uploadFileName);
+            return false;
         }
 
         _logger.LogInformation("Remove redundant files...");
@@ -79,6 +81,6 @@ public sealed class UploadParametersToExchangeAction : ToolAction
         //SmartSchema? uploadSmartSchema = _smartSchemas.GetSmartSchemaByKey(_uploadSmartSchemaName);
         exchangeFileManager.RemoveRedundantFiles(prefix, _dateMask, _parametersFileExtension, _uploadSmartSchema);
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

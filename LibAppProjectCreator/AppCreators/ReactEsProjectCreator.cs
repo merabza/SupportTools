@@ -45,7 +45,9 @@ public sealed class ReactEsProjectCreator
         var npmProcessor = new NpmProcessor(_logger);
 
         if (!npmProcessor.CreatingReactAppUsingVite(_createInPath, _projectName))
+        {
             return false;
+        }
 
         /*
            cd {_projectName}
@@ -54,21 +56,24 @@ public sealed class ReactEsProjectCreator
          */
 
         var sdkUri = new Uri(SdkRef);
-        var (statusCode, content) = GetOnePageContent(sdkUri);
+        (HttpStatusCode statusCode, string? content) = GetOnePageContent(sdkUri);
 
         if (statusCode != HttpStatusCode.OK || string.IsNullOrWhiteSpace(content))
+        {
             return false;
+        }
 
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(content);
 
-        var refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);
+        List<(string, string)> refsTitlesList = ExtractAllLinks(htmlDoc.DocumentNode);
         const string startString = "/packages/";
-        var res = refsTitlesList.Where(x => x.Item1.StartsWith(startString))
+        IOrderedEnumerable<(string, string)> res = refsTitlesList
+            .Where(x => x.Item1.StartsWith(startString, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(x => x.Item2, new VersionComparer());
 
-        var result = res.FirstOrDefault().Item1;
-        var javaScriptSdk = result[startString.Length..];
+        string? result = res.FirstOrDefault().Item1;
+        string? javaScriptSdk = result[startString.Length..];
         CreateEsprojFile(Path.Combine(_createInPath, _projectFolderName, _projectFileName), javaScriptSdk);
 
         //Microsoft.VisualStudio.JavaScript.Sdk-ს ბოლო ვერსიის დასადგენად უნდა მოვქაჩოთ გვერდი 
@@ -89,9 +94,11 @@ public sealed class ReactEsProjectCreator
 
     private static List<(string, string)> ExtractAllLinks(HtmlNode htmlDocDocumentNode)
     {
-        var links = htmlDocDocumentNode.SelectNodes("//a[@href]");
+        HtmlNodeCollection links = htmlDocDocumentNode.SelectNodes("//a[@href]");
         if (links is { Count: 0 })
+        {
             return [];
+        }
 
         return (from link in links
             let hrefValue = link.GetAttributeValue("href", string.Empty)
@@ -106,9 +113,9 @@ public sealed class ReactEsProjectCreator
         try
         {
             // ReSharper disable once using
-            var client = _httpClientFactory.CreateClient();
+            using HttpClient client = _httpClientFactory.CreateClient();
             // ReSharper disable once using
-            using var response = client.GetAsync(uri).Result;
+            using HttpResponseMessage response = client.GetAsync(uri).Result;
 
             return response.IsSuccessStatusCode
                 ? (response.StatusCode, response.Content.ReadAsStringAsync().Result)

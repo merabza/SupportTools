@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using ParametersManagement.LibFileParameters.Interfaces;
 using ParametersManagement.LibParameters;
@@ -17,17 +19,19 @@ public sealed class GenerateStandardRunTimesCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (IParametersWithSmartSchemas)_parametersManager.Parameters;
 
         if (!Inputer.InputBool("This process will change RunTimes, are you sure?", false, false))
-            return false;
+        {
+            return ValueTask.FromResult(false);
+        }
 
         StandardRunTimesGenerator.Generate(_parametersManager);
 
         //შენახვა
         _parametersManager.Save(parameters, "RunTimes generated success");
-        return true;
+        return ValueTask.FromResult(true);
     }
 }

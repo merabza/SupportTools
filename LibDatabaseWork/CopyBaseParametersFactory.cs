@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibFileParameters.Models;
@@ -12,6 +13,7 @@ using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
+using ToolsManagement.DatabasesManagement.Models;
 using ToolsManagement.FileManagersMain;
 
 namespace LibDatabaseWork;
@@ -23,9 +25,10 @@ public static class CopyBaseParametersFactory
         DatabaseParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
         CancellationToken cancellationToken = default)
     {
-        var databasesBackupFilesExchangeParameters = supportToolsParameters.DatabasesBackupFilesExchangeParameters;
-        var localPath = databasesBackupFilesExchangeParameters?.LocalPath;
-        var exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
+        DatabasesBackupFilesExchangeParameters? databasesBackupFilesExchangeParameters =
+            supportToolsParameters.DatabasesBackupFilesExchangeParameters;
+        string? localPath = databasesBackupFilesExchangeParameters?.LocalPath;
+        string? exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
@@ -33,7 +36,7 @@ public static class CopyBaseParametersFactory
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
         var createSourceBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(logger, null, null, true);
-        var createSourceBaseBackupParametersResult =
+        OneOf<BaseBackupParameters, Err[]> createSourceBaseBackupParametersResult =
             await createSourceBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
@@ -46,7 +49,7 @@ public static class CopyBaseParametersFactory
 
         var createDestinationBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(logger, null, null, true);
-        var createDestinationBaseBackupParametersResult =
+        OneOf<BaseBackupParameters, Err[]> createDestinationBaseBackupParametersResult =
             await createDestinationBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
@@ -66,15 +69,19 @@ public static class CopyBaseParametersFactory
         //1. თუ ლოკალური ფოლდერი არ არსებობს, შეიქმნას
         if (!Directory.Exists(localPath))
         {
-            logger.LogInformation("Creating local folder {localPath}", localPath);
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("Creating local folder {LocalPath}", localPath);
+            }
+
             Directory.CreateDirectory(localPath);
         }
 
-        var sourceDbConnectionName = fromDatabaseParameters.DbConnectionName;
-        var backupBaseName = fromDatabaseParameters.DatabaseName;
+        string? sourceDbConnectionName = fromDatabaseParameters.DbConnectionName;
+        string? backupBaseName = fromDatabaseParameters.DatabaseName;
 
-        var destinationDbConnectionName = toDatabaseParameters.DbConnectionName;
-        var destinationBaseName = toDatabaseParameters.DatabaseName;
+        string? destinationDbConnectionName = toDatabaseParameters.DbConnectionName;
+        string? destinationBaseName = toDatabaseParameters.DatabaseName;
 
         //თუ წყარო და მიზანი ერთიდაიგივე არ არის ბაზების სახელები განსხვავებული უნდა იყოს.
         //ფაქტობრივად იმავე სერვერზე მოხდება ბაზის დაკოპირება
@@ -87,14 +94,16 @@ public static class CopyBaseParametersFactory
         //თუ გაცვლის სერვერის პარამეტრები გვაქვს,
         //შევქმნათ შესაბამისი ფაილმენეჯერი
         Console.Write($" exchangeFileStorage - {exchangeFileStorageName}");
-        var (exchangeFileStorage, exchangeFileManager) = await FileManagersFactoryExt.CreateFileStorageAndFileManager(
-            true, logger, localPath, exchangeFileStorageName, fileStorages, null, null, cancellationToken);
+        (FileStorageData? exchangeFileStorage, FileManager? exchangeFileManager) =
+            await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath,
+                exchangeFileStorageName, fileStorages, null, null, cancellationToken);
 
         //წყაროს ფაილსაცავი
-        var sourceFileStorageName = fromDatabaseParameters.FileStorageName;
+        string? sourceFileStorageName = fromDatabaseParameters.FileStorageName;
 
-        var (sourceFileStorage, sourceFileManager) = await FileManagersFactoryExt.CreateFileStorageAndFileManager(true,
-            logger, localPath, sourceFileStorageName, fileStorages, null, null, cancellationToken);
+        (FileStorageData? sourceFileStorage, FileManager? sourceFileManager) =
+            await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath, sourceFileStorageName,
+                fileStorages, null, null, cancellationToken);
 
         if (sourceFileManager == null)
         {
@@ -109,10 +118,10 @@ public static class CopyBaseParametersFactory
         }
 
         //მიზნის ფაილსაცავი
-        var destinationFileStorageName = toDatabaseParameters.FileStorageName;
+        string? destinationFileStorageName = toDatabaseParameters.FileStorageName;
 
         Console.Write($" destinationFileStorage - {destinationFileStorageName}");
-        var (destinationFileStorage, destinationFileManager) =
+        (FileStorageData? destinationFileStorage, FileManager? destinationFileManager) =
             await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath,
                 destinationFileStorageName, fileStorages, null, null, cancellationToken);
 
@@ -130,7 +139,7 @@ public static class CopyBaseParametersFactory
 
         Console.WriteLine();
 
-        var localFileManager = FileManagersFactory.CreateFileManager(true, logger, localPath);
+        FileManager? localFileManager = FileManagersFactory.CreateFileManager(true, logger, localPath);
 
         if (localFileManager == null)
         {
@@ -140,9 +149,9 @@ public static class CopyBaseParametersFactory
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        var createDatabaseManagerResultForSource = await DatabaseManagersFactory.CreateDatabaseManager(logger, true,
-            sourceDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
-            cancellationToken);
+        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResultForSource =
+            await DatabaseManagersFactory.CreateDatabaseManager(logger, true, sourceDbConnectionName,
+                databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForSource.IsT1)
         {
@@ -151,9 +160,9 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        var createDatabaseManagerResultForDestination = await DatabaseManagersFactory.CreateDatabaseManager(logger,
-            true, destinationDbConnectionName, databaseServerConnections, apiClients, httpClientFactory, null, null,
-            cancellationToken);
+        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResultForDestination =
+            await DatabaseManagersFactory.CreateDatabaseManager(logger, true, destinationDbConnectionName,
+                databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForDestination.IsT1)
         {
@@ -162,14 +171,14 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        var sourceDatabaseName = fromDatabaseParameters.DatabaseName;
+        string? sourceDatabaseName = fromDatabaseParameters.DatabaseName;
         if (string.IsNullOrWhiteSpace(sourceDatabaseName))
         {
             logger.LogError("sourceDatabaseName does not detected");
             return null;
         }
 
-        var destinationDatabaseName = toDatabaseParameters.DatabaseName;
+        string? destinationDatabaseName = toDatabaseParameters.DatabaseName;
 
         if (string.IsNullOrWhiteSpace(destinationDatabaseName))
         {
@@ -177,16 +186,16 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        var needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
-                                      sourceFileStorageName != destinationFileStorageName;
+        bool needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
+                                       sourceFileStorageName != destinationFileStorageName;
 
-        var needDownloadFromExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
-                                       !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
-                                       exchangeFileStorageName != sourceFileStorageName;
+        bool needDownloadFromExchange = exchangeFileManager is not null && exchangeFileStorage is not null &&
+                                        !FileStorageData.IsSameToLocal(exchangeFileStorage, localPath) &&
+                                        exchangeFileStorageName != sourceFileStorageName;
 
-        var exchangeSmartSchemaName = databasesBackupFilesExchangeParameters?.ExchangeSmartSchemaName;
+        string? exchangeSmartSchemaName = databasesBackupFilesExchangeParameters?.ExchangeSmartSchemaName;
 
-        var exchangeSmartSchema = string.IsNullOrWhiteSpace(exchangeSmartSchemaName)
+        SmartSchema? exchangeSmartSchema = string.IsNullOrWhiteSpace(exchangeSmartSchemaName)
             ? null
             : smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
 
