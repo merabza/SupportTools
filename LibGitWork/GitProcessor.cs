@@ -319,7 +319,7 @@ fi*/
         while (true)
         {
             GitState gitState = GetGitState();
-            switch (GetGitState())
+            switch (gitState)
             {
                 case GitState.UpToDate:
                     return (true, pushed);
