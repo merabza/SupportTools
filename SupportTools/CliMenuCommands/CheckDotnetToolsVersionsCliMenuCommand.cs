@@ -18,16 +18,16 @@ public sealed class CheckDotnetToolsVersionsCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         if (DotnetToolsVersionsCheckerUpdater.Check(_parametersManager))
             //შენახვა
         {
-            _parametersManager.Save(parameters, "Dotnet Tools versions checked success");
+            await _parametersManager.Save(parameters, "Dotnet Tools versions checked success", null, cancellationToken);
         }
 
-        return new ValueTask<bool>(true);
+        return true;
     }
 }

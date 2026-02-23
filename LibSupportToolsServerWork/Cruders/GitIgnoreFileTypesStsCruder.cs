@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
@@ -96,9 +97,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         return gitIgnoreModelFilePaths.Any(x => x.Name == recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
         AddOrUpdateRecordWithKey(recordKey);
+        return ValueTask.CompletedTask;
     }
 
     private void AddOrUpdateRecordWithKey(string recordKey)
@@ -126,12 +129,14 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         }
     }
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
-        AddOrUpdateRecordWithKey(recordKey);
+        return UpdateRecordWithKey(recordKey, newRecord, cancellationToken);
     }
 
-    protected override void RemoveRecordWithKey(string recordKey)
+    protected override async ValueTask RemoveRecordWithKey(string recordKey,
+        CancellationToken cancellationToken = default)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -144,7 +149,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         try
         {
             Option<Err[]> updateGitRepoByKeyResult =
-                supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey).Result;
+                await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken);
             if (updateGitRepoByKeyResult.IsSome)
             {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);

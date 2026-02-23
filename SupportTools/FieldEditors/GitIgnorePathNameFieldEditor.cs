@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -18,13 +20,16 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         string? currentGitIgnorePathName = GetValue(recordForUpdate);
 
         var gitIgnorePathsCruder = GitIgnoreFilePathsCruder.Create(_logger, _parametersManager);
 
-        SetValue(recordForUpdate, gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName));
+        SetValue(recordForUpdate,
+            await gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName, null, false,
+                cancellationToken));
     }
 
     public override string GetValueStatus(object? record)

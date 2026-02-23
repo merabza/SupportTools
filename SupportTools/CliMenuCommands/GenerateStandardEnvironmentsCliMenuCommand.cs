@@ -19,19 +19,19 @@ public sealed class GenerateStandardEnvironmentsCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (IParametersWithSmartSchemas)_parametersManager.Parameters;
 
         if (!Inputer.InputBool("This process will change Environments, are you sure?", false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         StandardEnvironmentsGenerator.Generate(_parametersManager);
 
         //შენახვა
-        _parametersManager.Save(parameters, "Environments generated success");
-        return ValueTask.FromResult(true);
+        await _parametersManager.Save(parameters, "Environments generated success", null, cancellationToken);
+        return true;
     }
 }

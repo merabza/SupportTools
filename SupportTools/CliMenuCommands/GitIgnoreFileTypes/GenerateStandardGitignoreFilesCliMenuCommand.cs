@@ -22,22 +22,22 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         if (!Inputer.InputBool("This process will change .gitignore records, are you sure?", false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var standardGitignoreFilesGenerator = new StandardGitignoreFilesGenerator(_logger, parameters);
         if (!standardGitignoreFilesGenerator.Generate() && Inputer.InputBool("Continue ans Save Changes?", false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //შენახვა
-        _parametersManager.Save(parameters, "RunTimes generated success");
-        return ValueTask.FromResult(true);
+        await _parametersManager.Save(parameters, "RunTimes generated success", null, cancellationToken);
+        return true;
     }
 }

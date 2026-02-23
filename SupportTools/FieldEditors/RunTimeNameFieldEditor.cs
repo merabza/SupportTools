@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
@@ -14,13 +16,16 @@ public sealed class RunTimeNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         string? currentRunTimeName = GetValue(recordForUpdate);
 
         var runTimeCruder = RunTimeCruder.Create(_parametersManager);
 
-        SetValue(recordForUpdate, runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName));
+        SetValue(recordForUpdate,
+            await runTimeCruder.GetNameWithPossibleNewName(FieldName, currentRunTimeName, null, true,
+                cancellationToken));
     }
 
     public override string GetValueStatus(object? record)

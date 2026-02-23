@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
@@ -134,9 +136,11 @@ public sealed class GitStsCruder : Cruder
         }
     }
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
         AddOrUpdateRecordWithKey(recordKey, newRecord);
+        return ValueTask.CompletedTask;
     }
 
     private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
@@ -196,12 +200,14 @@ public sealed class GitStsCruder : Cruder
         }
     }
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
-        AddOrUpdateRecordWithKey(recordKey, newRecord);
+        return UpdateRecordWithKey(recordKey, newRecord, cancellationToken);
     }
 
-    protected override void RemoveRecordWithKey(string recordKey)
+    protected override async ValueTask RemoveRecordWithKey(string recordKey,
+        CancellationToken cancellationToken = default)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -213,7 +219,8 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            Option<Err[]> updateGitRepoByKeyResult = supportToolsServerApiClient.RemoveGitRepoByKey(recordKey).Result;
+            Option<Err[]> updateGitRepoByKeyResult =
+                await supportToolsServerApiClient.RemoveGitRepoByKey(recordKey, cancellationToken);
             if (updateGitRepoByKeyResult.IsSome)
             {
                 Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);

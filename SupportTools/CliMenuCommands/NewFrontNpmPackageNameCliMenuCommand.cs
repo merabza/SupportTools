@@ -27,17 +27,18 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Add new Npm Package started");
 
         var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        string? newGitName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
+        string? newGitName =
+            await npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null, null, false, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(newGitName))
         {
             StShared.WriteErrorLine("Name is empty", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //მიმდინარე პარამეტრები
@@ -47,7 +48,7 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         List<string> npmPackageNames = project.FrontNpmPackageNames;
@@ -58,14 +59,14 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
             StShared.WriteErrorLine(
                 $"Npm Package with Name {newGitName} in project {_projectName} is already exists. cannot create new record.",
                 true, _logger);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         npmPackageNames.Add(newGitName);
 
         //ცვლილებების შენახვა
-        _parametersManager.Save(parameters, "Add Npm Package Finished");
+        await _parametersManager.Save(parameters, "Add Npm Package Finished", null, cancellationToken);
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

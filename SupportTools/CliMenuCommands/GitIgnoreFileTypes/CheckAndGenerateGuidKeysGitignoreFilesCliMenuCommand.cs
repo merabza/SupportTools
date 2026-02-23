@@ -18,19 +18,19 @@ public sealed class CheckAndGenerateGuidKeysGitignoreFilesCliMenuCommand : CliMe
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         if (!Inputer.InputBool(
                 "This will Check And if any not have, will Generate Guid Keys for .gitignore file types. are you sure?",
                 false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //შენახვა
-        _parametersManager.Save(parameters, "Check And Generate Guid Keys success");
-        return ValueTask.FromResult(true);
+        await _parametersManager.Save(parameters, "Check And Generate Guid Keys success", null, cancellationToken);
+        return true;
     }
 }

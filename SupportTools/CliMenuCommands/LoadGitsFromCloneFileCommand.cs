@@ -132,7 +132,7 @@ public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
         //თუ აღმოჩენილია, მოხდეს პარამეტრების ფაილის შენახვა.
         if (haveChanges)
         {
-            _parametersManager.Save(parameters, "Changed git projects");
+            await _parametersManager.Save(parameters, "Changed git projects", null, cancellationToken);
         }
 
         //GitSyncAll gitSyncAll = new GitSyncAll(_logger, project.ProjectFolderName,

@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
@@ -15,13 +17,16 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         string? currentEnvironmentName = GetValue(recordForUpdate);
 
         var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
-        SetValue(recordForUpdate, environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName));
+        SetValue(recordForUpdate,
+            await environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName, null, false,
+                cancellationToken));
     }
 
     public override string GetValueStatus(object? record)

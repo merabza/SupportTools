@@ -42,7 +42,7 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         ////https://stackoverflow.com/questions/7293008/display-last-git-commit-comment
         ////https://unix.stackexchange.com/questions/196952/get-last-commit-message-author-and-hash-using-git-ls-remote-like-command            
@@ -55,18 +55,18 @@ public sealed class UpdateGitProjectCliMenuCommand : CliMenuCommand
         if (gitProjectsUpdater is null)
         {
             StShared.WriteErrorLine("gitProjectsUpdater does not created", true, _logger);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         GitProcessor? gitProcessor = gitProjectsUpdater.ProcessOneGitProject();
         if (gitProcessor is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        _parametersManager.Save(_supportToolsParameters, "Project Saved");
+        await _parametersManager.Save(_supportToolsParameters, "Project Saved", null, cancellationToken);
 
         Console.WriteLine("Success");
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

@@ -27,7 +27,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         _serverName = serverName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
@@ -36,7 +36,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         if (server is null)
         {
             StShared.WriteErrorLine($"Server with name {_serverName} is not exists 2", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
@@ -52,7 +52,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
         {
             if (!Enum.TryParse(kvp.Key, out EProjectServerTools tool))
             {
-                return ValueTask.FromResult(false);
+                return false;
             }
 
             if (kvp.Value)
@@ -70,7 +70,7 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
             }
         }
 
-        _parametersManager.Save(parameters, "Changes saved");
-        return ValueTask.FromResult(true);
+        await _parametersManager.Save(parameters, "Changes saved", null, cancellationToken);
+        return true;
     }
 }

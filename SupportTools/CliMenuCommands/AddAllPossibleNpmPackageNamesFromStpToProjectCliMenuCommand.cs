@@ -21,7 +21,7 @@ public sealed class AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand 
         _projectName = projectName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -34,8 +34,8 @@ public sealed class AddAllPossibleNpmPackageNamesFromStpToProjectCliMenuCommand 
         }
 
         //ცვლილებების შენახვა
-        _parametersManager.Save(parameters, "Add Npm Packages Finished");
+        await _parametersManager.Save(parameters, "Add Npm Packages Finished", null, cancellationToken);
 
-        return new ValueTask<bool>(true);
+        return true;
     }
 }

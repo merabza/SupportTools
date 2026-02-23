@@ -34,17 +34,18 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Add new Git started");
 
         var gitCruder = GitCruder.Create(_logger, _httpClientFactory, _parametersManager);
-        string? newGitName = gitCruder.GetNameWithPossibleNewName("Git Name", null);
+        string? newGitName =
+            await gitCruder.GetNameWithPossibleNewName("Git Name", null, null, false, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(newGitName))
         {
             StShared.WriteErrorLine("Name is empty", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //მიმდინარე პარამეტრები
@@ -54,7 +55,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"project with name {_projectName} does not exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         List<string> gitProjectNames = GitProjectNames(project, _gitCol);
@@ -65,18 +66,18 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
             StShared.WriteErrorLine(
                 $"Git Project with Name {newGitName} in project {_projectName} is already exists. cannot create new record. ",
                 true, _logger);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         gitProjectNames.Add(newGitName);
 
         //ცვლილებების შენახვა
-        _parametersManager.Save(parameters, "Add Git Project Finished");
+        await _parametersManager.Save(parameters, "Add Git Project Finished", null, cancellationToken);
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 
-    private List<string> GitProjectNames(ProjectModel project, EGitCol gitCol)
+    private static List<string> GitProjectNames(ProjectModel project, EGitCol gitCol)
     {
         List<string> gitProjectNames = gitCol switch
         {

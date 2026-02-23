@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -18,14 +20,16 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         string? currentReactAppTypeName = GetValue(recordForUpdate);
 
         var reactAppTypeCruder = ReactAppTypeCruder.Create(_logger, _parametersManager);
 
         string? newValue =
-            reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true);
+            await reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true,
+                cancellationToken);
 
         SetValue(recordForUpdate, newValue);
     }

@@ -25,7 +25,7 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         _npmPackageName = npmPackageName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -35,14 +35,14 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         {
             StShared.WriteErrorLine(
                 $"Npm Package with name {_npmPackageName} does not exists in project {_projectName}", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (!Inputer.InputBool(
                 $"This will Delete Npm Package with Name {_npmPackageName}, from this project. are you sure?", false,
                 false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         npmPackageNames.Remove(_npmPackageName);
@@ -52,10 +52,10 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         //    return false;
         //}
 
-        _parametersManager.Save(parameters,
-            $"Npm Package with Name {_npmPackageName} in project {_projectName} is deleted.");
+        await _parametersManager.Save(parameters,
+            $"Npm Package with Name {_npmPackageName} in project {_projectName} is deleted.", null, cancellationToken);
 
         MenuAction = EMenuAction.LevelUp;
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

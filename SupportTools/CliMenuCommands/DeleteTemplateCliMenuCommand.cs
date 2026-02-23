@@ -22,31 +22,31 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
         _templateName = templateName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
         AppProjectCreatorAllParameters? parameters = supportToolsParameters.AppProjectCreatorAllParameters;
         if (parameters == null)
         {
             StShared.WriteErrorLine("Support Tools Parameters not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         Dictionary<string, TemplateModel> templates = parameters.Templates;
         if (!templates.ContainsKey(_templateName))
         {
             StShared.WriteErrorLine($"Template {_templateName} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         templates.Remove(_templateName);
-        _parametersManager.Save(parameters, $"Template {_templateName} Deleted");
+        await _parametersManager.Save(parameters, $"Template {_templateName} Deleted", null, cancellationToken);
         MenuAction = EMenuAction.LevelUp;
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

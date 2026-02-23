@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibFileParameters.Models;
@@ -37,7 +39,7 @@ internal sealed class ProjectRecordCreator
         _newProjectKeyGuidPart = newProjectKeyGuidPart;
     }
 
-    public bool Create()
+    public async ValueTask<bool> Create(CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -340,7 +342,8 @@ internal sealed class ProjectRecordCreator
 
         supportToolsParameters.Projects.Add(_newProjectName, newProject);
 
-        _parametersManager.Save(supportToolsParameters, $"Project {_newProjectName} saved");
+        await _parametersManager.Save(supportToolsParameters, $"Project {_newProjectName} saved", null,
+            cancellationToken);
 
         return true;
     }

@@ -25,7 +25,7 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToo
         _parametersManager = parametersManager;
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -39,13 +39,13 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToo
         if (isAnyChanged)
             //შენახვა
         {
-            _parametersManager.Save(parameters, "GitIgnorePathNames applied success");
+            await _parametersManager.Save(parameters, "GitIgnorePathNames applied success", null, cancellationToken);
         }
         else
         {
             StShared.WriteWarningLine("All Git Projects already have GitIgnorePathNames, No Changes made", true);
         }
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

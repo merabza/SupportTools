@@ -70,7 +70,7 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
             parameters.Gits.Add(git.Key, git.Value);
         }
 
-        _parametersManager.Save(parameters, $"Project {projectName} Added");
+        await _parametersManager.Save(parameters, $"Project {projectName} Added", null, cancellationToken);
         return true;
     }
 }

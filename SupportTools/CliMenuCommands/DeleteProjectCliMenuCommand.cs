@@ -22,7 +22,7 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -30,17 +30,17 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
         if (!projects.ContainsKey(_projectName))
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (!Inputer.InputBool($"This will Delete Project {_projectName}. are you sure?", false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         projects.Remove(_projectName);
-        _parametersManager.Save(parameters, $"Project {_projectName} Deleted");
+        await _parametersManager.Save(parameters, $"Project {_projectName} Deleted", null, cancellationToken);
         MenuAction = EMenuAction.LevelUp;
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

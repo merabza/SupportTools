@@ -25,7 +25,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
@@ -35,7 +35,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         if (project is null)
         {
             StShared.WriteErrorLine($"Project with name {_projectName} does not exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
@@ -49,7 +49,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         {
             if (!Enum.TryParse(kvp.Key, out EProjectTools tool))
             {
-                return ValueTask.FromResult(false);
+                return false;
             }
 
             if (kvp.Value)
@@ -67,7 +67,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
             }
         }
 
-        _parametersManager.Save(parameters, "Changes saved");
-        return ValueTask.FromResult(true);
+        await _parametersManager.Save(parameters, "Changes saved", null, cancellationToken);
+        return true;
     }
 }

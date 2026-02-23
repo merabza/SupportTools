@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliParameters.FieldEditors;
 using LibSupportToolsServerWork.Cruders;
 using Microsoft.Extensions.Caching.Memory;
@@ -25,14 +27,17 @@ public sealed class GitIgnorePathNameStsFieldEditor : FieldEditor<string>
         _memoryCache = memoryCache;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         string? currentGitIgnorePathName = GetValue(recordForUpdate);
 
         var gitIgnorePathsCruder =
             new GitIgnoreFileTypesStsCruder(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
-        SetValue(recordForUpdate, gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName));
+        SetValue(recordForUpdate,
+            await gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName, null, false,
+                cancellationToken));
     }
 
     public override string GetValueStatus(object? record)

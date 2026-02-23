@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
@@ -96,7 +98,8 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         return gits.ContainsKey(recordKey);
     }
 
-    public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
+    public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
         if (newRecord is not GitDataModel newGit)
         {
@@ -105,9 +108,11 @@ public sealed class GitCruder : ParCruder<GitDataModel>
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         parameters.Gits[recordKey] = newGit;
+        return ValueTask.CompletedTask;
     }
 
-    protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
+    protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
+        CancellationToken cancellationToken = default)
     {
         if (newRecord is not GitDataModel newGit)
         {
@@ -116,13 +121,15 @@ public sealed class GitCruder : ParCruder<GitDataModel>
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         parameters.Gits.Add(recordKey, newGit);
+        return ValueTask.CompletedTask;
     }
 
-    protected override void RemoveRecordWithKey(string recordKey)
+    protected override ValueTask RemoveRecordWithKey(string recordKey, CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         Dictionary<string, GitDataModel> gits = parameters.Gits;
         gits.Remove(recordKey);
+        return ValueTask.CompletedTask;
     }
 
     public override bool CheckValidation(ItemData item)

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliParameters.FieldEditors;
@@ -27,7 +29,8 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         _gitProjectNamesParameterNames = gitProjectNamesParameterNames;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -70,7 +73,7 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         if (_useNone && index == -1)
         {
             SetValue(recordForUpdate, null);
-            return;
+            return ValueTask.CompletedTask;
         }
 
         if (index < 0 || index >= keys.Count)
@@ -79,5 +82,6 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         }
 
         SetValue(recordForUpdate, keys[index]);
+        return ValueTask.CompletedTask;
     }
 }

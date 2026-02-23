@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using AppCliTools.CliParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,7 +69,14 @@ try
 
     var supportTools = new SupportToolsCliAppLoop(logger, httpClientFactory, memoryCache,
         new ParametersManager(parametersFileName, par));
-    return await supportTools.Run() ? 0 : 100;
+
+    // ReSharper disable once using
+    // ReSharper disable once DisposableConstructor
+    using var cts = new CancellationTokenSource();
+    CancellationToken token = cts.Token;
+    token.ThrowIfCancellationRequested();
+
+    return await supportTools.Run(token) ? 0 : 100;
 }
 catch (Exception e)
 {

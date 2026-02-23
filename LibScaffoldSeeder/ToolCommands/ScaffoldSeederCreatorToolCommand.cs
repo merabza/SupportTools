@@ -216,7 +216,8 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 
         if (haveToSaveSupportToolsParameters)
         {
-            ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames");
+            await ParametersManager.Save(supportToolsParameters, "Saved ScaffoldSeederGitProjectNames", null,
+                cancellationToken);
         }
 
         //აქედან ეშვება კონკრეტული პროექტის მონაცემების ჩამყრელი კოდის შემქმნელი პროგრამა
