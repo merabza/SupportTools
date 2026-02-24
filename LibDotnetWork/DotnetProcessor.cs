@@ -39,7 +39,7 @@ public sealed class DotnetProcessor
         string projectFullPath, string projectName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"new {dotnetProjectType.ToString().ToUpperInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
+            $"new {dotnetProjectType.ToString().ToLowerInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
     }
 
     public Option<Err[]> AddProjectToSolution(string solutionPath, string? solutionFolderName,
