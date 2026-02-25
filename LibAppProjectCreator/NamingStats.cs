@@ -14,7 +14,7 @@ public static class NamingStats
 
     public static string DataSeedingPackageName(string projectName)
     {
-        return $"{projectName}DataSeeding";
+        return $"{projectName}DataSeeding.DataSeeding";
     }
 
     public static string DataSeedingPackageFolder(string scaffoldSeederProjectName, string workPath)

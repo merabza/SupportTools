@@ -231,7 +231,7 @@ public abstract class AppCreatorBase
             return false;
         }
 
-        foreach (string fileName in FilesForDelete)
+        foreach (string fileName in FilesForDelete.Where(File.Exists))
         {
             File.Delete(fileName);
         }
