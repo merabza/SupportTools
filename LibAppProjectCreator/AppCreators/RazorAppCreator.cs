@@ -35,13 +35,13 @@ public sealed class RazorAppCreator : AppCreatorBase
         //რეფერენსების სიის შედგენა
         AddReference(_razorAppCreatorData.MainProjectData, GitProjects.AppCliToolsCliParameters);
         //AddReference(_razorAppWithDatabaseCreatorData.MainProjectData, GitProjects.CliToolsData);
-        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.CliTools);
+        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.AppCliToolsCliTools);
 
         //პაკეტების სიის შედგენა
         AddPackage(_razorAppCreatorData.MainProjectData, NuGetPackages.MicrosoftExtensionsLoggingAbstractions);
 
         //რეფერენსების სიის შედგენა მთავარი პროექტისათვის
-        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.CliParametersDataEdit);
+        AddReference(_razorAppCreatorData.MainProjectData, GitProjects.AppCliToolsCliParametersDataEdit);
 
         //პაკეტების სიის შედგენა მთავარი პროექტისათვის
         AddPackage(_razorAppCreatorData.MainProjectData, NuGetPackages.MicrosoftEntityFrameworkCoreDesign);

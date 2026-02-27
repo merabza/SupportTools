@@ -122,6 +122,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.AppCliToolsCliParameters);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.BackendCarcassDataSeeding);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.AppCliToolsDbContextAnalyzer);
+        AddReference(_scaffoldSeederCreatorData.SeedDbProject, GitProjects.ParametersManagementLibDatabaseParameters);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, mainDatabaseProject);
         //AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DataSeedingClassLibProject);
         AddReference(_scaffoldSeederCreatorData.SeedDbProject, _scaffoldSeederCreatorData.DbMigrationProject);

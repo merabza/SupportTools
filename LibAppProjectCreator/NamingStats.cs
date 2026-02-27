@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using LibAppProjectCreator.Models;
 
 namespace LibAppProjectCreator;
 
@@ -14,7 +15,7 @@ public static class NamingStats
 
     public static string DataSeedingPackageName(string projectName)
     {
-        return $"{projectName}DataSeeding.DataSeeding";
+        return $"{projectName}DataSeeding";
     }
 
     public static string DataSeedingPackageFolder(string scaffoldSeederProjectName, string workPath)
@@ -40,7 +41,7 @@ public static class NamingStats
 
     public static string DataSeedingClassLibProjectName(string scaffoldSeederProjectName)
     {
-        return $"{scaffoldSeederProjectName}DbDataSeeding";
+        return $"{scaffoldSeederProjectName}DataSeeding.DataSeeding";
     }
 
     public static string ScaffoldSeederFolderName(string scaffoldSeederProjectName)

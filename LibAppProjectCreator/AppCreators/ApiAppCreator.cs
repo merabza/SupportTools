@@ -74,27 +74,27 @@ public sealed class ApiAppCreator : AppCreatorBase
 
         if (_apiAppCreatorData.UseSignalR)
         {
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SignalRMessages);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsSignalRMessages);
         }
 
         if (_apiAppCreatorData.UseFluentValidation)
         {
-            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.FluentValidationInstaller);
+            AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsValidationTools);
         }
 
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsShared);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ApiExceptionHandler);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SystemToolsSystemToolsShared);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsApiExceptionHandler);
 
         //if (_apiAppCreatorData.UseReCounter)
         //    AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ReCounterServiceInstaller);
 
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.TestToolsApi);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsTestToolsApi);
         //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.StaticFilesTools);
         //AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebInstallers);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.ConfigurationEncrypt);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SerilogLogger);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.SwaggerTools);
-        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WindowsServiceTools);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsConfigurationEncrypt);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsSerilogLogger);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsSwaggerTools);
+        AddReference(_apiAppCreatorData.MainProjectData, GitProjects.WebSystemToolsWindowsServiceTools);
 
         if (_apiAppCreatorData.UseCarcass)
         {
@@ -122,7 +122,7 @@ public sealed class ApiAppCreator : AppCreatorBase
         AddReference(_apiAppCreatorData.LibProjectRepositoriesProjectData, _apiAppCreatorData.DatabaseProjectData);
 
         //რეფერენსების სიის შედგენა Db პროექტისათვის
-        AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsShared);
+        AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.SystemToolsSystemToolsShared);
         //AddReference(_apiAppCreatorData.DatabaseProjectData, GitProjects.WebInstallers);
 
         if (!_apiAppCreatorData.UseDbPartFolderForDatabaseProjects)
