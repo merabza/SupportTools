@@ -164,7 +164,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
         const string connectionStringParameterName = "ConnectionStringSeed";
         var projectDesignTimeDbContextFactoryCreator = new FakeProjectDesignTimeDbContextFactoryCreator(Logger,
             fakeHosProjectPath, _par.DbContextProjectName, _scaffoldSeederCreatorData.FakeHostWebApiProject.ProjectName,
-            _par.ProjectDbContextClassName, connectionStringParameterName, parametersFileName);
+            _par.ProjectDbContextClassName, connectionStringParameterName, parametersFileName, _par.ScaffoldSeederProjectName);
 
         projectDesignTimeDbContextFactoryCreator.CreateFileStructure();
 
