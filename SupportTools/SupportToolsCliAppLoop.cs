@@ -1,11 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliTools;
 using AppCliTools.CliTools.CliMenuCommands;
-using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
@@ -103,8 +102,8 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
         }
 
         //პროგრამიდან გასასვლელი
-        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
-        mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length);
+        mainMenuSet.AddEscapeCommand(new ExitCliMenuCommand());
+
         return mainMenuSet;
     }
 }

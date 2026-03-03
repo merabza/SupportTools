@@ -1,7 +1,5 @@
-﻿using System;
-using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibDataInput;
+﻿using AppCliTools.CliMenu;
+using AppCliTools.LibMenuInput;
 using ParametersManagement.LibParameters;
 
 namespace SupportTools.CliMenuCommands;
@@ -31,8 +29,7 @@ public sealed class NpmPackageInProjectSubMenuCliMenuCommand : CliMenuCommand
         gitProjectSubMenuSet.AddMenuItem(deleteGitProjectCommand);
 
         //პროექტის მენიუში დაბრუნება
-        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
-        gitProjectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to Git menu", null), key.Length);
+        gitProjectSubMenuSet.AddEscapeCommand("Exit to Git menu");
 
         return gitProjectSubMenuSet;
     }

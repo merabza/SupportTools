@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
@@ -125,8 +125,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //მთავარ მენიუში გასვლა
-        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
-        projectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
+        projectSubMenuSet.AddEscapeCommand();
 
         return projectSubMenuSet;
     }

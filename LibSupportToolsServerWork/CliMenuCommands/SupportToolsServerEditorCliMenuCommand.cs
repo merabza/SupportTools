@@ -1,8 +1,6 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -39,8 +37,8 @@ public sealed class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
             new GitsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitsSupportToolsServerCliMenuCommand);
 
-        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
-        mainMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null), key.Length);
+        mainMenuSet.AddEscapeCommand();
+
         return mainMenuSet;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using LibAppProjectCreator.Models;
 
 namespace LibAppProjectCreator;
 

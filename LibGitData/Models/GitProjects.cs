@@ -54,37 +54,63 @@ public sealed class GitProjects
     }
 
     //AppCliTools
-    public GitProjectDataDomain AppCliToolsCliParameters => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParameters)}");
+    public GitProjectDataDomain AppCliToolsCliParameters =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(CliParameters)}");
+
     public GitProjectDataDomain AppCliToolsCliTools => GetGitProjectByKey($"{AppCliTools}.{nameof(CliTools)}");
-    public GitProjectDataDomain AppCliToolsCliParametersDataEdit => GetGitProjectByKey($"{AppCliTools}.{nameof(CliParametersDataEdit)}");
+
+    public GitProjectDataDomain AppCliToolsCliParametersDataEdit =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(CliParametersDataEdit)}");
+
     public GitProjectDataDomain AppCliToolsCliToolsData => GetGitProjectByKey($"{AppCliTools}.{nameof(CliToolsData)}");
-    public GitProjectDataDomain AppCliToolsDbContextAnalyzer => GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
+
+    public GitProjectDataDomain AppCliToolsDbContextAnalyzer =>
+        GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
 
     //BackendCarcass
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey($"{BackendCarcass}.{nameof(Api)}");
     public GitProjectDataDomain BackendCarcassDb => GetGitProjectByKey($"{BackendCarcass}.{Db}");
     public GitProjectDataDomain BackendCarcassDataSeeding => GetGitProjectByKey($"{BackendCarcass}.{DataSeeding}");
     public GitProjectDataDomain BackendCarcassIdentity => GetGitProjectByKey($"{BackendCarcass}.{nameof(Identity)}");
-    public GitProjectDataDomain BackendCarcassRepositories => GetGitProjectByKey($"{BackendCarcass}.{nameof(Repositories)}");
+
+    public GitProjectDataDomain BackendCarcassRepositories =>
+        GetGitProjectByKey($"{BackendCarcass}.{nameof(Repositories)}");
 
     //DatabaseTools
     public GitProjectDataDomain DatabaseToolsDbTools => GetGitProjectByKey($"{DatabaseTools}.{nameof(DbTools)}");
 
     //ParametersManagement
-    public GitProjectDataDomain ParametersManagementLibDatabaseParameters => GetGitProjectByKey($"{ParametersManagement}.{LibDatabaseParameters}");
+    public GitProjectDataDomain ParametersManagementLibDatabaseParameters =>
+        GetGitProjectByKey($"{ParametersManagement}.{LibDatabaseParameters}");
 
     //SystemTools
-    public GitProjectDataDomain SystemToolsSystemToolsShared => GetGitProjectByKey($"{SystemTools}.{nameof(SystemToolsShared)}");
+    public GitProjectDataDomain SystemToolsSystemToolsShared =>
+        GetGitProjectByKey($"{SystemTools}.{nameof(SystemToolsShared)}");
 
     //WebSystemTools
-    public GitProjectDataDomain WebSystemToolsApiExceptionHandler => GetGitProjectByKey($"{WebSystemTools}.{nameof(ApiExceptionHandler)}");
-    public GitProjectDataDomain WebSystemToolsConfigurationEncrypt => GetGitProjectByKey($"{WebSystemTools}.{nameof(ConfigurationEncrypt)}");
-    public GitProjectDataDomain WebSystemToolsSerilogLogger => GetGitProjectByKey($"{WebSystemTools}.{nameof(SerilogLogger)}");
-    public GitProjectDataDomain WebSystemToolsSignalRMessages => GetGitProjectByKey($"{WebSystemTools}.{nameof(SignalRMessages)}");
-    public GitProjectDataDomain WebSystemToolsSwaggerTools => GetGitProjectByKey($"{WebSystemTools}.{nameof(SwaggerTools)}");
-    public GitProjectDataDomain WebSystemToolsTestToolsApi => GetGitProjectByKey($"{WebSystemTools}.{nameof(TestToolsApi)}");
-    public GitProjectDataDomain WebSystemToolsValidationTools => GetGitProjectByKey($"{WebSystemTools}.{nameof(ValidationTools)}");
-    public GitProjectDataDomain WebSystemToolsWindowsServiceTools => GetGitProjectByKey($"{WebSystemTools}.{nameof(WindowsServiceTools)}");
+    public GitProjectDataDomain WebSystemToolsApiExceptionHandler =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(ApiExceptionHandler)}");
+
+    public GitProjectDataDomain WebSystemToolsConfigurationEncrypt =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(ConfigurationEncrypt)}");
+
+    public GitProjectDataDomain WebSystemToolsSerilogLogger =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(SerilogLogger)}");
+
+    public GitProjectDataDomain WebSystemToolsSignalRMessages =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(SignalRMessages)}");
+
+    public GitProjectDataDomain WebSystemToolsSwaggerTools =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(SwaggerTools)}");
+
+    public GitProjectDataDomain WebSystemToolsTestToolsApi =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(TestToolsApi)}");
+
+    public GitProjectDataDomain WebSystemToolsValidationTools =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(ValidationTools)}");
+
+    public GitProjectDataDomain WebSystemToolsWindowsServiceTools =>
+        GetGitProjectByKey($"{WebSystemTools}.{nameof(WindowsServiceTools)}");
 
     public static GitProjects Create(ILogger? logger, Dictionary<string, GitProjectDataModel> gitPrs)
     {

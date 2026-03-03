@@ -1,10 +1,8 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -57,9 +55,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //მთავარ მენიუში გასვლა
-        string key = ConsoleKey.Escape.Value().ToUpperInvariant();
-        projectGroupSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to level up menu", null),
-            key.Length);
+        projectGroupSubMenuSet.AddEscapeCommand();
 
         return projectGroupSubMenuSet;
     }
