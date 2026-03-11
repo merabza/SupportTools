@@ -31,17 +31,17 @@ public sealed class ProgramUpdaterToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
-        var environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
+        string projectName = ProgramUpdaterParameters.ProgramPublisherParameters.ProjectName;
+        string? environmentName = ProgramUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
         if (string.IsNullOrEmpty(environmentName))
         {
-            _logger.LogError("Environment {environmentName} is empty", environmentName);
+            _logger.LogError("Environment {EnvironmentName} is empty", environmentName);
             return false;
         }
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var programPublisherParameters = ProgramUpdaterParameters.ProgramPublisherParameters;
+        ProgramPublisherParameters programPublisherParameters = ProgramUpdaterParameters.ProgramPublisherParameters;
 
         var createPackageAndUpload = new CreatePackageAndUpload(_logger, programPublisherParameters.ProjectName,
             programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
@@ -51,7 +51,9 @@ public sealed class ProgramUpdaterToolCommand : ToolCommand
             programPublisherParameters.SmartSchemaForLocal, programPublisherParameters.SmartSchemaForExchange);
 
         if (!await createPackageAndUpload.Run(cancellationToken))
+        {
             return false;
+        }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         var installProgramAction = new InstallProgramAction(_logger, _httpClientFactory,
@@ -61,9 +63,11 @@ public sealed class ProgramUpdaterToolCommand : ToolCommand
             projectName, environmentName, UseConsole);
 
         if (await installProgramAction.Run(cancellationToken))
+        {
             return true;
+        }
 
-        _logger.LogError("project {projectName} not updated", projectName);
+        _logger.LogError("project {ProjectName} not updated", projectName);
         return false;
     }
 }

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitData;
+using LibGitWork.Models;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -32,12 +33,14 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
         string projectName, EGitCol gitCol, string? excludeFolder)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var clearOneProjectAllGitsParameters =
             ClearOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol);
 
         if (clearOneProjectAllGitsParameters is not null)
+        {
             return new ClearOneProjectAllGitsToolAction(loggerOrNull, clearOneProjectAllGitsParameters, excludeFolder);
+        }
 
         StShared.WriteErrorLine("ClearOneProjectAllGitsParameters is not created", true);
         return null;
@@ -45,8 +48,8 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        foreach (var gitData in _clearOneProjectAllGitsParameters.GitData.Where(x => x.GitIgnorePathName == "CSharp")
-                     .OrderBy(x => x.GitProjectFolderName))
+        foreach (GitData gitData in _clearOneProjectAllGitsParameters.GitData
+                     .Where(x => x.GitIgnorePathName == "CSharp").OrderBy(x => x.GitProjectFolderName))
         {
             var gitClear = new GitClearToolAction(_logger,
                 new GitClearParameters(gitData, _clearOneProjectAllGitsParameters.GitsFolder), _excludeFolder);

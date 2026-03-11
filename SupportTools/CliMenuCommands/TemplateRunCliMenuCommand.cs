@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,13 @@ public sealed class TemplateRunCliMenuCommand : CliMenuCommand
             parametersManager, templateName, testOrReal, true);
     }
 
-    protected override string GetActionDescription()
+    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return AppProjectCreatorByTemplateToolAction.ActionDescription;
+        return ValueTask.FromResult<string?>(AppProjectCreatorByTemplateToolAction.ActionDescription);
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        return _appProjectCreatorByTemplate.Run(CancellationToken.None).Result;
+        return await _appProjectCreatorByTemplate.Run(cancellationToken);
     }
 }

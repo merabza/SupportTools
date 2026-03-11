@@ -17,13 +17,13 @@ public sealed class GitProjectDataDomain
 
     public string ProjectName => Path.GetFileNameWithoutExtension(ProjectFileName);
 
-    public override string ToString()
-    {
-        return GitName;
-    }
-
     public string GitName { get; set; }
     public string ProjectRelativePath { get; set; }
     public string ProjectFileName { get; set; }
     public List<string> DependsOnProjectNames { get; set; }
+
+    public override string ToString()
+    {
+        return GitName;
+    }
 }

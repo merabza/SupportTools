@@ -10,14 +10,19 @@ public static class ProxySettingsCreator
         ServerInfoModel serverInfo)
     {
         if (serverSidePort > 0 && !string.IsNullOrWhiteSpace(apiVersionId))
+        {
             return new ProxySettings(serverSidePort, apiVersionId);
+        }
 
         if (serverSidePort == 0)
         {
             if (!string.IsNullOrWhiteSpace(apiVersionId))
+            {
                 StShared.WriteWarningLine(
                     $"ServerSidePort is 0 and Project ApiVersionId is specified for project {projectName} and server {serverInfo.GetItemKey()}. ApiVersionId wil be ignored.",
                     true);
+            }
+
             return new ProxySettingsBase();
         }
 

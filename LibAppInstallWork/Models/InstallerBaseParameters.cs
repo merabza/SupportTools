@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -18,10 +19,10 @@ public sealed class InstallerBaseParameters
     public ApiClientSettingsDomain? WebAgentForInstall { get; }
     public LocalInstallerSettingsDomain? LocalInstallerSettings { get; }
 
-    public static InstallerBaseParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
-        ServerInfoModel serverInfo)
+    public static async ValueTask<InstallerBaseParameters?> Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo, CancellationToken cancellationToken = default)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
         {
@@ -29,12 +30,12 @@ public sealed class InstallerBaseParameters
             return null;
         }
 
-        var server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
+        ServerDataModel server = supportToolsParameters.GetServerDataRequired(serverInfo.ServerName);
         ApiClientSettingsDomain? webAgentForInstall = null;
         LocalInstallerSettingsDomain? localInstallerSettingsDomain = null;
         if (!server.IsLocal)
         {
-            var webAgentNameForInstall =
+            string? webAgentNameForInstall =
                 project.UseAlternativeWebAgent ? server.WebAgentInstallerName : server.WebAgentName;
             if (string.IsNullOrWhiteSpace(webAgentNameForInstall))
             {
@@ -48,11 +49,13 @@ public sealed class InstallerBaseParameters
         }
         else
         {
-            localInstallerSettingsDomain = LocalInstallerSettingsDomain.Create(null, true,
-                supportToolsParameters.LocalInstallerSettings, null, null, CancellationToken.None).Result;
+            localInstallerSettingsDomain = await LocalInstallerSettingsDomain.Create(null, true,
+                supportToolsParameters.LocalInstallerSettings, null, null, cancellationToken);
 
             if (localInstallerSettingsDomain is not null)
+            {
                 return new InstallerBaseParameters(webAgentForInstall, localInstallerSettingsDomain);
+            }
 
             StShared.WriteErrorLine("LocalInstallerSettingsDomain does not Created", true);
             return null;

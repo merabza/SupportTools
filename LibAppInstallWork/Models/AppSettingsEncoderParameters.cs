@@ -45,7 +45,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
     public static AppSettingsEncoderParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (!project.IsService)
         {
@@ -65,14 +65,15 @@ public sealed class AppSettingsEncoderParameters : IParameters
             return null;
         }
 
-        var publisherDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        string? publisherDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(publisherDateMask))
         {
             StShared.WriteErrorLine("PublisherDateMask does not specified in support tools parameters", true);
             return null;
         }
 
-        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        string? parametersFileExtension =
+            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified in support tools parameters", true);
@@ -113,7 +114,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
             return null;
         }
 
-        var smartSchemaForExchange =
+        SmartSchema smartSchemaForExchange =
             supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForExchange);
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.FileStorageNameForExchange))
@@ -122,7 +123,7 @@ public sealed class AppSettingsEncoderParameters : IParameters
             return null;
         }
 
-        var fileStorageForUpload =
+        FileStorageData fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
         var appSettingsEncoderParameters = new AppSettingsEncoderParameters(serverInfo.AppSettingsJsonSourceFileName,

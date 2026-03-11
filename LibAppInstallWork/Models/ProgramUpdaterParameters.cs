@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
@@ -35,38 +37,45 @@ public sealed class ProgramUpdaterParameters : IParameters
         return true;
     }
 
-    public static ProgramUpdaterParameters? Create(ILogger logger, SupportToolsParameters supportToolsParameters,
-        string projectName, ServerInfoModel serverInfo)
+    public static async ValueTask<ProgramUpdaterParameters?> Create(ILogger logger,
+        SupportToolsParameters supportToolsParameters, string projectName, ServerInfoModel serverInfo,
+        CancellationToken cancellationToken)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         var programPublisherParameters =
             ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
         if (programPublisherParameters == null)
+        {
             return null;
+        }
 
-        var programArchiveDateMask = project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
+        string? programArchiveDateMask =
+            project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
         if (string.IsNullOrWhiteSpace(programArchiveDateMask))
         {
             StShared.WriteErrorLine("programArchiveDateMask does not specified", true);
             return null;
         }
 
-        var programArchiveExtension = project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
+        string? programArchiveExtension =
+            project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
         if (string.IsNullOrWhiteSpace(programArchiveExtension))
         {
             StShared.WriteErrorLine("programArchiveExtension does not specified", true);
             return null;
         }
 
-        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        string? parametersFileDateMask =
+            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        string? parametersFileExtension =
+            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);
@@ -79,10 +88,11 @@ public sealed class ProgramUpdaterParameters : IParameters
             return null;
         }
 
-        var fileStorageForUpload =
+        FileStorageData fileStorageForUpload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
+        var installerBaseParameters =
+            await InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo, cancellationToken);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(

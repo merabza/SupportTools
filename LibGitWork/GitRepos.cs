@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LibGitData.Models;
@@ -21,7 +22,7 @@ public sealed class GitRepos
         string? spaProjectFolderRelativePath, bool useConsole, bool useGitRecordNameForComplexGitProjectFolderName)
     {
         Dictionary<string, GitData> gits = new();
-        foreach (var (gitProjectName, gitData) in gitRepos)
+        foreach ((string gitProjectName, GitDataModel gitData) in gitRepos)
         {
             if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress))
             {
@@ -44,9 +45,10 @@ public sealed class GitRepos
                 continue;
             }
 
-            var gitProjectFolderName = gitData.GitProjectFolderName;
+            string? gitProjectFolderName = gitData.GitProjectFolderName;
 
-            if (gitProjectFolderName.StartsWith(GitDataModel.SpaProjectFolderRelativePathName))
+            if (gitProjectFolderName.StartsWith(GitDataModel.SpaProjectFolderRelativePathName,
+                    StringComparison.CurrentCulture))
             {
                 if (useGitRecordNameForComplexGitProjectFolderName)
                 {
@@ -55,7 +57,10 @@ public sealed class GitRepos
                 else
                 {
                     if (spaProjectFolderRelativePath is null)
+                    {
                         continue;
+                    }
+
                     gitProjectFolderName = Path.Combine(spaProjectFolderRelativePath,
                         gitProjectFolderName[GitDataModel.SpaProjectFolderRelativePathName.Length..]
                             .RemoveNotNeedLeadPart(Path.DirectorySeparatorChar));

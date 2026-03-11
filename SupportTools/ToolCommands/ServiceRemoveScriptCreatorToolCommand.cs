@@ -45,12 +45,15 @@ public sealed class ServiceRemoveScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var securityFolder = _par.SecurityFolder;
+        string? securityFolder = _par.SecurityFolder;
         string? defCloneFile = null;
         if (securityFolder is not null)
+        {
             defCloneFile = Path.Combine(securityFolder, _par.ProjectName, _par.ServerInfo.ServerName,
                 _par.ServerInfo.EnvironmentName, $"{_par.ProjectName}Remove.sh");
-        var scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
+        }
+
+        string? scriptFileNameForSave = MenuInputer.InputFilePath("File name for Generate", defCloneFile, false);
         if (scriptFileNameForSave is null)
         {
             StShared.WriteErrorLine("file name for Generate is not specified", true);
@@ -64,7 +67,7 @@ public sealed class ServiceRemoveScriptCreatorToolCommand : ToolCommand
         }
 
         var supportToolsParameters = (SupportToolsParameters)ParametersManager.Parameters;
-        var serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
+        ServerDataModel serverData = supportToolsParameters.GetServerDataRequired(_par.ServerInfo.ServerName);
 
         if (string.IsNullOrWhiteSpace(serverData.ServerSideDeployFolder))
         {

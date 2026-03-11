@@ -7,7 +7,7 @@ using ParametersManagement.LibParameters;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-internal class GitsStsCliMenuCommand : CliMenuCommand
+internal sealed class GitsStsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -28,7 +28,7 @@ internal class GitsStsCliMenuCommand : CliMenuCommand
     {
         var gitFromServerCruder = GitStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         //ჩამოვტვირთოთ გიტ სერვერიდან ინფორმაცია ყველა გიტ პროექტების შესახებ და შემდეგ ეს ინფორმაცია გამოვიყენოთ სიის ჩვენებისას
-        var menuSet = gitFromServerCruder.GetListMenu();
+        CliMenuSet menuSet = gitFromServerCruder.GetListMenu();
         return menuSet;
     }
 }

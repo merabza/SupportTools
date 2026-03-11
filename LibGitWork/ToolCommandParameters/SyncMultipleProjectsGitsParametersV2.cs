@@ -30,7 +30,9 @@ public sealed class SyncMultipleProjectsGitsParametersV2 : IParameters
         string? projectGroupName, string? projectName)
     {
         if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
+        {
             StShared.WriteWarningLine("ScaffoldSeedersWorkFolder is not specified", true);
+        }
 
         return new SyncMultipleProjectsGitsParametersV2(supportToolsParameters.ScaffoldSeedersWorkFolder,
             supportToolsParameters.Projects, projectGroupName, projectName);

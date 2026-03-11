@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
@@ -15,25 +17,30 @@ public sealed class EnvironmentNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
-        var currentEnvironmentName = GetValue(recordForUpdate);
+        string? currentEnvironmentName = GetValue(recordForUpdate);
 
         var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
-        SetValue(recordForUpdate, environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName));
+        SetValue(recordForUpdate,
+            await environmentCruder.GetNameWithPossibleNewName(FieldName, currentEnvironmentName, null, false,
+                cancellationToken));
     }
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var environmentCruder = EnvironmentCruder.Create(_parametersManager);
 
-        var status = environmentCruder.GetStatusFor(val);
+        string? status = environmentCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

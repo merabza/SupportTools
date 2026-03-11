@@ -30,69 +30,92 @@ public abstract class DoubleAppCreator
 
     public async Task<bool> CreateDoubleApp(CancellationToken cancellationToken = default)
     {
+        //ძირითადი აპის შემქმნელის შექმნა
         _mainAppCreator = CreateMainAppCreator();
         if (_mainAppCreator is null)
-            return false;
-
-        var solutionPathExists = Directory.Exists(_mainAppCreator.SolutionPath);
-
-        if (!await _mainAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
-                solutionPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
-            return false;
-
-        if (!solutionPathExists)
-            return true;
-
-        var mainSolutionFileManager =
-            FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.SolutionPath);
-
-        if (mainSolutionFileManager == null)
         {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {_mainAppCreator.SolutionPath}",
-                _useConsole, _logger);
             return false;
         }
 
-        var deleteBinObjFolders = new DeleteBinObjFolders(mainSolutionFileManager);
+        //შევამოწმოთ არსებობს თუ არა ძირითადი აპის სამუშაო ფოლდერი.
+        bool isWorkPathExists = Directory.Exists(_mainAppCreator.WorkPath);
+
+        //თუ სამუშაო ფოლდერი არ არსებობს, მაშინ შევქმნათ სამუშაო ფოლდერი და შევქმნათ აპი.
+        //თუ სამუშაო ფოლდერი არსებობს, მაშინ მხოლოდ სინქრონიზაცია გავაკეთოთ გიტის.
+        if (!await _mainAppCreator.PrepareParametersAndCreateApp(true, cancellationToken,
+                isWorkPathExists ? ECreateAppVersions.OnlySyncGit : ECreateAppVersions.DoAll))
+        {
+            return false;
+        }
+
+        //თუ სამუშაო ფოლდერი არ არსებობდა აპლიკაციის შექმნის პროცესის გაშვებამდე,
+        //მაშინ აპის შეიქმნებოდა მთლიანად და ამიტომ პროცესი დასრულებულია
+        if (!isWorkPathExists)
+        {
+            return true;
+        }
+
+        //შევქმნათ ფაილმენეჯერი ძირითადი აპის სამუშაო ფოლდერისთვის
+        FileManager? mainWorkPathFileManager =
+            FileManagersFactory.CreateFileManager(_useConsole, _logger, _mainAppCreator.WorkPath);
+
+        if (mainWorkPathFileManager == null)
+        {
+            StShared.WriteErrorLine($"FileManager does not created for folder {_mainAppCreator.WorkPath}", _useConsole,
+                _logger);
+            return false;
+        }
+
+        //წავშალოთ ყველა ბინარული ფაილები და მისი შემცველი ფოლდერები,
+        //რადგან ისინი არ გვჭირდება სინქრონიზაციისთვის და მხოლოდ პრობლემებს შექმნიან
+        var deleteBinObjFolders = new DeleteBinObjFolders(mainWorkPathFileManager);
         deleteBinObjFolders.Run();
 
-        var tempAppCreator = CreateTempAppCreator();
+        //შევქმნათ დროებითი აპის შემქმნელი
+        AppCreatorBase? tempAppCreator = CreateTempAppCreator();
         if (tempAppCreator is null)
+        {
             return false;
+        }
 
-        if (!await tempAppCreator.PrepareParametersAndCreateApp(true, cancellationToken, ECreateAppVersions.Temp))
+        //შევქმნათ დროებითი აპი და მოვამზადოთ მისი პარამეტრები
+        if (!await tempAppCreator.PrepareParametersAndCreateApp(false, cancellationToken, ECreateAppVersions.Temp))
+        {
             return false;
+        }
 
-        return SyncSolution(tempAppCreator.SolutionPath, mainSolutionFileManager);
+        return SyncSolution(tempAppCreator.WorkPath, mainWorkPathFileManager);
     }
 
-    private bool SyncSolution(string tempSolutionPath, FileManager mainSolutionFileManager)
+    private bool SyncSolution(string tempWorkPath, FileManager mainWorkFileManager)
     {
         //შევქმნათ ლოკალური გამგზავნი ფაილ მენეჯერი
-        var sourceFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempSolutionPath);
+        FileManager? tempWorkFileManager = FileManagersFactory.CreateFileManager(_useConsole, _logger, tempWorkPath);
 
-        if (sourceFileManager == null)
+        if (tempWorkFileManager == null)
         {
-            StShared.WriteErrorLine($"sourceFileManager does not created for folder {tempSolutionPath}", _useConsole,
+            StShared.WriteErrorLine($"tempWorkFileManager does not created for folder {tempWorkPath}", _useConsole,
                 _logger);
             return false;
         }
 
         var excludeSet = new ExcludeSet { FolderFileMasks = [@"*\.git\*", @"*\.vs\*", @"*\.gitignore", @"*\obj\*"] };
 
-        if (!sourceFileManager.IsFolderEmpty(null))
+        if (!tempWorkFileManager.IsFolderEmpty(null))
         {
             var copyAndReplaceFilesAndFolders =
-                new CopyAndReplaceFilesAndFolders(sourceFileManager, mainSolutionFileManager, excludeSet);
+                new CopyAndReplaceFilesAndFolders(tempWorkFileManager, mainWorkFileManager, excludeSet);
             copyAndReplaceFilesAndFolders.Run();
         }
 
-        if (mainSolutionFileManager.IsFolderEmpty(null))
+        if (mainWorkFileManager.IsFolderEmpty(null))
+        {
             return true;
+        }
 
-        var excludeFolders = new[] { ".git", ".vs", "obj" };
+        string[] excludeFolders = [".git", ".vs", "obj"];
         var deleteRedundantFiles =
-            new DeleteRedundantFiles(sourceFileManager, mainSolutionFileManager, excludeSet, excludeFolders);
+            new DeleteRedundantFiles(tempWorkFileManager, mainWorkFileManager, excludeSet, excludeFolders);
         deleteRedundantFiles.Run();
 
         return true;

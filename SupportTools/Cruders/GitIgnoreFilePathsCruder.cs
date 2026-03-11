@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using LibGitData;
+using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
@@ -51,7 +52,7 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         cruderSubMenuSet.AddMenuItem(generateCommand);
 
         var syncUpCommand = new SyncUpGitignoreFilesCliMenuCommand(_logger, _parametersManager);
-        cruderSubMenuSet.AddMenuItem(generateCommand);
+        cruderSubMenuSet.AddMenuItem(syncUpCommand);
     }
 
     public override string GetStatusFor(string name)
@@ -60,39 +61,46 @@ public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
         //if (git is null)
         //    return "ERROR: Git address Not found";
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var projects = supportToolsParameters.Projects;
+        Dictionary<string, ProjectModel> projects = supportToolsParameters.Projects;
 
-        var usageCount = 0;
+        int usageCount = 0;
 
-        foreach (var (_, project) in projects)
-        foreach (var gitCol in Enum.GetValues<EGitCol>())
+        foreach ((string _, ProjectModel project) in projects)
         {
-            var gits = supportToolsParameters.Gits;
-            var gitProjectNames = gitCol switch
+            foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())
             {
-                EGitCol.Main => project.GitProjectNames,
-                EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-                _ => null
-            } ?? [];
+                Dictionary<string, GitDataModel> gits = supportToolsParameters.Gits;
+                List<string> gitProjectNames = gitCol switch
+                {
+                    EGitCol.Main => project.GitProjectNames,
+                    EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+                    _ => null
+                } ?? [];
 
-            foreach (var gitProjectName in gitProjectNames)
-            {
-                if (!gits.TryGetValue(gitProjectName, out var git))
-                    continue;
-                if (git.GitIgnorePathName == name)
-                    usageCount++;
+                foreach (string gitProjectName in gitProjectNames)
+                {
+                    if (!gits.TryGetValue(gitProjectName, out GitDataModel? git))
+                    {
+                        continue;
+                    }
+
+                    if (git.GitIgnorePathName == name)
+                    {
+                        usageCount++;
+                    }
+                }
             }
         }
 
         return $"Usage count is: {usageCount}";
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         var getDbServerFoldersCliMenuCommand =
-            new ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand(_logger, recordKey,
+            new ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedCliMenuCommand(_logger, itemName,
                 _parametersManager);
         itemSubMenuSet.AddMenuItem(getDbServerFoldersCliMenuCommand);
     }

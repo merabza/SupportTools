@@ -28,11 +28,13 @@ public sealed class ServiceRemoveScriptCreatorParameters : IParameters
     public static ServiceRemoveScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (project.IsService)
+        {
             return new ServiceRemoveScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,
                 serverInfo, project);
+        }
 
         StShared.WriteErrorLine($"Project {projectName} is not service", true);
         return null;

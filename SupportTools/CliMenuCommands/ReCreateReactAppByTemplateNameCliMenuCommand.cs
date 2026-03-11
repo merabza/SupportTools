@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,13 @@ public sealed class ReCreateReactAppByTemplateNameCliMenuCommand : CliMenuComman
             parameters, parametersManager);
     }
 
-    protected override string GetActionDescription()
+    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return _command.Description;
+        return ValueTask.FromResult<string?>(_command.Description);
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        return _command.Run(CancellationToken.None).Result;
+        return await _command.Run(cancellationToken);
     }
 }

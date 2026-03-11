@@ -2,11 +2,13 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DatabaseTools.DbTools;
 using DatabaseTools.DbTools.Errors;
 using LanguageExt;
 using LibDatabaseWork.Models;
 using LibDotnetWork;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
@@ -59,7 +61,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დავადგინოთ თუ არსებობს დეველოპერ ბაზა
-        var isDatabaseExistsResult =
+        OneOf<bool, Err[]> isDatabaseExistsResult =
             await DatabaseMigrationParameters.DatabaseManager.IsDatabaseExists(DatabaseMigrationParameters.DatabaseName,
                 cancellationToken);
 
@@ -79,18 +81,24 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             var databaseDropper =
                 new DatabaseDropperMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
             if (!await databaseDropper.Run(cancellationToken))
+            {
                 return false;
+            }
         }
 
         //შეიქმნას თავიდან (სტორედ პროცედურების გათვალისწინებით)
         var databaseMigrationCreator =
             new DatabaseMigrationCreatorMigrationToolCommand(_logger, DatabaseMigrationParameters, ParametersManager);
         if (!await databaseMigrationCreator.Run(cancellationToken))
+        {
             return false;
+        }
 
-        var changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
+        Option<Err[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
         if (changeDatabaseRecoveryModelResult.IsSome)
+        {
             _logger.LogError("Error in ChangeDatabaseRecoveryModel");
+        }
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
         var correctNewDatabase = new CorrectNewDatabaseToolCommand(_logger, _correctNewDbParameters, ParametersManager);
@@ -101,7 +109,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     {
         var errors = new List<Err>();
 
-        var dbConnectionName = _devDatabaseParameters.DbConnectionName;
+        string? dbConnectionName = _devDatabaseParameters.DbConnectionName;
 
         if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
         {
@@ -110,9 +118,9 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return errors.ToArray();
         }
 
-        var createDatabaseManagerResult = await DatabaseManagersFactory.CreateDatabaseManager(_logger, true,
-            dbConnectionName, _databaseServerConnections, _apiClients, _httpClientFactory, null, null,
-            cancellationToken);
+        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResult =
+            await DatabaseManagersFactory.CreateDatabaseManager(_logger, true, dbConnectionName,
+                _databaseServerConnections, _apiClients, _httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResult.IsT1)
         {
@@ -126,19 +134,24 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             errors.Add(DbToolsErrors.DevDatabaseNameIsNotSpecified);
         }
 
-        var databaseRecoveryModel = _devDatabaseParameters.DatabaseRecoveryModel ??
-                                    DatabaseParameters.DefaultDatabaseRecoveryModel;
+        EDatabaseRecoveryModel databaseRecoveryModel = _devDatabaseParameters.DatabaseRecoveryModel ??
+                                                       DatabaseParameters.DefaultDatabaseRecoveryModel;
 
         if (errors.Count > 0)
+        {
             return errors.ToArray();
+        }
 
-        var dbManager = createDatabaseManagerResult.AsT0;
+        IDatabaseManager? dbManager = createDatabaseManagerResult.AsT0;
 
-        var changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
+        Option<Err[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
             _devDatabaseParameters.DatabaseName, databaseRecoveryModel, cancellationToken);
 
         if (changeDatabaseRecoveryModelResult.IsSome)
+        {
             return (Err[])changeDatabaseRecoveryModelResult;
+        }
+
         return null;
     }
 }

@@ -2,9 +2,12 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using LanguageExt;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibFileParameters.Models;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.Installer.ProjectManagers;
 using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -42,8 +45,9 @@ public sealed class InstallParametersAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectManager = ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
-            _fileStorageForUpload, _installerBaseParameters, UseConsole);
+        IIProjectsManagerWithFileStorage? projectManager =
+            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+                _fileStorageForUpload, _installerBaseParameters, UseConsole);
         if (projectManager is null)
         {
             _logger.LogError(
@@ -52,16 +56,22 @@ public sealed class InstallParametersAction : ToolAction
             return false;
         }
 
-        _logger.LogInformation("Updating app settings for project {_projectName}/{_environmentName} by web agent...",
-            _projectName, _environmentName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation(
+                "Updating app settings for project {_projectName}/{_environmentName} by web agent...", _projectName,
+                _environmentName);
+        }
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
-        var updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName, _environmentName,
-            Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask, _parametersFileExtension,
-            cancellationToken);
+        Option<Err[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
+            _environmentName, Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask,
+            _parametersFileExtension, cancellationToken);
 
         if (updateAppParametersFileResult.IsNone)
+        {
             return true;
+        }
 
         _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
         return false;

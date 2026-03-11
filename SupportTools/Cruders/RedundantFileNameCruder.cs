@@ -21,7 +21,7 @@ public sealed class RedundantFileNameCruder : SimpleNamesListCruder
     protected override List<string> GetList()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
         return project?.RedundantFileNames ?? [];
     }
 }

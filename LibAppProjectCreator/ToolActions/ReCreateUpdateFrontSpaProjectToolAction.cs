@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using LibAppProjectCreator.AppCreators;
 using LibNpmWork;
 using Microsoft.Extensions.Logging;
+using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -54,7 +55,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return ValueTask.FromResult(false);
         }
 
-        var smartSchemaForLocal =
+        SmartSchema smartSchemaForLocal =
             supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForLocal);
 
         if (string.IsNullOrWhiteSpace(supportToolsParameters.TempFolder))
@@ -69,7 +70,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return ValueTask.FromResult(false);
         }
 
-        var project = supportToolsParameters.GetProjectRequired(_projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(_projectName);
 
         if (string.IsNullOrWhiteSpace(project.SpaProjectName))
         {
@@ -83,7 +84,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             return ValueTask.FromResult(false);
         }
 
-        var createInPath = Path.Combine(supportToolsParameters.TempFolder, FrontSpaProjects, _projectName,
+        string createInPath = Path.Combine(supportToolsParameters.TempFolder, FrontSpaProjects, _projectName,
             $"{_projectName}Front");
 
         //რეაქტის პროექტის შექმნა ფრონტისთვის
@@ -91,26 +92,34 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
             project.SpaProjectName, $"{project.SpaProjectName}.esproj", project.SpaProjectName, true);
 
         if (Directory.Exists(createInPath))
+        {
             FileStat.DeleteDirectoryWithNormaliseAttributes(createInPath);
+        }
 
         if (!reactEsProjectCreator.Create())
+        {
             return ValueTask.FromResult(false);
+        }
 
         var npmProcessor = new NpmProcessor(_logger);
-        var spaProjectPath = Path.Combine(createInPath, project.SpaProjectName);
+        string spaProjectPath = Path.Combine(createInPath, project.SpaProjectName);
 
         if (!npmProcessor.InstallNpmPackages(spaProjectPath))
+        {
             return ValueTask.FromResult(false);
+        }
 
         //დაინსტალირდეს პროექტის შესაბამისი npm პაკეტები
         if (project.FrontNpmPackageNames.Any(npmPackageName =>
                 !npmProcessor.InstallNpmPackage(spaProjectPath, npmPackageName)))
+        {
             return ValueTask.FromResult(false);
+        }
 
-        var reservePath = Path.Combine(supportToolsParameters.TempFolder, ProjectReserves, _projectName);
+        string reservePath = Path.Combine(supportToolsParameters.TempFolder, ProjectReserves, _projectName);
 
         //შევამოწმოთ არსებობს თუ არა სარეზერვო არქივებისთვის განკუთვნილი ფოლდერი და თუ არ არსებობს შევქმნათ
-        var checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reservePath, true);
+        string? checkedReserveFolderFullPath = FileStat.CreateFolderIfNotExists(reservePath, true);
         if (checkedReserveFolderFullPath is null)
         {
             StShared.WriteErrorLine($"does not exists and can not be created work folder {reservePath}", true, _logger);
@@ -131,7 +140,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         compressor.CompressFolder(project.ProjectFolderName, checkedReserveFolderFullPath);
 
         //წაიშალოს არსებული პროექტის node_modules, obj ფოლდერები, .esproj, package.json, package-lock.json ფაილები
-        var frontProjectFolder =
+        string frontProjectFolder =
             Path.Combine(project.ProjectFolderName, $"{_projectName}Front", project.SpaProjectName);
 
         FileStat.DeleteDirectoryIfExists(Path.Combine(frontProjectFolder, nodeModulesFolderName));
@@ -140,7 +149,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
 
         FileStat.DeleteFileIfExists(Path.Combine(frontProjectFolder, $"{project.SpaProjectName}.esproj"));
 
-        var frontPackageJsonFileName = Path.Combine(frontProjectFolder, packageJsonFileName);
+        string frontPackageJsonFileName = Path.Combine(frontProjectFolder, packageJsonFileName);
 
         FileStat.DeleteFileIfExists(frontPackageJsonFileName);
         FileStat.DeleteFileIfExists(Path.Combine(frontProjectFolder, "package-lock.json"));
@@ -150,13 +159,10 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
 
         //გაეშვას npm install ბრძანება მიმდინარე პროექტისათვის
 
-        if (!npmProcessor.InstallNpmPackages(frontProjectFolder))
-            return ValueTask.FromResult(false);
+        return ValueTask.FromResult(npmProcessor.InstallNpmPackages(frontProjectFolder));
 
         //შემოწმდეს დროებით ფოლდერშ არსებული დანარჩენი ფაილები ემთხვევა თუ არა მიმდინარე პროექტის ფოლდერში არსებულ შესაბამის ფაილებს
 
         //აცდენის შესახებ ინფორმაცია გამოვიდეს კონსოლში
-
-        return ValueTask.FromResult(true);
     }
 }

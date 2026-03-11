@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using AppCliTools.CliParameters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,9 @@ try
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
 
     if (argParser.Analysis() != EParseResult.Ok)
+    {
         return 1;
+    }
 
     var par = (SupportToolsParameters?)argParser.Par;
     if (par is null)
@@ -32,10 +35,10 @@ try
         return 3;
     }
 
-    var parametersFileName = argParser.ParametersFileName;
+    string? parametersFileName = argParser.ParametersFileName;
     var servicesCreator = new SupportToolsServicesCreator(par);
     // ReSharper disable once using
-    var serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information);
+    ServiceProvider? serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information);
     if (serviceProvider == null)
     {
         Console.WriteLine("Logger not created");
@@ -66,7 +69,14 @@ try
 
     var supportTools = new SupportToolsCliAppLoop(logger, httpClientFactory, memoryCache,
         new ParametersManager(parametersFileName, par));
-    return supportTools.Run() ? 0 : 100;
+
+    // ReSharper disable once using
+    // ReSharper disable once DisposableConstructor
+    using var cts = new CancellationTokenSource();
+    CancellationToken token = cts.Token;
+    token.ThrowIfCancellationRequested();
+
+    return await supportTools.Run(token) ? 0 : 100;
 }
 catch (Exception e)
 {

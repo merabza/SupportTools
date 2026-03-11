@@ -19,7 +19,7 @@ public sealed class ProjectParametersJsonCreator
     {
         // ReSharper disable once CollectionNeverUpdated.Local
         var jObject = new JObject(new JProperty("LogFileName", $@"D:\Logs\{_projectName}\{_projectName}-log.txt"));
-        var forCreateFileName = Path.Combine(_placePath, $"{_projectName}.json");
+        string forCreateFileName = Path.Combine(_placePath, $"{_projectName}.json");
         File.WriteAllText(forCreateFileName, jObject.ToString());
         return true;
     }

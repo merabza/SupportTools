@@ -43,16 +43,18 @@ public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
         cruderSubMenuSet.AddMenuItem(reCreateAllReactAppsByTemplatesCliMenuCommand);
     }
 
-    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string recordKey)
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
-        base.FillDetailsSubMenu(itemSubMenuSet, recordKey);
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
-        var reactAppTemplateNames = GetDictionary();
-        if (!reactAppTemplateNames.TryGetValue(recordKey, out var name))
+        Dictionary<string, string> reactAppTemplateNames = GetDictionary();
+        if (!reactAppTemplateNames.TryGetValue(itemName, out string? name))
+        {
             return;
+        }
 
         var reCreateReactCommand =
-            new ReCreateReactAppByTemplateNameCliMenuCommand(_logger, _parametersManager, recordKey, name);
+            new ReCreateReactAppByTemplateNameCliMenuCommand(_logger, _parametersManager, itemName, name);
         itemSubMenuSet.AddMenuItem(reCreateReactCommand);
     }
 }

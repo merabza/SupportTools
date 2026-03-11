@@ -39,13 +39,14 @@ public sealed class ProjectForCreate : ProjectBase
         EDotnetProjectType dotnetProjectType, string projectCreateParameters, string? classForDelete,
         string[] availableFolders, string? solutionFolderName = null)
     {
-        var projectFileName = $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj";
+        string projectFileName =
+            $"{projectName}.{(dotnetProjectType == EDotnetProjectType.ReactEsProj ? "e" : "c")}sproj";
         var projectDataModel = new ProjectForCreate(projectName, dotnetProjectType, projectCreateParameters,
             createInPath, projectFolderName, projectFileName, classForDelete, solutionFolderName);
 
-        foreach (var folder in availableFolders)
+        foreach (string folder in availableFolders)
         {
-            var folderFullPath = Path.Combine(createInPath, projectFolderName, folder);
+            string folderFullPath = Path.Combine(createInPath, projectFolderName, folder);
             //ჩაემატოს პროექტის ფოლდერებში
             projectDataModel.AddFolder(folder, folderFullPath);
         }

@@ -42,45 +42,57 @@ public sealed class SettingsFilesCreator
 
     {
         Console.WriteLine("Creating appsettings.json...");
-        var sourceJsonFileName = Path.Combine(_projectFullPath, "appsettings.json");
+        string sourceJsonFileName = Path.Combine(_projectFullPath, "appsettings.json");
 
         await File.WriteAllTextAsync(sourceJsonFileName, _appSettingsJsonJObject.ToString(), cancellationToken);
 
         if (_forEncodeAppSettingsJsonKeys.Count <= 0)
+        {
             return true;
+        }
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
         JArray keysJArray = [];
-        foreach (var jsonKey in _forEncodeAppSettingsJsonKeys)
+        foreach (string jsonKey in _forEncodeAppSettingsJsonKeys)
         {
             keysJArray.Add(new JValue(jsonKey));
             if (dotnetProcessor.InitUserSecrets(_projectFullPath).IsSome)
+            {
                 return false;
+            }
 
-            var userSecretContentFileName = UserSecretFileNameDetector.GetFileName(_projectFileFullName);
+            string? userSecretContentFileName = UserSecretFileNameDetector.GetFileName(_projectFileFullName);
             if (userSecretContentFileName is null)
+            {
                 continue;
+            }
 
             if (FileStat.CreatePrevFolderIfNotExists(userSecretContentFileName, true, _logger))
+            {
                 await File.WriteAllTextAsync(userSecretContentFileName, _userSecretJsonJObject.ToString(),
                     cancellationToken);
+            }
         }
 
         var appSetEnKeysJObject = new JObject(new JProperty("Keys", keysJArray));
 
         Console.WriteLine("Creating appsetenkeys.json...");
-        var keysJsonFileName = Path.Combine(_projectFullPath, "appsetenkeys.json");
+        string keysJsonFileName = Path.Combine(_projectFullPath, "appsetenkeys.json");
         await File.WriteAllTextAsync(keysJsonFileName, appSetEnKeysJObject.ToString(Formatting.Indented),
             cancellationToken);
 
         Console.WriteLine("Creating appsettingsEncoded.json...");
-        var keyPart2 = Environment.MachineName.Capitalize();
+        string keyPart2 = Environment.MachineName.Capitalize();
 
-        var encodedJsonFileName = Path.Combine(_projectFullPath, "appsettingsEncoded.json");
+        string encodedJsonFileName = Path.Combine(_projectFullPath, "appsettingsEncoded.json");
         var encodeParametersAction = new EncodeParametersAction(_logger, keysJsonFileName, sourceJsonFileName,
             encodedJsonFileName, _keyPart1, keyPart2);
-        if (await encodeParametersAction.Run(cancellationToken)) return true;
+        if (await encodeParametersAction.Run(cancellationToken))
+        {
+            return true;
+        }
+
         _logger.LogError("Cannot encode parameters");
         return false;
     }

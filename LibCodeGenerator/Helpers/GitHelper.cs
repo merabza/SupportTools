@@ -12,9 +12,11 @@ public static class GitHelper
     public static async Task<bool> HasUncommittedChangesAsync(string projectPath)
     {
         if (string.IsNullOrWhiteSpace(projectPath) || !Directory.Exists(projectPath))
+        {
             throw new ArgumentException("Invalid project path.", nameof(projectPath));
+        }
 
-        var result = await RunGitCommandAsync("status --porcelain", projectPath);
+        string result = await RunGitCommandAsync("status --porcelain", projectPath);
         return !string.IsNullOrWhiteSpace(result);
     }
 
@@ -22,23 +24,27 @@ public static class GitHelper
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(testFolderPath) || !Directory.Exists(testFolderPath))
+        {
             throw new ArgumentException("Invalid test folder path.", nameof(testFolderPath));
+        }
 
         // Pull latest changes
-        var pullResult = await RunGitCommandAsync("pull", testFolderPath, cancellationToken);
+        string pullResult = await RunGitCommandAsync("pull", testFolderPath, cancellationToken);
         return !pullResult.Contains("error", StringComparison.OrdinalIgnoreCase);
     }
 
     public static async Task<string> GetFileDiffAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+        {
             throw new ArgumentException("Invalid file path.", nameof(filePath));
+        }
 
-        var directory = Path.GetDirectoryName(filePath)!;
-        var fileName = Path.GetFileName(filePath);
+        string directory = Path.GetDirectoryName(filePath)!;
+        string fileName = Path.GetFileName(filePath);
 
         // Show diff for the file
-        var diffResult = await RunGitCommandAsync($"diff {fileName}", directory);
+        string diffResult = await RunGitCommandAsync($"diff {fileName}", directory);
         return diffResult;
     }
 
@@ -62,13 +68,15 @@ public static class GitHelper
         process.StartInfo = psi;
         process.Start();
 
-        var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-        var error = await process.StandardError.ReadToEndAsync(cancellationToken);
+        string output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+        string error = await process.StandardError.ReadToEndAsync(cancellationToken);
 
         await process.WaitForExitAsync(cancellationToken);
 
         if (!string.IsNullOrEmpty(error))
+        {
             return error + Environment.NewLine + output;
+        }
 
         return output;
     }

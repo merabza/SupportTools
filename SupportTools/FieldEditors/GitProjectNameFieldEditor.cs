@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliParameters.FieldEditors;
@@ -27,46 +29,59 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
         _gitProjectNamesParameterNames = gitProjectNamesParameterNames;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var currentGitProjectName = GetValue(recordForUpdate);
+        string? currentGitProjectName = GetValue(recordForUpdate);
 
         List<string> projectGitNames = [];
-        foreach (var gitProjectNamesParameterName in _gitProjectNamesParameterNames)
+        foreach (string gitProjectNamesParameterName in _gitProjectNamesParameterNames)
         {
             var pgn = GetValue<List<string>?>(recordForUpdate, gitProjectNamesParameterName);
             if (pgn is not null)
+            {
                 projectGitNames.AddRange(pgn);
+            }
         }
 
         var gitProjectNamesMenuSet = new CliMenuSet();
 
-        var keys = parameters.GitProjects
+        List<string> keys = parameters.GitProjects
             .Where(x => x.Value.GitName is not null && x.Value.ProjectExtension == _projectExtension &&
                         projectGitNames.Contains(x.Value.GitName)).Select(x => x.Key).OrderBy(x => x).ToList();
 
         if (keys.Count < 1)
+        {
             throw new ListIsEmptyException("GitProjects List is empty");
+        }
 
-        if (_useNone) gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);
+        if (_useNone)
+        {
+            gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);
+        }
 
-        foreach (var listItem in keys)
+        foreach (string listItem in keys)
             //listItem
+        {
             gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem));
+        }
 
-        var index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
+        int index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
 
         if (_useNone && index == -1)
         {
             SetValue(recordForUpdate, null);
-            return;
+            return ValueTask.CompletedTask;
         }
 
         if (index < 0 || index >= keys.Count)
+        {
             throw new DataInputException("Selected invalid ID. ");
+        }
 
         SetValue(recordForUpdate, keys[index]);
+        return ValueTask.CompletedTask;
     }
 }
