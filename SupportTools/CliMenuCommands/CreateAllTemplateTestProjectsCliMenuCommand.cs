@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using Microsoft.Extensions.Logging;
@@ -22,10 +23,10 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
         _httpClientFactory = httpClientFactory;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var createAllTemplateTestProjectsToolCommand =
             new CreateAllTemplateTestProjectsToolCommand(_logger, _httpClientFactory, Name, _parametersManager, true);
-        return createAllTemplateTestProjectsToolCommand.Run(CancellationToken.None).Result;
+        return await createAllTemplateTestProjectsToolCommand.Run(cancellationToken);
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibDataInput;
+﻿using AppCliTools.CliMenu;
+using AppCliTools.LibMenuInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
@@ -42,8 +40,7 @@ public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
             _gitProjectName, _gitCol));
 
         //პროექტის მენიუში დაბრუნება
-        var key = ConsoleKey.Escape.Value().ToLower();
-        gitProjectSubMenuSet.AddMenuItem(key, new ExitToMainMenuCliMenuCommand("Exit to Git menu", null), key.Length);
+        gitProjectSubMenuSet.AddEscapeCommand("Exit to Git menu");
 
         return gitProjectSubMenuSet;
     }

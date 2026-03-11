@@ -40,7 +40,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var fluentValidationInstallerCodeCommands = _useFluentValidation
+        FlatCodeBlock? fluentValidationInstallerCodeCommands = _useFluentValidation
             ? new FlatCodeBlock(string.Empty, new OneLineComment("FluentValidationInstaller"), string.Empty, $"""
                  builder.Services.InstallValidation(
                  //BackendCarcass
@@ -50,7 +50,16 @@ public sealed class ApiProgramClassCreator : CodeCreator
                  """)
             : null;
 
-        var useMediatRLicenseKey = !string.IsNullOrWhiteSpace(_mediatRLicenseKey);
+        bool useMediatRLicenseKey = !string.IsNullOrWhiteSpace(_mediatRLicenseKey);
+
+        string? carcassIdentityAssemblyReference = _useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : null;
+        string? mediatRLicenseKey = useMediatRLicenseKey ? "cfg.LicenseKey = mediatRLicenseKey;" : null;
+        string? backendCarcassApiAssemblyReference = _useCarcass
+            ? """
+                 //BackendCarcass
+                 cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);
+              """
+            : null;
 
         var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
             "using ConfigurationEncrypt", _useFluentValidation ? "using FluentValidationInstaller" : null,
@@ -75,7 +84,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
                                                       CarcassRepositories.AssemblyReference.Assembly,
                                                       BackendCarcassApi.AssemblyReference.Assembly,
                                                       CarcassDom.AssemblyReference.Assembly,
-                                                      {(_useIdentity ? "CarcassIdentity.AssemblyReference.Assembly," : null)}
+                                                      {carcassIdentityAssemblyReference}
                                                       """ : null)}
 
                      {(_useDatabase ? $"""
@@ -104,13 +113,10 @@ public sealed class ApiProgramClassCreator : CodeCreator
                     ? $$$"""
                          builder.Services.AddMediatR(cfg =>
                          {{
-                         {{{(useMediatRLicenseKey ? "cfg.LicenseKey = mediatRLicenseKey;" : null)}}}
+                         {{{mediatRLicenseKey}}}
                              cfg.LicenseKey = "";
                              cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-                             {{{(_useCarcass ? """
-                                                  //BackendCarcass
-                                                  cfg.RegisterServicesFromAssembly(BackendCarcassApi.AssemblyReference.Assembly);
-                                               """ : null)}}}
+                             {{{backendCarcassApiAssemblyReference}}}
                              //{{{_projectNamespace}}}
                          }})
                          """

@@ -19,12 +19,9 @@ public static class NamingStats
 
     public static string DataSeedingPackageFolder(string scaffoldSeederProjectName, string workPath)
     {
-
-        var dataSeedingPackageName =
-            DataSeedingPackageName(scaffoldSeederProjectName);
+        string dataSeedingPackageName = DataSeedingPackageName(scaffoldSeederProjectName);
         return Path.Combine(workPath, dataSeedingPackageName);
     }
-
 
     public static string CreateProjectSeederCodeProjectName(string scaffoldSeederProjectName)
     {
@@ -41,11 +38,9 @@ public static class NamingStats
         return $"Seed{scaffoldSeederProjectName}Db";
     }
 
-    //
-
     public static string DataSeedingClassLibProjectName(string scaffoldSeederProjectName)
     {
-        return $"{scaffoldSeederProjectName}DbDataSeeding";
+        return $"{scaffoldSeederProjectName}DataSeeding.DataSeeding";
     }
 
     public static string ScaffoldSeederFolderName(string scaffoldSeederProjectName)

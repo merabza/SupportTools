@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -21,9 +23,12 @@ public sealed class ServerDataNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate) //, object currentRecord
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default) //, object currentRecord
     {
         var serverDataCruder = ServerDataCruder.Create(_logger, _httpClientFactory, _parametersManager);
-        SetValue(recordForUpdate, serverDataCruder.GetNameWithPossibleNewName(FieldName, GetValue(recordForUpdate)));
+        SetValue(recordForUpdate,
+            await serverDataCruder.GetNameWithPossibleNewName(FieldName, GetValue(recordForUpdate), null, false,
+                cancellationToken));
     }
 }

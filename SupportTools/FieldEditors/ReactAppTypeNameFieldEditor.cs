@@ -1,4 +1,6 @@
-﻿using AppCliTools.CliParameters.FieldEditors;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -18,27 +20,32 @@ public sealed class ReactAppTypeNameFieldEditor : FieldEditor<string>
         _parametersManager = parametersManager;
     }
 
-    public override void UpdateField(string? recordKey, object recordForUpdate)
+    public override async ValueTask UpdateField(string? recordKey, object recordForUpdate,
+        CancellationToken cancellationToken = default)
     {
-        var currentReactAppTypeName = GetValue(recordForUpdate);
+        string? currentReactAppTypeName = GetValue(recordForUpdate);
 
         var reactAppTypeCruder = ReactAppTypeCruder.Create(_logger, _parametersManager);
 
-        var newValue = reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true);
+        string? newValue =
+            await reactAppTypeCruder.GetNameWithPossibleNewName(FieldName, currentReactAppTypeName, null, true,
+                cancellationToken);
 
         SetValue(recordForUpdate, newValue);
     }
 
     public override string GetValueStatus(object? record)
     {
-        var val = GetValue(record);
+        string? val = GetValue(record);
 
         if (val == null)
+        {
             return string.Empty;
+        }
 
         var reactAppTypeCruder = ReactAppTypeCruder.Create(_logger, _parametersManager);
 
-        var status = reactAppTypeCruder.GetStatusFor(val);
+        string? status = reactAppTypeCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
     }
 }

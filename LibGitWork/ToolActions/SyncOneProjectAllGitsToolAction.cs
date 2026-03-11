@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitData;
+using LibGitWork.Models;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -34,12 +35,14 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var syncOneProjectAllGitsParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull,
             supportToolsParameters, projectName, gitCol, changedGitProjects, isFirstSync, useConsole);
 
         if (syncOneProjectAllGitsParameters is not null)
+        {
             return new SyncOneProjectAllGitsToolAction(loggerOrNull, syncOneProjectAllGitsParameters);
+        }
 
         StShared.WriteErrorLine("SyncOneProjectAllGitsParameters is not created", true);
         return null;
@@ -48,39 +51,55 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         string? commitMessage = null;
-        var changedGitProjects = _syncOneProjectAllGitsParameters.ChangedGitProjects;
-        var projectName = _syncOneProjectAllGitsParameters.ProjectName;
-        foreach (var gitData in _syncOneProjectAllGitsParameters.GitData.OrderBy(x => x.GitProjectFolderName))
+        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects =
+            _syncOneProjectAllGitsParameters.ChangedGitProjects;
+        string? projectName = _syncOneProjectAllGitsParameters.ProjectName;
+        foreach (GitData gitData in _syncOneProjectAllGitsParameters.GitData.OrderBy(x => x.GitProjectFolderName))
         {
-            var gitProjectFolderName = gitData.GitProjectFolderName;
+            string gitProjectFolderName = gitData.GitProjectFolderName;
 
             if (_syncOneProjectAllGitsParameters.UseProjectUpdater)
             {
                 var gitOneProjectUpdater = new GitOneProjectUpdater(_logger,
                     Path.Combine(_syncOneProjectAllGitsParameters.GitsFolder, gitProjectFolderName), gitData);
-                var gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
+                GitProcessor? gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
                 if (gitProcessor is null)
+                {
                     return false;
+                }
             }
             else
             {
                 if (projectName is not null && !_syncOneProjectAllGitsParameters.IsFirstSync &&
                     changedGitProjects is not null &&
-                    (!changedGitProjects[EGitCollect.Usage].TryGetValue(gitProjectFolderName, out var proListVal) ||
-                     (proListVal.Count == 1 && proListVal[0] == projectName)))
+                    (!changedGitProjects[EGitCollect.Usage]
+                         .TryGetValue(gitProjectFolderName, out List<string>? proListVal) ||
+                     proListVal.Count == 1 && proListVal[0] == projectName))
+                {
                     continue;
+                }
+
                 var gitSync = new GitSyncToolAction(_logger,
                     new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
                     commitMessage == null);
                 if (!await gitSync.Run(cancellationToken))
+                {
                     return false;
+                }
+
                 commitMessage = gitSync.UsedCommitMessage;
                 if (projectName is null || changedGitProjects is null || !gitSync.Changed)
+                {
                     continue;
-                if (changedGitProjects[EGitCollect.Collect].TryGetValue(gitProjectFolderName, out var proList))
+                }
+
+                if (changedGitProjects[EGitCollect.Collect]
+                    .TryGetValue(gitProjectFolderName, out List<string>? proList))
                 {
                     if (!proList.Contains(projectName))
+                    {
                         proList.Add(projectName);
+                    }
                 }
                 else
                 {

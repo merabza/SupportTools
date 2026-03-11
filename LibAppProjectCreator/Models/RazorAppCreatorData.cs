@@ -41,9 +41,14 @@ public sealed class RazorAppCreatorData
     {
         var projectFolders = new List<string> { "Properties" };
         if (!template.UseDatabase)
+        {
             projectFolders.Add("Models");
+        }
+
         if (template.UseMenu)
+        {
             projectFolders.Add("MenuCommands");
+        }
 
         //მთავარი პროექტი
         var mainProjectData = ProjectForCreate.Create(appCreatorBaseData.SolutionPath, projectName, projectName,

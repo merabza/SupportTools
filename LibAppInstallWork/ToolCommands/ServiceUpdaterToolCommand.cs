@@ -31,17 +31,18 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
-        var environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
+        string projectName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ProjectName;
+        string? environmentName = ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo.EnvironmentName;
 
         if (string.IsNullOrEmpty(environmentName))
         {
-            _logger.LogError("Environment {environmentName} is empty", environmentName);
+            _logger.LogError("Environment {EnvironmentName} is empty", environmentName);
             return false;
         }
 
         //1. შევქმნათ საინსტალაციო პაკეტი და ავტვირთოთ ფაილსაცავში
-        var programPublisherParameters = ProgramServiceUpdaterParameters.ProgramPublisherParameters;
+        ProgramPublisherParameters programPublisherParameters =
+            ProgramServiceUpdaterParameters.ProgramPublisherParameters;
 
         var createPackageAndUpload = new CreatePackageAndUpload(_logger, programPublisherParameters.ProjectName,
             programPublisherParameters.MainProjectFileName, programPublisherParameters.ServerInfo,
@@ -51,12 +52,15 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             programPublisherParameters.SmartSchemaForLocal, programPublisherParameters.SmartSchemaForExchange);
 
         if (!await createPackageAndUpload.Run(cancellationToken))
+        {
             return false;
+        }
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
-        var appSettingsEncoderParameters = ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
+        AppSettingsEncoderParameters appSettingsEncoderParameters =
+            ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
         string? appSettingsVersion = null;
-        var installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
+        bool installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
         if (installParameters)
         {
             var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
@@ -68,7 +72,10 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
                 appSettingsEncoderParameters.ParametersFileExtension,
                 appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
             if (!await encodeParametersAndUploadAction.Run(cancellationToken))
+            {
                 return false;
+            }
+
             appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
         }
 
@@ -86,7 +93,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             ProgramServiceUpdaterParameters.ProjectDescription, UseConsole);
         if (!await installProgramAction.Run(cancellationToken))
         {
-            _logger.LogError("project {projectName}/{environmentName} was not updated", projectName, environmentName);
+            _logger.LogError("project {ProjectName}/{EnvironmentName} was not updated", projectName, environmentName);
             return false;
         }
 
@@ -98,7 +105,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
 
         if (!await checkProgramVersionAction.Run(cancellationToken))
         {
-            _logger.LogError("project {projectName}/{environmentName} version check failed", projectName,
+            _logger.LogError("project {ProjectName}/{EnvironmentName} version check failed", projectName,
                 environmentName);
             return false;
         }
@@ -112,10 +119,12 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
                 ProgramServiceUpdaterParameters.ProxySettings, appSettingsVersion, 10, UseConsole);
 
             if (await checkParametersVersionAction.Run(cancellationToken))
+            {
                 return true;
+            }
         }
 
-        _logger.LogError("project {projectName}/{environmentName} parameters file check failed", projectName,
+        _logger.LogError("project {ProjectName}/{EnvironmentName} parameters file check failed", projectName,
             environmentName);
         return false;
     }

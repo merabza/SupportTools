@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LibAppProjectCreator.CodeCreators;
 
-internal class AssemblyReferenceClassCreator : CodeCreator
+internal sealed class AssemblyReferenceClassCreator : CodeCreator
 {
     private readonly string _projectNamespace;
 

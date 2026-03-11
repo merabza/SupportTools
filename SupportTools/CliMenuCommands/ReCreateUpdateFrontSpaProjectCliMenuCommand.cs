@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -21,14 +22,14 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
             new ReCreateUpdateFrontSpaProjectToolAction(logger, httpClientFactory, parametersManager, true);
     }
 
-    protected override string GetActionDescription()
+    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return AppProjectCreatorByTemplateToolAction.ActionDescription;
+        return ValueTask.FromResult<string?>(AppProjectCreatorByTemplateToolAction.ActionDescription);
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        var projectName = MenuSet?.ParentMenu?.Caption;
+        string? projectName = MenuSet?.ParentMenu?.Caption;
         if (string.IsNullOrEmpty(projectName))
         {
             Console.WriteLine("Project name is not set in menu caption.");
@@ -36,6 +37,6 @@ public sealed class ReCreateUpdateFrontSpaProjectCliMenuCommand : CliMenuCommand
         }
 
         _reCreateUpdateFrontSpaProjectToolAction.SetProjectName(projectName);
-        return _reCreateUpdateFrontSpaProjectToolAction.Run(CancellationToken.None).Result;
+        return await _reCreateUpdateFrontSpaProjectToolAction.Run(cancellationToken);
     }
 }

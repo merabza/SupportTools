@@ -26,18 +26,22 @@ public sealed class CopyAndReplaceFilesAndFolders : FolderProcessor
 
     protected override bool ProcessOneFile(string? afterRootPath, MyFileInfo file)
     {
-        var dirNames = afterRootPath is null
+        List<string> dirNames = afterRootPath is null
             ? []
             : afterRootPath.PrepareAfterRootPath(FileManager.DirectorySeparatorChar);
-        var preparedDestinationAfterRootPath = CheckDestinationDirs(dirNames);
+        string? preparedDestinationAfterRootPath = CheckDestinationDirs(dirNames);
 
-        var sourceFileFullPath = FileManager.GetPath(afterRootPath, file.FileName);
-        var destinationFileFullPath = _destinationFileManager.GetPath(preparedDestinationAfterRootPath, file.FileName);
+        string sourceFileFullPath = FileManager.GetPath(afterRootPath, file.FileName);
+        string destinationFileFullPath =
+            _destinationFileManager.GetPath(preparedDestinationAfterRootPath, file.FileName);
 
         if (File.Exists(destinationFileFullPath))
         {
             if (FileStat.FileCompare(sourceFileFullPath, destinationFileFullPath))
+            {
                 return true;
+            }
+
             File.Delete(destinationFileFullPath);
         }
 
@@ -48,13 +52,16 @@ public sealed class CopyAndReplaceFilesAndFolders : FolderProcessor
     private string? CheckDestinationDirs(IEnumerable<string> dirNames)
     {
         string? afterRootPath = null;
-        foreach (var dir in dirNames)
+        foreach (string dir in dirNames)
         {
-            var forCreateDirPart = _destinationFileManager.PathCombine(afterRootPath, dir);
+            string forCreateDirPart = _destinationFileManager.PathCombine(afterRootPath, dir);
             if (!_checkedFolders.Contains(forCreateDirPart))
             {
                 if (!_destinationFileManager.CareCreateDirectory(afterRootPath, dir, true))
+                {
                     return null;
+                }
+
                 _checkedFolders.Add(forCreateDirPart);
             }
 

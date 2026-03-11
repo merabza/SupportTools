@@ -4,9 +4,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
+using LanguageExt;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SystemTools.SystemToolsShared.Errors;
+using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -36,10 +39,14 @@ public sealed class ServiceStopperToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        var projectName = _parameters.ProjectName;
-        var environmentName = _parameters.EnvironmentName;
+        string projectName = _parameters.ProjectName;
+        string environmentName = _parameters.EnvironmentName;
 
-        _logger.LogInformation("Try to stop service {projectName}/{environmentName}...", projectName, environmentName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Try to stop service {ProjectName}/{EnvironmentName}...", projectName,
+                environmentName);
+        }
 
         if (string.IsNullOrWhiteSpace(projectName))
         {
@@ -48,21 +55,22 @@ public sealed class ServiceStopperToolCommand : ToolCommand
         }
 
         //კლიენტის შექმნა
-        var projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
+        IProjectsManager? projectManager = ProjectsManagersFactory.CreateProjectsManager(_logger, _httpClientFactory,
             _parameters.WebAgentForInstall, _parameters.InstallFolder, UseConsole);
 
         if (projectManager is null)
         {
-            _logger.LogError("agentClient does not created. Service {projectName}/{environmentName} can not be stopped",
+            _logger.LogError("agentClient does not created. Service {ProjectName}/{EnvironmentName} can not be stopped",
                 projectName, environmentName);
             return false;
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        var stopServiceResult = await projectManager.StopService(projectName, environmentName, cancellationToken);
+        Option<Err[]> stopServiceResult =
+            await projectManager.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsSome)
         {
-            _logger.LogError("Service {projectName}/{environmentName} can not be stopped", projectName,
+            _logger.LogError("Service {ProjectName}/{EnvironmentName} can not be stopped", projectName,
                 environmentName);
             return false;
         }

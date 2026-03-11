@@ -35,7 +35,7 @@ public sealed class ServiceInstallScriptCreatorParameters : IParameters
     public static ServiceInstallScriptCreatorParameters? Create(SupportToolsParameters supportToolsParameters,
         string projectName, ServerInfoModel serverInfo)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (!project.IsService)
         {
@@ -49,7 +49,7 @@ public sealed class ServiceInstallScriptCreatorParameters : IParameters
             return null;
         }
 
-        var fileStorageForDownload =
+        FileStorageData fileStorageForDownload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
         return new ServiceInstallScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,

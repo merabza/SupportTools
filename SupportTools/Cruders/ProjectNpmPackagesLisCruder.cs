@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using Microsoft.Extensions.Logging;
@@ -40,13 +42,16 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
         return _currentValuesList;
     }
 
-    protected override string? InputNewRecordName()
+    protected override async ValueTask<string?> InputNewRecordName(CancellationToken cancellationToken = default)
     {
         var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        var newNpmPackageName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
+        string? newNpmPackageName =
+            await npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null, null, false, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(newNpmPackageName))
+        {
             return newNpmPackageName;
+        }
 
         StShared.WriteErrorLine("Name is empty", true);
         return null;
@@ -54,7 +59,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 
     public override string? GetStatusFor(string name)
     {
-        var npmPackages = ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
+        Dictionary<string, string> npmPackages = ((SupportToolsParameters)_parametersManager.Parameters).NpmPackages;
         return npmPackages.GetValueOrDefault(name);
     }
 

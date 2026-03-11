@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
-        var wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
+        Dictionary<string, string> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         if (wrongGitIgnoreFilesList.Count == 0)
         {
@@ -30,7 +31,10 @@ public sealed class CheckGitIgnoreFilesToolAction : GitToolAction
         }
 
         Console.WriteLine("wrong .gitignore files are found:");
-        foreach (var (gitignoreFileName, _)in wrongGitIgnoreFilesList) Console.WriteLine(gitignoreFileName);
+        foreach ((string gitignoreFileName, string _)in wrongGitIgnoreFilesList)
+        {
+            Console.WriteLine(gitignoreFileName);
+        }
 
         return ValueTask.FromResult(true);
     }

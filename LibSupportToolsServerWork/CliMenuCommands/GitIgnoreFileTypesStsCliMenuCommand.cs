@@ -7,7 +7,7 @@ using ParametersManagement.LibParameters;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-internal class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
+internal sealed class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -30,7 +30,7 @@ internal class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
         var gitIgnoreFilePathsStsCruder =
             GitIgnoreFileTypesStsCruder.Create(_logger, _httpClientFactory, _memoryCache, _parametersManager);
 
-        var menuSet = gitIgnoreFilePathsStsCruder.GetListMenu();
+        CliMenuSet menuSet = gitIgnoreFilePathsStsCruder.GetListMenu();
         return menuSet;
     }
 }

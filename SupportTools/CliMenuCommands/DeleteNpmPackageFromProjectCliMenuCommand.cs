@@ -1,4 +1,7 @@
-﻿using AppCliTools.CliMenu;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -22,11 +25,11 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         _npmPackageName = npmPackageName;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var npmPackageNames = parameters.GetNpmPackageNames(_projectName);
+        List<string> npmPackageNames = parameters.GetNpmPackageNames(_projectName);
 
         if (!npmPackageNames.Contains(_npmPackageName))
         {
@@ -38,7 +41,9 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         if (!Inputer.InputBool(
                 $"This will Delete Npm Package with Name {_npmPackageName}, from this project. are you sure?", false,
                 false))
+        {
             return false;
+        }
 
         npmPackageNames.Remove(_npmPackageName);
         //if (!parameters.DeleteNpmPackageFromProjectByNames(_projectName, _npmPackageName))
@@ -47,8 +52,8 @@ public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
         //    return false;
         //}
 
-        _parametersManager.Save(parameters,
-            $"Npm Package with Name {_npmPackageName} in project {_projectName} is deleted.");
+        await _parametersManager.Save(parameters,
+            $"Npm Package with Name {_npmPackageName} in project {_projectName} is deleted.", null, cancellationToken);
 
         MenuAction = EMenuAction.LevelUp;
         return true;

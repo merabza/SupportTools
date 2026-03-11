@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
@@ -25,12 +26,16 @@ public sealed class ReCreateAllReactAppsByTemplatesToolCommand : ToolCommand
         var parameters = (SupportToolsParameters?)ParametersManager?.Parameters;
 
         if (ParametersManager is null)
+        {
             return false;
+        }
 
         if (parameters is null)
+        {
             return false;
+        }
 
-        foreach (var kvp in parameters.ReactAppTemplates)
+        foreach (KeyValuePair<string, string> kvp in parameters.ReactAppTemplates)
         {
             Console.WriteLine("Start create React App: {0}", kvp.Key);
 

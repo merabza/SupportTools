@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibTools.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -19,10 +20,10 @@ public sealed class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand : CliMen
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var clearAllProjectsToolAction =
             ClearMultipleProjectsToolAction.Create(_logger, _parametersManager, null, null, true);
-        return clearAllProjectsToolAction.Run(CancellationToken.None).Result;
+        return await clearAllProjectsToolAction.Run(cancellationToken);
     }
 }

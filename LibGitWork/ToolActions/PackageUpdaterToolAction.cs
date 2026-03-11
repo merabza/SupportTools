@@ -3,9 +3,11 @@ using LibDotnetWork;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
+using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.LibToolActions;
 
 namespace LibGitWork.ToolActions;
@@ -30,12 +32,14 @@ public sealed class PackageUpdaterToolAction : ToolAction
         string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
+        ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
             gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)
+        {
             return new PackageUpdaterToolAction(loggerOrNull, gitSyncParameters);
+        }
 
         StShared.WriteErrorLine("GitSyncParameters is not created", true);
         return null;
@@ -46,13 +50,18 @@ public sealed class PackageUpdaterToolAction : ToolAction
         //_projectFolderName
 
         if (_gitIgnorePathName != CSharp)
+        {
             return;
+        }
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
-        var localResult = dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
+        OneOf<(string, int), Err[]> localResult =
+            dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
         if (!localResult.IsT1)
+        {
             return;
+        }
 
         StShared.WriteErrorLine($"dotnet outdated finished with errors for {_projectFolderName})", true, _logger);
     }

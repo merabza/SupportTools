@@ -33,7 +33,7 @@ public sealed class CheckVersionParameters : IParameters
     {
         try
         {
-            var project = supportToolsParameters.GetProjectRequired(projectName);
+            ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
             if (checkService && !project.IsService)
             {
@@ -41,7 +41,7 @@ public sealed class CheckVersionParameters : IParameters
                 return null;
             }
 
-            var webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
+            string? webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
             if (string.IsNullOrWhiteSpace(webAgentNameForCheck))
             {
                 StShared.WriteErrorLine(
@@ -50,13 +50,16 @@ public sealed class CheckVersionParameters : IParameters
                 return null;
             }
 
-            var webAgentForCheck = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
+            ApiClientSettingsDomain webAgentForCheck =
+                supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
 
-            var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId,
-                projectName, serverInfo);
+            ProxySettingsBase? proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort,
+                serverInfo.ApiVersionId, projectName, serverInfo);
 
             if (proxySettings is null)
+            {
                 return null;
+            }
 
             var checkVersionParameters = new CheckVersionParameters(projectName, webAgentForCheck, proxySettings);
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using SystemTools.SystemToolsShared;
@@ -24,9 +25,9 @@ public sealed class ReCreateReactAppFiles
 
     public bool Run()
     {
-        var reactAppModelsFolderFullName = Path.Combine(_workFolder, "ReactAppModels");
+        string reactAppModelsFolderFullName = Path.Combine(_workFolder, "ReactAppModels");
 
-        var checkedPath = FileStat.CreateFolderIfNotExists(reactAppModelsFolderFullName, true);
+        string? checkedPath = FileStat.CreateFolderIfNotExists(reactAppModelsFolderFullName, true);
         if (checkedPath is null)
         {
             StShared.WriteErrorLine($"does not exists and cannot create work folder {reactAppModelsFolderFullName}",
@@ -34,12 +35,14 @@ public sealed class ReCreateReactAppFiles
             return false;
         }
 
-        var appName = _reactAppName.ToLower();
+        string appName = _reactAppName.ToLower(CultureInfo.CurrentCulture);
 
-        var appFolderFullName = Path.Combine(reactAppModelsFolderFullName, appName);
+        string appFolderFullName = Path.Combine(reactAppModelsFolderFullName, appName);
 
         if (Directory.Exists(appFolderFullName))
+        {
             FileStat.DeleteDirectoryWithNormaliseAttributes(appFolderFullName);
+        }
 
         if (!StShared.RunCmdProcess(
                 $"npx create-react-app {appFolderFullName}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? string.Empty : $" --template {_reactTemplateName}")}"))
@@ -48,9 +51,9 @@ public sealed class ReCreateReactAppFiles
             return false;
         }
 
-        var reactAppModelsForDiffFolderFullName = Path.Combine(_workFolder, "ReactAppModelsForDiff");
+        string reactAppModelsForDiffFolderFullName = Path.Combine(_workFolder, "ReactAppModelsForDiff");
 
-        var checkedDiffPath = FileStat.CreateFolderIfNotExists(reactAppModelsForDiffFolderFullName, true);
+        string? checkedDiffPath = FileStat.CreateFolderIfNotExists(reactAppModelsForDiffFolderFullName, true);
         if (checkedDiffPath is null)
         {
             StShared.WriteErrorLine(
@@ -58,12 +61,14 @@ public sealed class ReCreateReactAppFiles
             return false;
         }
 
-        var appFolderForDiffFullName = Path.Combine(reactAppModelsForDiffFolderFullName, appName);
+        string appFolderForDiffFullName = Path.Combine(reactAppModelsForDiffFolderFullName, appName);
 
         string[] excludes = [".git", "node_modules"];
 
         if (Directory.Exists(appFolderForDiffFullName))
+        {
             FileStat.ClearFolder(appFolderForDiffFullName, excludes);
+        }
 
         FileStat.CopyFilesAndFolders(appFolderFullName, appFolderForDiffFullName, excludes, true, _logger);
 
@@ -73,10 +78,14 @@ public sealed class ReCreateReactAppFiles
 
         var gitProcessor = new GitProcessor(true, _logger, appFolderForDiffFullName);
         if (gitProcessor.IsFolderPartOfGitWorkingTree(appFolderForDiffFullName))
+        {
             return true;
+        }
 
         if (gitProcessor.Initialise().IsSome)
+        {
             return false;
+        }
 
         return gitProcessor.Add() && gitProcessor.Commit("Initial");
     }

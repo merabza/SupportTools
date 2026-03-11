@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -25,12 +27,13 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         _projectName = projectName;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Add new Npm Package started");
 
         var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        var newGitName = npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null);
+        string? newGitName =
+            await npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null, null, false, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(newGitName))
         {
@@ -40,7 +43,7 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
 
         //მიმდინარე პარამეტრები
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is null)
         {
@@ -48,10 +51,10 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        var npmPackageNames = project.FrontNpmPackageNames;
+        List<string> npmPackageNames = project.FrontNpmPackageNames;
 
         //გადავამოწმოთ ხომ არ არსებობს იგივე სახელით სხვა პროექტი.
-        if (npmPackageNames.Any(a => a == newGitName))
+        if (npmPackageNames.Contains(newGitName))
         {
             StShared.WriteErrorLine(
                 $"Npm Package with Name {newGitName} in project {_projectName} is already exists. cannot create new record.",
@@ -62,7 +65,7 @@ public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
         npmPackageNames.Add(newGitName);
 
         //ცვლილებების შენახვა
-        _parametersManager.Save(parameters, "Add Npm Package Finished");
+        await _parametersManager.Save(parameters, "Add Npm Package Finished", null, cancellationToken);
 
         return true;
     }

@@ -16,3 +16,4 @@
 //    public bool SendMessageToCurrentUser { get; set; }
 //}
 
+

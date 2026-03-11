@@ -16,9 +16,11 @@ public sealed class ViewImportsPageCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var text = new TextCode(@$"@using {_projectName}
-@namespace {_projectName}.Pages
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers");
+        var text = new TextCode($"""
+                                 @using {_projectName}
+                                 @namespace {_projectName}.Pages
+                                 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+                                 """);
         CodeFile.Add(text);
         FinishAndSave();
     }

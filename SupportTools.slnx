@@ -19,7 +19,7 @@
     <Project Path="../BackendCarcass/BackendCarcass.MasterData/BackendCarcass.MasterData.csproj" />
   </Folder>
   <Folder Name="/BackendCarcassShared/">
-    <Project Path="../BackendCarcassShared/BackendCarcassContracts/BackendCarcassContracts.csproj" />
+    <Project Path="../BackendCarcassShared/BackendCarcassShared.Contracts/BackendCarcassShared.Contracts.csproj" />
   </Folder>
   <Folder Name="/ConnectionTools/">
     <Project Path="../ConnectionTools/ConnectionTools.ConnectTools/ConnectionTools.ConnectTools.csproj" />
@@ -41,6 +41,11 @@
   </Folder>
   <Folder Name="/SupportToolsServerShared/">
     <Project Path="../SupportToolsServerShared/SupportToolsServerApiContracts/SupportToolsServerApiContracts.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
@@ -76,8 +81,6 @@
   <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
   <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
   <Project Path="LibTools/LibTools.csproj" />
-  <Project Path="SupportTools.Domain/SupportTools.Domain.csproj" />
-  <Project Path="SupportTools.Repositories/SupportTools.Repositories.csproj" />
   <Project Path="SupportTools/SupportTools.csproj" />
   <Project Path="SupportToolsData/SupportToolsData.csproj" />
 </Solution>

@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -62,10 +64,10 @@ public sealed class ProgramInstallerParameters : IParameters
         return true;
     }
 
-    public static ProgramInstallerParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
-        ServerInfoModel serverInfo)
+    public static async ValueTask<ProgramInstallerParameters?> Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo, CancellationToken cancellationToken = default)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
         if (string.IsNullOrWhiteSpace(serverInfo.ServiceUserName))
         {
@@ -97,38 +99,43 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var fileStorageForDownload =
+        FileStorageData fileStorageForDownload =
             supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
 
-        var programArchiveDateMask = project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
+        string? programArchiveDateMask =
+            project.ProgramArchiveDateMask ?? supportToolsParameters.ProgramArchiveDateMask;
         if (string.IsNullOrWhiteSpace(programArchiveDateMask))
         {
             StShared.WriteErrorLine("programArchiveDateMask does not specified", true);
             return null;
         }
 
-        var programArchiveExtension = project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
+        string? programArchiveExtension =
+            project.ProgramArchiveExtension ?? supportToolsParameters.ProgramArchiveExtension;
         if (string.IsNullOrWhiteSpace(programArchiveExtension))
         {
             StShared.WriteErrorLine("programArchiveExtension does not specified", true);
             return null;
         }
 
-        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        string? parametersFileDateMask =
+            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        string? parametersFileExtension =
+            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);
             return null;
         }
 
-        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
+        var installerBaseParameters =
+            await InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo, cancellationToken);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
@@ -137,7 +144,7 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
+        string? webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
         if (string.IsNullOrWhiteSpace(webAgentNameForCheck))
         {
             StShared.WriteErrorLine(
@@ -146,13 +153,16 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentForCheck = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
+        ApiClientSettingsDomain webAgentForCheck =
+            supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
 
-        var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
-            serverInfo);
+        ProxySettingsBase? proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort,
+            serverInfo.ApiVersionId, projectName, serverInfo);
 
         if (proxySettings is null)
+        {
             return null;
+        }
 
         var progInstallerParameters = new ProgramInstallerParameters(projectName, project.IsService, serverInfo,
             installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,

@@ -19,9 +19,9 @@ internal sealed class ProjectServerParameters
     public static ProjectServerParameters Create(SupportToolsParameters supportToolsParameters, string projectName,
         string serverName)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
-        var serverInfo = project.GetServerInfoRequired(serverName);
-        var serverData = supportToolsParameters.GetServerDataRequired(serverName);
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
+        ServerInfoModel serverInfo = project.GetServerInfoRequired(serverName);
+        ServerDataModel serverData = supportToolsParameters.GetServerDataRequired(serverName);
         return new ProjectServerParameters(project, serverInfo, serverData);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,6 @@ using ParametersManagement.LibParameters;
 
 namespace LibGitWork.CliMenuCommands;
 
-//
 public sealed class UpdateOutdatedPackagesCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
@@ -20,10 +20,10 @@ public sealed class UpdateOutdatedPackagesCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var updateOutdatedPackagesToolAction =
             UpdateOutdatedPackagesToolAction.Create(_logger, _parametersManager, null, null, true);
-        return updateOutdatedPackagesToolAction.Run(CancellationToken.None).Result;
+        return await updateOutdatedPackagesToolAction.Run(cancellationToken);
     }
 }

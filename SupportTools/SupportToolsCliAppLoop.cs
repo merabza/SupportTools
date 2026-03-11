@@ -1,11 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliTools;
 using AppCliTools.CliTools.CliMenuCommands;
-using AppCliTools.LibDataInput;
+using AppCliTools.LibMenuInput;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
@@ -88,19 +87,23 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
         mainMenuSet.AddMenuItem(clearAllProjectsCliMenuCommand);
 
         //პროექტების ჯგუფების ჩამონათვალი
-        foreach (var projectGroupName in parameters.Projects
+        foreach (string projectGroupName in parameters.Projects
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
+        {
             mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory,
                 _parametersManager, projectGroupName));
+        }
 
         //ბოლოს გამოყენებული ბრძანებები
-        foreach (var itemSubMenuCommand in GetRecentCommands())
+        foreach (RecentCommandCliMenuCommand itemSubMenuCommand in GetRecentCommands())
+        {
             mainMenuSet.AddMenuItem(itemSubMenuCommand);
+        }
 
         //პროგრამიდან გასასვლელი
-        var key = ConsoleKey.Escape.Value().ToLower();
-        mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length);
+        mainMenuSet.AddEscapeCommand(new ExitCliMenuCommand());
+
         return mainMenuSet;
     }
 }

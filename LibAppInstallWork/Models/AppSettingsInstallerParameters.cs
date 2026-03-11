@@ -1,4 +1,6 @@
-﻿using ParametersManagement.LibFileParameters.Models;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -42,11 +44,11 @@ public sealed class AppSettingsInstallerParameters : IParameters
         return true;
     }
 
-    public static AppSettingsInstallerParameters? Create(SupportToolsParameters supportToolsParameters,
-        string projectName, ServerInfoModel serverInfo)
+    public static async ValueTask<AppSettingsInstallerParameters?> Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo, CancellationToken cancellationToken = default)
     {
-        var project = supportToolsParameters.GetProjectRequired(projectName);
-        var environmentName = serverInfo.EnvironmentName;
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
+        string? environmentName = serverInfo.EnvironmentName;
 
         if (!project.IsService)
         {
@@ -54,7 +56,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
+        string? webAgentNameForCheck = serverInfo.WebAgentNameForCheck;
         if (string.IsNullOrWhiteSpace(webAgentNameForCheck))
         {
             StShared.WriteErrorLine(
@@ -63,7 +65,8 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var webAgentForCheck = supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
+        ApiClientSettingsDomain webAgentForCheck =
+            supportToolsParameters.GetApiClientSettingsRequired(webAgentNameForCheck);
 
         if (serverInfo.AppSettingsEncodedJsonFileName is null)
         {
@@ -73,7 +76,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var programExchangeFileStorageName =
+        string? programExchangeFileStorageName =
             supportToolsParameters.LocalInstallerSettings?.ProgramExchangeFileStorageName;
 
         if (string.IsNullOrWhiteSpace(programExchangeFileStorageName))
@@ -82,24 +85,29 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var fileStorageForUpload = supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
-        var fileStorageForDownload = supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
+        FileStorageData fileStorageForUpload =
+            supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
+        FileStorageData fileStorageForDownload =
+            supportToolsParameters.GetFileStorageRequired(programExchangeFileStorageName);
 
-        var parametersFileDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        string? parametersFileDateMask =
+            project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
         if (string.IsNullOrWhiteSpace(parametersFileDateMask))
         {
             StShared.WriteErrorLine("parametersFileDateMask does not specified", true);
             return null;
         }
 
-        var parametersFileExtension = project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        string? parametersFileExtension =
+            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
         if (string.IsNullOrWhiteSpace(parametersFileExtension))
         {
             StShared.WriteErrorLine("parametersFileExtension does not specified", true);
             return null;
         }
 
-        var installerBaseParameters = InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo);
+        var installerBaseParameters =
+            await InstallerBaseParameters.Create(supportToolsParameters, projectName, serverInfo, cancellationToken);
         if (installerBaseParameters is null)
         {
             StShared.WriteErrorLine(
@@ -108,11 +116,13 @@ public sealed class AppSettingsInstallerParameters : IParameters
             return null;
         }
 
-        var proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort, serverInfo.ApiVersionId, projectName,
-            serverInfo);
+        ProxySettingsBase? proxySettings = ProxySettingsCreator.Create(serverInfo.ServerSidePort,
+            serverInfo.ApiVersionId, projectName, serverInfo);
 
         if (proxySettings is null)
+        {
             return null;
+        }
 
         var appSettingsInstallerParameters = new AppSettingsInstallerParameters(projectName, serverInfo,
             installerBaseParameters, serverInfo.AppSettingsEncodedJsonFileName, fileStorageForUpload,

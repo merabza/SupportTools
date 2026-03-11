@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibAppProjectCreator.ToolCommands;
 using Microsoft.Extensions.Logging;
@@ -20,11 +21,11 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
         _parametersManager = parametersManager;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var reCreateAllReactAppsByTemplatesToolCommand =
             new ReCreateAllReactAppsByTemplatesToolCommand(_logger, Name, _parametersManager.Parameters,
                 _parametersManager);
-        return reCreateAllReactAppsByTemplatesToolCommand.Run(CancellationToken.None).Result;
+        return await reCreateAllReactAppsByTemplatesToolCommand.Run(cancellationToken);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitData;
 using Microsoft.Extensions.Logging;
@@ -32,12 +34,13 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         _gitCol = gitCol;
     }
 
-    protected override bool RunBody()
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         Console.WriteLine("Add new Git started");
 
         var gitCruder = GitCruder.Create(_logger, _httpClientFactory, _parametersManager);
-        var newGitName = gitCruder.GetNameWithPossibleNewName("Git Name", null);
+        string? newGitName =
+            await gitCruder.GetNameWithPossibleNewName("Git Name", null, null, false, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(newGitName))
         {
@@ -47,7 +50,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
 
         //მიმდინარე პარამეტრები
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        var project = parameters.GetProject(_projectName);
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         if (project is null)
         {
@@ -55,15 +58,10 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        var gitProjectNames = _gitCol switch
-        {
-            EGitCol.Main => project.GitProjectNames,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        List<string> gitProjectNames = GitProjectNames(project, _gitCol);
 
         //გადავამოწმოთ ხომ არ არსებობს იგივე სახელით სხვა პროექტი.
-        if (gitProjectNames.Any(a => a == newGitName))
+        if (gitProjectNames.Contains(newGitName))
         {
             StShared.WriteErrorLine(
                 $"Git Project with Name {newGitName} in project {_projectName} is already exists. cannot create new record. ",
@@ -74,8 +72,20 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         gitProjectNames.Add(newGitName);
 
         //ცვლილებების შენახვა
-        _parametersManager.Save(parameters, "Add Git Project Finished");
+        await _parametersManager.Save(parameters, "Add Git Project Finished", null, cancellationToken);
 
         return true;
+    }
+
+    private static List<string> GitProjectNames(ProjectModel project, EGitCol gitCol)
+    {
+        List<string> gitProjectNames = gitCol switch
+        {
+            EGitCol.Main => project.GitProjectNames,
+            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
+            _ => throw new ArgumentOutOfRangeException(nameof(gitCol), gitCol,
+                $"Unsupported git collection type: {gitCol}")
+        };
+        return gitProjectNames;
     }
 }

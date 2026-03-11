@@ -39,19 +39,22 @@ public sealed class EncodeParametersAction : ToolAction
 
     public string? EncodedJsonContent { get; private set; }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         EncodedJsonContent = CreateEncodedJson();
-        var success = false;
+        bool success = false;
         if (EncodedJsonContent != null)
         {
-            File.WriteAllText(_encodedJsonFileName, EncodedJsonContent);
+            await File.WriteAllTextAsync(_encodedJsonFileName, EncodedJsonContent, cancellationToken);
             success = true;
         }
 
         if (!success)
+        {
             _logger.LogWarning("Encoded file does not created");
-        return ValueTask.FromResult(success);
+        }
+
+        return success;
     }
 
     private string? CreateEncodedJson()
@@ -71,39 +74,41 @@ public sealed class EncodeParametersAction : ToolAction
             return null;
         }
 
-        var appSetEnKeysList = KeysListDomain.LoadFromFile(_keysJsonFileName);
+        KeysListDomain? appSetEnKeysList = KeysListDomain.LoadFromFile(_keysJsonFileName);
         if (appSetEnKeysList?.Keys is null)
+        {
             return null;
+        }
 
-        var encKey = $"{_keyPart1}{_keyPart2.Capitalize()}";
+        string encKey = $"{_keyPart1}{_keyPart2.Capitalize()}";
 
-        if (encKey == string.Empty)
+        if (string.IsNullOrEmpty(encKey))
         {
             _logger.LogError("key is not defined");
             return null;
         }
 
-        var appSetJson = File.ReadAllText(_sourceJsonFileName);
-        var appSetJObject = JObject.Parse(appSetJson);
+        string appSetJson = File.ReadAllText(_sourceJsonFileName);
+        JObject appSetJObject = JObject.Parse(appSetJson);
 
         //დავადგინოთ _appsetenParameters._sourceJsonFileName ფაილის ფოლდერის სახელი
-        var directoryName = Path.GetDirectoryName(_sourceJsonFileName);
+        string? directoryName = Path.GetDirectoryName(_sourceJsonFileName);
 
         if (directoryName != null)
         {
             //დავადგინოთ ამ ფოლდერში არის თუ არა csproj ფაილი
             var dir = new DirectoryInfo(directoryName);
-            var csprojFile = dir.GetFiles().SingleOrDefault(w => Path.GetExtension(w.Name) == ".csproj");
+            FileInfo? csprojFile = dir.GetFiles().SingleOrDefault(w => Path.GetExtension(w.Name) == ".csproj");
 
             //თუ არსებობს გავხსნათ ეს csproj ფაილი და წავიკითხოთ როგორც XLM 
             if (csprojFile != null)
             {
-                var userSecretContentFileName = UserSecretFileNameDetector.GetFileName(csprojFile.FullName);
+                string? userSecretContentFileName = UserSecretFileNameDetector.GetFileName(csprojFile.FullName);
 
                 if (userSecretContentFileName is not null && File.Exists(userSecretContentFileName))
                 {
-                    var secretJson = File.ReadAllText(userSecretContentFileName);
-                    var secretJObject = JObject.Parse(secretJson);
+                    string secretJson = File.ReadAllText(userSecretContentFileName);
+                    JObject secretJObject = JObject.Parse(secretJson);
 
                     // შევაერთოთ jsonObj ობიექტთან
                     appSetJObject.Merge(secretJObject, new JsonMergeSettings
@@ -115,17 +120,21 @@ public sealed class EncodeParametersAction : ToolAction
             }
         }
 
-        foreach (var dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
+        foreach (string dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
                      .Where(w => w.keys.Length != 0).Where(w => !Enc(appSetJObject, encKey, w.keys))
                      .Select(s => s.dataKey))
-            _logger.LogWarning("cannot found dataKey {dataKey}", dataKey);
+        {
+            _logger.LogWarning("cannot found dataKey {DataKey}", dataKey);
+        }
 
         AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
         if (string.IsNullOrWhiteSpace(appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Value<string>()))
+        {
             StShared.WriteWarningLine(
                 $"AppSettingsVersion did not defined. If you continue, we can not check installed AppSettingsVersion. Please add to {_sourceJsonFileName} file VersionInfo:AppSettingsVersion",
                 true, _logger, true);
+        }
 
         appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);
@@ -134,34 +143,48 @@ public sealed class EncodeParametersAction : ToolAction
     private static bool Enc(JToken val, string encKey)
     {
         if (val.Type != JTokenType.String)
+        {
             return val.All(v => Enc(v, encKey));
-        var value = val.Value<string>();
+        }
+
+        string? value = val.Value<string>();
         if (value is not null)
+        {
             val.Replace(EncryptDecrypt.EncryptString(value, encKey));
+        }
+
         return true;
     }
 
     private static bool Enc(JToken val, string encKey, string[] keys, int k = 0)
     {
         if (k == keys.Length)
+        {
             return Enc(val, encKey);
+        }
 
         switch (keys[k])
         {
             case "[]":
                 var encodedPaths = new List<string>();
 
-                var atLastOneEncoded = true;
+                bool atLastOneEncoded = true;
                 while (atLastOneEncoded)
                 {
                     atLastOneEncoded = false;
-                    foreach (var v in val)
+                    foreach (JToken v in val)
                     {
-                        var path = v.Path;
+                        string path = v.Path;
                         if (encodedPaths.Contains(path))
+                        {
                             continue;
+                        }
+
                         if (!Enc(v, encKey, keys, k + 1))
+                        {
                             return false;
+                        }
+
                         encodedPaths.Add(path);
                         atLastOneEncoded = true;
                         break;
@@ -173,9 +196,9 @@ public sealed class EncodeParametersAction : ToolAction
                 return val.Values().All(p => Enc(p, encKey, keys, k + 1));
         }
 
-        var byKi = int.TryParse(keys[k], out var ki);
+        bool byKi = int.TryParse(keys[k], out int ki);
 
-        var valueByKey = byKi ? val[ki] : val[keys[k]];
+        JToken? valueByKey = byKi ? val[ki] : val[keys[k]];
 
         return valueByKey == null || Enc(valueByKey, encKey, keys, k + 1);
     }
