@@ -10,6 +10,8 @@ public enum EProjectTools
     RecreateDevDatabase, //აერთიანებს წინა სამ ოპერაციას, ანუ წაშლის დეველოპერ ბაზას, შექმნის ახალ ცარელა ბაზას მიგრაციის მიხედვით და დააკორექტირებს არასასურველ კონსტრუქციებს ბაზაში.
 
     DropDevDatabase, //დეველოპერ ბაზის წაშლა
+    AnaliseDevDatabase, //დეველოპერ ბაზის გაანალიზება
+    AnaliseProdCopyDatabase, //პროდუქშენ ბაზის ასლის გაანალიზება
     JetBrainsCleanupCode, //jb cleanupcode solutionFileName.sln -> JetBrain-ის უტილიტის გაშვება პროექტის სოლუშენის ფაილის მითითებით კოდის გასაწმენდად და მოსაწესრიგებლად
     JsonFromProjectDbProjectGetter, //არსებული პროდაქშენ ბაზის ასლიდან დაამზადებს json ფაილები თავიდან
 

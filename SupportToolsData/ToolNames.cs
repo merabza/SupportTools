@@ -12,6 +12,8 @@ public static class ToolNames
             EProjectTools.CreateDevDatabaseByMigration => "Create Dev Database By Migration",
             EProjectTools.RecreateDevDatabase => "2 - Recreate Dev Database",
             EProjectTools.DropDevDatabase => "Drop Dev Database",
+            EProjectTools.AnaliseDevDatabase => "Analise Dev Database",
+            EProjectTools.AnaliseProdCopyDatabase => "Analise Prod Copy Database",
             EProjectTools.JetBrainsCleanupCode => "JetBrains Cleanup Code",
             EProjectTools.JsonFromProjectDbProjectGetter => "Json From Project Db Project Getter",
             EProjectTools.ScaffoldSeederCreator => "1 - Scaffold Seeder Creator",

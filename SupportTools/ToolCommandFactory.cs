@@ -27,36 +27,6 @@ namespace SupportTools;
 
 public static class ToolCommandFactory
 {
-    //public static readonly EProjectTools[] ToolsByProjects =
-    //[
-    //    EProjectTools.CorrectNewDatabase,
-    //    EProjectTools.CreateDevDatabaseByMigration,
-    //    EProjectTools.DropDevDatabase,
-    //    EProjectTools.JetBrainsCleanupCode,
-    //    EProjectTools.JsonFromProjectDbProjectGetter,
-    //    EProjectTools.RecreateDevDatabase,
-    //    EProjectTools.ScaffoldSeederCreator,
-    //    EProjectTools.SeedData,
-    //    EProjectTools.PrepareProdCopyDatabase
-    //];
-
-    //public static readonly EProjectTools[] ToolsByProjectsAndServers =
-    //[
-    //    EProjectTools.AppSettingsEncoder,
-    //    EProjectTools.AppSettingsInstaller,
-    //    EProjectTools.AppSettingsUpdater,
-    //    EProjectTools.DevBaseToServerCopier,
-    //    EProjectTools.ProgPublisher,
-    //    EProjectTools.ProgramInstaller,
-    //    EProjectTools.ProgramUpdater,
-    //    EProjectTools.ProgRemover,
-    //    EProjectTools.ServerBaseToProdCopyCopier,
-    //    EProjectTools.ServiceInstallScriptCreator,
-    //    EProjectTools.ServiceRemoveScriptCreator,
-    //    EProjectTools.ServiceStarter,
-    //    EProjectTools.ServiceStopper,
-    //    EProjectTools.VersionChecker
-    //];
 
     public static IToolCommand? CreateProjectToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         EProjectTools tool, IParametersManager parametersManager, string projectName, bool useConsole)
@@ -202,19 +172,6 @@ public static class ToolCommandFactory
 
                 StShared.WriteErrorLine("generateApiRoutesParameters is null", true);
                 return null;
-            //case EProjectTools.AppSettingsInstaller:
-            //case EProjectTools.AppSettingsUpdater:
-            //case EProjectTools.DevBaseToServerCopier:
-            //case EProjectTools.ProgPublisher:
-            //case EProjectTools.ProgramInstaller:
-            //case EProjectTools.ProgramUpdater:
-            //case EProjectTools.ProgRemover:
-            //case EProjectTools.ServerBaseToProdCopyCopier:
-            //case EProjectTools.ServiceInstallScriptCreator:
-            //case EProjectTools.ServiceRemoveScriptCreator:
-            //case EProjectTools.ServiceStarter:
-            //case EProjectTools.ServiceStopper:
-            //case EProjectTools.VersionChecker:
             default:
                 StShared.WriteErrorLine("Command tool does not created", true, logger);
                 return null;
