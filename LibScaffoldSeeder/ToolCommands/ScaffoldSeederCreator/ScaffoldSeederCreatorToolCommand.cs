@@ -20,7 +20,7 @@ using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using SystemTools.SystemToolsShared.Errors;
 
-namespace LibScaffoldSeeder.ToolCommands;
+namespace LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 
 public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
 {

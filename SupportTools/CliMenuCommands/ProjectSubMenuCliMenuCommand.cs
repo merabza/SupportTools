@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.LibMenuInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -22,11 +22,14 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectName;
+    private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName) : base(projectName, EMenuAction.LoadSubMenu)
+    public ProjectSubMenuCliMenuCommand(ServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName) : base(
+        projectName, EMenuAction.LoadSubMenu)
     {
+        _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
@@ -100,8 +103,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             foreach (EProjectTools tool in Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
                          .OrderBy(x => x.GetProjectToolName()))
             {
-                projectSubMenuSet.AddMenuItem(new ProjectToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
-                    _projectName, _parametersManager));
+                projectSubMenuSet.AddMenuItem(new ProjectToolTaskCliMenuCommand(_serviceProvider, tool, _projectName,
+                    _parametersManager));
             }
         }
 

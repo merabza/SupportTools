@@ -5,7 +5,7 @@ using LibDotnetWork;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibDatabaseWork.ToolCommands;
+namespace LibDatabaseWork.ToolCommands.DropDevDatabase;
 
 public sealed class DatabaseDropperMigrationToolCommand : MigrationToolCommand
 {

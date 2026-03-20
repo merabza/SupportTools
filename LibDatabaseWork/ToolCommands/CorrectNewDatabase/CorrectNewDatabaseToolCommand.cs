@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SystemTools.SystemToolsShared;
 
-namespace LibDatabaseWork.ToolCommands;
+namespace LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 
 public sealed class CorrectNewDatabaseToolCommand : ToolCommand
 {

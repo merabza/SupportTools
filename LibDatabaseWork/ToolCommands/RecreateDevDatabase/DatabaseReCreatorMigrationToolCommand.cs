@@ -6,6 +6,9 @@ using DatabaseTools.DbTools;
 using DatabaseTools.DbTools.Errors;
 using LanguageExt;
 using LibDatabaseWork.Models;
+using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
+using LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
+using LibDatabaseWork.ToolCommands.DropDevDatabase;
 using LibDotnetWork;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -17,7 +20,7 @@ using ToolsManagement.DatabasesManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibDatabaseWork.ToolCommands;
+namespace LibDatabaseWork.ToolCommands.RecreateDevDatabase;
 
 public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
 {

@@ -10,7 +10,7 @@ using LibDotnetWork;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibDatabaseWork.ToolCommands;
+namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 
 public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationToolCommand
 {

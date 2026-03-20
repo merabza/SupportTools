@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.LibMenuInput;
 using LibGitWork.CliMenuCommands;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -17,11 +17,14 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectGroupName;
+    private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectGroupName) : base(projectGroupName, EMenuAction.LoadSubMenu)
+    public ProjectGroupSubMenuCliMenuCommand(ServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectGroupName) : base(
+        projectGroupName, EMenuAction.LoadSubMenu)
     {
+        _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
@@ -50,8 +53,8 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
                                  _projectGroupName).OrderBy(o => o.Key))
             //projectName
         {
-            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_logger, _httpClientFactory,
-                _parametersManager, projectName));
+            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_serviceProvider, _logger,
+                _httpClientFactory, _parametersManager, projectName));
         }
 
         //მთავარ მენიუში გასვლა

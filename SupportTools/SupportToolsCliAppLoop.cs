@@ -4,11 +4,11 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliTools;
 using AppCliTools.CliTools.CliMenuCommands;
-using AppCliTools.LibMenuInput;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
@@ -24,11 +24,14 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
     private readonly ParametersManager _parametersManager;
+    private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportToolsCliAppLoop(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        ParametersManager parametersManager) : base((IParametersWithRecentData)parametersManager.Parameters)
+    public SupportToolsCliAppLoop(ServiceProvider serviceProvider, ILogger logger, IHttpClientFactory httpClientFactory,
+        IMemoryCache memoryCache, ParametersManager parametersManager) : base(
+        (IParametersWithRecentData)parametersManager.Parameters)
     {
+        _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
@@ -91,7 +94,7 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
         {
-            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_logger, _httpClientFactory,
+            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_serviceProvider, _logger, _httpClientFactory,
                 _parametersManager, projectGroupName));
         }
 

@@ -5,7 +5,7 @@ using LibAppProjectCreator.Models;
 using Microsoft.Extensions.Logging;
 using SystemTools.JetBrainsResharperGlobalToolsWork;
 
-namespace LibAppProjectCreator.ToolCommands;
+namespace LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 
 public sealed class JetBrainsCleanupCodeRunnerToolCommand : ToolCommand
 {
