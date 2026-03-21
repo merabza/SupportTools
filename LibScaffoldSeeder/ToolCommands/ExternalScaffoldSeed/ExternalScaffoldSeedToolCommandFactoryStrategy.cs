@@ -5,7 +5,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibScaffoldSeeder.ToolCommands;
+namespace LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed;
 
 public class ExternalScaffoldSeedToolCommandFactoryStrategy
 {

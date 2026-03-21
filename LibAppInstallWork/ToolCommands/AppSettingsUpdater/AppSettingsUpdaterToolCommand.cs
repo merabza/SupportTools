@@ -11,7 +11,7 @@ using ParametersManagement.LibParameters;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.AppSettingsUpdater;
 
 public sealed class AppSettingsUpdaterToolCommand : ToolCommand
 {

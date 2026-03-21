@@ -1,7 +1,8 @@
-﻿using LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
+﻿using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 using LibCodeGenerator.ToolCommands.GenerateApiRoutes;
 using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
-using LibScaffoldSeeder.ToolCommands.JsonFromProjectDbProjectGetter;
+using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.JsonFromProjectDbProjectGetter;
 using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters.DependencyInjection;
 using SupportToolsData.Models;
@@ -26,6 +27,7 @@ public sealed class SupportToolsServicesCreator : ServicesCreator
             typeof(CorrectNewDatabaseToolCommandFactoryStrategy).Assembly,
             typeof(JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy).Assembly,
             typeof(JsonFromProjectDbProjectGetterFactoryStrategy).Assembly,
-            typeof(GenerateApiRoutesToolCommandFactoryStrategy).Assembly);
+            typeof(GenerateApiRoutesToolCommandFactoryStrategy).Assembly,
+            typeof(ApplicationSettingsEncoderToolCommandFactoryStrategy).Assembly);
     }
 }

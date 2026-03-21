@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using AppCliTools.CliMenu;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -14,22 +15,25 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 
     private readonly string _projectName;
     private readonly string _serverName;
+    private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfoSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, string itemKey,
-        ParametersManager parametersManager, string projectName, string serverName) : base(itemKey,
-        EMenuAction.LoadSubMenu)
+        ParametersManager parametersManager, string projectName, string serverName,
+        ServiceProvider serviceProvider) : base(itemKey, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _serverName = serverName;
+        _serviceProvider = serviceProvider;
     }
 
     public override CliMenuSet GetSubMenu()
     {
-        var serverInfoCruder = ServerInfoCruder.Create(_logger, _httpClientFactory, _parametersManager, _projectName);
+        var serverInfoCruder = ServerInfoCruder.Create(_serviceProvider, _logger, _httpClientFactory,
+            _parametersManager, _projectName);
         CliMenuSet serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName); //, $"Project => {_projectName} => ");
 
         return serverSubMenuSet;

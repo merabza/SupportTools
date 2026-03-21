@@ -108,7 +108,8 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             }
         }
 
-        var serverInfoCruder = ServerInfoCruder.Create(_logger, _httpClientFactory, _parametersManager, _projectName);
+        var serverInfoCruder = ServerInfoCruder.Create(_serviceProvider, _logger, _httpClientFactory,
+            _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
         var newItemCommand = new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,
@@ -123,7 +124,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                 //, kvp.Value.GetItemKey()
             {
                 projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
-                    kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key));
+                    kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key, _serviceProvider));
             }
         }
 

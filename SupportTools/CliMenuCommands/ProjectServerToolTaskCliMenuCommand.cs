@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -18,13 +19,14 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;
+    private readonly ServiceProvider _serviceProvider;
     private readonly EProjectServerTools _tool;
     private IToolCommand? _toolCommand;
 
     public ProjectServerToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        EProjectServerTools tool, string projectName, ServerInfoModel serverInfo,
-        IParametersManager parametersManager) : base(tool.GetProjectServerToolName(), EMenuAction.Reload,
-        EMenuAction.Reload, null, true)
+        EProjectServerTools tool, string projectName, ServerInfoModel serverInfo, IParametersManager parametersManager,
+        ServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(), EMenuAction.Reload, EMenuAction.Reload,
+        null, true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -32,12 +34,13 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
         _projectName = projectName;
         _serverInfo = serverInfo;
         _parametersManager = parametersManager;
+        _serviceProvider = serviceProvider;
     }
 
     private async ValueTask<IToolCommand> MemoCreateToolCommand()
     {
         return _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_logger, _httpClientFactory,
-            _tool, _parametersManager, _projectName, _serverInfo);
+            _tool, _serviceProvider, _parametersManager, _projectName, _serverInfo);
     }
 
     protected override async ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)

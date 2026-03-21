@@ -5,7 +5,7 @@ using LibDotnetWork;
 using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 
-namespace LibScaffoldSeeder.ToolCommands;
+namespace LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed;
 
 public sealed class ExternalScaffoldSeedToolCommand : ToolCommand
 {

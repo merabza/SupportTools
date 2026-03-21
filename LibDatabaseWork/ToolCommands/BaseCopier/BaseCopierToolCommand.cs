@@ -8,7 +8,7 @@ using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Models;
 using WebAgentContracts.WebAgentDatabasesApiContracts.V1.Responses;
 
-namespace LibDatabaseWork.ToolCommands;
+namespace LibDatabaseWork.ToolCommands.BaseCopier;
 
 public sealed class BaseCopierToolCommand : ToolCommand
 {

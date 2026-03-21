@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -11,30 +13,38 @@ namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 // ReSharper disable once UnusedType.Global
 public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    public string ToolCommandName => nameof(EProjectTools.CreateDevDatabaseByMigration);
-
-    private readonly ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
+    private readonly ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> _logger;
+
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(
+        ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> logger,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public string ToolCommandName => nameof(EProjectTools.CreateDevDatabaseByMigration);
+
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpCreator =
-            DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters, projectName);
+        var dmpCreator = DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters,
+            projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpCreator is not null)
         {
-            return new DatabaseMigrationCreatorMigrationToolCommand(_logger, dmpCreator,
-                parametersManager); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
+            return ValueTask.FromResult<IToolCommand?>(
+                new DatabaseMigrationCreatorMigrationToolCommand(_logger, dmpCreator,
+                    parametersManager)); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
         }
 
         StShared.WriteErrorLine("dmpCreator is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

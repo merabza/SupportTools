@@ -7,6 +7,7 @@ using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
 using AppCliTools.CliParametersDataEdit.FieldEditors;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
@@ -21,14 +22,16 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly string _projectName;
+    private readonly ServiceProvider _serviceProvider;
 
     public ServerInfoCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
-        Dictionary<string, ServerInfoModel> currentValuesDictionary, string projectName) : base(parametersManager,
-        currentValuesDictionary, "Server", "Servers", true)
+        Dictionary<string, ServerInfoModel> currentValuesDictionary, string projectName,
+        ServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary, "Server", "Servers", true)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _projectName = projectName;
+        _serviceProvider = serviceProvider;
 
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         ProjectModel project =
@@ -56,14 +59,15 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
             nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
     }
 
-    public static ServerInfoCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName)
+    public static ServerInfoCruder Create(ServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         Dictionary<string, ServerInfoModel> currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??
                                                                       throw new ArgumentNullException(
                                                                           nameof(projectName));
-        return new ServerInfoCruder(logger, httpClientFactory, parametersManager, currentValuesDictionary, projectName);
+        return new ServerInfoCruder(logger, httpClientFactory, parametersManager, currentValuesDictionary, projectName,
+            serviceProvider);
     }
 
     //private Dictionary<string, ServerInfoModel> GetServerInfos()
@@ -143,7 +147,7 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
                      .Intersect(server.AllowToolsList ?? []))
         {
             itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
-                _projectName, server, ParametersManager));
+                _projectName, server, ParametersManager, _serviceProvider));
         }
     }
 }

@@ -32,23 +32,25 @@ public sealed class ProjectToolTaskCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
     }
 
-    private IToolCommand? MemoCreateToolCommand()
+    private async ValueTask<IToolCommand?> MemoCreateToolCommand()
     {
         //return _toolCommand ??= ToolCommandFactory.CreateProjectToolCommand(_logger, _httpClientFactory, _tool,
         //    _parametersManager, _projectName, true);
 
         return _toolCommand ??=
-            ToolCommandFactory.CreateProjectToolCommand(_tool, _serviceProvider, _parametersManager, _projectName);
+            await ToolCommandFactory.CreateProjectToolCommand(_tool, _serviceProvider, _parametersManager,
+                _projectName);
     }
 
-    protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
+    protected override async ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return ValueTask.FromResult(MemoCreateToolCommand()?.Description);
+        IToolCommand? toolCommand = await MemoCreateToolCommand();
+        return toolCommand?.Description;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        IToolCommand? toolCommand = MemoCreateToolCommand();
+        IToolCommand? toolCommand = await MemoCreateToolCommand();
         if (toolCommand?.Par != null)
         {
             return await toolCommand.Run(cancellationToken);

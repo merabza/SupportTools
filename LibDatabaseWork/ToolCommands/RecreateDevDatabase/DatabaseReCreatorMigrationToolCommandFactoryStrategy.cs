@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibApiClientParameters;
@@ -26,8 +28,12 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
     public string ToolCommandName => nameof(EProjectTools.RecreateDevDatabase);
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+        string projectName = projectToolsFactoryStrategyParameters.ProjectName;
+
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
         var dmpForReCreator =
@@ -37,21 +43,21 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
         if (dmpForReCreator is null)
         {
             StShared.WriteErrorLine("dmpForReCreator is null", true);
-            return null;
+            return new ValueTask<IToolCommand?>((IToolCommand?)null);
         }
 
         ProjectModel? project = supportToolsParameters.GetProject(projectName);
         if (project == null)
         {
             StShared.WriteErrorLine($"Project with name {projectName} not found", true);
-            return null;
+            return new ValueTask<IToolCommand?>((IToolCommand?)null);
         }
 
         if (project.DevDatabaseParameters == null)
         {
             StShared.WriteErrorLine($"DevDatabaseParameters is not specified for Project with name {projectName}",
                 true);
-            return null;
+            return new ValueTask<IToolCommand?>((IToolCommand?)null);
         }
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
@@ -59,12 +65,13 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         if (correctNewDbParametersForRecreate is not null)
         {
-            return new DatabaseReCreatorMigrationToolCommand(_logger, dmpForReCreator, project.DevDatabaseParameters,
-                correctNewDbParametersForRecreate, databaseServerConnections, apiClients, _httpClientFactory,
-                parametersManager); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_logger,
+                dmpForReCreator, project.DevDatabaseParameters, correctNewDbParametersForRecreate,
+                databaseServerConnections, apiClients, _httpClientFactory,
+                parametersManager)); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
         }
 
         StShared.WriteErrorLine("correctNewDbParametersForRecreate is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

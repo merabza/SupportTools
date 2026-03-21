@@ -1,4 +1,6 @@
-﻿using LibDatabaseWork.Models;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -19,17 +21,22 @@ public class CorrectNewDatabaseToolCommandFactoryStrategy : IToolCommandFactoryS
 
     public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var correctNewDbParameters = CorrectNewDbParameters.Create(_logger, supportToolsParameters, projectName);
+        var correctNewDbParameters = CorrectNewDbParameters.Create(_logger, supportToolsParameters,
+            projectToolsFactoryStrategyParameters.ProjectName);
         if (correctNewDbParameters is not null)
         {
-            return new CorrectNewDatabaseToolCommand(_logger, correctNewDbParameters, parametersManager); //ახალი ბაზის 
+            return ValueTask.FromResult<IToolCommand?>(
+                new CorrectNewDatabaseToolCommand(_logger, correctNewDbParameters, parametersManager)); //ახალი ბაზის 
         }
 
         StShared.WriteErrorLine("correctNewDbParameters is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

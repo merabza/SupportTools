@@ -6,7 +6,7 @@ using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 
 public sealed class ApplicationSettingsEncoderToolCommand : ToolCommand
 {

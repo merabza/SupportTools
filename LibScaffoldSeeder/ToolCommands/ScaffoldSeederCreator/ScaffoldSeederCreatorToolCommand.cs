@@ -12,6 +12,7 @@ using LanguageExt;
 using LibAppProjectCreator;
 using LibDotnetWork;
 using LibScaffoldSeeder.Models;
+using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

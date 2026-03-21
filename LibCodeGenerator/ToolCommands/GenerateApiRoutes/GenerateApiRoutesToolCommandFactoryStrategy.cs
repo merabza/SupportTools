@@ -1,4 +1,6 @@
-﻿using LibCodeGenerator.Models;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using LibCodeGenerator.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -19,18 +21,23 @@ public class GenerateApiRoutesToolCommandFactoryStrategy : IToolCommandFactorySt
 
     public string ToolCommandName => nameof(EProjectTools.GenerateApiRoutes);
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+
         //სკაფოლდინგისა და სიდინგის პროექტების შექმნა
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var generateApiRoutesParameters = GenerateApiRoutesToolParameters.Create(supportToolsParameters, projectName);
+        var generateApiRoutesParameters = GenerateApiRoutesToolParameters.Create(supportToolsParameters,
+            projectToolsFactoryStrategyParameters.ProjectName);
         if (generateApiRoutesParameters is not null)
         {
-            return new GenerateApiRoutesToolCommand(_logger, parametersManager, generateApiRoutesParameters);
+            return ValueTask.FromResult<IToolCommand?>(
+                new GenerateApiRoutesToolCommand(_logger, parametersManager, generateApiRoutesParameters));
         }
 
         StShared.WriteErrorLine("generateApiRoutesParameters is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

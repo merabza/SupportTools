@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -14,6 +16,7 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DatabaseDropperMigrationToolCommandFactoryStrategy(
         ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
@@ -23,19 +26,22 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
 
     public string ToolCommandName => nameof(EProjectTools.DropDevDatabase);
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForDropper =
-            DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters, projectName);
+        var dmpForDropper = DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters,
+            projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpForDropper is not null)
         {
-            return new DatabaseDropperMigrationToolCommand(_logger, dmpForDropper,
-                parametersManager); //დეველოპერ ბაზის წაშლა
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseDropperMigrationToolCommand(_logger, dmpForDropper,
+                parametersManager)); //დეველოპერ ბაზის წაშლა
         }
 
         StShared.WriteErrorLine("dmpForDropper is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

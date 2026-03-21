@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.LibMenuInput;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;

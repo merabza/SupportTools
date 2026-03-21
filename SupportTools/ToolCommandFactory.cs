@@ -5,9 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolCommands;
-using LibDatabaseWork;
-using LibDatabaseWork.Models;
-using LibDatabaseWork.ToolCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -21,8 +18,8 @@ namespace SupportTools;
 
 public static class ToolCommandFactory
 {
-    public static IToolCommand? CreateProjectToolCommand(EProjectTools tool, ServiceProvider serviceProvider,
-        IParametersManager parametersManager, string projectName)
+    public static async ValueTask<IToolCommand?> CreateProjectToolCommand(EProjectTools tool,
+        ServiceProvider serviceProvider, IParametersManager parametersManager, string projectName)
     {
         Dictionary<string, IToolCommandFactoryStrategy>? toolCommandStrategies = serviceProvider
             .GetService<IEnumerable<IToolCommandFactoryStrategy>>()?.ToDictionary(s => s.ToolCommandName, s => s);
@@ -44,7 +41,8 @@ public static class ToolCommandFactory
 
         if (toolCommandStrategies.TryGetValue(tool.ToString(), out IToolCommandFactoryStrategy? strategy))
         {
-            return strategy.CreateToolCommand(parametersManager, projectName);
+            return await strategy.CreateToolCommand(parametersManager,
+                new ProjectToolsFactoryStrategyParameters { ProjectName = projectName });
         }
 
         StShared.WriteErrorLine($"No strategy found for tool {tool}", true);
@@ -201,9 +199,19 @@ public static class ToolCommandFactory
     //}
 
     public static async ValueTask<IToolCommand?> CreateProjectServerToolCommand(ILogger logger,
-        IHttpClientFactory httpClientFactory, EProjectServerTools tool, IParametersManager parametersManager,
-        string projectName, ServerInfoModel serverInfo, CancellationToken cancellationToken = default)
+        IHttpClientFactory httpClientFactory, EProjectServerTools tool, ServiceProvider serviceProvider,
+        IParametersManager parametersManager, string projectName, ServerInfoModel serverInfo,
+        CancellationToken cancellationToken = default)
     {
+        Dictionary<string, IToolCommandFactoryStrategy>? toolCommandStrategies = serviceProvider
+            .GetService<IEnumerable<IToolCommandFactoryStrategy>>()?.ToDictionary(s => s.ToolCommandName, s => s);
+
+        if (toolCommandStrategies == null)
+        {
+            StShared.WriteErrorLine("No IToolCommandFactoryStrategy implementations found", true);
+            return null;
+        }
+
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
         ProjectModel? project = supportToolsParameters.GetProject(projectName);
@@ -228,69 +236,107 @@ public static class ToolCommandFactory
             return null;
         }
 
+        if (toolCommandStrategies.TryGetValue(tool.ToString(), out IToolCommandFactoryStrategy? strategy))
+        {
+            return await strategy.CreateToolCommand(parametersManager,
+                new ProjectServerToolsFactoryStrategyParameters { ProjectName = projectName, ServerInfo = serverInfo },
+                cancellationToken);
+        }
+
+        StShared.WriteErrorLine($"No strategy found for tool {tool}", true);
+        //return null;
+
         switch (tool)
         {
-            case EProjectServerTools.AppSettingsEncoder: //  EncodeParameters, //პარამეტრების დაშიფვრა
-                //+ EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange
-                var appSettingsEncoderParameters =
-                    AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
-                if (appSettingsEncoderParameters is not null)
-                {
-                    return new ApplicationSettingsEncoderToolCommand(logger, appSettingsEncoderParameters,
-                        parametersManager);
-                }
+            //case EProjectServerTools.AppSettingsEncoder: //  EncodeParameters, //პარამეტრების დაშიფვრა
+            //    //+ EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange
+            //    var appSettingsEncoderParameters =
+            //        AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
+            //    if (appSettingsEncoderParameters is not null)
+            //    {
+            //        return new ApplicationSettingsEncoderToolCommand(logger, appSettingsEncoderParameters,
+            //            parametersManager);
+            //    }
 
-                StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
-                return null;
-            case EProjectServerTools.AppSettingsInstaller: //  InstallParameters, //დაშიფრული პარამეტრების განახლება
-                var appSettingsInstallerParameters = await AppSettingsInstallerParameters.Create(supportToolsParameters,
-                    projectName, serverInfo, cancellationToken);
-                if (appSettingsInstallerParameters is not null)
-                {
-                    return new AppSettingsInstallerToolCommand(logger, httpClientFactory, true,
-                        appSettingsInstallerParameters, parametersManager);
-                }
+            //    StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
+            //    return null;
+            //case EProjectServerTools.AppSettingsInstaller: //  InstallParameters, //დაშიფრული პარამეტრების განახლება
+            //    var appSettingsInstallerParameters = await AppSettingsInstallerParameters.Create(supportToolsParameters,
+            //        projectName, serverInfo, cancellationToken);
+            //    if (appSettingsInstallerParameters is not null)
+            //    {
+            //        return new AppSettingsInstallerToolCommand(logger, httpClientFactory, true,
+            //            appSettingsInstallerParameters, parametersManager);
+            //    }
 
-                StShared.WriteErrorLine("appSettingsInstallerParameters is null", true);
-                return null;
-            case EProjectServerTools.AppSettingsUpdater
-                : //  UpdateParameters, //პარამეტრების დაშიფვრა და დაინსტალირებული პროგრამისთვის ამ დაშიფრული პარამეტრების გადაგზავნა-განახლება
-                //+(EncodeParameters=>UploadParameters=>DownloadParameters=>UpdateParameters)
-                var appSettingsUpdaterParameters = await AppSettingsUpdaterParameters.Create(supportToolsParameters,
-                    projectName, serverInfo, cancellationToken);
-                if (appSettingsUpdaterParameters is not null)
-                {
-                    return new AppSettingsUpdaterToolCommand(logger, httpClientFactory, appSettingsUpdaterParameters,
-                        parametersManager, true);
-                }
+            //    StShared.WriteErrorLine("appSettingsInstallerParameters is null", true);
+            //    return null;
+            //case EProjectServerTools.AppSettingsUpdater
+            //    : //  UpdateParameters, //პარამეტრების დაშიფვრა და დაინსტალირებული პროგრამისთვის ამ დაშიფრული პარამეტრების გადაგზავნა-განახლება
+            //    //+(EncodeParameters=>UploadParameters=>DownloadParameters=>UpdateParameters)
+            //    var appSettingsUpdaterParameters = await AppSettingsUpdaterParameters.Create(supportToolsParameters,
+            //        projectName, serverInfo, cancellationToken);
+            //    if (appSettingsUpdaterParameters is not null)
+            //    {
+            //        return new AppSettingsUpdaterToolCommand(logger, httpClientFactory, appSettingsUpdaterParameters,
+            //            parametersManager, true);
+            //    }
 
-                StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
-                return null;
-            case EProjectServerTools.DevBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
-                if (project.DevDatabaseParameters == null)
-                {
-                    StShared.WriteErrorLine(
-                        $"DevDatabaseParameters is not specified for Project with name {projectName}", true);
-                    return null;
-                }
+            //    StShared.WriteErrorLine("appSettingsUpdaterParameters is null", true);
+            //    return null;
+            //case EProjectServerTools.DevBaseToServerCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+            //    if (project.DevDatabaseParameters == null)
+            //    {
+            //        StShared.WriteErrorLine(
+            //            $"DevDatabaseParameters is not specified for Project with name {projectName}", true);
+            //        return null;
+            //    }
 
-                if (serverInfo.NewDatabaseParameters == null)
-                {
-                    StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
-                    return null;
-                }
+            //    if (serverInfo.NewDatabaseParameters == null)
+            //    {
+            //        StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
+            //        return null;
+            //    }
 
-                CopyBaseParameters? copyBaseParametersDevToProd =
-                    await CopyBaseParametersFactory.CreateCopyBaseParameters(logger, httpClientFactory,
-                        project.DevDatabaseParameters, serverInfo.NewDatabaseParameters, supportToolsParameters,
-                        cancellationToken);
-                if (copyBaseParametersDevToProd is not null)
-                {
-                    return new BaseCopierToolCommand(logger, copyBaseParametersDevToProd, parametersManager);
-                }
+            //    CopyBaseParameters? copyBaseParametersDevToProd =
+            //        await CopyBaseParametersFactory.CreateCopyBaseParameters(logger, httpClientFactory,
+            //            project.DevDatabaseParameters, serverInfo.NewDatabaseParameters, supportToolsParameters,
+            //            cancellationToken);
+            //    if (copyBaseParametersDevToProd is not null)
+            //    {
+            //        return new BaseCopierToolCommand(logger, copyBaseParametersDevToProd, parametersManager);
+            //    }
 
-                StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
-                return null;
+            //    StShared.WriteErrorLine("copyBaseParametersDevToProd is null", true);
+            //    return null;
+            //case EProjectServerTools.ServerBaseToProdCopyCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
+
+            //    if (project.ProdCopyDatabaseParameters == null)
+            //    {
+            //        StShared.WriteErrorLine(
+            //            $"ProdCopyDatabaseParameters is not specified for Project with name {projectName}", true);
+            //        return null;
+            //    }
+
+            //    if (serverInfo.CurrentDatabaseParameters == null)
+            //    {
+            //        StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}",
+            //            true);
+            //        return null;
+            //    }
+
+            //    CopyBaseParameters? copyBaseParametersProdToDev =
+            //        await CopyBaseParametersFactory.CreateCopyBaseParameters(logger, httpClientFactory,
+            //            serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabaseParameters,
+            //            supportToolsParameters, cancellationToken);
+
+            //    if (copyBaseParametersProdToDev is not null)
+            //    {
+            //        return new BaseCopierToolCommand(logger, copyBaseParametersProdToDev, parametersManager);
+            //    }
+
+            //    StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);
+            //    return null;
             case EProjectServerTools.ProgPublisher: //  Publish, //პროგრამის საინსტალაციო პაკეტის გამზადება
                 //+(CreatePackage=>UploadPackage=>EncodeParameters=>UploadParameters)
 
@@ -375,34 +421,6 @@ public static class ToolCommandFactory
 
                 StShared.WriteErrorLine("serviceStartStopParameters is null", true);
                 return null;
-            case EProjectServerTools.ServerBaseToProdCopyCopier: //სერვისის გამაჩერებელი სერვერის მხარეს
-
-                if (project.ProdCopyDatabaseParameters == null)
-                {
-                    StShared.WriteErrorLine(
-                        $"ProdCopyDatabaseParameters is not specified for Project with name {projectName}", true);
-                    return null;
-                }
-
-                if (serverInfo.CurrentDatabaseParameters == null)
-                {
-                    StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}",
-                        true);
-                    return null;
-                }
-
-                CopyBaseParameters? copyBaseParametersProdToDev =
-                    await CopyBaseParametersFactory.CreateCopyBaseParameters(logger, httpClientFactory,
-                        serverInfo.CurrentDatabaseParameters, project.ProdCopyDatabaseParameters,
-                        supportToolsParameters, cancellationToken);
-
-                if (copyBaseParametersProdToDev is not null)
-                {
-                    return new BaseCopierToolCommand(logger, copyBaseParametersProdToDev, parametersManager);
-                }
-
-                StShared.WriteErrorLine("copyBaseParametersProdToDev is null", true);
-                return null;
             case EProjectServerTools.ServiceInstallScriptCreator:
                 var serviceInstallScriptCreatorParameters =
                     ServiceInstallScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
@@ -458,15 +476,7 @@ public static class ToolCommandFactory
 
                 StShared.WriteErrorLine("checkVersionParameters is null", true);
                 return null;
-            //case EProjectTools.RecreateDevDatabase:
-            //case EProjectTools.DropDevDatabase:
-            //case EProjectTools.CreateDevDatabaseByMigration:
-            //case EProjectTools.CorrectNewDatabase:
-            //case EProjectTools.ScaffoldSeederCreator:
-            //case EProjectTools.JsonFromProjectDbProjectGetter:
-            //case EProjectTools.SeedData:
-            //case EProjectTools.PrepareProdCopyDatabase:
-            //case EProjectTools.JetBrainsCleanupCode:
+
             default:
                 StShared.WriteErrorLine("Command tool does not created", true, logger);
                 return null;

@@ -1,4 +1,6 @@
-﻿using LibAppProjectCreator.Models;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using LibAppProjectCreator.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -11,6 +13,7 @@ public class JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy : IToolCommand
 {
     private readonly ILogger<JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy> _logger;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy(
         ILogger<JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy> logger)
     {
@@ -19,19 +22,22 @@ public class JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy : IToolCommand
 
     public string ToolCommandName => nameof(EProjectTools.JetBrainsCleanupCode);
 
-    public IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName)
+    public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
+        IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
         //სოლუშენის ფაილის მითითებით კოდის გასაწმენდად და მოსაწესრიგებლად
-        var jetBrainsCleanupCodeRunnerParameters =
-            JetBrainsCleanupCodeRunnerParameters.Create(supportToolsParameters, projectName);
+        var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
+        var jetBrainsCleanupCodeRunnerParameters = JetBrainsCleanupCodeRunnerParameters.Create(supportToolsParameters,
+            projectToolsFactoryStrategyParameters.ProjectName);
         if (jetBrainsCleanupCodeRunnerParameters is not null)
         {
-            return new JetBrainsCleanupCodeRunnerToolCommand(_logger, jetBrainsCleanupCodeRunnerParameters);
+            return ValueTask.FromResult<IToolCommand?>(
+                new JetBrainsCleanupCodeRunnerToolCommand(_logger, jetBrainsCleanupCodeRunnerParameters));
         }
 
         StShared.WriteErrorLine("dataSeederParameters is null", true);
-        return null;
+        return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

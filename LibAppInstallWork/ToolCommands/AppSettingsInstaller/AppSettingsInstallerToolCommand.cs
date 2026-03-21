@@ -10,7 +10,7 @@ using ToolsManagement.Installer.ToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.AppSettingsInstaller;
 
 public sealed class AppSettingsInstallerToolCommand : ToolCommand
 {
