@@ -6,12 +6,10 @@ using AppCliTools.CliParameters;
 using AppCliTools.LibMenuInput;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SupportTools.ToolActions;
-using SupportTools.ToolCommandParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ServiceInstallScriptCreator;
 
 public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
 {
@@ -173,7 +171,7 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
 
         var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
 
-        var createInstallScript = new CreateServiceInstallScript(_logger, scriptFileNameForSave,
+        var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,

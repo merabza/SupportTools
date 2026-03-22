@@ -5,12 +5,10 @@ using AppCliTools.CliParameters;
 using AppCliTools.LibMenuInput;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SupportTools.ToolActions;
-using SupportTools.ToolCommandParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ServiceRemoveScriptCreator;
 
 public sealed class ServiceRemoveScriptCreatorToolCommand : ToolCommand
 {

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using ToolsManagement.Installer.ProjectManagers;
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ProgRemover;
 
 public sealed class ProgramRemoverToolCommand : ToolCommand
 {

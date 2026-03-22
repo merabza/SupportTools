@@ -2,13 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SupportTools.ToolCommands;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace SupportTools.ToolActions;
+namespace LibAppInstallWork.ToolCommands.ServiceRemoveScriptCreator;
 
 public sealed class CreateServiceRemoveScript : ToolAction
 {

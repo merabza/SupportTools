@@ -2,7 +2,7 @@
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.ToolCommandParameters;
+namespace LibAppInstallWork.ToolCommands.ServiceRemoveScriptCreator;
 
 public sealed class ServiceRemoveScriptCreatorParameters : IParameters
 {

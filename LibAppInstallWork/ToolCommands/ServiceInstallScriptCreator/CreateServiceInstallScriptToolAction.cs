@@ -2,15 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SupportTools.ToolCommands;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.LibToolActions;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace SupportTools.ToolActions;
+namespace LibAppInstallWork.ToolCommands.ServiceInstallScriptCreator;
 
-public sealed class CreateServiceInstallScript : ToolAction
+public sealed class CreateServiceInstallScriptToolAction : ToolAction
 {
     private readonly string _environmentName;
     private readonly string _ftpSiteAddress;
@@ -30,10 +29,10 @@ public sealed class CreateServiceInstallScript : ToolAction
     private readonly string? _serviceDescriptionSignature;
     private readonly string _settingsFileName;
 
-    public CreateServiceInstallScript(ILogger logger, string scriptFileName, int portNumber, string ftpSiteAddress,
-        string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory, string projectName,
-        string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
-        string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
+    public CreateServiceInstallScriptToolAction(ILogger logger, string scriptFileName, int portNumber,
+        string ftpSiteAddress, string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory,
+        string projectName, string? serviceDescriptionSignature, string? projectDescription, string runTime,
+        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
         string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
         nameof(ServiceInstallScriptCreatorToolCommand), null, null)
     {

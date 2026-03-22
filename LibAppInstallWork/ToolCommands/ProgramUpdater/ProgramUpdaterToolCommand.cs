@@ -9,7 +9,7 @@ using ParametersManagement.LibParameters;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ProgramUpdater;
 
 public sealed class ProgramUpdaterToolCommand : ToolCommand
 {

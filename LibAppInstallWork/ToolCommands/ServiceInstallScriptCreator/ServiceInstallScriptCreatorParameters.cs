@@ -3,7 +3,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.ToolCommandParameters;
+namespace LibAppInstallWork.ToolCommands.ServiceInstallScriptCreator;
 
 public sealed class ServiceInstallScriptCreatorParameters : IParameters
 {

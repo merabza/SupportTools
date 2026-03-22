@@ -8,7 +8,7 @@ using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ProgPublisher;
 
 public sealed class ProgramPublisherToolCommand : ToolCommand
 {

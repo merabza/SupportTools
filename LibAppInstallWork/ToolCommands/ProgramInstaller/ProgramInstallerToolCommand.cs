@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using ToolsManagement.Installer.ToolActions;
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ProgramInstaller;
 
 public sealed class ProgramInstallerToolCommand : ToolCommand
 {

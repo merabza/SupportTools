@@ -1,9 +1,7 @@
-﻿using System.Net.Http;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -14,8 +12,6 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;
@@ -23,13 +19,10 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
     private readonly EProjectServerTools _tool;
     private IToolCommand? _toolCommand;
 
-    public ProjectServerToolTaskCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        EProjectServerTools tool, string projectName, ServerInfoModel serverInfo, IParametersManager parametersManager,
-        ServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(), EMenuAction.Reload, EMenuAction.Reload,
-        null, true)
+    public ProjectServerToolTaskCliMenuCommand(EProjectServerTools tool, string projectName, ServerInfoModel serverInfo,
+        IParametersManager parametersManager, ServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(),
+        EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
         _tool = tool;
         _projectName = projectName;
         _serverInfo = serverInfo;
@@ -39,8 +32,8 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
 
     private async ValueTask<IToolCommand> MemoCreateToolCommand()
     {
-        return _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_logger, _httpClientFactory,
-            _tool, _serviceProvider, _parametersManager, _projectName, _serverInfo);
+        return _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_tool, _serviceProvider,
+            _parametersManager, _projectName, _serverInfo);
     }
 
     protected override async ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)

@@ -19,8 +19,6 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger _logger;
     private readonly string _projectName;
     private readonly ServiceProvider _serviceProvider;
 
@@ -28,8 +26,6 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         Dictionary<string, ServerInfoModel> currentValuesDictionary, string projectName,
         ServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary, "Server", "Servers", true)
     {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
         _projectName = projectName;
         _serviceProvider = serviceProvider;
 
@@ -70,63 +66,6 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
             serviceProvider);
     }
 
-    //private Dictionary<string, ServerInfoModel> GetServerInfos()
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var project = parameters.GetProject(_projectName);
-    //    return project?.ServerInfos ?? [];
-    //}
-
-    //protected override Dictionary<string, ItemData> GetCrudersDictionary()
-    //{
-    //    return GetServerInfos().ToDictionary(p => p.Key, p => (ItemData)p.Value);
-    //}
-
-    //public override bool ContainsRecordWithKey(string recordKey)
-    //{
-    //    var itemDataDict = GetCrudersDictionary();
-
-    //    return itemDataDict.ContainsKey(recordKey);
-    //}
-
-    //public override void UpdateRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ServerInfoModel newServer)
-    //        throw new Exception("newServer is null in ServerInfoCruder.UpdateRecordWithKey");
-
-    //    var crudersDictionary = GetCrudersDictionary() ??
-    //                            throw new Exception(
-    //                                "crudersDictionary is null in ServerInfoCruder.UpdateRecordWithKey");
-    //    crudersDictionary[recordKey] = newServer;
-    //}
-
-    //protected override void AddRecordWithKey(string recordKey, ItemData newRecord)
-    //{
-    //    if (newRecord is not ServerInfoModel newServer)
-    //        throw new Exception("newServer is null in ServerInfoCruder.AddRecordWithKey");
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var project = parameters.GetProject(_projectName) ??
-    //                  throw new Exception($"Project with name {_projectName} not found");
-    //    project.ServerInfos.Add(recordKey, newServer);
-    //}
-
-    //protected override void RemoveRecordWithKey(string recordKey)
-    //{
-    //    var parameters = (SupportToolsParameters)ParametersManager.Parameters;
-    //    var project = parameters.GetProject(_projectName) ??
-    //                  throw new Exception($"Project with name {_projectName} not found");
-    //    project.ServerInfos.Remove(recordKey);
-    //}
-
-    //protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)
-    //{
-    //    return new ServerInfoModel();
-    //}
-
-    //protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
-    //{
-    //}
-
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
         base.FillDetailsSubMenu(itemSubMenuSet, itemName);
@@ -146,8 +85,8 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         foreach (EProjectServerTools tool in Enum.GetValues<EProjectServerTools>()
                      .Intersect(server.AllowToolsList ?? []))
         {
-            itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(_logger, _httpClientFactory, tool,
-                _projectName, server, ParametersManager, _serviceProvider));
+            itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(tool, _projectName, server,
+                ParametersManager, _serviceProvider));
         }
     }
 }

@@ -2,6 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using LibAppInstallWork.Models;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -9,7 +10,7 @@ using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
 using ToolsManagement.Installer.Domain;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.AppSettingsUpdater;
 
 public sealed class AppSettingsUpdaterParameters : IParameters
 {

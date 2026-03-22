@@ -23,6 +23,8 @@
 
   <ItemGroup>
     <Folder Include="ProgramManipulations\" />
+    <Folder Include="ToolCommandParameters\" />
+    <Folder Include="ToolCommands\" />
   </ItemGroup>
 
   <ItemGroup>

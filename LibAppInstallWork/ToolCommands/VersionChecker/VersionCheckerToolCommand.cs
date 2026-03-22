@@ -9,7 +9,7 @@ using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.VersionChecker;
 
 public sealed class VersionCheckerToolCommand : ToolCommand
 {

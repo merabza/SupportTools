@@ -14,7 +14,7 @@ using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
-namespace LibAppInstallWork.ToolCommands;
+namespace LibAppInstallWork.ToolCommands.ServiceStarter;
 
 public sealed class ServiceStarterToolCommand : ToolCommand
 {
