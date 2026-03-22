@@ -31,7 +31,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
     {
         var projectToolsFactoryStrategyParameters =
             (ProjectServerToolsFactoryStrategyParameters)factoryStrategyParameters;
-        var projectName = projectToolsFactoryStrategyParameters.ProjectName;
+        string projectName = projectToolsFactoryStrategyParameters.ProjectName;
         var serverInfo = projectToolsFactoryStrategyParameters.ServerInfo;
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

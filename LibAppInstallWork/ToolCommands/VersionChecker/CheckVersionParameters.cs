@@ -1,12 +1,13 @@
 //Created by ProjectParametersClassCreator at 5/11/2021 08:52:10
 
 using System;
+using LibAppInstallWork.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.VersionChecker;
 
 public sealed class CheckVersionParameters : IParameters
 {

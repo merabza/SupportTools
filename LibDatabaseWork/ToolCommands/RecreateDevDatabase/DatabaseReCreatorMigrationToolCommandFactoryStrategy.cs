@@ -1,7 +1,8 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LibDatabaseWork.Models;
+using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
+using LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;

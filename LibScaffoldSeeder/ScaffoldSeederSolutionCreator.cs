@@ -11,6 +11,7 @@ using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.CodeCreators;
 using LibGitData.Domain;
 using LibScaffoldSeeder.Models;
+using LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SupportToolsData.Models;

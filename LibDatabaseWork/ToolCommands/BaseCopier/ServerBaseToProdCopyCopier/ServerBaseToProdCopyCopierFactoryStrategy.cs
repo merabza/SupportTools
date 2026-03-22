@@ -39,13 +39,13 @@ public class ServerBaseToProdCopyCopierFactoryStrategy : BaseCopierFactoryStrate
             return null;
         }
 
-        if (serverInfo.CurrentDatabaseParameters == null)
+        if (serverInfo.CurrentDatabaseParameters != null)
         {
-            StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}", true);
-            return null;
+            return await CreateToolCommand(parametersManager, serverInfo.CurrentDatabaseParameters,
+                project.ProdCopyDatabaseParameters, cancellationToken);
         }
 
-        return await CreateToolCommand(parametersManager, serverInfo.CurrentDatabaseParameters,
-            project.ProdCopyDatabaseParameters, cancellationToken);
+        StShared.WriteErrorLine($"CurrentDatabaseParameters is not specified {serverInfo.ServerName}", true);
+        return null;
     }
 }

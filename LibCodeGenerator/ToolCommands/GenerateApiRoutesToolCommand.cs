@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using LibCodeGenerator.CodeCreators;
 using LibCodeGenerator.Helpers;
-using LibCodeGenerator.Models;
+using LibCodeGenerator.ToolCommands.GenerateApiRoutes;
 using LibGitData;
 using LibGitData.Models;
 using LibGitWork;

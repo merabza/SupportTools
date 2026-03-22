@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LibAppInstallWork.Models;
+using LibAppInstallWork.ToolCommands.ServiceStarter;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -31,7 +31,7 @@ public class ServiceStopperToolCommandFactoryStrategy : IToolCommandFactoryStrat
     {
         var projectToolsFactoryStrategyParameters =
             (ProjectServerToolsFactoryStrategyParameters)factoryStrategyParameters;
-        var projectName = projectToolsFactoryStrategyParameters.ProjectName;
+        string projectName = projectToolsFactoryStrategyParameters.ProjectName;
         var serverInfo = projectToolsFactoryStrategyParameters.ServerInfo;
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

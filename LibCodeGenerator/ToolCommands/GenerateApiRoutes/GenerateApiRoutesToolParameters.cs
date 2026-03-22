@@ -3,7 +3,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibCodeGenerator.Models;
+namespace LibCodeGenerator.ToolCommands.GenerateApiRoutes;
 
 public sealed class GenerateApiRoutesToolParameters : IParameters
 {

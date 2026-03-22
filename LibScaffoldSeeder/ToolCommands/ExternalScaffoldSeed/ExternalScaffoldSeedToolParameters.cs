@@ -5,7 +5,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibScaffoldSeeder.Models;
+namespace LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed;
 
 public sealed class ExternalScaffoldSeedToolParameters : IParameters
 {

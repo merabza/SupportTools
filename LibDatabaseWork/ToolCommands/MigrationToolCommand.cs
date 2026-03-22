@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using AppCliTools.CliParameters;
-using LibDatabaseWork.Models;
+using LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 

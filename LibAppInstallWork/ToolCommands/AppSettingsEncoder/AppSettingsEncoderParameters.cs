@@ -3,7 +3,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 
 public sealed class AppSettingsEncoderParameters : IParameters
 {

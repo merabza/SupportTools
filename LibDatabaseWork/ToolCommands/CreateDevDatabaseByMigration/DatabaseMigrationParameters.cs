@@ -9,7 +9,7 @@ using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Errors;
 
-namespace LibDatabaseWork.Models;
+namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 
 public sealed class DatabaseMigrationParameters : IParameters
 {

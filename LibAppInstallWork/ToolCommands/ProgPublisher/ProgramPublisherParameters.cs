@@ -9,7 +9,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.ProgPublisher;
 
 public sealed class ProgramPublisherParameters : IParameters
 {

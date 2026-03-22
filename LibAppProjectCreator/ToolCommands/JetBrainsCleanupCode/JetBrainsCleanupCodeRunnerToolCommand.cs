@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
-using LibAppProjectCreator.Models;
 using Microsoft.Extensions.Logging;
 using SystemTools.JetBrainsResharperGlobalToolsWork;
 

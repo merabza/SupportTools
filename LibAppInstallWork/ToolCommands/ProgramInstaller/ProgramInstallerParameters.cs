@@ -1,12 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
+using LibAppInstallWork.Models;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.ProgramInstaller;
 
 public sealed class ProgramInstallerParameters : IParameters
 {

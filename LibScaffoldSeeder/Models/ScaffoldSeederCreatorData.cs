@@ -3,6 +3,7 @@ using System.IO;
 using LibAppProjectCreator;
 using LibAppProjectCreator.Models;
 using LibDotnetWork;
+using LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 
 namespace LibScaffoldSeeder.Models;
 

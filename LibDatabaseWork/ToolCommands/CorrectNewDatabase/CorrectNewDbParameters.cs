@@ -7,7 +7,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibDatabaseWork.Models;
+namespace LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 
 public sealed class CorrectNewDbParameters : IParameters
 {

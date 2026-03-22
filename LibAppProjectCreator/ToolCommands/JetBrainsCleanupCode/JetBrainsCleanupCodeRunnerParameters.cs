@@ -4,7 +4,7 @@ using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibAppProjectCreator.Models;
+namespace LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 
 public sealed class JetBrainsCleanupCodeRunnerParameters : IParameters
 {

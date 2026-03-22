@@ -39,13 +39,13 @@ public class DevBaseToServerCopierFactoryStrategy : BaseCopierFactoryStrategy, I
             return null;
         }
 
-        if (serverInfo.NewDatabaseParameters == null)
+        if (serverInfo.NewDatabaseParameters != null)
         {
-            StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
-            return null;
+            return await CreateToolCommand(parametersManager, project.DevDatabaseParameters,
+                serverInfo.NewDatabaseParameters, cancellationToken);
         }
 
-        return await CreateToolCommand(parametersManager, project.DevDatabaseParameters,
-            serverInfo.NewDatabaseParameters, cancellationToken);
+        StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
+        return null;
     }
 }

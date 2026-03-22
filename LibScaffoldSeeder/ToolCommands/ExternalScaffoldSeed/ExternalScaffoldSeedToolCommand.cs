@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using LibDotnetWork;
-using LibScaffoldSeeder.Models;
 using Microsoft.Extensions.Logging;
 
 namespace LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed;

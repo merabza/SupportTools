@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbTools.Errors;
 using LanguageExt;
-using LibDatabaseWork.Models;
 using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 using LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 using LibDatabaseWork.ToolCommands.DropDevDatabase;

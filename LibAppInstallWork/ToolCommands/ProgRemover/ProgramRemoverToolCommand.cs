@@ -2,7 +2,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
-using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using ToolsManagement.Installer.ProjectManagers;

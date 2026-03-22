@@ -4,6 +4,7 @@ using System.Net.Http;
 using LibAppProjectCreator.AppCreators;
 using LibAppProjectCreator.Models;
 using LibScaffoldSeeder.Models;
+using LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 using Microsoft.Extensions.Logging;
 using SupportToolsData;
 using SystemTools.SystemToolsShared;

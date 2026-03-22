@@ -1,43 +1,48 @@
-//Created by ProjectParametersClassCreator at 5/10/2021 16:03:33
-
-using System;
+﻿using System;
+using LibAppInstallWork.Models;
+using LibAppInstallWork.ToolCommands.VersionChecker;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
 
-namespace LibAppInstallWork.Models;
+namespace LibAppInstallWork.ToolCommands.ProgRemover;
 
-public sealed class ServiceStartStopParameters : IParameters
+public sealed class ProgramRemoverParameters : IParameters
 {
-    private ServiceStartStopParameters(string projectName, string environmentName,
-        ApiClientSettingsDomain? webAgentForInstall, string? installFolder, ProxySettingsBase proxySettings,
-        ApiClientSettingsDomain webAgentForCheck)
+    private ProgramRemoverParameters(string projectName, string environmentName, bool isService,
+        ApiClientSettingsDomain? webAgentForInstall, string? installFolder
+        //, ProxySettingsBase proxySettings,
+        //ApiClientSettingsDomain webAgentForCheck
+    )
     {
         ProjectName = projectName;
         EnvironmentName = environmentName;
+        IsService = isService;
         WebAgentForInstall = webAgentForInstall;
         InstallFolder = installFolder;
-        ProxySettings = proxySettings;
-        WebAgentForCheck = webAgentForCheck;
+        //ProxySettings = proxySettings;
+        //WebAgentForCheck = webAgentForCheck;
     }
 
     public string ProjectName { get; }
     public string EnvironmentName { get; }
+    public bool IsService { get; }
 
     public ApiClientSettingsDomain? WebAgentForInstall { get; }
-    public string? InstallFolder { get; }
-    public ProxySettingsBase ProxySettings { get; }
 
-    public ApiClientSettingsDomain WebAgentForCheck { get; }
+    public string? InstallFolder { get; }
+    //public ProxySettingsBase ProxySettings { get; }
+
+    //public ApiClientSettingsDomain WebAgentForCheck { get; }
 
     public bool CheckBeforeSave()
     {
         return true;
     }
 
-    public static ServiceStartStopParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
-        ServerInfoModel serverInfo, bool checkService = true)
+    public static ProgramRemoverParameters? Create(SupportToolsParameters supportToolsParameters, string projectName,
+        ServerInfoModel serverInfo)
     {
         try
         {
@@ -48,12 +53,6 @@ public sealed class ServiceStartStopParameters : IParameters
             }
 
             ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
-
-            if (checkService && !project.IsService)
-            {
-                StShared.WriteErrorLine($"Project {projectName} is not service", true);
-                return null;
-            }
 
             if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
             {
@@ -102,8 +101,8 @@ public sealed class ServiceStartStopParameters : IParameters
 
             return proxySettings is null
                 ? null
-                : new ServiceStartStopParameters(projectName, serverInfo.EnvironmentName, webAgentForInstall,
-                    installFolder, proxySettings, checkVersionParameters.WebAgentForCheck);
+                : new ProgramRemoverParameters(projectName, serverInfo.EnvironmentName, project.IsService,
+                    webAgentForInstall, installFolder); //, proxySettings, checkVersionParameters.WebAgentForCheck);
         }
         catch (Exception e)
         {
