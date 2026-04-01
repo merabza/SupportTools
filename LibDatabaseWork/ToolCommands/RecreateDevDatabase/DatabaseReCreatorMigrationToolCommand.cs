@@ -63,7 +63,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დავადგინოთ თუ არსებობს დეველოპერ ბაზა
-        OneOf<bool, Err[]> isDatabaseExistsResult =
+        OneOf<bool, Error[]> isDatabaseExistsResult =
             await DatabaseMigrationParameters.DatabaseManager.IsDatabaseExists(DatabaseMigrationParameters.DatabaseName,
                 cancellationToken);
 
@@ -96,7 +96,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return false;
         }
 
-        Option<Err[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
+        Option<Error[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
         if (changeDatabaseRecoveryModelResult.IsSome)
         {
             _logger.LogError("Error in ChangeDatabaseRecoveryModel");
@@ -107,9 +107,9 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         return await correctNewDatabase.Run(cancellationToken);
     }
 
-    private async ValueTask<Option<Err[]>> ChangeDatabaseRecoveryModel(CancellationToken cancellationToken = default)
+    private async ValueTask<Option<Error[]>> ChangeDatabaseRecoveryModel(CancellationToken cancellationToken = default)
     {
-        var errors = new List<Err>();
+        var errors = new List<Error>();
 
         string? dbConnectionName = _devDatabaseParameters.DbConnectionName;
 
@@ -120,7 +120,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return errors.ToArray();
         }
 
-        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResult =
+        OneOf<IDatabaseManager, Error[]> createDatabaseManagerResult =
             await DatabaseManagersFactory.CreateDatabaseManager(_logger, true, dbConnectionName,
                 _databaseServerConnections, _apiClients, _httpClientFactory, null, null, cancellationToken);
 
@@ -146,12 +146,12 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
 
         IDatabaseManager? dbManager = createDatabaseManagerResult.AsT0;
 
-        Option<Err[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
+        Option<Error[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
             _devDatabaseParameters.DatabaseName, databaseRecoveryModel, cancellationToken);
 
         if (changeDatabaseRecoveryModelResult.IsSome)
         {
-            return (Err[])changeDatabaseRecoveryModelResult;
+            return (Error[])changeDatabaseRecoveryModelResult;
         }
 
         return null;

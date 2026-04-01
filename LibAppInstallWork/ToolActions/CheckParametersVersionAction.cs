@@ -61,14 +61,14 @@ public sealed class CheckParametersVersionAction : ToolAction
                     _logger.LogInformation("Try to get parameters Version {TryCount}...", tryCount);
                 }
 
-                var errors = new List<Err>();
+                var errors = new List<Error>();
 
                 if (_proxySettings is ProxySettings proxySettings)
                 {
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, UseConsole);
-                    OneOf<string, Err[]> getAppSettingsVersionByProxyResult =
+                    OneOf<string, Error[]> getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
@@ -85,7 +85,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient =
                         new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
-                    OneOf<string, Err[]> getAppSettingsVersionResult =
+                    OneOf<string, Error[]> getAppSettingsVersionResult =
                         await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                     {
@@ -99,7 +99,7 @@ public sealed class CheckParametersVersionAction : ToolAction
 
                 if (errors.Count > 0)
                 {
-                    Err.PrintErrorsOnConsole(errors);
+                    Error.PrintErrorsOnConsole(errors);
                 }
                 else
                 {

@@ -65,7 +65,8 @@ public sealed class GitCruder : ParCruder<GitDataModel>
                     remoteGitRepos);
             }
 
-            OneOf<List<StsGitDataModel>, Err[]> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+            OneOf<List<StsGitDataModel>, Error[]> remoteGitReposResult =
+                supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
                 remoteGitRepos = remoteGitReposResult.AsT0;
@@ -73,7 +74,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
             else
             {
                 StShared.WriteErrorLine("could not received remoteGits", true, logger);
-                Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
         }
         catch (Exception e)

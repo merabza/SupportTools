@@ -4,49 +4,48 @@ namespace LibGitWork.Errors;
 
 public static class GitSyncToolActionErrors
 {
-    public static readonly Err CouldNotUpdateGitRemote = new()
+    public static readonly Error CouldNotUpdateGitRemote = new()
     {
-        ErrorCode = nameof(CouldNotUpdateGitRemote), ErrorMessage = "Could not Update Git Remote"
+        Code = nameof(CouldNotUpdateGitRemote), Name = "Could not Update Git Remote"
     };
 
-    public static readonly Err CouldNotGetGitRemoteId = new()
+    public static readonly Error CouldNotGetGitRemoteId = new()
     {
-        ErrorCode = nameof(CouldNotGetGitRemoteId), ErrorMessage = "Could not get git Remote Id"
+        Code = nameof(CouldNotGetGitRemoteId), Name = "Could not get git Remote Id"
     };
 
-    public static readonly Err CouldNotGetGitLocalId = new()
+    public static readonly Error CouldNotGetGitLocalId = new()
     {
-        ErrorCode = nameof(CouldNotGetGitLocalId), ErrorMessage = "Could not get git Local Id"
+        Code = nameof(CouldNotGetGitLocalId), Name = "Could not get git Local Id"
     };
 
-    public static readonly Err CouldNotGetGitBaseId = new()
+    public static readonly Error CouldNotGetGitBaseId = new()
     {
-        ErrorCode = nameof(CouldNotGetGitBaseId), ErrorMessage = "Could not get git Base Id"
+        Code = nameof(CouldNotGetGitBaseId), Name = "Could not get git Base Id"
     };
 
-    public static readonly Err GetRemoteOriginUrlError = new()
+    public static readonly Error GetRemoteOriginUrlError = new()
     {
-        ErrorCode = nameof(GetRemoteOriginUrlError), ErrorMessage = "Error when detecting Remote Origin Url"
+        Code = nameof(GetRemoteOriginUrlError), Name = "Error when detecting Remote Origin Url"
     };
 
-    public static readonly Err GetRedundantCachedFilesListError = new()
+    public static readonly Error GetRedundantCachedFilesListError = new()
     {
-        ErrorCode = nameof(GetRedundantCachedFilesListError),
-        ErrorMessage = "Error when getting Redundant Cached Files List"
+        Code = nameof(GetRedundantCachedFilesListError), Name = "Error when getting Redundant Cached Files List"
     };
 
-    public static readonly Err HaveUnTrackedFilesError = new()
+    public static readonly Error HaveUnTrackedFilesError = new()
     {
-        ErrorCode = nameof(HaveUnTrackedFilesError), ErrorMessage = "Error when detecting UnTracked Files"
+        Code = nameof(HaveUnTrackedFilesError), Name = "Error when detecting UnTracked Files"
     };
 
-    public static readonly Err NeedCommitError = new()
+    public static readonly Error NeedCommitError = new()
     {
-        ErrorCode = nameof(NeedCommitError), ErrorMessage = "Error when detecting Need Commit"
+        Code = nameof(NeedCommitError), Name = "Error when detecting Need Commit"
     };
 
-    public static Err PropertyIsEmpty(string propertyName)
+    public static Error PropertyIsEmpty(string propertyName)
     {
-        return new Err { ErrorCode = nameof(PropertyIsEmpty), ErrorMessage = $"Property {propertyName} Is Empty " };
+        return new Error { Code = nameof(PropertyIsEmpty), Name = $"Property {propertyName} Is Empty " };
     }
 }

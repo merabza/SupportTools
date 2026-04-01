@@ -36,27 +36,27 @@ public static class CopyBaseParametersFactory
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
         var createSourceBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(logger, null, null, true);
-        OneOf<BaseBackupParameters, Err[]> createSourceBaseBackupParametersResult =
+        OneOf<BaseBackupParameters, Error[]> createSourceBaseBackupParametersResult =
             await createSourceBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createSourceBaseBackupParametersResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(createSourceBaseBackupParametersResult.AsT1);
+            Error.PrintErrorsOnConsole(createSourceBaseBackupParametersResult.AsT1);
             return null;
         }
 
         var createDestinationBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(logger, null, null, true);
-        OneOf<BaseBackupParameters, Err[]> createDestinationBaseBackupParametersResult =
+        OneOf<BaseBackupParameters, Error[]> createDestinationBaseBackupParametersResult =
             await createDestinationBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
         if (createDestinationBaseBackupParametersResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(createDestinationBaseBackupParametersResult.AsT1);
+            Error.PrintErrorsOnConsole(createDestinationBaseBackupParametersResult.AsT1);
             return null;
         }
 
@@ -149,24 +149,24 @@ public static class CopyBaseParametersFactory
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResultForSource =
+        OneOf<IDatabaseManager, Error[]> createDatabaseManagerResultForSource =
             await DatabaseManagersFactory.CreateDatabaseManager(logger, true, sourceDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForSource.IsT1)
         {
-            Err.PrintErrorsOnConsole(createDatabaseManagerResultForSource.AsT1);
+            Error.PrintErrorsOnConsole(createDatabaseManagerResultForSource.AsT1);
             logger.LogError("Can not create client for source Database server");
             return null;
         }
 
-        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResultForDestination =
+        OneOf<IDatabaseManager, Error[]> createDatabaseManagerResultForDestination =
             await DatabaseManagersFactory.CreateDatabaseManager(logger, true, destinationDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForDestination.IsT1)
         {
-            Err.PrintErrorsOnConsole(createDatabaseManagerResultForDestination.AsT1);
+            Error.PrintErrorsOnConsole(createDatabaseManagerResultForDestination.AsT1);
             logger.LogError("Can not create client for destination Database server");
             return null;
         }

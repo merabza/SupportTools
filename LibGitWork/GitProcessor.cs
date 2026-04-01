@@ -32,7 +32,7 @@ public sealed class GitProcessor
         LastRemoteId = GitGetRemoteId();
     }
 
-    //public OneOf<bool, Err[]> NeedPull(bool updateRemote = false)
+    //public OneOf<bool, Error[]> NeedPull(bool updateRemote = false)
     //{
     //    if (updateRemote && !GitRemoteUpdate())
     //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
@@ -132,7 +132,7 @@ fi*/
 
     private string? GitGetId(string parameters)
     {
-        OneOf<(string, int), Err[]> localResult =
+        OneOf<(string, int), Error[]> localResult =
             StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} {parameters}");
         if (!localResult.IsT1)
         {
@@ -165,9 +165,9 @@ fi*/
         return false;
     }
 
-    public OneOf<string, Err[]> GetRemoteOriginUrl()
+    public OneOf<string, Error[]> GetRemoteOriginUrl()
     {
-        OneOf<(string, int), Err[]> result = StShared.RunProcessWithOutput(false, null, Git,
+        OneOf<(string, int), Error[]> result = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} config --get remote.origin.url");
         if (result.IsT1)
         {
@@ -189,9 +189,9 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Err[]> NeedCommit()
+    public OneOf<bool, Error[]> NeedCommit()
     {
-        OneOf<(string, int), Err[]> gitStatusOutputResult =
+        OneOf<(string, int), Error[]> gitStatusOutputResult =
             StShared.RunProcessWithOutput(false, null, Git, $"{_switchToProjectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
         {
@@ -246,10 +246,10 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Err[]> HaveUnTrackedFiles()
+    public OneOf<bool, Error[]> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), Err[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
+        OneOf<(string, int), Error[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
@@ -352,10 +352,10 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], Err[]> GetRedundantCachedFilesList()
+    public OneOf<string[], Error[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), Err[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
+        OneOf<(string, int), Error[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, Git,
             $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
 
         if (statusCommandOutputResult.IsT1)
@@ -382,14 +382,14 @@ fi*/
         return false;
     }
 
-    public Option<Err[]> Initialise()
+    public Option<Error[]> Initialise()
     {
         return StShared.RunProcess(_useConsole, _logger, Git, $"{_switchToProjectPath} init");
     }
 
     public bool IsFolderPartOfGitWorkingTree(string appFolderForDiffFullName)
     {
-        OneOf<(string, int), Err[]> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, Git,
+        OneOf<(string, int), Error[]> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, Git,
             $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
         if (isInsideWorkTreeResult.IsT1)
         {

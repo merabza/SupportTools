@@ -71,7 +71,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
             try
             {
-                OneOf<List<StsGitIgnoreFileTypeDataModel>, Err[]> remoteGitReposResult =
+                OneOf<List<StsGitIgnoreFileTypeDataModel>, Error[]> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
                 if (remoteGitReposResult.IsT0)
                 {
@@ -79,7 +79,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
                 }
 
                 StShared.WriteErrorLine("could not received GitIgnore File Types List", true, _logger);
-                Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
             catch (Exception e)
             {
@@ -116,11 +116,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<Err[]> updateGitRepoByKeyResult = supportToolsServerApiClient
+            Option<Error[]> updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)
@@ -148,11 +148,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<Err[]> updateGitRepoByKeyResult =
+            Option<Error[]> updateGitRepoByKeyResult =
                 await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken);
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Err.PrintErrorsOnConsole((Err[])updateGitRepoByKeyResult);
+                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)

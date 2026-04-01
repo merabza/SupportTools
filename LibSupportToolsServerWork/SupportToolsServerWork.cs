@@ -27,14 +27,15 @@ public static class SupportToolsServerWork
                 return [];
             }
 
-            OneOf<List<StsGitDataModel>, Err[]> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
+            OneOf<List<StsGitDataModel>, Error[]> remoteGitReposResult =
+                supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
                 return remoteGitReposResult.AsT0;
             }
 
             StShared.WriteErrorLine("could not received remoteGits", true, logger);
-            Err.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
         }
         catch (Exception e)
         {

@@ -70,13 +70,13 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<bool, Err[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        OneOf<bool, Error[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT0)
         {
             return haveUnTrackedFilesResult.AsT0;
         }
 
-        Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
+        Error.PrintErrorsOnConsole(Error.RecreateErrors(haveUnTrackedFilesResult.AsT1,
             GitSyncToolActionErrors.HaveUnTrackedFilesError));
         return false;
     }
@@ -121,10 +121,10 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<string, Err[]> getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
+        OneOf<string, Error[]> getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
         if (getRemoteOriginUrlResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+            Error.PrintErrorsOnConsole(Error.RecreateErrors(getRemoteOriginUrlResult.AsT1,
                 GitSyncToolActionErrors.GetRedundantCachedFilesListError));
             return false;
         }
@@ -139,10 +139,10 @@ public sealed class GitSyncToolAction : ToolAction
 
         //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
         //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-        OneOf<string[], Err[]> getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
+        OneOf<string[], Error[]> getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
         if (getRedundantCachedFilesListResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(Err.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
+            Error.PrintErrorsOnConsole(Error.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
                 GitSyncToolActionErrors.GetRedundantCachedFilesListError));
             return false;
         }
@@ -157,10 +157,10 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<bool, Err[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        OneOf<bool, Error[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
         if (haveUnTrackedFilesResult.IsT1)
         {
-            Err.PrintErrorsOnConsole(Err.RecreateErrors(haveUnTrackedFilesResult.AsT1,
+            Error.PrintErrorsOnConsole(Error.RecreateErrors(haveUnTrackedFilesResult.AsT1,
                 GitSyncToolActionErrors.HaveUnTrackedFilesError));
             return false;
         }
@@ -172,14 +172,15 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<bool, Err[]> needCommitResult = GitProcessor.NeedCommit();
+        OneOf<bool, Error[]> needCommitResult = GitProcessor.NeedCommit();
         if (needCommitResult.IsT0)
         {
             Phase1Result = needCommitResult.AsT0 ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
             return true;
         }
 
-        Err.PrintErrorsOnConsole(Err.RecreateErrors(needCommitResult.AsT1, GitSyncToolActionErrors.NeedCommitError));
+        Error.PrintErrorsOnConsole(Error.RecreateErrors(needCommitResult.AsT1,
+            GitSyncToolActionErrors.NeedCommitError));
         return false;
     }
 

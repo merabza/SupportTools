@@ -279,7 +279,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     {
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         //dotnetProcessor.Restore(databaseScaffoldClassLibProjectFileFullName);
-        Option<Err[]> restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
+        Option<Error[]> restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
         if (restoreResult.IsSome)
         {
             return false;

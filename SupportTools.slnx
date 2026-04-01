@@ -50,6 +50,7 @@
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
+    <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.DomainShared/SystemTools.DomainShared.csproj" />
     <Project Path="../SystemTools/SystemTools.JetBrainsResharperGlobalToolsWork/SystemTools.JetBrainsResharperGlobalToolsWork.csproj" />
     <Project Path="../SystemTools/SystemTools.ReCounterContracts/SystemTools.ReCounterContracts.csproj" />

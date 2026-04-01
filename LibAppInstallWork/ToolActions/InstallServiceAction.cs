@@ -77,16 +77,16 @@ public sealed class InstallServiceAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        OneOf<string, Err[]> installServiceResult = await projectManager.InstallService(_projectName, _environmentName,
-            _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask, _programArchiveExtension,
-            _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature, _projectDescription,
-            cancellationToken);
+        OneOf<string, Error[]> installServiceResult = await projectManager.InstallService(_projectName,
+            _environmentName, _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask,
+            _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature,
+            _projectDescription, cancellationToken);
 
         if (installServiceResult.IsT1)
         {
             _logger.LogError("Error when Install service project {_projectName}/{_environmentName}", _projectName,
                 _environmentName);
-            Err.PrintErrorsOnConsole(installServiceResult.AsT1);
+            Error.PrintErrorsOnConsole(installServiceResult.AsT1);
             return false;
         }
 

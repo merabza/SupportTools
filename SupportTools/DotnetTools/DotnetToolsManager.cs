@@ -42,7 +42,7 @@
 //                var createResult = Create();
 //                if (createResult.IsT1)
 //                {
-//                    Err.PrintErrorsOnConsole(createResult.AsT1);
+//                    Error.PrintErrorsOnConsole(createResult.AsT1);
 //                    return null;
 //                }
 
@@ -53,7 +53,7 @@
 //        }
 //    }
 
-//    private static OneOf<DotnetToolsManager, Err[]> Create()
+//    private static OneOf<DotnetToolsManager, Error[]> Create()
 //    {
 //        StShared.ConsoleWriteInformationLine(null, true, "Wait...");
 //        var necessaryToolsNames = new Dictionary<ENecessaryTools, string>
@@ -71,18 +71,18 @@
 //        };
 //        var createListOfDotnetToolsResult = CreateListOfDotnetTools(necessaryToolsNames);
 //        if (createListOfDotnetToolsResult.IsT1)
-//            return Err.RecreateErrors(createListOfDotnetToolsResult.AsT1,
+//            return Error.RecreateErrors(createListOfDotnetToolsResult.AsT1,
 //                DotnetToolsManagerErrors.CreateListOfDotnetToolsError);
 //        var dotnetTools = createListOfDotnetToolsResult.AsT0;
 //        return new DotnetToolsManager(necessaryToolsNames, dotnetTools);
 //    }
 
-//    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetTools(
+//    private static OneOf<List<DotnetTool>, Error[]> CreateListOfDotnetTools(
 //        Dictionary<ENecessaryTools, string> necessaryToolsNames)
 //    {
 //        var createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
 //        if (createListOfDotnetToolsInstalledResult.IsT1)
-//            return Err.RecreateErrors(createListOfDotnetToolsInstalledResult.AsT1,
+//            return Error.RecreateErrors(createListOfDotnetToolsInstalledResult.AsT1,
 //                DotnetToolsManagerErrors.CreateListOfDotnetToolsInstalledError);
 //        var listOfTools = createListOfDotnetToolsInstalledResult.AsT0;
 
@@ -90,7 +90,7 @@
 //        {
 //            var getAvailableVersionOfToolResult = GetAvailableVersionOfTool(pair.Value);
 //            if (getAvailableVersionOfToolResult.IsT1)
-//                return Err.RecreateErrors(getAvailableVersionOfToolResult.AsT1,
+//                return Error.RecreateErrors(getAvailableVersionOfToolResult.AsT1,
 //                    DotnetToolsManagerErrors.GetAvailableVersionOfToolError);
 //            var availableVersion = getAvailableVersionOfToolResult.AsT0;
 //            var nesTool = listOfTools.FirstOrDefault(tool => tool.PackageId == pair.Value);
@@ -103,12 +103,12 @@
 //        return listOfTools;
 //    }
 
-//    private static OneOf<string, Err[]> GetAvailableVersionOfTool(string toolName)
+//    private static OneOf<string, Error[]> GetAvailableVersionOfTool(string toolName)
 //    {
 //        var dotnetProcessor = new DotnetProcessor(null, false);
 //        var processResult = dotnetProcessor.SearchTool(toolName);
 //        if (processResult.IsT1)
-//            return (Err[])processResult.AsT1;
+//            return (Error[])processResult.AsT1;
 //        var outputResult = processResult.AsT0.Item1;
 //        var outputLines = outputResult.Split(Environment.NewLine);
 //        if (outputLines.Length < 3) return "N/A";
@@ -116,12 +116,12 @@
 //        return lineParts.Length < 2 ? "N/A" : lineParts[1];
 //    }
 
-//    private static OneOf<List<DotnetTool>, Err[]> CreateListOfDotnetToolsInstalled()
+//    private static OneOf<List<DotnetTool>, Error[]> CreateListOfDotnetToolsInstalled()
 //    {
 //        var dotnetProcessor = new DotnetProcessor(null, false);
 //        var getToolsRawListResult = dotnetProcessor.GetToolsRawList();
 //        if (getToolsRawListResult.IsT1)
-//            return (Err[])getToolsRawListResult.AsT1;
+//            return (Error[])getToolsRawListResult.AsT1;
 
 //        var listOfTools = getToolsRawListResult.AsT0.Skip(2)
 //            .Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
@@ -137,7 +137,7 @@
 //        var createListOfDotnetToolsResult = CreateListOfDotnetTools(_necessaryToolsNames);
 //        if (createListOfDotnetToolsResult.IsT1)
 //        {
-//            Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
+//            Error.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
 //            return;
 //        }
 
@@ -167,7 +167,7 @@
 //            createListOfDotnetToolsResult = CreateListOfDotnetTools(_necessaryToolsNames);
 //            if (createListOfDotnetToolsResult.IsT1)
 //            {
-//                Err.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
+//                Error.PrintErrorsOnConsole(createListOfDotnetToolsResult.AsT1);
 //                return;
 //            }
 

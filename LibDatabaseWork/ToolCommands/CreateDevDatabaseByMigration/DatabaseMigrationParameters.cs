@@ -103,13 +103,13 @@ public sealed class DatabaseMigrationParameters : IParameters
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
-        OneOf<IDatabaseManager, Err[]> createDatabaseManagerResult = DatabaseManagersFactory
+        OneOf<IDatabaseManager, Error[]> createDatabaseManagerResult = DatabaseManagersFactory
             .CreateDatabaseManager(logger, true, devDatabaseParameters.DbConnectionName, databaseServerConnections,
                 apiClients, httpClientFactory, null, null).Result;
         if (createDatabaseManagerResult.IsT1)
         {
 #pragma warning disable CA2254
-            logger.LogError(DatabaseManagerErrors.CanNotCreateDatabaseServerClient.ErrorMessage);
+            logger.LogError(DatabaseManagerErrors.CanNotCreateDatabaseServerClient.Name);
 #pragma warning restore CA2254
             return null;
         }
