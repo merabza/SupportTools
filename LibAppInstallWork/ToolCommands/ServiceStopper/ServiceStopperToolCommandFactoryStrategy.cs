@@ -24,7 +24,7 @@ public class ServiceStopperToolCommandFactoryStrategy : IToolCommandFactoryStrat
         _httpClientFactory = httpClientFactory;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.ServiceStopper);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

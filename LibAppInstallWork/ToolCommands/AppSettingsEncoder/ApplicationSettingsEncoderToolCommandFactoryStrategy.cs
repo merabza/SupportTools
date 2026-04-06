@@ -19,7 +19,7 @@ public class ApplicationSettingsEncoderToolCommandFactoryStrategy : IToolCommand
         _logger = logger;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.AppSettingsEncoder);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

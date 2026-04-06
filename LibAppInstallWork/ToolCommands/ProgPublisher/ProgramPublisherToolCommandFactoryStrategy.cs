@@ -20,7 +20,7 @@ public class ProgramPublisherToolCommandFactoryStrategy : IToolCommandFactoryStr
         _logger = logger;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.ProgPublisher);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

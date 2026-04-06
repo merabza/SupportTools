@@ -17,7 +17,7 @@ public class SeedDataFactoryStrategy : ExternalScaffoldSeedToolCommandFactoryStr
     {
     }
 
-    public string ToolCommandName => nameof(EProjectTools.JsonFromProjectDbProjectGetter);
+    public string ToolCommandName => nameof(EProjectTools.SeedData);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

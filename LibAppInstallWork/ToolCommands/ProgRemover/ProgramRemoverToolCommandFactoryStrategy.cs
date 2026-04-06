@@ -23,7 +23,7 @@ public class ProgramRemoverToolCommandFactoryStrategy : IToolCommandFactoryStrat
         _httpClientFactory = httpClientFactory;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.ProgRemover);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

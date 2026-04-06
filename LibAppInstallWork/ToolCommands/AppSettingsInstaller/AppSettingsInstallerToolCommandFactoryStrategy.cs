@@ -22,7 +22,7 @@ public class AppSettingsInstallerToolCommandFactoryStrategy : IToolCommandFactor
         _httpClientFactory = httpClientFactory;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.AppSettingsInstaller);
 
     public async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

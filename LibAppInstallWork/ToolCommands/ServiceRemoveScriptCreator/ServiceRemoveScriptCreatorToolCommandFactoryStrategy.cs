@@ -20,7 +20,7 @@ public class ServiceRemoveScriptCreatorToolCommandFactoryStrategy : IToolCommand
         _logger = logger;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.ServiceRemoveScriptCreator);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

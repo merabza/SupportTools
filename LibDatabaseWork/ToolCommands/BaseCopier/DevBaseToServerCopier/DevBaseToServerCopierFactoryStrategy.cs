@@ -17,7 +17,7 @@ public class DevBaseToServerCopierFactoryStrategy : BaseCopierFactoryStrategy, I
     {
     }
 
-    public string ToolCommandName => nameof(EProjectTools.JsonFromProjectDbProjectGetter);
+    public string ToolCommandName => nameof(EProjectServerTools.DevBaseToServerCopier);
 
     public async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)

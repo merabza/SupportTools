@@ -23,7 +23,7 @@ public class VersionCheckerToolCommandFactoryStrategy : IToolCommandFactoryStrat
         _httpClientFactory = httpClientFactory;
     }
 
-    public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
+    public string ToolCommandName => nameof(EProjectServerTools.VersionChecker);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
