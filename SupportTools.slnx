@@ -49,6 +49,7 @@
   </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
+    <Project Path="../SystemTools/SystemTools.BackgroundTasks/SystemTools.BackgroundTasks.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.DomainShared/SystemTools.DomainShared.csproj" />
@@ -65,7 +66,6 @@
     <Project Path="../ToolsManagement/ToolsManagement.DatabasesManagement/ToolsManagement.DatabasesManagement.csproj" />
     <Project Path="../ToolsManagement/ToolsManagement.FileManagersMain/ToolsManagement.FileManagersMain.csproj" />
     <Project Path="../ToolsManagement/ToolsManagement.Installer/ToolsManagement.Installer.csproj" />
-    <Project Path="../ToolsManagement/ToolsManagement.LibToolActions/ToolsManagement.LibToolActions.csproj" />
   </Folder>
   <Folder Name="/WebAgentContracts/">
     <Project Path="../WebAgentContracts/WebAgentContracts.WebAgentDatabasesApiContracts/WebAgentContracts.WebAgentDatabasesApiContracts.csproj" />

@@ -31,7 +31,7 @@ public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStr
         var projectToolsFactoryStrategyParameters =
             (ProjectServerToolsFactoryStrategyParameters)factoryStrategyParameters;
         string projectName = projectToolsFactoryStrategyParameters.ProjectName;
-        var serverInfo = projectToolsFactoryStrategyParameters.ServerInfo;
+        ServerInfoModel serverInfo = projectToolsFactoryStrategyParameters.ServerInfo;
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
