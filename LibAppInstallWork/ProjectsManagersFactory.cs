@@ -10,7 +10,7 @@ namespace LibAppInstallWork;
 
 public static class ProjectsManagersFactory
 {
-    public static IIProjectsManagerWithFileStorage? CreateProjectsManagerWithFileStorage(ILogger logger,
+    public static IIProjectsManagerWithFileStorage? CreateProjectsManagerWithFileStorage(string appName, ILogger logger,
         IHttpClientFactory httpClientFactory, FileStorageData fileStorageForUpload,
         InstallerBaseParameters installerBaseParameters, bool useConsole)
     {
@@ -31,7 +31,7 @@ public static class ProjectsManagersFactory
 
         if (installerBaseParameters.LocalInstallerSettings is not null)
         {
-            return new ProjectsManagerLocalWithFileStorage(logger, false, fileStorageForUpload,
+            return new ProjectsManagerLocalWithFileStorage(appName, logger, false, fileStorageForUpload,
                 installerBaseParameters.LocalInstallerSettings, null, null);
         }
 

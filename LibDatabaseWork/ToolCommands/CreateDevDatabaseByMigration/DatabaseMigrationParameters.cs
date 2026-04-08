@@ -39,8 +39,8 @@ public sealed class DatabaseMigrationParameters : IParameters
         return true;
     }
 
-    public static DatabaseMigrationParameters? Create(ILogger logger, IHttpClientFactory httpClientFactory,
-        SupportToolsParameters supportToolsParameters, string projectName)
+    public static DatabaseMigrationParameters? Create(string appName, ILogger logger,
+        IHttpClientFactory httpClientFactory, SupportToolsParameters supportToolsParameters, string projectName)
     {
         ProjectModel? project = supportToolsParameters.GetProject(projectName);
 
@@ -104,8 +104,8 @@ public sealed class DatabaseMigrationParameters : IParameters
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
         OneOf<IDatabaseManager, Error[]> createDatabaseManagerResult = DatabaseManagersFactory
-            .CreateDatabaseManager(logger, true, devDatabaseParameters.DbConnectionName, databaseServerConnections,
-                apiClients, httpClientFactory, null, null).Result;
+            .CreateDatabaseManager(appName, logger, true, devDatabaseParameters.DbConnectionName,
+                databaseServerConnections, apiClients, httpClientFactory, null, null).Result;
         if (createDatabaseManagerResult.IsT1)
         {
 #pragma warning disable CA2254

@@ -20,13 +20,15 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
 
     private readonly IHttpClientFactory _httpClientFactory;
 
+    private readonly string _appName;
     private readonly ILogger _logger;
     private readonly bool _useConsole;
 
-    public AppSettingsInstallerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
+    public AppSettingsInstallerToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
         AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
         parameters, parametersManager, ActionDescription, useConsole)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _useConsole = useConsole;
@@ -65,7 +67,7 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
         }
 
         //2. მოვსინჯოთ პარამეტრების ფაილის დაინსტალირება ან განახლება პროგრამის მხარეს.
-        var installParametersAction = new InstallParametersAction(_logger, _httpClientFactory,
+        var installParametersAction = new InstallParametersAction(_appName, _logger, _httpClientFactory,
             AppSettingsInstallerParameters.ParametersFileDateMask,
             AppSettingsInstallerParameters.ParametersFileExtension,
             AppSettingsInstallerParameters.InstallerBaseParameters, AppSettingsInstallerParameters.FileStorageForUpload,

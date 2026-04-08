@@ -12,11 +12,13 @@ namespace LibDatabaseWork.ToolCommands.BaseCopier;
 
 public class BaseCopierFactoryStrategy
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
 
-    protected BaseCopierFactoryStrategy(ILogger logger, IHttpClientFactory httpClientFactory)
+    protected BaseCopierFactoryStrategy(string appName, ILogger logger, IHttpClientFactory httpClientFactory)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -43,7 +45,7 @@ public class BaseCopierFactoryStrategy
         //}
 
         CopyBaseParameters? copyBaseParametersDevToProd =
-            await CopyBaseParametersFactory.CreateCopyBaseParameters(_logger, _httpClientFactory,
+            await CopyBaseParametersFactory.CreateCopyBaseParameters(_appName, _logger, _httpClientFactory,
                 fromDatabaseParameters, toDatabaseParameters, supportToolsParameters, cancellationToken);
         if (copyBaseParametersDevToProd is not null)
         {

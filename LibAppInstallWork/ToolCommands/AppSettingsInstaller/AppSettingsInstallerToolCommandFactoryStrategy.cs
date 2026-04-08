@@ -12,12 +12,14 @@ namespace LibAppInstallWork.ToolCommands.AppSettingsInstaller;
 public class AppSettingsInstallerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string _appName;
     private readonly ILogger<AppSettingsInstallerToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public AppSettingsInstallerToolCommandFactoryStrategy(
+    public AppSettingsInstallerToolCommandFactoryStrategy(string appName,
         ILogger<AppSettingsInstallerToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -38,7 +40,7 @@ public class AppSettingsInstallerToolCommandFactoryStrategy : IToolCommandFactor
             CancellationToken.None);
         if (appSettingsInstallerParameters is not null)
         {
-            return new AppSettingsInstallerToolCommand(_logger, _httpClientFactory, true,
+            return new AppSettingsInstallerToolCommand(_appName, _logger, _httpClientFactory, true,
                 appSettingsInstallerParameters, parametersManager);
         }
 

@@ -22,9 +22,10 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
     private readonly string _projectName;
     private readonly ServiceProvider _serviceProvider;
 
-    public ServerInfoCruder(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
-        Dictionary<string, ServerInfoModel> currentValuesDictionary, string projectName,
-        ServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary, "Server", "Servers", true)
+    public ServerInfoCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        ParametersManager parametersManager, Dictionary<string, ServerInfoModel> currentValuesDictionary,
+        string projectName, ServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary,
+        "Server", "Servers", true)
     {
         _projectName = projectName;
         _serviceProvider = serviceProvider;
@@ -49,21 +50,21 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
         //FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
         //    nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(appName, logger, httpClientFactory,
             nameof(ServerInfoModel.CurrentDatabaseParameters), parametersManager));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(appName, logger, httpClientFactory,
             nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
     }
 
-    public static ServerInfoCruder Create(ServiceProvider serviceProvider, ILogger logger,
+    public static ServerInfoCruder Create(string appName, ServiceProvider serviceProvider, ILogger logger,
         IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         Dictionary<string, ServerInfoModel> currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??
                                                                       throw new ArgumentNullException(
                                                                           nameof(projectName));
-        return new ServerInfoCruder(logger, httpClientFactory, parametersManager, currentValuesDictionary, projectName,
-            serviceProvider);
+        return new ServerInfoCruder(appName, logger, httpClientFactory, parametersManager, currentValuesDictionary,
+            projectName, serviceProvider);
     }
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)

@@ -9,6 +9,7 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -18,10 +19,11 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerInfoSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, string itemKey,
-        ParametersManager parametersManager, string projectName, string serverName,
+    public ServerInfoSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        string itemKey, ParametersManager parametersManager, string projectName, string serverName,
         ServiceProvider serviceProvider) : base(itemKey, EMenuAction.LoadSubMenu)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
@@ -32,7 +34,7 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var serverInfoCruder = ServerInfoCruder.Create(_serviceProvider, _logger, _httpClientFactory,
+        var serverInfoCruder = ServerInfoCruder.Create(_appName, _serviceProvider, _logger, _httpClientFactory,
             _parametersManager, _projectName);
         CliMenuSet serverSubMenuSet = serverInfoCruder.GetItemMenu(_serverName); //, $"Project => {_projectName} => ");
 

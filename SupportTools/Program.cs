@@ -19,7 +19,7 @@ try
     const string appName = "SupportTools";
 
     //პროგრამის ატრიბუტების დაყენება 
-    ProgramAttributes.Instance.AppName = appName;
+    //ProgramAttributes.Instance.AppName = appName;
 
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
 
@@ -67,7 +67,7 @@ try
         return 6;
     }
 
-    var supportTools = new SupportToolsCliAppLoop(serviceProvider, logger, httpClientFactory, memoryCache,
+    var supportTools = new SupportToolsCliAppLoop(appName, serviceProvider, logger, httpClientFactory, memoryCache,
         new ParametersManager(parametersFileName, par));
 
     // ReSharper disable once using

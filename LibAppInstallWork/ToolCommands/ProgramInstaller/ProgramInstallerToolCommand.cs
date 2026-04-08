@@ -15,15 +15,17 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
 {
     private const string ActionName = "Installing Program";
     private const string ActionDescription = "Installing Program";
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramInstallerToolCommand(ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
-        IParameters parameters, IParametersManager parametersManager) : base(logger, ActionName, parameters,
-        parametersManager, ActionDescription, useConsole)
+    public ProgramInstallerToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        bool useConsole, IParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
+        parameters, parametersManager, ActionDescription, useConsole)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _useConsole = useConsole;
@@ -48,7 +50,7 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
         if (!Parameters.IsService)
         {
             //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-            var installProgramAction = new InstallProgramAction(_logger, _httpClientFactory,
+            var installProgramAction = new InstallProgramAction(_appName, _logger, _httpClientFactory,
                 Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask,
                 Parameters.ProgramArchiveExtension, Parameters.ParametersFileDateMask,
                 Parameters.ParametersFileExtension, Parameters.FileStorageForExchange, Parameters.ProjectName,
@@ -80,7 +82,7 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
         //2. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
         string projectName = Parameters.ProjectName;
         string? environmentName = Parameters.ServerInfo.EnvironmentName;
-        var installServiceAction = new InstallServiceAction(_logger, _httpClientFactory,
+        var installServiceAction = new InstallServiceAction(_appName, _logger, _httpClientFactory,
             Parameters.InstallerBaseParameters, Parameters.ProgramArchiveDateMask, Parameters.ProgramArchiveExtension,
             Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension, Parameters.FileStorageForExchange,
             projectName, Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName,

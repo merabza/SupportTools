@@ -17,13 +17,15 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
     private readonly ParametersManager _parametersManager;
 
     private readonly string _projectGroupName;
+    private readonly string _appName;
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCliMenuCommand(ServiceProvider serviceProvider, ILogger logger,
+    public ProjectGroupSubMenuCliMenuCommand(string appName, ServiceProvider serviceProvider, ILogger logger,
         IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectGroupName) : base(
         projectGroupName, EMenuAction.LoadSubMenu)
     {
+        _appName = appName;
         _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -53,7 +55,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
                                  _projectGroupName).OrderBy(o => o.Key))
             //projectName
         {
-            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_serviceProvider, _logger,
+            projectGroupSubMenuSet.AddMenuItem(new ProjectSubMenuCliMenuCommand(_appName, _serviceProvider, _logger,
                 _httpClientFactory, _parametersManager, projectName));
         }
 

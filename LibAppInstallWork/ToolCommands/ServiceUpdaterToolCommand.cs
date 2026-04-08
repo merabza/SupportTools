@@ -17,14 +17,16 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
 {
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
 
-    public ServiceUpdaterToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+    public ServiceUpdaterToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         ServiceUpdaterParameters programServiceUpdaterParameters, IParametersManager parametersManager,
         bool useConsole) : base(logger, ActionName, programServiceUpdaterParameters, parametersManager,
         ActionDescription, useConsole)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -82,7 +84,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
-        var installProgramAction = new InstallServiceAction(_logger, _httpClientFactory,
+        var installProgramAction = new InstallServiceAction(_appName, _logger, _httpClientFactory,
             ProgramServiceUpdaterParameters.InstallerBaseParameters,
             ProgramServiceUpdaterParameters.ProgramArchiveDateMask,
             ProgramServiceUpdaterParameters.ProgramArchiveExtension,

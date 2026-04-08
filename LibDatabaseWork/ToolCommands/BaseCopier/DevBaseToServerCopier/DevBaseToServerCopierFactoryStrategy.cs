@@ -12,8 +12,8 @@ namespace LibDatabaseWork.ToolCommands.BaseCopier.DevBaseToServerCopier;
 public class DevBaseToServerCopierFactoryStrategy : BaseCopierFactoryStrategy, IToolCommandFactoryStrategy
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DevBaseToServerCopierFactoryStrategy(ILogger<DevBaseToServerCopierFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory) : base(logger, httpClientFactory)
+    public DevBaseToServerCopierFactoryStrategy(string appName, ILogger<DevBaseToServerCopierFactoryStrategy> logger,
+        IHttpClientFactory httpClientFactory) : base(appName, logger, httpClientFactory)
     {
     }
 

@@ -20,6 +20,7 @@ namespace SupportTools;
 
 public sealed class SupportToolsCliAppLoop : CliAppLoop
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
@@ -27,10 +28,11 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SupportToolsCliAppLoop(ServiceProvider serviceProvider, ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, ParametersManager parametersManager) : base(
-        (IParametersWithRecentData)parametersManager.Parameters)
+    public SupportToolsCliAppLoop(string appName, ServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ParametersManager parametersManager) : base(
+        appName, (IParametersWithRecentData)parametersManager.Parameters)
     {
+        _appName = appName;
         _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -59,9 +61,10 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
         mainMenuSet.AddMenuItem(
-            new ProjectCreatorSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager));
+            new ProjectCreatorSubMenuCliMenuCommand(_appName, _logger, _httpClientFactory, _parametersManager));
 
-        var projectCruder = new ProjectCruder(_logger, _httpClientFactory, _parametersManager, parameters.Projects);
+        var projectCruder =
+            new ProjectCruder(_appName, _logger, _httpClientFactory, _parametersManager, parameters.Projects);
 
         //ახალი პროექტის შექმნა
         var newItemCommand = new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural,
@@ -94,8 +97,8 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
                      .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
                      .OrderBy(x => x))
         {
-            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_serviceProvider, _logger, _httpClientFactory,
-                _parametersManager, projectGroupName));
+            mainMenuSet.AddMenuItem(new ProjectGroupSubMenuCliMenuCommand(_appName, _serviceProvider, _logger,
+                _httpClientFactory, _parametersManager, projectGroupName));
         }
 
         //ბოლოს გამოყენებული ბრძანებები

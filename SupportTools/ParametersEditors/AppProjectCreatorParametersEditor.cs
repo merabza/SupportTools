@@ -12,7 +12,7 @@ namespace SupportTools.ParametersEditors;
 
 public sealed class AppProjectCreatorParametersEditor : ParametersEditor
 {
-    public AppProjectCreatorParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory,
+    public AppProjectCreatorParametersEditor(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         IParameters parameters, IParametersManager parametersManager, ParametersManager listsParametersManager) : base(
         "AppProjectCreatorParametersEditor", parameters, parametersManager)
     {
@@ -20,7 +20,7 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
         FieldEditors.Add(new TextFieldEditor(nameof(AppProjectCreatorAllParameters.FakeHostProjectName)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.ProjectsFolderPathReal)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.SecretsFolderPathReal)));
-        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(appName, logger, httpClientFactory,
             nameof(AppProjectCreatorAllParameters.DeveloperDbConnectionName), listsParametersManager, true));
         //გაცვლის ფაილსაცავის სახელი
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,

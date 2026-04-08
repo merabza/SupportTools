@@ -13,13 +13,15 @@ namespace LibAppInstallWork.ToolCommands.ProgramUpdater;
 // ReSharper disable once UnusedType.Global
 public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<ProgramUpdaterToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramUpdaterToolCommandFactoryStrategy(ILogger<ProgramUpdaterToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
+    public ProgramUpdaterToolCommandFactoryStrategy(string appName,
+        ILogger<ProgramUpdaterToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -47,7 +49,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
                 projectName, serverInfo, cancellationToken);
             if (programServiceUpdaterParameters is not null)
             {
-                return new ServiceUpdaterToolCommand(_logger, _httpClientFactory, programServiceUpdaterParameters,
+                return new ServiceUpdaterToolCommand(_appName, _logger, _httpClientFactory, programServiceUpdaterParameters,
                     parametersManager, true);
             }
 
@@ -59,7 +61,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
             projectName, serverInfo, cancellationToken);
         if (programUpdaterParameters is not null)
         {
-            return new ProgramUpdaterToolCommand(_logger, _httpClientFactory, programUpdaterParameters,
+            return new ProgramUpdaterToolCommand(_appName, _logger, _httpClientFactory, programUpdaterParameters,
                 parametersManager, true);
         }
 

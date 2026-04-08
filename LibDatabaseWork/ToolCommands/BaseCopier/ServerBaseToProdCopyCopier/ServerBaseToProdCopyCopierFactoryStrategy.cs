@@ -12,8 +12,9 @@ namespace LibDatabaseWork.ToolCommands.BaseCopier.ServerBaseToProdCopyCopier;
 public class ServerBaseToProdCopyCopierFactoryStrategy : BaseCopierFactoryStrategy, IToolCommandFactoryStrategy
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerBaseToProdCopyCopierFactoryStrategy(ILogger<ServerBaseToProdCopyCopierFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory) : base(logger, httpClientFactory)
+    public ServerBaseToProdCopyCopierFactoryStrategy(string appName,
+        ILogger<ServerBaseToProdCopyCopierFactoryStrategy> logger, IHttpClientFactory httpClientFactory) : base(appName,
+        logger, httpClientFactory)
     {
     }
 

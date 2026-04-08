@@ -15,6 +15,7 @@ namespace LibAppInstallWork.ToolActions;
 
 public sealed class InstallProgramAction : ToolAction
 {
+    private readonly string _appName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -28,12 +29,13 @@ public sealed class InstallProgramAction : ToolAction
 
     //private string? _installingProgramVersion;
 
-    public InstallProgramAction(ILogger logger, IHttpClientFactory httpClientFactory,
+    public InstallProgramAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
         string projectName, string environmentName, bool useConsole) : base(logger, "Install service", null, null,
         useConsole)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _installerBaseParameters = installerBaseParameters;
@@ -50,7 +52,7 @@ public sealed class InstallProgramAction : ToolAction
     {
         //კლიენტის შექმნა
         IIProjectsManagerWithFileStorage? projectManager =
-            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_appName, _logger, _httpClientFactory,
                 _fileStorageForDownload, _installerBaseParameters, UseConsole);
 
         if (projectManager is null)

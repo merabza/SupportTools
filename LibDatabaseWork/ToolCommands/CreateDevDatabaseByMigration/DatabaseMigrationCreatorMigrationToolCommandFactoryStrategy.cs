@@ -12,15 +12,16 @@ namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 // ReSharper disable once UnusedType.Global
 public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(
+    public DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(string appName,
         ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -34,8 +35,8 @@ public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : ITool
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpCreator = DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters,
-            projectToolsFactoryStrategyParameters.ProjectName);
+        var dmpCreator = DatabaseMigrationParameters.Create(_appName, _logger, _httpClientFactory,
+            supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpCreator is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(

@@ -16,6 +16,7 @@ namespace LibAppInstallWork.ToolActions;
 
 public sealed class InstallParametersAction : ToolAction
 {
+    private readonly string _appName;
     private readonly string _appSettingsEncodedJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForUpload;
@@ -26,12 +27,13 @@ public sealed class InstallParametersAction : ToolAction
     private readonly string _parametersFileExtension;
     private readonly string _projectName;
 
-    public InstallParametersAction(ILogger logger, IHttpClientFactory httpClientFactory, string parametersFileDateMask,
-        string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
+    public InstallParametersAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        string parametersFileDateMask, string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
         FileStorageData fileStorageForUpload, string projectName, string environmentName,
         string appSettingsEncodedJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null,
         useConsole)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _installerBaseParameters = installerBaseParameters;
@@ -46,7 +48,7 @@ public sealed class InstallParametersAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         IIProjectsManagerWithFileStorage? projectManager =
-            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_logger, _httpClientFactory,
+            ProjectsManagersFactory.CreateProjectsManagerWithFileStorage(_appName, _logger, _httpClientFactory,
                 _fileStorageForUpload, _installerBaseParameters, UseConsole);
         if (projectManager is null)
         {

@@ -20,7 +20,7 @@ namespace LibDatabaseWork;
 
 public static class CopyBaseParametersFactory
 {
-    public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(ILogger logger,
+    public static async Task<CopyBaseParameters?> CreateCopyBaseParameters(string appName, ILogger logger,
         IHttpClientFactory httpClientFactory, DatabaseParameters fromDatabaseParameters,
         DatabaseParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
         CancellationToken cancellationToken = default)
@@ -35,7 +35,8 @@ public static class CopyBaseParametersFactory
         var fileStorages = new FileStorages(supportToolsParameters.FileStorages);
         var smartSchemas = new SmartSchemas(supportToolsParameters.SmartSchemas);
 
-        var createSourceBaseBackupParametersFactory = new CreateBaseBackupParametersFactory(logger, null, null, true);
+        var createSourceBaseBackupParametersFactory =
+            new CreateBaseBackupParametersFactory(appName, logger, null, null, true);
         OneOf<BaseBackupParameters, Error[]> createSourceBaseBackupParametersResult =
             await createSourceBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
@@ -48,7 +49,7 @@ public static class CopyBaseParametersFactory
         }
 
         var createDestinationBaseBackupParametersFactory =
-            new CreateBaseBackupParametersFactory(logger, null, null, true);
+            new CreateBaseBackupParametersFactory(appName, logger, null, null, true);
         OneOf<BaseBackupParameters, Error[]> createDestinationBaseBackupParametersResult =
             await createDestinationBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
@@ -150,7 +151,7 @@ public static class CopyBaseParametersFactory
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
         OneOf<IDatabaseManager, Error[]> createDatabaseManagerResultForSource =
-            await DatabaseManagersFactory.CreateDatabaseManager(logger, true, sourceDbConnectionName,
+            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, sourceDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForSource.IsT1)
@@ -161,7 +162,7 @@ public static class CopyBaseParametersFactory
         }
 
         OneOf<IDatabaseManager, Error[]> createDatabaseManagerResultForDestination =
-            await DatabaseManagersFactory.CreateDatabaseManager(logger, true, destinationDbConnectionName,
+            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, destinationDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResultForDestination.IsT1)

@@ -17,6 +17,7 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
@@ -25,10 +26,11 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectSubMenuCliMenuCommand(ServiceProvider serviceProvider, ILogger logger,
+    public ProjectSubMenuCliMenuCommand(string appName, ServiceProvider serviceProvider, ILogger logger,
         IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName) : base(
         projectName, EMenuAction.LoadSubMenu)
     {
+        _appName = appName;
         _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
@@ -51,7 +53,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         projectSubMenuSet.AddMenuItem(exportProjectCommand);
 
         //პროექტის პარამეტრი
-        var projectCruder = ProjectCruder.Create(_logger, _httpClientFactory, _parametersManager);
+        var projectCruder = ProjectCruder.Create(_appName, _logger, _httpClientFactory, _parametersManager);
         var editCommand = new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _projectName);
         projectSubMenuSet.AddMenuItem(editCommand);
 
@@ -80,23 +82,6 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                     _parametersManager, _projectName, EGitCol.ScaffoldSeed));
             }
 
-            //if (!string.IsNullOrWhiteSpace(project.SpaProjectName))
-            //{
-            //    //projectSubMenuSet.AddMenuItem(
-            //    //    new FrontNpmPackageNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
-            //    projectSubMenuSet.AddMenuItem(new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger,
-            //        _httpClientFactory, _parametersManager));
-            //}
-
-            //if (project.IsService)
-            //{
-            //    projectSubMenuSet.AddMenuItem(
-            //        new EndpointNamesSubMenuCliMenuCommand(_logger, _parametersManager, _projectName));
-            //    //projectSubMenuSet.AddMenuItem(
-            //    //    new ReCreateUpdateFrontSpaProjectCliMenuCommand(_logger, _httpClientFactory,
-            //    //        _parametersManager, _projectName));
-            //}
-
             //დასაშვები ინსტრუმენტების არჩევა
             projectSubMenuSet.AddMenuItem(new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _projectName));
 
@@ -108,7 +93,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             }
         }
 
-        var serverInfoCruder = ServerInfoCruder.Create(_serviceProvider, _logger, _httpClientFactory,
+        var serverInfoCruder = ServerInfoCruder.Create(_appName, _serviceProvider, _logger, _httpClientFactory,
             _parametersManager, _projectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
@@ -123,7 +108,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
                      project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
                 //, kvp.Value.GetItemKey()
             {
-                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_logger, _httpClientFactory,
+                projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_appName, _logger, _httpClientFactory,
                     kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key, _serviceProvider));
             }
         }

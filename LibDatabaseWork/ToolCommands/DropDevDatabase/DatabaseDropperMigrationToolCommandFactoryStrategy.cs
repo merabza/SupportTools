@@ -14,12 +14,14 @@ namespace LibDatabaseWork.ToolCommands.DropDevDatabase;
 public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string _appName;
     private readonly ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseDropperMigrationToolCommandFactoryStrategy(
+    public DatabaseDropperMigrationToolCommandFactoryStrategy(string appName,
         ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
+        _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -33,7 +35,7 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForDropper = DatabaseMigrationParameters.Create(_logger, _httpClientFactory, supportToolsParameters,
+        var dmpForDropper = DatabaseMigrationParameters.Create(_appName, _logger, _httpClientFactory, supportToolsParameters,
             projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpForDropper is not null)
         {

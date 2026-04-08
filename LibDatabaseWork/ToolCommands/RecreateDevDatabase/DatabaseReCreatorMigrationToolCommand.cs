@@ -36,6 +36,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
                                              """;
 
     private readonly ApiClients _apiClients;
+    private readonly string _appName;
 
     private readonly CorrectNewDbParameters _correctNewDbParameters;
     private readonly DatabaseServerConnections _databaseServerConnections;
@@ -44,12 +45,13 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     private readonly ILogger _logger;
 
     //პარამეტრები მოეწოდება პირდაპირ კონსტრუქტორში
-    public DatabaseReCreatorMigrationToolCommand(ILogger logger,
+    public DatabaseReCreatorMigrationToolCommand(string appName, ILogger logger,
         DatabaseMigrationParameters databaseMigrationParameters, DatabaseParameters devDatabaseParameters,
         CorrectNewDbParameters correctNewDbParameters, DatabaseServerConnections databaseServerConnections,
         ApiClients apiClients, IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(
         logger, ActionName, databaseMigrationParameters, parametersManager, ActionDescription)
     {
+        _appName = appName;
         _logger = logger;
         _devDatabaseParameters = devDatabaseParameters;
         _correctNewDbParameters = correctNewDbParameters;
@@ -121,7 +123,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         }
 
         OneOf<IDatabaseManager, Error[]> createDatabaseManagerResult =
-            await DatabaseManagersFactory.CreateDatabaseManager(_logger, true, dbConnectionName,
+            await DatabaseManagersFactory.CreateDatabaseManager(_appName, _logger, true, dbConnectionName,
                 _databaseServerConnections, _apiClients, _httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResult.IsT1)
