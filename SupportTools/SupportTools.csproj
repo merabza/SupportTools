@@ -10,6 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ToolCommandParameters\**" />
+    <Compile Remove="ToolCommands\**" />
+    <EmbeddedResource Remove="ToolCommandParameters\**" />
+    <EmbeddedResource Remove="ToolCommands\**" />
+    <None Remove="ToolCommandParameters\**" />
+    <None Remove="ToolCommands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibCodeGenerator\LibCodeGenerator.csproj" />
@@ -23,8 +32,6 @@
 
   <ItemGroup>
     <Folder Include="ProgramManipulations\" />
-    <Folder Include="ToolCommandParameters\" />
-    <Folder Include="ToolCommands\" />
   </ItemGroup>
 
   <ItemGroup>
