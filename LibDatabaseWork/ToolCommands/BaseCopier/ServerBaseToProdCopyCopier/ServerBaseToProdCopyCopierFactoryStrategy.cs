@@ -9,11 +9,12 @@ using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.BaseCopier.ServerBaseToProdCopyCopier;
 
+// ReSharper disable once UnusedType.Global
 public class ServerBaseToProdCopyCopierFactoryStrategy : BaseCopierFactoryStrategy, IToolCommandFactoryStrategy
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerBaseToProdCopyCopierFactoryStrategy(string appName,
-        ILogger<ServerBaseToProdCopyCopierFactoryStrategy> logger, IHttpClientFactory httpClientFactory) : base(appName,
+    public ServerBaseToProdCopyCopierFactoryStrategy(IApplication app,
+        ILogger<ServerBaseToProdCopyCopierFactoryStrategy> logger, IHttpClientFactory httpClientFactory) : base(app,
         logger, httpClientFactory)
     {
     }

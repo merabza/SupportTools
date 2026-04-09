@@ -12,15 +12,15 @@ namespace LibAppInstallWork.ToolCommands.ProgramInstaller;
 // ReSharper disable once UnusedType.Global
 public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    private readonly string _appName;
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<ProgramInstallerToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramInstallerToolCommandFactoryStrategy(string appName,
+    public ProgramInstallerToolCommandFactoryStrategy(IApplication app,
         ILogger<ProgramInstallerToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
-        _appName = appName;
+        _app = app;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -44,7 +44,7 @@ public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStr
 
         if (programInstallerParameters is not null)
         {
-            return new ProgramInstallerToolCommand(_appName, _logger, _httpClientFactory, true,
+            return new ProgramInstallerToolCommand(_app.Name, _logger, _httpClientFactory, true,
                 programInstallerParameters, parametersManager);
         }
 

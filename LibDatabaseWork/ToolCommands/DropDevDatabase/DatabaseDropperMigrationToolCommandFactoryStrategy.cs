@@ -13,15 +13,15 @@ namespace LibDatabaseWork.ToolCommands.DropDevDatabase;
 // ReSharper disable once UnusedType.Global
 public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly string _appName;
     private readonly ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseDropperMigrationToolCommandFactoryStrategy(string appName,
+    public DatabaseDropperMigrationToolCommandFactoryStrategy(IApplication app,
         ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
-        _appName = appName;
+        _app = app;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -35,8 +35,8 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForDropper = DatabaseMigrationParameters.Create(_appName, _logger, _httpClientFactory, supportToolsParameters,
-            projectToolsFactoryStrategyParameters.ProjectName);
+        var dmpForDropper = DatabaseMigrationParameters.Create(_app.Name, _logger, _httpClientFactory,
+            supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpForDropper is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(new DatabaseDropperMigrationToolCommand(_logger, dmpForDropper,

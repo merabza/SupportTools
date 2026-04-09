@@ -12,13 +12,13 @@ namespace LibDatabaseWork.ToolCommands.BaseCopier;
 
 public class BaseCopierFactoryStrategy
 {
-    private readonly string _appName;
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
 
-    protected BaseCopierFactoryStrategy(string appName, ILogger logger, IHttpClientFactory httpClientFactory)
+    protected BaseCopierFactoryStrategy(IApplication app, ILogger logger, IHttpClientFactory httpClientFactory)
     {
-        _appName = appName;
+        _app = app;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -29,23 +29,8 @@ public class BaseCopierFactoryStrategy
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        //ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
-
-        //if (project.DevDatabaseParameters == null)
-        //{
-        //    StShared.WriteErrorLine($"DevDatabaseParameters is not specified for Project with name {projectName}",
-        //        true);
-        //    return null;
-        //}
-
-        //if (serverInfo.NewDatabaseParameters == null)
-        //{
-        //    StShared.WriteErrorLine($"NewDatabaseParameters is not specified {serverInfo.ServerName}", true);
-        //    return null;
-        //}
-
         CopyBaseParameters? copyBaseParametersDevToProd =
-            await CopyBaseParametersFactory.CreateCopyBaseParameters(_appName, _logger, _httpClientFactory,
+            await CopyBaseParametersFactory.CreateCopyBaseParameters(_app.Name, _logger, _httpClientFactory,
                 fromDatabaseParameters, toDatabaseParameters, supportToolsParameters, cancellationToken);
         if (copyBaseParametersDevToProd is not null)
         {

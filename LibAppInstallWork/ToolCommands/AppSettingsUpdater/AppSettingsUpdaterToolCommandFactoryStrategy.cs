@@ -11,17 +11,17 @@ namespace LibAppInstallWork.ToolCommands.AppSettingsUpdater;
 
 public class AppSettingsUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    private readonly string _appName;
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<AppSettingsUpdaterToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public AppSettingsUpdaterToolCommandFactoryStrategy(string appName,
+    public AppSettingsUpdaterToolCommandFactoryStrategy(IApplication app,
         ILogger<AppSettingsUpdaterToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
-        _appName = appName;
+        _app = app;
     }
 
     public string ToolCommandName => nameof(EProjectServerTools.AppSettingsUpdater);
@@ -41,7 +41,7 @@ public class AppSettingsUpdaterToolCommandFactoryStrategy : IToolCommandFactoryS
             cancellationToken);
         if (appSettingsUpdaterParameters is not null)
         {
-            return new AppSettingsUpdaterToolCommand(_appName, _logger, _httpClientFactory,
+            return new AppSettingsUpdaterToolCommand(_app.Name, _logger, _httpClientFactory,
                 appSettingsUpdaterParameters, parametersManager, true);
         }
 

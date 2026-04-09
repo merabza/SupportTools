@@ -23,6 +23,8 @@ public sealed class SupportToolsServicesCreator : ServicesCreator
         services.AddHttpClient();
         services.AddMemoryCache();
 
+        services.AddSingleton<IApplication, SupportToolsApplication>();
+
         services.AddTransientAllToolCommandFactoryStrategies(
             typeof(CorrectNewDatabaseToolCommandFactoryStrategy).Assembly,
             typeof(JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy).Assembly,

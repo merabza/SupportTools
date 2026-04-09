@@ -13,15 +13,15 @@ namespace LibAppInstallWork.ToolCommands.ProgramUpdater;
 // ReSharper disable once UnusedType.Global
 public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    private readonly string _appName;
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<ProgramUpdaterToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramUpdaterToolCommandFactoryStrategy(string appName,
+    public ProgramUpdaterToolCommandFactoryStrategy(IApplication app,
         ILogger<ProgramUpdaterToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
-        _appName = appName;
+        _app = app;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -49,8 +49,8 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
                 projectName, serverInfo, cancellationToken);
             if (programServiceUpdaterParameters is not null)
             {
-                return new ServiceUpdaterToolCommand(_appName, _logger, _httpClientFactory, programServiceUpdaterParameters,
-                    parametersManager, true);
+                return new ServiceUpdaterToolCommand(_app.Name, _logger, _httpClientFactory,
+                    programServiceUpdaterParameters, parametersManager, true);
             }
 
             StShared.WriteErrorLine("programServiceUpdaterParameters is null", true);
@@ -61,7 +61,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
             projectName, serverInfo, cancellationToken);
         if (programUpdaterParameters is not null)
         {
-            return new ProgramUpdaterToolCommand(_appName, _logger, _httpClientFactory, programUpdaterParameters,
+            return new ProgramUpdaterToolCommand(_app.Name, _logger, _httpClientFactory, programUpdaterParameters,
                 parametersManager, true);
         }
 

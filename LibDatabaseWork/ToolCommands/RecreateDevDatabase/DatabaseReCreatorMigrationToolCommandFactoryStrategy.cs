@@ -16,15 +16,15 @@ namespace LibDatabaseWork.ToolCommands.RecreateDevDatabase;
 // ReSharper disable once UnusedType.Global
 public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    private readonly string _appName;
+    private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DatabaseReCreatorMigrationToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseReCreatorMigrationToolCommandFactoryStrategy(string appName,
+    public DatabaseReCreatorMigrationToolCommandFactoryStrategy(IApplication app,
         ILogger<DatabaseReCreatorMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
     {
-        _appName = appName;
+        _app = app;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
     }
@@ -39,7 +39,7 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForReCreator = DatabaseMigrationParameters.Create(_appName, _logger, _httpClientFactory,
+        var dmpForReCreator = DatabaseMigrationParameters.Create(_app.Name, _logger, _httpClientFactory,
             supportToolsParameters, projectName);
         var correctNewDbParametersForRecreate =
             CorrectNewDbParameters.Create(_logger, supportToolsParameters, projectName);
@@ -68,7 +68,7 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         if (correctNewDbParametersForRecreate is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_appName, _logger,
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_app.Name, _logger,
                 dmpForReCreator, project.DevDatabaseParameters, correctNewDbParametersForRecreate,
                 databaseServerConnections, apiClients, _httpClientFactory,
                 parametersManager)); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
