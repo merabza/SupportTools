@@ -5,16 +5,18 @@ using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibGitWork.CliMenuCommands;
+namespace LibGitWork.Menu.SyncAllProjectsAllGits;
 
 public sealed class SyncAllProjectsAllGitsCliMenuCommandV2 : CliMenuCommand
 {
+    public const string MenuCommandName = "Sync All Projects All Gits V2";
+
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllProjectsAllGitsCliMenuCommandV2(ILogger logger, ParametersManager parametersManager) : base(
-        "Sync All Projects All Gits V2", EMenuAction.Reload, EMenuAction.Reload, null, true)
+        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

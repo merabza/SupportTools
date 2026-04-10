@@ -20,7 +20,7 @@ public sealed class CreateAllTemplateTestProjectsToolCommand : ToolCommand
     private readonly ILogger _logger;
 
     public CreateAllTemplateTestProjectsToolCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        string actionName, ParametersManager parametersManager, bool useConsole) : base(logger, actionName,
+        string actionName, IParametersManager parametersManager, bool useConsole) : base(logger, actionName,
         parametersManager, actionName, useConsole)
     {
         _logger = logger;

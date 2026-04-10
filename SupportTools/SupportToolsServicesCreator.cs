@@ -3,6 +3,7 @@ using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 using LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 using LibCodeGenerator.ToolCommands.GenerateApiRoutes;
 using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
+using LibGitWork.Menu.SyncAllProjectsAllGits;
 using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.JsonFromProjectDbProjectGetter;
 using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +39,8 @@ public sealed class SupportToolsServicesCreator : ServicesCreator
 
         services.AddTransientAllMenuCommandFactoryStrategies(
             typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy).Assembly,
-            typeof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy).Assembly);
+            typeof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy).Assembly,
+            typeof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy).Assembly);
 
         services.AddSingleton<IProcesses, Processes>();
     }

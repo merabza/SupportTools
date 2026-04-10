@@ -1,22 +1,15 @@
 ﻿using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliTools;
 using AppCliTools.CliTools.CliMenuCommands;
 using LibGitWork.CliMenuCommands;
-using LibSupportToolsServerWork.CliMenuCommands;
-using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
 using LibTools.CliMenuCommands;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
-using SupportTools.Cruders;
 using SupportTools.Menu;
-using SupportTools.Menu.SupportToolsParametersEdit;
-using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 
 namespace SupportTools;
@@ -25,17 +18,18 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
 {
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
+
     private readonly ILogger _logger;
+
     //private readonly IMemoryCache _memoryCache;
     private readonly ParametersManager _parametersManager;
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsCliAppLoop(string appName, ServiceProvider serviceProvider, ILogger logger,
-        IHttpClientFactory httpClientFactory, 
+        IHttpClientFactory httpClientFactory,
         //IMemoryCache memoryCache, 
-        ParametersManager parametersManager) : base(
-        appName, (IParametersWithRecentData)parametersManager.Parameters)
+        ParametersManager parametersManager) : base(appName, (IParametersWithRecentData)parametersManager.Parameters)
     {
         _appName = appName;
         _serviceProvider = serviceProvider;
@@ -71,29 +65,25 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
         //    new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         //mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
-        //ახალი პროექტების შემქმნელი სუბმენიუ
-        mainMenuSet.AddMenuItem(
-            new ProjectCreatorSubMenuCliMenuCommand(_appName, _logger, _httpClientFactory, _parametersManager));
+        ////ახალი პროექტების შემქმნელი სუბმენიუ
+        //mainMenuSet.AddMenuItem(
+        //    new ProjectCreatorSubMenuCliMenuCommand(_appName, _logger, _httpClientFactory, _parametersManager));
 
-        var projectCruder =
-            new ProjectCruder(_appName, _logger, _httpClientFactory, _parametersManager, parameters.Projects);
+        //var projectCruder =
+        //    new ProjectCruder(_appName, _logger, _httpClientFactory, _parametersManager, parameters.Projects);
 
-        //ახალი პროექტის შექმნა
-        var newItemCommand = new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural,
-            $"New {projectCruder.CrudName}");
-        mainMenuSet.AddMenuItem(newItemCommand);
+        ////ახალი პროექტის შექმნა
+        //var newItemCommand = new NewItemCliMenuCommand(projectCruder, projectCruder.CrudNamePlural,
+        //    $"New {projectCruder.CrudName}");
+        //mainMenuSet.AddMenuItem(newItemCommand);
 
-        //პროექტის დაიმპორტება
-        var importProjectCommand = new ImportProjectCliMenuCommand(_parametersManager);
-        mainMenuSet.AddMenuItem(importProjectCommand);
+        ////პროექტის დაიმპორტება
+        //var importProjectCommand = new ImportProjectCliMenuCommand(_parametersManager);
+        //mainMenuSet.AddMenuItem(importProjectCommand);
 
         ////ყველა პროექტის git-ის სინქრონიზაცია
         //var syncAllProjectsGits = new SyncAllProjectsAllGitsCliMenuCommand(_logger, _parametersManager);
         //mainMenuSet.AddMenuItem(syncAllProjectsGits);
-
-        //ყველა პროექტის git-ის სინქრონიზაცია ახალი მეთოდით V2
-        var syncAllProjectsGitsV2 = new SyncAllProjectsAllGitsCliMenuCommandV2(_logger, _parametersManager);
-        mainMenuSet.AddMenuItem(syncAllProjectsGitsV2);
 
         //ყველა პროექტის პაკეტების განახლება
         var updateOutdatedPackages = new UpdateOutdatedPackagesCliMenuCommand(_logger, _parametersManager);

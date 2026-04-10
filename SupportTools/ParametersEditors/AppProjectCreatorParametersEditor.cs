@@ -13,7 +13,7 @@ namespace SupportTools.ParametersEditors;
 public sealed class AppProjectCreatorParametersEditor : ParametersEditor
 {
     public AppProjectCreatorParametersEditor(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        IParameters parameters, IParametersManager parametersManager, ParametersManager listsParametersManager) : base(
+        IParameters parameters, IParametersManager parametersManager, IParametersManager listsParametersManager) : base(
         "AppProjectCreatorParametersEditor", parameters, parametersManager)
     {
         FieldEditors.Add(new IntFieldEditor(nameof(AppProjectCreatorAllParameters.IndentSize)));

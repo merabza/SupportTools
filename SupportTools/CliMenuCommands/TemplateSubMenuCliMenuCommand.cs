@@ -12,13 +12,13 @@ public sealed class TemplateSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     private readonly string _templateName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public TemplateSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string templateName) : base(templateName, EMenuAction.LoadSubMenu)
+        IParametersManager parametersManager, string templateName) : base(templateName, EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _parametersManager = parametersManager;

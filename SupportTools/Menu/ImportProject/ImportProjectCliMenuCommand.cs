@@ -12,14 +12,16 @@ using SupportTools.Models;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ImportProject;
 
 public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 {
-    private readonly ParametersManager _parametersManager;
+    public static string MenuCommandName => "Import Project";
+
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ImportProjectCliMenuCommand(ParametersManager parametersManager) : base("Import Project", EMenuAction.Reload)
+    public ImportProjectCliMenuCommand(IParametersManager parametersManager) : base(MenuCommandName, EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }

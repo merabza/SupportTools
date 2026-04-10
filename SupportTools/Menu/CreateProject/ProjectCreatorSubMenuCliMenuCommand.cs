@@ -5,22 +5,24 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.CreateProject;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
+    public static string MenuCommandName => "Project Creator";
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager) : base("Project Creator", EMenuAction.LoadSubMenu)
+        IParametersManager parametersManager) : base(MenuCommandName, EMenuAction.LoadSubMenu)
     {
         _appName = appName;
         _logger = logger;

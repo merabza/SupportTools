@@ -4,6 +4,7 @@ using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.CliMenuCommands;
+using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersDataEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
@@ -15,17 +16,19 @@ namespace SupportTools.Cruders;
 
 public sealed class ProjectCruder : ParCruder<ProjectModel>
 {
+    public static string MenuCommandName => "Project";
+
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
-    public ProjectCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
+    public ProjectCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
         Dictionary<string, ProjectModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
         "Project", "Projects")
     {
-        string[] gitProjectNamesParameterNames = new[]
-        {
+        string[] gitProjectNamesParameterNames =
+        [
             nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)
-        };
+        ];
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));

@@ -11,11 +11,11 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
 {
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _templateName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteTemplateCliMenuCommand(ParametersManager parametersManager, string templateName) : base(
+    public DeleteTemplateCliMenuCommand(IParametersManager parametersManager, string templateName) : base(
         "Delete Template", EMenuAction.LevelUp, EMenuAction.Reload, templateName)
     {
         _parametersManager = parametersManager;

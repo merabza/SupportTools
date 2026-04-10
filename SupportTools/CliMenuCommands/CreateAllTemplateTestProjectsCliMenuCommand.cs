@@ -12,11 +12,11 @@ public sealed class CreateAllTemplateTestProjectsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CreateAllTemplateTestProjectsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager) : base("Create All Template Test Projects", EMenuAction.Reload)
+        IParametersManager parametersManager) : base("Create All Template Test Projects", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
