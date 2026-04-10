@@ -16,12 +16,15 @@ using SupportTools.Cruders;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
 
-namespace SupportTools.ParametersEditors;
+namespace SupportTools.Menu.SupportToolsParametersEdit;
 
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
+
+    public static string MenuCommandName => "Support Tools Parameters Editor";
+
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
-        ParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
+        IParametersManager parametersManager) : base(MenuCommandName, parameters, parametersManager)
     {
         FieldEditors.Add(
             new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(nameof(SupportToolsParameters.DotnetTools),

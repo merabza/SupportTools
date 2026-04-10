@@ -67,7 +67,7 @@ try
         return 6;
     }
 
-    var supportTools = new SupportToolsCliAppLoop(appName, serviceProvider, logger, httpClientFactory, memoryCache,
+    var supportTools = new SupportToolsCliAppLoop(appName, serviceProvider, logger, httpClientFactory,
         new ParametersManager(parametersFileName, par));
 
     // ReSharper disable once using

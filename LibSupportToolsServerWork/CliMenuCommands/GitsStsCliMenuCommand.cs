@@ -12,11 +12,11 @@ internal sealed class GitsStsCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitsStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
-        ParametersManager parametersManager) : base("Gits from SupportToolsServer", EMenuAction.LoadSubMenu)
+        IParametersManager parametersManager) : base("Gits from SupportToolsServer", EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

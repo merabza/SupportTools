@@ -12,11 +12,11 @@ internal sealed class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitIgnoreFileTypesStsCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, ParametersManager parametersManager) : base("GitIgnore File Types",
+        IMemoryCache memoryCache, IParametersManager parametersManager) : base("GitIgnore File Types",
         EMenuAction.LoadSubMenu)
     {
         _logger = logger;

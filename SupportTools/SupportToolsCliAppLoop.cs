@@ -6,8 +6,8 @@ using AppCliTools.CliTools;
 using AppCliTools.CliTools.CliMenuCommands;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
+using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
 using LibTools.CliMenuCommands;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,6 +15,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.Menu;
+using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 
@@ -25,20 +26,22 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly IMemoryCache _memoryCache;
+    //private readonly IMemoryCache _memoryCache;
     private readonly ParametersManager _parametersManager;
     private readonly ServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsCliAppLoop(string appName, ServiceProvider serviceProvider, ILogger logger,
-        IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ParametersManager parametersManager) : base(
+        IHttpClientFactory httpClientFactory, 
+        //IMemoryCache memoryCache, 
+        ParametersManager parametersManager) : base(
         appName, (IParametersWithRecentData)parametersManager.Parameters)
     {
         _appName = appName;
         _serviceProvider = serviceProvider;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
-        _memoryCache = memoryCache;
+        //_memoryCache = memoryCache;
         _parametersManager = parametersManager;
     }
 
@@ -47,23 +50,26 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //მთავარი მენიუს ჩატვირთვა
-        var mainMenuSet = new CliMenuSet("Main Menu");
+        //var mainMenuSet = new CliMenuSet("Main Menu");
 
-        foreach (string menuCommandName in MenuData.MenuCommandNames)
-        {
-            CliMenuCommand? menuCommand =
-                MenuCommandFactory.CreateMenuCommand(menuCommandName, _serviceProvider, _parametersManager);
-            mainMenuSet.AddMenuItem(menuCommand!);
-        }
+        CliMenuSet mainMenuSet = CliMenuSetFactory.CreateMenuSet("Main Menu", MenuData.MenuCommandNames,
+            _serviceProvider, _parametersManager);
 
-        //პარამეტრების რედაქტორი
-        var supportToolsParametersEditor =
-            new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
-        mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
+        //foreach (string menuCommandName in MenuData.MenuCommandNames)
+        //{
+        //    CliMenuCommand? menuCommand =
+        //        MenuCommandFactory.CreateMenuCommand(menuCommandName, _serviceProvider, _parametersManager);
+        //    mainMenuSet.AddMenuItem(menuCommand!);
+        //}
 
-        var supportToolsServerEditorCliMenuCommand =
-            new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
-        mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
+        ////პარამეტრების რედაქტორი
+        //var supportToolsParametersEditor =
+        //    new SupportToolsParametersEditor(_logger, _httpClientFactory, parameters, _parametersManager);
+        //mainMenuSet.AddMenuItem(new ParametersEditorListCliMenuCommand(supportToolsParametersEditor));
+
+        //var supportToolsServerEditorCliMenuCommand =
+        //    new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
+        //mainMenuSet.AddMenuItem(supportToolsServerEditorCliMenuCommand);
 
         //ახალი პროექტების შემქმნელი სუბმენიუ
         mainMenuSet.AddMenuItem(
