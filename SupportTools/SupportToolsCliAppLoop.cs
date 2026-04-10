@@ -7,12 +7,14 @@ using AppCliTools.CliTools.CliMenuCommands;
 using LibGitWork.CliMenuCommands;
 using LibSupportToolsServerWork.CliMenuCommands;
 using LibTools.CliMenuCommands;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
+using SupportTools.Menu;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
 
@@ -46,6 +48,13 @@ public sealed class SupportToolsCliAppLoop : CliAppLoop
 
         //მთავარი მენიუს ჩატვირთვა
         var mainMenuSet = new CliMenuSet("Main Menu");
+
+        foreach (string menuCommandName in MenuData.MenuCommandNames)
+        {
+            CliMenuCommand? menuCommand =
+                MenuCommandFactory.CreateMenuCommand(menuCommandName, _serviceProvider, _parametersManager);
+            mainMenuSet.AddMenuItem(menuCommand!);
+        }
 
         //პარამეტრების რედაქტორი
         var supportToolsParametersEditor =
