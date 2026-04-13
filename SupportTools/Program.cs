@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using AppCliTools.CliParameters;
 using AppCliTools.CliTools;
 using AppCliTools.CliTools.DependencyInjection;
-using AppCliTools.CliTools.Services.MenuBuilder;
-using AppCliTools.CliTools.Services.RecentCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
@@ -21,9 +20,16 @@ try
 
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
 
-    if (argParser.Analysis() != EParseResult.Ok)
+    switch (argParser.Analysis())
     {
-        return 1;
+        case EParseResult.Ok:
+            break;
+        case EParseResult.Usage:
+            return 1;
+        case EParseResult.Error:
+            return 2;
+        default:
+            throw new SwitchExpressionException();
     }
 
     var par = (SupportToolsParameters?)argParser.Par;
@@ -71,28 +77,13 @@ try
         return 5;
     }
 
-    var app = serviceProvider.GetService<IApplication>();
-    if (app is null)
+    var cliLoopPar = CliAppLoopParameters.Create(serviceProvider);
+    if (cliLoopPar is null)
     {
-        StShared.WriteErrorLine("app is null", true);
         return 6;
     }
 
-    var menuBuilder = serviceProvider.GetService<IMenuBuilder>();
-    if (menuBuilder is null)
-    {
-        StShared.WriteErrorLine("menuBuilder is null", true);
-        return 6;
-    }
-
-    var recentCommandsService = serviceProvider.GetService<IRecentCommandsService>();
-    if (recentCommandsService is null)
-    {
-        StShared.WriteErrorLine("recentCommandsService is null", true);
-        return 6;
-    }
-
-    var supportTools = new CliAppLoop(app, menuBuilder, recentCommandsService);
+    var supportTools = new CliAppLoop(cliLoopPar);
 
     // ReSharper disable once using
     // ReSharper disable once DisposableConstructor
