@@ -1,6 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using AppCliTools.CliMenu;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -12,16 +12,16 @@ public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     private readonly string _projectName;
     private readonly string _serverName;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfoSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        string itemKey, ParametersManager parametersManager, string projectName, string serverName,
-        ServiceProvider serviceProvider) : base(itemKey, EMenuAction.LoadSubMenu)
+        string itemKey, IParametersManager parametersManager, string projectName, string serverName,
+        IServiceProvider serviceProvider) : base(itemKey, EMenuAction.LoadSubMenu)
     {
         _appName = appName;
         _logger = logger;

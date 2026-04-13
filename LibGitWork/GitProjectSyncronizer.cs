@@ -17,11 +17,11 @@ public sealed class GitProjectSyncronizer
     private readonly string _gitProjectName;
     private readonly List<GitSyncToolAction> _gitSyncToolActionList = [];
     private readonly ILogger? _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitProjectSyncronizer(ILogger? logger, ParametersManager parametersManager, string gitProjectName,
+    public GitProjectSyncronizer(ILogger? logger, IParametersManager parametersManager, string gitProjectName,
         bool useConsole)
     {
         _logger = logger;

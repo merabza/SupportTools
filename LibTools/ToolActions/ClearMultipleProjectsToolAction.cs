@@ -19,9 +19,9 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
     private readonly ClearAllProjectsParameters _clearAllProjectsParameters;
     private readonly string? _excludeFolder;
     private readonly ILogger? _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
-    private ClearMultipleProjectsToolAction(ILogger logger, ParametersManager parametersManager,
+    private ClearMultipleProjectsToolAction(ILogger logger, IParametersManager parametersManager,
         ClearAllProjectsParameters clearAllProjectsParameters, string? excludeFolder, bool useConsole) : base(logger,
         "Clear Multiple Projects", null, null, useConsole)
     {
@@ -31,7 +31,7 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         _parametersManager = parametersManager;
     }
 
-    public static ClearMultipleProjectsToolAction Create(ILogger logger, ParametersManager parametersManager,
+    public static ClearMultipleProjectsToolAction Create(ILogger logger, IParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
         //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net9.0

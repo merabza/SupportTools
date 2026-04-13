@@ -7,7 +7,6 @@ using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
 using AppCliTools.CliParametersDataEdit.FieldEditors;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
@@ -20,11 +19,11 @@ namespace SupportTools.Cruders;
 public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 {
     private readonly string _projectName;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ServerInfoCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, Dictionary<string, ServerInfoModel> currentValuesDictionary,
-        string projectName, ServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary,
+    private ServerInfoCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, Dictionary<string, ServerInfoModel> currentValuesDictionary,
+        string projectName, IServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary,
         "Server", "Servers", true)
     {
         _projectName = projectName;
@@ -56,8 +55,8 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
             nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
     }
 
-    public static ServerInfoCruder Create(string appName, ServiceProvider serviceProvider, ILogger logger,
-        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName)
+    public static ServerInfoCruder Create(string appName, IServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, IParametersManager parametersManager, string projectName)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         Dictionary<string, ServerInfoModel> currentValuesDictionary = parameters.GetProject(projectName)?.ServerInfos ??

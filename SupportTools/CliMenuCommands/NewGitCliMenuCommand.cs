@@ -18,13 +18,13 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     private readonly EGitCol _gitCol;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
     public NewGitCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName, EGitCol gitCol) : base("Add Git Project",
+        IParametersManager parametersManager, string projectName, EGitCol gitCol) : base("Add Git Project",
         EMenuAction.Reload)
     {
         _logger = logger;

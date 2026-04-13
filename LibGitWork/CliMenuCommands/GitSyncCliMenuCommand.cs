@@ -13,11 +13,11 @@ public sealed class GitSyncCliMenuCommand : CliMenuCommand
     private readonly EGitCol _gitCol;
     private readonly string _gitProjectName;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSyncCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+    public GitSyncCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName,
         string gitProjectName, EGitCol gitCol) : base("Sync", EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

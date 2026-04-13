@@ -18,7 +18,6 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
-    public static string MenuCommandName => "Project Creator";
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
@@ -29,6 +28,8 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
+
+    public static string MenuCommandName => "Project Creator";
 
     public override CliMenuSet GetSubMenu()
     {

@@ -16,10 +16,10 @@ namespace LibGitWork.ToolActions;
 public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 {
     private readonly ILogger? _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly SyncMultipleProjectsGitsParametersV2 _syncMultipleProjectsGitsParametersV2;
 
-    private SyncMultipleProjectsGitsToolActionV2(ILogger? logger, ParametersManager parametersManager,
+    private SyncMultipleProjectsGitsToolActionV2(ILogger? logger, IParametersManager parametersManager,
         SyncMultipleProjectsGitsParametersV2 syncMultipleProjectsGitsParametersV2, bool useConsole) : base(logger,
         "Sync Multiple Projects Gits V2", null, null, useConsole)
     {
@@ -28,7 +28,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         _syncMultipleProjectsGitsParametersV2 = syncMultipleProjectsGitsParametersV2;
     }
 
-    public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger logger, ParametersManager parametersManager,
+    public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger logger, IParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

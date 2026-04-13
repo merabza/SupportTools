@@ -4,7 +4,6 @@ using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.CliMenuCommands;
-using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersDataEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
@@ -16,14 +15,12 @@ namespace SupportTools.Cruders;
 
 public sealed class ProjectCruder : ParCruder<ProjectModel>
 {
-    public static string MenuCommandName => "Project";
-
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
-    public ProjectCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        Dictionary<string, ProjectModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
-        "Project", "Projects")
+    public ProjectCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, Dictionary<string, ProjectModel> currentValuesDictionary) : base(
+        parametersManager, currentValuesDictionary, "Project", "Projects")
     {
         string[] gitProjectNamesParameterNames =
         [
@@ -85,8 +82,10 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
             nameof(ProjectModel.FrontNpmPackageNames), logger, httpClientFactory, parametersManager));
     }
 
+    public static string MenuCommandName => "Project";
+
     public static ProjectCruder Create(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager)
+        IParametersManager parametersManager)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         return new ProjectCruder(appName, logger, httpClientFactory, parametersManager, parameters.Projects);

@@ -20,9 +20,9 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
     private const string ActionDescription =
         "this tool will crate new encoded parameters file, then will Install parameters file server side adn will chek that parameters updated";
 
-    private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly string _appName;
+
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
 
     public AppSettingsUpdaterToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,

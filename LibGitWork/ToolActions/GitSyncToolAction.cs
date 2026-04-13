@@ -46,7 +46,7 @@ public sealed class GitSyncToolAction : ToolAction
     public bool Changed { get; private set; }
     public string? UsedCommitMessage { get; private set; }
 
-    public static GitSyncToolAction? Create(ILogger? logger, ParametersManager parametersManager, string projectName,
+    public static GitSyncToolAction? Create(ILogger? logger, IParametersManager parametersManager, string projectName,
         EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

@@ -9,12 +9,13 @@ namespace LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
 public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IMemoryCache _memoryCache;
     private readonly ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> _logger;
+    private readonly IMemoryCache _memoryCache;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServerEditorListCliMenuCommandFactoryStrategy(
-        ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache)
+        ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
+        IMemoryCache memoryCache)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

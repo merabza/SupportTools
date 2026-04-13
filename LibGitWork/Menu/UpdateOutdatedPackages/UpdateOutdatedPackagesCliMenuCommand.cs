@@ -5,10 +5,12 @@ using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibGitWork.CliMenuCommands;
+namespace LibGitWork.Menu.UpdateOutdatedPackages;
 
 public sealed class UpdateOutdatedPackagesCliMenuCommand : CliMenuCommand
 {
+    public const string MenuCommandName = "Update Outdated Packages";
+
     private readonly ILogger _logger;
     private readonly ParametersManager _parametersManager;
 

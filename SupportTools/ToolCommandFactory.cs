@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace SupportTools;
 public static class ToolCommandFactory
 {
     public static async ValueTask<IToolCommand?> CreateProjectToolCommand(EProjectTools tool,
-        ServiceProvider serviceProvider, IParametersManager parametersManager, string projectName)
+        IServiceProvider serviceProvider, IParametersManager parametersManager, string projectName)
     {
         Dictionary<string, IToolCommandFactoryStrategy>? toolCommandStrategies = serviceProvider
             .GetService<IEnumerable<IToolCommandFactoryStrategy>>()?.ToDictionary(s => s.ToolCommandName, s => s);
@@ -44,7 +45,7 @@ public static class ToolCommandFactory
     }
 
     public static async ValueTask<IToolCommand?> CreateProjectServerToolCommand(EProjectServerTools tool,
-        ServiceProvider serviceProvider, IParametersManager parametersManager, string projectName,
+        IServiceProvider serviceProvider, IParametersManager parametersManager, string projectName,
         ServerInfoModel serverInfo, CancellationToken cancellationToken = default)
     {
         Dictionary<string, IToolCommandFactoryStrategy>? toolCommandStrategies = serviceProvider

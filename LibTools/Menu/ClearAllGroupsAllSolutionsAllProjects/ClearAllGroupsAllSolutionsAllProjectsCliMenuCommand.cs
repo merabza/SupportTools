@@ -5,16 +5,18 @@ using LibTools.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibTools.CliMenuCommands;
+namespace LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 
 public sealed class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand : CliMenuCommand
 {
+    public const string MenuCommandName = "Clear All Groups All Solutions All Projects";
+
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(ILogger logger, ParametersManager parametersManager) :
-        base("Clear All Groups All Solutions All Projects", EMenuAction.Reload, EMenuAction.Reload, null, true)
+    public ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand(ILogger logger, IParametersManager parametersManager) :
+        base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

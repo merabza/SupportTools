@@ -16,13 +16,13 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
+        IParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
         gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git", EMenuAction.LoadSubMenu)
     {
         _logger = logger;

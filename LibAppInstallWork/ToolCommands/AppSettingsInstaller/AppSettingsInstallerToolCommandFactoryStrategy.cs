@@ -11,8 +11,8 @@ namespace LibAppInstallWork.ToolCommands.AppSettingsInstaller;
 
 public class AppSettingsInstallerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly IApplication _app;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<AppSettingsInstallerToolCommandFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor

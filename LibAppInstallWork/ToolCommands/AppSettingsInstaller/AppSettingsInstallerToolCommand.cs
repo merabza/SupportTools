@@ -18,15 +18,15 @@ public sealed class AppSettingsInstallerToolCommand : ToolCommand
     private const string ActionDescription =
         "This tool will Download latest parameters file from exchange server, then will update parameters file, and check if parameters updated";
 
-    private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly string _appName;
+
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly bool _useConsole;
 
-    public AppSettingsInstallerToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory, bool useConsole,
-        AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger, ActionName,
-        parameters, parametersManager, ActionDescription, useConsole)
+    public AppSettingsInstallerToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+        bool useConsole, AppSettingsInstallerParameters parameters, IParametersManager parametersManager) : base(logger,
+        ActionName, parameters, parametersManager, ActionDescription, useConsole)
     {
         _appName = appName;
         _logger = logger;

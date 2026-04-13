@@ -6,7 +6,6 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using LibGitData;
 using LibGitWork.CliMenuCommands;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -20,14 +19,14 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     private readonly string _projectName;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectSubMenuCliMenuCommand(string appName, ServiceProvider serviceProvider, ILogger logger,
-        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectName) : base(
+    public ProjectSubMenuCliMenuCommand(string appName, IServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, IParametersManager parametersManager, string projectName) : base(
         projectName, EMenuAction.LoadSubMenu)
     {
         _appName = appName;

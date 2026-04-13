@@ -14,11 +14,11 @@ public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
     private readonly string _gitProjectName;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteGitProjectCliMenuCommand(ParametersManager parametersManager, string projectName,
+    public DeleteGitProjectCliMenuCommand(IParametersManager parametersManager, string projectName,
         string gitProjectName, EGitCol gitCol) : base("Delete Git Project", EMenuAction.LevelUp, EMenuAction.Reload,
         gitProjectName)
     {

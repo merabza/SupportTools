@@ -16,8 +16,6 @@ namespace SupportTools.Menu.ImportProject;
 
 public sealed class ImportProjectCliMenuCommand : CliMenuCommand
 {
-    public static string MenuCommandName => "Import Project";
-
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -25,6 +23,8 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
     {
         _parametersManager = parametersManager;
     }
+
+    public static string MenuCommandName => "Import Project";
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {

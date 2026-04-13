@@ -16,11 +16,11 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class SaveGitsCloneFileCliMenuCommand : CloneInfoFileCliMenuCommand
 {
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SaveGitsCloneFileCliMenuCommand(ParametersManager parametersManager, string projectName) : base(
+    public SaveGitsCloneFileCliMenuCommand(IParametersManager parametersManager, string projectName) : base(
         "Save Gits Clone File")
     {
         _parametersManager = parametersManager;

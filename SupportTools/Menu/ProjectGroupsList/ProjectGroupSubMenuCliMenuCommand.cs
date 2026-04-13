@@ -1,28 +1,29 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using LibGitWork.CliMenuCommands;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList;
 
 public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 {
+    private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     private readonly string _projectGroupName;
-    private readonly string _appName;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupSubMenuCliMenuCommand(string appName, ServiceProvider serviceProvider, ILogger logger,
-        IHttpClientFactory httpClientFactory, ParametersManager parametersManager, string projectGroupName) : base(
+    public ProjectGroupSubMenuCliMenuCommand(string appName, IServiceProvider serviceProvider, ILogger logger,
+        IHttpClientFactory httpClientFactory, IParametersManager parametersManager, string projectGroupName) : base(
         projectGroupName, EMenuAction.LoadSubMenu)
     {
         _appName = appName;
@@ -32,6 +33,8 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
     }
+
+    public static string MenuCommandListName => nameof(ProjectGroupSubMenuCliMenuCommand);
 
     public override CliMenuSet GetSubMenu()
     {

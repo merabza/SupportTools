@@ -10,13 +10,14 @@ namespace LibGitWork.CliMenuCommands;
 public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2 : CliMenuCommand
 {
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(ILogger logger, ParametersManager parametersManager,
-        string projectName, bool askRunAction = true) : base("Sync One Project All Gits With Scaffold Seeders V2",
-        EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
+    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(ILogger logger,
+        IParametersManager parametersManager, string projectName, bool askRunAction = true) : base(
+        "Sync One Project All Gits With Scaffold Seeders V2", EMenuAction.Reload, EMenuAction.Reload, null,
+        askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;

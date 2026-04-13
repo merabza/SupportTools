@@ -29,7 +29,7 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
         _syncOneProjectAllGitsParameters = syncOneProjectAllGitsParameters;
     }
 
-    public static SyncOneProjectAllGitsToolAction? Create(ILogger? logger, ParametersManager parametersManager,
+    public static SyncOneProjectAllGitsToolAction? Create(ILogger? logger, IParametersManager parametersManager,
         string projectName, EGitCol gitCol,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
         bool useConsole)

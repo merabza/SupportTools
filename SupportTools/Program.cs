@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading;
 using AppCliTools.CliParameters;
-using Microsoft.Extensions.Caching.Memory;
+using AppCliTools.CliTools;
+using AppCliTools.CliTools.DependencyInjection;
+using AppCliTools.CliTools.Services.MenuBuilder;
+using AppCliTools.CliTools.Services.RecentCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibParameters;
 using Serilog.Events;
 using SupportTools;
 using SupportToolsData.Models;
@@ -16,10 +17,7 @@ try
 {
     Console.WriteLine("Loading...");
 
-    const string appName = "SupportTools";
-
-    //პროგრამის ატრიბუტების დაყენება 
-    //ProgramAttributes.Instance.AppName = appName;
+    const string appName = "Support Tools";
 
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
 
@@ -36,14 +34,35 @@ try
     }
 
     string? parametersFileName = argParser.ParametersFileName;
-    var servicesCreator = new SupportToolsServicesCreator(par);
-    // ReSharper disable once using
-    ServiceProvider? serviceProvider = servicesCreator.CreateServiceProvider(LogEventLevel.Information);
-    if (serviceProvider == null)
+    if (string.IsNullOrWhiteSpace(parametersFileName))
     {
-        Console.WriteLine("Logger not created");
-        return 4;
+        StShared.WriteErrorLine("parametersFileName is null or empty", true);
+        return 3;
     }
+
+    var serviceCollection = new ServiceCollection();
+
+    serviceCollection.AddSerilogLoggerService(LogEventLevel.Information, appName, par.LogFolder).AddServices()
+        .AddMenuCommandsFactoryStrategies().AddToolCommandsFactoryStrategies().AddApplication(x =>
+        {
+            x.AppName = appName;
+        }).AddMainParametersManager(x =>
+        {
+            x.ParametersFileName = parametersFileName;
+            x.Par = par;
+        });
+
+    if (!string.IsNullOrWhiteSpace(par.RecentCommandsFileName) && par.RecentCommandsCount > 0)
+    {
+        serviceCollection.AddRecentCommandsService(x =>
+        {
+            x.RecentCommandsFileName = par.RecentCommandsFileName;
+            x.RecentCommandsCount = par.RecentCommandsCount;
+        });
+    }
+
+    // ReSharper disable once using
+    await using ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
     logger = serviceProvider.GetService<ILogger<Program>>();
     if (logger is null)
@@ -52,23 +71,28 @@ try
         return 5;
     }
 
-    var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
-    if (httpClientFactory is null)
+    var app = serviceProvider.GetService<IApplication>();
+    if (app is null)
     {
-        StShared.WriteErrorLine("httpClientFactory is null", true);
+        StShared.WriteErrorLine("app is null", true);
         return 6;
     }
 
-    // ReSharper disable once using
-    using var memoryCache = serviceProvider.GetService<IMemoryCache>();
-    if (memoryCache is null)
+    var menuBuilder = serviceProvider.GetService<IMenuBuilder>();
+    if (menuBuilder is null)
     {
-        StShared.WriteErrorLine("memoryCache is null", true);
+        StShared.WriteErrorLine("menuBuilder is null", true);
         return 6;
     }
 
-    var supportTools = new SupportToolsCliAppLoop(appName, serviceProvider, logger, httpClientFactory,
-        new ParametersManager(parametersFileName, par));
+    var recentCommandsService = serviceProvider.GetService<IRecentCommandsService>();
+    if (recentCommandsService is null)
+    {
+        StShared.WriteErrorLine("recentCommandsService is null", true);
+        return 6;
+    }
+
+    var supportTools = new CliAppLoop(app, menuBuilder, recentCommandsService);
 
     // ReSharper disable once using
     // ReSharper disable once DisposableConstructor

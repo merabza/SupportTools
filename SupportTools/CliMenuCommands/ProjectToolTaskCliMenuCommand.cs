@@ -2,31 +2,25 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
-using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
-
-// ReSharper disable ConvertToPrimaryConstructor
 
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectToolTaskCliMenuCommand : CliMenuCommand
 {
-    //private readonly IHttpClientFactory _httpClientFactory;
-    //private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly EProjectTools _tool;
     private IToolCommand? _toolCommand;
 
-    public ProjectToolTaskCliMenuCommand(ServiceProvider serviceProvider, EProjectTools tool, string projectName,
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public ProjectToolTaskCliMenuCommand(IServiceProvider serviceProvider, EProjectTools tool, string projectName,
         IParametersManager parametersManager) : base(tool.GetProjectToolName(), EMenuAction.Reload, EMenuAction.Reload,
         null, true)
     {
         _serviceProvider = serviceProvider;
-        //_logger = logger;
-        //_httpClientFactory = httpClientFactory;
         _tool = tool;
         _projectName = projectName;
         _parametersManager = parametersManager;
@@ -34,9 +28,6 @@ public sealed class ProjectToolTaskCliMenuCommand : CliMenuCommand
 
     private async ValueTask<IToolCommand?> MemoCreateToolCommand()
     {
-        //return _toolCommand ??= ToolCommandFactory.CreateProjectToolCommand(_logger, _httpClientFactory, _tool,
-        //    _parametersManager, _projectName, true);
-
         return _toolCommand ??=
             await ToolCommandFactory.CreateProjectToolCommand(_tool, _serviceProvider, _parametersManager,
                 _projectName);

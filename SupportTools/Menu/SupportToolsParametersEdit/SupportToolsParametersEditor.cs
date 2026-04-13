@@ -20,9 +20,6 @@ namespace SupportTools.Menu.SupportToolsParametersEdit;
 
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
-
-    public static string MenuCommandName => "Support Tools Parameters Editor";
-
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
         IParametersManager parametersManager) : base(MenuCommandName, parameters, parametersManager)
     {
@@ -130,4 +127,6 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(nameof(SupportToolsParameters.Environments),
                 parametersManager));
     }
+
+    public static string MenuCommandName => "Support Tools Parameters Editor";
 }

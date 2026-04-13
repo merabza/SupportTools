@@ -29,7 +29,7 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
         _excludeFolder = excludeFolder;
     }
 
-    public static ClearOneProjectAllGitsToolAction? Create(ILogger? logger, ParametersManager parametersManager,
+    public static ClearOneProjectAllGitsToolAction? Create(ILogger? logger, IParametersManager parametersManager,
         string projectName, EGitCol gitCol, string? excludeFolder)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

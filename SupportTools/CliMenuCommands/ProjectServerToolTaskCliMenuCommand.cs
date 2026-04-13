@@ -1,7 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
-using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -15,12 +15,12 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
     private readonly ServerInfoModel _serverInfo;
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly EProjectServerTools _tool;
     private IToolCommand? _toolCommand;
 
     public ProjectServerToolTaskCliMenuCommand(EProjectServerTools tool, string projectName, ServerInfoModel serverInfo,
-        IParametersManager parametersManager, ServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(),
+        IParametersManager parametersManager, IServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(),
         EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _tool = tool;

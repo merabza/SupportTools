@@ -10,11 +10,11 @@ namespace LibGitWork.CliMenuCommands;
 public sealed class SyncOneGroupAllProjectsGitsCliMenuCommandV2 : CliMenuCommand
 {
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectGroupName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneGroupAllProjectsGitsCliMenuCommandV2(ILogger logger, ParametersManager parametersManager,
+    public SyncOneGroupAllProjectsGitsCliMenuCommandV2(ILogger logger, IParametersManager parametersManager,
         string projectGroupName) : base("Sync One Group All Projects Gits V2", EMenuAction.Reload, EMenuAction.Reload,
         null, true)
     {

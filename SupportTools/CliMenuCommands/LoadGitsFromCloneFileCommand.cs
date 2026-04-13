@@ -14,11 +14,11 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class LoadGitsFromCloneFileCommand : CloneInfoFileCliMenuCommand
 {
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public LoadGitsFromCloneFileCommand(ParametersManager parametersManager, string projectName) : base(
+    public LoadGitsFromCloneFileCommand(IParametersManager parametersManager, string projectName) : base(
         "Load Gits From Clone File")
     {
         _parametersManager = parametersManager;

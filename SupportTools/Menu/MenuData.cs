@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
+using AppCliTools.CliTools.CliMenuCommands;
 using LibGitWork.Menu.SyncAllProjectsAllGits;
+using LibGitWork.Menu.UpdateOutdatedPackages;
 using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
+using LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Cruders;
 using SupportTools.Menu.CreateProject;
 using SupportTools.Menu.ImportProject;
+using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
 
 namespace SupportTools.Menu;
@@ -23,7 +27,14 @@ public static class MenuData
         //პროექტის დაიმპორტება
         ImportProjectCliMenuCommand.MenuCommandName,
         //ყველა პროექტის git-ის სინქრონიზაცია V2
-        SyncAllProjectsAllGitsCliMenuCommandV2.MenuCommandName
-
+        SyncAllProjectsAllGitsCliMenuCommandV2.MenuCommandName,
+        //ყველა პროექტის პაკეტების განახლება
+        UpdateOutdatedPackagesCliMenuCommand.MenuCommandName,
+        //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
+        ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand.MenuCommandName,
+        //პროექტების ჯგუფების ჩამონათვალი
+        ProjectGroupSubMenuCliMenuCommand.MenuCommandListName,
+        //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
+        nameof(RecentCommandCliMenuCommand)
     ];
 }

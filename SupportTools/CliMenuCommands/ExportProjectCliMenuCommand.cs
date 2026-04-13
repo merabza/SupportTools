@@ -16,12 +16,12 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class ExportProjectCliMenuCommand : CliMenuCommand
 {
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ExportProjectCliMenuCommand(ParametersManager parametersManager, string projectName) : base("Export Project",
-        EMenuAction.Reload, EMenuAction.Reload, projectName)
+    public ExportProjectCliMenuCommand(IParametersManager parametersManager, string projectName) : base(
+        "Export Project", EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;

@@ -12,11 +12,11 @@ public sealed class SyncOneProjectAllGitsCliMenuCommand : CliMenuCommand
 {
     private readonly EGitCol _gitCol;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName,
+    public SyncOneProjectAllGitsCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName,
         EGitCol gitCol, bool askRunAction = true) : base("Sync One Project All gits", EMenuAction.Reload,
         EMenuAction.Reload, null, askRunAction)
     {
