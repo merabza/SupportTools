@@ -18,7 +18,7 @@ try
 
     const string appName = "Support Tools";
 
-    var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName, null);
+    var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName);
 
     switch (argParser.Analysis())
     {
