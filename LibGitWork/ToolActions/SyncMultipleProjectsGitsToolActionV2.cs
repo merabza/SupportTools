@@ -18,25 +18,27 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
     private readonly ILogger? _logger;
     private readonly IParametersManager _parametersManager;
     private readonly SyncMultipleProjectsGitsParametersV2 _syncMultipleProjectsGitsParametersV2;
+    private readonly string? _useMessage;
 
     private SyncMultipleProjectsGitsToolActionV2(ILogger? logger, IParametersManager parametersManager,
-        SyncMultipleProjectsGitsParametersV2 syncMultipleProjectsGitsParametersV2, bool useConsole) : base(logger,
+        SyncMultipleProjectsGitsParametersV2 syncMultipleProjectsGitsParametersV2, bool useConsole, string? useMessage = null) : base(logger,
         "Sync Multiple Projects Gits V2", null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _syncMultipleProjectsGitsParametersV2 = syncMultipleProjectsGitsParametersV2;
+        _useMessage = useMessage;
     }
 
     public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger? logger, IParametersManager parametersManager,
-        string? projectGroupName, string? projectName, bool useConsole)
+        string? projectGroupName, string? projectName, bool useConsole, string? useMessage = null)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var syncMultipleProjectsGitsParametersV2 =
             SyncMultipleProjectsGitsParametersV2.Create(supportToolsParameters, projectGroupName, projectName);
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new SyncMultipleProjectsGitsToolActionV2(loggerOrNull, parametersManager,
-            syncMultipleProjectsGitsParametersV2, useConsole);
+        syncMultipleProjectsGitsParametersV2, useConsole, useMessage);
     }
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -79,7 +81,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             }
         }
 
-        string? usedCommitMessage = null;
+        string? usedCommitMessage = _useMessage;
 
         bool useSameMessageForNextCommits = false;
 

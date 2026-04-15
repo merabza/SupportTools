@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -39,8 +42,12 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        string useMessage = Inputer.InputTextRequired("Message",
+            $"Update Packages {DateTime.Now.ToString("yyyyMMddHHmm",
+                CultureInfo.InvariantCulture)}");
+
         var syncOneProjectAllGitsToolAction =
-            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true);
+            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true, $"{useMessage} Check");
         await syncOneProjectAllGitsToolAction.Run(cancellationToken);
 
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
@@ -67,7 +74,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 string projectName = kvp.Key;
 
                 var syncOneGroupAllProjectsGitsToolAction =
-                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
+                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true, $"{useMessage} Prepare");
                 await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
 
                 string gitProjectName = kvp.Value[0];
@@ -84,7 +91,9 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 projectGitProjectNames.Where(x => x.Value.Count == 0).ToList()
                     .ForEach(x => projectGitProjectNames.Remove(x.Key));
 
-                await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
+                var syncOneGroupAllProjectsGitsToolAction2 =
+                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true, $"{useMessage} Update");
+                await syncOneGroupAllProjectsGitsToolAction2.Run(cancellationToken);
             }
         }
 
