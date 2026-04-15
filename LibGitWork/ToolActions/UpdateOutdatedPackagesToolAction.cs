@@ -65,6 +65,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                          .ToList())
             {
                 string projectName = kvp.Key;
+
                 var syncOneGroupAllProjectsGitsToolAction =
                     SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
                 await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
