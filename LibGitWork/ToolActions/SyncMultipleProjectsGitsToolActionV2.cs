@@ -83,7 +83,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 
         string? usedCommitMessage = _useMessage;
 
-        bool useSameMessageForNextCommits = false;
+        bool useSameMessageForNextCommits = _useMessage is not null;
 
         Console.WriteLine("Count changes");
         //წინასწარ ვადგენთ, რომელიმე რეპოზიტორიაში ხომ არ გვაქვს ცვლილებები, რომ პირველ რიგში ისინი დავამუშაოვოთ
