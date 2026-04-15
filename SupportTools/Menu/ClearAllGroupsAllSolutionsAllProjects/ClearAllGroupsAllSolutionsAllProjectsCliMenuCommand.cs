@@ -5,7 +5,7 @@ using LibTools.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
+namespace SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 
 public sealed class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand : CliMenuCommand
 {

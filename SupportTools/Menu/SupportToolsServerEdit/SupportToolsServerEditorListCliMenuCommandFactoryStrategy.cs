@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
+namespace SupportTools.Menu.SupportToolsServerEdit;
 
 public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {

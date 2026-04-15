@@ -2,7 +2,7 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
+namespace SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 
 // ReSharper disable once UnusedType.Global
 public class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy

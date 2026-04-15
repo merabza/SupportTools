@@ -2,7 +2,7 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibGitWork.Menu.SyncAllProjectsAllGits;
+namespace SupportTools.Menu.SyncAllProjectsAllGits;
 
 // ReSharper disable once UnusedType.Global
 public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy : IMenuCommandFactoryStrategy

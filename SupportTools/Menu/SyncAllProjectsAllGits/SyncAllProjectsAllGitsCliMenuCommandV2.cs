@@ -5,7 +5,7 @@ using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibGitWork.Menu.SyncAllProjectsAllGits;
+namespace SupportTools.Menu.SyncAllProjectsAllGits;
 
 public sealed class SyncAllProjectsAllGitsCliMenuCommandV2 : CliMenuCommand
 {

@@ -8,10 +8,7 @@ using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 using LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 using LibCodeGenerator.ToolCommands.GenerateApiRoutes;
 using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
-using LibGitWork.Menu.SyncAllProjectsAllGits;
 using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.JsonFromProjectDbProjectGetter;
-using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
-using LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters;
 using ParametersManagement.LibParameters.DependencyInjection;
@@ -50,10 +47,7 @@ public static class SupportToolsServices
     public static IServiceCollection AddMenuCommandsFactoryStrategies(this IServiceCollection services)
     {
         services.AddTransientAllMenuCommandFactoryStrategies(
-            typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy).Assembly,
-            typeof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy).Assembly,
-            typeof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy).Assembly,
-            typeof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy).Assembly);
+            typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy).Assembly);
         return services;
     }
 

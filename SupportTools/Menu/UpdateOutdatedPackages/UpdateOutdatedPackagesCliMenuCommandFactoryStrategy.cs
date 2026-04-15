@@ -2,7 +2,7 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace LibGitWork.Menu.UpdateOutdatedPackages;
+namespace SupportTools.Menu.UpdateOutdatedPackages;
 
 // ReSharper disable once UnusedType.Global
 public class UpdateOutdatedPackagesCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy

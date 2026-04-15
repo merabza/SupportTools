@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using AppCliTools.CliTools.CliMenuCommands;
-using LibGitWork.Menu.SyncAllProjectsAllGits;
-using LibGitWork.Menu.UpdateOutdatedPackages;
-using LibSupportToolsServerWork.Menu.SupportToolsServerEdit;
-using LibTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Cruders;
+using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateProject;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
+using SupportTools.Menu.SupportToolsServerEdit;
+using SupportTools.Menu.SyncAllProjectsAllGits;
+using SupportTools.Menu.UpdateOutdatedPackages;
 
 namespace SupportTools.Menu;
 

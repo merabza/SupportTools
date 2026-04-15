@@ -28,7 +28,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         _syncMultipleProjectsGitsParametersV2 = syncMultipleProjectsGitsParametersV2;
     }
 
-    public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger logger, IParametersManager parametersManager,
+    public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger? logger, IParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

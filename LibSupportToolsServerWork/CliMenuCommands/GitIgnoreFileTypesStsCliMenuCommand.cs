@@ -7,7 +7,7 @@ using ParametersManagement.LibParameters;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-internal sealed class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
+public sealed class GitIgnoreFileTypesStsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;

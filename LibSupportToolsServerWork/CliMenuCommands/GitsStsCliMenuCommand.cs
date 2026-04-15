@@ -7,7 +7,7 @@ using ParametersManagement.LibParameters;
 
 namespace LibSupportToolsServerWork.CliMenuCommands;
 
-internal sealed class GitsStsCliMenuCommand : CliMenuCommand
+public sealed class GitsStsCliMenuCommand : CliMenuCommand
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;

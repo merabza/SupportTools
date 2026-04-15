@@ -37,37 +37,78 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
             useConsole);
     }
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        var syncOneProjectAllGitsToolAction =
+            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true);
+        await syncOneProjectAllGitsToolAction.Run(cancellationToken);
+
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
 
         List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
 
-        var gitSyncToolsByGitProjectNames = new Dictionary<string, PackageUpdater>();
+        //var packageUpdaters = new Dictionary<string, PackageUpdater>();
+        var projectGitProjectNames = new Dictionary<string, List<string>>();
+        //var updatedGitProjectNames = new List<string>();
         const EGitCol gitCol = EGitCol.Main;
 
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+            projectGitProjectNames.Add(projectName, project.GetGitProjectNamesByGitCollectionType(gitCol).ToList());
+        }
+
+        int lastProjectsCount = projectGitProjectNames.Count + 1;
+        while (projectGitProjectNames.Count > 0 && projectGitProjectNames.Count < lastProjectsCount)
+        {
+            lastProjectsCount = projectGitProjectNames.Count;
+            foreach (KeyValuePair<string, List<string>> kvp in projectGitProjectNames.Where(x => x.Value.Count == 1)
+                         .ToList())
             {
-                if (!gitSyncToolsByGitProjectNames.TryGetValue(gitProjectName, out PackageUpdater? value))
+                string projectName = kvp.Key;
+                var syncOneGroupAllProjectsGitsToolAction =
+                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
+                await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
+
+                string gitProjectName = kvp.Value[0];
+                var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
+                    gitCol, gitProjectName, true);
+                packageUpdaterToolAction?.RunPackageUpdate();
+
+                foreach (KeyValuePair<string, List<string>> pair in projectGitProjectNames)
                 {
-                    value = new PackageUpdater(_logger, _parametersManager, gitProjectName, true);
-                    gitSyncToolsByGitProjectNames.Add(gitProjectName, value);
+                    pair.Value.Remove(gitProjectName);
                 }
 
-                value.Add(projectName, gitCol);
+                projectGitProjectNames.Remove(projectName);
+                projectGitProjectNames.Where(x => x.Value.Count == 0).ToList()
+                    .ForEach(x => projectGitProjectNames.Remove(x.Key));
+
+                await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
             }
         }
 
-        foreach (KeyValuePair<string, PackageUpdater> keyValuePair in gitSyncToolsByGitProjectNames
-                     .Where(x => x.Value.Count > 0).OrderBy(x => x.Key))
-        {
-            PackageUpdater packageUpdater = keyValuePair.Value;
-            packageUpdater.Run();
-        }
+        //foreach ((string projectName, ProjectModel project) in projectsListOrdered)
+        //{
+        //    foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+        //    {
+        //        if (!packageUpdaters.TryGetValue(gitProjectName, out PackageUpdater? value))
+        //        {
+        //            value = new PackageUpdater(_logger, _parametersManager, gitProjectName, true);
+        //            packageUpdaters.Add(gitProjectName, value);
+        //        }
 
-        return ValueTask.FromResult(true);
+        //        value.Add(projectName, gitCol);
+        //    }
+        //}
+
+        //foreach (KeyValuePair<string, PackageUpdater> keyValuePair in packageUpdaters.Where(x => x.Value.Count > 0)
+        //             .OrderBy(x => x.Key))
+        //{
+        //    PackageUpdater packageUpdater = keyValuePair.Value;
+        //    packageUpdater.Run();
+        //}
+
+        return true;
     }
 
     private IEnumerable<KeyValuePair<string, ProjectModel>> GetProjectsList()
