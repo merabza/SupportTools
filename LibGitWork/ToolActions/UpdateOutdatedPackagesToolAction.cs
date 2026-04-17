@@ -47,7 +47,8 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 CultureInfo.InvariantCulture)}");
 
         var syncOneProjectAllGitsToolAction =
-            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true, $"{useMessage} Check");
+            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true,
+                $"{useMessage} Check");
         await syncOneProjectAllGitsToolAction.Run(cancellationToken);
 
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
@@ -73,8 +74,8 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
             {
                 string projectName = kvp.Key;
 
-                var syncOneGroupAllProjectsGitsToolAction =
-                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true, $"{useMessage} Prepare");
+                var syncOneGroupAllProjectsGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
+                    _parametersManager, null, projectName, true, $"{useMessage} Prepare");
                 await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
 
                 string gitProjectName = kvp.Value[0];
@@ -91,8 +92,8 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 projectGitProjectNames.Where(x => x.Value.Count == 0).ToList()
                     .ForEach(x => projectGitProjectNames.Remove(x.Key));
 
-                var syncOneGroupAllProjectsGitsToolAction2 =
-                    SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true, $"{useMessage} Update");
+                var syncOneGroupAllProjectsGitsToolAction2 = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
+                    _parametersManager, null, projectName, true, $"{useMessage} Update");
                 await syncOneGroupAllProjectsGitsToolAction2.Run(cancellationToken);
             }
         }

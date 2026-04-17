@@ -21,8 +21,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
     private readonly string? _useMessage;
 
     private SyncMultipleProjectsGitsToolActionV2(ILogger? logger, IParametersManager parametersManager,
-        SyncMultipleProjectsGitsParametersV2 syncMultipleProjectsGitsParametersV2, bool useConsole, string? useMessage = null) : base(logger,
-        "Sync Multiple Projects Gits V2", null, null, useConsole)
+        SyncMultipleProjectsGitsParametersV2 syncMultipleProjectsGitsParametersV2, bool useConsole,
+        string? useMessage = null) : base(logger, "Sync Multiple Projects Gits V2", null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -38,7 +38,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
             SyncMultipleProjectsGitsParametersV2.Create(supportToolsParameters, projectGroupName, projectName);
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new SyncMultipleProjectsGitsToolActionV2(loggerOrNull, parametersManager,
-        syncMultipleProjectsGitsParametersV2, useConsole, useMessage);
+            syncMultipleProjectsGitsParametersV2, useConsole, useMessage);
     }
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
