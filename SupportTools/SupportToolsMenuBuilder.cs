@@ -1,5 +1,6 @@
 ﻿using System;
 using AppCliTools.CliMenu;
+using AppCliTools.CliMenu.CliMenuCommands;
 using AppCliTools.CliTools.CliMenuCommands;
 using AppCliTools.CliTools.Services.MenuBuilder;
 using ParametersManagement.LibParameters;
@@ -23,10 +24,7 @@ public sealed class SupportToolsMenuBuilder : IMenuBuilder
     {
         //მთავარი მენიუს ჩატვირთვა
         CliMenuSet mainMenuSet = CliMenuSetFactory.CreateMenuSet("Main Menu", MenuData.MenuCommandNames,
-            _serviceProvider, _parametersManager);
-
-        //პროგრამიდან გასასვლელი
-        mainMenuSet.AddEscapeCommand(new ExitCliMenuCommand());
+            _serviceProvider, _parametersManager, true);
 
         return mainMenuSet;
     }

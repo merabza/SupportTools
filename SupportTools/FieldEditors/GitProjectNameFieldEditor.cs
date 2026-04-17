@@ -59,7 +59,7 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 
         if (_useNone)
         {
-            gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"), 1);
+            gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"));
         }
 
         foreach (string listItem in keys)
