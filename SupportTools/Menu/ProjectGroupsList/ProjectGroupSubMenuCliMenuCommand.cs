@@ -42,11 +42,6 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        ////ყველა პროექტის git-ის სინქრონიზაცია
-        //var syncGroupAllProjectsGits =
-        //    new SyncOneGroupAllProjectsGitsCliMenuCommand(_logger, _parametersManager, _projectGroupName);
-        //projectGroupSubMenuSet.AddMenuItem(syncGroupAllProjectsGits);
-
         //ყველა პროექტის git-ის სინქრონიზაცია V2
         var syncGroupAllProjectsGitsV2 =
             new SyncOneGroupAllProjectsGitsCliMenuCommandV2(_logger, _parametersManager, _projectGroupName);
