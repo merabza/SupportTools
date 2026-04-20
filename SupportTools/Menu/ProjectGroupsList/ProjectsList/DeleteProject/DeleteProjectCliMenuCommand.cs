@@ -27,9 +27,10 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        ProjectModel? project = parameters.GetProject(_projectName);
 
         Dictionary<string, ProjectModel> projects = parameters.Projects;
-        if (!projects.ContainsKey(_projectName))
+        if (project is null)
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
             return false;

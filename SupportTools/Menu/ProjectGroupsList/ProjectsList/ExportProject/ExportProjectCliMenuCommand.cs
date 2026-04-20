@@ -32,9 +32,9 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        ProjectModel? project = parameters.GetProject(_projectName);
 
-        Dictionary<string, ProjectModel> projects = parameters.Projects;
-        if (!projects.TryGetValue(_projectName, out ProjectModel? project))
+        if (project is null)
         {
             StShared.WriteErrorLine($"Project {_projectName} does not found", true);
             return false;

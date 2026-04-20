@@ -4,6 +4,7 @@ using AppCliTools.CliParameters;
 using AppCliTools.CliTools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using SupportTools.DependencyInjection;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -50,3 +51,8 @@ catch (Exception e)
     StShared.WriteException(e, true, logger);
     return 4;
 }
+finally
+{
+    await Log.CloseAndFlushAsync();
+}
+

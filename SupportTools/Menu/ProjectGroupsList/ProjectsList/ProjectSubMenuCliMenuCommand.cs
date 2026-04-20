@@ -4,7 +4,9 @@ using System.Linq;
 using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList;
 
@@ -34,6 +36,11 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (project is null || string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
         {
             excludeList.Add(nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy));
+        }
+
+        if (!SystemStat.IsWindows())
+        {
+            excludeList.Add(OpenByVisualStudioCliMenuCommand.MenuCommandName);
         }
 
         _menuParameters.ProjectName = _projectName;

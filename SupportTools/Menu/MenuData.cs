@@ -12,6 +12,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequen
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
@@ -64,6 +65,8 @@ public static class MenuData
         DeleteProjectCliMenuCommand.MenuCommandName,
         //პროექტის ექსპორტი
         ExportProjectCliMenuCommand.MenuCommandName,
+        //პროექტის Visual Studio-ში გახსნა
+        OpenByVisualStudioCliMenuCommand.MenuCommandName,
         //პროექტის გიტების სინქრონიზაცია
         SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2.MenuCommandName,
         //პროექტის გიტების ჩამონათვალი და მართვა
