@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 
 public sealed class ServerInfoSubMenuCliMenuCommand : CliMenuCommand
 {

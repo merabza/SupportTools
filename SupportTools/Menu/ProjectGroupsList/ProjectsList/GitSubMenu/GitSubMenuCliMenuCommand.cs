@@ -6,9 +6,10 @@ using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.CliMenuCommands;
 using SupportToolsData.Models;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 
 public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 {

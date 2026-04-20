@@ -10,15 +10,15 @@ using SystemTools.SystemToolsShared;
 namespace SupportTools.Menu.CreateNewProject;
 
 // ReSharper disable once UnusedMember.Global
-public class NewProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
+public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IApplication _application;
 
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<NewProjectCliMenuCommandFactoryStrategy> _logger;
+    private readonly ILogger<CreateNewProjectFactoryStrategy> _logger;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NewProjectCliMenuCommandFactoryStrategy(ILogger<NewProjectCliMenuCommandFactoryStrategy> logger,
+    public CreateNewProjectFactoryStrategy(ILogger<CreateNewProjectFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IApplication application)
     {
         _logger = logger;
@@ -26,7 +26,7 @@ public class NewProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
         _application = application;
     }
 
-    public string MenuCommandName => $"New {ProjectCruder.MenuCommandName}";
+    public string MenuCommandName => nameof(CreateNewProjectFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

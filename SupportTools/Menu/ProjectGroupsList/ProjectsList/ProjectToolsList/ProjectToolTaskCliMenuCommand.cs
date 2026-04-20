@@ -5,7 +5,7 @@ using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 
 public sealed class ProjectToolTaskCliMenuCommand : CliMenuCommand
 {

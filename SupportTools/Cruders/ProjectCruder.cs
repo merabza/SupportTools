@@ -82,8 +82,6 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
             nameof(ProjectModel.FrontNpmPackageNames), logger, httpClientFactory, parametersManager));
     }
 
-    public static string MenuCommandName => "Project";
-
     public static ProjectCruder Create(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {
@@ -108,5 +106,23 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         {
             itemSubMenuSet.AddMenuItem(detailListCommand);
         }
+    }
+
+    public override List<CliMenuCommand> GetDetailsSubMenu(string itemName)
+    {
+        List<CliMenuCommand> result = base.GetDetailsSubMenu(itemName);
+
+        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+        Dictionary<string, ProjectModel> projects = parameters.Projects;
+        ProjectModel project = projects[itemName];
+
+        var detailsCruder = new RedundantFileNameCruder(ParametersManager, itemName);
+        var newItemCommand = new NewItemCliMenuCommand(detailsCruder, itemName, $"Create New {detailsCruder.CrudName}");
+        result.Add(newItemCommand);
+
+        result.AddRange(project.RedundantFileNames.Select(mask =>
+            new ItemSubMenuCliMenuCommand(detailsCruder, mask, itemName, true)));
+
+        return result;
     }
 }

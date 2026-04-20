@@ -10,7 +10,7 @@ using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 
 public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
 {
