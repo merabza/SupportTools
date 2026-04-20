@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using AppCliTools.CliParameters;
 using AppCliTools.CliTools;
-using AppCliTools.CliTools.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog.Events;
 using SupportTools.DependencyInjection;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -35,12 +32,13 @@ try
     var serviceCollection = new ServiceCollection();
 
     // ReSharper disable once using
-    await using ServiceProvider serviceProvider = serviceCollection.AddServices(appName, argParser.Par!, argParser.ParametersFileName).BuildServiceProvider();
+    await using ServiceProvider serviceProvider = serviceCollection
+        .AddServices(appName, argParser.Par!, argParser.ParametersFileName).BuildServiceProvider();
 
     var cliLoopPar = CliAppLoopParameters.Create<Program>(serviceProvider);
     if (cliLoopPar is null)
     {
-        return 6;
+        return 3;
     }
 
     var cliAppLoop = new CliAppLoop(cliLoopPar);
@@ -50,5 +48,5 @@ try
 catch (Exception e)
 {
     StShared.WriteException(e, true, logger);
-    return 7;
+    return 4;
 }

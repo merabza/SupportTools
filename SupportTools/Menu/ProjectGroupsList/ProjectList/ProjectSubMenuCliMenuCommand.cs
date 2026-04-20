@@ -8,11 +8,12 @@ using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportToolsData;
 using SupportToolsData.Models;
 
-namespace SupportTools.CliMenuCommands;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectList;
 
 public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 {
@@ -58,11 +59,6 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         projectCruder.FillDetailsSubMenu(projectSubMenuSet, _projectName);
 
-        ////ყველა პროექტის git-ის სინქრონიზაცია
-        //var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand =
-        //    new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand(_logger, _parametersManager, _projectName);
-        //projectSubMenuSet.AddMenuItem(syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommand);
-
         //ყველა პროექტის git-ის სინქრონიზაცია V2
         var syncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2 =
             new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(_logger, _parametersManager, _projectName);
@@ -105,7 +101,6 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         {
             foreach (KeyValuePair<string, ServerInfoModel> kvp in
                      project.ServerInfos.OrderBy(o => o.Value.GetItemKey()))
-                //, kvp.Value.GetItemKey()
             {
                 projectSubMenuSet.AddMenuItem(new ServerInfoSubMenuCliMenuCommand(_appName, _logger, _httpClientFactory,
                     kvp.Value.GetItemKey(), _parametersManager, _projectName, kvp.Key, _serviceProvider));

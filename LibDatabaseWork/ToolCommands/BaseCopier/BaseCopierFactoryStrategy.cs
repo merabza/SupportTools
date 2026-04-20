@@ -30,7 +30,7 @@ public class BaseCopierFactoryStrategy
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
         CopyBaseParameters? copyBaseParametersDevToProd =
-            await CopyBaseParametersFactory.CreateCopyBaseParameters(_app.Name, _logger, _httpClientFactory,
+            await CopyBaseParametersFactory.CreateCopyBaseParameters(_app.AppName, _logger, _httpClientFactory,
                 fromDatabaseParameters, toDatabaseParameters, supportToolsParameters, cancellationToken);
         if (copyBaseParametersDevToProd is not null)
         {

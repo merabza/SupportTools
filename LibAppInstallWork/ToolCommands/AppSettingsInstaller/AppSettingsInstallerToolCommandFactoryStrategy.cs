@@ -40,7 +40,7 @@ public class AppSettingsInstallerToolCommandFactoryStrategy : IToolCommandFactor
             CancellationToken.None);
         if (appSettingsInstallerParameters is not null)
         {
-            return new AppSettingsInstallerToolCommand(_app.Name, _logger, _httpClientFactory, true,
+            return new AppSettingsInstallerToolCommand(_app.AppName, _logger, _httpClientFactory, true,
                 appSettingsInstallerParameters, parametersManager);
         }
 

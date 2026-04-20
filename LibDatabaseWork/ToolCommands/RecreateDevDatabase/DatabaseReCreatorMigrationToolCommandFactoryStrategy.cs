@@ -39,7 +39,7 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForReCreator = DatabaseMigrationParameters.Create(_app.Name, _logger, _httpClientFactory,
+        var dmpForReCreator = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
             supportToolsParameters, projectName);
         var correctNewDbParametersForRecreate =
             CorrectNewDbParameters.Create(_logger, supportToolsParameters, projectName);
@@ -68,7 +68,7 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         if (correctNewDbParametersForRecreate is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_app.Name, _logger,
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_app.AppName, _logger,
                 dmpForReCreator, project.DevDatabaseParameters, correctNewDbParametersForRecreate,
                 databaseServerConnections, apiClients, _httpClientFactory,
                 parametersManager)); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა

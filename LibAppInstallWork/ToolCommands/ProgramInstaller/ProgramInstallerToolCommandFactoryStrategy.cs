@@ -44,7 +44,7 @@ public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStr
 
         if (programInstallerParameters is not null)
         {
-            return new ProgramInstallerToolCommand(_app.Name, _logger, _httpClientFactory, true,
+            return new ProgramInstallerToolCommand(_app.AppName, _logger, _httpClientFactory, true,
                 programInstallerParameters, parametersManager);
         }
 

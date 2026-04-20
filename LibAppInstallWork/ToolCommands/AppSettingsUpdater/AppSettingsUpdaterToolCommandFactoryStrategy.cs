@@ -41,7 +41,7 @@ public class AppSettingsUpdaterToolCommandFactoryStrategy : IToolCommandFactoryS
             cancellationToken);
         if (appSettingsUpdaterParameters is not null)
         {
-            return new AppSettingsUpdaterToolCommand(_app.Name, _logger, _httpClientFactory,
+            return new AppSettingsUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory,
                 appSettingsUpdaterParameters, parametersManager, true);
         }
 

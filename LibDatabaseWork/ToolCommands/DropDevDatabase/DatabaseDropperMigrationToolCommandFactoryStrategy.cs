@@ -35,7 +35,7 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForDropper = DatabaseMigrationParameters.Create(_app.Name, _logger, _httpClientFactory,
+        var dmpForDropper = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
             supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpForDropper is not null)
         {

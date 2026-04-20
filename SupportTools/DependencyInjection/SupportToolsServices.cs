@@ -14,6 +14,7 @@ using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.JsonFromProjectDbProje
 using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters;
 using Serilog.Events;
+using SupportTools.Menu;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportToolsData.Models;
@@ -27,19 +28,25 @@ public static class SupportToolsServices
     public static IServiceCollection AddServices(this IServiceCollection services, string appName,
         SupportToolsParameters par, string parametersFileName)
     {
-        services.AddSerilogLoggerService(LogEventLevel.Information, appName, par.LogFolder).AddHttpClient()
+        // @formatter:off
+        services
+            .AddSerilogLoggerService(LogEventLevel.Information, appName, par.LogFolder)
+            .AddHttpClient()
             .AddMemoryCache()
-            .AddTransientAllStrategies<
-                IMenuCommandListFactoryStrategy>(typeof(ProjectGroupsListFactoryStrategy).Assembly)
-            .AddSingleton<IProcesses, Processes>().AddSingleton<IMenuBuilder, SupportToolsMenuBuilder>()
-            .AddTransientAllStrategies<
-                IMenuCommandFactoryStrategy>(typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy)
-                .Assembly).AddTransientAllStrategies<IToolCommandFactoryStrategy>(
+            .AddSingleton<MenuParameters>()
+            .AddTransientAllStrategies<IMenuCommandListFactoryStrategy>(
+                typeof(ProjectGroupsListFactoryStrategy).Assembly)
+            .AddSingleton<IProcesses, Processes>()
+            .AddSingleton<IMenuBuilder, SupportToolsMenuBuilder>()
+            .AddTransientAllStrategies<IMenuCommandFactoryStrategy>(
+                typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy).Assembly)
+            .AddTransientAllStrategies<IToolCommandFactoryStrategy>(
                 typeof(CorrectNewDatabaseToolCommandFactoryStrategy).Assembly,
                 typeof(JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy).Assembly,
                 typeof(JsonFromProjectDbProjectGetterFactoryStrategy).Assembly,
                 typeof(GenerateApiRoutesToolCommandFactoryStrategy).Assembly,
-                typeof(ApplicationSettingsEncoderToolCommandFactoryStrategy).Assembly).AddApplication(x =>
+                typeof(ApplicationSettingsEncoderToolCommandFactoryStrategy).Assembly)
+            .AddApplication(x =>
             {
                 x.AppName = appName;
             }).AddMainParametersManager(x =>
@@ -48,6 +55,7 @@ public static class SupportToolsServices
                 x.Par = par;
             });
 
+        // @formatter:on
         if (!string.IsNullOrWhiteSpace(par.RecentCommandsFileName) && par.RecentCommandsCount > 0)
         {
             services.AddRecentCommandsService(x =>
@@ -59,30 +67,6 @@ public static class SupportToolsServices
 
         return services;
     }
-
-    //public static IServiceCollection AddMenuBuilderStrategies(this IServiceCollection services)
-    //{
-    //    services.AddTransient()
-    //    return services;
-    //}
-
-    //public static IServiceCollection AddToolCommandsFactoryStrategies(this IServiceCollection services)
-    //{
-    //    services.AddTransientAllStrategies<IToolCommandFactoryStrategy>(
-    //        typeof(CorrectNewDatabaseToolCommandFactoryStrategy).Assembly,
-    //        typeof(JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy).Assembly,
-    //        typeof(JsonFromProjectDbProjectGetterFactoryStrategy).Assembly,
-    //        typeof(GenerateApiRoutesToolCommandFactoryStrategy).Assembly,
-    //        typeof(ApplicationSettingsEncoderToolCommandFactoryStrategy).Assembly);
-    //    return services;
-    //}
-
-    //public static IServiceCollection AddMenuCommandsFactoryStrategies(this IServiceCollection services)
-    //{
-    //    services.AddTransientAllStrategies<IMenuCommandFactoryStrategy>(
-    //        typeof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy).Assembly);
-    //    return services;
-    //}
 
     private static IServiceCollection AddApplication(this IServiceCollection services,
         Action<ApplicationOptions> setupAction)

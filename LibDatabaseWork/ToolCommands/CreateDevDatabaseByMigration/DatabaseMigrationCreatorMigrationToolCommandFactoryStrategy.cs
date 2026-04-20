@@ -35,7 +35,7 @@ public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : ITool
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpCreator = DatabaseMigrationParameters.Create(_app.Name, _logger, _httpClientFactory,
+        var dmpCreator = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
             supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpCreator is not null)
         {

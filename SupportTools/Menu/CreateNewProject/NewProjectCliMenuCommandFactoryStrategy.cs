@@ -32,7 +32,7 @@ public class NewProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var projectCruder = new ProjectCruder(_application.Name, _logger, _httpClientFactory, parametersManager,
+        var projectCruder = new ProjectCruder(_application.AppName, _logger, _httpClientFactory, parametersManager,
             parameters.Projects);
 
         //ახალი პროექტის შექმნა

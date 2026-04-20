@@ -49,7 +49,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
                 projectName, serverInfo, cancellationToken);
             if (programServiceUpdaterParameters is not null)
             {
-                return new ServiceUpdaterToolCommand(_app.Name, _logger, _httpClientFactory,
+                return new ServiceUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory,
                     programServiceUpdaterParameters, parametersManager, true);
             }
 
@@ -61,7 +61,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
             projectName, serverInfo, cancellationToken);
         if (programUpdaterParameters is not null)
         {
-            return new ProgramUpdaterToolCommand(_app.Name, _logger, _httpClientFactory, programUpdaterParameters,
+            return new ProgramUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory, programUpdaterParameters,
                 parametersManager, true);
         }
 

@@ -5,6 +5,8 @@ using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateProject;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectList;
+using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
 using SupportTools.Menu.SyncAllProjectsAllGits;
@@ -33,8 +35,13 @@ public static class MenuData
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
         ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand.MenuCommandName,
         //პროექტების ჯგუფების ჩამონათვალი
-        ProjectGroupSubMenuCliMenuCommand.MenuCommandListName,
+        nameof(ProjectGroupSubMenuCliMenuCommand),
         //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
         nameof(RecentCommandCliMenuCommand)
+    ];
+
+    public static List<string> ProjectGroupSubMenuCommandNames { get; } =
+    [
+        SyncOneGroupAllProjectsGitsCliMenuCommandV2.MenuCommandName, nameof(ProjectSubMenuCliMenuCommand)
     ];
 }
