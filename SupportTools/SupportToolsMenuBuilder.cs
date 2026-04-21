@@ -18,6 +18,7 @@ public sealed class SupportToolsMenuBuilder : IMenuBuilder
     public CliMenuSet BuildMainMenu()
     {
         //მთავარი მენიუს ჩატვირთვა
-        return CliMenuSetFactory.CreateMenuSet("Main Menu", MenuData.MenuCommandNames, _serviceProvider, true);
+        return CliMenuSetFactory.CreateMenuSet("Main Menu", MenuData.MainMenuCommandFactoryStrategyNames,
+            _serviceProvider, true);
     }
 }

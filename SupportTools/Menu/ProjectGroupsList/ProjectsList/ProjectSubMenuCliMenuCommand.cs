@@ -40,12 +40,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
 
         if (!SystemStat.IsWindows())
         {
-            excludeList.Add(OpenByVisualStudioCliMenuCommand.MenuCommandName);
+            excludeList.Add(nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy));
         }
 
         _menuParameters.ProjectName = _projectName;
         return CliMenuSetFactory.CreateMenuSet(_projectName,
-            MenuData.ProjectSubMenuCommandNames.Where(menuCommandName => !excludeList.Contains(menuCommandName))
-                .ToList(), _serviceProvider);
+            MenuData.ProjectSubMenuCommandFactoryStrategyNames
+                .Where(menuCommandName => !excludeList.Contains(menuCommandName)).ToList(), _serviceProvider);
     }
 }

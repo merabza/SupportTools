@@ -21,7 +21,7 @@ namespace SupportTools.Menu.SupportToolsParametersEdit;
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
     public SupportToolsParametersEditor(ILogger logger, IHttpClientFactory httpClientFactory, IParameters parameters,
-        IParametersManager parametersManager) : base(MenuCommandName, parameters, parametersManager)
+        IParametersManager parametersManager) : base("Support Tools Parameters Editor", parameters, parametersManager)
     {
         FieldEditors.Add(
             new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(nameof(SupportToolsParameters.DotnetTools),
@@ -127,6 +127,4 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(nameof(SupportToolsParameters.Environments),
                 parametersManager));
     }
-
-    public static string MenuCommandName => "Support Tools Parameters Editor";
 }

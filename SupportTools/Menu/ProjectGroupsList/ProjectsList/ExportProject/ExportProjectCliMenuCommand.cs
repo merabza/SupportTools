@@ -19,14 +19,12 @@ public sealed class ExportProjectCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ExportProjectCliMenuCommand(IParametersManager parametersManager, string projectName) : base(MenuCommandName,
-        EMenuAction.Reload, EMenuAction.Reload, projectName)
+    public ExportProjectCliMenuCommand(IParametersManager parametersManager, string projectName) : base(
+        "Export Project", EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
-
-    public static string MenuCommandName => "Export Project";
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {

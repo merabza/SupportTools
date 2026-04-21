@@ -11,6 +11,7 @@ public class OpenByVisualStudioCliMenuCommandFactoryStrategy : IMenuCommandFacto
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public OpenByVisualStudioCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> logger, IParametersManager parametersManager)
     {

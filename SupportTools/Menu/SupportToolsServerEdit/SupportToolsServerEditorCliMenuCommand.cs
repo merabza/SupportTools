@@ -16,15 +16,14 @@ public sealed class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServerEditorCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache, IParametersManager parametersManager) : base(MenuCommandName, EMenuAction.LoadSubMenu)
+        IMemoryCache memoryCache, IParametersManager parametersManager) : base("Support Tools Server Editor",
+        EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
         _parametersManager = parametersManager;
     }
-
-    public static string MenuCommandName => "Support Tools Server Editor";
 
     public override CliMenuSet GetSubMenu()
     {

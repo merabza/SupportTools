@@ -19,12 +19,11 @@ public sealed class ImportProjectCliMenuCommand : CliMenuCommand
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ImportProjectCliMenuCommand(IParametersManager parametersManager) : base(MenuCommandName, EMenuAction.Reload)
+    public ImportProjectCliMenuCommand(IParametersManager parametersManager) : base("Import Project",
+        EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
     }
-
-    public static string MenuCommandName => "Import Project";
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {

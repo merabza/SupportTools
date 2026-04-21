@@ -21,15 +21,13 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager) : base(MenuCommandName, EMenuAction.LoadSubMenu)
+        IParametersManager parametersManager) : base("Project Creator", EMenuAction.LoadSubMenu)
     {
         _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-
-    public static string MenuCommandName => "Project Creator";
 
     public override CliMenuSet GetSubMenu()
     {

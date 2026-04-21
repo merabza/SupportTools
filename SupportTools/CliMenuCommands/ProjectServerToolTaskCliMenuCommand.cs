@@ -6,8 +6,6 @@ using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
@@ -19,6 +17,7 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
     private readonly EProjectServerTools _tool;
     private IToolCommand? _toolCommand;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectServerToolTaskCliMenuCommand(EProjectServerTools tool, string projectName, ServerInfoModel serverInfo,
         IParametersManager parametersManager, IServiceProvider serviceProvider) : base(tool.GetProjectServerToolName(),
         EMenuAction.Reload, EMenuAction.Reload, null, true)

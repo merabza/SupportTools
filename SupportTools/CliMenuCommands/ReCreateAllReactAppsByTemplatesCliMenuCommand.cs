@@ -5,8 +5,6 @@ using LibAppProjectCreator.ToolCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-// ReSharper disable ConvertToPrimaryConstructor
-
 namespace SupportTools.CliMenuCommands;
 
 public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuCommand
@@ -14,6 +12,7 @@ public sealed class ReCreateAllReactAppsByTemplatesCliMenuCommand : CliMenuComma
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ReCreateAllReactAppsByTemplatesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
         "ReCreate All React Apps By Templates", EMenuAction.Reload)
     {

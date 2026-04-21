@@ -28,7 +28,7 @@ namespace SupportTools.Menu;
 
 public static class MenuData
 {
-    public static List<string> MenuCommandNames { get; } =
+    public static List<string> MainMenuCommandFactoryStrategyNames { get; } =
     [
         //ძირითადი პარამეტრების რედაქტირება
         nameof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy),
@@ -52,7 +52,7 @@ public static class MenuData
         nameof(RecentCommandsListFactoryStrategy)
     ];
 
-    public static List<string> ProjectGroupSubMenuCommandNames { get; } =
+    public static List<string> ProjectGroupSubMenuCommandFactoryStrategyNames { get; } =
     [
         //ჯგუფში შემავალი ყველა პროჯეცტის გიტების სინქრონიზაცია
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
@@ -60,7 +60,7 @@ public static class MenuData
         nameof(ProjectsListFactoryStrategy)
     ];
 
-    public static List<string> ProjectSubMenuCommandNames { get; } =
+    public static List<string> ProjectSubMenuCommandFactoryStrategyNames { get; } =
     [
         //პროექტის წაშლა
         nameof(DeleteProjectCliMenuCommandFactoryStrategy),

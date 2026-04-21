@@ -15,14 +15,12 @@ public sealed class DeleteProjectCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteProjectCliMenuCommand(IParametersManager parametersManager, string projectName) : base(MenuCommandName,
-        EMenuAction.LevelUp, EMenuAction.Reload, projectName)
+    public DeleteProjectCliMenuCommand(IParametersManager parametersManager, string projectName) : base(
+        "Delete Project", EMenuAction.LevelUp, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
-
-    public static string MenuCommandName => "Delete Project";
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {

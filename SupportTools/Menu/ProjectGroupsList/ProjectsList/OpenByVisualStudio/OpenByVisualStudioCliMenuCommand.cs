@@ -21,14 +21,12 @@ public sealed class OpenByVisualStudioCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public OpenByVisualStudioCliMenuCommand(IParametersManager parametersManager, string projectName, ILogger? logger) :
-        base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName)
+        base("Open By Visual Studio", EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
         _logger = logger;
     }
-
-    public static string MenuCommandName => "Open By Visual Studio";
 
     protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
