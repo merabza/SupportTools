@@ -36,15 +36,13 @@ try
     await using ServiceProvider serviceProvider = serviceCollection
         .AddServices(appName, argParser.Par!, argParser.ParametersFileName!).BuildServiceProvider();
 
-    var cliLoopPar = CliAppLoopParameters<Program>.Create(serviceProvider);
+    (var cliLoopPar, logger) = CliAppLoopParameters.Create<Program>(serviceProvider);
     if (cliLoopPar is null)
     {
         return 3;
     }
 
-    logger = cliLoopPar.Logger;
-
-    var cliAppLoop = new CliAppLoop<Program>(cliLoopPar);
+    var cliAppLoop = new CliAppLoop(cliLoopPar);
 
     return await cliAppLoop.Run() ? 0 : 100;
 }
@@ -57,4 +55,3 @@ finally
 {
     await Log.CloseAndFlushAsync();
 }
-
