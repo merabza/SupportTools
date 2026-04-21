@@ -1,8 +1,5 @@
-﻿using System.Net.Http;
-using AppCliTools.CliMenu;
-using Microsoft.Extensions.Logging;
+﻿using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
-using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 
@@ -13,15 +10,13 @@ public class SelectProjectAllowToolsFactoryStrategy : IMenuCommandFactoryStrateg
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SelectProjectAllowToolsFactoryStrategy(ILogger<SelectProjectAllowToolsFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory, MenuParameters menuParameters, IParametersManager parametersManager,
-        IApplication application)
+    public SelectProjectAllowToolsFactoryStrategy(MenuParameters menuParameters, IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
 
-    public string MenuCommandName => nameof(SelectProjectAllowToolsCliMenuCommand);
+    public string StrategyName => nameof(SelectProjectAllowToolsFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

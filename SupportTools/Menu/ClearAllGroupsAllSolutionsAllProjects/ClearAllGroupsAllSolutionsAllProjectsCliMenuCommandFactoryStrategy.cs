@@ -1,6 +1,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.SupportToolsServerEdit;
 
 namespace SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 
@@ -16,7 +17,7 @@ public class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy 
         _logger = logger;
     }
 
-    public string MenuCommandName => ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

@@ -26,7 +26,7 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
         _parametersManager = parametersManager;
     }
 
-    public string MenuCommandName => nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy);
+    public string StrategyName => nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

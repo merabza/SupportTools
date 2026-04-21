@@ -1,6 +1,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 
 namespace SupportTools.Menu.UpdateOutdatedPackages;
 
@@ -16,7 +17,7 @@ public class UpdateOutdatedPackagesCliMenuCommandFactoryStrategy : IMenuCommandF
         _logger = logger;
     }
 
-    public string MenuCommandName => UpdateOutdatedPackagesCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

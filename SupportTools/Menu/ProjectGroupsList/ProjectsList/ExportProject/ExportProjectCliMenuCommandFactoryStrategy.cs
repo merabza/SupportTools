@@ -1,5 +1,6 @@
 ﻿using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.SyncAllProjectsAllGits;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 
@@ -14,7 +15,7 @@ public class ExportProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStr
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandName => ExportProjectCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(ExportProjectCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

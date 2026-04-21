@@ -1,6 +1,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 
 namespace SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 
@@ -18,7 +19,7 @@ public class SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy : IMenuC
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandName => SyncOneGroupAllProjectsGitsCliMenuCommandV2.MenuCommandName;
+    public string StrategyName => nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

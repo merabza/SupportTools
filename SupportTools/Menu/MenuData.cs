@@ -18,6 +18,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
+using SupportTools.Menu.RecentCommandsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
 using SupportTools.Menu.SyncAllProjectsAllGits;
@@ -30,51 +31,51 @@ public static class MenuData
     public static List<string> MenuCommandNames { get; } =
     [
         //ძირითადი პარამეტრების რედაქტირება
-        SupportToolsParametersEditor.MenuCommandName,
+        nameof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy),
         //სერვერის პარამეტრების რედაქტირება
-        SupportToolsServerEditorCliMenuCommand.MenuCommandName,
+        nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy),
         //ახალი პროექტების შემქმნელი სუბმენიუ
-        ProjectCreatorSubMenuCliMenuCommand.MenuCommandName,
+        nameof(ProjectCreatorSubMenuCliMenuCommandFactoryStrategy),
         //ახალი პროექტის შექმნა 
         nameof(CreateNewProjectFactoryStrategy),
         //პროექტის დაიმპორტება
-        ImportProjectCliMenuCommand.MenuCommandName,
+        nameof(ImportProjectCliMenuCommandFactoryStrategy),
         //ყველა პროექტის git-ის სინქრონიზაცია V2
-        SyncAllProjectsAllGitsCliMenuCommandV2.MenuCommandName,
+        nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy),
         //ყველა პროექტის პაკეტების განახლება
-        UpdateOutdatedPackagesCliMenuCommand.MenuCommandName,
+        nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy),
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
-        ClearAllGroupsAllSolutionsAllProjectsCliMenuCommand.MenuCommandName,
+        nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
         //პროექტების ჯგუფების ჩამონათვალი
-        nameof(ProjectGroupSubMenuCliMenuCommand),
+        nameof(ProjectGroupsListFactoryStrategy),
         //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
-        nameof(RecentCommandCliMenuCommand)
+        nameof(RecentCommandsListFactoryStrategy)
     ];
 
     public static List<string> ProjectGroupSubMenuCommandNames { get; } =
     [
         //ჯგუფში შემავალი ყველა პროჯეცტის გიტების სინქრონიზაცია
-        SyncOneGroupAllProjectsGitsCliMenuCommandV2.MenuCommandName,
+        nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
         //პროექტების ჩამონავთვალი
-        nameof(ProjectSubMenuCliMenuCommand)
+        nameof(ProjectsListFactoryStrategy)
     ];
 
     public static List<string> ProjectSubMenuCommandNames { get; } =
     [
         //პროექტის წაშლა
-        DeleteProjectCliMenuCommand.MenuCommandName,
+        nameof(DeleteProjectCliMenuCommandFactoryStrategy),
         //პროექტის ექსპორტი
-        ExportProjectCliMenuCommand.MenuCommandName,
+        nameof(ExportProjectCliMenuCommandFactoryStrategy),
         //პროექტის Visual Studio-ში გახსნა
-        OpenByVisualStudioCliMenuCommand.MenuCommandName,
+        nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
-        SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2.MenuCommandName,
+        nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა
         nameof(GitSubMenuCliMenuCommandFactoryStrategy),
         //პროექტის Scaffold Seeder-ის გიტების ჩამონათვალი და მართვა
         nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy),
         //დასაშვები ინსტრუმენტების არჩევის საშუალება
-        nameof(SelectProjectAllowToolsCliMenuCommand),
+        nameof(SelectProjectAllowToolsFactoryStrategy),
         //დასაშვები ინსტრუმენტები
         nameof(ProjectToolsListFactoryStrategy),
         //ახალი პროექტის შექმნა 

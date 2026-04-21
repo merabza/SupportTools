@@ -3,6 +3,7 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 
 namespace SupportTools.Menu.SupportToolsServerEdit;
 
@@ -22,7 +23,7 @@ public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCo
         _memoryCache = memoryCache;
     }
 
-    public string MenuCommandName => SupportToolsServerEditorCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

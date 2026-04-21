@@ -26,7 +26,7 @@ public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
         _application = application;
     }
 
-    public string MenuCommandName => nameof(CreateNewProjectFactoryStrategy);
+    public string StrategyName => nameof(CreateNewProjectFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

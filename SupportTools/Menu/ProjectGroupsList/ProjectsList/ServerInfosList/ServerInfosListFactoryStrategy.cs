@@ -33,7 +33,7 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
         _parametersManager = parametersManager;
     }
 
-    public string MenuCommandListName => nameof(ServerInfoSubMenuCliMenuCommand);
+    public string StrategyName => nameof(ServerInfoSubMenuCliMenuCommand);
 
     public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
     {

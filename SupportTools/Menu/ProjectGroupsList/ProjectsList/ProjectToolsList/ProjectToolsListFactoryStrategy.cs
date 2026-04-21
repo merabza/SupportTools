@@ -27,7 +27,7 @@ public class ProjectToolsListFactoryStrategy : IMenuCommandListFactoryStrategy
         _serviceProvider = serviceProvider;
     }
 
-    public string MenuCommandListName => nameof(ProjectToolsListFactoryStrategy);
+    public string StrategyName => nameof(ProjectToolsListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
     {

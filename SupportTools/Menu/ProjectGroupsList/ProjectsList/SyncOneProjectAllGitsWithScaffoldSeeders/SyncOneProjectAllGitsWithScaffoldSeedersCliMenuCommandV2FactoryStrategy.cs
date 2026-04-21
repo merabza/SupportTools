@@ -1,6 +1,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 
@@ -19,7 +20,7 @@ public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStra
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandName => SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2.MenuCommandName;
+    public string StrategyName => nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

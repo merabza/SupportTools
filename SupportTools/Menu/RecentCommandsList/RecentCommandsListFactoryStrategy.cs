@@ -18,7 +18,7 @@ public class RecentCommandsListFactoryStrategy : IMenuCommandListFactoryStrategy
         _recentCommandsService = recentCommandsService;
     }
 
-    public string MenuCommandListName => nameof(RecentCommandCliMenuCommand);
+    public string StrategyName => nameof(RecentCommandsListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
     {

@@ -20,7 +20,7 @@ public class ProjectGroupsListFactoryStrategy : IMenuCommandListFactoryStrategy
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandListName => nameof(ProjectGroupSubMenuCliMenuCommand);
+    public string StrategyName => nameof(ProjectGroupsListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
     {

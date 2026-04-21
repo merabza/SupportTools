@@ -1,6 +1,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 
 namespace SupportTools.Menu.SyncAllProjectsAllGits;
 
@@ -16,7 +17,7 @@ public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy : IMenuComman
         _logger = logger;
     }
 
-    public string MenuCommandName => SyncAllProjectsAllGitsCliMenuCommandV2.MenuCommandName;
+    public string StrategyName => nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

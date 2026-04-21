@@ -49,7 +49,8 @@ public static class SupportToolsServices
             .AddApplication(x =>
             {
                 x.AppName = appName;
-            }).AddMainParametersManager(x =>
+            })
+            .AddMainParametersManager(x =>
             {
                 x.ParametersFileName = parametersFileName;
                 x.Par = par;

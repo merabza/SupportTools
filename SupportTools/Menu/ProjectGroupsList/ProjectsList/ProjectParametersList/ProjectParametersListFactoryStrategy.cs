@@ -29,7 +29,7 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
         _application = application;
     }
 
-    public string MenuCommandListName => nameof(ProjectParametersListFactoryStrategy);
+    public string StrategyName => nameof(ProjectParametersListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
     {

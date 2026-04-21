@@ -1,5 +1,6 @@
 ﻿using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.CreateProject;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 
@@ -14,7 +15,7 @@ public class DeleteProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStr
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandName => DeleteProjectCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(DeleteProjectCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

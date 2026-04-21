@@ -2,6 +2,7 @@
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.CreateProject;
@@ -23,7 +24,7 @@ public class ProjectCreatorSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFa
         _application = application;
     }
 
-    public string MenuCommandName => ProjectCreatorSubMenuCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(ProjectCreatorSubMenuCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

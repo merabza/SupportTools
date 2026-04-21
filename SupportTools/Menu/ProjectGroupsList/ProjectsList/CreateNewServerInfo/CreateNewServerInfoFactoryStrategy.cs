@@ -32,7 +32,7 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
         _menuParameters = menuParameters;
     }
 
-    public string MenuCommandName => nameof(CreateNewServerInfoFactoryStrategy);
+    public string StrategyName => nameof(CreateNewServerInfoFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

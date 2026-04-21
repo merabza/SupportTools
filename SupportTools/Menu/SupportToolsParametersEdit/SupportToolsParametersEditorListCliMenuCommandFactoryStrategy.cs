@@ -3,6 +3,7 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.UpdateOutdatedPackages;
 using SupportToolsData.Models;
 
 namespace SupportTools.Menu.SupportToolsParametersEdit;
@@ -22,7 +23,7 @@ public class SupportToolsParametersEditorListCliMenuCommandFactoryStrategy : IMe
         _httpClientFactory = httpClientFactory;
     }
 
-    public string MenuCommandName => SupportToolsParametersEditor.MenuCommandName;
+    public string StrategyName => nameof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

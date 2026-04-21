@@ -25,7 +25,7 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
         _parametersManager = parametersManager;
     }
 
-    public string MenuCommandName => nameof(GitSubMenuCliMenuCommandFactoryStrategy);
+    public string StrategyName => nameof(GitSubMenuCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

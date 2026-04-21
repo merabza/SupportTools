@@ -1,6 +1,7 @@
 ﻿using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 
@@ -18,7 +19,7 @@ public class OpenByVisualStudioCliMenuCommandFactoryStrategy : IMenuCommandFacto
         _logger = logger;
     }
 
-    public string MenuCommandName => OpenByVisualStudioCliMenuCommand.MenuCommandName;
+    public string StrategyName => nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {

@@ -29,7 +29,7 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
         _parametersManager = parametersManager;
     }
 
-    public string MenuCommandName => nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy);
+    public string StrategyName => nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
     {
