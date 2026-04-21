@@ -34,7 +34,7 @@ try
 
     // ReSharper disable once using
     await using ServiceProvider serviceProvider = serviceCollection
-        .AddServices(appName, argParser.Par!, argParser.ParametersFileName).BuildServiceProvider();
+        .AddServices(appName, argParser.Par!, argParser.ParametersFileName!).BuildServiceProvider();
 
     var cliLoopPar = CliAppLoopParameters.Create<Program>(serviceProvider);
     if (cliLoopPar is null)
