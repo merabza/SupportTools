@@ -36,13 +36,15 @@ try
     await using ServiceProvider serviceProvider = serviceCollection
         .AddServices(appName, argParser.Par!, argParser.ParametersFileName!).BuildServiceProvider();
 
-    var cliLoopPar = CliAppLoopParameters.Create<Program>(serviceProvider);
+    var cliLoopPar = CliAppLoopParameters<Program>.Create(serviceProvider);
     if (cliLoopPar is null)
     {
         return 3;
     }
 
-    var cliAppLoop = new CliAppLoop(cliLoopPar);
+    logger = cliLoopPar.Logger;
+
+    var cliAppLoop = new CliAppLoop<Program>(cliLoopPar);
 
     return await cliAppLoop.Run() ? 0 : 100;
 }
