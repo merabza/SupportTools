@@ -46,6 +46,6 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         _menuParameters.ProjectName = _projectName;
         return CliMenuSetFactory.CreateMenuSet(_projectName,
             MenuData.ProjectSubMenuCommandNames.Where(menuCommandName => !excludeList.Contains(menuCommandName))
-                .ToList(), _serviceProvider, _parametersManager);
+                .ToList(), _serviceProvider);
     }
 }

@@ -8,7 +8,7 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly IApplication _application;
@@ -17,7 +17,6 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersListFactoryStrategy(ILogger<ProjectParametersListFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, MenuParameters menuParameters, IParametersManager parametersManager,
         IApplication application)
@@ -31,7 +30,7 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
 
     public string StrategyName => nameof(ProjectParametersListFactoryStrategy);
 
-    public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
+    public List<CliMenuCommand> CreateMenuCommandsList()
     {
         var projectCruder = ProjectCruder.Create(_application.AppName, _logger, _httpClientFactory, _parametersManager);
 

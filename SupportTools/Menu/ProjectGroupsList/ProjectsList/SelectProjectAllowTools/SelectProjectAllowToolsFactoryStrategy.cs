@@ -3,13 +3,12 @@ using ParametersManagement.LibParameters;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class SelectProjectAllowToolsFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public SelectProjectAllowToolsFactoryStrategy(MenuParameters menuParameters, IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
@@ -18,7 +17,7 @@ public class SelectProjectAllowToolsFactoryStrategy : IMenuCommandFactoryStrateg
 
     public string StrategyName => nameof(SelectProjectAllowToolsFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
         return new SelectProjectAllowToolsCliMenuCommand(_parametersManager, _menuParameters.ProjectName);
     }

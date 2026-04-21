@@ -61,7 +61,7 @@ public sealed class OpenByVisualStudioCliMenuCommand : CliMenuCommand
 
     private void OpenSolution(string slnFilePath)
     {
-        var devenvPath = DetectDevEnvPath();
+        string? devenvPath = DetectDevEnvPath();
 
         if (string.IsNullOrWhiteSpace(devenvPath))
         {
@@ -75,7 +75,7 @@ public sealed class OpenByVisualStudioCliMenuCommand : CliMenuCommand
     private string? DetectDevEnvPath()
     {
         // Try using vswhere.exe to find the latest Visual Studio installation
-        var vswherePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+        string vswherePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
             "Microsoft Visual Studio", "Installer", "vswhere.exe");
 
         if (File.Exists(vswherePath))
@@ -88,7 +88,7 @@ public sealed class OpenByVisualStudioCliMenuCommand : CliMenuCommand
                 string installPath = runProcessWithOutputResult.AsT0.Item1.RemoveNotNeedLastPart("\r\n");
                 if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
                 {
-                    var devenvPath = Path.Combine(installPath, "Common7", "IDE", "devenv.exe");
+                    string devenvPath = Path.Combine(installPath, "Common7", "IDE", "devenv.exe");
                     if (File.Exists(devenvPath))
                     {
                         return devenvPath;
@@ -98,15 +98,15 @@ public sealed class OpenByVisualStudioCliMenuCommand : CliMenuCommand
         }
 
         // Fallback: Search common Visual Studio installation paths
-        var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        var vsBasePath = Path.Combine(programFiles, "Microsoft Visual Studio");
+        string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        string vsBasePath = Path.Combine(programFiles, "Microsoft Visual Studio");
 
         if (!Directory.Exists(vsBasePath))
         {
             return null;
         }
 
-        var editions = new[] { "Community", "Professional", "Enterprise" };
+        string[] editions = ["Community", "Professional", "Enterprise"];
 
         return (from yearDir in Directory.GetDirectories(vsBasePath).OrderByDescending(d => d)
             from edition in editions

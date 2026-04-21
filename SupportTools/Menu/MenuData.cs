@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AppCliTools.CliTools.CliMenuCommands;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
 using SupportTools.Menu.CreateProject;
@@ -16,6 +15,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Menu.RecentCommandsList;
@@ -78,8 +78,10 @@ public static class MenuData
         nameof(SelectProjectAllowToolsFactoryStrategy),
         //დასაშვები ინსტრუმენტები
         nameof(ProjectToolsListFactoryStrategy),
-        //ახალი პროექტის შექმნა 
+        //ახალი სერვერის ინფორმაციის შექმნა 
         nameof(CreateNewServerInfoFactoryStrategy),
+        //სერვერების ინფორმაციის ჩამონათვალი და მართვა
+        nameof(ServerInfosListFactoryStrategy),
         //პროექტის პარამეტრების რედაქტირება თანმიმდევრობით
         nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy),
         //პროექტის პარამეტრების სია თავისი რედაქტორებით

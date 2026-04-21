@@ -9,7 +9,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ProjectToolsListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly ILogger<ProjectToolsListFactoryStrategy> _logger;
@@ -17,7 +17,6 @@ public class ProjectToolsListFactoryStrategy : IMenuCommandListFactoryStrategy
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectToolsListFactoryStrategy(ILogger<ProjectToolsListFactoryStrategy> logger,
         MenuParameters menuParameters, IParametersManager parametersManager, IServiceProvider serviceProvider)
     {
@@ -29,7 +28,7 @@ public class ProjectToolsListFactoryStrategy : IMenuCommandListFactoryStrategy
 
     public string StrategyName => nameof(ProjectToolsListFactoryStrategy);
 
-    public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
+    public List<CliMenuCommand> CreateMenuCommandsList()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);

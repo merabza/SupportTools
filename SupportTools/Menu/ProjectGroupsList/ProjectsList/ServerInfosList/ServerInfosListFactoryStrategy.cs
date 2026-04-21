@@ -10,7 +10,7 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly IApplication _app;
@@ -20,7 +20,6 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfosListFactoryStrategy(IApplication app, IServiceProvider serviceProvider,
         ILogger<ServerInfosListFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         MenuParameters menuParameters, IParametersManager parametersManager)
@@ -35,9 +34,9 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
 
     public string StrategyName => nameof(ServerInfoSubMenuCliMenuCommand);
 
-    public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
+    public List<CliMenuCommand> CreateMenuCommandsList()
     {
-        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
 
         if (project?.ServerInfos != null)

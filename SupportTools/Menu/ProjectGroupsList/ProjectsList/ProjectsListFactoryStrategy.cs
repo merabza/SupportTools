@@ -7,29 +7,31 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ProjectsListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly MenuParameters _menuParameters;
+    private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectsListFactoryStrategy(IServiceProvider serviceProvider, MenuParameters menuParameters)
+    public ProjectsListFactoryStrategy(IServiceProvider serviceProvider, MenuParameters menuParameters,
+        IParametersManager parametersManager)
     {
         _serviceProvider = serviceProvider;
         _menuParameters = menuParameters;
+        _parametersManager = parametersManager;
     }
 
     public string StrategyName => nameof(ProjectsListFactoryStrategy);
 
-    public List<CliMenuCommand> CreateMenuCommandsList(IParametersManager parametersManager)
+    public List<CliMenuCommand> CreateMenuCommandsList()
     {
-        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         //პროექტების ჩამონათვალი
         return parameters.Projects
             .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                         _menuParameters.ProjectGroupName).OrderBy(o => o.Key).Select(kvp =>
-                new ProjectSubMenuCliMenuCommand(_serviceProvider, parametersManager, kvp.Key, _menuParameters))
+                new ProjectSubMenuCliMenuCommand(_serviceProvider, _parametersManager, kvp.Key, _menuParameters))
             .Cast<CliMenuCommand>().ToList();
     }
 }

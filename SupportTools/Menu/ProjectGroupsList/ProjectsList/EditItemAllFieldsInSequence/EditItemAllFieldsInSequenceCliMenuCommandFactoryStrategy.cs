@@ -8,7 +8,7 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequence;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IApplication _application;
@@ -17,7 +17,6 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         IApplication application, ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
@@ -31,7 +30,7 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
 
     public string StrategyName => nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
         var projectCruder = ProjectCruder.Create(_application.AppName, _logger, _httpClientFactory, _parametersManager);
         return new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _menuParameters.ProjectName);

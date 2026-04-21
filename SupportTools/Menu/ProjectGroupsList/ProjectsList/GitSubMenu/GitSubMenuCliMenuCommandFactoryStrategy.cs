@@ -6,7 +6,7 @@ using ParametersManagement.LibParameters;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -14,7 +14,6 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         ILogger<GitSubMenuCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
@@ -27,7 +26,7 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
 
     public string StrategyName => nameof(GitSubMenuCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
         return new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
             _menuParameters.ProjectName, EGitCol.Main);

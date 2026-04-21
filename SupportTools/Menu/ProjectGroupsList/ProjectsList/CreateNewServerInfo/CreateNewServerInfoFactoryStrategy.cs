@@ -9,7 +9,7 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 
-// ReSharper disable once UnusedMember.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IApplication _application;
@@ -19,7 +19,6 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public CreateNewServerInfoFactoryStrategy(ILogger<CreateNewServerInfoFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IApplication application, IServiceProvider serviceProvider,
         IParametersManager parametersManager, MenuParameters menuParameters)
@@ -34,7 +33,7 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
 
     public string StrategyName => nameof(CreateNewServerInfoFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
         var serverInfoCruder = ServerInfoCruder.Create(_application.AppName, _serviceProvider, _logger,
             _httpClientFactory, _parametersManager, _menuParameters.ProjectName);

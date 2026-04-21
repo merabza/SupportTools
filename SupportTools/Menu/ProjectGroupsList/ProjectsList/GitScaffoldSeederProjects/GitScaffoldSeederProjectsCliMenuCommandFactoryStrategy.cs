@@ -7,7 +7,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -15,7 +15,6 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         ILogger<GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
@@ -28,7 +27,7 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
 
     public string StrategyName => nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
         return new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
             _menuParameters.ProjectName, EGitCol.ScaffoldSeed);

@@ -1,24 +1,25 @@
 ﻿using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
-using SupportTools.Menu.CreateProject;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class DeleteProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly MenuParameters _menuParameters;
+    private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters)
+    public DeleteProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+        IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
+        _parametersManager = parametersManager;
     }
 
     public string StrategyName => nameof(DeleteProjectCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
-        return new DeleteProjectCliMenuCommand(parametersManager, _menuParameters.ProjectName);
+        return new DeleteProjectCliMenuCommand(_parametersManager, _menuParameters.ProjectName);
     }
 }

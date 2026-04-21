@@ -1,24 +1,25 @@
 ﻿using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
-using SupportTools.Menu.SyncAllProjectsAllGits;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ExportProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly MenuParameters _menuParameters;
+    private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ExportProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters)
+    public ExportProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+        IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
+        _parametersManager = parametersManager;
     }
 
     public string StrategyName => nameof(ExportProjectCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
-        return new ExportProjectCliMenuCommand(parametersManager, _menuParameters.ProjectName);
+        return new ExportProjectCliMenuCommand(_parametersManager, _menuParameters.ProjectName);
     }
 }

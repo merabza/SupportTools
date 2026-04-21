@@ -3,30 +3,32 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 
 namespace SupportTools.Menu.SupportToolsServerEdit;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> _logger;
     private readonly IMemoryCache _memoryCache;
+    private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServerEditorListCliMenuCommandFactoryStrategy(
         ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
-        IMemoryCache memoryCache)
+        IMemoryCache memoryCache, IParametersManager parametersManager)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _memoryCache = memoryCache;
+        _parametersManager = parametersManager;
     }
 
     public string StrategyName => nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy);
 
-    public CliMenuCommand CreateMenuCommand(IParametersManager parametersManager)
+    public CliMenuCommand CreateMenuCommand()
     {
-        return new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache, parametersManager);
+        return new SupportToolsServerEditorCliMenuCommand(_logger, _httpClientFactory, _memoryCache,
+            _parametersManager);
     }
 }
