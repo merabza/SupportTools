@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.Menu.CreateCruderNewItem;
+using AppCliTools.CliParameters.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -19,6 +19,7 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CreateNewServerInfoFactoryStrategy(ILogger<CreateNewServerInfoFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IApplication application, IServiceProvider serviceProvider,
         IParametersManager parametersManager, MenuParameters menuParameters)
@@ -30,8 +31,6 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
     }
-
-    public string StrategyName => nameof(CreateNewServerInfoFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

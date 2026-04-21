@@ -23,8 +23,6 @@ public class ProjectGroupsListFactoryStrategy : IMenuCommandListFactoryStrategy
         _parametersManager = parametersManager;
     }
 
-    public string StrategyName => nameof(ProjectGroupsListFactoryStrategy);
-
     public List<CliMenuCommand> CreateMenuCommandsList()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;

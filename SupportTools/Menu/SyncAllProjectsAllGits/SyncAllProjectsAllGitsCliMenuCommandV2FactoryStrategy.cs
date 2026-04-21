@@ -10,14 +10,13 @@ public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy : IMenuComman
     private readonly ILogger<SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy(
         ILogger<SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy> logger, IParametersManager parametersManager)
     {
         _logger = logger;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

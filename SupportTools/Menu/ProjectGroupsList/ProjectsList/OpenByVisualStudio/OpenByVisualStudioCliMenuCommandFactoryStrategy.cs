@@ -20,8 +20,6 @@ public class OpenByVisualStudioCliMenuCommandFactoryStrategy : IMenuCommandFacto
         _parametersManager = parametersManager;
     }
 
-    public string StrategyName => nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy);
-
     public CliMenuCommand CreateMenuCommand()
     {
         return new OpenByVisualStudioCliMenuCommand(_parametersManager, _menuParameters.ProjectName, _logger);

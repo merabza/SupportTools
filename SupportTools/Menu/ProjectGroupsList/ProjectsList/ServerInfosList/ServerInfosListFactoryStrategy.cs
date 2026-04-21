@@ -20,6 +20,7 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfosListFactoryStrategy(IApplication app, IServiceProvider serviceProvider,
         ILogger<ServerInfosListFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         MenuParameters menuParameters, IParametersManager parametersManager)
@@ -31,8 +32,6 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(ServerInfoSubMenuCliMenuCommand);
 
     public List<CliMenuCommand> CreateMenuCommandsList()
     {

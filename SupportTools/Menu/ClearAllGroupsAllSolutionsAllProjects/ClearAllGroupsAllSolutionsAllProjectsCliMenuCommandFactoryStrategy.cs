@@ -10,6 +10,7 @@ public class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy 
     private readonly ILogger<ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy(
         ILogger<ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy> logger,
         IParametersManager parametersManager)
@@ -17,8 +18,6 @@ public class ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy 
         _logger = logger;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

@@ -11,6 +11,7 @@ public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStra
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy(
         ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> logger,
         MenuParameters menuParameters, IParametersManager parametersManager)
@@ -19,8 +20,6 @@ public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStra
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

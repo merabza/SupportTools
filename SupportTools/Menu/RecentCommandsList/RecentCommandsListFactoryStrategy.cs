@@ -10,12 +10,11 @@ public class RecentCommandsListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly IRecentCommandsService _recentCommandsService;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public RecentCommandsListFactoryStrategy(IRecentCommandsService recentCommandsService)
     {
         _recentCommandsService = recentCommandsService;
     }
-
-    public string StrategyName => nameof(RecentCommandsListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList()
     {

@@ -9,14 +9,13 @@ public class ExportProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStr
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ExportProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(ExportProjectCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

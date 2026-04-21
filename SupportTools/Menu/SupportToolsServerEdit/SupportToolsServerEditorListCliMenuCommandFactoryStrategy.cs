@@ -14,6 +14,7 @@ public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCo
     private readonly IMemoryCache _memoryCache;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsServerEditorListCliMenuCommandFactoryStrategy(
         ILogger<SupportToolsServerEditorListCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IMemoryCache memoryCache, IParametersManager parametersManager)
@@ -23,8 +24,6 @@ public class SupportToolsServerEditorListCliMenuCommandFactoryStrategy : IMenuCo
         _memoryCache = memoryCache;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

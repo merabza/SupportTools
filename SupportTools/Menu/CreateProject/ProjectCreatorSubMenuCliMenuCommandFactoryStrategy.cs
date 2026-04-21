@@ -14,6 +14,7 @@ public class ProjectCreatorSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFa
     private readonly ILogger<ProjectCreatorSubMenuCliMenuCommandFactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommandFactoryStrategy(
         ILogger<ProjectCreatorSubMenuCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IApplication application, IParametersManager parametersManager)
@@ -23,8 +24,6 @@ public class ProjectCreatorSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFa
         _application = application;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(ProjectCreatorSubMenuCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

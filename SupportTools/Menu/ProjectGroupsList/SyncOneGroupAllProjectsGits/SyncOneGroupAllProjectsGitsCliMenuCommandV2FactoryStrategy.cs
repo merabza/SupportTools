@@ -11,6 +11,7 @@ public class SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy : IMenuC
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy(
         ILogger<SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy> logger, MenuParameters menuParameters,
         IParametersManager parametersManager)
@@ -19,8 +20,6 @@ public class SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy : IMenuC
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

@@ -9,13 +9,12 @@ public class SelectProjectAllowToolsFactoryStrategy : IMenuCommandFactoryStrateg
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SelectProjectAllowToolsFactoryStrategy(MenuParameters menuParameters, IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SelectProjectAllowToolsFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

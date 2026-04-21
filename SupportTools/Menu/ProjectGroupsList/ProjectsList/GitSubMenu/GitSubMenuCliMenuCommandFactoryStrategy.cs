@@ -14,6 +14,7 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         ILogger<GitSubMenuCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
@@ -23,8 +24,6 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(GitSubMenuCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

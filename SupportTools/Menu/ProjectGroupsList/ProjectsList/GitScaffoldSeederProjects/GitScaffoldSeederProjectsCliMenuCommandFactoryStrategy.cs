@@ -15,6 +15,7 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         ILogger<GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
@@ -24,8 +25,6 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

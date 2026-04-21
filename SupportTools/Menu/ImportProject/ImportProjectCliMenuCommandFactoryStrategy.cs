@@ -8,12 +8,11 @@ public class ImportProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStr
 {
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ImportProjectCliMenuCommandFactoryStrategy(IParametersManager parametersManager)
     {
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(ImportProjectCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

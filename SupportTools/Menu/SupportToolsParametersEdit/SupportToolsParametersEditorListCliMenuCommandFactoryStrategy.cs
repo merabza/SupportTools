@@ -14,6 +14,7 @@ public class SupportToolsParametersEditorListCliMenuCommandFactoryStrategy : IMe
     private readonly ILogger<SupportToolsParametersEditorListCliMenuCommandFactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public SupportToolsParametersEditorListCliMenuCommandFactoryStrategy(
         ILogger<SupportToolsParametersEditorListCliMenuCommandFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
@@ -22,8 +23,6 @@ public class SupportToolsParametersEditorListCliMenuCommandFactoryStrategy : IMe
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

@@ -9,14 +9,13 @@ public class DeleteProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStr
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(DeleteProjectCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

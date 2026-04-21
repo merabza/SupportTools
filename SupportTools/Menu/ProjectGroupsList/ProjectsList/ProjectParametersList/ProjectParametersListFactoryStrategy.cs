@@ -17,6 +17,7 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersListFactoryStrategy(ILogger<ProjectParametersListFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, MenuParameters menuParameters, IParametersManager parametersManager,
         IApplication application)
@@ -27,8 +28,6 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
         _parametersManager = parametersManager;
         _application = application;
     }
-
-    public string StrategyName => nameof(ProjectParametersListFactoryStrategy);
 
     public List<CliMenuCommand> CreateMenuCommandsList()
     {

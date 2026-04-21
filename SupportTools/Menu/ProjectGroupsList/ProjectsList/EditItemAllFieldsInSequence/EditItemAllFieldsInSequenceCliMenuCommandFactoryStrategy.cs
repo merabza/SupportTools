@@ -17,6 +17,7 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
     private readonly MenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
         IApplication application, ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
@@ -27,8 +28,6 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

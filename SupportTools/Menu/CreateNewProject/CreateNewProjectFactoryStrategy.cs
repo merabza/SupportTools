@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using AppCliTools.CliMenu;
-using AppCliTools.CliParameters.Menu.CreateCruderNewItem;
+using AppCliTools.CliParameters.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -26,8 +26,6 @@ public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
         _application = application;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(CreateNewProjectFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {

@@ -10,14 +10,13 @@ public class UpdateOutdatedPackagesCliMenuCommandFactoryStrategy : IMenuCommandF
     private readonly ILogger<UpdateOutdatedPackagesCliMenuCommandFactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public UpdateOutdatedPackagesCliMenuCommandFactoryStrategy(
         ILogger<UpdateOutdatedPackagesCliMenuCommandFactoryStrategy> logger, IParametersManager parametersManager)
     {
         _logger = logger;
         _parametersManager = parametersManager;
     }
-
-    public string StrategyName => nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy);
 
     public CliMenuCommand CreateMenuCommand()
     {
