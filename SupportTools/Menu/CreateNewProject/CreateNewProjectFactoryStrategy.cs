@@ -17,6 +17,7 @@ public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
     private readonly ILogger<CreateNewProjectFactoryStrategy> _logger;
     private readonly IParametersManager _parametersManager;
 
+    // ReSharper disable once ConvertToPrimaryConstructor
     public CreateNewProjectFactoryStrategy(ILogger<CreateNewProjectFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IApplication application, IParametersManager parametersManager)
     {
