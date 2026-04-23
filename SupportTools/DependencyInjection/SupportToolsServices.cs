@@ -57,14 +57,11 @@ public static class SupportToolsServices
             });
 
         // @formatter:on
-        if (!string.IsNullOrWhiteSpace(par.RecentCommandsFileName) && par.RecentCommandsCount > 0)
+        services.AddRecentCommandsService(x =>
         {
-            services.AddRecentCommandsService(x =>
-            {
-                x.RecentCommandsFileName = par.RecentCommandsFileName;
-                x.RecentCommandsCount = par.RecentCommandsCount;
-            });
-        }
+            x.RecentCommandsFileName = par.RecentCommandsFileName;
+            x.RecentCommandsCount = par.RecentCommandsCount;
+        });
 
         return services;
     }
