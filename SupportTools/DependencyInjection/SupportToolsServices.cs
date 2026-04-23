@@ -3,6 +3,7 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliMenu.DependencyInjection;
 using AppCliTools.CliTools.App;
 using AppCliTools.CliTools.DependencyInjection;
+using AppCliTools.CliTools.Menu.RecentCommandsList;
 using AppCliTools.CliTools.Services.MenuBuilder;
 using AppCliTools.CliTools.Services.RecentCommands;
 using AppCliTools.CliTools.Services.RecentCommands.Models;
@@ -35,7 +36,8 @@ public static class SupportToolsServices
             .AddMemoryCache()
             .AddSingleton<MenuParameters>()
             .AddTransientAllStrategies<IMenuCommandListFactoryStrategy>(
-                typeof(ProjectGroupsListFactoryStrategy).Assembly)
+                typeof(ProjectGroupsListFactoryStrategy).Assembly, 
+                typeof(RecentCommandsListFactoryStrategy).Assembly)
             .AddSingleton<IProcesses, Processes>()
             .AddSingleton<IMenuBuilder, SupportToolsMenuBuilder>()
             .AddTransientAllStrategies<IMenuCommandFactoryStrategy>(
