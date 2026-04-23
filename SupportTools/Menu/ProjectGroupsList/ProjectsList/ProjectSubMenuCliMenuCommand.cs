@@ -38,7 +38,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy));
         }
 
-        if (!SystemStat.IsWindows())
+        if (!SystemStat.IsWindows() || string.IsNullOrWhiteSpace(project?.SolutionFileName))
         {
             excludeList.Add(nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy));
         }
