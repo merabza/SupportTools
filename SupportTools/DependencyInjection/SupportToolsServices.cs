@@ -71,7 +71,7 @@ public static class SupportToolsServices
     private static IServiceCollection AddApplication(this IServiceCollection services,
         Action<ApplicationOptions> setupAction)
     {
-        services.AddSingleton<IApplication, SupportToolsApplication>();
+        services.AddSingleton<IApplication, Application>();
         services.Configure(setupAction);
         return services;
     }
