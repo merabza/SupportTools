@@ -12,11 +12,11 @@ public class GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy : IMenuComma
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+    public GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
         ILogger<GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {

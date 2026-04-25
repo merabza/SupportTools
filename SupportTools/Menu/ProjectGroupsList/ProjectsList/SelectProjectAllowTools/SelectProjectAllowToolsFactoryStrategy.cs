@@ -6,11 +6,12 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowToo
 // ReSharper disable once ClassNeverInstantiated.Global
 public class SelectProjectAllowToolsFactoryStrategy : IMenuCommandFactoryStrategy
 {
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SelectProjectAllowToolsFactoryStrategy(MenuParameters menuParameters, IParametersManager parametersManager)
+    public SelectProjectAllowToolsFactoryStrategy(SupportToolsMenuParameters menuParameters,
+        IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;
         _parametersManager = parametersManager;

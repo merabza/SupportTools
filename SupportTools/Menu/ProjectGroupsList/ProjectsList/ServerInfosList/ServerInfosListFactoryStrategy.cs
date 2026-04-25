@@ -16,14 +16,14 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
     private readonly IApplication _app;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<ServerInfosListFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ServerInfosListFactoryStrategy(IApplication app, IServiceProvider serviceProvider,
         ILogger<ServerInfosListFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
-        MenuParameters menuParameters, IParametersManager parametersManager)
+        SupportToolsMenuParameters menuParameters, IParametersManager parametersManager)
     {
         _app = app;
         _serviceProvider = serviceProvider;

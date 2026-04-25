@@ -14,13 +14,13 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
     private readonly IApplication _application;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<ProjectParametersListFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectParametersListFactoryStrategy(ILogger<ProjectParametersListFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory, MenuParameters menuParameters, IParametersManager parametersManager,
-        IApplication application)
+        IHttpClientFactory httpClientFactory, SupportToolsMenuParameters menuParameters,
+        IParametersManager parametersManager, IApplication application)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

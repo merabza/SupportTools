@@ -10,12 +10,12 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ProjectsListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectsListFactoryStrategy(IServiceProvider serviceProvider, MenuParameters menuParameters,
+    public ProjectsListFactoryStrategy(IServiceProvider serviceProvider, SupportToolsMenuParameters menuParameters,
         IParametersManager parametersManager)
     {
         _serviceProvider = serviceProvider;

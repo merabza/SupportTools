@@ -14,11 +14,11 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
     private readonly IApplication _application;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+    public EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
         IApplication application, ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
     {

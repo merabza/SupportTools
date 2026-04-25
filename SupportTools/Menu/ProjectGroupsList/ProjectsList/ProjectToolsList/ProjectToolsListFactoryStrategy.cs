@@ -13,13 +13,14 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 public class ProjectToolsListFactoryStrategy : IMenuCommandListFactoryStrategy
 {
     private readonly ILogger<ProjectToolsListFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectToolsListFactoryStrategy(ILogger<ProjectToolsListFactoryStrategy> logger,
-        MenuParameters menuParameters, IParametersManager parametersManager, IServiceProvider serviceProvider)
+        SupportToolsMenuParameters menuParameters, IParametersManager parametersManager,
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _menuParameters = menuParameters;

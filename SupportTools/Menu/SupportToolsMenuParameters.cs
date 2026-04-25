@@ -1,6 +1,6 @@
 ﻿namespace SupportTools.Menu;
 
-public class MenuParameters
+public class SupportToolsMenuParameters
 {
     public string ProjectGroupName { get; set; }
     public string ProjectName { get; set; }

@@ -8,11 +8,11 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 public class OpenByVisualStudioCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public OpenByVisualStudioCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+    public OpenByVisualStudioCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
         ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> logger, IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;

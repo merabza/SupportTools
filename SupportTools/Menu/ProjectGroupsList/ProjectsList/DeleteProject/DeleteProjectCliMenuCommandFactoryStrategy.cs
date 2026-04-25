@@ -6,11 +6,11 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DeleteProjectCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
 {
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteProjectCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+    public DeleteProjectCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
         IParametersManager parametersManager)
     {
         _menuParameters = menuParameters;

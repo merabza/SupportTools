@@ -8,13 +8,13 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits
 public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy : IMenuCommandFactoryStrategy
 {
     private readonly ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy(
         ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> logger,
-        MenuParameters menuParameters, IParametersManager parametersManager)
+        SupportToolsMenuParameters menuParameters, IParametersManager parametersManager)
     {
         _logger = logger;
         _menuParameters = menuParameters;

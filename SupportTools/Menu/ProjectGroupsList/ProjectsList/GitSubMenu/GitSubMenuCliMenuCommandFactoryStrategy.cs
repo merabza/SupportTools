@@ -11,11 +11,11 @@ public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrate
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<GitSubMenuCliMenuCommandFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCliMenuCommandFactoryStrategy(MenuParameters menuParameters,
+    public GitSubMenuCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
         ILogger<GitSubMenuCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {

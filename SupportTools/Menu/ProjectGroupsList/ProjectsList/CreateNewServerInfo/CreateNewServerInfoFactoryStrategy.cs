@@ -15,14 +15,14 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
     private readonly IApplication _application;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<CreateNewServerInfoFactoryStrategy> _logger;
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
     private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public CreateNewServerInfoFactoryStrategy(ILogger<CreateNewServerInfoFactoryStrategy> logger,
         IHttpClientFactory httpClientFactory, IApplication application, IServiceProvider serviceProvider,
-        IParametersManager parametersManager, MenuParameters menuParameters)
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

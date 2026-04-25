@@ -9,14 +9,15 @@ namespace SupportTools.Menu.ProjectGroupsList;
 
 public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly MenuParameters _menuParameters;
+    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectGroupName;
     private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectGroupSubMenuCliMenuCommand(IServiceProvider serviceProvider, IParametersManager parametersManager,
-        string projectGroupName, MenuParameters menuParameters) : base(projectGroupName, EMenuAction.LoadSubMenu)
+        string projectGroupName, SupportToolsMenuParameters menuParameters) : base(projectGroupName,
+        EMenuAction.LoadSubMenu)
     {
         _serviceProvider = serviceProvider;
         _parametersManager = parametersManager;
