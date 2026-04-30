@@ -17,6 +17,7 @@ using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportToolsData.Models;
 using SystemTools.BackgroundTasks;
+using SystemTools.SystemToolsShared.DependencyInjection;
 
 namespace SupportTools.DependencyInjection;
 
