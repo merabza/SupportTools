@@ -27,7 +27,6 @@ public class ProjectCreatorSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFa
 
     public CliMenuCommand CreateMenuCommand()
     {
-        return new ProjectCreatorSubMenuCliMenuCommand(_application.AppName, _logger, _httpClientFactory,
-            _parametersManager);
+        return new ProjectCreatorSubMenuCliMenuCommand(_application, _logger, _httpClientFactory, _parametersManager);
     }
 }

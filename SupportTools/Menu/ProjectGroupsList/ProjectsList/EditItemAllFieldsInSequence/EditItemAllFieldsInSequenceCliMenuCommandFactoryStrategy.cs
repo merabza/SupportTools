@@ -31,7 +31,7 @@ public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCom
 
     public CliMenuCommand CreateMenuCommand()
     {
-        var projectCruder = ProjectCruder.Create(_application.AppName, _logger, _httpClientFactory, _parametersManager);
+        var projectCruder = ProjectCruder.Create(_application, _logger, _httpClientFactory, _parametersManager);
         return new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _menuParameters.ProjectName);
     }
 }

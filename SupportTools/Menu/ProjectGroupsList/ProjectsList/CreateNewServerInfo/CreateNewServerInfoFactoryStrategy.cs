@@ -34,8 +34,8 @@ public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
 
     public CliMenuCommand CreateMenuCommand()
     {
-        var serverInfoCruder = ServerInfoCruder.Create(_application.AppName, _serviceProvider, _logger,
-            _httpClientFactory, _parametersManager, _menuParameters.ProjectName);
+        var serverInfoCruder = ServerInfoCruder.Create(_application, _serviceProvider, _logger, _httpClientFactory,
+            _parametersManager, _menuParameters.ProjectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
         return new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,

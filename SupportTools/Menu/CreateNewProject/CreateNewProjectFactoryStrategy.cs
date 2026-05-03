@@ -31,7 +31,7 @@ public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        var projectCruder = new ProjectCruder(_application.AppName, _logger, _httpClientFactory, _parametersManager,
+        var projectCruder = new ProjectCruder(_application, _logger, _httpClientFactory, _parametersManager,
             parameters.Projects);
 
         //ახალი პროექტის შექმნა

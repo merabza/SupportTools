@@ -41,8 +41,7 @@ public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
         if (project?.ServerInfos != null)
         {
             return project.ServerInfos.OrderBy(o => o.Value.GetItemKey()).Select(kvp =>
-                    new ServerInfoSubMenuCliMenuCommand(_app.AppName, _logger, _httpClientFactory,
-                        kvp.Value.GetItemKey(),
+                    new ServerInfoSubMenuCliMenuCommand(_app, _logger, _httpClientFactory, kvp.Value.GetItemKey(),
                         _parametersManager, _menuParameters.ProjectName, kvp.Key, _serviceProvider))
                 .Cast<CliMenuCommand>()
                 .ToList();

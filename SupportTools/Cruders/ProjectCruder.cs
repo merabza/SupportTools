@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Cruders;
 
@@ -18,7 +19,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
-    public ProjectCruder(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+    public ProjectCruder(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager, Dictionary<string, ProjectModel> currentValuesDictionary) : base(
         parametersManager, currentValuesDictionary, "Project", "Projects")
     {
@@ -45,9 +46,9 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
             gitProjectNamesParameterNames, EsProjExtension, parametersManager));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(appName, logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
             nameof(ProjectModel.DevDatabaseParameters), parametersManager));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(appName, logger, httpClientFactory,
+        FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
             nameof(ProjectModel.ProdCopyDatabaseParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
@@ -82,11 +83,11 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
             nameof(ProjectModel.FrontNpmPackageNames), logger, httpClientFactory, parametersManager));
     }
 
-    public static ProjectCruder Create(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
+    public static ProjectCruder Create(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
-        return new ProjectCruder(appName, logger, httpClientFactory, parametersManager, parameters.Projects);
+        return new ProjectCruder(application, logger, httpClientFactory, parametersManager, parameters.Projects);
     }
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)

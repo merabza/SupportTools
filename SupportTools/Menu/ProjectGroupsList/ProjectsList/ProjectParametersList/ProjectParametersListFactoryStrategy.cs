@@ -31,7 +31,7 @@ public class ProjectParametersListFactoryStrategy : IMenuCommandListFactoryStrat
 
     public List<CliMenuCommand> CreateMenuCommandsList()
     {
-        var projectCruder = ProjectCruder.Create(_application.AppName, _logger, _httpClientFactory, _parametersManager);
+        var projectCruder = ProjectCruder.Create(_application, _logger, _httpClientFactory, _parametersManager);
 
         return projectCruder.GetDetailsSubMenu(_menuParameters.ProjectName);
     }

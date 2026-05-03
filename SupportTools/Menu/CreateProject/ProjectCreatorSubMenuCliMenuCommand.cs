@@ -9,21 +9,23 @@ using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
 using SupportTools.ParametersEditors;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.CreateProject;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly string _appName;
+    private readonly IApplication _application;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectCreatorSubMenuCliMenuCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager) : base("Project Creator", EMenuAction.LoadSubMenu)
+    public ProjectCreatorSubMenuCliMenuCommand(IApplication application, ILogger logger,
+        IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base("Project Creator",
+        EMenuAction.LoadSubMenu)
     {
-        _appName = appName;
+        _application = application;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
@@ -41,7 +43,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
             appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
         }
 
-        var appProjectCreatorParametersEditor = new AppProjectCreatorParametersEditor(_appName, _logger,
+        var appProjectCreatorParametersEditor = new AppProjectCreatorParametersEditor(_application, _logger,
             _httpClientFactory, appProjectCreatorAllParameters, _parametersManager, _parametersManager);
 
         appProjectCreatorParametersEditor.FillDetailsSubMenu(projectCreatorSubMenuSet);
