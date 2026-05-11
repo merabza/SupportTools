@@ -39,15 +39,18 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        Dictionary<string, bool> checks = Enum.GetValues<EProjectTools>().ToDictionary(tool => tool.ToString(),
+        Dictionary<string, bool> checks = Enum.GetValues<EProjectTools>().ToDictionary(tool => tool.GetProjectToolName(),
             tool => project.AllowToolsList.Contains(tool));
+
+        Dictionary<string, EProjectTools> visibleNames = Enum.GetValues<EProjectTools>().ToDictionary(tool => tool.GetProjectToolName(),
+            tool => tool);
 
         //გამოვიდეს სიიდან ამრჩევი
         MenuInputer.MultipleInputFromList("Select allow tools", checks);
 
         foreach (KeyValuePair<string, bool> kvp in checks)
         {
-            if (!Enum.TryParse(kvp.Key, out EProjectTools tool))
+            if (!visibleNames.TryGetValue(kvp.Key, out EProjectTools tool))
             {
                 return false;
             }

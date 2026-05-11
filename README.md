@@ -1,48 +1,78 @@
-# SupportTools #
+# SupportTools
 
-Support Tools
-პროექტის დანიშნულებაა გაუშვას სხვადასხვა დანიშნულების სკრიპტები. აპლიკაცია მუშაობს ტერმინალში, შესაბამისად შესაძლებელია სერვერზე გაშვება, ნებისმიერ ოპერაციულ სისტემაში, სადაც ეშვება dotnet.
+Modular CLI application for managing .NET multi-project environments:
+Git synchronization, database lifecycle, scaffolding, deployment, and
+remote server operations.
 
-შესაძლებელია სხვადასხვა პარამეტრების რედაქტირება პირდაპირ აპლიკაციაში. შესაძლებელია პროექტების შექმნა. პარამეტრების და პროექტების შესახებ ინფორმაცია ინახება json ფაილში.
+[ქართულად](README.ka.md)
 
-აპლიკაციის საშუალებით შესაძლებელია შემდეგი სამუშაოების შესრულება:
+## Overview
 
-1. პროექტების დაყოფა რეპოზიტორიებად და სინქრონიზაციის გაშვება
-2. dotnet ინსტრუმენტების დარეგისტრირება და მათი განახლება კომპიუტერზე
-3. თუ პროექტი მუშაობს მონაცემთა ბაზასთან, შესაძლებელია ბაზასთან დაკავშირებული სამუშაოების ჩატარება: ბაზის შექმნა, წაშლა, მიგრაციის კოდის მიხედვით შექმნა, ბაზის კორექტირება შეცდომების თავიდან ასაცილებლად.
-4. არსებული ბაზიდან სკაფოლდ პროექტის შექმნა, რომელიც საშუალებას იძლევა არსებული ბაზიდან წამოვიღოთ ინფორმაცია.
-5. ბაზიდან ინფორმაციის წამოღება JSON ფაილებში
-6. JSON ფაილებიდან ახალ ბაზაში ინფრომაციის ჩაყრა
-7. JetBrains CleanupCode-ს გაშვება მთელ პროექტზე
-8. პროექტის AppSettings ფაილის კოდირება
-9. პროექტის შეცვლილი AppSettings ფაილის გადაგზავნა სერვერზე, სადაც დაყენებულია პროექტი და განახლება
-10. პროექტიდან მიღებული პროგრამის დაყენება მოშორებულ ან ლოკალურ კომპიუტერზე.
-11. პროგრამის წაშლა სერვერიდან, ან ლოკალური კომპიუტერიდან
-12. სერვისის გაშვება/გაჩერება
-13. სერვისის ვერსიის შემოწმება
-14. პროდაქშენ სერვერიდან ბაზის დაკოპირება დეველოპერის კომპიუტერზე
-15. დეველოპერ ბაზის დაკოპირება პროდაქშენში.
-16. შაბლონების მიხედვით ახალი პროექტების შექმნა.
+SupportTools is a .NET 10 console application that orchestrates the
+repetitive operational work surrounding a collection of related .NET
+projects. Instead of `cd`-ing into each repo to pull, building each
+service individually, or hand-encoding `appsettings.json` for each
+environment, you do all of it from one menu-driven CLI.
 
-## განვითარება ##
+The tool runs on any platform that supports .NET. Remote server work is
+mediated by a companion service called WebAgent, so the same SupportTools
+binary on a developer machine can manage installs on Linux, Windows, or
+any host running WebAgent.
 
-პროექტი ვითარდება სხვადასხვა მიმართულებით, საჭიროების მიხედვით. იგეგმება გიტის ბრენჩებთან მუშაობუს საშუალების დამატება. pull request-ების შექმნითა და ჩამერჯვით. იგეგმება გიტთან მეტი ინტეგრაცია. პროექტების შემქმნელის, ბაზოს ანალიზატორისა და ბაზაში ინფორმაციის ჩამყრელის შემდგომი განვითარება.
+State — projects, groups, server entries, Git URLs — lives in a single
+JSON parameters file under your user profile.
 
-## დაკავშირებული პროექტები ##
+## Capabilities
 
-Support Tools იყენებს <https://github.com/merabza/WebAgent> და <https://github.com/merabza/WebAgentInstaller> პროექტებს, რომლებიც გამოიყენება როგორც Support Tools-ის დამხმარე პროექტები, მოშორებულ სერვერზე ცვლილებების განსახორციელებლად, ან საჭირო ინფორმაციის წამოსაღებად. WebAgentInstaller გამოიყენება WebAgent-ის გასაახლებად მხოლოდ. ყველა ის ფუნქციონალი რაც გააჩნია WebAgent-ს, ასევე გააჩნია Support Tools-აც, ოღონდ მას შეუძლია მხოლოდ იმ კომპიუტერზე ზემოქმედება, რომელზეც გაშვებულია. WebAgent-ი კი გამოიყენება მოშორებულ სერვერზე ზემოქმედებისათვის.
+* **Git** — sync many repositories at once (all projects, one group, or
+one project); manage a project's list of Git URLs
+* **Database** — create or drop a dev database from EF migrations;
+correct post-migration schema; analyze schema; scaffold from a prod
+copy; extract data to JSON; seed a dev database from JSON
+* **Deployment** — encode `appsettings.json`, publish a build, install
+or remove a program on a server, start/stop/version-check services
+(locally or remotely via WebAgent)
+* **Project creation** — bootstrap new Console/API/Razor solutions
+from templates; import/export project configurations; bulk-update NuGet
+packages across projects
+* **Code quality** — run `jb cleanupcode` against a solution; generate
+API-route constant classes from contract metadata
 
-## To get clone with all parts ყველა ნაწილის დასაკოპირებლად უნდა გამოიყენოთ სკრიპტი ##
+## Documentation
 
-mkdir SupportTools  
-cd SupportTools  
-git clone <git@github.com>:merabza/AppCliTools.git AppCliTools  
-git clone <git@github.com>:merabza/ConnectionTools.git ConnectionTools  
-git clone <git@github.com>:merabza/SupportTools.git SupportTools  
-git clone <git@github.com>:merabza/SystemTools.git SystemTools  
-git clone <git@github.com>:merabza/WebAgentContracts.git WebAgentContracts  
-git clone <git@github.com>:merabza/DatabaseTools.git DatabaseTools  
-git clone <git@github.com>:merabza/ParametersManagement.git ParametersManagement  
-git clone <git@github.com>:merabza/ToolsManagement.git ToolsManagement  
-git clone <git@github.com>:merabza/BackendCarcass.git BackendCarcass  
-cd ..
+* [Getting Started](docs/en/getting-started.md) — prerequisites, clone,
+build, first run
+* [Architecture](docs/en/architecture.md) — module layering and
+dependencies
+* [Configuration](docs/en/configuration.md) — parameters file structure
+* [Development](docs/en/development.md) — code style, analyzers,
+extending the menu
+* [Related Projects](docs/en/related-projects.md) — WebAgent and
+WebAgentInstaller
+
+### Use cases
+
+|If you need to...|See|
+|-|-|
+|Sync Git repositories|[Git Operations](docs/en/use-cases/git-operations.md)|
+|Create, drop, or analyze a database|[Database Operations](docs/en/use-cases/database-operations.md)|
+|Deploy a build, encode app settings, manage a service|[Deployment](docs/en/use-cases/deployment.md)|
+|Create a new project, import, or update packages|[Project Creation](docs/en/use-cases/project-creation.md)|
+|Run code cleanup or generate API routes|[Code Quality](docs/en/use-cases/code-quality.md)|
+
+## Quick start
+
+Prerequisites: .NET 10 SDK, Git.
+
+Clone the ten sibling repositories that SupportTools depends on (see
+[Getting Started](docs/en/getting-started.md) for the full script), then:
+
+```bash
+dotnet build SupportTools.slnx
+dotnet run --project SupportTools/SupportTools.csproj
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
