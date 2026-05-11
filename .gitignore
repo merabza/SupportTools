@@ -345,6 +345,9 @@ project.lock.json
 # Visual Studio Code
 .vscode
 
+# Claude Code
+.claude/
+
 # User-specific files
 *.suo
 *.user
