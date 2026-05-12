@@ -10,21 +10,11 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ProgramInstaller;
 
 // ReSharper disable once UnusedType.Global
-public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ProgramInstallerToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<ProgramInstallerToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ProgramInstallerToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramInstallerToolCommandFactoryStrategy(IApplication app,
-        ILogger<ProgramInstallerToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _app = app;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ProgramInstaller);
 
     public async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -44,7 +34,7 @@ public class ProgramInstallerToolCommandFactoryStrategy : IToolCommandFactoryStr
 
         if (programInstallerParameters is not null)
         {
-            return new ProgramInstallerToolCommand(_app.AppName, _logger, _httpClientFactory, true,
+            return new ProgramInstallerToolCommand(app.AppName, logger, httpClientFactory, true,
                 programInstallerParameters, parametersManager);
         }
 

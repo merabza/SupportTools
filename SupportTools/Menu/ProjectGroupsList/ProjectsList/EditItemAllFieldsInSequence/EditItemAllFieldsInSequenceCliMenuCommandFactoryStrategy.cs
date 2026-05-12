@@ -9,29 +9,16 @@ using SystemTools.SystemToolsShared;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequence;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
+public class EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(
+    SupportToolsMenuParameters menuParameters,
+    IApplication application,
+    ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly IApplication _application;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
-        IApplication application, ILogger<EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory, IParametersManager parametersManager)
-    {
-        _menuParameters = menuParameters;
-        _application = application;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        var projectCruder = ProjectCruder.Create(_application, _logger, _httpClientFactory, _parametersManager);
-        return new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, _menuParameters.ProjectName);
+        var projectCruder = ProjectCruder.Create(application, logger, httpClientFactory, parametersManager);
+        return new EditItemAllFieldsInSequenceCliMenuCommand(projectCruder, menuParameters.ProjectName);
     }
 }

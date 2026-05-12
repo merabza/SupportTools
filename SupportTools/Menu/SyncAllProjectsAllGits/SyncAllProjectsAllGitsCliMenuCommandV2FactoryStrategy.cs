@@ -5,22 +5,13 @@ using ParametersManagement.LibParameters;
 namespace SupportTools.Menu.SyncAllProjectsAllGits;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy : IMenuCommandFactoryStrategy
+public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy(
+    ILogger<SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy> logger,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly ILogger<SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy> _logger;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy(
-        ILogger<SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy> logger, IParametersManager parametersManager)
-    {
-        _logger = logger;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        var parametersManager1 = (ParametersManager)_parametersManager;
-        return new SyncAllProjectsAllGitsCliMenuCommandV2(_logger, parametersManager1);
+        var parametersManager1 = (ParametersManager)parametersManager;
+        return new SyncAllProjectsAllGitsCliMenuCommandV2(logger, parametersManager1);
     }
 }

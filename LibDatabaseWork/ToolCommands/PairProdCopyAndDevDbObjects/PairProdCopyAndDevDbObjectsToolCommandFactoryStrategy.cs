@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -6,30 +6,30 @@ using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibCodeGenerator.ToolCommands.GenerateApiRoutes;
+namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
-public class GenerateApiRoutesToolCommandFactoryStrategy(ILogger<GenerateApiRoutesToolCommandFactoryStrategy> logger)
-    : IToolCommandFactoryStrategy
+// ReSharper disable once UnusedType.Global
+public class PairProdCopyAndDevDbObjectsToolCommandFactoryStrategy(
+    ILogger<PairProdCopyAndDevDbObjectsToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
 {
-    public string ToolCommandName => nameof(EProjectTools.GenerateApiRoutes);
+    public string ToolCommandName => nameof(EProjectTools.PairProdCopyAndDevDbObjects);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
     {
         var projectToolsFactoryStrategyParameters = (ProjectToolsFactoryStrategyParameters)factoryStrategyParameters;
 
-        //სკაფოლდინგისა და სიდინგის პროექტების შექმნა
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var generateApiRoutesParameters = GenerateApiRoutesToolParameters.Create(supportToolsParameters,
+        var pairDbObjectsParameters = PairDbObjectsParameters.Create(logger, supportToolsParameters,
             projectToolsFactoryStrategyParameters.ProjectName);
-        if (generateApiRoutesParameters is not null)
+        if (pairDbObjectsParameters is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new GenerateApiRoutesToolCommand(logger, parametersManager, generateApiRoutesParameters));
+                new PairProdCopyAndDevDbObjectsToolCommand(logger, pairDbObjectsParameters, parametersManager));
         }
 
-        StShared.WriteErrorLine("generateApiRoutesParameters is null", true);
+        StShared.WriteErrorLine("pairDbObjectsParameters is null", true);
         return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

@@ -10,28 +10,17 @@ using SystemTools.SystemToolsShared;
 namespace SupportTools.Menu.CreateNewProject;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class CreateNewProjectFactoryStrategy : IMenuCommandFactoryStrategy
+public class CreateNewProjectFactoryStrategy(
+    ILogger<CreateNewProjectFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory,
+    IApplication application,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly IApplication _application;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<CreateNewProjectFactoryStrategy> _logger;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public CreateNewProjectFactoryStrategy(ILogger<CreateNewProjectFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory, IApplication application, IParametersManager parametersManager)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _application = application;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var projectCruder = new ProjectCruder(_application, _logger, _httpClientFactory, _parametersManager,
+        var projectCruder = new ProjectCruder(application, logger, httpClientFactory, parametersManager,
             parameters.Projects);
 
         //ახალი პროექტის შექმნა

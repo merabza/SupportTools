@@ -10,19 +10,10 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ProgRemover;
 
 // ReSharper disable once UnusedType.Global
-public class ProgramRemoverToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ProgramRemoverToolCommandFactoryStrategy(
+    ILogger<ProgramRemoverToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ProgramRemoverToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramRemoverToolCommandFactoryStrategy(ILogger<ProgramRemoverToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ProgRemover);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -40,7 +31,7 @@ public class ProgramRemoverToolCommandFactoryStrategy : IToolCommandFactoryStrat
             ProgramRemoverParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceStartStopParameters is not null)
         {
-            return new ValueTask<IToolCommand?>(new ProgramRemoverToolCommand(_logger, _httpClientFactory,
+            return new ValueTask<IToolCommand?>(new ProgramRemoverToolCommand(logger, httpClientFactory,
                 serviceStartStopParameters, parametersManager, true));
         }
 

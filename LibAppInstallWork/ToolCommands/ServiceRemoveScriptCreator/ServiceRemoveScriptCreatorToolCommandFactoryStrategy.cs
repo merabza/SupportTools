@@ -9,17 +9,9 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ServiceRemoveScriptCreator;
 
 // ReSharper disable once UnusedType.Global
-public class ServiceRemoveScriptCreatorToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ServiceRemoveScriptCreatorToolCommandFactoryStrategy(
+    ILogger<ServiceRemoveScriptCreatorToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<ServiceRemoveScriptCreatorToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ServiceRemoveScriptCreatorToolCommandFactoryStrategy(
-        ILogger<ServiceRemoveScriptCreatorToolCommandFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ServiceRemoveScriptCreator);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -36,7 +28,7 @@ public class ServiceRemoveScriptCreatorToolCommandFactoryStrategy : IToolCommand
             ServiceRemoveScriptCreatorParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceRemoveScriptCreatorParameters is not null)
         {
-            return new ValueTask<IToolCommand?>(new ServiceRemoveScriptCreatorToolCommand(_logger,
+            return new ValueTask<IToolCommand?>(new ServiceRemoveScriptCreatorToolCommand(logger,
                 serviceRemoveScriptCreatorParameters, parametersManager));
         }
 

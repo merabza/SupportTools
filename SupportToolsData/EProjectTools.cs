@@ -20,5 +20,7 @@ public enum EProjectTools
     SeedData, //scaffold-ით მიღებული ბაზიდან მიღებულ json-ებზე დაყრდნობით ინფორმაციის ჩაყრა დეველოპერ ბაზაში.
     PrepareProdCopyDatabase, //პროდაქშენ ბაზის ასლის მომზადება სკაფოლდით დამუშავებისათვის
 
-    GenerateApiRoutes //API რაუტების გენერაცია
+    GenerateApiRoutes, //API რაუტების გენერაცია
+
+    PairProdCopyAndDevDbObjects //ProdCopy და Dev ბაზის ცხრილებისა და ველების სახელების მიხედვით დაწყვილება და დაწყვილებული შესაბამისობების ჯეისონ ფაილში შენახვა
 }

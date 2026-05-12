@@ -10,32 +10,18 @@ using SystemTools.SystemToolsShared;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class CreateNewServerInfoFactoryStrategy : IMenuCommandFactoryStrategy
+public class CreateNewServerInfoFactoryStrategy(
+    ILogger<CreateNewServerInfoFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory,
+    IApplication application,
+    IServiceProvider serviceProvider,
+    IParametersManager parametersManager,
+    SupportToolsMenuParameters menuParameters) : IMenuCommandFactoryStrategy
 {
-    private readonly IApplication _application;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<CreateNewServerInfoFactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-    private readonly IServiceProvider _serviceProvider;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public CreateNewServerInfoFactoryStrategy(ILogger<CreateNewServerInfoFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory, IApplication application, IServiceProvider serviceProvider,
-        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _application = application;
-        _serviceProvider = serviceProvider;
-        _parametersManager = parametersManager;
-        _menuParameters = menuParameters;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        var serverInfoCruder = ServerInfoCruder.Create(_application, _serviceProvider, _logger, _httpClientFactory,
-            _parametersManager, _menuParameters.ProjectName);
+        var serverInfoCruder = ServerInfoCruder.Create(application, serviceProvider, logger, httpClientFactory,
+            parametersManager, menuParameters.ProjectName);
 
         //ახალი სერვერის ინფორმაციის შექმნა
         return new NewItemCliMenuCommand(serverInfoCruder, serverInfoCruder.CrudNamePlural,

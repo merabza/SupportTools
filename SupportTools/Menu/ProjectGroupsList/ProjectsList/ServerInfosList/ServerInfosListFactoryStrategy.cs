@@ -11,39 +11,24 @@ using SystemTools.SystemToolsShared;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ServerInfosListFactoryStrategy : IMenuCommandListFactoryStrategy
+public class ServerInfosListFactoryStrategy(
+    IApplication app,
+    IServiceProvider serviceProvider,
+    ILogger<ServerInfosListFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory,
+    SupportToolsMenuParameters menuParameters,
+    IParametersManager parametersManager) : IMenuCommandListFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ServerInfosListFactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-    private readonly IServiceProvider _serviceProvider;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ServerInfosListFactoryStrategy(IApplication app, IServiceProvider serviceProvider,
-        ILogger<ServerInfosListFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
-        SupportToolsMenuParameters menuParameters, IParametersManager parametersManager)
-    {
-        _app = app;
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _menuParameters = menuParameters;
-        _parametersManager = parametersManager;
-    }
-
     public List<CliMenuCommand> CreateMenuCommandsList()
     {
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+        ProjectModel? project = parameters.GetProject(menuParameters.ProjectName);
 
         if (project?.ServerInfos != null)
         {
             return project.ServerInfos.OrderBy(o => o.Value.GetItemKey()).Select(kvp =>
-                    new ServerInfoSubMenuCliMenuCommand(_app, _logger, _httpClientFactory, kvp.Value.GetItemKey(),
-                        _parametersManager, _menuParameters.ProjectName, kvp.Key, _serviceProvider))
-                .Cast<CliMenuCommand>()
+                    new ServerInfoSubMenuCliMenuCommand(app, logger, httpClientFactory, kvp.Value.GetItemKey(),
+                        parametersManager, menuParameters.ProjectName, kvp.Key, serviceProvider)).Cast<CliMenuCommand>()
                 .ToList();
         }
 

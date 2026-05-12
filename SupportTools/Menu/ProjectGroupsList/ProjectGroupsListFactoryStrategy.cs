@@ -8,28 +8,18 @@ using SupportToolsData.Models;
 namespace SupportTools.Menu.ProjectGroupsList;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ProjectGroupsListFactoryStrategy : IMenuCommandListFactoryStrategy
+public class ProjectGroupsListFactoryStrategy(
+    IServiceProvider serviceProvider,
+    SupportToolsMenuParameters menuParameters,
+    IParametersManager parametersManager) : IMenuCommandListFactoryStrategy
 {
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-    private readonly IServiceProvider _serviceProvider;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectGroupsListFactoryStrategy(IServiceProvider serviceProvider, SupportToolsMenuParameters menuParameters,
-        IParametersManager parametersManager)
-    {
-        _serviceProvider = serviceProvider;
-        _menuParameters = menuParameters;
-        _parametersManager = parametersManager;
-    }
-
     public List<CliMenuCommand> CreateMenuCommandsList()
     {
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
         return parameters.Projects.Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
             .Distinct().OrderBy(x => x)
-            .Select(projectGroupName => new ProjectGroupSubMenuCliMenuCommand(_serviceProvider, _parametersManager,
-                projectGroupName, _menuParameters)).Cast<CliMenuCommand>().ToList();
+            .Select(projectGroupName => new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager,
+                projectGroupName, menuParameters)).Cast<CliMenuCommand>().ToList();
     }
 }

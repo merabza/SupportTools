@@ -10,22 +10,11 @@ using SystemTools.SystemToolsShared;
 namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 
 // ReSharper disable once UnusedType.Global
-public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy(IApplication app,
-        ILogger<DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
-    {
-        _app = app;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.CreateDevDatabaseByMigration);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -35,12 +24,12 @@ public class DatabaseMigrationCreatorMigrationToolCommandFactoryStrategy : ITool
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpCreator = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
+        var dmpCreator = DatabaseMigrationParameters.Create(app.AppName, logger, httpClientFactory,
             supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpCreator is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new DatabaseMigrationCreatorMigrationToolCommand(_logger, dmpCreator,
+                new DatabaseMigrationCreatorMigrationToolCommand(logger, dmpCreator,
                     parametersManager)); //მიგრაციის საშუალებით ცარელა დეველოპერ ბაზის შექმნა
         }
 

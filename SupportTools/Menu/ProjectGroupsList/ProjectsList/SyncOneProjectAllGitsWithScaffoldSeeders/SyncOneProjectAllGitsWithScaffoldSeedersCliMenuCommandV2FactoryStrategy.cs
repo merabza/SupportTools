@@ -5,25 +5,14 @@ using ParametersManagement.LibParameters;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy : IMenuCommandFactoryStrategy
+public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy(
+    ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> logger,
+    SupportToolsMenuParameters menuParameters,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy(
-        ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy> logger,
-        SupportToolsMenuParameters menuParameters, IParametersManager parametersManager)
-    {
-        _logger = logger;
-        _menuParameters = menuParameters;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        return new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(_logger, _parametersManager,
-            _menuParameters.ProjectGroupName);
+        return new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(logger, parametersManager,
+            menuParameters.ProjectGroupName);
     }
 }

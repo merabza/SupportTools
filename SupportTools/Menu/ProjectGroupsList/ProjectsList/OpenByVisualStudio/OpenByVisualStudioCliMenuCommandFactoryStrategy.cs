@@ -5,23 +5,13 @@ using ParametersManagement.LibParameters;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class OpenByVisualStudioCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
+public class OpenByVisualStudioCliMenuCommandFactoryStrategy(
+    SupportToolsMenuParameters menuParameters,
+    ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> logger,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public OpenByVisualStudioCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
-        ILogger<OpenByVisualStudioCliMenuCommandFactoryStrategy> logger, IParametersManager parametersManager)
-    {
-        _menuParameters = menuParameters;
-        _logger = logger;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        return new OpenByVisualStudioCliMenuCommand(_parametersManager, _menuParameters.ProjectName, _logger);
+        return new OpenByVisualStudioCliMenuCommand(parametersManager, menuParameters.ProjectName, logger);
     }
 }

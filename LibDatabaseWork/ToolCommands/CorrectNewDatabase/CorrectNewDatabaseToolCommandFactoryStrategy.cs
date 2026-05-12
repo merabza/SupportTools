@@ -8,16 +8,9 @@ using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 
-public class CorrectNewDatabaseToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class CorrectNewDatabaseToolCommandFactoryStrategy(ILogger<CorrectNewDatabaseToolCommandFactoryStrategy> logger)
+    : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<CorrectNewDatabaseToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public CorrectNewDatabaseToolCommandFactoryStrategy(ILogger<CorrectNewDatabaseToolCommandFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.CorrectNewDatabase);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -27,12 +20,12 @@ public class CorrectNewDatabaseToolCommandFactoryStrategy : IToolCommandFactoryS
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var correctNewDbParameters = CorrectNewDbParameters.Create(_logger, supportToolsParameters,
+        var correctNewDbParameters = CorrectNewDbParameters.Create(logger, supportToolsParameters,
             projectToolsFactoryStrategyParameters.ProjectName);
         if (correctNewDbParameters is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new CorrectNewDatabaseToolCommand(_logger, correctNewDbParameters, parametersManager)); //ახალი ბაზის 
+                new CorrectNewDatabaseToolCommand(logger, correctNewDbParameters, parametersManager)); //ახალი ბაზის 
         }
 
         StShared.WriteErrorLine("correctNewDbParameters is null", true);

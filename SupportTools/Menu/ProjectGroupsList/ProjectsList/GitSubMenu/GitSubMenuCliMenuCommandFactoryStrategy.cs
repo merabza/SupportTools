@@ -7,27 +7,15 @@ using ParametersManagement.LibParameters;
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class GitSubMenuCliMenuCommandFactoryStrategy : IMenuCommandFactoryStrategy
+public class GitSubMenuCliMenuCommandFactoryStrategy(
+    SupportToolsMenuParameters menuParameters,
+    ILogger<GitSubMenuCliMenuCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory,
+    IParametersManager parametersManager) : IMenuCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<GitSubMenuCliMenuCommandFactoryStrategy> _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly IParametersManager _parametersManager;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSubMenuCliMenuCommandFactoryStrategy(SupportToolsMenuParameters menuParameters,
-        ILogger<GitSubMenuCliMenuCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager)
-    {
-        _menuParameters = menuParameters;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _parametersManager = parametersManager;
-    }
-
     public CliMenuCommand CreateMenuCommand()
     {
-        return new GitSubMenuCliMenuCommand(_logger, _httpClientFactory, _parametersManager,
-            _menuParameters.ProjectName, EGitCol.Main);
+        return new GitSubMenuCliMenuCommand(logger, httpClientFactory, parametersManager, menuParameters.ProjectName,
+            EGitCol.Main);
     }
 }

@@ -53,6 +53,7 @@ public sealed class ProjectModel : ItemData
     public List<EProjectTools> AllowToolsList { get; init; } = [];
     public string? PrepareProdCopyDatabaseProjectFilePath { get; set; }
     public string? PrepareProdCopyDatabaseProjectParametersFilePath { get; set; }
+    public string? PairedDbObjectsResultFileName { get; set; }
 
     public ServerInfoModel GetServerInfoRequired(string serverName)
     {

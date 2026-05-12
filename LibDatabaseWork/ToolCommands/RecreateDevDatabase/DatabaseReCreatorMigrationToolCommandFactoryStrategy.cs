@@ -14,21 +14,11 @@ using SystemTools.SystemToolsShared;
 namespace LibDatabaseWork.ToolCommands.RecreateDevDatabase;
 
 // ReSharper disable once UnusedType.Global
-public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class DatabaseReCreatorMigrationToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<DatabaseReCreatorMigrationToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<DatabaseReCreatorMigrationToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseReCreatorMigrationToolCommandFactoryStrategy(IApplication app,
-        ILogger<DatabaseReCreatorMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _app = app;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.RecreateDevDatabase);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -39,10 +29,10 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForReCreator = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
+        var dmpForReCreator = DatabaseMigrationParameters.Create(app.AppName, logger, httpClientFactory,
             supportToolsParameters, projectName);
         var correctNewDbParametersForRecreate =
-            CorrectNewDbParameters.Create(_logger, supportToolsParameters, projectName);
+            CorrectNewDbParameters.Create(logger, supportToolsParameters, projectName);
         if (dmpForReCreator is null)
         {
             StShared.WriteErrorLine("dmpForReCreator is null", true);
@@ -68,9 +58,9 @@ public class DatabaseReCreatorMigrationToolCommandFactoryStrategy : IToolCommand
 
         if (correctNewDbParametersForRecreate is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(_app.AppName, _logger,
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseReCreatorMigrationToolCommand(app.AppName, logger,
                 dmpForReCreator, project.DevDatabaseParameters, correctNewDbParametersForRecreate,
-                databaseServerConnections, apiClients, _httpClientFactory,
+                databaseServerConnections, apiClients, httpClientFactory,
                 parametersManager)); //დეველოპერ ბაზის წაშლა და თავიდან შექმნა
         }
 

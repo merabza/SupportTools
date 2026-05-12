@@ -11,21 +11,11 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ProgramUpdater;
 
 // ReSharper disable once UnusedType.Global
-public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ProgramUpdaterToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<ProgramUpdaterToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ProgramUpdaterToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramUpdaterToolCommandFactoryStrategy(IApplication app,
-        ILogger<ProgramUpdaterToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _app = app;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ProgramUpdater);
 
     public async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -45,11 +35,11 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
 
         if (projectForUpdate.IsService)
         {
-            var programServiceUpdaterParameters = await ServiceUpdaterParameters.Create(_logger, supportToolsParameters,
+            var programServiceUpdaterParameters = await ServiceUpdaterParameters.Create(logger, supportToolsParameters,
                 projectName, serverInfo, cancellationToken);
             if (programServiceUpdaterParameters is not null)
             {
-                return new ServiceUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory,
+                return new ServiceUpdaterToolCommand(app.AppName, logger, httpClientFactory,
                     programServiceUpdaterParameters, parametersManager, true);
             }
 
@@ -57,11 +47,11 @@ public class ProgramUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrat
             return null;
         }
 
-        var programUpdaterParameters = await ProgramUpdaterParameters.Create(_logger, supportToolsParameters,
+        var programUpdaterParameters = await ProgramUpdaterParameters.Create(logger, supportToolsParameters,
             projectName, serverInfo, cancellationToken);
         if (programUpdaterParameters is not null)
         {
-            return new ProgramUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory, programUpdaterParameters,
+            return new ProgramUpdaterToolCommand(app.AppName, logger, httpClientFactory, programUpdaterParameters,
                 parametersManager, true);
         }
 

@@ -11,19 +11,10 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ServiceStopper;
 
 // ReSharper disable once UnusedType.Global
-public class ServiceStopperToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ServiceStopperToolCommandFactoryStrategy(
+    ILogger<ServiceStopperToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ServiceStopperToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ServiceStopperToolCommandFactoryStrategy(ILogger<ServiceStopperToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ServiceStopper);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -40,7 +31,7 @@ public class ServiceStopperToolCommandFactoryStrategy : IToolCommandFactoryStrat
         var serviceStopParameters = ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceStopParameters is not null)
         {
-            return new ValueTask<IToolCommand?>(new ServiceStopperToolCommand(_logger, _httpClientFactory,
+            return new ValueTask<IToolCommand?>(new ServiceStopperToolCommand(logger, httpClientFactory,
                 serviceStopParameters, parametersManager, true));
         }
 

@@ -8,17 +8,9 @@ using SystemTools.SystemToolsShared;
 
 namespace LibAppProjectCreator.ToolCommands.JetBrainsCleanupCode;
 
-public class JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy(
+    ILogger<JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy(
-        ILogger<JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.JetBrainsCleanupCode);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -33,7 +25,7 @@ public class JetBrainsCleanupCodeRunnerToolCommandFactoryStrategy : IToolCommand
         if (jetBrainsCleanupCodeRunnerParameters is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new JetBrainsCleanupCodeRunnerToolCommand(_logger, jetBrainsCleanupCodeRunnerParameters));
+                new JetBrainsCleanupCodeRunnerToolCommand(logger, jetBrainsCleanupCodeRunnerParameters));
         }
 
         StShared.WriteErrorLine("dataSeederParameters is null", true);

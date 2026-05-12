@@ -10,16 +10,9 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ProgPublisher;
 
 // ReSharper disable once UnusedType.Global
-public class ProgramPublisherToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ProgramPublisherToolCommandFactoryStrategy(ILogger<ProgramPublisherToolCommandFactoryStrategy> logger)
+    : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<ProgramPublisherToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ProgramPublisherToolCommandFactoryStrategy(ILogger<ProgramPublisherToolCommandFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ProgPublisher);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -35,7 +28,7 @@ public class ProgramPublisherToolCommandFactoryStrategy : IToolCommandFactoryStr
         //  Publish, //პროგრამის საინსტალაციო პაკეტის გამზადება
         //+(CreatePackage=>UploadPackage=>EncodeParameters=>UploadParameters)
         var programPublisherParameters =
-            ProgramPublisherParameters.Create(_logger, supportToolsParameters, projectName, serverInfo);
+            ProgramPublisherParameters.Create(logger, supportToolsParameters, projectName, serverInfo);
         if (programPublisherParameters is null)
         {
             StShared.WriteErrorLine("programPublisherParameters does not created", true);
@@ -46,7 +39,7 @@ public class ProgramPublisherToolCommandFactoryStrategy : IToolCommandFactoryStr
 
         if (!projectForPublish.IsService)
         {
-            return new ValueTask<IToolCommand?>(new ProgramPublisherToolCommand(_logger, programPublisherParameters,
+            return new ValueTask<IToolCommand?>(new ProgramPublisherToolCommand(logger, programPublisherParameters,
                 parametersManager));
         }
 
@@ -55,7 +48,7 @@ public class ProgramPublisherToolCommandFactoryStrategy : IToolCommandFactoryStr
 
         if (appSettingsEncoderParametersForPublish != null)
         {
-            return new ValueTask<IToolCommand?>(new ServicePublisherToolCommand(_logger, programPublisherParameters,
+            return new ValueTask<IToolCommand?>(new ServicePublisherToolCommand(logger, programPublisherParameters,
                 appSettingsEncoderParametersForPublish, parametersManager));
         }
 

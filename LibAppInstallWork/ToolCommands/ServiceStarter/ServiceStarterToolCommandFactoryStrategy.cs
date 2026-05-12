@@ -10,19 +10,10 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.ServiceStarter;
 
 // ReSharper disable once UnusedType.Global
-public class ServiceStarterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ServiceStarterToolCommandFactoryStrategy(
+    ILogger<ServiceStarterToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ServiceStarterToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ServiceStarterToolCommandFactoryStrategy(ILogger<ServiceStarterToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.ServiceStarter);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -39,7 +30,7 @@ public class ServiceStarterToolCommandFactoryStrategy : IToolCommandFactoryStrat
         var serviceStartParameters = ServiceStartStopParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (serviceStartParameters is not null)
         {
-            return new ValueTask<IToolCommand?>(new ServiceStarterToolCommand(_logger, _httpClientFactory,
+            return new ValueTask<IToolCommand?>(new ServiceStarterToolCommand(logger, httpClientFactory,
                 serviceStartParameters, parametersManager, true));
         }
 

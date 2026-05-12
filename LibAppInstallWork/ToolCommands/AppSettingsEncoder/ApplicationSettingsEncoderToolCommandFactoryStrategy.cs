@@ -8,17 +8,9 @@ using SystemTools.SystemToolsShared;
 
 namespace LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 
-public class ApplicationSettingsEncoderToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ApplicationSettingsEncoderToolCommandFactoryStrategy(
+    ILogger<ApplicationSettingsEncoderToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<ApplicationSettingsEncoderToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ApplicationSettingsEncoderToolCommandFactoryStrategy(
-        ILogger<ApplicationSettingsEncoderToolCommandFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.AppSettingsEncoder);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -34,7 +26,7 @@ public class ApplicationSettingsEncoderToolCommandFactoryStrategy : IToolCommand
         if (appSettingsEncoderParameters is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new ApplicationSettingsEncoderToolCommand(_logger, appSettingsEncoderParameters, parametersManager));
+                new ApplicationSettingsEncoderToolCommand(logger, appSettingsEncoderParameters, parametersManager));
         }
 
         StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);

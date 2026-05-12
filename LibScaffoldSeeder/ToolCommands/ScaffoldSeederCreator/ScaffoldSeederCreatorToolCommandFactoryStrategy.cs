@@ -10,19 +10,10 @@ using SystemTools.SystemToolsShared;
 namespace LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 
 // ReSharper disable once UnusedType.Global
-public class ScaffoldSeederCreatorToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class ScaffoldSeederCreatorToolCommandFactoryStrategy(
+    ILogger<ScaffoldSeederCreatorToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ScaffoldSeederCreatorToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public ScaffoldSeederCreatorToolCommandFactoryStrategy(
-        ILogger<ScaffoldSeederCreatorToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.ScaffoldSeederCreator);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -33,11 +24,11 @@ public class ScaffoldSeederCreatorToolCommandFactoryStrategy : IToolCommandFacto
         //სკაფოლდინგისა და სიდინგის პროექტების შექმნა
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var scaffoldSeederCreatorParameters = ScaffoldSeederCreatorParameters.Create(_logger, supportToolsParameters,
+        var scaffoldSeederCreatorParameters = ScaffoldSeederCreatorParameters.Create(logger, supportToolsParameters,
             projectToolsFactoryStrategyParameters.ProjectName, true);
         if (scaffoldSeederCreatorParameters is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new ScaffoldSeederCreatorToolCommand(_logger, _httpClientFactory,
+            return ValueTask.FromResult<IToolCommand?>(new ScaffoldSeederCreatorToolCommand(logger, httpClientFactory,
                 true, scaffoldSeederCreatorParameters, parametersManager));
         }
 

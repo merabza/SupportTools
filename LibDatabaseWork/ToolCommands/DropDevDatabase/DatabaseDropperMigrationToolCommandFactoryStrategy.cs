@@ -11,21 +11,11 @@ using SystemTools.SystemToolsShared;
 namespace LibDatabaseWork.ToolCommands.DropDevDatabase;
 
 // ReSharper disable once UnusedType.Global
-public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class DatabaseDropperMigrationToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public DatabaseDropperMigrationToolCommandFactoryStrategy(IApplication app,
-        ILogger<DatabaseDropperMigrationToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _app = app;
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.DropDevDatabase);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -35,11 +25,11 @@ public class DatabaseDropperMigrationToolCommandFactoryStrategy : IToolCommandFa
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var dmpForDropper = DatabaseMigrationParameters.Create(_app.AppName, _logger, _httpClientFactory,
+        var dmpForDropper = DatabaseMigrationParameters.Create(app.AppName, logger, httpClientFactory,
             supportToolsParameters, projectToolsFactoryStrategyParameters.ProjectName);
         if (dmpForDropper is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new DatabaseDropperMigrationToolCommand(_logger, dmpForDropper,
+            return ValueTask.FromResult<IToolCommand?>(new DatabaseDropperMigrationToolCommand(logger, dmpForDropper,
                 parametersManager)); //დეველოპერ ბაზის წაშლა
         }
 

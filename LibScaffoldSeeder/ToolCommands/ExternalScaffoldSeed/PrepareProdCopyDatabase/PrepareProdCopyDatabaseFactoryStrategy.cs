@@ -8,16 +8,10 @@ using SystemTools.SystemToolsShared;
 
 namespace LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.PrepareProdCopyDatabase;
 
-public class PrepareProdCopyDatabaseFactoryStrategy : IToolCommandFactoryStrategy
+// ReSharper disable once UnusedType.Global
+public class PrepareProdCopyDatabaseFactoryStrategy(ILogger<PrepareProdCopyDatabaseFactoryStrategy> logger)
+    : IToolCommandFactoryStrategy
 {
-    private readonly ILogger<PrepareProdCopyDatabaseFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public PrepareProdCopyDatabaseFactoryStrategy(ILogger<PrepareProdCopyDatabaseFactoryStrategy> logger)
-    {
-        _logger = logger;
-    }
-
     public string ToolCommandName => nameof(EProjectTools.PrepareProdCopyDatabase);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -41,7 +35,7 @@ public class PrepareProdCopyDatabaseFactoryStrategy : IToolCommandFactoryStrateg
         if (prepareProdCopyDatabaseParameters is not null)
         {
             return ValueTask.FromResult<IToolCommand?>(
-                new ExternalScaffoldSeedToolCommand(_logger, prepareProdCopyDatabaseParameters));
+                new ExternalScaffoldSeedToolCommand(logger, prepareProdCopyDatabaseParameters));
         }
 
         StShared.WriteErrorLine("dataSeederParameters is null", true);

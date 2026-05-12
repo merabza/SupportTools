@@ -9,21 +9,12 @@ using SystemTools.SystemToolsShared;
 
 namespace LibAppInstallWork.ToolCommands.AppSettingsUpdater;
 
-public class AppSettingsUpdaterToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+// ReSharper disable once UnusedType.Global
+public class AppSettingsUpdaterToolCommandFactoryStrategy(
+    IApplication app,
+    ILogger<AppSettingsUpdaterToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IApplication _app;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<AppSettingsUpdaterToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public AppSettingsUpdaterToolCommandFactoryStrategy(IApplication app,
-        ILogger<AppSettingsUpdaterToolCommandFactoryStrategy> logger, IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-        _app = app;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.AppSettingsUpdater);
 
     public async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -41,7 +32,7 @@ public class AppSettingsUpdaterToolCommandFactoryStrategy : IToolCommandFactoryS
             cancellationToken);
         if (appSettingsUpdaterParameters is not null)
         {
-            return new AppSettingsUpdaterToolCommand(_app.AppName, _logger, _httpClientFactory,
+            return new AppSettingsUpdaterToolCommand(app.AppName, logger, httpClientFactory,
                 appSettingsUpdaterParameters, parametersManager, true);
         }
 

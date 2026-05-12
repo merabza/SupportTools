@@ -10,19 +10,10 @@ using SystemTools.SystemToolsShared;
 namespace LibAppInstallWork.ToolCommands.VersionChecker;
 
 // ReSharper disable once UnusedType.Global
-public class VersionCheckerToolCommandFactoryStrategy : IToolCommandFactoryStrategy
+public class VersionCheckerToolCommandFactoryStrategy(
+    ILogger<VersionCheckerToolCommandFactoryStrategy> logger,
+    IHttpClientFactory httpClientFactory) : IToolCommandFactoryStrategy
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<VersionCheckerToolCommandFactoryStrategy> _logger;
-
-    // ReSharper disable once ConvertToPrimaryConstructor
-    public VersionCheckerToolCommandFactoryStrategy(ILogger<VersionCheckerToolCommandFactoryStrategy> logger,
-        IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
-
     public string ToolCommandName => nameof(EProjectServerTools.VersionChecker);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
@@ -39,7 +30,7 @@ public class VersionCheckerToolCommandFactoryStrategy : IToolCommandFactoryStrat
         var checkVersionParameters = CheckVersionParameters.Create(supportToolsParameters, projectName, serverInfo);
         if (checkVersionParameters is not null)
         {
-            return new ValueTask<IToolCommand?>(new VersionCheckerToolCommand(_logger, _httpClientFactory,
+            return new ValueTask<IToolCommand?>(new VersionCheckerToolCommand(logger, httpClientFactory,
                 checkVersionParameters, parametersManager, true));
         }
 
