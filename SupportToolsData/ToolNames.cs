@@ -21,6 +21,7 @@ public static class ToolNames
             EProjectTools.PrepareProdCopyDatabase => "Prepare Prod Copy Database",
             EProjectTools.GenerateApiRoutes => "Generate Api Routes",
             EProjectTools.PairProdCopyAndDevDbObjects => "Pair ProdCopy and Dev Db Objects",
+            EProjectTools.TransferProdCopyToDevByPairs => "Transfer ProdCopy To Dev By Pairs",
             //EProjectTools.AppSettingsEncoder => "App Settings Encoder",
             //EProjectTools.AppSettingsInstaller => "App Settings Installer",
             //EProjectTools.AppSettingsUpdater => "App Settings Updater",

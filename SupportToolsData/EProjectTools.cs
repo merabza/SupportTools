@@ -22,5 +22,7 @@ public enum EProjectTools
 
     GenerateApiRoutes, //API რაუტების გენერაცია
 
-    PairProdCopyAndDevDbObjects //ProdCopy და Dev ბაზის ცხრილებისა და ველების სახელების მიხედვით დაწყვილება და დაწყვილებული შესაბამისობების ჯეისონ ფაილში შენახვა
+    PairProdCopyAndDevDbObjects, //ProdCopy და Dev ბაზის ცხრილებისა და ველების სახელების მიხედვით დაწყვილება და დაწყვილებული შესაბამისობების ჯეისონ ფაილში შენახვა
+
+    TransferProdCopyToDevByPairs //ProdCopy → Dev ბაზაში ინფორმაციის პირდაპირი გადატანა დაწყვილებული ცხრილებისა და ველების მიხედვით, scaffolding-ის და კოდის გენერაციის გარეშე
 }
