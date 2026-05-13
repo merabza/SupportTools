@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AppCliTools.CliTools.Menu.RecentCommandsList;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
@@ -13,6 +13,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
@@ -36,7 +37,7 @@ public static class MenuData
         nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy),
         //ახალი პროექტების შემქმნელი სუბმენიუ
         nameof(ProjectCreatorSubMenuCliMenuCommandFactoryStrategy),
-        //ახალი პროექტის შექმნა 
+        //ახალი პროექტის შექმნა
         nameof(CreateNewProjectFactoryStrategy),
         //პროექტის დაიმპორტება
         nameof(ImportProjectCliMenuCommandFactoryStrategy),
@@ -78,7 +79,9 @@ public static class MenuData
         nameof(SelectProjectAllowToolsFactoryStrategy),
         //დასაშვები ინსტრუმენტები
         nameof(ProjectToolsListFactoryStrategy),
-        //ახალი სერვერის ინფორმაციის შექმნა 
+        //ცხრილების და ველების წყვილების ფაილის რედაქტირება
+        nameof(PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy),
+        //ახალი სერვერის ინფორმაციის შექმნა
         nameof(CreateNewServerInfoFactoryStrategy),
         //სერვერების ინფორმაციის ჩამონათვალი და მართვა
         nameof(ServerInfosListFactoryStrategy),
@@ -86,5 +89,33 @@ public static class MenuData
         nameof(EditItemAllFieldsInSequenceCliMenuCommandFactoryStrategy),
         //პროექტის პარამეტრების სია თავისი რედაქტორებით
         nameof(ProjectParametersListFactoryStrategy)
+    ];
+
+    public static List<string> PairedDbObjectsSubMenuCommandFactoryStrategyNames { get; } =
+    [
+        //ახალი ცხრილების წყვილის დამატება
+        nameof(AddPairedTableCliMenuCommandFactoryStrategy),
+        //არსებული ცხრილების წყვილების ჩამონათვალი
+        nameof(PairedTableListFactoryStrategy)
+    ];
+
+    public static List<string> PairedTableSubMenuCommandFactoryStrategyNames { get; } =
+    [
+        //ცხრილების წყვილის რედაქტირება
+        nameof(EditPairedTableCliMenuCommandFactoryStrategy),
+        //ცხრილების წყვილის წაშლა
+        nameof(DeletePairedTableCliMenuCommandFactoryStrategy),
+        //ახალი ველების წყვილის დამატება
+        nameof(AddPairedFieldCliMenuCommandFactoryStrategy),
+        //არსებული ველების წყვილების ჩამონათვალი
+        nameof(PairedFieldListFactoryStrategy)
+    ];
+
+    public static List<string> PairedFieldSubMenuCommandFactoryStrategyNames { get; } =
+    [
+        //ველების წყვილის რედაქტირება
+        nameof(EditPairedFieldCliMenuCommandFactoryStrategy),
+        //ველების წყვილის წაშლა
+        nameof(DeletePairedFieldCliMenuCommandFactoryStrategy)
     ];
 }

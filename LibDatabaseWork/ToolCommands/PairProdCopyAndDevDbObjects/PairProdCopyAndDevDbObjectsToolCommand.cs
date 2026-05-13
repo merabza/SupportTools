@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
-using DatabaseTools.DbTools;
-using DatabaseTools.DbToolsFactory;
+using AppCliTools.LibDataInput;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SystemTools.SystemToolsShared;
 
@@ -69,15 +68,22 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        //თუ შედეგების ფაილი უკვე არსებობს, ვკითხოთ მომხმარებელს გადაწერის ნებართვაზე
+        if (File.Exists(Parameters.ResultFileName) &&
+            !Inputer.InputBool($"File {Parameters.ResultFileName} exists, overwrite?", false, false))
+        {
+            return false;
+        }
+
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
-            ReadTablesAndColumns(Parameters.ProdCopyConnectionString, "ProdCopy");
+            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.ProdCopyConnectionString, "ProdCopy", _logger);
         if (prodCopyTables is null)
         {
             return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? devTables =
-            ReadTablesAndColumns(Parameters.DevConnectionString, "Dev");
+            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.DevConnectionString, "Dev", _logger);
         if (devTables is null)
         {
             return false;
@@ -128,60 +134,5 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
         }
 
         return true;
-    }
-
-    private DbManager GetDbManager(string connectionString)
-    {
-        DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
-        // ReSharper disable once using
-        return DbManager.Create(dbKit, connectionString) ?? throw new Exception("Cannot create DbManager");
-    }
-
-    private Dictionary<(string SchemaLower, string TableLower), TableInfo>? ReadTablesAndColumns(
-        string connectionString, string sideName)
-    {
-        // ReSharper disable once using
-        using DbManager dbm = GetDbManager(connectionString);
-        try
-        {
-            const string query = """
-                                 SELECT c.TABLE_SCHEMA, c.TABLE_NAME, c.COLUMN_NAME
-                                 FROM INFORMATION_SCHEMA.COLUMNS c
-                                 INNER JOIN INFORMATION_SCHEMA.TABLES t
-                                   ON c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME
-                                 WHERE t.TABLE_TYPE = 'BASE TABLE'
-                                 ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, c.ORDINAL_POSITION
-                                 """;
-            dbm.Open();
-            // ReSharper disable once using
-            using IDataReader reader = dbm.ExecuteReader(query);
-            var tables = new Dictionary<(string SchemaLower, string TableLower), TableInfo>();
-            while (reader.Read())
-            {
-                string schema = (string)reader["TABLE_SCHEMA"];
-                string table = (string)reader["TABLE_NAME"];
-                string column = (string)reader["COLUMN_NAME"];
-
-                (string SchemaLower, string TableLower) key = (schema.ToLowerInvariant(), table.ToLowerInvariant());
-                if (!tables.TryGetValue(key, out TableInfo? tableInfo))
-                {
-                    tableInfo = new TableInfo(schema, table);
-                    tables[key] = tableInfo;
-                }
-
-                tableInfo.Columns.Add(column);
-            }
-
-            return tables;
-        }
-        catch (Exception ex)
-        {
-            StShared.WriteException(ex, $"Failed to read tables and columns from {sideName} database", true, _logger);
-            return null;
-        }
-        finally
-        {
-            dbm.Close();
-        }
     }
 }
