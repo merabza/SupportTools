@@ -4,6 +4,7 @@ using System.Data;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibDatabaseParameters;
@@ -15,7 +16,7 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 internal static class DevTableMetaReader
 {
     public static Dictionary<(string Schema, string Table), DevTableMeta>? Read(string devConnectionString,
-        PairedDbObjectsResult pairs, ILogger logger)
+        PairedDbObjectsModel pairs, ILogger logger)
     {
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using

@@ -13,7 +13,7 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //case-sensitive შემოწმება: pairs-ში მოცემული ცხრილი/ველი არსებობს თუ არა ბაზაში ზუსტი რეგისტრით
 internal static class PairsSchemaValidator
 {
-    public static ValidationReport Validate(PairedDbObjectsResult pairs,
+    public static ValidationReport Validate(PairedDbObjectsModel pairs,
         Dictionary<(string Schema, string Table), TableInfo> schema, bool useProdCopySide, string sideName,
         ILogger logger)
     {

@@ -10,7 +10,6 @@ using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SystemTools.SystemToolsShared;
 
@@ -98,15 +97,15 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                 return false;
             }
 
-            if (!PairsAutoGenerator.GenerateAndSave(Parameters.ProdCopyConnectionString,
-                    Parameters.DevConnectionString, Parameters.PairedDbObjectsResultFileName, _logger))
+            if (!await PairsAutoGenerator.GenerateAndSave(Parameters.ProdCopyConnectionString,
+                    Parameters.DevConnectionString, Parameters.PairedDbObjectsResultFileName, _logger,
+                    cancellationToken))
             {
                 return false;
             }
         }
 
-        PairedDbObjectsResult pairs =
-            PairedDbObjectsFileLoader.Load(Parameters.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel pairs = PairedDbObjectsParametersManager.Load(Parameters.PairedDbObjectsResultFileName, _logger);
         if (pairs.PairedTables.Count == 0)
         {
             StShared.WriteErrorLine("Paired DB objects file is empty — nothing to transfer", true, _logger);
@@ -115,15 +114,14 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
 
         //4. Pairs vs ProdCopy schema (case-sensitive)
         ValidationReport prodCopyReport =
-            PairsSchemaValidator.Validate(pairs, prodCopySchema, useProdCopySide: true, "ProdCopy", _logger);
+            PairsSchemaValidator.Validate(pairs, prodCopySchema, true, "ProdCopy", _logger);
         if (!prodCopyReport.IsValid)
         {
             return false;
         }
 
         //5. Pairs vs Dev schema (case-sensitive)
-        ValidationReport devReport =
-            PairsSchemaValidator.Validate(pairs, devSchema, useProdCopySide: false, "Dev", _logger);
+        ValidationReport devReport = PairsSchemaValidator.Validate(pairs, devSchema, false, "Dev", _logger);
         if (!devReport.IsValid)
         {
             return false;
@@ -158,8 +156,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             return false;
         }
 
-        List<(string Schema, string Table)> nodes =
-            pairs.PairedTables.Select(p => (p.DevSchemaName, p.DevTableName)).ToList();
+        List<(string Schema, string Table)> nodes = pairs.PairedTables.Select(p => (p.DevSchemaName, p.DevTableName))
+            .ToList();
         TopologicalSorter.SortResult sortResult = TopologicalSorter.Sort(nodes, fkEdges);
         if (sortResult.HasCycle)
         {
@@ -172,8 +170,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
         }
 
         //9. დადასტურება
-        if (!Inputer.InputBool(
-                $"About to transfer {pairs.PairedTables.Count} tables from ProdCopy to Dev. Continue?", true, false))
+        if (!Inputer.InputBool($"About to transfer {pairs.PairedTables.Count} tables from ProdCopy to Dev. Continue?",
+                true, false))
         {
             return false;
         }

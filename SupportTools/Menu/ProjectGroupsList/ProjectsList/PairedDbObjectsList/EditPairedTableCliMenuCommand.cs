@@ -21,14 +21,14 @@ public sealed class EditPairedTableCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public EditPairedTableCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        SupportToolsMenuParameters menuParameters) : base("Edit table pair", EMenuAction.Reload, EMenuAction.Reload)
+        SupportToolsMenuParameters menuParameters) : base("Edit table pair", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
@@ -36,50 +36,51 @@ public sealed class EditPairedTableCliMenuCommand : CliMenuCommand
             string.IsNullOrWhiteSpace(_menuParameters.PairedTableKey))
         {
             StShared.WriteErrorLine("Project, pairs file, or current table pair not set", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result =
+            PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
         PairedTable? current =
-            result.PairedTables.FirstOrDefault(pt => PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
+            result.PairedTables.FirstOrDefault(pt =>
+                PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
         if (current is null)
         {
             StShared.WriteErrorLine($"Table pair {_menuParameters.PairedTableKey} not found in file", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsConnectionResolver? resolver =
-            PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
+        var resolver = PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
         if (resolver is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
             DbSchemaQueryHelper.ReadTablesAndColumns(resolver.ProdCopyConnectionString, "ProdCopy", _logger);
         if (prodCopyTables is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? devTables =
             DbSchemaQueryHelper.ReadTablesAndColumns(resolver.DevConnectionString, "Dev", _logger);
         if (devTables is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         TableInfo? newProd = PromptTable(prodCopyTables, "ProdCopy",
             $"{current.ProdCopySchemaName}.{current.ProdCopyTableName}");
         if (newProd is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         TableInfo? newDev = PromptTable(devTables, "Dev", $"{current.DevSchemaName}.{current.DevTableName}");
         if (newDev is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         string newKey = $"{newProd.SchemaName}.{newProd.TableName}";
@@ -87,7 +88,7 @@ public sealed class EditPairedTableCliMenuCommand : CliMenuCommand
             result.PairedTables.Any(pt => PairedTableKeyBuilder.BuildKey(pt) == newKey))
         {
             StShared.WriteErrorLine($"Another table pair with ProdCopy table {newKey} already exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         current.ProdCopySchemaName = newProd.SchemaName;
@@ -95,14 +96,16 @@ public sealed class EditPairedTableCliMenuCommand : CliMenuCommand
         current.DevSchemaName = newDev.SchemaName;
         current.DevTableName = newDev.TableName;
 
-        if (!PairedDbObjectsFileLoader.Save(project.PairedDbObjectsResultFileName, result, _logger))
+        var parMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, result);
+        bool saved = await parMan.Save(result, null, null, cancellationToken);
+        if (!saved)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //განვაახლოთ მიმდინარე გასაღები
         _menuParameters.PairedTableKey = newKey;
-        return ValueTask.FromResult(true);
+        return true;
     }
 
     private static TableInfo? PromptTable(Dictionary<(string SchemaLower, string TableLower), TableInfo> tables,

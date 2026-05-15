@@ -2,6 +2,7 @@ using System;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
@@ -11,7 +12,7 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //ცარიელობის შემოწმება: Dev-ში pairs-ის თითო ცხრილზე SELECT COUNT_BIG(*) > 0 ნიშნავს ცარიელი არ არის
 internal static class DevEmptinessChecker
 {
-    public static bool AllEmpty(string devConnectionString, PairedDbObjectsResult pairs, ILogger logger,
+    public static bool AllEmpty(string devConnectionString, PairedDbObjectsModel pairs, ILogger logger,
         out string? firstNonEmptyTable)
     {
         firstNonEmptyTable = null;

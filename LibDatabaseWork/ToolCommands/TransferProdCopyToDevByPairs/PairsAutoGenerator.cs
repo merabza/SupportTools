@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
@@ -9,8 +11,8 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //pairs ფაილის ავტო-დაგენერირება — იყენებს არსებულ DbSchemaQueryHelper-ის (case-insensitive) matching-ის ლოგიკას
 internal static class PairsAutoGenerator
 {
-    public static bool GenerateAndSave(string prodCopyConnectionString, string devConnectionString,
-        string resultFileName, ILogger logger)
+    public static async ValueTask<bool> GenerateAndSave(string prodCopyConnectionString, string devConnectionString,
+        string resultFileName, ILogger logger, CancellationToken cancellationToken = default)
     {
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
             DbSchemaQueryHelper.ReadTablesAndColumns(prodCopyConnectionString, "ProdCopy", logger);
@@ -27,14 +29,12 @@ internal static class PairsAutoGenerator
         }
 
         var pairedTables = new List<PairedTable>();
-        foreach (KeyValuePair<(string SchemaLower, string TableLower), TableInfo> prodCopyKvp in prodCopyTables)
+        foreach (((string SchemaLower, string TableLower) key, TableInfo prodCopyTable) in prodCopyTables)
         {
-            if (!devTables.TryGetValue(prodCopyKvp.Key, out TableInfo? devTable))
+            if (!devTables.TryGetValue(key, out TableInfo? devTable))
             {
                 continue;
             }
-
-            TableInfo prodCopyTable = prodCopyKvp.Value;
 
             Dictionary<string, string> devColumnLookup =
                 devTable.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c);
@@ -52,8 +52,9 @@ internal static class PairsAutoGenerator
                 devTable.TableName, pairedFields));
         }
 
-        var result = new PairedDbObjectsResult(pairedTables);
-        if (!PairedDbObjectsFileLoader.Save(resultFileName, result, logger))
+        var result = new PairedDbObjectsModel(pairedTables);
+        var parMan = new PairedDbObjectsParametersManager(resultFileName, result);
+        if (!await parMan.Save(result, null, null, cancellationToken))
         {
             return false;
         }

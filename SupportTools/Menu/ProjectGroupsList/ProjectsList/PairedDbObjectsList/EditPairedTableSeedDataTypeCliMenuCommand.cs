@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibMenuInput;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -27,7 +28,7 @@ public sealed class EditPairedTableSeedDataTypeCliMenuCommand : CliMenuCommand
         _menuParameters = menuParameters;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
@@ -35,24 +36,25 @@ public sealed class EditPairedTableSeedDataTypeCliMenuCommand : CliMenuCommand
             string.IsNullOrWhiteSpace(_menuParameters.PairedTableKey))
         {
             StShared.WriteErrorLine("Project, pairs file, or current table pair not set", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result = PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
         PairedTable? current =
             result.PairedTables.FirstOrDefault(pt =>
                 PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
         if (current is null)
         {
             StShared.WriteErrorLine($"Table pair {_menuParameters.PairedTableKey} not found in file", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         ESeedDataType newValue = MenuInputer.InputFromEnumList("Seed Data Type", current.SeedDataType);
         current.SeedDataType = newValue;
 
-        bool saved = PairedDbObjectsFileLoader.Save(project.PairedDbObjectsResultFileName, result, _logger);
-        return ValueTask.FromResult(saved);
+        var parMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, result);
+        bool saved = await parMan.Save(result, null, null, cancellationToken);
+        return saved;
     }
 
     protected override string? GetStatus()
@@ -65,7 +67,7 @@ public sealed class EditPairedTableSeedDataTypeCliMenuCommand : CliMenuCommand
             return null;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result = PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
         PairedTable? current =
             result.PairedTables.FirstOrDefault(pt =>
                 PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);

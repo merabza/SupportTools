@@ -50,7 +50,7 @@ public static class SupportToolsServices
             {
                 x.AppName = appName;
             })
-            .AddMainParametersManager(x =>
+            .AddMainParametersManager<SupportToolsMainParametersManager>(x =>
             {
                 x.ParametersFileName = parametersFileName;
                 x.Par = par;

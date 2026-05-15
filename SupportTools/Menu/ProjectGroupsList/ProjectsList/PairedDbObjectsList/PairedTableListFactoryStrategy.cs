@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AppCliTools.CliMenu;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -26,15 +27,15 @@ public class PairedTableListFactoryStrategy(
             return [];
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, logger);
+        PairedDbObjectsModel result =
+            PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, logger);
 
-        return result.PairedTables.Select(pt =>
+        return result.PairedTables.Select(CliMenuCommand (pt) =>
         {
             string key = PairedTableKeyBuilder.BuildKey(pt);
             string displayName =
                 $"{pt.ProdCopySchemaName}.{pt.ProdCopyTableName} <-> {pt.DevSchemaName}.{pt.DevTableName} ({pt.PairedFields.Count} fields) [SeedDataType: {pt.SeedDataType}]";
-            return (CliMenuCommand)new PairedTableSubMenuCliMenuCommand(serviceProvider, key, displayName,
-                menuParameters);
+            return new PairedTableSubMenuCliMenuCommand(serviceProvider, key, displayName, menuParameters);
         }).ToList();
     }
 }

@@ -21,14 +21,14 @@ public sealed class EditPairedFieldCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public EditPairedFieldCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        SupportToolsMenuParameters menuParameters) : base("Edit field pair", EMenuAction.Reload, EMenuAction.Reload)
+        SupportToolsMenuParameters menuParameters) : base("Edit field pair", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
@@ -37,77 +37,79 @@ public sealed class EditPairedFieldCliMenuCommand : CliMenuCommand
             string.IsNullOrWhiteSpace(_menuParameters.PairedFieldKey))
         {
             StShared.WriteErrorLine("Project, pairs file, current table pair, or field pair not set", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result =
+            PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
         PairedTable? currentTable =
-            result.PairedTables.FirstOrDefault(pt => PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
+            result.PairedTables.FirstOrDefault(pt =>
+                PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
         if (currentTable is null)
         {
             StShared.WriteErrorLine($"Table pair {_menuParameters.PairedTableKey} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedField? currentField =
-            currentTable.PairedFields.FirstOrDefault(pf => PairedTableKeyBuilder.BuildFieldKey(pf) ==
-                                                           _menuParameters.PairedFieldKey);
+        PairedField? currentField = currentTable.PairedFields.FirstOrDefault(pf =>
+            PairedTableKeyBuilder.BuildFieldKey(pf) == _menuParameters.PairedFieldKey);
         if (currentField is null)
         {
             StShared.WriteErrorLine($"Field pair {_menuParameters.PairedFieldKey} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsConnectionResolver? resolver =
-            PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
+        var resolver = PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
         if (resolver is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         List<string>? prodColumns = ReadColumns(resolver.ProdCopyConnectionString, "ProdCopy",
             currentTable.ProdCopySchemaName, currentTable.ProdCopyTableName);
         if (prodColumns is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         List<string>? devColumns = ReadColumns(resolver.DevConnectionString, "Dev", currentTable.DevSchemaName,
             currentTable.DevTableName);
         if (devColumns is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         string? newProdColumn = PromptColumn(prodColumns, "ProdCopy", currentField.ProdCopyFieldName);
         if (string.IsNullOrEmpty(newProdColumn))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (newProdColumn != currentField.ProdCopyFieldName &&
             currentTable.PairedFields.Any(pf => pf.ProdCopyFieldName == newProdColumn))
         {
             StShared.WriteErrorLine($"Another field pair with ProdCopy field {newProdColumn} already exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         string? newDevColumn = PromptColumn(devColumns, "Dev", currentField.DevFieldName);
         if (string.IsNullOrEmpty(newDevColumn))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         currentField.ProdCopyFieldName = newProdColumn;
         currentField.DevFieldName = newDevColumn;
 
-        if (!PairedDbObjectsFileLoader.Save(project.PairedDbObjectsResultFileName, result, _logger))
+        var parMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, result);
+        bool saved = await parMan.Save(result, null, null, cancellationToken);
+        if (!saved)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         _menuParameters.PairedFieldKey = newProdColumn;
-        return ValueTask.FromResult(true);
+        return true;
     }
 
     private List<string>? ReadColumns(string connectionString, string sideName, string schemaName, string tableName)

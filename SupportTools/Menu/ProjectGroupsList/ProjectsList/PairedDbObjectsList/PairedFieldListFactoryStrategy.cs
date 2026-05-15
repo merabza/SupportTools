@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AppCliTools.CliMenu;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -27,7 +28,7 @@ public class PairedFieldListFactoryStrategy(
             return [];
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, logger);
+        PairedDbObjectsModel result = PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, logger);
         PairedTable? currentTable =
             result.PairedTables.FirstOrDefault(pt => PairedTableKeyBuilder.BuildKey(pt) == menuParameters.PairedTableKey);
         if (currentTable is null)
@@ -35,11 +36,11 @@ public class PairedFieldListFactoryStrategy(
             return [];
         }
 
-        return currentTable.PairedFields.Select(pf =>
+        return currentTable.PairedFields.Select(CliMenuCommand (pf) =>
         {
             string key = PairedTableKeyBuilder.BuildFieldKey(pf);
             string displayName = $"{pf.ProdCopyFieldName} <-> {pf.DevFieldName}";
-            return (CliMenuCommand)new PairedFieldSubMenuCliMenuCommand(serviceProvider, key, displayName,
+            return new PairedFieldSubMenuCliMenuCommand(serviceProvider, key, displayName,
                 menuParameters);
         }).ToList();
     }

@@ -26,6 +26,7 @@ public sealed class ProjectModel : ItemData
     public string? ParametersFileDateMask { get; set; }
     public string? ParametersFileExtension { get; set; }
     public string? MigrationStartupProjectFilePath { get; set; }
+    public string? DataSeederByTableStartupProjectFilePath { get; set; }
 
     public string? MigrationProjectFilePath { get; set; }
 

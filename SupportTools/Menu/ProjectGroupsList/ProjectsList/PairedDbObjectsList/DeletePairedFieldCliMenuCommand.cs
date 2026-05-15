@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -26,7 +27,7 @@ public sealed class DeletePairedFieldCliMenuCommand : CliMenuCommand
         _menuParameters = menuParameters;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_menuParameters.ProjectName);
@@ -35,21 +36,21 @@ public sealed class DeletePairedFieldCliMenuCommand : CliMenuCommand
             string.IsNullOrWhiteSpace(_menuParameters.PairedFieldKey))
         {
             StShared.WriteErrorLine("Project, pairs file, current table pair, or field pair not set", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (!Inputer.InputBool($"Delete field pair {_menuParameters.PairedFieldKey}?", false, false))
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result = PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
         PairedTable? currentTable =
             result.PairedTables.FirstOrDefault(pt => PairedTableKeyBuilder.BuildKey(pt) == _menuParameters.PairedTableKey);
         if (currentTable is null)
         {
             StShared.WriteErrorLine($"Table pair {_menuParameters.PairedTableKey} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         PairedField? toRemove =
@@ -58,17 +59,19 @@ public sealed class DeletePairedFieldCliMenuCommand : CliMenuCommand
         if (toRemove is null)
         {
             StShared.WriteErrorLine($"Field pair {_menuParameters.PairedFieldKey} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         currentTable.PairedFields.Remove(toRemove);
 
-        if (!PairedDbObjectsFileLoader.Save(project.PairedDbObjectsResultFileName, result, _logger))
+        var parMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, result);
+        bool saved = await parMan.Save(result, null, null, cancellationToken);
+        if (!saved)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         _menuParameters.PairedFieldKey = null;
-        return ValueTask.FromResult(true);
+        return true;
     }
 }

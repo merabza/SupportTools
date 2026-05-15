@@ -115,7 +115,7 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
                 devTable.TableName, pairedFields));
         }
 
-        var result = new PairedDbObjectsResult(pairedTables);
+        var result = new PairedDbObjectsModel(pairedTables);
 
         try
         {

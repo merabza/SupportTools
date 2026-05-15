@@ -22,69 +22,69 @@ public sealed class AddPairedTableCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public AddPairedTableCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName) :
-        base("Add new table pair", EMenuAction.Reload, EMenuAction.Reload)
+        base("Add new table pair", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
     }
 
-    protected override ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_projectName);
         if (project is null)
         {
             StShared.WriteErrorLine($"Project {_projectName} not found", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(project.PairedDbObjectsResultFileName))
         {
             StShared.WriteErrorLine($"Project {_projectName} does not contain PairedDbObjectsResultFileName", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsConnectionResolver? resolver =
-            PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
+        var resolver = PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
         if (resolver is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
             DbSchemaQueryHelper.ReadTablesAndColumns(resolver.ProdCopyConnectionString, "ProdCopy", _logger);
         if (prodCopyTables is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? devTables =
             DbSchemaQueryHelper.ReadTablesAndColumns(resolver.DevConnectionString, "Dev", _logger);
         if (devTables is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         TableInfo? prodTableInfo = PromptTable(prodCopyTables, "ProdCopy");
         if (prodTableInfo is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         TableInfo? devTableInfo = PromptTable(devTables, "Dev");
         if (devTableInfo is null)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
-        PairedDbObjectsResult result = PairedDbObjectsFileLoader.Load(project.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel result =
+            PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
 
         string newKey = $"{prodTableInfo.SchemaName}.{prodTableInfo.TableName}";
         if (result.PairedTables.Any(pt => PairedTableKeyBuilder.BuildKey(pt) == newKey))
         {
             StShared.WriteErrorLine($"Table pair with ProdCopy table {newKey} already exists", true);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         List<PairedField> pairedFields = [];
@@ -104,8 +104,9 @@ public sealed class AddPairedTableCliMenuCommand : CliMenuCommand
         result.PairedTables.Add(new PairedTable(prodTableInfo.SchemaName, prodTableInfo.TableName,
             devTableInfo.SchemaName, devTableInfo.TableName, pairedFields));
 
-        bool saved = PairedDbObjectsFileLoader.Save(project.PairedDbObjectsResultFileName, result, _logger);
-        return ValueTask.FromResult(saved);
+        var parMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, result);
+        bool saved = await parMan.Save(result, null, null, cancellationToken);
+        return saved;
     }
 
     private static TableInfo? PromptTable(Dictionary<(string SchemaLower, string TableLower), TableInfo> tables,
