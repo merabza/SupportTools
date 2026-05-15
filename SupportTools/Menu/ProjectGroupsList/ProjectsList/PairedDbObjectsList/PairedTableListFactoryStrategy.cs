@@ -32,7 +32,7 @@ public class PairedTableListFactoryStrategy(
         {
             string key = PairedTableKeyBuilder.BuildKey(pt);
             string displayName =
-                $"{pt.ProdCopySchemaName}.{pt.ProdCopyTableName} <-> {pt.DevSchemaName}.{pt.DevTableName} ({pt.PairedFields.Count} fields)";
+                $"{pt.ProdCopySchemaName}.{pt.ProdCopyTableName} <-> {pt.DevSchemaName}.{pt.DevTableName} ({pt.PairedFields.Count} fields) [SeedDataType: {pt.SeedDataType}]";
             return (CliMenuCommand)new PairedTableSubMenuCliMenuCommand(serviceProvider, key, displayName,
                 menuParameters);
         }).ToList();

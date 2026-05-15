@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SystemTools.DatabaseToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
@@ -11,6 +12,7 @@ public sealed class PairedTable
         DevSchemaName = string.Empty;
         DevTableName = string.Empty;
         PairedFields = [];
+        SeedDataType = ESeedDataType.OnlyDatabase;
     }
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -22,6 +24,7 @@ public sealed class PairedTable
         DevSchemaName = devSchemaName;
         DevTableName = devTableName;
         PairedFields = pairedFields;
+        SeedDataType = ESeedDataType.OnlyDatabase;
     }
 
     public string ProdCopySchemaName { get; set; }
@@ -29,4 +32,5 @@ public sealed class PairedTable
     public string DevSchemaName { get; set; }
     public string DevTableName { get; set; }
     public List<PairedField> PairedFields { get; set; }
+    public ESeedDataType SeedDataType { get; set; }
 }

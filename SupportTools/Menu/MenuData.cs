@@ -103,6 +103,8 @@ public static class MenuData
     [
         //ცხრილების წყვილის რედაქტირება
         nameof(EditPairedTableCliMenuCommandFactoryStrategy),
+        //ცხრილების წყვილის Seed Data Type-ის რედაქტირება
+        nameof(EditPairedTableSeedDataTypeCliMenuCommandFactoryStrategy),
         //ცხრილების წყვილის წაშლა
         nameof(DeletePairedTableCliMenuCommandFactoryStrategy),
         //ახალი ველების წყვილის დამატება
