@@ -7,7 +7,6 @@ using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -20,7 +19,7 @@ internal static class DevTableMetaReader
     {
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? dbm = DbManager.Create(dbKit, devConnectionString);
+        using var dbm = DbManager.Create(dbKit, devConnectionString);
         if (dbm is null)
         {
             StShared.WriteErrorLine("Cannot create DbManager for Dev database", true, logger);
@@ -42,7 +41,7 @@ internal static class DevTableMetaReader
 
             //pairs-ში არსებული ცხრილების set
             var wanted = new HashSet<(string Schema, string Table)>();
-            foreach (PairedTable pt in pairs.PairedTables)
+            foreach (PairedTable pt in pairs.PairedTables.Values)
             {
                 wanted.Add((pt.DevSchemaName, pt.DevTableName));
             }

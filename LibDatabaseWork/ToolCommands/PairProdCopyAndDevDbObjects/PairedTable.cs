@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using SystemTools.DatabaseToolsShared;
+using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
-public sealed class PairedTable
+public sealed class PairedTable : ItemData
 {
     public PairedTable()
     {
@@ -17,7 +17,7 @@ public sealed class PairedTable
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PairedTable(string prodCopySchemaName, string prodCopyTableName, string devSchemaName, string devTableName,
-        List<PairedField> pairedFields)
+        Dictionary<string, PairedField> pairedFields)
     {
         ProdCopySchemaName = prodCopySchemaName;
         ProdCopyTableName = prodCopyTableName;
@@ -31,6 +31,11 @@ public sealed class PairedTable
     public string ProdCopyTableName { get; set; }
     public string DevSchemaName { get; set; }
     public string DevTableName { get; set; }
-    public List<PairedField> PairedFields { get; set; }
+    public Dictionary<string, PairedField> PairedFields { get; set; }
     public ESeedDataType SeedDataType { get; set; }
+
+    public override string GetItemKey()
+    {
+        return $"{ProdCopySchemaName}.{ProdCopyTableName}";
+    }
 }

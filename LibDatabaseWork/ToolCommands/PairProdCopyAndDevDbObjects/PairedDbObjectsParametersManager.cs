@@ -2,7 +2,6 @@
 using System.IO;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using ParametersManagement.LibParameters;
 using SystemTools.SystemToolsShared;
@@ -11,6 +10,11 @@ namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
 public class PairedDbObjectsParametersManager : ParametersManager
 {
+    public PairedDbObjectsParametersManager(string parametersFileName, IParameters parameters) : base(
+        parametersFileName, parameters)
+    {
+    }
+
     public static PairedDbObjectsModel Load(string filePath, ILogger logger)
     {
         if (!File.Exists(filePath))
@@ -28,10 +32,9 @@ public class PairedDbObjectsParametersManager : ParametersManager
 
             var settings = new JsonSerializerSettings
             {
-                NullValueHandling = NullValueHandling.Ignore,
-                MissingMemberHandling = MissingMemberHandling.Ignore
+                NullValueHandling = NullValueHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Ignore
             };
-            PairedDbObjectsModel? result = JsonConvert.DeserializeObject<PairedDbObjectsModel>(json, settings);
+            var result = JsonConvert.DeserializeObject<PairedDbObjectsModel>(json, settings);
             return result ?? new PairedDbObjectsModel();
         }
         catch (Exception ex)
@@ -39,9 +42,5 @@ public class PairedDbObjectsParametersManager : ParametersManager
             StShared.WriteException(ex, $"Failed to load paired DB objects file {filePath}", true, logger);
             return new PairedDbObjectsModel();
         }
-    }
-
-    public PairedDbObjectsParametersManager(string parametersFileName, IParameters parameters) : base(parametersFileName, parameters)
-    {
     }
 }

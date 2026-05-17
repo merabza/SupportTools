@@ -28,7 +28,7 @@ internal static class PairsAutoGenerator
             return false;
         }
 
-        var pairedTables = new List<PairedTable>();
+        var pairedTables = new Dictionary<string, PairedTable>();
         foreach (((string SchemaLower, string TableLower) key, TableInfo prodCopyTable) in prodCopyTables)
         {
             if (!devTables.TryGetValue(key, out TableInfo? devTable))
@@ -39,17 +39,18 @@ internal static class PairsAutoGenerator
             Dictionary<string, string> devColumnLookup =
                 devTable.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c);
 
-            var pairedFields = new List<PairedField>();
+            var pairedFields = new Dictionary<string, PairedField>();
             foreach (string prodColumn in prodCopyTable.Columns)
             {
                 if (devColumnLookup.TryGetValue(prodColumn.ToLowerInvariant(), out string? devColumn))
                 {
-                    pairedFields.Add(new PairedField(prodColumn, devColumn));
+                    pairedFields.Add(prodColumn, new PairedField(prodColumn, devColumn));
                 }
             }
 
-            pairedTables.Add(new PairedTable(prodCopyTable.SchemaName, prodCopyTable.TableName, devTable.SchemaName,
-                devTable.TableName, pairedFields));
+            var pairedTable = new PairedTable(prodCopyTable.SchemaName, prodCopyTable.TableName, devTable.SchemaName,
+                devTable.TableName, pairedFields);
+            pairedTables.Add(pairedTable.GetItemKey(), pairedTable);
         }
 
         var result = new PairedDbObjectsModel(pairedTables);

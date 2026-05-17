@@ -34,8 +34,7 @@ public sealed class PairedDbObjectsConnectionResolver
             return null;
         }
 
-        var databaseServerConnections =
-            new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
+        var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
 
         (EDatabaseProvider? prodCopyDataProvider, string? prodCopyConnectionString, int _) =
             DbConnectionFactory.GetDataProviderConnectionStringCommandTimeOut(project.ProdCopyDatabaseParameters,

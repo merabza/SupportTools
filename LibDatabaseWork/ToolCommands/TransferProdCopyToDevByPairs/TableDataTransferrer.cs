@@ -8,7 +8,6 @@ using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -33,7 +32,7 @@ internal static class TableDataTransferrer
 
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? prodDbm = DbManager.Create(dbKit, prodCopyConnectionString);
+        using var prodDbm = DbManager.Create(dbKit, prodCopyConnectionString);
         if (prodDbm is null)
         {
             logger.LogError("Cannot create DbManager for ProdCopy database");
@@ -51,7 +50,7 @@ internal static class TableDataTransferrer
         await devConn.OpenAsync(cancellationToken);
 
         // ReSharper disable once using
-        using var bulkCopy = new SqlBulkCopy(devConn, options, externalTransaction: null)
+        using var bulkCopy = new SqlBulkCopy(devConn, options, null)
         {
             DestinationTableName = $"[{pt.DevSchemaName}].[{pt.DevTableName}]",
             BulkCopyTimeout = commandTimeOut,
@@ -65,8 +64,7 @@ internal static class TableDataTransferrer
         }
 
         string selectList = string.Join(", ", insertableFields.Select(f => $"[{f.ProdCopyFieldName}]"));
-        string selectSql =
-            $"SELECT {selectList} FROM [{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
+        string selectSql = $"SELECT {selectList} FROM [{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
 
         prodDbm.Open();
         try

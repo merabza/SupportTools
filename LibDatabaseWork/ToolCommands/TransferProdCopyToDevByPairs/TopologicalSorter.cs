@@ -8,25 +8,12 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //ან ციკლის შემცველი ცხრილების სია.
 internal static class TopologicalSorter
 {
-    public sealed class SortResult
-    {
-        public SortResult(List<(string Schema, string Table)>? ordered, List<(string Schema, string Table)>? cycle)
-        {
-            Ordered = ordered;
-            Cycle = cycle;
-        }
-
-        public List<(string Schema, string Table)>? Ordered { get; }
-        public List<(string Schema, string Table)>? Cycle { get; }
-        public bool HasCycle => Cycle is not null;
-    }
-
     public static SortResult Sort(IReadOnlyList<(string Schema, string Table)> nodes, IReadOnlyList<FkEdge> edges)
     {
         var nodeSet = new HashSet<(string Schema, string Table)>(nodes);
 
         //ვითვალისწინებთ მხოლოდ იმ edge-ებს, რომელთა ორივე ბოლო პოვნადია nodes-ში; self-reference იგნორდება
-        var relevantEdges = edges.Where(e =>
+        List<FkEdge> relevantEdges = edges.Where(e =>
             nodeSet.Contains((e.FromSchema, e.FromTable)) && nodeSet.Contains((e.ToSchema, e.ToTable)) &&
             !(e.FromSchema == e.ToSchema && e.FromTable == e.ToTable)).ToList();
 
@@ -80,7 +67,20 @@ internal static class TopologicalSorter
         }
 
         //ციკლი არსებობს: ციკლის შემცველ ცხრილებად ვცილცილდებით ყველაფერს, რაც ordered-ში არ მოყვა
-        var cycle = nodes.Where(n => incomingCount[n] > 0).ToList();
+        List<(string Schema, string Table)> cycle = nodes.Where(n => incomingCount[n] > 0).ToList();
         return new SortResult(null, cycle);
+    }
+
+    public sealed class SortResult
+    {
+        public SortResult(List<(string Schema, string Table)>? ordered, List<(string Schema, string Table)>? cycle)
+        {
+            Ordered = ordered;
+            Cycle = cycle;
+        }
+
+        public List<(string Schema, string Table)>? Ordered { get; }
+        public List<(string Schema, string Table)>? Cycle { get; }
+        public bool HasCycle => Cycle is not null;
     }
 }

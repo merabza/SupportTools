@@ -4,7 +4,6 @@ using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -18,7 +17,7 @@ internal static class DevEmptinessChecker
         firstNonEmptyTable = null;
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? dbm = DbManager.Create(dbKit, devConnectionString);
+        using var dbm = DbManager.Create(dbKit, devConnectionString);
         if (dbm is null)
         {
             StShared.WriteErrorLine("Cannot create DbManager for Dev database", true, logger);
@@ -28,7 +27,7 @@ internal static class DevEmptinessChecker
         try
         {
             dbm.Open();
-            foreach (PairedTable pt in pairs.PairedTables)
+            foreach (PairedTable pt in pairs.PairedTables.Values)
             {
                 string fullName = $"[{pt.DevSchemaName}].[{pt.DevTableName}]";
                 string query = $"SELECT COUNT_BIG(*) FROM {fullName}";

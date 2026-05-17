@@ -8,5 +8,4 @@ public class SupportToolsMainParametersManager : ParametersManager
     public SupportToolsMainParametersManager(IOptions<MainParametersManagerOptions> options) : base(options)
     {
     }
-
 }

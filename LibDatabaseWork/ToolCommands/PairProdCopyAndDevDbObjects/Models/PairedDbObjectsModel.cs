@@ -11,12 +11,12 @@ public sealed class PairedDbObjectsModel : IParameters
     }
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PairedDbObjectsModel(List<PairedTable> pairedTables)
+    public PairedDbObjectsModel(Dictionary<string, PairedTable> pairedTables)
     {
         PairedTables = pairedTables;
     }
 
-    public List<PairedTable> PairedTables { get; set; }
+    public Dictionary<string, PairedTable> PairedTables { get; set; }
 
     public bool CheckBeforeSave()
     {

@@ -1,6 +1,8 @@
+using SystemTools.SystemToolsShared;
+
 namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
-public sealed class PairedField
+public sealed class PairedField : ItemData
 {
     public PairedField()
     {
@@ -17,4 +19,9 @@ public sealed class PairedField
 
     public string ProdCopyFieldName { get; set; }
     public string DevFieldName { get; set; }
+
+    public override string GetItemKey()
+    {
+        return ProdCopyFieldName;
+    }
 }

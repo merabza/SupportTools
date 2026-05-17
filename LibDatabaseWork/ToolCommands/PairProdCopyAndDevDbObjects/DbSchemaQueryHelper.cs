@@ -5,7 +5,6 @@ using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
@@ -27,7 +26,7 @@ public static class DbSchemaQueryHelper
     {
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? dbm = DbManager.Create(dbKit, connectionString);
+        using var dbm = DbManager.Create(dbKit, connectionString);
         if (dbm is null)
         {
             StShared.WriteErrorLine($"Cannot create DbManager for {sideName} database", true, logger);
@@ -75,7 +74,7 @@ public static class DbSchemaQueryHelper
     {
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? dbm = DbManager.Create(dbKit, connectionString);
+        using var dbm = DbManager.Create(dbKit, connectionString);
         if (dbm is null)
         {
             StShared.WriteErrorLine($"Cannot create DbManager for {sideName} database", true, logger);

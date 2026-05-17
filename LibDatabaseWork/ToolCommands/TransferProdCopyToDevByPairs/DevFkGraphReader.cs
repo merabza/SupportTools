@@ -5,7 +5,6 @@ using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
-using ParametersManagement.LibDatabaseParameters;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -17,7 +16,7 @@ internal static class DevFkGraphReader
     {
         DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
         // ReSharper disable once using
-        using DbManager? dbm = DbManager.Create(dbKit, devConnectionString);
+        using var dbm = DbManager.Create(dbKit, devConnectionString);
         if (dbm is null)
         {
             StShared.WriteErrorLine("Cannot create DbManager for Dev database", true, logger);

@@ -1,6 +1,9 @@
-using System;
 using AppCliTools.CliMenu;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
+using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportTools.Cruders;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -8,20 +11,17 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 
 public sealed class PairedDbObjectsSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly SupportToolsMenuParameters _menuParameters;
+    private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
-    private readonly IServiceProvider _serviceProvider;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PairedDbObjectsSubMenuCliMenuCommand(IServiceProvider serviceProvider, IParametersManager parametersManager,
-        string projectName, SupportToolsMenuParameters menuParameters) : base("Paired Db Objects",
-        EMenuAction.LoadSubMenu)
+    public PairedDbObjectsSubMenuCliMenuCommand(ILogger logger, IParametersManager parametersManager,
+        string projectName) : base("Paired Db Objects", EMenuAction.LoadSubMenu)
     {
-        _serviceProvider = serviceProvider;
+        _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
-        _menuParameters = menuParameters;
     }
 
     public override CliMenuSet? GetSubMenu()
@@ -31,7 +31,7 @@ public sealed class PairedDbObjectsSubMenuCliMenuCommand : CliMenuCommand
 
         if (project is null)
         {
-            StShared.WriteErrorLine($"Project {_projectName} not found", true);
+            StShared.WriteErrorLine($"Project {_projectName} not found", true, _logger);
             return null;
         }
 
@@ -39,15 +39,22 @@ public sealed class PairedDbObjectsSubMenuCliMenuCommand : CliMenuCommand
         {
             StShared.WriteErrorLine(
                 $"Project {_projectName} does not contain PairedDbObjectsResultFileName. Please set it in project parameters.",
-                true);
+                true, _logger);
             return null;
         }
 
-        _menuParameters.ProjectName = _projectName;
-        _menuParameters.PairedTableKey = null;
-        _menuParameters.PairedFieldKey = null;
+        PairedDbObjectsModel model =
+            PairedDbObjectsParametersManager.Load(project.PairedDbObjectsResultFileName, _logger);
+        var pairedParMan = new PairedDbObjectsParametersManager(project.PairedDbObjectsResultFileName, model);
 
-        return CliMenuSetFactory.CreateMenuSet($"{_projectName} => Paired Db Objects",
-            MenuData.PairedDbObjectsSubMenuCommandFactoryStrategyNames, _serviceProvider);
+        var resolver = PairedDbObjectsConnectionResolver.Create(parameters, project, _logger);
+        if (resolver is null)
+        {
+            return null;
+        }
+
+        var cruder = PairedTableCruder.Create(pairedParMan, _logger, model.PairedTables,
+            resolver.ProdCopyConnectionString, resolver.DevConnectionString);
+        return cruder.GetListMenu();
     }
 }

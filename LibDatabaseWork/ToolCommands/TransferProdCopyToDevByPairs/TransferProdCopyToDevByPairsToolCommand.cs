@@ -105,7 +105,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             }
         }
 
-        PairedDbObjectsModel pairs = PairedDbObjectsParametersManager.Load(Parameters.PairedDbObjectsResultFileName, _logger);
+        PairedDbObjectsModel pairs =
+            PairedDbObjectsParametersManager.Load(Parameters.PairedDbObjectsResultFileName, _logger);
         if (pairs.PairedTables.Count == 0)
         {
             StShared.WriteErrorLine("Paired DB objects file is empty — nothing to transfer", true, _logger);
@@ -156,8 +157,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             return false;
         }
 
-        List<(string Schema, string Table)> nodes = pairs.PairedTables.Select(p => (p.DevSchemaName, p.DevTableName))
-            .ToList();
+        List<(string Schema, string Table)> nodes = pairs.PairedTables.Values
+            .Select(p => (p.DevSchemaName, p.DevTableName)).ToList();
         TopologicalSorter.SortResult sortResult = TopologicalSorter.Sort(nodes, fkEdges);
         if (sortResult.HasCycle)
         {
@@ -177,7 +178,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
         }
 
         //10. გადატანა ტოპოლოგიური თანმიმდევრობით
-        var pairsByDevKey = pairs.PairedTables.ToDictionary(p => (p.DevSchemaName, p.DevTableName), p => p);
+        Dictionary<(string DevSchemaName, string DevTableName), PairedTable> pairsByDevKey =
+            pairs.PairedTables.Values.ToDictionary(p => (p.DevSchemaName, p.DevTableName), p => p);
         long totalRows = 0;
         var stopwatch = Stopwatch.StartNew();
         foreach ((string Schema, string Table) node in sortResult.Ordered!)
@@ -185,8 +187,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             PairedTable pt = pairsByDevKey[node];
             DevTableMeta meta = devMeta[node];
 
-            List<PairedField> insertable =
-                pt.PairedFields.Where(f => !meta.ComputedColumns.Contains(f.DevFieldName)).ToList();
+            List<PairedField> insertable = pt.PairedFields.Values
+                .Where(f => !meta.ComputedColumns.Contains(f.DevFieldName)).ToList();
             bool hasIdentity = insertable.Any(f => meta.IdentityColumns.Contains(f.DevFieldName));
 
             if (_logger.IsEnabled(LogLevel.Information))

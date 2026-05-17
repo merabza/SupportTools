@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -20,10 +21,10 @@ internal static class PairsSchemaValidator
         var report = new ValidationReport();
 
         //case-insensitive lookup-ი diagnostic-ისთვის: მისახვედრად, რა სახელით არსებობს რეალურად
-        var insensitiveTables = schema.Keys.ToDictionary(
+        Dictionary<(string, string), (string Schema, string Table)> insensitiveTables = schema.Keys.ToDictionary(
             k => (k.Schema.ToLowerInvariant(), k.Table.ToLowerInvariant()), k => k);
 
-        foreach (PairedTable pt in pairs.PairedTables)
+        foreach (PairedTable pt in pairs.PairedTables.Values)
         {
             string pairedSchema = useProdCopySide ? pt.ProdCopySchemaName : pt.DevSchemaName;
             string pairedTable = useProdCopySide ? pt.ProdCopyTableName : pt.DevTableName;
@@ -31,21 +32,21 @@ internal static class PairsSchemaValidator
 
             if (!schema.TryGetValue(key, out TableInfo? tableInfo))
             {
-                string suggestion = insensitiveTables.TryGetValue(
-                    (pairedSchema.ToLowerInvariant(), pairedTable.ToLowerInvariant()),
-                    out (string Schema, string Table) actual)
-                    ? $"(no match — closest: {actual.Schema}.{actual.Table})"
-                    : "(no match — table not found)";
+                string suggestion =
+                    insensitiveTables.TryGetValue((pairedSchema.ToLowerInvariant(), pairedTable.ToLowerInvariant()),
+                        out (string Schema, string Table) actual)
+                        ? $"(no match — closest: {actual.Schema}.{actual.Table})"
+                        : "(no match — table not found)";
                 report.MissingTables.Add($"{pairedSchema}.{pairedTable} {suggestion}");
                 continue;
             }
 
             //case-sensitive HashSet ცხრილის ველებზე
-            var columnsExact = new HashSet<string>(tableInfo.Columns, System.StringComparer.Ordinal);
-            var columnsInsensitive =
-                tableInfo.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c, System.StringComparer.Ordinal);
+            var columnsExact = new HashSet<string>(tableInfo.Columns, StringComparer.Ordinal);
+            Dictionary<string, string> columnsInsensitive =
+                tableInfo.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c, StringComparer.Ordinal);
 
-            foreach (PairedField pf in pt.PairedFields)
+            foreach (PairedField pf in pt.PairedFields.Values)
             {
                 string pairedField = useProdCopySide ? pf.ProdCopyFieldName : pf.DevFieldName;
                 if (columnsExact.Contains(pairedField))
@@ -53,10 +54,10 @@ internal static class PairsSchemaValidator
                     continue;
                 }
 
-                string fieldSuggestion = columnsInsensitive.TryGetValue(pairedField.ToLowerInvariant(),
-                    out string? actualField)
-                    ? $"(closest: {pairedSchema}.{pairedTable}.{actualField})"
-                    : "(no match — field not found)";
+                string fieldSuggestion =
+                    columnsInsensitive.TryGetValue(pairedField.ToLowerInvariant(), out string? actualField)
+                        ? $"(closest: {pairedSchema}.{pairedTable}.{actualField})"
+                        : "(no match — field not found)";
                 report.MissingFields.Add($"{pairedSchema}.{pairedTable}.{pairedField} {fieldSuggestion}");
             }
         }

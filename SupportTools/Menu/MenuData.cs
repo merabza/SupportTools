@@ -90,34 +90,4 @@ public static class MenuData
         //პროექტის პარამეტრების სია თავისი რედაქტორებით
         nameof(ProjectParametersListFactoryStrategy)
     ];
-
-    public static List<string> PairedDbObjectsSubMenuCommandFactoryStrategyNames { get; } =
-    [
-        //ახალი ცხრილების წყვილის დამატება
-        nameof(AddPairedTableCliMenuCommandFactoryStrategy),
-        //არსებული ცხრილების წყვილების ჩამონათვალი
-        nameof(PairedTableListFactoryStrategy)
-    ];
-
-    public static List<string> PairedTableSubMenuCommandFactoryStrategyNames { get; } =
-    [
-        //ცხრილების წყვილის რედაქტირება
-        nameof(EditPairedTableCliMenuCommandFactoryStrategy),
-        //ცხრილების წყვილის Seed Data Type-ის რედაქტირება
-        nameof(EditPairedTableSeedDataTypeCliMenuCommandFactoryStrategy),
-        //ცხრილების წყვილის წაშლა
-        nameof(DeletePairedTableCliMenuCommandFactoryStrategy),
-        //ახალი ველების წყვილის დამატება
-        nameof(AddPairedFieldCliMenuCommandFactoryStrategy),
-        //არსებული ველების წყვილების ჩამონათვალი
-        nameof(PairedFieldListFactoryStrategy)
-    ];
-
-    public static List<string> PairedFieldSubMenuCommandFactoryStrategyNames { get; } =
-    [
-        //ველების წყვილის რედაქტირება
-        nameof(EditPairedFieldCliMenuCommandFactoryStrategy),
-        //ველების წყვილის წაშლა
-        nameof(DeletePairedFieldCliMenuCommandFactoryStrategy)
-    ];
 }
