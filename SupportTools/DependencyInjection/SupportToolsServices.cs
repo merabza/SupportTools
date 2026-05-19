@@ -1,5 +1,4 @@
 ﻿using AppCliTools.CliMenu;
-using AppCliTools.CliMenu.DependencyInjection;
 using AppCliTools.CliTools.DependencyInjection;
 using AppCliTools.CliTools.Menu.RecentCommandsList;
 using AppCliTools.CliTools.Services.MenuBuilder;

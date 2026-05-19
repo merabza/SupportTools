@@ -12,7 +12,7 @@ public sealed class TransferProdCopyToDevByPairsParameters : IParameters
     // ReSharper disable once ConvertToPrimaryConstructor
     private TransferProdCopyToDevByPairsParameters(EDatabaseProvider prodCopyDataProvider,
         string prodCopyConnectionString, EDatabaseProvider devDataProvider, string devConnectionString,
-        int commandTimeOut, string pairedDbObjectsResultFileName)
+        int commandTimeOut, string pairedDbObjectsResultFileName, string? dataSeederRulesByTableStartupProjectFilePath)
     {
         ProdCopyDataProvider = prodCopyDataProvider;
         ProdCopyConnectionString = prodCopyConnectionString;
@@ -20,6 +20,7 @@ public sealed class TransferProdCopyToDevByPairsParameters : IParameters
         DevConnectionString = devConnectionString;
         CommandTimeOut = commandTimeOut;
         PairedDbObjectsResultFileName = pairedDbObjectsResultFileName;
+        DataSeederRulesByTableStartupProjectFilePath = dataSeederRulesByTableStartupProjectFilePath;
     }
 
     public EDatabaseProvider ProdCopyDataProvider { get; }
@@ -28,6 +29,9 @@ public sealed class TransferProdCopyToDevByPairsParameters : IParameters
     public string DevConnectionString { get; }
     public int CommandTimeOut { get; }
     public string PairedDbObjectsResultFileName { get; }
+
+    //SeederRules-ის გასაშვებად საჭირო პროექტის ფაილის გზა (შეიძლება იყოს null, თუ პროექტში არცერთი ცხრილი არ იყენებს SeedDataType-ს რომელიც წესებს მოითხოვს)
+    public string? DataSeederRulesByTableStartupProjectFilePath { get; }
 
     public bool CheckBeforeSave()
     {
@@ -91,6 +95,6 @@ public sealed class TransferProdCopyToDevByPairsParameters : IParameters
         return new TransferProdCopyToDevByPairsParameters(prodCopyDataProvider.Value, prodCopyConnectionString,
             devDataProvider.Value, devConnectionString,
             prodCopyCommandTimeout > devCommandTimeout ? prodCopyCommandTimeout : devCommandTimeout,
-            project.PairedDbObjectsResultFileName);
+            project.PairedDbObjectsResultFileName, project.DataSeederRulesByTableStartupProjectFilePath);
     }
 }

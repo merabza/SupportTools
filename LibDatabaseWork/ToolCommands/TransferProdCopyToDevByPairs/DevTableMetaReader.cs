@@ -36,8 +36,6 @@ internal static class DevTableMetaReader
                                  INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
                                  """;
             dbm.Open();
-            // ReSharper disable once using
-            using IDataReader reader = dbm.ExecuteReader(query);
 
             //pairs-ში არსებული ცხრილების set
             var wanted = new HashSet<(string Schema, string Table)>();
@@ -47,34 +45,38 @@ internal static class DevTableMetaReader
             }
 
             var result = new Dictionary<(string Schema, string Table), DevTableMeta>();
-            while (reader.Read())
+            // ReSharper disable once using
+            using (IDataReader reader = dbm.ExecuteReader(query))
             {
-                string schema = (string)reader["SchemaName"];
-                string table = (string)reader["TableName"];
-                (string Schema, string Table) key = (schema, table);
-                if (!wanted.Contains(key))
+                while (reader.Read())
                 {
-                    continue;
-                }
+                    string schema = (string)reader["SchemaName"];
+                    string table = (string)reader["TableName"];
+                    (string Schema, string Table) key = (schema, table);
+                    if (!wanted.Contains(key))
+                    {
+                        continue;
+                    }
 
-                string column = (string)reader["ColumnName"];
-                bool isIdentity = (bool)reader["IsIdentity"];
-                bool isComputed = (bool)reader["IsComputed"];
+                    string column = (string)reader["ColumnName"];
+                    bool isIdentity = (bool)reader["IsIdentity"];
+                    bool isComputed = (bool)reader["IsComputed"];
 
-                if (!result.TryGetValue(key, out DevTableMeta? meta))
-                {
-                    meta = new DevTableMeta();
-                    result[key] = meta;
-                }
+                    if (!result.TryGetValue(key, out DevTableMeta? meta))
+                    {
+                        meta = new DevTableMeta();
+                        result[key] = meta;
+                    }
 
-                if (isIdentity)
-                {
-                    meta.IdentityColumns.Add(column);
-                }
+                    if (isIdentity)
+                    {
+                        meta.IdentityColumns.Add(column);
+                    }
 
-                if (isComputed)
-                {
-                    meta.ComputedColumns.Add(column);
+                    if (isComputed)
+                    {
+                        meta.ComputedColumns.Add(column);
+                    }
                 }
             }
 
@@ -84,6 +86,36 @@ internal static class DevTableMetaReader
                 if (!result.ContainsKey(key))
                 {
                     result[key] = new DevTableMeta();
+                }
+            }
+
+            //პირველადი გასაღების სვეტების ჩატვირთვა — Adjust ალგორითმისთვის საჭიროა
+            const string pkQuery = """
+                                   SELECT s.name AS SchemaName, t.name AS TableName, c.name AS ColumnName,
+                                          ic.key_ordinal AS KeyOrdinal
+                                   FROM sys.indexes i
+                                   INNER JOIN sys.tables t ON i.object_id = t.object_id
+                                   INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
+                                   INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
+                                   INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
+                                   WHERE i.is_primary_key = 1
+                                   ORDER BY s.name, t.name, ic.key_ordinal
+                                   """;
+            // ReSharper disable once using
+            using (IDataReader pkReader = dbm.ExecuteReader(pkQuery))
+            {
+                while (pkReader.Read())
+                {
+                    string schema = (string)pkReader["SchemaName"];
+                    string table = (string)pkReader["TableName"];
+                    (string Schema, string Table) key = (schema, table);
+                    if (!result.TryGetValue(key, out DevTableMeta? meta))
+                    {
+                        continue;
+                    }
+
+                    string column = (string)pkReader["ColumnName"];
+                    meta.PrimaryKeyColumns.Add(column);
                 }
             }
 
