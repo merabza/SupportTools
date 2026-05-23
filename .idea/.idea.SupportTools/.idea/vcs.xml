@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../AppCliTools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../BackendCarcass" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../BackendCarcassShared" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ConnectionTools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../DatabaseTools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ParametersManagement" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../SystemTools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ToolsManagement" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../WebAgentContracts" vcs="Git" />
+  </component>
+</project>

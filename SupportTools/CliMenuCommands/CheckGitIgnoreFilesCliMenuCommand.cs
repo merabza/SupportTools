@@ -33,7 +33,7 @@ public sealed class CheckGitIgnoreFilesCliMenuCommand : CliMenuCommand
     {
         MenuAction = EMenuAction.Reload;
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(_logger, _parametersManager, true);
-        Dictionary<string, string> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
+        Dictionary<string, (string, string)> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         return wrongGitIgnoreFilesList.Count.ToString(CultureInfo.InvariantCulture);
     }

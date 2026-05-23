@@ -24,7 +24,7 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         var wrongGitignoreFilesListCreator = new WrongGitignoreFilesListCreator(Logger, _parametersManager, UseConsole);
-        Dictionary<string, string> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
+        Dictionary<string, (string, string)> wrongGitIgnoreFilesList = wrongGitignoreFilesListCreator.Create();
 
         if (wrongGitIgnoreFilesList.Count == 0)
         {
@@ -33,10 +33,17 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
         }
 
         Console.WriteLine("Update wrong .gitignore files");
-        foreach ((string gitignoreFileName, string gitignoreFileContent)in wrongGitIgnoreFilesList)
+        List<string> changedGitProjectsList = [];
+        foreach ((string gitignoreFileName, (string gitignoreFileContent, string gitProjectName)) in wrongGitIgnoreFilesList)
         {
+            if (changedGitProjectsList.Contains(gitProjectName))
+            {
+                continue;
+            }
+
             Console.WriteLine($"Update {gitignoreFileName}");
             await File.WriteAllTextAsync(gitignoreFileName, gitignoreFileContent, cancellationToken);
+            changedGitProjectsList.Add(gitProjectName);
         }
 
         return true;

@@ -26,7 +26,7 @@ public sealed class WrongGitignoreFilesListCreator
         _useConsole = useConsole;
     }
 
-    public Dictionary<string, string> Create()
+    public Dictionary<string, (string, string)> Create()
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
@@ -35,7 +35,7 @@ public sealed class WrongGitignoreFilesListCreator
         Dictionary<string, ProjectModel> projectsList = supportToolsParameters.Projects;
         var gitIgnoreTemplateFileContents = new Dictionary<string, string>();
         var missingGitIgnoreTemplateFiles = new Dictionary<string, string>();
-        var wrongGitIgnoreFilesList = new Dictionary<string, string>();
+        var wrongGitIgnoreFilesList = new Dictionary<string, (string, string)>();
 
         List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
@@ -104,12 +104,12 @@ public sealed class WrongGitignoreFilesListCreator
                         string gitignoreFileContent = File.ReadAllText(gitignoreFileName);
                         if (gitignoreFileContent != gitIgnoreTemplateFileContent)
                         {
-                            wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, gitIgnoreTemplateFileContent);
+                            wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, (gitIgnoreTemplateFileContent, gd.GitProjectName));
                         }
                     }
                     else
                     {
-                        wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, gitIgnoreTemplateFileContent);
+                        wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, (gitIgnoreTemplateFileContent, gd.GitProjectName));
                     }
                 }
             }

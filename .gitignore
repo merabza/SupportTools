@@ -1,5 +1,7 @@
 appsettingsEncoded.json
 */Properties/launchSettings.json
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
 
 bin/
 obj/
@@ -344,12 +346,6 @@ project.lock.json
 
 # Visual Studio Code
 .vscode
-
-# Claude Code
-.claude/
-
-# JetBrains Rider / IntelliJ
-.idea/
 
 # User-specific files
 *.suo
