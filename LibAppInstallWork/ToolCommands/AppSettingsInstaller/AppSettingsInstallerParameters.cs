@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using ParametersManagement.LibFileParameters.Models;
@@ -12,7 +13,7 @@ namespace LibAppInstallWork.ToolCommands.AppSettingsInstaller;
 public sealed class AppSettingsInstallerParameters : IParameters
 {
     private AppSettingsInstallerParameters(string projectName, ServerInfoModel serverInfo,
-        InstallerBaseParameters installerBaseParameters, string appSettingsEncodedJsonFileName,
+        InstallerBaseParameters installerBaseParameters, string appSettingsJsonFileName,
         FileStorageData fileStorageForUpload, FileStorageData fileStorageForDownload,
         ApiClientSettingsDomain webAgentForCheck, ProxySettingsBase proxySettings, string parametersFileDateMask,
         string parametersFileExtension)
@@ -20,7 +21,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
         ProjectName = projectName;
         ServerInfo = serverInfo;
         InstallerBaseParameters = installerBaseParameters;
-        AppSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
+        AppSettingsJsonFileName = appSettingsJsonFileName;
         FileStorageForUpload = fileStorageForUpload;
         FileStorageForDownload = fileStorageForDownload;
         WebAgentForCheck = webAgentForCheck;
@@ -32,7 +33,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
     public string ProjectName { get; }
     public ServerInfoModel ServerInfo { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
-    public string AppSettingsEncodedJsonFileName { get; }
+    public string AppSettingsJsonFileName { get; }
     public FileStorageData FileStorageForUpload { get; }
     public FileStorageData FileStorageForDownload { get; }
     public ApiClientSettingsDomain WebAgentForCheck { get; }
@@ -126,7 +127,10 @@ public sealed class AppSettingsInstallerParameters : IParameters
         }
 
         var appSettingsInstallerParameters = new AppSettingsInstallerParameters(projectName, serverInfo,
-            installerBaseParameters, serverInfo.AppSettingsEncodedJsonFileName, fileStorageForUpload,
+            installerBaseParameters,
+            serverInfo.AppSettingsEncodedJsonFileName is null
+                ? "appsettings.json"
+                : Path.GetFileName(serverInfo.AppSettingsEncodedJsonFileName), fileStorageForUpload,
             fileStorageForDownload, webAgentForCheck, proxySettings, parametersFileDateMask, parametersFileExtension);
         return appSettingsInstallerParameters;
     }

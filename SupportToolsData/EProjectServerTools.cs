@@ -21,6 +21,7 @@ public enum EProjectServerTools
     //-------------------------------------------------------------------------------
     //ეს ინსტრუმენტები გამოიყენება თითოეული პროექტისათვისა და თითოეული სერვერისათვის
     AppSettingsEncoder, //  EncodeParameters, //პარამეტრების დაშიფვრა
+    AppSettingsPreparer, //  PrepareParameters, //პარამეტრების მომზადება
 
     // EncodeParameters=>GenerateEncodedParametersFile=>UploadParametersToExchange
     AppSettingsInstaller, //  InstallParameters, //დაშიფრული პარამეტრების განახლება

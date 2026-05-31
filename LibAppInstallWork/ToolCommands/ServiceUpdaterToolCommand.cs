@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using AppCliTools.CliParameters;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolActions;
 using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using LibAppInstallWork.ToolCommands.ProgPublisher;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -60,27 +62,50 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             return false;
         }
 
+        var appSettingsFileName = "appsettings.json";
+
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         AppSettingsEncoderParameters appSettingsEncoderParameters =
             ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
+        AppSettingsPreparerParameters appSettingsPreparerParameters =
+            ProgramServiceUpdaterParameters.AppSettingsPreparerParameters;
         string? appSettingsVersion = null;
-        bool installParameters = !string.IsNullOrWhiteSpace(appSettingsEncoderParameters.AppSettingsJsonSourceFileName);
+        bool installParameters =
+            !string.IsNullOrWhiteSpace(appSettingsPreparerParameters.AppSettingsJsonSourceFileName);
         if (installParameters)
         {
-            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
-                appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
-                appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
-                appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
-                appSettingsEncoderParameters.KeyPart2, appSettingsEncoderParameters.ProjectName,
-                appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
-                appSettingsEncoderParameters.ParametersFileExtension,
-                appSettingsEncoderParameters.FileStorageForExchange, appSettingsEncoderParameters.ExchangeSmartSchema);
-            if (!await encodeParametersAndUploadAction.Run(cancellationToken))
+            if (appSettingsEncoderParameters is not null)
             {
-                return false;
-            }
+                var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
+                    appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
+                    appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
+                    appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
+                    appSettingsEncoderParameters.KeyPart2, appSettingsPreparerParameters.ProjectName,
+                    appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
+                    appSettingsPreparerParameters.ParametersFileExtension,
+                    appSettingsPreparerParameters.FileStorageForExchange,
+                    appSettingsPreparerParameters.ExchangeSmartSchema);
+                if (!await encodeParametersAndUploadAction.Run(cancellationToken))
+                {
+                    return false;
+                }
 
-            appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
+                appSettingsFileName = Path.GetFileName(appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
+                appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
+            }
+            else
+            {
+                var prepareParametersAndUploadAction = new PrepareParametersAndUploadAction(_logger,
+                    appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
+                    appSettingsPreparerParameters.ProjectName, appSettingsPreparerParameters.ServerInfo,
+                    appSettingsPreparerParameters.DateMask, appSettingsPreparerParameters.ParametersFileExtension,
+                    appSettingsPreparerParameters.FileStorageForExchange,
+                    appSettingsPreparerParameters.ExchangeSmartSchema);
+                if (!await prepareParametersAndUploadAction.Run(cancellationToken))
+                {
+                    return false;
+                }
+            }
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
@@ -91,8 +116,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             ProgramServiceUpdaterParameters.ParametersFileDateMask,
             ProgramServiceUpdaterParameters.ParametersFileExtension,
             ProgramServiceUpdaterParameters.FileStorageForDownload, projectName, environmentName,
-            ProgramServiceUpdaterParameters.ServiceUserName,
-            appSettingsEncoderParameters.AppSettingsEncodedJsonFileName,
+            ProgramServiceUpdaterParameters.ServiceUserName, appSettingsFileName,
             ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
             ProgramServiceUpdaterParameters.ProjectDescription, UseConsole);
         if (!await installProgramAction.Run(cancellationToken))

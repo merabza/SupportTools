@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -43,16 +44,19 @@ public class ProgramPublisherToolCommandFactoryStrategy(ILogger<ProgramPublisher
                 parametersManager));
         }
 
+        var appSettingsPreparerParameters =
+            AppSettingsPreparerParameters.Create(supportToolsParameters, projectName, serverInfo);
+
+        if (appSettingsPreparerParameters is null)
+        {
+            StShared.WriteErrorLine("appSettingsEncoderParametersForPublish does not created", true);
+            return new ValueTask<IToolCommand?>((IToolCommand?)null);
+        }
+
         var appSettingsEncoderParametersForPublish =
             AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
 
-        if (appSettingsEncoderParametersForPublish != null)
-        {
-            return new ValueTask<IToolCommand?>(new ServicePublisherToolCommand(logger, programPublisherParameters,
-                appSettingsEncoderParametersForPublish, parametersManager));
-        }
-
-        StShared.WriteErrorLine("appSettingsEncoderParametersForPublish does not created", true);
-        return new ValueTask<IToolCommand?>((IToolCommand?)null);
+        return new ValueTask<IToolCommand?>(new ServicePublisherToolCommand(logger, programPublisherParameters,
+            appSettingsPreparerParameters, appSettingsEncoderParametersForPublish, parametersManager));
     }
 }

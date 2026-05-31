@@ -17,16 +17,18 @@ namespace LibAppInstallWork.ToolCommands.AppSettingsUpdater;
 
 public sealed class AppSettingsUpdaterParameters : IParameters
 {
-    private AppSettingsUpdaterParameters(string projectName, string environmentName,
+    private AppSettingsUpdaterParameters(string projectName, ServerInfoModel serverInfo, string environmentName,
         InstallerBaseParameters installerBaseParameters, ProxySettingsBase proxySettings,
-        AppSettingsEncoderParameters appSettingsEncoderParameters, ApiClientSettingsDomain webAgentForCheck,
-        string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForUpload)
+        //AppSettingsEncoderParameters? appSettingsEncoderParameters, 
+        ApiClientSettingsDomain webAgentForCheck, string parametersFileDateMask, string parametersFileExtension,
+        FileStorageData fileStorageForUpload)
     {
         ProjectName = projectName;
+        ServerInfo = serverInfo;
         EnvironmentName = environmentName;
         InstallerBaseParameters = installerBaseParameters;
         ProxySettings = proxySettings;
-        AppSettingsEncoderParameters = appSettingsEncoderParameters;
+        //AppSettingsEncoderParameters = appSettingsEncoderParameters;
         WebAgentForCheck = webAgentForCheck;
         ParametersFileDateMask = parametersFileDateMask;
         ParametersFileExtension = parametersFileExtension;
@@ -34,11 +36,14 @@ public sealed class AppSettingsUpdaterParameters : IParameters
     }
 
     public string ProjectName { get; }
+    public ServerInfoModel ServerInfo { get; }
     public string EnvironmentName { get; }
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public ProxySettingsBase ProxySettings { get; }
+
     public ApiClientSettingsDomain WebAgentForCheck { get; }
-    public AppSettingsEncoderParameters AppSettingsEncoderParameters { get; }
+
+    //public AppSettingsEncoderParameters? AppSettingsEncoderParameters { get; }
     public string ParametersFileDateMask { get; }
     public string ParametersFileExtension { get; }
     public FileStorageData FileStorageForUpload { get; }
@@ -86,12 +91,12 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        var appSettingsEncoderParameters =
-            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
-        if (appSettingsEncoderParameters == null)
-        {
-            return null;
-        }
+        //var appSettingsEncoderParameters =
+        //    AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
+        //if (appSettingsEncoderParameters == null)
+        //{
+        //    return null;
+        //}
 
         string? parametersFileDateMask =
             project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
@@ -148,10 +153,9 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        var appSettingsUpdaterParameters = new AppSettingsUpdaterParameters(projectName, environmentName,
-            installerBaseParameters, proxySettings, appSettingsEncoderParameters,
-            checkVersionParameters.WebAgentForCheck, parametersFileDateMask, parametersFileExtension,
-            fileStorageForUpload);
+        var appSettingsUpdaterParameters = new AppSettingsUpdaterParameters(projectName, serverInfo, environmentName,
+            installerBaseParameters, proxySettings, checkVersionParameters.WebAgentForCheck, parametersFileDateMask,
+            parametersFileExtension, fileStorageForUpload);
         return appSettingsUpdaterParameters;
     }
 }

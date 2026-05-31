@@ -41,7 +41,7 @@ public sealed class EncodeParametersAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        EncodedJsonContent = CreateEncodedJson();
+        EncodedJsonContent = await CreateEncodedJson(cancellationToken);
         bool success = false;
         if (EncodedJsonContent != null)
         {
@@ -57,7 +57,7 @@ public sealed class EncodeParametersAction : ToolAction
         return success;
     }
 
-    private string? CreateEncodedJson()
+    private async Task<string?> CreateEncodedJson(CancellationToken cancellationToken = default)
     {
         //Get Whole json file and change only passed key with passed value.
         //It requires modification if you need to support change multi level json structure
@@ -88,36 +88,55 @@ public sealed class EncodeParametersAction : ToolAction
             return null;
         }
 
-        string appSetJson = File.ReadAllText(_sourceJsonFileName);
-        JObject appSetJObject = JObject.Parse(appSetJson);
-
-        //დავადგინოთ _appsetenParameters._sourceJsonFileName ფაილის ფოლდერის სახელი
-        string? directoryName = Path.GetDirectoryName(_sourceJsonFileName);
-
-        if (directoryName != null)
+        var prepareAppSettingsParametersAction = new PrepareAppSettingsParametersAction(_logger, _sourceJsonFileName);
+        if (!await prepareAppSettingsParametersAction.Run(cancellationToken))
         {
-            //დავადგინოთ ამ ფოლდერში არის თუ არა csproj ფაილი
-            var dir = new DirectoryInfo(directoryName);
-            FileInfo? csprojFile = dir.GetFiles().SingleOrDefault(w => Path.GetExtension(w.Name) == ".csproj");
+            _logger.LogError("Cannot prepare appSettings parameters");
+            return null;
+        }
 
-            //თუ არსებობს გავხსნათ ეს csproj ფაილი და წავიკითხოთ როგორც XLM 
-            if (csprojFile != null)
-            {
-                string? userSecretContentFileName = UserSecretFileNameDetector.GetFileName(csprojFile.FullName);
+        AppSettingsVersion = prepareAppSettingsParametersAction.AppSettingsVersion;
+        //EncodedJsonContent = prepareAppSettingsParametersAction.AppSettingsJsonContent;
+        var appSetJObject = prepareAppSettingsParametersAction.AppSetJObject;
 
-                if (userSecretContentFileName is not null && File.Exists(userSecretContentFileName))
-                {
-                    string secretJson = File.ReadAllText(userSecretContentFileName);
-                    JObject secretJObject = JObject.Parse(secretJson);
 
-                    // შევაერთოთ jsonObj ობიექტთან
-                    appSetJObject.Merge(secretJObject, new JsonMergeSettings
-                    {
-                        // union array values together to avoid duplicates
-                        MergeArrayHandling = MergeArrayHandling.Merge
-                    });
-                }
-            }
+
+        //string appSetJson = File.ReadAllText(_sourceJsonFileName);
+        //JObject appSetJObject = JObject.Parse(appSetJson);
+
+        ////დავადგინოთ _appsetenParameters._sourceJsonFileName ფაილის ფოლდერის სახელი
+        //string? directoryName = Path.GetDirectoryName(_sourceJsonFileName);
+
+        //if (directoryName != null)
+        //{
+        //    //დავადგინოთ ამ ფოლდერში არის თუ არა csproj ფაილი
+        //    var dir = new DirectoryInfo(directoryName);
+        //    FileInfo? csprojFile = dir.GetFiles().SingleOrDefault(w => Path.GetExtension(w.Name) == ".csproj");
+
+        //    //თუ არსებობს გავხსნათ ეს csproj ფაილი და წავიკითხოთ როგორც XLM 
+        //    if (csprojFile != null)
+        //    {
+        //        string? userSecretContentFileName = UserSecretFileNameDetector.GetFileName(csprojFile.FullName);
+
+        //        if (userSecretContentFileName is not null && File.Exists(userSecretContentFileName))
+        //        {
+        //            string secretJson = File.ReadAllText(userSecretContentFileName);
+        //            JObject secretJObject = JObject.Parse(secretJson);
+
+        //            // შევაერთოთ jsonObj ობიექტთან
+        //            appSetJObject.Merge(secretJObject, new JsonMergeSettings
+        //            {
+        //                // union array values together to avoid duplicates
+        //                MergeArrayHandling = MergeArrayHandling.Merge
+        //            });
+        //        }
+        //    }
+        //}
+
+        if ( appSetJObject is null)
+        {
+            _logger.LogError("appSettings json content is not prepared");
+            return null;
         }
 
         foreach (string dataKey in appSetEnKeysList.Keys.Select(dataKey => new { dataKey, keys = dataKey.Split(":") })
@@ -127,16 +146,16 @@ public sealed class EncodeParametersAction : ToolAction
             _logger.LogWarning("cannot found dataKey {DataKey}", dataKey);
         }
 
-        AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
+        //AppSettingsVersion = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
-        if (string.IsNullOrWhiteSpace(appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Value<string>()))
-        {
-            StShared.WriteWarningLine(
-                $"AppSettingsVersion did not defined. If you continue, we can not check installed AppSettingsVersion. Please add to {_sourceJsonFileName} file VersionInfo:AppSettingsVersion",
-                true, _logger, true);
-        }
+        //if (string.IsNullOrWhiteSpace(appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Value<string>()))
+        //{
+        //    StShared.WriteWarningLine(
+        //        $"AppSettingsVersion did not defined. If you continue, we can not check installed AppSettingsVersion. Please add to {_sourceJsonFileName} file VersionInfo:AppSettingsVersion",
+        //        true, _logger, true);
+        //}
 
-        appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
+        //appSetJObject["VersionInfo"]?["AppSettingsVersion"]?.Replace(AppSettingsVersion);
         return JsonConvert.SerializeObject(appSetJObject, Formatting.Indented);
     }
 

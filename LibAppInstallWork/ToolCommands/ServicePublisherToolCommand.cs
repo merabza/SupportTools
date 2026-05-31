@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using LibAppInstallWork.ToolActions;
 using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using LibAppInstallWork.ToolCommands.ProgPublisher;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -17,14 +18,16 @@ public sealed class ServicePublisherToolCommand : ToolCommand
 {
     private const string ActionName = "Publishing Service";
     private const string ActionDescription = "Publishing Service";
-    private readonly AppSettingsEncoderParameters _appSettingsEncoderParameters;
+    private readonly AppSettingsEncoderParameters? _appSettingsEncoderParameters;
     private readonly ILogger _logger;
+    private readonly AppSettingsPreparerParameters _appSettingsPreparerParameters;
 
-    public ServicePublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,
-        AppSettingsEncoderParameters appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
+    public ServicePublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,AppSettingsPreparerParameters appSettingsPreparerParameters,
+        AppSettingsEncoderParameters? appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
         _logger = logger;
+        _appSettingsPreparerParameters = appSettingsPreparerParameters;
         _appSettingsEncoderParameters = appSettingsEncoderParametersForPublish;
     }
 
@@ -44,17 +47,28 @@ public sealed class ServicePublisherToolCommand : ToolCommand
             return false;
         }
 
-        //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
-        //AppSettingsEncoderParameters appSettingsEncoderParameters =
-        //    ProgramPublisherParameters.AppSettingsEncoderParameters;
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
-            _appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
-            _appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
-            _appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, _appSettingsEncoderParameters.KeyPart1,
-            _appSettingsEncoderParameters.KeyPart2, ProgramPublisherParameters.ProjectName,
-            ProgramPublisherParameters.ServerInfo, ProgramPublisherParameters.DateMask,
-            _appSettingsEncoderParameters.ParametersFileExtension, ProgramPublisherParameters.FileStorageForExchange,
-            ProgramPublisherParameters.SmartSchemaForExchange);
-        return await encodeParametersAndUploadAction.Run(cancellationToken);
+        if (_appSettingsEncoderParameters is not null)
+        {
+            //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
+            //AppSettingsEncoderParameters appSettingsEncoderParameters =
+            //    ProgramPublisherParameters.AppSettingsEncoderParameters;
+            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
+                _appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
+                _appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
+                _appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, _appSettingsEncoderParameters.KeyPart1,
+                _appSettingsEncoderParameters.KeyPart2, ProgramPublisherParameters.ProjectName,
+                ProgramPublisherParameters.ServerInfo, ProgramPublisherParameters.DateMask,
+                _appSettingsPreparerParameters.ParametersFileExtension,
+                ProgramPublisherParameters.FileStorageForExchange, ProgramPublisherParameters.SmartSchemaForExchange);
+            return await encodeParametersAndUploadAction.Run(cancellationToken);
+        }
+
+        var prepareParametersAndUploadAction = new PrepareParametersAndUploadAction(_logger,
+            _appSettingsPreparerParameters.AppSettingsJsonSourceFileName, _appSettingsPreparerParameters.ProjectName,
+            _appSettingsPreparerParameters.ServerInfo, _appSettingsPreparerParameters.DateMask,
+            _appSettingsPreparerParameters.ParametersFileExtension,
+            _appSettingsPreparerParameters.FileStorageForExchange,
+            _appSettingsPreparerParameters.ExchangeSmartSchema);
+        return await prepareParametersAndUploadAction.Run(cancellationToken);
     }
 }

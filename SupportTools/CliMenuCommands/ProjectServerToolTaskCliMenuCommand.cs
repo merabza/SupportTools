@@ -31,13 +31,14 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
 
     private async ValueTask<IToolCommand> MemoCreateToolCommand()
     {
-        return _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_tool, _serviceProvider,
+        _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_tool, _serviceProvider,
             _parametersManager, _projectName, _serverInfo);
+        return _toolCommand;
     }
 
     protected override async ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
-        return (await MemoCreateToolCommand()).Description;
+        return (await MemoCreateToolCommand())?.Description;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)

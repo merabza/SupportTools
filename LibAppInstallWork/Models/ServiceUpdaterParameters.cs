@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using LibAppInstallWork.ToolCommands.ProgPublisher;
 using LibAppInstallWork.ToolCommands.ServiceStarter;
 using LibAppInstallWork.ToolCommands.VersionChecker;
@@ -16,16 +17,17 @@ public sealed class ServiceUpdaterParameters : IParameters
 {
     private ServiceUpdaterParameters(string serviceUserName, InstallerBaseParameters installerBaseParameters,
         ProgramPublisherParameters progPublisherParameters, CheckVersionParameters checkVersionParameters,
-        ProxySettingsBase proxySettings, AppSettingsEncoderParameters appSettingsEncoderParameters,
-        string programArchiveDateMask, string programArchiveExtension, string parametersFileDateMask,
-        string parametersFileExtension, FileStorageData fileStorageForDownload, string? serviceDescriptionSignature,
-        string? projectDescription)
+        ProxySettingsBase proxySettings, AppSettingsPreparerParameters appSettingsPreparerParameters,
+        AppSettingsEncoderParameters? appSettingsEncoderParameters, string programArchiveDateMask,
+        string programArchiveExtension, string parametersFileDateMask, string parametersFileExtension,
+        FileStorageData fileStorageForDownload, string? serviceDescriptionSignature, string? projectDescription)
     {
         ServiceUserName = serviceUserName;
         InstallerBaseParameters = installerBaseParameters;
         ProgramPublisherParameters = progPublisherParameters;
         CheckVersionParameters = checkVersionParameters;
         ProxySettings = proxySettings;
+        AppSettingsPreparerParameters = appSettingsPreparerParameters;
         AppSettingsEncoderParameters = appSettingsEncoderParameters;
         ProgramArchiveDateMask = programArchiveDateMask;
         ProgramArchiveExtension = programArchiveExtension;
@@ -41,7 +43,8 @@ public sealed class ServiceUpdaterParameters : IParameters
     public InstallerBaseParameters InstallerBaseParameters { get; }
     public CheckVersionParameters CheckVersionParameters { get; }
     public ProxySettingsBase ProxySettings { get; }
-    public AppSettingsEncoderParameters AppSettingsEncoderParameters { get; }
+    public AppSettingsPreparerParameters AppSettingsPreparerParameters { get; }
+    public AppSettingsEncoderParameters? AppSettingsEncoderParameters { get; }
     public FileStorageData FileStorageForDownload { get; }
     public string ProgramArchiveDateMask { get; }
     public string ProgramArchiveExtension { get; }
@@ -87,12 +90,15 @@ public sealed class ServiceUpdaterParameters : IParameters
             return null;
         }
 
-        var appSettingsEncoderParameters =
-            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
-        if (appSettingsEncoderParameters == null)
+        var appSettingsPreparerParameters =
+            AppSettingsPreparerParameters.Create(supportToolsParameters, projectName, serverInfo);
+        if (appSettingsPreparerParameters == null)
         {
             return null;
         }
+
+        var appSettingsEncoderParameters =
+            AppSettingsEncoderParameters.Create(supportToolsParameters, projectName, serverInfo);
 
         if (string.IsNullOrWhiteSpace(serverInfo.ServiceUserName))
         {
@@ -163,9 +169,9 @@ public sealed class ServiceUpdaterParameters : IParameters
 
         var programServiceUpdaterParameters = new ServiceUpdaterParameters(serverInfo.ServiceUserName,
             installerBaseParameters, progPublisherParameters, checkVersionParameters, proxySettings,
-            appSettingsEncoderParameters, programArchiveDateMask, programArchiveExtension, parametersFileDateMask,
-            parametersFileExtension, fileStorageForUpload, supportToolsParameters.ServiceDescriptionSignature,
-            project.ProjectDescription);
+            appSettingsPreparerParameters, appSettingsEncoderParameters, programArchiveDateMask,
+            programArchiveExtension, parametersFileDateMask, parametersFileExtension, fileStorageForUpload,
+            supportToolsParameters.ServiceDescriptionSignature, project.ProjectDescription);
         return programServiceUpdaterParameters;
     }
 }

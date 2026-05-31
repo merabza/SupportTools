@@ -17,7 +17,7 @@ namespace LibAppInstallWork.ToolActions;
 public sealed class InstallParametersAction : ToolAction
 {
     private readonly string _appName;
-    private readonly string _appSettingsEncodedJsonFileName;
+    private readonly string _appSettingsJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForUpload;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -30,7 +30,7 @@ public sealed class InstallParametersAction : ToolAction
     public InstallParametersAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         string parametersFileDateMask, string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
         FileStorageData fileStorageForUpload, string projectName, string environmentName,
-        string appSettingsEncodedJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null,
+        string appSettingsJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null,
         useConsole)
     {
         _appName = appName;
@@ -42,7 +42,7 @@ public sealed class InstallParametersAction : ToolAction
         _fileStorageForUpload = fileStorageForUpload;
         _projectName = projectName;
         _environmentName = environmentName;
-        _appSettingsEncodedJsonFileName = appSettingsEncodedJsonFileName;
+        _appSettingsJsonFileName = appSettingsJsonFileName;
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -64,10 +64,10 @@ public sealed class InstallParametersAction : ToolAction
                 "Updating app settings for project {_projectName}/{_environmentName} by web agent...", _projectName,
                 _environmentName);
         }
-        //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
 
+        //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
         Option<Error[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
-            _environmentName, Path.GetFileName(_appSettingsEncodedJsonFileName), _parametersFileDateMask,
+            _environmentName, _appSettingsJsonFileName, _parametersFileDateMask,
             _parametersFileExtension, cancellationToken);
 
         if (updateAppParametersFileResult.IsNone)

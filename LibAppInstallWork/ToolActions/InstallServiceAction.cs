@@ -17,7 +17,7 @@ namespace LibAppInstallWork.ToolActions;
 public sealed class InstallServiceAction : ToolAction
 {
     private readonly string _appName;
-    private readonly string _encodedJsonFileName;
+    private readonly string _appSettingsJsonFileName;
     private readonly string _environmentName;
     private readonly FileStorageData _fileStorageForDownload;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -35,7 +35,7 @@ public sealed class InstallServiceAction : ToolAction
     public InstallServiceAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
-        string projectName, string environmentName, string serviceUserName, string encodedJsonFileName,
+        string projectName, string environmentName, string serviceUserName, string appSettingsJsonFileName,
         string? serviceDescriptionSignature, string? projectDescription, bool useConsole) : base(logger,
         "Install service", null, null, useConsole)
     {
@@ -51,7 +51,7 @@ public sealed class InstallServiceAction : ToolAction
         _projectName = projectName;
         _environmentName = environmentName;
         _serviceUserName = serviceUserName;
-        _encodedJsonFileName = encodedJsonFileName;
+        _appSettingsJsonFileName = appSettingsJsonFileName;
         _serviceDescriptionSignature = serviceDescriptionSignature;
         _projectDescription = projectDescription;
     }
@@ -80,7 +80,7 @@ public sealed class InstallServiceAction : ToolAction
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
         OneOf<string, Error[]> installServiceResult = await projectManager.InstallService(_projectName,
-            _environmentName, _serviceUserName, Path.GetFileName(_encodedJsonFileName), _programArchiveDateMask,
+            _environmentName, _serviceUserName, Path.GetFileName(_appSettingsJsonFileName), _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature,
             _projectDescription, cancellationToken);
 

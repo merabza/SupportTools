@@ -1,0 +1,106 @@
+﻿using ParametersManagement.LibFileParameters.Models;
+using ParametersManagement.LibParameters;
+using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
+
+namespace LibAppInstallWork.ToolCommands.AppSettingsPreparer;
+
+public sealed class AppSettingsPreparerParameters : IParameters
+{
+    private AppSettingsPreparerParameters(string appSettingsJsonSourceFileName, string projectName,
+        ServerInfoModel serverInfo, string dateMask, string parametersFileExtension,
+        FileStorageData fileStorageForExchange, SmartSchema exchangeSmartSchema)
+    {
+        AppSettingsJsonSourceFileName = appSettingsJsonSourceFileName;
+        ProjectName = projectName;
+        ServerInfo = serverInfo;
+        DateMask = dateMask;
+        ParametersFileExtension = parametersFileExtension;
+        FileStorageForExchange = fileStorageForExchange;
+        ExchangeSmartSchema = exchangeSmartSchema;
+    }
+
+    public string AppSettingsJsonSourceFileName { get; }
+    public string ProjectName { get; }
+    public ServerInfoModel ServerInfo { get; }
+    public string DateMask { get; }
+    public string ParametersFileExtension { get; }
+    public FileStorageData FileStorageForExchange { get; }
+    public SmartSchema ExchangeSmartSchema { get; }
+
+    public bool CheckBeforeSave()
+    {
+        return true;
+    }
+
+    public static AppSettingsPreparerParameters? Create(SupportToolsParameters supportToolsParameters,
+        string projectName, ServerInfoModel serverInfo)
+    {
+        ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
+
+        if (!project.IsService)
+        {
+            StShared.WriteErrorLine($"Project {projectName} is not service", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.ServerName))
+        {
+            StShared.WriteErrorLine("Server name is not specified", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.EnvironmentName))
+        {
+            StShared.WriteErrorLine("Environment Name is not specified", true);
+            return null;
+        }
+
+        string? publisherDateMask = project.ParametersFileDateMask ?? supportToolsParameters.ParametersFileDateMask;
+        if (string.IsNullOrWhiteSpace(publisherDateMask))
+        {
+            StShared.WriteErrorLine("PublisherDateMask does not specified in support tools parameters", true);
+            return null;
+        }
+
+        string? parametersFileExtension =
+            project.ParametersFileExtension ?? supportToolsParameters.ParametersFileExtension;
+        if (string.IsNullOrWhiteSpace(parametersFileExtension))
+        {
+            StShared.WriteErrorLine("parametersFileExtension does not specified in support tools parameters", true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(serverInfo.AppSettingsJsonSourceFileName))
+        {
+            StShared.WriteErrorLine(
+                $"AppSettingsJsonSourceFileName does not specified for server {serverInfo.GetItemKey()} and project {projectName}",
+                true);
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(supportToolsParameters.SmartSchemaNameForExchange))
+        {
+            StShared.WriteErrorLine($"SmartSchemaNameForLocal does not specified for Project {projectName}", true);
+            return null;
+        }
+
+        SmartSchema smartSchemaForExchange =
+            supportToolsParameters.GetSmartSchemaRequired(supportToolsParameters.SmartSchemaNameForExchange);
+
+        if (string.IsNullOrWhiteSpace(supportToolsParameters.FileStorageNameForExchange))
+        {
+            StShared.WriteErrorLine($"FileStorageNameForExchange does not specified for Project {projectName}", true);
+            return null;
+        }
+
+        FileStorageData fileStorageForUpload =
+            supportToolsParameters.GetFileStorageRequired(supportToolsParameters.FileStorageNameForExchange);
+
+        var appSettingsPreparerParameters = new AppSettingsPreparerParameters(serverInfo.AppSettingsJsonSourceFileName,
+            projectName, serverInfo, publisherDateMask, parametersFileExtension, fileStorageForUpload,
+            smartSchemaForExchange);
+
+        return appSettingsPreparerParameters;
+    }
+}

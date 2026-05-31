@@ -1,13 +1,17 @@
 //Created by ProjectMainClassCreator at 1/11/2021 20:04:36
 
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using LibAppInstallWork.ToolActions;
 using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -23,6 +27,7 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
     private readonly string _appName;
 
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IParametersManager _parametersManager;
     private readonly ILogger _logger;
 
     public AppSettingsUpdaterToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
@@ -32,29 +37,65 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
         _appName = appName;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _parametersManager = parametersManager;
     }
 
     private AppSettingsUpdaterParameters AppSettingsUpdaterParameters => (AppSettingsUpdaterParameters)Par;
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+
+        AppSettingsPreparerParameters appSettingsPreparerParameters =
+            AppSettingsPreparerParameters.Create(supportToolsParameters, AppSettingsUpdaterParameters.ProjectName,
+                AppSettingsUpdaterParameters.ServerInfo);
+
+        var appSettingsFileName = "appsettings.json";
+
+        if (appSettingsPreparerParameters is null)
+        {
+            StShared.WriteErrorLine($"AppSettingsPreparerParameters can not be prepared for Project {AppSettingsUpdaterParameters.ProjectName}", true, _logger);
+            return false;
+        }
+
         AppSettingsEncoderParameters appSettingsEncoderParameters =
-            AppSettingsUpdaterParameters.AppSettingsEncoderParameters;
+            AppSettingsEncoderParameters.Create(supportToolsParameters, AppSettingsUpdaterParameters.ProjectName,
+                AppSettingsUpdaterParameters.ServerInfo);
 
-        //1. დავამზადოთ პარამეტრების ფაილი დაშიფრული და ავტვირთოთ ფაილსაცავში პარამეტრების ფაილის შიგთავსი.
-        var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
-            appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
-            appSettingsEncoderParameters.AppSettingsJsonSourceFileName,
-            appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
-            appSettingsEncoderParameters.KeyPart2, appSettingsEncoderParameters.ProjectName,
-            appSettingsEncoderParameters.ServerInfo, appSettingsEncoderParameters.DateMask,
-            appSettingsEncoderParameters.ParametersFileExtension, appSettingsEncoderParameters.FileStorageForExchange,
-            appSettingsEncoderParameters.ExchangeSmartSchema);
-        bool result = await encodeParametersAndUploadAction.Run(cancellationToken);
-        string? encodedJson = encodeParametersAndUploadAction.EncodedJsonContent;
-        string? checkForVersion = encodeParametersAndUploadAction.AppSettingsVersion;
+        string? checkForVersion;
+        string? appSettingsContent;
+        bool result;
+        if (appSettingsEncoderParameters != null)
+        {
+            //1. დავამზადოთ პარამეტრების ფაილი დაშიფრული და ავტვირთოთ ფაილსაცავში პარამეტრების ფაილის შიგთავსი.
+            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
+                appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
+                appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
+                appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
+                appSettingsEncoderParameters.KeyPart2, appSettingsPreparerParameters.ProjectName,
+                appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
+                appSettingsPreparerParameters.ParametersFileExtension,
+                appSettingsPreparerParameters.FileStorageForExchange, appSettingsPreparerParameters.ExchangeSmartSchema);
+            result = await encodeParametersAndUploadAction.Run(cancellationToken);
 
-        if (!result || string.IsNullOrWhiteSpace(encodedJson) || string.IsNullOrWhiteSpace(checkForVersion))
+            appSettingsFileName = Path.GetFileName(appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
+            appSettingsContent = encodeParametersAndUploadAction.EncodedJsonContent;
+            checkForVersion = encodeParametersAndUploadAction.AppSettingsVersion;
+        }
+        else
+        {
+            var prepareParametersAndUploadAction = new PrepareParametersAndUploadAction(_logger,
+                appSettingsPreparerParameters.AppSettingsJsonSourceFileName, appSettingsPreparerParameters.ProjectName,
+                appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
+                appSettingsPreparerParameters.ParametersFileExtension,
+                appSettingsPreparerParameters.FileStorageForExchange,
+                appSettingsPreparerParameters.ExchangeSmartSchema);
+            result = await prepareParametersAndUploadAction.Run(cancellationToken);
+            appSettingsContent = prepareParametersAndUploadAction.PreparedJsonContent;
+            checkForVersion = prepareParametersAndUploadAction.AppSettingsVersion;
+        }
+
+        if (!result || string.IsNullOrWhiteSpace(appSettingsContent) || string.IsNullOrWhiteSpace(checkForVersion))
         {
             _logger.LogError("Cannot encode parameters");
             return false;
@@ -65,7 +106,7 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
             AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
-            AppSettingsUpdaterParameters.AppSettingsEncoderParameters.AppSettingsEncodedJsonFileName, UseConsole);
+            appSettingsFileName, UseConsole);
         string projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!await installParametersAction.Run(cancellationToken))
         {
