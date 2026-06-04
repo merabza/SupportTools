@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
 using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -7,12 +8,13 @@ using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
-namespace LibAppInstallWork.ToolCommands.AppSettingsEncoder;
+namespace LibAppInstallWork.ToolCommands.ServiceInstallScriptCreator;
 
-public class ApplicationSettingsEncoderToolCommandFactoryStrategy(
-    ILogger<ApplicationSettingsEncoderToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
+// ReSharper disable once UnusedType.Global
+public class ServiceInstallScriptCreatorToolCommandFactoryStrategy(
+    ILogger<ServiceInstallScriptCreatorToolCommandFactoryStrategy> logger) : IToolCommandFactoryStrategy
 {
-    public string ToolCommandName => nameof(EProjectServerTools.AppSettingsEncoder);
+    public string ToolCommandName => nameof(EProjectServerTools.ServiceInstallScriptCreator);
 
     public ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         IFactoryStrategyParameters factoryStrategyParameters, CancellationToken cancellationToken = default)
@@ -22,12 +24,12 @@ public class ApplicationSettingsEncoderToolCommandFactoryStrategy(
 
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        var appSettingsPreparerParameters = AppSettingsPreparerParameters.Create(supportToolsParameters,
+        var serviceInstallScriptCreatorParameters = ServiceInstallScriptCreatorParameters.Create(supportToolsParameters,
             projectToolsFactoryStrategyParameters.ProjectName, projectToolsFactoryStrategyParameters.ServerInfo);
 
-        if (appSettingsPreparerParameters is null)
+        if (serviceInstallScriptCreatorParameters is null)
         {
-            StShared.WriteErrorLine("appSettingsPreparerParameters is null", true);
+            StShared.WriteErrorLine("serviceInstallScriptCreatorParameters is null", true);
             return new ValueTask<IToolCommand?>((IToolCommand?)null);
         }
 
@@ -35,8 +37,8 @@ public class ApplicationSettingsEncoderToolCommandFactoryStrategy(
             projectToolsFactoryStrategyParameters.ProjectName, projectToolsFactoryStrategyParameters.ServerInfo);
         if (appSettingsEncoderParameters is not null)
         {
-            return ValueTask.FromResult<IToolCommand?>(new ApplicationSettingsEncoderToolCommand(logger,
-                appSettingsPreparerParameters, appSettingsEncoderParameters, parametersManager));
+            return ValueTask.FromResult<IToolCommand?>(new ServiceInstallScriptCreatorToolCommand(logger,
+                serviceInstallScriptCreatorParameters, parametersManager));
         }
 
         StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
