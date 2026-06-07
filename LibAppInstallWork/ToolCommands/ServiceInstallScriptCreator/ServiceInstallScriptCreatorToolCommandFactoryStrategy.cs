@@ -1,7 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using LibAppInstallWork.ToolCommands.AppSettingsEncoder;
-using LibAppInstallWork.ToolCommands.AppSettingsPreparer;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -33,15 +31,15 @@ public class ServiceInstallScriptCreatorToolCommandFactoryStrategy(
             return new ValueTask<IToolCommand?>((IToolCommand?)null);
         }
 
-        var appSettingsEncoderParameters = AppSettingsEncoderParameters.Create(supportToolsParameters,
-            projectToolsFactoryStrategyParameters.ProjectName, projectToolsFactoryStrategyParameters.ServerInfo);
-        if (appSettingsEncoderParameters is not null)
-        {
-            return ValueTask.FromResult<IToolCommand?>(new ServiceInstallScriptCreatorToolCommand(logger,
-                serviceInstallScriptCreatorParameters, parametersManager));
-        }
+        //var appSettingsEncoderParameters = AppSettingsEncoderParameters.Create(supportToolsParameters,
+        //    projectToolsFactoryStrategyParameters.ProjectName, projectToolsFactoryStrategyParameters.ServerInfo);
+        //if (appSettingsEncoderParameters is not null)
+        //{
+        return ValueTask.FromResult<IToolCommand?>(new ServiceInstallScriptCreatorToolCommand(logger,
+            serviceInstallScriptCreatorParameters, parametersManager));
+        //}
 
-        StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
-        return new ValueTask<IToolCommand?>((IToolCommand?)null);
+        //StShared.WriteErrorLine("appSettingsEncoderParameters is null", true);
+        //return new ValueTask<IToolCommand?>((IToolCommand?)null);
     }
 }

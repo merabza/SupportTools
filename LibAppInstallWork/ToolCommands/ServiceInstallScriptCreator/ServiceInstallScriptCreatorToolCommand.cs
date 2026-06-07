@@ -109,13 +109,13 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName))
-        {
-            StShared.WriteErrorLine(
-                $"App Settings Encoded Json File Name is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
-                true);
-            return false;
-        }
+        //if (string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName))
+        //{
+        //    StShared.WriteErrorLine(
+        //        $"App Settings Encoded Json File Name is not specified for server {_par.ServerInfo.GetItemKey()} and project {_par.ProjectName}",
+        //        true);
+        //    return false;
+        //}
 
         string? securityFolder = _par.SecurityFolder;
         string? defCloneFile = null;
@@ -169,7 +169,17 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var sf = new FileInfo(_par.ServerInfo.AppSettingsEncodedJsonFileName);
+        var settingsFileFullName = string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName)
+            ? _par.ServerInfo.AppSettingsJsonSourceFileName
+            : _par.ServerInfo.AppSettingsEncodedJsonFileName;
+
+        if (string.IsNullOrWhiteSpace(settingsFileFullName))
+        {
+            StShared.WriteErrorLine($"Settings file is not specified for server {_par.ServerInfo.ServerName}", true);
+            return false;
+        }
+
+        var sf = new FileInfo(settingsFileFullName);
 
         var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave,
             _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
