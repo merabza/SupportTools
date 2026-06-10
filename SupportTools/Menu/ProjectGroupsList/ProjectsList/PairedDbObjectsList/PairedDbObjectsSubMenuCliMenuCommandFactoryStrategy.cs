@@ -6,7 +6,7 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy(
-    ILogger<PairedDbObjectsSubMenuCliMenuCommand> logger,
+    ILogger<PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy> logger,
     IParametersManager parametersManager,
     SupportToolsMenuParameters menuParameters) : IMenuCommandFactoryStrategy
 {
