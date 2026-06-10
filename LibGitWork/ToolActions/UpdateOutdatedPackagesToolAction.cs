@@ -78,7 +78,13 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                     _parametersManager, null, projectName, true, $"{useMessage} Prepare");
                 await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
 
+                if (kvp.Value.Count == 0)
+                {
+                    continue;
+                }
+
                 string gitProjectName = kvp.Value[0];
+
                 var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
                     gitCol, gitProjectName, true);
                 packageUpdaterToolAction?.RunPackageUpdate();
