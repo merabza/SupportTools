@@ -75,14 +75,15 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
 
         //FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
         FieldEditors.Add(new DictionaryFieldEditor<EndpointCruder, EndpointModel>(nameof(ProjectModel.Endpoints),
-            parametersManager));
+            x => new EndpointCruder(parametersManager, x)));
 
         //FieldEditors.Add(new RouteClassesFieldEditor(nameof(ProjectModel.RouteClasses), parametersManager));
         FieldEditors.Add(new DictionaryFieldEditor<RouteClassCruder, RouteClassModel>(
-            nameof(ProjectModel.RouteClasses), parametersManager));
+            nameof(ProjectModel.RouteClasses), x => new RouteClassCruder(parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesListFieldEditor<ProjectNpmPackagesLisCruder>(
-            nameof(ProjectModel.FrontNpmPackageNames), logger, httpClientFactory, parametersManager));
+            nameof(ProjectModel.FrontNpmPackageNames),
+            x => new ProjectNpmPackagesLisCruder(logger, httpClientFactory, parametersManager, x)));
     }
 
     public static ProjectCruder Create(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
