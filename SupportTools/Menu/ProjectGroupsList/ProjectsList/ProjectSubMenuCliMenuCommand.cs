@@ -5,6 +5,7 @@ using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -47,5 +48,29 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         return CliMenuSetFactory.CreateMenuSet(_projectName,
             MenuData.ProjectSubMenuCommandFactoryStrategyNames
                 .Where(menuCommandName => !excludeList.Contains(menuCommandName)).ToList(), _serviceProvider);
+    }
+
+    protected override string? GetStatus()
+    {
+        //სტატუსი ჩანს მხოლოდ მაშინ, თუ ეს პროექტი უკვე შემოწმდა
+        return GetProjectStatus()?.ToString();
+    }
+
+    protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
+    {
+        EProjectBuildCheckStatus? status = GetProjectStatus();
+        if (status is null)
+        {
+            return null;
+        }
+
+        return [new StatusColorPart(status.Value.ToString(), ProjectBuildCheckStatusView.GetColor(status))];
+    }
+
+    private EProjectBuildCheckStatus? GetProjectStatus()
+    {
+        return _menuParameters.ProjectBuildCheckStatuses.TryGetValue(_projectName, out EProjectBuildCheckStatus status)
+            ? status
+            : null;
     }
 }

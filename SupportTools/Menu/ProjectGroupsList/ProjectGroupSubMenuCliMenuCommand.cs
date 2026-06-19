@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 
 namespace SupportTools.Menu.ProjectGroupsList;
@@ -34,10 +36,61 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
     protected override string GetStatus()
     {
-        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        List<string> projectNames = GetGroupProjectNames();
 
-        return parameters.Projects.Count(x =>
-                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
-            .ToString(CultureInfo.InvariantCulture);
+        //სანამ ამ ჯგუფის არცერთი პროექტი არ შემოწმებულა, ისე ვტოვებთ, როგორც აქამდე იყო - მხოლოდ რაოდენობა
+        if (!projectNames.Any(IsProjectChecked))
+        {
+            return projectNames.Count.ToString(CultureInfo.InvariantCulture);
+        }
+
+        //ჯგუფში შემავალი პროექტების სტატუსები და მათი რაოდენობები
+        return string.Join(", ", BuildBreakdown(projectNames).Select(b =>
+            $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}"));
+    }
+
+    protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
+    {
+        List<string> projectNames = GetGroupProjectNames();
+
+        //სანამ ამ ჯგუფის არცერთი პროექტი არ შემოწმებულა, ფერადი სტატუსები არ გვინდა (რჩება ჩვეულებრივი რაოდენობა)
+        if (!projectNames.Any(IsProjectChecked))
+        {
+            return null;
+        }
+
+        return BuildBreakdown(projectNames).Select(b => new StatusColorPart(
+                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
+                ProjectBuildCheckStatusView.GetColor(b.Status)))
+            .ToList();
+    }
+
+    private List<string> GetGroupProjectNames()
+    {
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        return parameters.Projects
+            .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+            .Select(x => x.Key).ToList();
+    }
+
+    private List<(EProjectBuildCheckStatus? Status, int Count)> BuildBreakdown(IEnumerable<string> projectNames)
+    {
+        return projectNames
+            .GroupBy(GetProjectStatus)
+            .OrderBy(g => g.Key)
+            .Select(g => (g.Key, g.Count()))
+            .ToList();
+    }
+
+    private bool IsProjectChecked(string projectName)
+    {
+        return _menuParameters.ProjectBuildCheckStatuses.ContainsKey(projectName);
+    }
+
+    private EProjectBuildCheckStatus? GetProjectStatus(string projectName)
+    {
+        return _menuParameters.ProjectBuildCheckStatuses.TryGetValue(projectName, out EProjectBuildCheckStatus status)
+            ? status
+            : null;
     }
 }

@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using AppCliTools.CliTools.Menu.RecentCommandsList;
+using SupportTools.Menu.CheckAllProjectsBuild;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
+using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
 using SupportTools.Menu.CreateProject;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
@@ -47,6 +50,8 @@ public static class MenuData
         nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy),
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
         nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
+        //ყველა პროექტის build-ის შემოწმება
+        nameof(CheckAllProjectsBuildCliMenuCommandFactoryStrategy),
         //პროექტების ჯგუფების ჩამონათვალი
         nameof(ProjectGroupsListFactoryStrategy),
         //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
@@ -57,6 +62,8 @@ public static class MenuData
     [
         //ჯგუფში შემავალი ყველა პროჯეცტის გიტების სინქრონიზაცია
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
+        //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
+        nameof(CheckGroupProjectsBuildCliMenuCommandFactoryStrategy),
         //პროექტების ჩამონავთვალი
         nameof(ProjectsListFactoryStrategy)
     ];
@@ -69,6 +76,8 @@ public static class MenuData
         nameof(ExportProjectCliMenuCommandFactoryStrategy),
         //პროექტის Visual Studio-ში გახსნა
         nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy),
+        //პროექტის build-ის შემოწმება
+        nameof(CheckOneProjectBuildCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
         nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა

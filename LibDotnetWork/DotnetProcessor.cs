@@ -103,6 +103,12 @@ public sealed class DotnetProcessor
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
     }
 
+    //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს
+    public Option<Error[]> Build(string solutionFileName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"build {solutionFileName}", null, false);
+    }
+
     public Option<Error[]> EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
         string prodCopyDatabaseConnectionString, string providerPackageName,
         string createProjectSeederCodeProjectFileFullName, string dbScContextName,
