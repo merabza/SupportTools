@@ -39,7 +39,8 @@ public sealed class AppSettingsEncoderParameters : IParameters
 
         if (string.IsNullOrWhiteSpace(project.KeyGuidPart))
         {
-            StShared.WriteWarningLine($"KeyGuidPart does not specified for project {projectName}, setting can not be encoded", true);
+            StShared.WriteWarningLine(
+                $"KeyGuidPart does not specified for project {projectName}, setting can not be encoded", true);
             return null;
         }
 

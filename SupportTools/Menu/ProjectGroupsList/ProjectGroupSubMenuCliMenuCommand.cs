@@ -45,8 +45,9 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //ჯგუფში შემავალი პროექტების სტატუსები და მათი რაოდენობები
-        return string.Join(", ", BuildBreakdown(projectNames).Select(b =>
-            $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}"));
+        return string.Join(", ",
+            BuildBreakdown(projectNames).Select(b =>
+                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}"));
     }
 
     protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
@@ -60,9 +61,8 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         }
 
         return BuildBreakdown(projectNames).Select(b => new StatusColorPart(
-                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
-                ProjectBuildCheckStatusView.GetColor(b.Status)))
-            .ToList();
+            $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
+            ProjectBuildCheckStatusView.GetColor(b.Status))).ToList();
     }
 
     private List<string> GetGroupProjectNames()
@@ -75,11 +75,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
     private List<(EProjectBuildCheckStatus? Status, int Count)> BuildBreakdown(IEnumerable<string> projectNames)
     {
-        return projectNames
-            .GroupBy(GetProjectStatus)
-            .OrderBy(g => g.Key)
-            .Select(g => (g.Key, g.Count()))
-            .ToList();
+        return projectNames.GroupBy(GetProjectStatus).OrderBy(g => g.Key).Select(g => (g.Key, g.Count())).ToList();
     }
 
     private bool IsProjectChecked(string projectName)

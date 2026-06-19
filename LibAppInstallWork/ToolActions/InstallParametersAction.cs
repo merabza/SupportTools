@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LanguageExt;
@@ -30,8 +29,7 @@ public sealed class InstallParametersAction : ToolAction
     public InstallParametersAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         string parametersFileDateMask, string parametersFileExtension, InstallerBaseParameters installerBaseParameters,
         FileStorageData fileStorageForUpload, string projectName, string environmentName,
-        string appSettingsJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null,
-        useConsole)
+        string appSettingsJsonFileName, bool useConsole) : base(logger, "Install Parameters", null, null, useConsole)
     {
         _appName = appName;
         _logger = logger;
@@ -67,8 +65,8 @@ public sealed class InstallParametersAction : ToolAction
 
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
         Option<Error[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
-            _environmentName, _appSettingsJsonFileName, _parametersFileDateMask,
-            _parametersFileExtension, cancellationToken);
+            _environmentName, _appSettingsJsonFileName, _parametersFileDateMask, _parametersFileExtension,
+            cancellationToken);
 
         if (updateAppParametersFileResult.IsNone)
         {

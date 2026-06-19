@@ -19,10 +19,11 @@ public sealed class ServicePublisherToolCommand : ToolCommand
     private const string ActionName = "Publishing Service";
     private const string ActionDescription = "Publishing Service";
     private readonly AppSettingsEncoderParameters? _appSettingsEncoderParameters;
-    private readonly ILogger _logger;
     private readonly AppSettingsPreparerParameters _appSettingsPreparerParameters;
+    private readonly ILogger _logger;
 
-    public ServicePublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,AppSettingsPreparerParameters appSettingsPreparerParameters,
+    public ServicePublisherToolCommand(ILogger logger, ProgramPublisherParameters parameters,
+        AppSettingsPreparerParameters appSettingsPreparerParameters,
         AppSettingsEncoderParameters? appSettingsEncoderParametersForPublish, IParametersManager parametersManager) :
         base(logger, ActionName, parameters, parametersManager, ActionDescription)
     {
@@ -67,8 +68,7 @@ public sealed class ServicePublisherToolCommand : ToolCommand
             _appSettingsPreparerParameters.AppSettingsJsonSourceFileName, _appSettingsPreparerParameters.ProjectName,
             _appSettingsPreparerParameters.ServerInfo, _appSettingsPreparerParameters.DateMask,
             _appSettingsPreparerParameters.ParametersFileExtension,
-            _appSettingsPreparerParameters.FileStorageForExchange,
-            _appSettingsPreparerParameters.ExchangeSmartSchema);
+            _appSettingsPreparerParameters.FileStorageForExchange, _appSettingsPreparerParameters.ExchangeSmartSchema);
         return await prepareParametersAndUploadAction.Run(cancellationToken);
     }
 }

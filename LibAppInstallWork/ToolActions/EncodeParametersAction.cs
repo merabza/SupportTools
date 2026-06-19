@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -99,8 +97,6 @@ public sealed class EncodeParametersAction : ToolAction
         //EncodedJsonContent = prepareAppSettingsParametersAction.AppSettingsJsonContent;
         var appSetJObject = prepareAppSettingsParametersAction.AppSetJObject;
 
-
-
         //string appSetJson = File.ReadAllText(_sourceJsonFileName);
         //JObject appSetJObject = JObject.Parse(appSetJson);
 
@@ -133,7 +129,7 @@ public sealed class EncodeParametersAction : ToolAction
         //    }
         //}
 
-        if ( appSetJObject is null)
+        if (appSetJObject is null)
         {
             _logger.LogError("appSettings json content is not prepared");
             return null;

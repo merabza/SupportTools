@@ -12,6 +12,7 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
 public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Check project build";
+    private readonly string _appName;
 
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
@@ -19,11 +20,12 @@ public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckOneProjectBuildCliMenuCommand(ILogger logger, ParametersManager parametersManager,
+    public CheckOneProjectBuildCliMenuCommand(ILogger logger, string appName, ParametersManager parametersManager,
         SupportToolsMenuParameters menuParameters, string projectName) : base(MenuCommandName, EMenuAction.Reload,
         EMenuAction.Reload, projectName)
     {
         _logger = logger;
+        _appName = appName;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
         _projectName = projectName;
@@ -40,7 +42,7 @@ public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
         }
 
         //მხოლოდ ეს ერთი პროექტი მოწმდება და მისი სტატუსი ახლდება
-        ProjectBuildChecker.CheckProjects([new KeyValuePair<string, ProjectModel>(_projectName, project)],
+        ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(_projectName, project)],
             _menuParameters, _logger, cancellationToken);
 
         return ValueTask.FromResult(true);

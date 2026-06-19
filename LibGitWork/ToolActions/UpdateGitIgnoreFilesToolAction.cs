@@ -34,7 +34,8 @@ public sealed class UpdateGitIgnoreFilesToolAction : ToolAction
 
         Console.WriteLine("Update wrong .gitignore files");
         List<string> changedGitProjectsList = [];
-        foreach ((string gitignoreFileName, (string gitignoreFileContent, string gitProjectName)) in wrongGitIgnoreFilesList)
+        foreach ((string gitignoreFileName, (string gitignoreFileContent, string gitProjectName)) in
+                 wrongGitIgnoreFilesList)
         {
             if (changedGitProjectsList.Contains(gitProjectName))
             {

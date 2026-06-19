@@ -7,10 +7,13 @@ public enum EProjectBuildCheckStatus
     SolutionFileNameIsEmpty,
 
     //მითითებული სოლუშენის ფაილი არ არსებობს
-    SolutionFiledoesNotExists,
+    SolutionFileDoesNotExists,
 
     //ფაილი არსებობს, მაგრამ არ არის სოლუშენის ფაილი
     InvalidSolutionFile,
+
+    //გაშვებული პროექტის შესაბამისი სოლუშების დაბილდვა არ გამოვა
+    CannotBuildSelf,
 
     //სოლუშენის აგება (build) ვერ შესრულდა
     BuildFailed,

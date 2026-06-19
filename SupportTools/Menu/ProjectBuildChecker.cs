@@ -12,7 +12,7 @@ namespace SupportTools.Menu;
 //"Check ... build" მენიუს ბრძანებების საერთო ლოგიკა - პროექტების დაბილდვა და სტატუსების მეხსიერებაში ჩაწერა
 public static class ProjectBuildChecker
 {
-    public static void CheckProjects(IEnumerable<KeyValuePair<string, ProjectModel>> projects,
+    public static void CheckProjects(string appName, IEnumerable<KeyValuePair<string, ProjectModel>> projects,
         SupportToolsMenuParameters menuParameters, ILogger logger, CancellationToken cancellationToken)
     {
         var dotnetProcessor = new DotnetProcessor(logger, true);
@@ -20,13 +20,14 @@ public static class ProjectBuildChecker
         foreach ((string projectName, ProjectModel project) in projects)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            EProjectBuildCheckStatus status = CheckProjectBuild(project, dotnetProcessor);
+            EProjectBuildCheckStatus status = CheckProjectBuild(projectName, appName, project, dotnetProcessor);
             menuParameters.ProjectBuildCheckStatuses[projectName] = status;
             Console.WriteLine($"{projectName}: {status}");
         }
     }
 
-    private static EProjectBuildCheckStatus CheckProjectBuild(ProjectModel project, DotnetProcessor dotnetProcessor)
+    private static EProjectBuildCheckStatus CheckProjectBuild(string projectName, string appName, ProjectModel project,
+        DotnetProcessor dotnetProcessor)
     {
         if (string.IsNullOrWhiteSpace(project.SolutionFileName))
         {
@@ -35,12 +36,17 @@ public static class ProjectBuildChecker
 
         if (!File.Exists(project.SolutionFileName))
         {
-            return EProjectBuildCheckStatus.SolutionFiledoesNotExists;
+            return EProjectBuildCheckStatus.SolutionFileDoesNotExists;
         }
 
         if (!IsSolutionFile(project.SolutionFileName))
         {
             return EProjectBuildCheckStatus.InvalidSolutionFile;
+        }
+
+        if (projectName == appName)
+        {
+            return EProjectBuildCheckStatus.CannotBuildSelf;
         }
 
         var buildResult = dotnetProcessor.Build(project.SolutionFileName);

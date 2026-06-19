@@ -104,12 +104,14 @@ public sealed class WrongGitignoreFilesListCreator
                         string gitignoreFileContent = File.ReadAllText(gitignoreFileName);
                         if (gitignoreFileContent != gitIgnoreTemplateFileContent)
                         {
-                            wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, (gitIgnoreTemplateFileContent, gd.GitProjectName));
+                            wrongGitIgnoreFilesList.TryAdd(gitignoreFileName,
+                                (gitIgnoreTemplateFileContent, gd.GitProjectName));
                         }
                     }
                     else
                     {
-                        wrongGitIgnoreFilesList.TryAdd(gitignoreFileName, (gitIgnoreTemplateFileContent, gd.GitProjectName));
+                        wrongGitIgnoreFilesList.TryAdd(gitignoreFileName,
+                            (gitIgnoreTemplateFileContent, gd.GitProjectName));
                     }
                 }
             }

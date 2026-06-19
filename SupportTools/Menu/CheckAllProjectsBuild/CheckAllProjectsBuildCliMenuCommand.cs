@@ -10,17 +10,19 @@ namespace SupportTools.Menu.CheckAllProjectsBuild;
 public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Check all projects build";
+    private readonly string _appName;
 
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
     private readonly ParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckAllProjectsBuildCliMenuCommand(ILogger logger, ParametersManager parametersManager,
+    public CheckAllProjectsBuildCliMenuCommand(ILogger logger, string appName, ParametersManager parametersManager,
         SupportToolsMenuParameters menuParameters) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null,
         true)
     {
         _logger = logger;
+        _appName = appName;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
     }
@@ -31,7 +33,7 @@ public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
 
         //ყველა პროექტი თავიდან მოწმდება, ამიტომ წინა შედეგებს ვასუფთავებთ
         _menuParameters.ProjectBuildCheckStatuses.Clear();
-        ProjectBuildChecker.CheckProjects(parameters.Projects, _menuParameters, _logger, cancellationToken);
+        ProjectBuildChecker.CheckProjects(_appName, parameters.Projects, _menuParameters, _logger, cancellationToken);
 
         return ValueTask.FromResult(true);
     }

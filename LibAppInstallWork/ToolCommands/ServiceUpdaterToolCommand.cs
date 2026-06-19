@@ -62,7 +62,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             return false;
         }
 
-        var appSettingsFileName = "appsettings.json";
+        string appSettingsFileName = "appsettings.json";
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
         AppSettingsEncoderParameters appSettingsEncoderParameters =

@@ -169,7 +169,7 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var settingsFileFullName = string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName)
+        string? settingsFileFullName = string.IsNullOrWhiteSpace(_par.ServerInfo.AppSettingsEncodedJsonFileName)
             ? _par.ServerInfo.AppSettingsJsonSourceFileName
             : _par.ServerInfo.AppSettingsEncodedJsonFileName;
 

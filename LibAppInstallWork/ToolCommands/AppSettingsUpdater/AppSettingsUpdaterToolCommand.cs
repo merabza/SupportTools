@@ -27,8 +27,8 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
     private readonly string _appName;
 
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IParametersManager _parametersManager;
     private readonly ILogger _logger;
+    private readonly IParametersManager _parametersManager;
 
     public AppSettingsUpdaterToolCommand(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         AppSettingsUpdaterParameters parameters, IParametersManager parametersManager, bool useConsole) : base(logger,
@@ -46,21 +46,21 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        AppSettingsPreparerParameters appSettingsPreparerParameters =
-            AppSettingsPreparerParameters.Create(supportToolsParameters, AppSettingsUpdaterParameters.ProjectName,
-                AppSettingsUpdaterParameters.ServerInfo);
+        var appSettingsPreparerParameters = AppSettingsPreparerParameters.Create(supportToolsParameters,
+            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.ServerInfo);
 
-        var appSettingsFileName = "appsettings.json";
+        string appSettingsFileName = "appsettings.json";
 
         if (appSettingsPreparerParameters is null)
         {
-            StShared.WriteErrorLine($"AppSettingsPreparerParameters can not be prepared for Project {AppSettingsUpdaterParameters.ProjectName}", true, _logger);
+            StShared.WriteErrorLine(
+                $"AppSettingsPreparerParameters can not be prepared for Project {AppSettingsUpdaterParameters.ProjectName}",
+                true, _logger);
             return false;
         }
 
-        AppSettingsEncoderParameters appSettingsEncoderParameters =
-            AppSettingsEncoderParameters.Create(supportToolsParameters, AppSettingsUpdaterParameters.ProjectName,
-                AppSettingsUpdaterParameters.ServerInfo);
+        var appSettingsEncoderParameters = AppSettingsEncoderParameters.Create(supportToolsParameters,
+            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.ServerInfo);
 
         string? checkForVersion;
         string? appSettingsContent;
@@ -75,7 +75,8 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
                 appSettingsEncoderParameters.KeyPart2, appSettingsPreparerParameters.ProjectName,
                 appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
                 appSettingsPreparerParameters.ParametersFileExtension,
-                appSettingsPreparerParameters.FileStorageForExchange, appSettingsPreparerParameters.ExchangeSmartSchema);
+                appSettingsPreparerParameters.FileStorageForExchange,
+                appSettingsPreparerParameters.ExchangeSmartSchema);
             result = await encodeParametersAndUploadAction.Run(cancellationToken);
 
             appSettingsFileName = Path.GetFileName(appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
@@ -105,8 +106,8 @@ public sealed class AppSettingsUpdaterToolCommand : ToolCommand
         var installParametersAction = new InstallParametersAction(_appName, _logger, _httpClientFactory,
             AppSettingsUpdaterParameters.ParametersFileDateMask, AppSettingsUpdaterParameters.ParametersFileExtension,
             AppSettingsUpdaterParameters.InstallerBaseParameters, AppSettingsUpdaterParameters.FileStorageForUpload,
-            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName,
-            appSettingsFileName, UseConsole);
+            AppSettingsUpdaterParameters.ProjectName, AppSettingsUpdaterParameters.EnvironmentName, appSettingsFileName,
+            UseConsole);
         string projectName = AppSettingsUpdaterParameters.ProjectName;
         if (!await installParametersAction.Run(cancellationToken))
         {

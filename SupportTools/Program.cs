@@ -14,7 +14,7 @@ try
 {
     Console.WriteLine("Loading...");
 
-    const string appName = "Support Tools";
+    const string appName = "SupportTools";
 
     var argParser = new ArgumentsParser<SupportToolsParameters>(args, appName);
 

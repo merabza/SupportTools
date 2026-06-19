@@ -25,9 +25,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         IParameters parameters, IParametersManager parametersManager) : base("Support Tools Parameters Editor",
         parameters, parametersManager)
     {
-        FieldEditors.Add(
-            new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(nameof(SupportToolsParameters.DotnetTools),
-                x => new DotnetToolCruder(parametersManager, x)));
+        FieldEditors.Add(new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(
+            nameof(SupportToolsParameters.DotnetTools), x => new DotnetToolCruder(parametersManager, x)));
 
         //SupportToolsServerWebApiClientName
         FieldEditors.Add(new ApiClientNameFieldEditor(nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
@@ -78,10 +77,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new DictionaryFieldEditor<GitCruder, GitDataModel>(nameof(SupportToolsParameters.Gits),
             x => new GitCruder(logger, httpClientFactory, parametersManager, x)));
 
-        FieldEditors.Add(
-            new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(
-                nameof(SupportToolsParameters.ReactAppTemplates),
-                x => new ReactAppTypeCruder(logger, parametersManager, x)));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<ReactAppTypeCruder>(
+            nameof(SupportToolsParameters.ReactAppTemplates),
+            x => new ReactAppTypeCruder(logger, parametersManager, x)));
 
         FieldEditors.Add(
             new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(nameof(SupportToolsParameters.NpmPackages),
@@ -90,24 +88,21 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         //FieldEditors.Add(new FileStoragesFieldEditor(logger, nameof(SupportToolsParameters.FileStorages),
         //    parametersManager));
 
-        FieldEditors.Add(
-            new DictionaryFieldEditor<FileStorageCruder, FileStorageData>(nameof(SupportToolsParameters.FileStorages),
-                x => new FileStorageCruder(logger, parametersManager, x)));
+        FieldEditors.Add(new DictionaryFieldEditor<FileStorageCruder, FileStorageData>(
+            nameof(SupportToolsParameters.FileStorages), x => new FileStorageCruder(logger, parametersManager, x)));
 
         FieldEditors.Add(new DictionaryFieldEditor<DatabaseServerConnectionCruder, DatabaseServerConnectionData>(
             nameof(SupportToolsParameters.DatabaseServerConnections),
             x => new DatabaseServerConnectionCruder(application, logger, httpClientFactory, parametersManager, x)));
 
         //FieldEditors.Add(new SmartSchemasFieldEditor(nameof(SupportToolsParameters.SmartSchemas), parametersManager));
-        FieldEditors.Add(
-            new DictionaryFieldEditor<SmartSchemaCruder, SmartSchema>(nameof(SupportToolsParameters.SmartSchemas),
-                x => new SmartSchemaCruder(parametersManager, x)));
+        FieldEditors.Add(new DictionaryFieldEditor<SmartSchemaCruder, SmartSchema>(
+            nameof(SupportToolsParameters.SmartSchemas), x => new SmartSchemaCruder(parametersManager, x)));
 
         //FieldEditors.Add(new ArchiversFieldEditor(nameof(SupportToolsParameters.Archivers), parametersManager));
 
-        FieldEditors.Add(
-            new DictionaryFieldEditor<ArchiverCruder, ArchiverData>(nameof(SupportToolsParameters.Archivers),
-                x => new ArchiverCruder(parametersManager, x)));
+        FieldEditors.Add(new DictionaryFieldEditor<ArchiverCruder, ArchiverData>(
+            nameof(SupportToolsParameters.Archivers), x => new ArchiverCruder(parametersManager, x)));
 
         //FieldEditors.Add(new ProjectsFieldEditor(logger, httpClientFactory, nameof(SupportToolsParameters.Projects),
         //    parametersManager));
@@ -122,16 +117,14 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             nameof(SupportToolsParameters.Servers),
             x => new ServerDataCruder(logger, httpClientFactory, parametersManager, x)));
 
-        FieldEditors.Add(
-            new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(nameof(SupportToolsParameters.RunTimes),
-                x => new RunTimeCruder(parametersManager, x)));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(
+            nameof(SupportToolsParameters.RunTimes), x => new RunTimeCruder(parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(
             nameof(SupportToolsParameters.GitIgnoreModelFilePaths),
             x => new GitIgnoreFilePathsCruder(logger, parametersManager, x)));
 
-        FieldEditors.Add(
-            new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(nameof(SupportToolsParameters.Environments),
-                x => new EnvironmentCruder(parametersManager, x)));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(
+            nameof(SupportToolsParameters.Environments), x => new EnvironmentCruder(parametersManager, x)));
     }
 }

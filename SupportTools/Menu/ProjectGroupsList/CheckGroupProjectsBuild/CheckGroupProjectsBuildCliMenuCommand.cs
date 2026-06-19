@@ -11,6 +11,7 @@ namespace SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
 public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Check group projects build";
+    private readonly string _appName;
 
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
@@ -18,11 +19,12 @@ public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
     private readonly string _projectGroupName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckGroupProjectsBuildCliMenuCommand(ILogger logger, ParametersManager parametersManager,
+    public CheckGroupProjectsBuildCliMenuCommand(ILogger logger, string appName, ParametersManager parametersManager,
         SupportToolsMenuParameters menuParameters, string projectGroupName) : base(MenuCommandName, EMenuAction.Reload,
         EMenuAction.Reload, null, true)
     {
         _logger = logger;
+        _appName = appName;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
         _projectGroupName = projectGroupName;
@@ -33,9 +35,9 @@ public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //მხოლოდ ამ ჯგუფის პროექტები მოწმდება, დანარჩენი ჯგუფების სტატუსები ხელუხლებელი რჩება
-        var groupProjects = parameters.Projects
-            .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName);
-        ProjectBuildChecker.CheckProjects(groupProjects, _menuParameters, _logger, cancellationToken);
+        var groupProjects = parameters.Projects.Where(x =>
+            SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName);
+        ProjectBuildChecker.CheckProjects(_appName, groupProjects, _menuParameters, _logger, cancellationToken);
 
         return ValueTask.FromResult(true);
     }
