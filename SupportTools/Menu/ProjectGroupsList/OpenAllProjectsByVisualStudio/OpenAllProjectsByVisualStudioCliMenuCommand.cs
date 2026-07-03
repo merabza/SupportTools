@@ -50,7 +50,7 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        var isFirst = true;
+        bool isFirst = true;
 
         foreach (KeyValuePair<string, ProjectModel> kvp in groupProjects)
         {
