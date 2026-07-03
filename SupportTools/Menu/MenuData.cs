@@ -7,6 +7,7 @@ using SupportTools.Menu.CreateProject;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
+using SupportTools.Menu.ProjectGroupsList.OpenAllProjectsByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
@@ -64,6 +65,8 @@ public static class MenuData
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
         nameof(CheckGroupProjectsBuildCliMenuCommandFactoryStrategy),
+        //ჯგუფში შემავალი ყველა პროექტის Visual Studio-ში გახსნა
+        nameof(OpenAllProjectsByVisualStudioCliMenuCommandFactoryStrategy),
         //პროექტების ჩამონავთვალი
         nameof(ProjectsListFactoryStrategy)
     ];
