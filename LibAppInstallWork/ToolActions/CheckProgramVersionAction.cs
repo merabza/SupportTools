@@ -61,6 +61,13 @@ public sealed class CheckProgramVersionAction : ToolAction
 
                 if (_proxySettings is ProxySettings proxySettings)
                 {
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation(
+                            "Checking version by proxy {Server} with ServerSidePort={ServerSidePort}, ApiVersionId={ApiVersionId}",
+                            _webAgentForCheck.Server, proxySettings.ServerSidePort, proxySettings.ApiVersionId);
+                    }
+
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _useConsole);
@@ -77,6 +84,12 @@ public sealed class CheckProgramVersionAction : ToolAction
                 }
                 else
                 {
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation("Checking version directly on {Server} (without proxy)",
+                            _webAgentForCheck.Server);
+                    }
+
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _useConsole);
