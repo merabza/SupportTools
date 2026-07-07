@@ -33,7 +33,7 @@ public class ProgramUpdaterToolCommandFactoryStrategy(
 
         ProjectModel projectForUpdate = supportToolsParameters.GetProjectRequired(projectName);
 
-        if (projectForUpdate.IsService)
+        if (projectForUpdate.ProjectType == EProjectType.IsService)
         {
             var programServiceUpdaterParameters = await ServiceUpdaterParameters.Create(logger, supportToolsParameters,
                 projectName, serverInfo, cancellationToken);

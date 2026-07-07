@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -165,7 +166,8 @@ public sealed class ProgramInstallerParameters : IParameters
             return null;
         }
 
-        var progInstallerParameters = new ProgramInstallerParameters(projectName, project.IsService, serverInfo,
+        var progInstallerParameters = new ProgramInstallerParameters(projectName,
+            project.ProjectType == EProjectType.IsService, serverInfo,
             installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
             serverInfo.AppSettingsEncodedJsonFileName, proxySettings, fileStorageForDownload, webAgentForCheck,
             programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension,

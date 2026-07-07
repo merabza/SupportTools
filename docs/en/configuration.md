@@ -44,7 +44,7 @@ The core of each registered project. Located at
 |Group|Fields|
 |-|-|
 |Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`|
-|Service flag|`IsService`, `UseAlternativeWebAgent`|
+|Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
 |Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |Migration \& seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
 |Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|

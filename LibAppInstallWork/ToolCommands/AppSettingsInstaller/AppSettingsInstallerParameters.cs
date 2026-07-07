@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -52,7 +53,7 @@ public sealed class AppSettingsInstallerParameters : IParameters
         ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
         string? environmentName = serverInfo.EnvironmentName;
 
-        if (!project.IsService)
+        if (project.ProjectType != EProjectType.IsService)
         {
             StShared.WriteErrorLine($"Project {projectName} is not service", true);
             return null;

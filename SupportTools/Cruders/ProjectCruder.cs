@@ -9,6 +9,7 @@ using AppCliTools.CliParametersDataEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -27,7 +28,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         [
             nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)
         ];
-        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.IsService)));
+        FieldEditors.Add(new EnumFieldEditor<EProjectType>(nameof(ProjectModel.ProjectType), EProjectType.Standard));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent)));

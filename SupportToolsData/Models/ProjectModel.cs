@@ -11,7 +11,7 @@ namespace SupportToolsData.Models;
 
 public sealed class ProjectModel : ItemData
 {
-    public bool IsService { get; init; }
+    public EProjectType ProjectType { get; init; }
     public string? ProjectGroupName { get; init; }
     public string? ProjectDescription { get; set; }
     public bool UseAlternativeWebAgent { get; init; }

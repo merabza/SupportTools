@@ -43,7 +43,7 @@
 |ჯგუფი|ველები|
 |-|-|
 |იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`|
-|სერვისის ფლაგი|`IsService`, `UseAlternativeWebAgent`|
+|პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
 |ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |მიგრაცია და seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
 |Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|

@@ -4,6 +4,7 @@ using System;
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolCommands.VersionChecker;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -51,7 +52,7 @@ public sealed class ServiceStartStopParameters : IParameters
 
             ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
-            if (checkService && !project.IsService)
+            if (checkService && project.ProjectType != EProjectType.IsService)
             {
                 StShared.WriteErrorLine($"Project {projectName} is not service", true);
                 return null;

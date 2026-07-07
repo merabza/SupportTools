@@ -1,5 +1,6 @@
 ﻿using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -37,7 +38,7 @@ public sealed class ServiceInstallScriptCreatorParameters : IParameters
     {
         ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
-        if (!project.IsService)
+        if (project.ProjectType != EProjectType.IsService)
         {
             StShared.WriteErrorLine($"Project {projectName} is not service", true);
             return null;

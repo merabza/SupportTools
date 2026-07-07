@@ -38,7 +38,7 @@ public class ProgramPublisherToolCommandFactoryStrategy(ILogger<ProgramPublisher
 
         ProjectModel projectForPublish = supportToolsParameters.GetProjectRequired(projectName);
 
-        if (!projectForPublish.IsService)
+        if (projectForPublish.ProjectType != EProjectType.IsService)
         {
             return new ValueTask<IToolCommand?>(new ProgramPublisherToolCommand(logger, programPublisherParameters,
                 parametersManager));

@@ -251,7 +251,9 @@ internal sealed class ProjectRecordCreator
 
         var newProject = new ProjectModel
         {
-            IsService = _templateModel.SupportProjectType == ESupportProjectType.Api,
+            ProjectType = _templateModel.SupportProjectType == ESupportProjectType.Api
+                ? EProjectType.IsService
+                : EProjectType.Standard,
             UseAlternativeWebAgent = false,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
             SolutionFileName =

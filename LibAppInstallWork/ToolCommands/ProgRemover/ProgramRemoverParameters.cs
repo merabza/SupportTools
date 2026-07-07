@@ -2,6 +2,7 @@
 using LibAppInstallWork.Models;
 using LibAppInstallWork.ToolCommands.VersionChecker;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -101,7 +102,8 @@ public sealed class ProgramRemoverParameters : IParameters
 
             return proxySettings is null
                 ? null
-                : new ProgramRemoverParameters(projectName, serverInfo.EnvironmentName, project.IsService,
+                : new ProgramRemoverParameters(projectName, serverInfo.EnvironmentName,
+                    project.ProjectType == EProjectType.IsService,
                     webAgentForInstall, installFolder); //, proxySettings, checkVersionParameters.WebAgentForCheck);
         }
         catch (Exception e)

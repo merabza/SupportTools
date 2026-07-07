@@ -1,4 +1,5 @@
 ﻿using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -30,7 +31,7 @@ public sealed class ServiceRemoveScriptCreatorParameters : IParameters
     {
         ProjectModel project = supportToolsParameters.GetProjectRequired(projectName);
 
-        if (project.IsService)
+        if (project.ProjectType == EProjectType.IsService)
         {
             return new ServiceRemoveScriptCreatorParameters(supportToolsParameters.SecurityFolder, projectName,
                 serverInfo, project);

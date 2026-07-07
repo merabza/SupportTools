@@ -7,6 +7,7 @@ using LibAppInstallWork.ToolCommands.ServiceStarter;
 using LibAppInstallWork.ToolCommands.VersionChecker;
 using ParametersManagement.LibFileParameters.Models;
 using ParametersManagement.LibParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
@@ -84,7 +85,7 @@ public sealed class AppSettingsUpdaterParameters : IParameters
             return null;
         }
 
-        if (!project.IsService)
+        if (project.ProjectType != EProjectType.IsService)
         {
             StShared.WriteErrorLine($"Project {projectName} is not service", true);
             return null;
