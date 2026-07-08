@@ -23,6 +23,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public const string DefaultUploadFileTempExtension = ".up!";
 
     public string? SupportToolsServerWebApiClientName { get; set; }
+    public string? LocalPackageManagerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
     public string? WorkFolder { get; set; }

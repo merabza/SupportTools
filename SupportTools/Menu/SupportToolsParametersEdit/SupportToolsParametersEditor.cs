@@ -31,6 +31,10 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new ApiClientNameFieldEditor(nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
             logger, httpClientFactory, parametersManager));
 
+        FieldEditors.Add(new ApiClientNameFieldEditor(
+            nameof(SupportToolsParameters.LocalPackageManagerWebApiClientName), logger, httpClientFactory,
+            parametersManager));
+
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.LogFolder)));
         FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.LogGitWork)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
@@ -47,25 +51,25 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
 
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.UploadTempExtension),
             SupportToolsParameters.DefaultUploadFileTempExtension));
-        
+
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ProgramArchiveDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ProgramArchiveExtension)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ParametersFileExtension)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.MediatRLicenseKey)));
-        
+
         FieldEditors.Add(new FileStorageNameFieldEditor(logger,
             nameof(SupportToolsParameters.FileStorageNameForExchange), parametersManager));
-        
+
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForLocal),
             parametersManager));
-        
+
         FieldEditors.Add(new SmartSchemaNameFieldEditor(nameof(SupportToolsParameters.SmartSchemaNameForExchange),
             parametersManager));
 
         FieldEditors.Add(new InstallerSettingsFieldEditor(nameof(SupportToolsParameters.LocalInstallerSettings), logger,
             parametersManager));
-        
+
         FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(
             nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters), logger, parametersManager));
 

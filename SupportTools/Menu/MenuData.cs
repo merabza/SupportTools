@@ -9,6 +9,7 @@ using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
 using SupportTools.Menu.ProjectGroupsList.OpenAllProjectsByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
@@ -81,6 +82,8 @@ public static class MenuData
         nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy),
         //პროექტის build-ის შემოწმება
         nameof(CheckOneProjectBuildCliMenuCommandFactoryStrategy),
+        //პაკეტის დაბილდვა და ატვირთვა package manager-ზე (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
+        nameof(BuildPackageCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
         nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა

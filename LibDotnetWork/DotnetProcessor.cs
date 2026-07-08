@@ -109,6 +109,18 @@ public sealed class DotnetProcessor
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"build {solutionFileName}", null, false);
     }
 
+    public Option<Error[]> Pack(string projectFileName, string outputFolderPath, string packageVersion)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"pack {projectFileName} --configuration Release --output {outputFolderPath} -p:PackageVersion={packageVersion}");
+    }
+
+    public Option<Error[]> NugetPush(string nupkgPath, string source, string? apiKey)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"nuget push {nupkgPath} --source {source} --skip-duplicate{(string.IsNullOrWhiteSpace(apiKey) ? string.Empty : $" --api-key {apiKey}")}");
+    }
+
     public Option<Error[]> EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
         string prodCopyDatabaseConnectionString, string providerPackageName,
         string createProjectSeederCodeProjectFileFullName, string dbScContextName,
