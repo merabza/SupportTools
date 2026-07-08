@@ -117,17 +117,18 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
-        string nugetSourceUrl = CreateNugetSourceUrl(apiClientSettings.Server);
+        string nugetSourceUrl = NugetServerUrls.GetServiceIndexUrl(apiClientSettings.Server);
 
         //პაკეტის ატვირთვა package manager-ზე
-        if (dotnetProcessor.NugetPush(Path.Combine(outputFolderPath, "*.nupkg"), nugetSourceUrl,
+        if (!dotnetProcessor.NugetPush(Path.Combine(outputFolderPath, "*.nupkg"), nugetSourceUrl,
                 apiClientSettings.ApiKey).IsSome)
         {
-            StShared.WriteErrorLine($"Cannot push package for project {_projectName}", true, _logger);
-            return ValueTask.FromResult(false);
+            return ValueTask.FromResult(true);
         }
 
-        return ValueTask.FromResult(true);
+        StShared.WriteErrorLine($"Cannot push package for project {_projectName}", true, _logger);
+        return ValueTask.FromResult(false);
+
     }
 
     //პაკეტის ვერსიის შექმნა csproj ფაილში მითითებული ვერსიისა და მიმდინარე თარიღის მიხედვით
@@ -160,26 +161,5 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
                 .InvariantCulture));
         packageVersionNumbers.Add(((int)(now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
         return string.Join('.', packageVersionNumbers);
-    }
-
-    //package manager-ის მისამართი შეიძლება ბოლოვდებოდეს /api/v1-ის მსგავსი სუფიქსით,
-    //push-ისთვის კი საჭიროა nuget-ის service index-ის მისამართი
-    private static string CreateNugetSourceUrl(string server)
-    {
-        string baseUrl = server.TrimEnd('/');
-        int lastSlashIndex = baseUrl.LastIndexOf('/');
-        if (lastSlashIndex > 0)
-        {
-            string lastSegment = baseUrl[(lastSlashIndex + 1)..];
-            string beforeLastSegment = baseUrl[..lastSlashIndex];
-            if (lastSegment.Length > 1 && (lastSegment[0] == 'v' || lastSegment[0] == 'V') &&
-                lastSegment[1..].All(char.IsAsciiDigit) &&
-                beforeLastSegment.EndsWith("/api", StringComparison.OrdinalIgnoreCase))
-            {
-                baseUrl = beforeLastSegment[..^4];
-            }
-        }
-
-        return baseUrl + "/v3/index.json";
     }
 }

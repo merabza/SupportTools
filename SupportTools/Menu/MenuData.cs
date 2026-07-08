@@ -18,6 +18,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
@@ -84,6 +85,8 @@ public static class MenuData
         nameof(CheckOneProjectBuildCliMenuCommandFactoryStrategy),
         //პაკეტის დაბილდვა და ატვირთვა package manager-ზე (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
         nameof(BuildPackageCliMenuCommandFactoryStrategy),
+        //პაკეტის გავრცელება მომხმარებელ პროექტებში (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
+        nameof(PackageDistributionCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
         nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა

@@ -61,6 +61,12 @@ public sealed class DotnetProcessor
             $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}");
     }
 
+    public Option<Error[]> RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"remove {projectFilePath} reference {referenceProjectFilePath}");
+    }
+
     public Option<Error[]> InitUserSecrets(string projectFullPath)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"user-secrets init --project {projectFullPath}");

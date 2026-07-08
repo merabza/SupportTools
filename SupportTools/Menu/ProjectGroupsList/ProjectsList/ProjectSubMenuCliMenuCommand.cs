@@ -6,6 +6,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -35,10 +36,11 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         ProjectModel? project = parameters.GetProject(_projectName);
 
         List<string> excludeList = [];
-        //პაკეტის დაბილდვის ბრძანება ჩანს მხოლოდ პაკეტის ტიპის პროექტებისთვის
+        //პაკეტის დაბილდვისა და გავრცელების ბრძანებები ჩანს მხოლოდ პაკეტის ტიპის პროექტებისთვის
         if (project is null || project.ProjectType != EProjectType.IsPackage)
         {
             excludeList.Add(nameof(BuildPackageCliMenuCommandFactoryStrategy));
+            excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
         }
 
         if (project is null || string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
