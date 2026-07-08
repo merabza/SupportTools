@@ -70,8 +70,17 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
+        //იპაკება მთელი solution-ი, რომ ყველა packable პროექტის პაკეტი შეიქმნას და აიტვირთოს
+        string? solutionFileName = project.SolutionFileName;
+        if (string.IsNullOrWhiteSpace(solutionFileName))
+        {
+            StShared.WriteErrorLine($"Solution file name does not specified for {_projectName}", true);
+            return ValueTask.FromResult(false);
+        }
+
         var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
 
+        //მთავარი პროექტის csproj გამოიყენება პაკეტების ვერსიის საბაზისო ნაწილის დასადგენად
         string? mainProjectFileName = project.MainProjectFileName(gitProjects);
         if (mainProjectFileName is null)
         {
@@ -101,10 +110,10 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
-        //პაკეტის დაბილდვა
-        if (dotnetProcessor.Pack(mainProjectFileName, outputFolderPath, packageVersion).IsSome)
+        //პაკეტების დაბილდვა
+        if (dotnetProcessor.Pack(solutionFileName, outputFolderPath, packageVersion).IsSome)
         {
-            StShared.WriteErrorLine($"Cannot pack project {_projectName}", true, _logger);
+            StShared.WriteErrorLine($"Cannot pack solution for project {_projectName}", true, _logger);
             return ValueTask.FromResult(false);
         }
 
