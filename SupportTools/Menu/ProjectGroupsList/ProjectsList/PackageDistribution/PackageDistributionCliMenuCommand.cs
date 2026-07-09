@@ -180,6 +180,13 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         bool hadErrors = false;
 
+        //მანამდე უკვე ჩასმული ამავე პაკეტის პროექტის პაკეტების ვერსიები უახლესზე აიწევა,
+        //რომ ძველ ვერსიებზე მიბმის გამო ვერსიების კონფლიქტები (NU1107) არ წარმოიშვას
+        if (!await UpdateExistingPackageVersions(mainRepoPath, packageRepoPath, server, cancellationToken))
+        {
+            hadErrors = true;
+        }
+
         foreach (string csprojFile in Directory.EnumerateFiles(mainRepoPath, "*.csproj", SearchOption.AllDirectories))
         {
             string? csprojFolder = Path.GetDirectoryName(csprojFile);
@@ -247,6 +254,79 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
                         "Replaced ProjectReference {ReferencePath} with package {PackageId} {PackageVersion} in {ProjectFilePath}",
                         refFullPath, packageId, latestVersion, csprojFile);
                 }
+            }
+        }
+
+        return !hadErrors;
+    }
+
+    //მომხმარებელი პროექტის მთავარ რეპოზიტორიაში უკვე არსებული ამ პაკეტის პროექტის პაკეტების
+    //ვერსიების აწევა უახლესზე Directory.Packages.props ფაილებში
+    private async Task<bool> UpdateExistingPackageVersions(string mainRepoPath, string packageRepoPath, string server,
+        CancellationToken cancellationToken)
+    {
+        //პაკეტის პროექტის პაკეტების სახელები ემთხვევა მისი რეპოზიტორიის csproj ფაილების სახელებს
+        HashSet<string>? packageIds = null;
+        if (Directory.Exists(packageRepoPath))
+        {
+            packageIds = Directory.EnumerateFiles(packageRepoPath, "*.csproj", SearchOption.AllDirectories)
+                .Select(Path.GetFileNameWithoutExtension).OfType<string>()
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
+        bool hadErrors = false;
+
+        foreach (string propsFile in Directory.EnumerateFiles(mainRepoPath, "Directory.Packages.props",
+                     SearchOption.AllDirectories))
+        {
+            XDocument propsXml = XDocument.Load(propsFile, LoadOptions.PreserveWhitespace);
+            bool changed = false;
+
+            foreach (XElement packageVersionElement in propsXml.Descendants("PackageVersion"))
+            {
+                string? packageId = (string?)packageVersionElement.Attribute("Include");
+                if (string.IsNullOrWhiteSpace(packageId))
+                {
+                    continue;
+                }
+
+                //თუ პაკეტის რეპოზიტორიის კლონი ვერ მოიძებნა, გამოიყენება სახელების კონვენცია
+                bool isPackageProjectPackage = packageIds?.Contains(packageId) ??
+                                               (packageId.Equals(_projectName, StringComparison.OrdinalIgnoreCase) ||
+                                                packageId.StartsWith(_projectName + ".",
+                                                    StringComparison.OrdinalIgnoreCase));
+                if (!isPackageProjectPackage)
+                {
+                    continue;
+                }
+
+                string? latestVersion = await GetLatestPackageVersion(server, packageId, cancellationToken);
+                if (latestVersion is null)
+                {
+                    hadErrors = true;
+                    continue;
+                }
+
+                string? currentVersion = (string?)packageVersionElement.Attribute("Version");
+                if (string.Equals(currentVersion, latestVersion, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                packageVersionElement.SetAttributeValue("Version", latestVersion);
+                changed = true;
+
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation(
+                        "Updated package {PackageId} version {CurrentVersion} -> {LatestVersion} in {PropsFile}",
+                        packageId, currentVersion, latestVersion, propsFile);
+                }
+            }
+
+            if (changed)
+            {
+                propsXml.Save(propsFile, SaveOptions.DisableFormatting);
             }
         }
 
