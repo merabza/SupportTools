@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SystemTools\SystemTools.SystemToolsShared\SystemTools.SystemToolsShared.csproj" />
+    <PackageReference Include="SystemTools.SystemToolsShared" />
   </ItemGroup>
 
 </Project>

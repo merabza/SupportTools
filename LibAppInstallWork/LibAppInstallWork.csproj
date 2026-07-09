@@ -8,13 +8,16 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibFileParameters\ParametersManagement.LibFileParameters.csproj" />
-    <ProjectReference Include="..\..\SystemTools\SystemTools.TestApiContracts\SystemTools.TestApiContracts.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.ApiClientsManagement\ToolsManagement.ApiClientsManagement.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.FileManagersMain\ToolsManagement.FileManagersMain.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
     <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentProjectsApiContracts\WebAgentContracts.WebAgentProjectsApiContracts.csproj" />
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SystemTools.TestApiContracts" />
   </ItemGroup>
 
 </Project>

@@ -31,6 +31,8 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new EnumFieldEditor<EProjectType>(nameof(ProjectModel.ProjectType), EProjectType.Standard));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
+        FieldEditors.Add(new IntFieldEditor(nameof(ProjectModel.MajorVersion), 1));
+        FieldEditors.Add(new IntFieldEditor(nameof(ProjectModel.MinorVersion)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveExtension)));

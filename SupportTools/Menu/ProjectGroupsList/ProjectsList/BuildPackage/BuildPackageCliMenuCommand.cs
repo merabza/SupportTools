@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using AppCliTools.CliMenu;
 using LibDotnetWork;
-using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
@@ -78,16 +75,6 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
-        var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
-
-        //მთავარი პროექტის csproj გამოიყენება პაკეტების ვერსიის საბაზისო ნაწილის დასადგენად
-        string? mainProjectFileName = project.MainProjectFileName(gitProjects);
-        if (mainProjectFileName is null)
-        {
-            StShared.WriteErrorLine($"Main project does not specified for {_projectName}", true);
-            return ValueTask.FromResult(false);
-        }
-
         //პაკეტების output ფოლდერი ყოველ ჯერზე თავიდან იქმნება,
         //რომ ატვირთვისას მხოლოდ ახლად შექმნილი პაკეტები მოხვდეს
         string outputFolderPath = Path.Combine(Path.GetTempPath(), "SupportTools", "BuildPackage", _projectName);
@@ -101,7 +88,7 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
-        string packageVersion = CreatePackageVersion(mainProjectFileName);
+        string packageVersion = CreatePackageVersion(project.MajorVersion, project.MinorVersion);
 
         if (_logger.IsEnabled(LogLevel.Information))
         {
@@ -130,35 +117,20 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
         return ValueTask.FromResult(false);
     }
 
-    //პაკეტის ვერსიის შექმნა csproj ფაილში მითითებული ვერსიისა და მიმდინარე თარიღის მიხედვით
-    private static string CreatePackageVersion(string mainProjectFileName)
+    //პაკეტის ვერსიის შექმნა პროექტში მითითებული MajorVersion, MinorVersion ვერსიებისა და მიმდინარე თარიღის მიხედვით
+    private static string CreatePackageVersion(int majorVersion, int minorVersion)
     {
-        XElement projectXml = XElement.Load(mainProjectFileName);
-
-        XElement? xmlVersionId = projectXml.Descendants("PropertyGroup").Descendants("Version").SingleOrDefault();
-
-        string versionId = xmlVersionId?.Value ?? "1.0.0";
-
-        string[] verNumbers = versionId.Split('.');
-        var packageVersionNumbers = new List<string>();
-        packageVersionNumbers.AddRange(verNumbers.Take(2));
-        if (packageVersionNumbers.Count == 0)
-        {
-            packageVersionNumbers.Add("1");
-        }
-
-        if (packageVersionNumbers.Count == 1)
-        {
-            packageVersionNumbers.Add("0");
-        }
-
         DateTime todayDate = DateTime.Today;
         DateTime now = DateTime.Now;
 
-        packageVersionNumbers.Add(
+        var packageVersionNumbers = new List<string>
+        {
+            majorVersion.ToString(CultureInfo.InvariantCulture),
+            minorVersion.ToString(CultureInfo.InvariantCulture),
             (todayDate - new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalDays.ToString(CultureInfo
-                .InvariantCulture));
-        packageVersionNumbers.Add(((int)(now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture));
+                .InvariantCulture),
+            ((int)(now - todayDate).TotalSeconds / 2).ToString(CultureInfo.InvariantCulture)
+        };
         return string.Join('.', packageVersionNumbers);
     }
 }

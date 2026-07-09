@@ -14,12 +14,12 @@
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="SystemTools.JetBrainsResharperGlobalToolsWork" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
     <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibDatabaseParameters\ParametersManagement.LibDatabaseParameters.csproj" />
-    <ProjectReference Include="..\..\SystemTools\SystemTools.JetBrainsResharperGlobalToolsWork\SystemTools.JetBrainsResharperGlobalToolsWork.csproj" />
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.CompressionManagement\ToolsManagement.CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />

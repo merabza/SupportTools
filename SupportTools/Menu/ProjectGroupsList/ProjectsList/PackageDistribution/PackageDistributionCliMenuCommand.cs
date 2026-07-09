@@ -187,7 +187,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
             {
                 continue;
             }
-
+            StShared.ConsoleWriteInformationLine(_logger, true, $"Processing {csprojFile}");
             //ჯერ მხოლოდ იკითხება csproj ფაილი, ცვლილებები კეთდება dotnet-ის ბრძანებებით
             XElement projectXml = XElement.Load(csprojFile);
             List<string> includes = projectXml.Descendants("ProjectReference")
@@ -223,10 +223,21 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
                 if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, latestVersion).IsSome)
                 {
-                    StShared.WriteErrorLine(
-                        $"Reference {refFullPath} was removed from {csprojFile}, but package {packageId} was not added. Recover the file from git if needed",
-                        true, _logger);
                     hadErrors = true;
+
+                    //თუ პაკეტის ჩასმა ვერ მოხერხდა, წაშლილი რეფერენსი უბრუნდება პროექტს,
+                    //რომ შეცვლილი პროექტი შეცდომაზე არ გავიდეს
+                    if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsSome)
+                    {
+                        StShared.WriteErrorLine(
+                            $"Cannot add package {packageId} to {csprojFile} and cannot restore removed reference {refFullPath}. Recover the file from git",
+                            true, _logger);
+                        continue;
+                    }
+
+                    StShared.WriteErrorLine(
+                        $"Cannot add package {packageId} to {csprojFile}. Removed reference was restored", true,
+                        _logger);
                     continue;
                 }
 

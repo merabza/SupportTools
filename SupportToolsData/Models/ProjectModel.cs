@@ -14,6 +14,8 @@ public sealed class ProjectModel : ItemData
     public EProjectType ProjectType { get; init; }
     public string? ProjectGroupName { get; init; }
     public string? ProjectDescription { get; set; }
+    public int MajorVersion { get; set; } = 1;
+    public int MinorVersion { get; set; }
     public bool UseAlternativeWebAgent { get; init; }
     public string? ProjectFolderName { get; init; }
     public string? SolutionFileName { get; init; }
