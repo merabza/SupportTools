@@ -108,8 +108,8 @@ public sealed class CheckPackageSolutionCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
-        //სოლუშენში შემავალი ყველა პროექტის სახელი უნდა იწყებოდეს სოლუშენის სახელით და წერტილით
-        if (!CheckProjectNamePrefixes(solutionName, solutionProjectFullPaths))
+        //სოლუშენის ფოლდერში მდებარე ყველა პროექტის სახელი უნდა იწყებოდეს სოლუშენის სახელით და წერტილით
+        if (!CheckProjectNamePrefixes(solutionName, solutionFolder, solutionProjectFullPaths))
         {
             return ValueTask.FromResult(false);
         }
@@ -153,9 +153,17 @@ public sealed class CheckPackageSolutionCliMenuCommand : CliMenuCommand
             pathPart.Equals("obj", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static bool CheckProjectNamePrefixes(string solutionName, List<string> solutionProjectFullPaths)
+    private static bool CheckProjectNamePrefixes(string solutionName, string solutionFolder,
+        List<string> solutionProjectFullPaths)
     {
+        //სახელები მოწმდება მხოლოდ იმ პროექტებს, რომლებიც სოლუშენის ფაილის ფოლდერში მდებარეობენ.
+        //სოლუშენის ფოლდერის გარეთ მიერთებული პროექტების სახელები არ მოწმდება
+        string solutionFolderPrefix =
+            Path.TrimEndingDirectorySeparator(Path.GetFullPath(solutionFolder)) + Path.DirectorySeparatorChar;
+
         List<string> invalidProjectNames = solutionProjectFullPaths
+            .Where(projectFileName =>
+                projectFileName.StartsWith(solutionFolderPrefix, StringComparison.OrdinalIgnoreCase))
             .Select(projectFileName => Path.GetFileNameWithoutExtension(projectFileName)).Where(projectName =>
                 !projectName.StartsWith(solutionName + ".", StringComparison.Ordinal)).ToList();
 
