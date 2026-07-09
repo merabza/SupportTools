@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AppCliTools.CliParametersDataEdit" />
+    <PackageReference Include="AppCliTools.CodeTools" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="SystemTools.DatabaseToolsShared" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParametersDataEdit\AppCliTools.CliParametersDataEdit.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>

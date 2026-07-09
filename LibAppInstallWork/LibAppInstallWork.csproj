@@ -6,18 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
-    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibFileParameters\ParametersManagement.LibFileParameters.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.ApiClientsManagement\ToolsManagement.ApiClientsManagement.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.FileManagersMain\ToolsManagement.FileManagersMain.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
-    <ProjectReference Include="..\..\WebAgentContracts\WebAgentContracts.WebAgentProjectsApiContracts\WebAgentContracts.WebAgentProjectsApiContracts.csproj" />
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AppCliTools.CliParameters" />
+    <PackageReference Include="ParametersManagement.LibFileParameters" />
     <PackageReference Include="SystemTools.TestApiContracts" />
+    <PackageReference Include="ToolsManagement.ApiClientsManagement" />
+    <PackageReference Include="ToolsManagement.FileManagersMain" />
+    <PackageReference Include="ToolsManagement.Installer" />
+    <PackageReference Include="WebAgentContracts.WebAgentProjectsApiContracts" />
   </ItemGroup>
 
 </Project>

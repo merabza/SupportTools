@@ -12,15 +12,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AppCliTools.CodeTools" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="ParametersManagement.LibDatabaseParameters" />
     <PackageReference Include="SystemTools.JetBrainsResharperGlobalToolsWork" />
+    <PackageReference Include="ToolsManagement.CompressionManagement" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
-    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibDatabaseParameters\ParametersManagement.LibDatabaseParameters.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.CompressionManagement\ToolsManagement.CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibNpmWork\LibNpmWork.csproj" />

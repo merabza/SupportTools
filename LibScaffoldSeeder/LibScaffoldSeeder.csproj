@@ -6,13 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParametersDataEdit\AppCliTools.CliParametersDataEdit.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.DbContextAnalyzer\AppCliTools.DbContextAnalyzer.csproj" />
-    <ProjectReference Include="..\..\AppCliTools\AppCliTools.LibSeedCodeCreator\AppCliTools.LibSeedCodeCreator.csproj" />
-    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.CompressionManagement\ToolsManagement.CompressionManagement.csproj" />
     <ProjectReference Include="..\LibAppProjectCreator\LibAppProjectCreator.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AppCliTools.CliParametersDataEdit" />
+    <PackageReference Include="AppCliTools.LibSeedCodeCreator" />
+    <PackageReference Include="ToolsManagement.CompressionManagement" />
   </ItemGroup>
 
 </Project>
