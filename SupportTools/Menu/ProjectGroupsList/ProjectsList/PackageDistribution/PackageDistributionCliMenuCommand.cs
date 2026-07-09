@@ -178,14 +178,10 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
         string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
-        bool hadErrors = false;
 
         //მანამდე უკვე ჩასმული ამავე პაკეტის პროექტის პაკეტების ვერსიები უახლესზე აიწევა,
         //რომ ძველ ვერსიებზე მიბმის გამო ვერსიების კონფლიქტები (NU1107) არ წარმოიშვას
-        if (!await UpdateExistingPackageVersions(mainRepoPath, packageRepoPath, server, cancellationToken))
-        {
-            hadErrors = true;
-        }
+        bool hadErrors = !await UpdateExistingPackageVersions(mainRepoPath, packageRepoPath, server, cancellationToken);
 
         foreach (string csprojFile in Directory.EnumerateFiles(mainRepoPath, "*.csproj", SearchOption.AllDirectories))
         {
@@ -194,6 +190,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
             {
                 continue;
             }
+
             StShared.ConsoleWriteInformationLine(_logger, true, $"Processing {csprojFile}");
             //ჯერ მხოლოდ იკითხება csproj ფაილი, ცვლილებები კეთდება dotnet-ის ბრძანებებით
             XElement projectXml = XElement.Load(csprojFile);
@@ -270,8 +267,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
         if (Directory.Exists(packageRepoPath))
         {
             packageIds = Directory.EnumerateFiles(packageRepoPath, "*.csproj", SearchOption.AllDirectories)
-                .Select(Path.GetFileNameWithoutExtension).OfType<string>()
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                .Select(Path.GetFileNameWithoutExtension).OfType<string>().ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
 
         bool hadErrors = false;
@@ -292,9 +288,9 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
                 //თუ პაკეტის რეპოზიტორიის კლონი ვერ მოიძებნა, გამოიყენება სახელების კონვენცია
                 bool isPackageProjectPackage = packageIds?.Contains(packageId) ??
-                                               (packageId.Equals(_projectName, StringComparison.OrdinalIgnoreCase) ||
-                                                packageId.StartsWith(_projectName + ".",
-                                                    StringComparison.OrdinalIgnoreCase));
+                                               packageId.Equals(_projectName, StringComparison.OrdinalIgnoreCase) ||
+                                               packageId.StartsWith(_projectName + ".",
+                                                   StringComparison.OrdinalIgnoreCase);
                 if (!isPackageProjectPackage)
                 {
                     continue;
