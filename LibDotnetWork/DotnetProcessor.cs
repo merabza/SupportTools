@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using LanguageExt;
 using Microsoft.Extensions.Logging;
 using OneOf;
@@ -152,6 +153,40 @@ public sealed class DotnetProcessor
 
         string outputResult = processResult.AsT0.Item1;
         return outputResult.Split(Environment.NewLine);
+    }
+
+    //სოლუშენში შემავალი პროექტების ჩამონათვალის მიღება dotnet sln list ბრძანებით.
+    //აბრუნებს პროექტების გზებს სოლუშენის ფოლდერის მიმართ
+    public OneOf<List<string>, Error[]> GetSolutionProjectsList(string solutionFileName)
+    {
+        OneOf<(string, int), Error[]> processResult =
+            StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"sln {solutionFileName} list");
+        if (processResult.IsT1)
+        {
+            return processResult.AsT1;
+        }
+
+        var projects = new List<string>();
+        bool headerPassed = false;
+        foreach (string outputLine in processResult.AsT0.Item1.Split(Environment.NewLine))
+        {
+            string trimmedLine = outputLine.Trim();
+            if (trimmedLine.Length == 0)
+            {
+                continue;
+            }
+
+            //სათაურის ხაზები მთავრდება ტირეებისგან შემდგარი გამყოფი ხაზით
+            if (!headerPassed)
+            {
+                headerPassed = trimmedLine.All(c => c == '-');
+                continue;
+            }
+
+            projects.Add(trimmedLine);
+        }
+
+        return projects;
     }
 
     public Option<Error[]> InstallTool(string packageId, string? version = null)

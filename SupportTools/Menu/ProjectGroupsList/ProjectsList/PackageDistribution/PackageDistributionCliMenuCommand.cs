@@ -99,8 +99,8 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
         var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
 
-        var hadErrors = false;
-        var consumersCount = 0;
+        bool hadErrors = false;
+        int consumersCount = 0;
 
         //მომხმარებელი პროექტია ყველა ის პროექტი, რომლის გიტების სიაშიც არის პაკეტის პროექტის რეპოზიტორია
         foreach ((string consumerProjectName, ProjectModel consumerProject) in parameters.Projects.OrderBy(x => x.Key,
@@ -123,7 +123,8 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
         if (_logger.IsEnabled(LogLevel.Information))
         {
-            _logger.LogInformation("Package distribution for {ProjectName} finished. Consumer projects processed: {ConsumersCount}",
+            _logger.LogInformation(
+                "Package distribution for {ProjectName} finished. Consumer projects processed: {ConsumersCount}",
                 _projectName, consumersCount);
         }
 
@@ -177,7 +178,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
         string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
-        var hadErrors = false;
+        bool hadErrors = false;
 
         foreach (string csprojFile in Directory.EnumerateFiles(mainRepoPath, "*.csproj", SearchOption.AllDirectories))
         {
@@ -320,7 +321,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
         }
 
         string content = await response.Content.ReadAsStringAsync(cancellationToken);
-        List<string>? versions = JObject.Parse(content)["versions"]?.ToObject<List<string>>();
+        var versions = JObject.Parse(content)["versions"]?.ToObject<List<string>>();
         if (versions is null || versions.Count == 0)
         {
             StShared.WriteErrorLine($"Versions list is empty for package {packageId}", true, _logger);

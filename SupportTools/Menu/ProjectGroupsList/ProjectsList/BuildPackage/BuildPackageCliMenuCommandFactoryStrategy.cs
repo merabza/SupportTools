@@ -12,7 +12,6 @@ public class BuildPackageCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new BuildPackageCliMenuCommand(logger, (ParametersManager)parametersManager,
-            menuParameters.ProjectName);
+        return new BuildPackageCliMenuCommand(logger, (ParametersManager)parametersManager, menuParameters.ProjectName);
     }
 }

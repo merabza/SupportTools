@@ -167,8 +167,8 @@ public sealed class ProgramInstallerParameters : IParameters
         }
 
         var progInstallerParameters = new ProgramInstallerParameters(projectName,
-            project.ProjectType == EProjectType.IsService, serverInfo,
-            installerBaseParameters, serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
+            project.ProjectType == EProjectType.IsService, serverInfo, installerBaseParameters,
+            serverInfo.ServiceUserName, serverInfo.AppSettingsJsonSourceFileName,
             serverInfo.AppSettingsEncodedJsonFileName, proxySettings, fileStorageForDownload, webAgentForCheck,
             programArchiveDateMask, programArchiveExtension, parametersFileDateMask, parametersFileExtension,
             supportToolsParameters.ServiceDescriptionSignature, project.ProjectDescription);

@@ -128,7 +128,6 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
 
         StShared.WriteErrorLine($"Cannot push package for project {_projectName}", true, _logger);
         return ValueTask.FromResult(false);
-
     }
 
     //პაკეტის ვერსიის შექმნა csproj ფაილში მითითებული ვერსიისა და მიმდინარე თარიღის მიხედვით

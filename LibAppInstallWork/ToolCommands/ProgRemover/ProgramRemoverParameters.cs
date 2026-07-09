@@ -103,8 +103,8 @@ public sealed class ProgramRemoverParameters : IParameters
             return proxySettings is null
                 ? null
                 : new ProgramRemoverParameters(projectName, serverInfo.EnvironmentName,
-                    project.ProjectType == EProjectType.IsService,
-                    webAgentForInstall, installFolder); //, proxySettings, checkVersionParameters.WebAgentForCheck);
+                    project.ProjectType == EProjectType.IsService, webAgentForInstall,
+                    installFolder); //, proxySettings, checkVersionParameters.WebAgentForCheck);
         }
         catch (Exception e)
         {

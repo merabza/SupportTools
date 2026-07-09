@@ -4,6 +4,7 @@ using System.Linq;
 using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
@@ -36,9 +37,10 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         ProjectModel? project = parameters.GetProject(_projectName);
 
         List<string> excludeList = [];
-        //პაკეტის დაბილდვისა და გავრცელების ბრძანებები ჩანს მხოლოდ პაკეტის ტიპის პროექტებისთვის
+        //პაკეტის შემოწმების, დაბილდვისა და გავრცელების ბრძანებები ჩანს მხოლოდ პაკეტის ტიპის პროექტებისთვის
         if (project is null || project.ProjectType != EProjectType.IsPackage)
         {
+            excludeList.Add(nameof(CheckPackageSolutionCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(BuildPackageCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
         }
