@@ -214,5 +214,9 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         var uploadGitProjectsToSupportToolsServerCliMenuCommand =
             new UploadGitProjectsToSupportToolsServerCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
         cruderSubMenuSet.InsertMenuItem(2, uploadGitProjectsToSupportToolsServerCliMenuCommand);
+
+        var findGitProjectsWithoutMatchingProjectsCliMenuCommand =
+            new FindGitProjectsWithoutMatchingProjectsCliMenuCommand(this, ParametersManager);
+        cruderSubMenuSet.InsertMenuItem(3, findGitProjectsWithoutMatchingProjectsCliMenuCommand);
     }
 }
