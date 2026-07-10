@@ -209,10 +209,10 @@ public sealed class GitCruder : ParCruder<GitDataModel>
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
         var updateGitProjectsCommand = new UpdateGitProjectsCliMenuCommand(_logger, ParametersManager);
-        cruderSubMenuSet.AddMenuItem(updateGitProjectsCommand);
+        cruderSubMenuSet.InsertMenuItem(1, updateGitProjectsCommand);
 
         var uploadGitProjectsToSupportToolsServerCliMenuCommand =
             new UploadGitProjectsToSupportToolsServerCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
-        cruderSubMenuSet.AddMenuItem(uploadGitProjectsToSupportToolsServerCliMenuCommand);
+        cruderSubMenuSet.InsertMenuItem(2, uploadGitProjectsToSupportToolsServerCliMenuCommand);
     }
 }
