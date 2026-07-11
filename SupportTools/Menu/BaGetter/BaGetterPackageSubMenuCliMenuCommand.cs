@@ -32,14 +32,14 @@ public sealed class BaGetterPackageSubMenuCliMenuCommand : CliMenuCommand
             return packageMenuSet;
         }
 
+        //ყველა ვერსიის და მთლიანად პაკეტის წაშლა
+        packageMenuSet.AddMenuItem(new DeleteBaGetterPackageCliMenuCommand(_logger, _apiClient, _packageId));
+
         //პაკეტის ვერსიების ჩამონათვალი
         foreach (string version in versions)
         {
             packageMenuSet.AddMenuItem(new BaGetterVersionSubMenuCliMenuCommand(_apiClient, _packageId, version));
         }
-
-        //ყველა ვერსიის და მთლიანად პაკეტის წაშლა
-        packageMenuSet.AddMenuItem(new DeleteBaGetterPackageCliMenuCommand(_logger, _apiClient, _packageId));
 
         packageMenuSet.AddEscapeCommand();
         return packageMenuSet;
