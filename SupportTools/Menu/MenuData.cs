@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AppCliTools.CliTools.Menu.RecentCommandsList;
+using SupportTools.Menu.BaGetter;
 using SupportTools.Menu.CheckAllProjectsBuild;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
@@ -56,6 +57,8 @@ public static class MenuData
         nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
         //ყველა პროექტის build-ის შემოწმება
         nameof(CheckAllProjectsBuildCliMenuCommandFactoryStrategy),
+        //BaGetter პაკეტების სერვერზე პაკეტების ჩამონათვალი და მართვა
+        nameof(BaGetterSubMenuCliMenuCommandFactoryStrategy),
         //პროექტების ჯგუფების ჩამონათვალი
         nameof(ProjectGroupsListFactoryStrategy),
         //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
