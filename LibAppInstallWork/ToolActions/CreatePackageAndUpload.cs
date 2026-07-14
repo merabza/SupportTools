@@ -163,6 +163,15 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
+        _logger.LogInformation("Cleaning previous build outputs...");
+
+        //წინა ბილდების ნაშთები იწმინდება, რომ პაკეტში ძველ რეფერენსებზე აწყობილი assembly-ები არ მოხვდეს
+        if (dotnetProcessor.CleanRelease(_runtime, _mainProjectFileName).IsSome)
+        {
+            _logger.LogError("Cannot clean project {_projectName}", _projectName);
+            return false;
+        }
+
         //მთავარი პროექტის შექმნა
         if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsSome)
         {

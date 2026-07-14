@@ -30,6 +30,12 @@ public sealed class DotnetProcessor
             $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:AssemblyVersion={assemblyVersion}");
     }
 
+    public Option<Error[]> CleanRelease(string runtime, string mainProjectFileName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"clean --configuration Release --runtime {runtime} {mainProjectFileName}");
+    }
+
     public Option<Error[]> CreateNewSolution(string solutionPath, string solutionName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
