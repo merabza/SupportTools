@@ -20,11 +20,11 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.9" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
-    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.JetBrainsResharperGlobalToolsWork" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.SerilogStuff" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.SystemToolsShared" Version="1.0.9689.2043" />
-    <PackageVersion Include="SystemTools.TestApiContracts" Version="1.0.9689.2043" />
+    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.JetBrainsResharperGlobalToolsWork" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.SerilogStuff" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.SystemToolsShared" Version="1.0.9691.25951" />
+    <PackageVersion Include="SystemTools.TestApiContracts" Version="1.0.9691.25951" />
     <PackageVersion Include="ToolsManagement.ApiClientsManagement" Version="1.0.9686.35962" />
     <PackageVersion Include="ToolsManagement.CompressionManagement" Version="1.0.9686.35962" />
     <PackageVersion Include="ToolsManagement.FileManagersMain" Version="1.0.9686.35962" />
