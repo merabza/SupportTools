@@ -11,11 +11,8 @@
     <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\LibGitData\LibGitData.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AppCliTools.CliMenu" />
-    <PackageReference Include="DatabaseTools.SqlServerDbTools" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliMenu\AppCliTools.CliMenu.csproj" />
+    <ProjectReference Include="..\..\DatabaseTools\DatabaseTools.SqlServerDbTools\DatabaseTools.SqlServerDbTools.csproj" />
   </ItemGroup>
 
 </Project>

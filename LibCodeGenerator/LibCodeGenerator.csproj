@@ -9,11 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AppCliTools.CliParameters" />
-    <PackageReference Include="AppCliTools.CodeTools" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CodeTools\AppCliTools.CodeTools.csproj" />
   </ItemGroup>
 
 </Project>

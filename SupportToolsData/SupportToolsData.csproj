@@ -8,14 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SupportToolsServerShared\SupportToolsServerApiContracts\SupportToolsServerApiContracts.csproj" />
     <ProjectReference Include="..\LibGitData\LibGitData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AppCliTools.CliTools" />
-    <PackageReference Include="ParametersManagement.LibDatabaseParameters" />
-    <PackageReference Include="ParametersManagement.LibFileParameters" />
-    <PackageReference Include="ToolsManagement.ApiClientsManagement" />
-    <PackageReference Include="ToolsManagement.Installer" />
+    <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliTools\AppCliTools.CliTools.csproj" />
+    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibDatabaseParameters\ParametersManagement.LibDatabaseParameters.csproj" />
+    <ProjectReference Include="..\..\ParametersManagement\ParametersManagement.LibFileParameters\ParametersManagement.LibFileParameters.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.ApiClientsManagement\ToolsManagement.ApiClientsManagement.csproj" />
+    <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
   </ItemGroup>
 
 </Project>

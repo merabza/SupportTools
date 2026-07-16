@@ -28,6 +28,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
+using SupportTools.Menu.ReversePackageDistribution;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
 using SupportTools.Menu.SyncAllProjectsAllGits;
@@ -53,6 +54,8 @@ public static class MenuData
         nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy),
         //ყველა პროექტის პაკეტების განახლება
         nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy),
+        //ყველა პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით
+        nameof(ReversePackageDistributionCliMenuCommandFactoryStrategy),
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
         nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
         //ყველა პროექტის build-ის შემოწმება
