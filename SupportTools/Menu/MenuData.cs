@@ -5,6 +5,7 @@ using SupportTools.Menu.CheckAllProjectsBuild;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
 using SupportTools.Menu.CreateProject;
+using SupportTools.Menu.DistributeAllPackages;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
@@ -54,6 +55,8 @@ public static class MenuData
         nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy),
         //ყველა პროექტის პაკეტების განახლება
         nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy),
+        //ყველა პაკეტის პროექტის სინქრონიზაცია, დაბილდვა, ატვირთვა და გავრცელება დამოკიდებულებების მიხედვით დალაგებული თანმიმდევრობით
+        nameof(DistributeAllPackagesCliMenuCommandFactoryStrategy),
         //ყველა პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით
         nameof(ReversePackageDistributionCliMenuCommandFactoryStrategy),
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
