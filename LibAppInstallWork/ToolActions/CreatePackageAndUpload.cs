@@ -165,12 +165,18 @@ public sealed class CreatePackageAndUpload : ToolAction
 
         _logger.LogInformation("Cleaning previous build outputs...");
 
-        //წინა ბილდების ნაშთები იწმინდება, რომ პაკეტში ძველ რეფერენსებზე აწყობილი assembly-ები არ მოხვდეს
-        if (dotnetProcessor.CleanRelease(_runtime, _mainProjectFileName).IsSome)
+        //წინა ბილდების ნაშთები იწმინდება, რომ პაკეტში ძველ რეფერენსებზე აწყობილი assembly-ები არ მოხვდეს.
+        //dotnet clean აქ არ გამოდგება, რადგან ის მოითხოვს შესაბამისი runtime-ით გაკეთებულ restore-ს (NETSDK1047),
+        //ამიტომ bin და obj ფოლდერები პირდაპირ იშლება. publish თვითონ გააკეთებს ახალ restore-ს.
+        string? mainProjectFolderPath = Path.GetDirectoryName(_mainProjectFileName);
+        if (string.IsNullOrWhiteSpace(mainProjectFolderPath))
         {
-            _logger.LogError("Cannot clean project {_projectName}", _projectName);
+            _logger.LogError("Cannot detect project folder for {_mainProjectFileName}", _mainProjectFileName);
             return false;
         }
+
+        FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "bin"));
+        FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "obj"));
 
         //მთავარი პროექტის შექმნა
         if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsSome)
