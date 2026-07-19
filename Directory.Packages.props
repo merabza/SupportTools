@@ -4,15 +4,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AppCliTools.CliMenu" Version="1.0.9686.36108" />
-    <PackageVersion Include="AppCliTools.CliParameters" Version="1.0.9686.36108" />
-    <PackageVersion Include="AppCliTools.CliParametersDataEdit" Version="1.0.9686.36108" />
-    <PackageVersion Include="AppCliTools.CliTools" Version="1.0.9686.36108" />
-    <PackageVersion Include="AppCliTools.CodeTools" Version="1.0.9686.36108" />
-    <PackageVersion Include="AppCliTools.LibSeedCodeCreator" Version="1.0.9686.36108" />
-    <PackageVersion Include="DatabaseTools.SqlServerDbTools" Version="1.0.9686.33837" />
-    <PackageVersion Include="ParametersManagement.LibDatabaseParameters" Version="1.0.9686.34062" />
-    <PackageVersion Include="ParametersManagement.LibFileParameters" Version="1.0.9686.34062" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
@@ -20,15 +11,5 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.10" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
-    <PackageVersion Include="SystemTools.DatabaseToolsShared" Version="1.0.9691.25951" />
-    <PackageVersion Include="SystemTools.JetBrainsResharperGlobalToolsWork" Version="1.0.9691.25951" />
-    <PackageVersion Include="SystemTools.SerilogStuff" Version="1.0.9691.25951" />
-    <PackageVersion Include="SystemTools.SystemToolsShared" Version="1.0.9691.25951" />
-    <PackageVersion Include="SystemTools.TestApiContracts" Version="1.0.9691.25951" />
-    <PackageVersion Include="ToolsManagement.ApiClientsManagement" Version="1.0.9686.35962" />
-    <PackageVersion Include="ToolsManagement.CompressionManagement" Version="1.0.9686.35962" />
-    <PackageVersion Include="ToolsManagement.FileManagersMain" Version="1.0.9686.35962" />
-    <PackageVersion Include="ToolsManagement.Installer" Version="1.0.9686.35962" />
-    <PackageVersion Include="WebAgentContracts.WebAgentProjectsApiContracts" Version="1.0.9686.34669" />
   </ItemGroup>
 </Project>

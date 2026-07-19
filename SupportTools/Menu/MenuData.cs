@@ -29,6 +29,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
+using SupportTools.Menu.RemoveUnusedPackageVersions;
 using SupportTools.Menu.ReversePackageDistribution;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
@@ -59,6 +60,8 @@ public static class MenuData
         nameof(DistributeAllPackagesCliMenuCommandFactoryStrategy),
         //ყველა პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით
         nameof(ReversePackageDistributionCliMenuCommandFactoryStrategy),
+        //ყველა პროექტის Directory.Packages.props ფაილებიდან გამოუყენებელი PackageVersion ჩანაწერების წაშლა
+        nameof(RemoveUnusedPackageVersionsCliMenuCommandFactoryStrategy),
         //ყველა ჯგუფების, ყველა სოლუშენის, ყველა პროექტის გასუფთავება
         nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
         //ყველა პროექტის build-ის შემოწმება
