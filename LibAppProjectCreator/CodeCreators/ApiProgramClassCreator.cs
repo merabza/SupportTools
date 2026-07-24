@@ -15,8 +15,8 @@ public sealed class ApiProgramClassCreator : CodeCreator
     private readonly bool _useDatabase;
     private readonly bool _useFluentValidation;
     private readonly bool _useIdentity;
-    private readonly bool _useReact;
     private readonly bool _useReCounter;
+    private readonly bool _useReact;
     private readonly bool _useSignalR;
 
     // ReSharper disable once ConvertToPrimaryConstructor

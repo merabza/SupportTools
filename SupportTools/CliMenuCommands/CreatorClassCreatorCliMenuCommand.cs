@@ -172,7 +172,17 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
     private static bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
     {
-        List<string> existsFileNames = [.. classCreatorInfos.Select(classCreatorInfo => new { classCreatorInfo, toGenerateFileName = Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName) }).Where(x => File.Exists(x.toGenerateFileName)).Select(sx => sx.classCreatorInfo.DestinationCodeFileName)];
+        List<string> existsFileNames =
+        [
+            .. classCreatorInfos
+                .Select(classCreatorInfo => new
+                {
+                    classCreatorInfo,
+                    toGenerateFileName =
+                        Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
+                }).Where(x => File.Exists(x.toGenerateFileName))
+                .Select(sx => sx.classCreatorInfo.DestinationCodeFileName)
+        ];
 
         if (existsFileNames.Count <= 0)
         {

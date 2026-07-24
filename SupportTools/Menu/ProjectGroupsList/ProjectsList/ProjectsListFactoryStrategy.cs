@@ -23,7 +23,6 @@ public class ProjectsListFactoryStrategy(
                 .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                             menuParameters.ProjectGroupName).OrderBy(o => o.Key).Select(kvp =>
                     new ProjectSubMenuCliMenuCommand(serviceProvider, parametersManager, kvp.Key, menuParameters))
-                .Cast<CliMenuCommand>()
         ];
     }
 }

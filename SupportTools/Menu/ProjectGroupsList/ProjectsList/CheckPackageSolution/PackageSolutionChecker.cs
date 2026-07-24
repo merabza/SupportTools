@@ -161,8 +161,8 @@ public sealed class PackageSolutionChecker
     {
         //სახელები მოწმდება მხოლოდ იმ პროექტებს, რომლებიც სოლუშენის ფაილის ფოლდერში მდებარეობენ.
         //სოლუშენის ფოლდერის გარეთ მიერთებული პროექტების სახელები არ მოწმდება
-        string solutionFolderPrefix =
-            Path.TrimEndingDirectorySeparator(Path.GetFullPath(solutionFolder)) + Path.DirectorySeparatorChar;
+        string solutionFolderPrefix = Path.TrimEndingDirectorySeparator(Path.GetFullPath(solutionFolder)) +
+                                      Path.DirectorySeparatorChar;
 
         List<string> invalidProjectNames =
         [

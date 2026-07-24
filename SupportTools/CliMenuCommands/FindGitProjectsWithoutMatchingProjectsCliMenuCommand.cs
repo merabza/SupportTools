@@ -16,9 +16,8 @@ public sealed class FindGitProjectsWithoutMatchingProjectsCliMenuCommand : CliMe
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public FindGitProjectsWithoutMatchingProjectsCliMenuCommand(Cruder gitCruder,
-        IParametersManager parametersManager) : base("Find Git Projects Without Matching Projects",
-        EMenuAction.LoadSubMenu)
+    public FindGitProjectsWithoutMatchingProjectsCliMenuCommand(Cruder gitCruder, IParametersManager parametersManager)
+        : base("Find Git Projects Without Matching Projects", EMenuAction.LoadSubMenu)
     {
         _gitCruder = gitCruder;
         _parametersManager = parametersManager;

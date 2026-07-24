@@ -250,8 +250,8 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
                              .Where(x => x.Name.LocalName is "PackageReference" or "GlobalPackageReference"))
                 {
                     if (!TryAddPackageId(usedPackageIds, (string?)referenceElement.Attribute("Include"),
-                            consumerFile) ||
-                        !TryAddPackageId(usedPackageIds, (string?)referenceElement.Attribute("Update"), consumerFile))
+                            consumerFile) || !TryAddPackageId(usedPackageIds,
+                            (string?)referenceElement.Attribute("Update"), consumerFile))
                     {
                         return null;
                     }

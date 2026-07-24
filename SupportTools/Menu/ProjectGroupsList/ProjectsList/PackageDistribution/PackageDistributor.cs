@@ -38,8 +38,8 @@ public sealed class PackageDistributor
     private string? _packageBaseAddress;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName)
+    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
+        string projectName)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

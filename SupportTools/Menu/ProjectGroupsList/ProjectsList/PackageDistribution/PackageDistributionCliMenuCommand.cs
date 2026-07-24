@@ -35,8 +35,7 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        var packageDistributor =
-            new PackageDistributor(_logger, _httpClientFactory, _parametersManager, _projectName);
+        var packageDistributor = new PackageDistributor(_logger, _httpClientFactory, _parametersManager, _projectName);
         return await packageDistributor.DistributePackage(cancellationToken);
     }
 }

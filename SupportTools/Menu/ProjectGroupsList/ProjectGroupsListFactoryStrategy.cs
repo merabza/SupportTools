@@ -22,7 +22,7 @@ public class ProjectGroupsListFactoryStrategy(
             .. parameters.Projects.Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
                 .Distinct().OrderBy(x => x).Select(projectGroupName =>
                     new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager, projectGroupName,
-                        menuParameters)).Cast<CliMenuCommand>()
+                        menuParameters))
         ];
     }
 }
