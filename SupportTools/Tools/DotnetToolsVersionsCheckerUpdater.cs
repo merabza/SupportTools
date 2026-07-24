@@ -283,15 +283,17 @@ public static class DotnetToolsVersionsCheckerUpdater
         OneOf<IEnumerable<string>, Error[]> getToolsRawListResult = dotnetProcessor.GetToolsRawList();
         return getToolsRawListResult.Match<OneOf<List<DotnetToolData>, Error[]>>(t0 =>
         {
-            List<DotnetToolData> listOfTools = t0.Skip(2)
-                .Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
-                .Where(lineParts => lineParts.Length == 3).Select(lineParts => new DotnetToolData
-                {
-                    PackageId = lineParts[0],
-                    InstalledVersion = lineParts[1],
-                    LatestVersion = null,
-                    CommandName = lineParts[2]
-                }).ToList();
+            List<DotnetToolData> listOfTools =
+            [
+                .. t0.Skip(2).Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+                    .Where(lineParts => lineParts.Length == 3).Select(lineParts => new DotnetToolData
+                    {
+                        PackageId = lineParts[0],
+                        InstalledVersion = lineParts[1],
+                        LatestVersion = null,
+                        CommandName = lineParts[2]
+                    })
+            ];
 
             return listOfTools;
         }, t1 => t1.ToArray());

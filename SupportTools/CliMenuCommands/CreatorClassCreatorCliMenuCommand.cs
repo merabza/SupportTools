@@ -99,7 +99,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
             Console.WriteLine($"Analyze {cci.SourceFileFullPath}...");
             string fileContent = File.ReadAllText(cci.SourceFileFullPath);
             string[] lines = fileContent.Split(Environment.NewLine);
-            List<LineData> lineData = lines.Select(LineData.Create).ToList();
+            List<LineData> lineData = [.. lines.Select(LineData.Create)];
             for (int i = 1; i < lineData.Count - 1; i++)
             {
                 if (string.IsNullOrEmpty(lineData[i].DryLine))
@@ -172,14 +172,7 @@ public sealed class CreatorClassCreatorCliMenuCommand : CliMenuCommand
 
     private static bool CheckDestinationFilesExists(List<ClassCreatorInfo> classCreatorInfos)
     {
-        List<string> existsFileNames = classCreatorInfos
-            .Select(classCreatorInfo => new
-            {
-                classCreatorInfo,
-                toGenerateFileName =
-                    Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName)
-            }).Where(x => File.Exists(x.toGenerateFileName))
-            .Select(sx => sx.classCreatorInfo.DestinationCodeFileName).ToList();
+        List<string> existsFileNames = [.. classCreatorInfos.Select(classCreatorInfo => new { classCreatorInfo, toGenerateFileName = Path.Combine(classCreatorInfo.DestinationFolder, classCreatorInfo.DestinationCodeFileName) }).Where(x => File.Exists(x.toGenerateFileName)).Select(sx => sx.classCreatorInfo.DestinationCodeFileName)];
 
         if (existsFileNames.Count <= 0)
         {

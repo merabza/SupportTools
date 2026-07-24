@@ -23,16 +23,20 @@ public static class TableRowsAdjuster
                         ? string.Empty
                         : v.ToString()?.ToLower(CultureInfo.CurrentCulture) ?? string.Empty));
 
-        List<string> duplicatePriorityKeys = listWithMorePriority.GroupBy(KeySelector).Where(g => g.Count() > 1)
-            .Select(g => g.Key).ToList();
+        List<string> duplicatePriorityKeys =
+        [
+            .. listWithMorePriority.GroupBy(KeySelector).Where(g => g.Count() > 1).Select(g => g.Key)
+        ];
         if (duplicatePriorityKeys.Count > 0)
         {
             throw new InvalidOperationException(
                 $"Priority keys contain duplicates for {tableLabel}: {string.Join(", ", duplicatePriorityKeys)}");
         }
 
-        List<string> duplicateSecondaryKeys = listWithLessPriority.GroupBy(KeySelector).Where(g => g.Count() > 1)
-            .Select(g => g.Key).ToList();
+        List<string> duplicateSecondaryKeys =
+        [
+            .. listWithLessPriority.GroupBy(KeySelector).Where(g => g.Count() > 1).Select(g => g.Key)
+        ];
         if (duplicateSecondaryKeys.Count > 0)
         {
             throw new InvalidOperationException(

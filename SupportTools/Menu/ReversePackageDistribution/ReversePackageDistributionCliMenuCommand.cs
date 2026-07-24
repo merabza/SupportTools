@@ -106,8 +106,11 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
             StShared.ConsoleWriteInformationLine(_logger, true, $"Processing {csprojFile}");
             //ჯერ მხოლოდ იკითხება csproj ფაილი, ცვლილებები კეთდება dotnet-ის ბრძანებებით
             XElement projectXml = XElement.Load(csprojFile);
-            List<string> packageIds = projectXml.Descendants("PackageReference")
-                .Select(x => (string?)x.Attribute("Include")).OfType<string>().ToList();
+            List<string> packageIds =
+            [
+                .. projectXml.Descendants("PackageReference").Select(x => (string?)x.Attribute("Include"))
+                    .OfType<string>()
+            ];
 
             foreach (string packageId in packageIds)
             {

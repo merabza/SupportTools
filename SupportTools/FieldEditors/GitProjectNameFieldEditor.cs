@@ -48,9 +48,12 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 
         var gitProjectNamesMenuSet = new CliMenuSet();
 
-        List<string> keys = parameters.GitProjects
-            .Where(x => x.Value.GitName is not null && x.Value.ProjectExtension == _projectExtension &&
-                        projectGitNames.Contains(x.Value.GitName)).Select(x => x.Key).OrderBy(x => x).ToList();
+        List<string> keys =
+        [
+            .. parameters.GitProjects
+                .Where(x => x.Value.GitName is not null && x.Value.ProjectExtension == _projectExtension &&
+                            projectGitNames.Contains(x.Value.GitName)).Select(x => x.Key).OrderBy(x => x)
+        ];
 
         if (keys.Count < 1)
         {

@@ -114,7 +114,7 @@ public sealed class UpdateGitProjectsToolAction : ToolAction
             XElement projectXml = XElement.Load(filePath);
 
             List<XElement> projectReferences =
-                projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
+                [.. projectXml.Descendants("ItemGroup").Descendants("ProjectReference")];
 
             foreach (XElement element in projectReferences)
             {

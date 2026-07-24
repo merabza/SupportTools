@@ -100,12 +100,15 @@ public sealed class ReactEsProjectCreator
             return [];
         }
 
-        return (from link in links
+        return
+        [
+            .. from link in links
             let hrefValue = link.GetAttributeValue("href", string.Empty)
             let titleValue = link.GetAttributeValue("title", string.Empty)
             where !string.IsNullOrWhiteSpace(hrefValue) && !string.IsNullOrWhiteSpace(titleValue) &&
                   char.IsDigit(titleValue[0])
-            select (hrefValue, titleValue)).ToList();
+            select (hrefValue, titleValue)
+        ];
     }
 
     private (HttpStatusCode, string?) GetOnePageContent(Uri uri)

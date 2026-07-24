@@ -23,11 +23,13 @@ public class ProjectToolsListFactoryStrategy(
 
         if (project != null)
         {
-            return Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
-                .OrderBy(x => x.GetProjectToolName())
-                .Select(tool =>
-                    new ProjectToolTaskCliMenuCommand(serviceProvider, tool, menuParameters.ProjectName,
-                        parametersManager)).Cast<CliMenuCommand>().ToList();
+            return
+            [
+                .. Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
+                    .OrderBy(x => x.GetProjectToolName()).Select(tool =>
+                        new ProjectToolTaskCliMenuCommand(serviceProvider, tool, menuParameters.ProjectName,
+                            parametersManager))
+            ];
         }
 
         logger.LogWarning("Project not found: {ProjectName}", menuParameters.ProjectName);

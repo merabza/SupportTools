@@ -38,9 +38,12 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //მხოლოდ ამ ჯგუფის პროექტები იხსნება, სახელების ანბანური თანმიმდევრობით
-        List<KeyValuePair<string, ProjectModel>> groupProjects = parameters.Projects
-            .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
-            .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase).ToList();
+        List<KeyValuePair<string, ProjectModel>> groupProjects =
+        [
+            .. parameters.Projects
+                .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+                .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
+        ];
 
         string? devenvPath = VisualStudioOpener.DetectDevEnvPath(_logger);
 

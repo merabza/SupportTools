@@ -17,9 +17,12 @@ public class ProjectGroupsListFactoryStrategy(
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
-        return parameters.Projects.Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
-            .Distinct().OrderBy(x => x)
-            .Select(projectGroupName => new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager,
-                projectGroupName, menuParameters)).Cast<CliMenuCommand>().ToList();
+        return
+        [
+            .. parameters.Projects.Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
+                .Distinct().OrderBy(x => x).Select(projectGroupName =>
+                    new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager, projectGroupName,
+                        menuParameters)).Cast<CliMenuCommand>()
+        ];
     }
 }

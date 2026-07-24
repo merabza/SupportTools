@@ -13,9 +13,12 @@ internal static class TopologicalSorter
         var nodeSet = new HashSet<(string Schema, string Table)>(nodes);
 
         //ვითვალისწინებთ მხოლოდ იმ edge-ებს, რომელთა ორივე ბოლო პოვნადია nodes-ში; self-reference იგნორდება
-        List<FkEdge> relevantEdges = edges.Where(e =>
-            nodeSet.Contains((e.FromSchema, e.FromTable)) && nodeSet.Contains((e.ToSchema, e.ToTable)) &&
-            !(e.FromSchema == e.ToSchema && e.FromTable == e.ToTable)).ToList();
+        List<FkEdge> relevantEdges =
+        [
+            .. edges.Where(e =>
+                nodeSet.Contains((e.FromSchema, e.FromTable)) && nodeSet.Contains((e.ToSchema, e.ToTable)) &&
+                !(e.FromSchema == e.ToSchema && e.FromTable == e.ToTable))
+        ];
 
         //adjacency: To → set of From (referenced table → list of tables that depend on it)
         var dependents = new Dictionary<(string Schema, string Table), HashSet<(string Schema, string Table)>>();
@@ -67,7 +70,7 @@ internal static class TopologicalSorter
         }
 
         //ციკლი არსებობს: ციკლის შემცველ ცხრილებად ვცილცილდებით ყველაფერს, რაც ordered-ში არ მოყვა
-        List<(string Schema, string Table)> cycle = nodes.Where(n => incomingCount[n] > 0).ToList();
+        List<(string Schema, string Table)> cycle = [.. nodes.Where(n => incomingCount[n] > 0)];
         return new SortResult(null, cycle);
     }
 

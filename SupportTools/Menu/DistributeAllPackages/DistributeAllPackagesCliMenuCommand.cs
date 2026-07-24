@@ -65,8 +65,11 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         List<string> orderedProjectNames = OrderPackageProjectsByDependencies(packageProjects);
         if (orderedProjectNames.Count != packageProjects.Count)
         {
-            List<string> cycleProjectNames = packageProjects.Keys.Except(orderedProjectNames, StringComparer.Ordinal)
-                .OrderBy(x => x, StringComparer.Ordinal).ToList();
+            List<string> cycleProjectNames =
+            [
+                .. packageProjects.Keys.Except(orderedProjectNames, StringComparer.Ordinal)
+                    .OrderBy(x => x, StringComparer.Ordinal)
+            ];
             StShared.WriteErrorLine(
                 $"Cannot order package projects by dependencies, cycle detected. Projects in cycle: {string.Join(", ", cycleProjectNames)}",
                 true, _logger);

@@ -56,9 +56,10 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         }
 
         _menuParameters.ProjectName = _projectName;
-        return CliMenuSetFactory.CreateMenuSet(_projectName,
-            MenuData.ProjectSubMenuCommandFactoryStrategyNames
-                .Where(menuCommandName => !excludeList.Contains(menuCommandName)).ToList(), _serviceProvider);
+        return CliMenuSetFactory.CreateMenuSet(_projectName, [
+            .. MenuData.ProjectSubMenuCommandFactoryStrategyNames.Where(menuCommandName =>
+                !excludeList.Contains(menuCommandName))
+        ], _serviceProvider);
     }
 
     protected override string? GetStatus()

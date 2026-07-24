@@ -17,13 +17,13 @@ public sealed class GitProjectDataModel
 
     public void DependsOn(List<string> dependsOnProjectNames)
     {
-        List<string> newProjects = dependsOnProjectNames.Except(DependsOnProjectNames).ToList();
+        List<string> newProjects = [.. dependsOnProjectNames.Except(DependsOnProjectNames)];
         if (newProjects.Count > 0)
         {
             DependsOnProjectNames.AddRange(newProjects);
         }
 
-        List<string> forDeleteProjects = DependsOnProjectNames.Except(dependsOnProjectNames).ToList();
+        List<string> forDeleteProjects = [.. DependsOnProjectNames.Except(dependsOnProjectNames)];
         if (forDeleteProjects.Count == 0)
         {
             return;

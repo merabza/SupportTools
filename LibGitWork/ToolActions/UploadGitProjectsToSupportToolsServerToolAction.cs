@@ -57,7 +57,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
             new SyncGitRequest
             {
                 GitIgnoreFiles = gitIgnoreFiles,
-                Gits = gitRepos.Gits.Values.Select(g => g.ToContractModel()).ToList()
+                Gits = [.. gitRepos.Gits.Values.Select(g => g.ToContractModel())]
             }, cancellationToken);
 
         ////თითოეული გიტის პროექტი აიტვირთოს სერვერზე

@@ -59,6 +59,6 @@ public sealed class VersionComparer : IComparer<string>
             }
         }
 
-        return intDigits.ToArray();
+        return [.. intDigits];
     }
 }

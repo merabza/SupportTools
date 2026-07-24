@@ -399,11 +399,11 @@ public abstract class AppCreatorBase
 
     private bool AppGitsSync(bool useProjectUpdater)
     {
-        List<string> gitProjectNames = GitClones.Select(x => x.GitProjectFolderName).ToList();
+        List<string> gitProjectNames = [.. GitClones.Select(x => x.GitProjectFolderName)];
 
         var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
             new SyncOneProjectAllGitsParameters(null, WorkPath,
-                _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), null, true,
+                [.. _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)], null, true,
                 useProjectUpdater));
         return gitSyncAll.Run(CancellationToken.None).Result;
     }

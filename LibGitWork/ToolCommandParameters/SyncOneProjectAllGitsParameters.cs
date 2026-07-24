@@ -70,7 +70,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
 
-        List<string> absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
+        List<string> absentGitRepoNames = [.. gitProjectNames.Except(gitRepos.Gits.Keys)];
 
         if (absentGitRepoNames.Count != 0)
         {
@@ -83,7 +83,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
         }
 
         return new SyncOneProjectAllGitsParameters(projectName, gitsFolder,
-            gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList(), changedGitProjects,
+            [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)], changedGitProjects,
             isFirstSync, false);
     }
 }

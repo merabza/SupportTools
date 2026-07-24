@@ -121,7 +121,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         string[] excl = [".vs", ".git", "obj", "bin"];
 
         var compressor = new Compressor(_useConsole, _logger, _ssParameters.SmartSchemaForLocal, "_ScaffoldSeeder_",
-            excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
+            [.. excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*")]);
 
         //შევამოწმოთ არსებობს თუ არა მიმდინარე სკაფოლდ-სიდინგის პროექტის შესაბამისი ფოლდერი
         if (Directory.Exists(_scaffoldSeederFolderPath) &&

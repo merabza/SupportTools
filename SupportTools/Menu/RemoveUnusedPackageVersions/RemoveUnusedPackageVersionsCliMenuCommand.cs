@@ -16,7 +16,7 @@ namespace SupportTools.Menu.RemoveUnusedPackageVersions;
 
 public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
 {
-    public const string MenuCommandName = "Remove Unused Package Versions";
+    private const string MenuCommandName = "Remove Unused Package Versions";
 
     private const string PropsFileName = "Directory.Packages.props";
 
@@ -112,9 +112,11 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
             return [];
         }
 
-        List<string> propsFiles = Directory
-            .EnumerateFiles(Path.GetFullPath(solutionFolder), PropsFileName, SearchOption.AllDirectories)
-            .Where(x => !IsInBinOrObjFolder(x)).Select(x => Path.GetFullPath(x)).ToList();
+        List<string> propsFiles =
+        [
+            .. Directory.EnumerateFiles(Path.GetFullPath(solutionFolder), PropsFileName, SearchOption.AllDirectories)
+                .Where(x => !IsInBinOrObjFolder(x)).Select(Path.GetFullPath)
+        ];
 
         if (propsFiles.Count == 0)
         {
@@ -191,7 +193,7 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
             {
                 string? packageId = (string?)unusedElement.Attribute("Include");
 
-                if (unusedElement.Parent is { } parentElement && parentElement.Name.LocalName == "ItemGroup")
+                if (unusedElement.Parent is { Name.LocalName: "ItemGroup" } parentElement)
                 {
                     touchedItemGroups.Add(parentElement);
                 }

@@ -68,7 +68,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         }
 
         List<string> gitProjectNames =
-            scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName).ToList();
+            [.. scaffoldSeederDoubleAppCreator.GitClones.Select(x => x.GitProjectFolderName)];
 
         if (ParametersManager is null)
         {

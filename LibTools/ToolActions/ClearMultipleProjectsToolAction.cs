@@ -54,7 +54,7 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
     {
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
 
-        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 
         //var changedGitProjects = new Dictionary<EGitCollect, Dictionary<string, List<string>>>
         //{

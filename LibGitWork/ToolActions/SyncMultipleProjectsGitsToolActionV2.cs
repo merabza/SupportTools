@@ -60,7 +60,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
                 _syncMultipleProjectsGitsParametersV2.ProjectGroupName,
                 _syncMultipleProjectsGitsParametersV2.ProjectName);
 
-        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 
         var gitSyncToolsByGitProjectNames = new Dictionary<string, GitProjectSyncronizer>();
 

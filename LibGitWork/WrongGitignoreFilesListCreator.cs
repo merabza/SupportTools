@@ -37,7 +37,7 @@ public sealed class WrongGitignoreFilesListCreator
         var missingGitIgnoreTemplateFiles = new Dictionary<string, string>();
         var wrongGitIgnoreFilesList = new Dictionary<string, (string, string)>();
 
-        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
             foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())

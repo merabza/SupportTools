@@ -99,7 +99,7 @@ public sealed class GitClearToolAction : ToolAction
         }
 
         var dir = new DirectoryInfo(folderPath);
-        DirectoryInfo[] subDirs = dir.GetDirectories().OrderBy(x => x.Name).ToArray();
+        DirectoryInfo[] subDirs = [.. dir.GetDirectories().OrderBy(x => x.Name)];
         FileInfo[] subFiles = dir.GetFiles();
         if (subDirs is [{ Name: "bin" }, { Name: "obj" }] && subFiles.Length == 0 && MustBeDeleted(folderPath))
         {

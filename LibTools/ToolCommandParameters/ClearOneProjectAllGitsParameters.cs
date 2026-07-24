@@ -61,19 +61,22 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
         var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), true, false);
 
-        List<string> absentGitRepoNames = gitProjectNames.Except(gitRepos.Gits.Keys).ToList();
+        List<string> absentGitRepoNames = [.. gitProjectNames.Except(gitRepos.Gits.Keys)];
 
-        if (absentGitRepoNames.Count != 0)
+        if (absentGitRepoNames.Count == 0)
         {
-            foreach (string absentGitRepoName in absentGitRepoNames)
-            {
-                StShared.WriteErrorLine(absentGitRepoName, true, null, false);
-            }
-
-            StShared.WriteErrorLine("Gits with this names are absent", true);
+            return new ClearOneProjectAllGitsParameters(gitsFolder,
+                [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)]);
         }
 
+        foreach (string absentGitRepoName in absentGitRepoNames)
+        {
+            StShared.WriteErrorLine(absentGitRepoName, true, null, false);
+        }
+
+        StShared.WriteErrorLine("Gits with this names are absent", true);
+
         return new ClearOneProjectAllGitsParameters(gitsFolder,
-            gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value).ToList());
+            [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)]);
     }
 }

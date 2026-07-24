@@ -135,7 +135,7 @@ public sealed class ReCreateUpdateFrontSpaProjectToolAction : ToolAction
         string[] excl = [".vs", ".git", "obj", "bin", nodeModulesFolderName];
 
         var compressor = new Compressor(_useConsole, _logger, smartSchemaForLocal, "_Reserve_",
-            excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*").ToArray());
+            [.. excl.Select(s => $"*{Path.DirectorySeparatorChar}{s}{Path.DirectorySeparatorChar}*")]);
 
         compressor.CompressFolder(project.ProjectFolderName, checkedReserveFolderFullPath);
 

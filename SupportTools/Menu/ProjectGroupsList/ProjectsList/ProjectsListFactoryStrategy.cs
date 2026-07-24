@@ -17,10 +17,13 @@ public class ProjectsListFactoryStrategy(
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         //პროექტების ჩამონათვალი
-        return parameters.Projects
-            .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
-                        menuParameters.ProjectGroupName).OrderBy(o => o.Key).Select(kvp =>
-                new ProjectSubMenuCliMenuCommand(serviceProvider, parametersManager, kvp.Key, menuParameters))
-            .Cast<CliMenuCommand>().ToList();
+        return
+        [
+            .. parameters.Projects
+                .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
+                            menuParameters.ProjectGroupName).OrderBy(o => o.Key).Select(kvp =>
+                    new ProjectSubMenuCliMenuCommand(serviceProvider, parametersManager, kvp.Key, menuParameters))
+                .Cast<CliMenuCommand>()
+        ];
     }
 }

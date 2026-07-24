@@ -60,22 +60,28 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
             return null;
         }
 
-        return BuildBreakdown(projectNames).Select(b => new StatusColorPart(
-            $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
-            ProjectBuildCheckStatusView.GetColor(b.Status))).ToList();
+        return
+        [
+            .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
+                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
+                ProjectBuildCheckStatusView.GetColor(b.Status)))
+        ];
     }
 
     private List<string> GetGroupProjectNames()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        return parameters.Projects
-            .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
-            .Select(x => x.Key).ToList();
+        return
+        [
+            .. parameters.Projects
+                .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+                .Select(x => x.Key)
+        ];
     }
 
     private List<(EProjectBuildCheckStatus? Status, int Count)> BuildBreakdown(IEnumerable<string> projectNames)
     {
-        return projectNames.GroupBy(GetProjectStatus).OrderBy(g => g.Key).Select(g => (g.Key, g.Count())).ToList();
+        return [.. projectNames.GroupBy(GetProjectStatus).OrderBy(g => g.Key).Select(g => (g.Key, g.Count()))];
     }
 
     private bool IsProjectChecked(string projectName)

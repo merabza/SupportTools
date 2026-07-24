@@ -26,10 +26,12 @@ public class ServerInfosListFactoryStrategy(
 
         if (project?.ServerInfos != null)
         {
-            return project.ServerInfos.OrderBy(o => o.Value.GetItemKey()).Select(kvp =>
+            return
+            [
+                .. project.ServerInfos.OrderBy(o => o.Value.GetItemKey()).Select(kvp =>
                     new ServerInfoSubMenuCliMenuCommand(app, logger, httpClientFactory, kvp.Value.GetItemKey(),
-                        parametersManager, menuParameters.ProjectName, kvp.Key, serviceProvider)).Cast<CliMenuCommand>()
-                .ToList();
+                        parametersManager, menuParameters.ProjectName, kvp.Key, serviceProvider))
+            ];
         }
 
         return [];

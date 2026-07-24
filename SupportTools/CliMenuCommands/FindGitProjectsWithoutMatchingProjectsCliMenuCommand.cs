@@ -29,8 +29,11 @@ public sealed class FindGitProjectsWithoutMatchingProjectsCliMenuCommand : CliMe
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //ვპოულობთ გიტის პროექტებს, რომლებსაც არ მოეძებნება შესაბამისი სახელის SupportTools-ის პროექტი
-        List<string> unmatchedNames = parameters.Gits.Keys.Where(x => !parameters.Projects.ContainsKey(x))
-            .OrderBy(x => x, StringComparer.Ordinal).ToList();
+        List<string> unmatchedNames =
+        [
+            .. parameters.Gits.Keys.Where(x => !parameters.Projects.ContainsKey(x))
+                .OrderBy(x => x, StringComparer.Ordinal)
+        ];
 
         var menuSet = new CliMenuSet("Git Projects Without Matching Projects");
 

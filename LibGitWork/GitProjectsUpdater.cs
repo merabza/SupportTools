@@ -196,8 +196,11 @@ public sealed class GitProjectsUpdater
         //var fileNames = Directory.GetFiles(folderPath, "*.csproj").ToList();
         //fileNames.AddRange(Directory.GetFiles(folderPath, "*.esproj"));
 
-        List<string> fileNames = dir.GetFiles("*.csproj").Select(x => x.Name).ToList();
-        fileNames.AddRange(dir.GetFiles("*.esproj").Select(x => x.Name));
+        List<string> fileNames =
+        [
+            .. dir.GetFiles("*.csproj").Select(x => x.Name),
+            .. dir.GetFiles("*.esproj").Select(x => x.Name)
+        ];
 
         return fileNames.All(fileName => ProcessOneFile(folderPath, fileName, gitName));
     }
@@ -208,7 +211,7 @@ public sealed class GitProjectsUpdater
         Console.WriteLine($"Dependencies for {filePath}");
         XElement projectXml = XElement.Load(filePath);
 
-        List<XElement> projectReferences = projectXml.Descendants("ItemGroup").Descendants("ProjectReference").ToList();
+        List<XElement> projectReferences = [.. projectXml.Descendants("ItemGroup").Descendants("ProjectReference")];
 
         string projectRelativePath = Path.GetRelativePath(_gitsFolder, folderPath);
         GitProjectDataModel project = RegisterProject(projectRelativePath, fileName, gitName);

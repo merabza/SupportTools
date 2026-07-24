@@ -96,8 +96,11 @@ public sealed class PackageSolutionChecker
             return false;
         }
 
-        List<string> solutionProjectFullPaths = projectsListResult.AsT0
-            .Select(relativePath => Path.GetFullPath(Path.Combine(solutionFolder, relativePath))).ToList();
+        List<string> solutionProjectFullPaths =
+        [
+            .. projectsListResult.AsT0.Select(relativePath =>
+                Path.GetFullPath(Path.Combine(solutionFolder, relativePath)))
+        ];
 
         //სოლუშენის ფოლდერში ისეთი პროექტების მოძებნა, რომლებიც სოლუშენში არ არის გაერთიანებული
         if (!CheckNoOrphanProjects(solutionName, solutionFolder, solutionProjectFullPaths))
@@ -127,10 +130,13 @@ public sealed class PackageSolutionChecker
     {
         var solutionProjectsSet = new HashSet<string>(solutionProjectFullPaths, StringComparer.OrdinalIgnoreCase);
 
-        List<string> orphanProjects = Directory.GetFiles(solutionFolder, "*.csproj", SearchOption.AllDirectories)
-            .Where(projectFileName => !IsInBinOrObjFolder(projectFileName))
-            .Select(projectFileName => Path.GetFullPath(projectFileName))
-            .Where(projectFileName => !solutionProjectsSet.Contains(projectFileName)).ToList();
+        List<string> orphanProjects =
+        [
+            .. Directory.GetFiles(solutionFolder, "*.csproj", SearchOption.AllDirectories)
+                .Where(projectFileName => !IsInBinOrObjFolder(projectFileName))
+                .Select(projectFileName => Path.GetFullPath(projectFileName)).Where(projectFileName =>
+                    !solutionProjectsSet.Contains(projectFileName))
+        ];
 
         if (orphanProjects.Count == 0)
         {
@@ -158,11 +164,14 @@ public sealed class PackageSolutionChecker
         string solutionFolderPrefix =
             Path.TrimEndingDirectorySeparator(Path.GetFullPath(solutionFolder)) + Path.DirectorySeparatorChar;
 
-        List<string> invalidProjectNames = solutionProjectFullPaths
-            .Where(projectFileName =>
-                projectFileName.StartsWith(solutionFolderPrefix, StringComparison.OrdinalIgnoreCase))
-            .Select(projectFileName => Path.GetFileNameWithoutExtension(projectFileName)).Where(projectName =>
-                !projectName.StartsWith(solutionName + ".", StringComparison.Ordinal)).ToList();
+        List<string> invalidProjectNames =
+        [
+            .. solutionProjectFullPaths
+                .Where(projectFileName =>
+                    projectFileName.StartsWith(solutionFolderPrefix, StringComparison.OrdinalIgnoreCase))
+                .Select(projectFileName => Path.GetFileNameWithoutExtension(projectFileName)).Where(projectName =>
+                    !projectName.StartsWith(solutionName + ".", StringComparison.Ordinal))
+        ];
 
         if (invalidProjectNames.Count == 0)
         {

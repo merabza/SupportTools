@@ -53,7 +53,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
 
-        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = projectsList.OrderBy(o => o.Key).ToList();
+        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 
         //var packageUpdaters = new Dictionary<string, PackageUpdater>();
         var projectGitProjectNames = new Dictionary<string, List<string>>();
@@ -62,7 +62,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            projectGitProjectNames.Add(projectName, project.GetGitProjectNamesByGitCollectionType(gitCol).ToList());
+            projectGitProjectNames.Add(projectName, [.. project.GetGitProjectNamesByGitCollectionType(gitCol)]);
         }
 
         int lastProjectsCount = projectGitProjectNames.Count + 1;

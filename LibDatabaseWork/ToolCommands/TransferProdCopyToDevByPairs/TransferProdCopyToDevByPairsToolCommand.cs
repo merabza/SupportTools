@@ -157,8 +157,10 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             return false;
         }
 
-        List<(string Schema, string Table)> nodes = pairs.PairedTables.Values
-            .Select(p => (p.DevSchemaName, p.DevTableName)).ToList();
+        List<(string Schema, string Table)> nodes =
+        [
+            .. pairs.PairedTables.Values.Select(p => (p.DevSchemaName, p.DevTableName))
+        ];
         TopologicalSorter.SortResult sortResult = TopologicalSorter.Sort(nodes, fkEdges);
         if (sortResult.HasCycle)
         {
@@ -187,8 +189,10 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             PairedTable pt = pairsByDevKey[node];
             DevTableMeta meta = devMeta[node];
 
-            List<PairedField> insertable = pt.PairedFields.Values
-                .Where(f => !meta.ComputedColumns.Contains(f.DevFieldName)).ToList();
+            List<PairedField> insertable =
+            [
+                .. pt.PairedFields.Values.Where(f => !meta.ComputedColumns.Contains(f.DevFieldName))
+            ];
             bool hasIdentity = insertable.Any(f => meta.IdentityColumns.Contains(f.DevFieldName));
 
             if (_logger.IsEnabled(LogLevel.Information))
