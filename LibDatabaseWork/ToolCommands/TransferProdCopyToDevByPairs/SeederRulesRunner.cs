@@ -41,16 +41,27 @@ public static class SeederRulesRunner
     private static List<Dictionary<string, object?>>? ParseRowsFromOutput(string stdout, string tableName,
         ILogger logger)
     {
-        int firstBracket = stdout.IndexOf('[');
-        int lastBracket = stdout.LastIndexOf(']');
-        if (firstBracket < 0 || lastBracket < 0 || lastBracket <= firstBracket)
+        //JSON მასივი ერთ ხაზზეა; stdout-ში build-ისა და ლოგის სტრიქონებიც ხვდება ('['-ით იწყება, მაგრამ ']'-ით არ მთავრდება)
+        string? json = null;
+        string[] lines = stdout.Split('\n');
+        for (int i = lines.Length - 1; i >= 0; i--)
+        {
+            string line = lines[i].Trim();
+            if (!line.StartsWith('[') || !line.EndsWith(']'))
+            {
+                continue;
+            }
+
+            json = line;
+            break;
+        }
+
+        if (json is null)
         {
             StShared.WriteErrorLine($"Could not find JSON array in DataSeederRules output for table '{tableName}'",
                 true, logger);
             return null;
         }
-
-        string json = stdout.Substring(firstBracket, lastBracket - firstBracket + 1);
         try
         {
             JArray array = JArray.Parse(json);

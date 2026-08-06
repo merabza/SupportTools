@@ -7,6 +7,7 @@ using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
+using SystemTools.DatabaseToolsShared;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -26,6 +27,12 @@ internal static class PairsSchemaValidator
 
         foreach (PairedTable pt in pairs.PairedTables.Values)
         {
+            //OnlySeederRules ცხრილი ProdCopy-დან საერთოდ არ იკითხება — ProdCopy-ის მხარეს არსებობა სავალდებულო არ არის
+            if (useProdCopySide && pt.SeedDataType == ESeedDataType.OnlySeederRules)
+            {
+                continue;
+            }
+
             string pairedSchema = useProdCopySide ? pt.ProdCopySchemaName : pt.DevSchemaName;
             string pairedTable = useProdCopySide ? pt.ProdCopyTableName : pt.DevTableName;
             (string Schema, string Table) key = (pairedSchema, pairedTable);

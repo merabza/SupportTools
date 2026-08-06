@@ -11,6 +11,7 @@ using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SystemTools.DatabaseToolsShared;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -189,10 +190,24 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             PairedTable pt = pairsByDevKey[node];
             DevTableMeta meta = devMeta[node];
 
-            List<PairedField> insertable =
-            [
-                .. pt.PairedFields.Values.Where(f => !meta.ComputedColumns.Contains(f.DevFieldName))
-            ];
+            List<PairedField> insertable;
+            if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
+            {
+                //OnlySeederRules — ველები Dev სქემიდან: pairs მხოლოდ ProdCopy-სთან საერთო სვეტებს შეიცავს,
+                //SeederRules-ით შესავსებ ცხრილს კი Dev-ის ყველა არაგამოთვლადი სვეტი სჭირდება
+                insertable =
+                [
+                    .. devSchema[node].Columns.Where(c => !meta.ComputedColumns.Contains(c))
+                        .Select(c => new PairedField(c, c))
+                ];
+            }
+            else
+            {
+                insertable =
+                [
+                    .. pt.PairedFields.Values.Where(f => !meta.ComputedColumns.Contains(f.DevFieldName))
+                ];
+            }
             bool hasIdentity = insertable.Any(f => meta.IdentityColumns.Contains(f.DevFieldName));
 
             if (_logger.IsEnabled(LogLevel.Information))
