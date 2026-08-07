@@ -217,7 +217,7 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             }
 
             long rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyConnectionString,
-                Parameters.DevConnectionString, pt, insertable, hasIdentity, Parameters.CommandTimeOut,
+                Parameters.DevConnectionString, pt, insertable, meta.IdentityColumns, Parameters.CommandTimeOut,
                 meta.PrimaryKeyColumns, Parameters.DataSeederRulesByTableStartupProjectFilePath, _logger,
                 cancellationToken);
             totalRows += rows;

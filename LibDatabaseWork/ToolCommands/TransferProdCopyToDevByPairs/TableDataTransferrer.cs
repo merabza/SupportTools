@@ -18,9 +18,9 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 internal static class TableDataTransferrer
 {
     public static async Task<long> TransferAsync(string prodCopyConnectionString, string devConnectionString,
-        PairedTable pt, IReadOnlyList<PairedField> insertableFields, bool hasIdentity, int commandTimeOut,
-        IReadOnlyList<string> primaryKeyColumns, string? dataSeederRulesByTableStartupProjectFilePath, ILogger logger,
-        CancellationToken cancellationToken)
+        PairedTable pt, IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
+        int commandTimeOut, IReadOnlyList<string> primaryKeyColumns,
+        string? dataSeederRulesByTableStartupProjectFilePath, ILogger logger, CancellationToken cancellationToken)
     {
         //None — ცხრილი საერთოდ არ კოპირდება
         if (pt.SeedDataType == ESeedDataType.None)
@@ -44,6 +44,8 @@ internal static class TableDataTransferrer
 
             return 0;
         }
+
+        bool hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
 
         //OnlyDatabase — არსებული ქცევა: ProdCopy → Dev პირდაპირი streaming
         if (pt.SeedDataType == ESeedDataType.OnlyDatabase)
@@ -72,6 +74,23 @@ internal static class TableDataTransferrer
         if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
         {
             dataToInsert = rulesData;
+            //identity სვეტი, რომელსაც წესები არცერთ მწკრივში არ ავსებენ, ამოვარდეს ჩასაწერი ველებიდან —
+            //მნიშვნელობებს Dev ბაზა დააგენერირებს
+            if (!hasIdentity || dataToInsert.Count <= 0)
+            {
+                return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
+                    dataToInsert, cancellationToken);
+            }
+
+            List<PairedField>? adjustedFields =
+                DropIdentityColumnsNotFilledByRules(insertableFields, identityColumns, dataToInsert, pt, logger);
+            if (adjustedFields is null)
+            {
+                return 0;
+            }
+
+            insertableFields = adjustedFields;
+            hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
         }
         else
         {
@@ -107,6 +126,8 @@ internal static class TableDataTransferrer
             return 0;
         }
 
+        // ReSharper disable once using
+        // ReSharper disable once DisposableConstructor
         await using var devConn = new SqlConnection(devConnectionString);
         await devConn.OpenAsync(cancellationToken);
 
@@ -141,6 +162,8 @@ internal static class TableDataTransferrer
             return 0;
         }
 
+        // ReSharper disable once using
+        // ReSharper disable once DisposableConstructor
         using var dataTable = new DataTable();
         foreach (PairedField pf in insertableFields)
         {
@@ -160,6 +183,8 @@ internal static class TableDataTransferrer
             dataTable.Rows.Add(dataRow);
         }
 
+        // ReSharper disable once using
+        // ReSharper disable once DisposableConstructor
         await using var devConn = new SqlConnection(devConnectionString);
         await devConn.OpenAsync(cancellationToken);
 
@@ -169,6 +194,52 @@ internal static class TableDataTransferrer
 
         await bulkCopy.WriteToServerAsync(dataTable, cancellationToken);
         return bulkCopy.RowsCopied;
+    }
+
+    //OnlySeederRules: თუ identity სვეტს წესები არცერთ მწკრივში არ ავსებენ, სვეტი ამოვარდეს ჩასაწერი ველებიდან,
+    //რომ მნიშვნელობები Dev ბაზამ დააგენერიროს; ნაწილობრივ შევსებული identity სვეტი შეცდომაა — ბრუნდება null
+    private static List<PairedField>? DropIdentityColumnsNotFilledByRules(
+        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
+        List<Dictionary<string, object?>> rows, PairedTable pt, ILogger logger)
+    {
+        List<PairedField> result = [.. insertableFields];
+        foreach (PairedField pf in insertableFields.Where(f => identityColumns.Contains(f.DevFieldName)))
+        {
+            int filledCount = rows.Count(r => IsFilled(r, pf.DevFieldName));
+            if (filledCount == rows.Count)
+            {
+                continue;
+            }
+
+            if (filledCount > 0)
+            {
+                StShared.WriteErrorLine(
+                    $"Identity column '{pf.DevFieldName}' of {pt.DevSchemaName}.{pt.DevTableName} is filled in {filledCount} of {rows.Count} seeder rules rows. Fill it in every row or in none.",
+                    true, logger);
+                return null;
+            }
+
+            result.Remove(pf);
+        }
+
+        return result;
+    }
+
+    //identity სვეტისთვის „შევსებულად" ითვლება მხოლოდ არანულოვანი რიცხვი — 0 სერიალიზებული default-ია და არა რეალური ID
+    private static bool IsFilled(Dictionary<string, object?> row, string fieldName)
+    {
+        if (!row.TryGetValue(fieldName, out object? value) || value is null)
+        {
+            return false;
+        }
+
+        //identity სვეტი JSON-ში მთელი რიცხვია — JsonValueToClrValue მას long-ად აბრუნებს
+        return value switch
+        {
+            long l => l != 0,
+            int i => i != 0,
+            _ => true
+        };
     }
 
     private static SqlBulkCopy CreateBulkCopy(SqlConnection devConn, PairedTable pt,
@@ -181,6 +252,7 @@ internal static class TableDataTransferrer
             options |= SqlBulkCopyOptions.KeepIdentity;
         }
 
+        // ReSharper disable once using
         var bulkCopy = new SqlBulkCopy(devConn, options, null)
         {
             DestinationTableName = $"[{pt.DevSchemaName}].[{pt.DevTableName}]",
