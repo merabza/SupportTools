@@ -70,6 +70,13 @@ internal static class TableDataTransferrer
             return 0;
         }
 
+        //SeederRules-ის JSON-ში FK მიმართვები გასაღების სტრიქონებითაა — ჩაწერამდე Dev ბაზის ID-ებით უნდა ჩანაცვლდეს
+        if (!await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields, rulesData,
+                commandTimeOut, logger, cancellationToken))
+        {
+            return 0;
+        }
+
         List<Dictionary<string, object?>> dataToInsert;
         if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
         {
