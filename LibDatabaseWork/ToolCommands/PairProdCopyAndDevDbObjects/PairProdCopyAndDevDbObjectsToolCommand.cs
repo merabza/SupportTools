@@ -106,7 +106,8 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
             {
                 if (devColumnLookup.TryGetValue(prodColumn.ToLowerInvariant(), out string? devColumn))
                 {
-                    pairedFields.Add(prodColumn, new PairedField(prodColumn, devColumn));
+                    var pairedField = new PairedField(prodColumn, devColumn);
+                    pairedFields.Add(pairedField.GetItemKey(), pairedField);
                 }
             }
 

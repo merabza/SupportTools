@@ -22,6 +22,6 @@ public sealed class PairedField : ItemData
 
     public override string GetItemKey()
     {
-        return ProdCopyFieldName;
+        return $"{ProdCopyFieldName} - {DevFieldName}";
     }
 }

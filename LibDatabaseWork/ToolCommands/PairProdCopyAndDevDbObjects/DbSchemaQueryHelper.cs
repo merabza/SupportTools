@@ -18,6 +18,7 @@ public static class DbSchemaQueryHelper
                                  INNER JOIN INFORMATION_SCHEMA.TABLES t
                                    ON c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME
                                  WHERE t.TABLE_TYPE = 'BASE TABLE'
+                                   AND t.TABLE_NAME <> '__EFMigrationsHistory' -- EF-ის მიგრაციების ისტორია არ წყვილდება: Dev-ს საკუთარი აქვს
                                  ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, c.ORDINAL_POSITION
                                  """;
 

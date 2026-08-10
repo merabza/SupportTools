@@ -37,6 +37,6 @@ public sealed class PairedTable : ItemData
 
     public override string GetItemKey()
     {
-        return $"{ProdCopySchemaName}.{ProdCopyTableName}";
+        return $"{ProdCopySchemaName}.{ProdCopyTableName} - {DevSchemaName}.{DevTableName}";
     }
 }
