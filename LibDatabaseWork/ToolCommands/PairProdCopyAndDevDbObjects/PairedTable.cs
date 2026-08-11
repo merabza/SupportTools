@@ -34,6 +34,7 @@ public sealed class PairedTable : ItemData
     public string DevTableName { get; set; }
     public Dictionary<string, PairedField> PairedFields { get; set; }
     public ESeedDataType SeedDataType { get; set; }
+    public bool UseOldDataConvertor { get; set; }
 
     public override string GetItemKey()
     {

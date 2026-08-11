@@ -27,8 +27,9 @@ internal static class PairsSchemaValidator
 
         foreach (PairedTable pt in pairs.PairedTables.Values)
         {
-            //OnlySeederRules ცხრილი ProdCopy-დან საერთოდ არ იკითხება — ProdCopy-ის მხარეს არსებობა სავალდებულო არ არის
-            if (useProdCopySide && pt.SeedDataType == ESeedDataType.OnlySeederRules)
+            //OnlySeederRules ან UseOldDataConvertor ცხრილი ProdCopy-დან პირდაპირ არ იკითხება —
+            //ProdCopy-ის მხარეს არსებობა და სტრუქტურის დამთხვევა სავალდებულო არ არის (ძველ ბაზას შეიძლება სხვა სტრუქტურა ჰქონდეს)
+            if (useProdCopySide && (pt.SeedDataType == ESeedDataType.OnlySeederRules || pt.UseOldDataConvertor))
             {
                 continue;
             }

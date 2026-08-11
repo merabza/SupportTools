@@ -29,6 +29,7 @@ public sealed class ProjectModel : ItemData
     public string? ParametersFileExtension { get; set; }
     public string? MigrationStartupProjectFilePath { get; set; }
     public string? DataSeederRulesByTableStartupProjectFilePath { get; set; }
+    public string? OldDataConvertorForDataSeeder { get; set; }
 
     public string? MigrationProjectFilePath { get; set; }
 

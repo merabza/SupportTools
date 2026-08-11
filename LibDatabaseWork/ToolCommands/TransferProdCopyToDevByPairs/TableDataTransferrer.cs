@@ -20,7 +20,8 @@ internal static class TableDataTransferrer
     public static async Task<long> TransferAsync(string prodCopyConnectionString, string devConnectionString,
         PairedTable pt, IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
         int commandTimeOut, IReadOnlyList<string> primaryKeyColumns,
-        string? dataSeederRulesByTableStartupProjectFilePath, ILogger logger, CancellationToken cancellationToken)
+        string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
+        CancellationToken cancellationToken)
     {
         //None — ცხრილი საერთოდ არ კოპირდება
         if (pt.SeedDataType == ESeedDataType.None)
@@ -47,11 +48,40 @@ internal static class TableDataTransferrer
 
         bool hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
 
-        //OnlyDatabase — არსებული ქცევა: ProdCopy → Dev პირდაპირი streaming
+        //კონვერტორი მხოლოდ იქ მოქმედებს, სადაც ბაზის მონაცემები მონაწილეობს — OnlySeederRules-ზე დროშა უმოქმედოა
+        string? convertorProjectFilePath = null;
+        if (pt.UseOldDataConvertor && pt.SeedDataType != ESeedDataType.OnlySeederRules)
+        {
+            if (string.IsNullOrWhiteSpace(oldDataConvertorProjectFilePath))
+            {
+                StShared.WriteErrorLine(
+                    $"OldDataConvertorForDataSeeder not specified, but UseOldDataConvertor=true for {pt.DevSchemaName}.{pt.DevTableName}",
+                    true, logger);
+                return 0;
+            }
+
+            convertorProjectFilePath = oldDataConvertorProjectFilePath;
+        }
+
+        //OnlyDatabase — არსებული ქცევა: ProdCopy → Dev პირდაპირი streaming; კონვერტორის შემთხვევაში ყველა მწკრივი მისგან მოდის
         if (pt.SeedDataType == ESeedDataType.OnlyDatabase)
         {
-            return await TransferStreamingFromProdCopyAsync(prodCopyConnectionString, devConnectionString, pt,
-                insertableFields, hasIdentity, commandTimeOut, logger, cancellationToken);
+            if (convertorProjectFilePath is null)
+            {
+                return await TransferStreamingFromProdCopyAsync(prodCopyConnectionString, devConnectionString, pt,
+                    insertableFields, hasIdentity, commandTimeOut, logger, cancellationToken);
+            }
+
+            List<Dictionary<string, object?>>? convertorData = await LoadConvertorRowsAsync(convertorProjectFilePath,
+                prodCopyConnectionString, devConnectionString, pt, insertableFields, commandTimeOut, logger,
+                cancellationToken);
+            if (convertorData is null)
+            {
+                return 0;
+            }
+
+            return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
+                identityColumns, hasIdentity, commandTimeOut, convertorData, logger, cancellationToken);
         }
 
         //დარჩენილი სამივე ვარიანტი მოითხოვს SeederRules-ის გაშვებას
@@ -77,43 +107,29 @@ internal static class TableDataTransferrer
             return 0;
         }
 
-        List<Dictionary<string, object?>> dataToInsert;
+        //OnlySeederRules — ყველა მწკრივი წესებიდან მოდის
         if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
         {
-            dataToInsert = rulesData;
-            //identity სვეტი, რომელსაც წესები არცერთ მწკრივში არ ავსებენ, ამოვარდეს ჩასაწერი ველებიდან —
-            //მნიშვნელობებს Dev ბაზა დააგენერირებს
-            if (!hasIdentity || dataToInsert.Count <= 0)
-            {
-                return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
-                    dataToInsert, cancellationToken);
-            }
-
-            List<PairedField>? adjustedFields =
-                DropIdentityColumnsNotFilledByRules(insertableFields, identityColumns, dataToInsert, pt, logger);
-            if (adjustedFields is null)
-            {
-                return 0;
-            }
-
-            insertableFields = adjustedFields;
-            hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
+            return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
+                identityColumns, hasIdentity, commandTimeOut, rulesData, logger, cancellationToken);
         }
-        else
+
+        //SeederRulesHasMorePriority ან DatabaseDataHasMorePriority — ორივე წყაროდან ჩატვირთვა და Adjust;
+        //კონვერტორის შემთხვევაში ბაზის მხარის მწკრივები ProdCopy-ის პირდაპირი წაკითხვის ნაცვლად კონვერტორისგან მოდის
+        List<Dictionary<string, object?>>? dbData = convertorProjectFilePath is not null
+            ? await LoadConvertorRowsAsync(convertorProjectFilePath, prodCopyConnectionString, devConnectionString, pt,
+                insertableFields, commandTimeOut, logger, cancellationToken)
+            : await ProdCopyTableReader.ReadAsync(prodCopyConnectionString, pt, insertableFields, logger,
+                cancellationToken);
+        if (dbData is null)
         {
-            //SeederRulesHasMorePriority ან DatabaseDataHasMorePriority — ორივე წყაროდან ჩატვირთვა და Adjust
-            List<Dictionary<string, object?>>? dbData = await ProdCopyTableReader.ReadAsync(prodCopyConnectionString,
-                pt, insertableFields, logger, cancellationToken);
-            if (dbData is null)
-            {
-                return 0;
-            }
-
-            string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
-            dataToInsert = pt.SeedDataType == ESeedDataType.SeederRulesHasMorePriority
-                ? TableRowsAdjuster.Adjust(rulesData, dbData, primaryKeyColumns, tableLabel)
-                : TableRowsAdjuster.Adjust(dbData, rulesData, primaryKeyColumns, tableLabel);
+            return 0;
         }
+
+        string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
+        List<Dictionary<string, object?>> dataToInsert = pt.SeedDataType == ESeedDataType.SeederRulesHasMorePriority
+            ? TableRowsAdjuster.Adjust(rulesData, dbData, primaryKeyColumns, tableLabel)
+            : TableRowsAdjuster.Adjust(dbData, rulesData, primaryKeyColumns, tableLabel);
 
         return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
             dataToInsert, cancellationToken);
@@ -203,9 +219,53 @@ internal static class TableDataTransferrer
         return bulkCopy.RowsCopied;
     }
 
-    //OnlySeederRules: თუ identity სვეტს წესები არცერთ მწკრივში არ ავსებენ, სვეტი ამოვარდეს ჩასაწერი ველებიდან,
-    //რომ მნიშვნელობები Dev ბაზამ დააგენერიროს; ნაწილობრივ შევსებული identity სვეტი შეცდომაა — ბრუნდება null
-    private static List<PairedField>? DropIdentityColumnsNotFilledByRules(
+    //კონვერტორის გაშვება და მიღებულ მწკრივებზე გასაღებიანი FK მიმართვების ამოხსნა Dev ცნობარებით
+    //(ასეთი ველების გარეშე ამომხსნელი უმოქმედოა)
+    private static async Task<List<Dictionary<string, object?>>?> LoadConvertorRowsAsync(
+        string convertorProjectFilePath, string prodCopyConnectionString, string devConnectionString, PairedTable pt,
+        IReadOnlyList<PairedField> insertableFields, int commandTimeOut, ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        List<Dictionary<string, object?>>? rows = OldDataConvertorRunner.Run(convertorProjectFilePath,
+            pt.DevTableName, prodCopyConnectionString, logger);
+        if (rows is null)
+        {
+            return null;
+        }
+
+        bool resolved = await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields,
+            rows, commandTimeOut, logger, cancellationToken);
+        return resolved ? rows : null;
+    }
+
+    //გარე წყაროდან (SeederRules ან კონვერტორი) მიღებული მწკრივების ჩაწერა identity სვეტების კორექტირებით:
+    //სვეტი, რომელსაც წყარო არცერთ მწკრივში არ ავსებს, ამოვარდება — მნიშვნელობებს Dev ბაზა დააგენერირებს
+    private static async Task<long> BulkInsertRowsAdjustingIdentityAsync(string devConnectionString, PairedTable pt,
+        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns, bool hasIdentity,
+        int commandTimeOut, List<Dictionary<string, object?>> rows, ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        if (!hasIdentity || rows.Count <= 0)
+        {
+            return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
+                rows, cancellationToken);
+        }
+
+        List<PairedField>? adjustedFields =
+            DropIdentityColumnsNotFilledInRows(insertableFields, identityColumns, rows, pt, logger);
+        if (adjustedFields is null)
+        {
+            return 0;
+        }
+
+        bool adjustedHasIdentity = adjustedFields.Any(f => identityColumns.Contains(f.DevFieldName));
+        return await BulkInsertRowsAsync(devConnectionString, pt, adjustedFields, adjustedHasIdentity, commandTimeOut,
+            rows, cancellationToken);
+    }
+
+    //თუ identity სვეტს გარე წყარო (SeederRules ან კონვერტორი) არცერთ მწკრივში არ ავსებს, სვეტი ამოვარდეს ჩასაწერი
+    //ველებიდან, რომ მნიშვნელობები Dev ბაზამ დააგენერიროს; ნაწილობრივ შევსებული identity სვეტი შეცდომაა — ბრუნდება null
+    private static List<PairedField>? DropIdentityColumnsNotFilledInRows(
         IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
         List<Dictionary<string, object?>> rows, PairedTable pt, ILogger logger)
     {
@@ -221,7 +281,7 @@ internal static class TableDataTransferrer
             if (filledCount > 0)
             {
                 StShared.WriteErrorLine(
-                    $"Identity column '{pf.DevFieldName}' of {pt.DevSchemaName}.{pt.DevTableName} is filled in {filledCount} of {rows.Count} seeder rules rows. Fill it in every row or in none.",
+                    $"Identity column '{pf.DevFieldName}' of {pt.DevSchemaName}.{pt.DevTableName} is filled in {filledCount} of {rows.Count} rows. Fill it in every row or in none.",
                     true, logger);
                 return null;
             }

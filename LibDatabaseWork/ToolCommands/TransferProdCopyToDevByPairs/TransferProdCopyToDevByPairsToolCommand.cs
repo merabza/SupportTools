@@ -191,10 +191,10 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             DevTableMeta meta = devMeta[node];
 
             List<PairedField> insertable;
-            if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
+            if (pt.SeedDataType == ESeedDataType.OnlySeederRules || pt.UseOldDataConvertor)
             {
-                //OnlySeederRules — ველები Dev სქემიდან: pairs მხოლოდ ProdCopy-სთან საერთო სვეტებს შეიცავს,
-                //SeederRules-ით შესავსებ ცხრილს კი Dev-ის ყველა არაგამოთვლადი სვეტი სჭირდება
+                //OnlySeederRules ან კონვერტორი — ველები Dev სქემიდან: pairs მხოლოდ ProdCopy-სთან საერთო სვეტებს შეიცავს,
+                //გარე წყაროდან შესავსებ ცხრილს კი Dev-ის ყველა არაგამოთვლადი სვეტი სჭირდება
                 insertable =
                 [
                     .. devSchema[node].Columns.Where(c => !meta.ComputedColumns.Contains(c))
@@ -218,8 +218,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
 
             long rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyConnectionString,
                 Parameters.DevConnectionString, pt, insertable, meta.IdentityColumns, Parameters.CommandTimeOut,
-                meta.PrimaryKeyColumns, Parameters.DataSeederRulesByTableStartupProjectFilePath, _logger,
-                cancellationToken);
+                meta.PrimaryKeyColumns, Parameters.DataSeederRulesByTableStartupProjectFilePath,
+                Parameters.OldDataConvertorForDataSeeder, _logger, cancellationToken);
             totalRows += rows;
 
             if (_logger.IsEnabled(LogLevel.Information))
