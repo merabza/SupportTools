@@ -119,6 +119,44 @@ internal static class DevTableMetaReader
                 }
             }
 
+            //უნიკალური ინდექსების ჩატვირთვა (PK-ს ჩათვლით) — bulk insert-ამდე კოლიზიების შესამოწმებლად
+            const string uqQuery = """
+                                   SELECT s.name AS SchemaName, t.name AS TableName, i.name AS IndexName,
+                                          i.has_filter AS HasFilter, c.name AS ColumnName
+                                   FROM sys.indexes i
+                                   INNER JOIN sys.tables t ON i.object_id = t.object_id
+                                   INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
+                                   INNER JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
+                                   INNER JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
+                                   WHERE i.is_unique = 1 AND i.is_hypothetical = 0 AND ic.is_included_column = 0
+                                   ORDER BY s.name, t.name, i.name, ic.key_ordinal
+                                   """;
+            // ReSharper disable once using
+            using (IDataReader uqReader = dbm.ExecuteReader(uqQuery))
+            {
+                var indexesByKey = new Dictionary<(string Schema, string Table, string IndexName), UniqueIndexMeta>();
+                while (uqReader.Read())
+                {
+                    string schema = (string)uqReader["SchemaName"];
+                    string table = (string)uqReader["TableName"];
+                    if (!result.TryGetValue((schema, table), out DevTableMeta? meta))
+                    {
+                        continue;
+                    }
+
+                    string indexName = (string)uqReader["IndexName"];
+                    (string Schema, string Table, string IndexName) indexKey = (schema, table, indexName);
+                    if (!indexesByKey.TryGetValue(indexKey, out UniqueIndexMeta? indexMeta))
+                    {
+                        indexMeta = new UniqueIndexMeta(indexName, (bool)uqReader["HasFilter"]);
+                        indexesByKey[indexKey] = indexMeta;
+                        meta.UniqueIndexes.Add(indexMeta);
+                    }
+
+                    indexMeta.Columns.Add((string)uqReader["ColumnName"]);
+                }
+            }
+
             return result;
         }
         catch (Exception ex)

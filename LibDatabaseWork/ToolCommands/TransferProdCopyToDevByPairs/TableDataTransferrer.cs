@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
+using LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using SystemTools.DatabaseToolsShared;
@@ -20,7 +21,7 @@ internal static class TableDataTransferrer
 {
     public static async Task<long> TransferAsync(string prodCopyConnectionString, string devConnectionString,
         PairedTable pt, IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
-        int commandTimeOut, IReadOnlyList<string> primaryKeyColumns,
+        int commandTimeOut, IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
         string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
         CancellationToken cancellationToken)
     {
@@ -48,6 +49,10 @@ internal static class TableDataTransferrer
         }
 
         bool hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
+
+        string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
+        //შერწყმისა და დიაგნოსტიკის გასაღები: pairs ფაილში მითითებული ბუნებრივი გასაღები, თუ ცარიელია — Dev-ის პირველადი გასაღები
+        IReadOnlyList<string> keyFieldNames = pt.KeyFieldNames.Count > 0 ? pt.KeyFieldNames : primaryKeyColumns;
 
         //კონვერტორი მხოლოდ იქ მოქმედებს, სადაც ბაზის მონაცემები მონაწილეობს — OnlySeederRules-ზე დროშა უმოქმედოა
         string? convertorProjectFilePath = null;
@@ -81,6 +86,8 @@ internal static class TableDataTransferrer
                 return 0;
             }
 
+            convertorData = UniqueIndexCollisionResolver.Resolve(convertorData, insertableFields, identityColumns,
+                uniqueIndexes, keyFieldNames, tableLabel, null, logger);
             return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
                 identityColumns, hasIdentity, commandTimeOut, convertorData, logger, cancellationToken);
         }
@@ -111,6 +118,8 @@ internal static class TableDataTransferrer
         //OnlySeederRules — ყველა მწკრივი წესებიდან მოდის
         if (pt.SeedDataType == ESeedDataType.OnlySeederRules)
         {
+            rulesData = UniqueIndexCollisionResolver.Resolve(rulesData, insertableFields, identityColumns,
+                uniqueIndexes, keyFieldNames, tableLabel, null, logger);
             return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
                 identityColumns, hasIdentity, commandTimeOut, rulesData, logger, cancellationToken);
         }
@@ -127,12 +136,18 @@ internal static class TableDataTransferrer
             return 0;
         }
 
-        string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
-        //შერწყმის გასაღები: pairs ფაილში მითითებული ბუნებრივი გასაღები, თუ ცარიელია — Dev-ის პირველადი გასაღები
-        IReadOnlyList<string> keyFieldNames = pt.KeyFieldNames.Count > 0 ? pt.KeyFieldNames : primaryKeyColumns;
         List<Dictionary<string, object?>> dataToInsert = pt.SeedDataType == ESeedDataType.SeederRulesHasMorePriority
             ? TableRowsAdjuster.Adjust(rulesData, dbData, keyFieldNames, tableLabel)
             : TableRowsAdjuster.Adjust(dbData, rulesData, keyFieldNames, tableLabel);
+
+        //უნიკალური ინდექსების კოლიზიების მოხსნა identity-ის შევსებამდე — გადაგდებულმა მწკრივებმა backfill
+        //მნიშვნელობები არ დაიკავონ; Adjust მწკრივებს reference-ით ატარებს, ამიტომ priority წყაროსადმი
+        //კუთვნილება membership-ტესტით დგინდება
+        var priorityRows = new HashSet<Dictionary<string, object?>>(
+            pt.SeedDataType == ESeedDataType.SeederRulesHasMorePriority ? rulesData : dbData,
+            ReferenceEqualityComparer.Instance);
+        dataToInsert = UniqueIndexCollisionResolver.Resolve(dataToInsert, insertableFields, identityColumns,
+            uniqueIndexes, keyFieldNames, tableLabel, priorityRows, logger);
 
         //წესებიდან მოსულ მწკრივებს identity სვეტი შეიძლება შევსებული არ ჰქონდეთ — KeepIdentity ჩაწერისთვის
         //მათ მიენიჭებათ შევსებული მაქსიმუმის მომდევნო მნიშვნელობები
@@ -323,7 +338,7 @@ internal static class TableDataTransferrer
     }
 
     //identity სვეტისთვის „შევსებულად" ითვლება მხოლოდ არანულოვანი რიცხვი — 0 სერიალიზებული default-ია და არა რეალური ID
-    private static bool IsFilled(Dictionary<string, object?> row, string fieldName)
+    internal static bool IsFilled(Dictionary<string, object?> row, string fieldName)
     {
         if (!row.TryGetValue(fieldName, out object? value) || value is null)
         {

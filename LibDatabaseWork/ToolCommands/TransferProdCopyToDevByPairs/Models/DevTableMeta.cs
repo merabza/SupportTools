@@ -10,6 +10,7 @@ public sealed class DevTableMeta
         IdentityColumns = new HashSet<string>(StringComparer.Ordinal);
         ComputedColumns = new HashSet<string>(StringComparer.Ordinal);
         PrimaryKeyColumns = [];
+        UniqueIndexes = [];
     }
 
     public HashSet<string> IdentityColumns { get; }
@@ -17,4 +18,7 @@ public sealed class DevTableMeta
 
     //პირველადი გასაღების სვეტების სია — Adjust ალგორითმისთვის გასაღების სანახავად
     public List<string> PrimaryKeyColumns { get; }
+
+    //უნიკალური ინდექსები (PK-ს ჩათვლით) — bulk insert-ამდე კოლიზიების შესამოწმებლად
+    public List<UniqueIndexMeta> UniqueIndexes { get; }
 }
