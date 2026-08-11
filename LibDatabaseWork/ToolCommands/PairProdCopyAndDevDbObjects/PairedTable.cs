@@ -36,6 +36,10 @@ public sealed class PairedTable : ItemData
     public ESeedDataType SeedDataType { get; set; }
     public bool UseOldDataConvertor { get; set; }
 
+    //ბუნებრივი გასაღების ველები Adjust შერწყმისთვის (SeederRulesHasMorePriority/DatabaseDataHasMorePriority);
+    //ცარიელი სიის შემთხვევაში გამოიყენება Dev ცხრილის პირველადი გასაღების სვეტები
+    public List<string> KeyFieldNames { get; set; } = [];
+
     public override string GetItemKey()
     {
         return $"{ProdCopySchemaName}.{ProdCopyTableName} - {DevSchemaName}.{DevTableName}";

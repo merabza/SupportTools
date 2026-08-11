@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -127,9 +128,18 @@ internal static class TableDataTransferrer
         }
 
         string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
+        //შერწყმის გასაღები: pairs ფაილში მითითებული ბუნებრივი გასაღები, თუ ცარიელია — Dev-ის პირველადი გასაღები
+        IReadOnlyList<string> keyFieldNames = pt.KeyFieldNames.Count > 0 ? pt.KeyFieldNames : primaryKeyColumns;
         List<Dictionary<string, object?>> dataToInsert = pt.SeedDataType == ESeedDataType.SeederRulesHasMorePriority
-            ? TableRowsAdjuster.Adjust(rulesData, dbData, primaryKeyColumns, tableLabel)
-            : TableRowsAdjuster.Adjust(dbData, rulesData, primaryKeyColumns, tableLabel);
+            ? TableRowsAdjuster.Adjust(rulesData, dbData, keyFieldNames, tableLabel)
+            : TableRowsAdjuster.Adjust(dbData, rulesData, keyFieldNames, tableLabel);
+
+        //წესებიდან მოსულ მწკრივებს identity სვეტი შეიძლება შევსებული არ ჰქონდეთ — KeepIdentity ჩაწერისთვის
+        //მათ მიენიჭებათ შევსებული მაქსიმუმის მომდევნო მნიშვნელობები
+        if (hasIdentity)
+        {
+            FillMissingIdentityValues(insertableFields, identityColumns, dataToInsert);
+        }
 
         return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
             dataToInsert, cancellationToken);
@@ -290,6 +300,26 @@ internal static class TableDataTransferrer
         }
 
         return result;
+    }
+
+    //შერწყმულ სიაში identity სვეტის შეუვსებელ მწკრივებს (მაგ. წესებიდან მოსულებს) ენიჭებათ შევსებული მაქსიმუმის
+    //მომდევნო მნიშვნელობები, რომ KeepIdentity ჩაწერა შესაძლებელი იყოს — ბაზისეული მწკრივები ინარჩუნებენ თავიანთ ID-ებს
+    private static void FillMissingIdentityValues(IReadOnlyList<PairedField> insertableFields,
+        IReadOnlySet<string> identityColumns, List<Dictionary<string, object?>> rows)
+    {
+        foreach (PairedField pf in insertableFields.Where(f => identityColumns.Contains(f.DevFieldName)))
+        {
+            long maxValue = 0;
+            foreach (Dictionary<string, object?> row in rows.Where(r => IsFilled(r, pf.DevFieldName)))
+            {
+                maxValue = Math.Max(maxValue, Convert.ToInt64(row[pf.DevFieldName], CultureInfo.InvariantCulture));
+            }
+
+            foreach (Dictionary<string, object?> row in rows.Where(r => !IsFilled(r, pf.DevFieldName)))
+            {
+                row[pf.DevFieldName] = ++maxValue;
+            }
+        }
     }
 
     //identity სვეტისთვის „შევსებულად" ითვლება მხოლოდ არანულოვანი რიცხვი — 0 სერიალიზებული default-ია და არა რეალური ID
