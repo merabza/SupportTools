@@ -251,15 +251,15 @@ internal static class TableDataTransferrer
         IReadOnlyList<PairedField> insertableFields, int commandTimeOut, ILogger logger,
         CancellationToken cancellationToken)
     {
-        List<Dictionary<string, object?>>? rows = OldDataConvertorRunner.Run(convertorProjectFilePath,
-            pt.DevTableName, prodCopyConnectionString, logger);
+        List<Dictionary<string, object?>>? rows = OldDataConvertorRunner.Run(convertorProjectFilePath, pt.DevTableName,
+            prodCopyConnectionString, logger);
         if (rows is null)
         {
             return null;
         }
 
-        bool resolved = await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields,
-            rows, commandTimeOut, logger, cancellationToken);
+        bool resolved = await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields, rows,
+            commandTimeOut, logger, cancellationToken);
         return resolved ? rows : null;
     }
 
@@ -267,8 +267,7 @@ internal static class TableDataTransferrer
     //სვეტი, რომელსაც წყარო არცერთ მწკრივში არ ავსებს, ამოვარდება — მნიშვნელობებს Dev ბაზა დააგენერირებს
     private static async Task<long> BulkInsertRowsAdjustingIdentityAsync(string devConnectionString, PairedTable pt,
         IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns, bool hasIdentity,
-        int commandTimeOut, List<Dictionary<string, object?>> rows, ILogger logger,
-        CancellationToken cancellationToken)
+        int commandTimeOut, List<Dictionary<string, object?>> rows, ILogger logger, CancellationToken cancellationToken)
     {
         if (!hasIdentity || rows.Count <= 0)
         {
@@ -290,9 +289,8 @@ internal static class TableDataTransferrer
 
     //თუ identity სვეტს გარე წყარო (SeederRules ან კონვერტორი) არცერთ მწკრივში არ ავსებს, სვეტი ამოვარდეს ჩასაწერი
     //ველებიდან, რომ მნიშვნელობები Dev ბაზამ დააგენერიროს; ნაწილობრივ შევსებული identity სვეტი შეცდომაა — ბრუნდება null
-    private static List<PairedField>? DropIdentityColumnsNotFilledInRows(
-        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
-        List<Dictionary<string, object?>> rows, PairedTable pt, ILogger logger)
+    private static List<PairedField>? DropIdentityColumnsNotFilledInRows(IReadOnlyList<PairedField> insertableFields,
+        IReadOnlySet<string> identityColumns, List<Dictionary<string, object?>> rows, PairedTable pt, ILogger logger)
     {
         List<PairedField> result = [.. insertableFields];
         foreach (PairedField pf in insertableFields.Where(f => identityColumns.Contains(f.DevFieldName)))

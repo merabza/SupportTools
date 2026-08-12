@@ -208,6 +208,7 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                     .. pt.PairedFields.Values.Where(f => !meta.ComputedColumns.Contains(f.DevFieldName))
                 ];
             }
+
             bool hasIdentity = insertable.Any(f => meta.IdentityColumns.Contains(f.DevFieldName));
 
             if (_logger.IsEnabled(LogLevel.Information))

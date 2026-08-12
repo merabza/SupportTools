@@ -14,9 +14,11 @@
   </Folder>
   <Folder Name="/BackendCarcass/">
     <Project Path="../BackendCarcass/BackendCarcass.Database/BackendCarcass.Database.csproj" />
-    <Project Path="../BackendCarcass/BackendCarcass.Db/BackendCarcass.Db.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.LibCrud/BackendCarcass.LibCrud.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.MasterData/BackendCarcass.MasterData.csproj" />
+  </Folder>
+  <Folder Name="/BackendCarcassDomain/">
+    <Project Path="../BackendCarcassDomain/BackendCarcassDomain.Entities/BackendCarcassDomain.Entities.csproj" />
   </Folder>
   <Folder Name="/BackendCarcassShared/">
     <Project Path="../BackendCarcassShared/BackendCarcassShared.Contracts/BackendCarcassShared.Contracts.csproj" />
@@ -52,7 +54,6 @@
     <Project Path="../SystemTools/SystemTools.BackgroundTasks/SystemTools.BackgroundTasks.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />
-    <Project Path="../SystemTools/SystemTools.DomainShared/SystemTools.DomainShared.csproj" />
     <Project Path="../SystemTools/SystemTools.JetBrainsResharperGlobalToolsWork/SystemTools.JetBrainsResharperGlobalToolsWork.csproj" />
     <Project Path="../SystemTools/SystemTools.ReCounterContracts/SystemTools.ReCounterContracts.csproj" />
     <Project Path="../SystemTools/SystemTools.RepositoriesShared/SystemTools.RepositoriesShared.csproj" />
@@ -83,7 +84,6 @@
   <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
   <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
   <Project Path="LibTools/LibTools.csproj" />
-  <Project Path="SupportTools.Application/SupportTools.Application.csproj" Id="5db1d390-c693-4ced-8e8a-526fa01b44bc" />
   <Project Path="SupportTools/SupportTools.csproj" />
   <Project Path="SupportToolsData/SupportToolsData.csproj" />
 </Solution>

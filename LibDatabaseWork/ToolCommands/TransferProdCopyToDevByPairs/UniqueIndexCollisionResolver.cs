@@ -134,8 +134,7 @@ internal static class UniqueIndexCollisionResolver
             logger.LogWarning(
                 "Dropping secondary row from {Table}: unique index {IndexName} value {Value} collides with a priority row (kept key: '{KeptKey}'). Dropped row key: '{DroppedKey}' ({DroppedIdentity}). Rows referencing the dropped row will fail FK checks if they are transferred too.",
                 tableLabel, index.IndexName, valueLabel, DisplayKey(keptRow, keyFieldNames),
-                DisplayKey(row, keyFieldNames),
-                droppedIdentity.Length == 0 ? "no identity value" : droppedIdentity);
+                DisplayKey(row, keyFieldNames), droppedIdentity.Length == 0 ? "no identity value" : droppedIdentity);
         }
     }
 

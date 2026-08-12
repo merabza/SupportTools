@@ -30,10 +30,11 @@ internal static class RunnerOutputParser
 
         if (json is null)
         {
-            StShared.WriteErrorLine($"Could not find JSON array in {sourceLabel} output for table '{tableName}'",
-                true, logger);
+            StShared.WriteErrorLine($"Could not find JSON array in {sourceLabel} output for table '{tableName}'", true,
+                logger);
             return null;
         }
+
         try
         {
             JArray array = JArray.Parse(json);
