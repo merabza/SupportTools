@@ -229,6 +229,11 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             }
         }
 
+        //11. ბალკ-ჩატვირთვა კავშირებს (FK) შემოწმების გარეშე წერს და ისინი untrusted ხდება —
+        //    ბოლოს ყველა გადატანილი ცხრილის კავშირი არსებული მონაცემების შემოწმებით თავიდან ირთვება
+        bool revalidated = DevFkRevalidator.Revalidate(Parameters.DevConnectionString, sortResult.Ordered!,
+            Parameters.CommandTimeOut, _logger);
+
         stopwatch.Stop();
         if (_logger.IsEnabled(LogLevel.Information))
         {
@@ -236,6 +241,6 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                 totalRows, pairs.PairedTables.Count, stopwatch.Elapsed);
         }
 
-        return true;
+        return revalidated;
     }
 }
