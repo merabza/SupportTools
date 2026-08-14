@@ -21,7 +21,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString, int prodCommandTimeout,
         string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
         string excludesRulesParametersFilePath, string fakeHostProjectName, string? migrationSqlFilesFolder,
-        GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths)
+        GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths,
+        string? gitExecutablePath = null)
     {
         LogFolder = logFolder;
         ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
@@ -46,6 +47,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         GitProjects = gitProjects;
         GitRepos = gitRepos;
         GitIgnoreModelFilePaths = gitIgnoreModelFilePaths;
+        GitExecutablePath = gitExecutablePath;
     }
 
     public string LogFolder { get; }
@@ -71,6 +73,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
     public string FakeHostProjectName { get; }
+    public string? GitExecutablePath { get; }
 
     public bool CheckBeforeSave()
     {
@@ -196,7 +199,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
-                    useConsole, false), supportToolsParameters.GitIgnoreModelFilePaths);
+                    useConsole, false), supportToolsParameters.GitIgnoreModelFilePaths,
+                supportToolsParameters.GitExecutablePath);
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

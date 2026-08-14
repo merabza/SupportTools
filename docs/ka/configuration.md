@@ -25,7 +25,7 @@
 
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
-|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`|სად კითხულობს/წერს ხელსაწყო დისკზე|
+|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
 |ბრძანებების ისტორია|`RecentCommandsFileName`, `RecentCommandsCount`|მენიუს ისტორია|
 |არქივები|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|პაკეტირების კონვენციები|

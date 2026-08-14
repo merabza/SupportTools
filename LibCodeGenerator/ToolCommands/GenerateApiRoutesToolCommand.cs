@@ -93,7 +93,8 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
 
             Console.WriteLine($"---=== {gitProjectName} ===---");
 
-            var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolder, gitData);
+            var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, gitProjectFolder, gitData,
+                supportToolsParameters.GitExecutablePath);
             GitProcessor? gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
 
             if (gitProcessor is null)

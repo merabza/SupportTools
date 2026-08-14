@@ -238,7 +238,8 @@ public sealed class GitStsCruder : Cruder
 
     public override bool CheckValidation(ItemData item)
     {
-        var gitApi = new GitApi(true, _logger);
+        var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
+        var gitApi = new GitApi(true, _logger, supportToolsParameters.GitExecutablePath);
         try
         {
             if (item is not GitDataModel gitDataModel)

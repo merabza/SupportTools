@@ -52,7 +52,8 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
                      .Where(x => x.GitIgnorePathName == "CSharp").OrderBy(x => x.GitProjectFolderName))
         {
             var gitClear = new GitClearToolAction(_logger,
-                new GitClearParameters(gitData, _clearOneProjectAllGitsParameters.GitsFolder), _excludeFolder);
+                new GitClearParameters(gitData, _clearOneProjectAllGitsParameters.GitsFolder,
+                    _clearOneProjectAllGitsParameters.GitExecutablePath), _excludeFolder);
             await gitClear.Run(cancellationToken);
         }
 

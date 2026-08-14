@@ -61,7 +61,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
             if (_syncOneProjectAllGitsParameters.UseProjectUpdater)
             {
                 var gitOneProjectUpdater = new GitOneProjectUpdater(_logger,
-                    Path.Combine(_syncOneProjectAllGitsParameters.GitsFolder, gitProjectFolderName), gitData);
+                    Path.Combine(_syncOneProjectAllGitsParameters.GitsFolder, gitProjectFolderName), gitData,
+                    _syncOneProjectAllGitsParameters.GitExecutablePath);
                 GitProcessor? gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
                 if (gitProcessor is null)
                 {
@@ -80,8 +81,8 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
                 }
 
                 var gitSync = new GitSyncToolAction(_logger,
-                    new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder), commitMessage,
-                    commitMessage == null);
+                    new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder,
+                        _syncOneProjectAllGitsParameters.GitExecutablePath), commitMessage, commitMessage == null);
                 if (!await gitSync.Run(cancellationToken))
                 {
                     return false;

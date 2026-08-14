@@ -71,7 +71,8 @@ public sealed class GitProjectsUpdater
 
     public GitProcessor? ProcessOneGitProject(bool processFolder = true)
     {
-        var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, _projectFolderName, _gitData);
+        var gitOneProjectUpdater = new GitOneProjectUpdater(_logger, _projectFolderName, _gitData,
+            _supportToolsParameters.GitExecutablePath);
         GitProcessor? gitProcessor = gitOneProjectUpdater.UpdateOneGitProject();
 
         if (gitProcessor is null)

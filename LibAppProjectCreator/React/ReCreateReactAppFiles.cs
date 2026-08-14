@@ -10,17 +10,20 @@ namespace LibAppProjectCreator.React;
 
 public sealed class ReCreateReactAppFiles
 {
+    private readonly string? _gitExecutablePath;
     private readonly ILogger _logger;
     private readonly string _reactAppName;
     private readonly string? _reactTemplateName;
     private readonly string _workFolder;
 
-    public ReCreateReactAppFiles(ILogger logger, string workFolder, string reactAppName, string? reactTemplateName)
+    public ReCreateReactAppFiles(ILogger logger, string workFolder, string reactAppName, string? reactTemplateName,
+        string? gitExecutablePath = null)
     {
         _logger = logger;
         _workFolder = workFolder;
         _reactAppName = reactAppName;
         _reactTemplateName = reactTemplateName;
+        _gitExecutablePath = gitExecutablePath;
     }
 
     public bool Run()
@@ -76,7 +79,7 @@ public sealed class ReCreateReactAppFiles
         //თუ დაინიცირებულია ვჩერდებით
         //თუ არა უბრალოდ ვაინიცირებთ და ვაკომიტებთ
 
-        var gitProcessor = new GitProcessor(true, _logger, appFolderForDiffFullName);
+        var gitProcessor = new GitProcessor(true, _logger, appFolderForDiffFullName, _gitExecutablePath);
         if (gitProcessor.IsFolderPartOfGitWorkingTree(appFolderForDiffFullName))
         {
             return true;

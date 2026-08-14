@@ -12,20 +12,22 @@ namespace LibGitWork;
 public sealed class GitOneProjectUpdater
 {
     private readonly GitData _git;
+    private readonly string? _gitExecutablePath;
     private readonly ILogger? _logger;
     private readonly string _projectPath;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitOneProjectUpdater(ILogger? logger, string projectPath, GitData git)
+    public GitOneProjectUpdater(ILogger? logger, string projectPath, GitData git, string? gitExecutablePath = null)
     {
         _logger = logger;
         _projectPath = projectPath;
         _git = git;
+        _gitExecutablePath = gitExecutablePath;
     }
 
     public GitProcessor? UpdateOneGitProject()
     {
-        var gitProcessor = new GitProcessor(true, _logger, _projectPath);
+        var gitProcessor = new GitProcessor(true, _logger, _projectPath, _gitExecutablePath);
 
         if (Directory.Exists(_projectPath))
         {

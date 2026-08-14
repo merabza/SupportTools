@@ -135,7 +135,8 @@ public sealed class GitCruder : ParCruder<GitDataModel>
 
     public override bool CheckValidation(ItemData item)
     {
-        var gitApi = new GitApi(true, _logger);
+        var parameters = (SupportToolsParameters)ParametersManager.Parameters;
+        var gitApi = new GitApi(true, _logger, parameters.GitExecutablePath);
         try
         {
             if (item is not GitDataModel gitDataModel)

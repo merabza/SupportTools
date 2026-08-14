@@ -26,7 +26,7 @@ of properties:
 
 |Group|Properties|Used for|
 |-|-|-|
-|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`|Where the tool reads/writes on disk|
+|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `GitExecutablePath`|Where the tool reads/writes on disk; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
 |Recent commands|`RecentCommandsFileName`, `RecentCommandsCount`|Menu history|
 |Archives|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|Packaging conventions|

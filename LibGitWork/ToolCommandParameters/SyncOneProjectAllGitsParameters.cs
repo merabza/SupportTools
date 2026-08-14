@@ -15,7 +15,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
     // ReSharper disable once ConvertToPrimaryConstructor
     public SyncOneProjectAllGitsParameters(string? projectName, string gitsFolder, List<GitData> gitData,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
-        bool useProjectUpdater)
+        bool useProjectUpdater, string? gitExecutablePath = null)
     {
         ProjectName = projectName;
         GitData = gitData;
@@ -23,6 +23,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
         IsFirstSync = isFirstSync;
         UseProjectUpdater = useProjectUpdater;
         GitsFolder = gitsFolder;
+        GitExecutablePath = gitExecutablePath;
     }
 
     public string? ProjectName { get; }
@@ -31,6 +32,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
     public string GitsFolder { get; }
     public bool IsFirstSync { get; }
     public bool UseProjectUpdater { get; }
+    public string? GitExecutablePath { get; }
 
     public bool CheckBeforeSave()
     {
@@ -84,6 +86,6 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
 
         return new SyncOneProjectAllGitsParameters(projectName, gitsFolder,
             [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)], changedGitProjects,
-            isFirstSync, false);
+            isFirstSync, false, supportToolsParameters.GitExecutablePath);
     }
 }

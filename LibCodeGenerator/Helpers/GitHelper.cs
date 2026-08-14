@@ -53,7 +53,9 @@ public static class GitHelper
     {
         var psi = new ProcessStartInfo
         {
+#pragma warning disable S4036
             FileName = "git",
+#pragma warning restore S4036
             Arguments = arguments,
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,

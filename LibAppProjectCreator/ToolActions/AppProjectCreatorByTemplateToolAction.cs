@@ -139,6 +139,8 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
             return false;
         }
 
+        appCreator.GitExecutablePath = supportToolsParameters.GitExecutablePath;
+
         if (!await appCreator.PrepareParametersAndCreateApp(_testOrReal == ETestOrReal.Real, cancellationToken))
         {
             return false;

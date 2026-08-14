@@ -158,7 +158,7 @@ public sealed class ConsoleAppCreator : AppCreatorBase
         //    _consoleAppCreatorData.MainProjectData.ProjectFullPath, ProjectName, ".gitignore");
         //mainProjectGitIgnoreCreator.CreateFileStructure();
 
-        var gitProcessor = new GitProcessor(true, Logger, SolutionPath);
+        var gitProcessor = new GitProcessor(true, Logger, SolutionPath, GitExecutablePath);
         return Task.FromResult(gitProcessor.Initialise().IsNone);
     }
 

@@ -26,6 +26,10 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? LocalPackageManagerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }
+
+    //git პროგრამის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ "git" PATH-იდან)
+    public string? GitExecutablePath { get; set; }
+
     public string? WorkFolder { get; set; }
     public string? FolderForGitignoreFiles { get; set; }
     public string? TempFolder { get; set; }

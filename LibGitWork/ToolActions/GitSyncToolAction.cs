@@ -35,7 +35,7 @@ public sealed class GitSyncToolAction : ToolAction
         UsedCommitMessage = commitMessage;
         _projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
-        GitProcessor = new GitProcessor(true, _logger, _projectFolderName);
+        GitProcessor = new GitProcessor(true, _logger, _projectFolderName, _gitSyncParameters.GitExecutablePath);
     }
 
     public string? LastRemoteId => GitProcessor.LastRemoteId;

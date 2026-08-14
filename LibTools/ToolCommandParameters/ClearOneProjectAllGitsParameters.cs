@@ -14,16 +14,19 @@ namespace LibTools.ToolCommandParameters;
 public sealed class ClearOneProjectAllGitsParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    private ClearOneProjectAllGitsParameters(string gitsFolder, List<GitData> gitData)
+    private ClearOneProjectAllGitsParameters(string gitsFolder, List<GitData> gitData,
+        string? gitExecutablePath = null)
     {
         //ProjectName = projectName;
         GitData = gitData;
         GitsFolder = gitsFolder;
+        GitExecutablePath = gitExecutablePath;
     }
 
     //public string? ProjectName { get; }
     public List<GitData> GitData { get; }
     public string GitsFolder { get; }
+    public string? GitExecutablePath { get; }
 
     public bool CheckBeforeSave()
     {
@@ -66,7 +69,8 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
         if (absentGitRepoNames.Count == 0)
         {
             return new ClearOneProjectAllGitsParameters(gitsFolder,
-                [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)]);
+                [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)],
+                supportToolsParameters.GitExecutablePath);
         }
 
         foreach (string absentGitRepoName in absentGitRepoNames)
@@ -77,6 +81,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
         StShared.WriteErrorLine("Gits with this names are absent", true);
 
         return new ClearOneProjectAllGitsParameters(gitsFolder,
-            [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)]);
+            [.. gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)],
+            supportToolsParameters.GitExecutablePath);
     }
 }

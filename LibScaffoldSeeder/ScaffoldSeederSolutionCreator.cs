@@ -35,6 +35,7 @@ public sealed class ScaffoldSeederSolutionCreator : AppCreatorBase
     {
         _par = scaffoldSeederCreatorParameters;
         _scaffoldSeederCreatorData = scaffoldSeederAppCreatorData;
+        GitExecutablePath = scaffoldSeederCreatorParameters.GitExecutablePath;
     }
 
     protected override void PrepareProjectsData()

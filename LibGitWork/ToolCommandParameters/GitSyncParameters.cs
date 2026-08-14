@@ -12,14 +12,16 @@ namespace LibGitWork.ToolCommandParameters;
 public sealed class GitSyncParameters : IParameters
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitSyncParameters(GitData gitData, string gitsFolder)
+    public GitSyncParameters(GitData gitData, string gitsFolder, string? gitExecutablePath = null)
     {
         GitData = gitData;
         GitsFolder = gitsFolder;
+        GitExecutablePath = gitExecutablePath;
     }
 
     public GitData GitData { get; }
     public string GitsFolder { get; }
+    public string? GitExecutablePath { get; }
 
     public bool CheckBeforeSave()
     {
@@ -67,7 +69,7 @@ public sealed class GitSyncParameters : IParameters
 
         if (gitsFolder != null)
         {
-            return new GitSyncParameters(gitDataDom, gitsFolder);
+            return new GitSyncParameters(gitDataDom, gitsFolder, supportToolsParameters.GitExecutablePath);
         }
 
         StShared.WriteErrorLine("Gits folder not found", true);

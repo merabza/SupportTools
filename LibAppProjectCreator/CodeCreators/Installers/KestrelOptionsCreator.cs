@@ -18,6 +18,8 @@ public sealed class KestrelOptionsCreator
     {
         _appSettingsJsonJObject.Add(new JProperty("Kestrel",
             new JObject(new JProperty("Endpoints",
+#pragma warning disable S5332
                 new JObject(new JProperty("Http", new JObject(new JProperty("Url", "http://*:5099"))))))));
+#pragma warning restore S5332
     }
 }

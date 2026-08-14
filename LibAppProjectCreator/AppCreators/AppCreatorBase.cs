@@ -58,6 +58,9 @@ public abstract class AppCreatorBase
     public string SolutionPath { get; }
     public List<GitCloneDataModel> GitClones { get; } = []; //გიტით დასაკლონი პროექტების სია
 
+    //git პროგრამის გამშვები ფაილის გზა (ივსება შემქმნელი მხარის მიერ; თუ ცარიელია, გამოიყენება "git")
+    public string? GitExecutablePath { get; set; }
+
     public async Task<bool> PrepareParametersAndCreateApp(bool askForDelete, CancellationToken cancellationToken,
         ECreateAppVersions createAppVersions = ECreateAppVersions.DoAll)
     {
@@ -404,7 +407,7 @@ public abstract class AppCreatorBase
         var gitSyncAll = new SyncOneProjectAllGitsToolAction(Logger,
             new SyncOneProjectAllGitsParameters(null, WorkPath,
                 [.. _gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value)], null, true,
-                useProjectUpdater));
+                useProjectUpdater, GitExecutablePath));
         return gitSyncAll.Run(CancellationToken.None).Result;
     }
 }
