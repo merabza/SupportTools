@@ -10,13 +10,18 @@ namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 public sealed class PairedDbObjectsConnectionResolver
 {
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PairedDbObjectsConnectionResolver(string prodCopyConnectionString, string devConnectionString)
+    public PairedDbObjectsConnectionResolver(EDatabaseProvider prodCopyDataProvider, string prodCopyConnectionString,
+        EDatabaseProvider devDataProvider, string devConnectionString)
     {
+        ProdCopyDataProvider = prodCopyDataProvider;
         ProdCopyConnectionString = prodCopyConnectionString;
+        DevDataProvider = devDataProvider;
         DevConnectionString = devConnectionString;
     }
 
+    public EDatabaseProvider ProdCopyDataProvider { get; }
     public string ProdCopyConnectionString { get; }
+    public EDatabaseProvider DevDataProvider { get; }
     public string DevConnectionString { get; }
 
     public static PairedDbObjectsConnectionResolver? Create(SupportToolsParameters supportToolsParameters,
@@ -56,6 +61,7 @@ public sealed class PairedDbObjectsConnectionResolver
             return null;
         }
 
-        return new PairedDbObjectsConnectionResolver(prodCopyConnectionString, devConnectionString);
+        return new PairedDbObjectsConnectionResolver(prodCopyDataProvider.Value, prodCopyConnectionString,
+            devDataProvider.Value, devConnectionString);
     }
 }

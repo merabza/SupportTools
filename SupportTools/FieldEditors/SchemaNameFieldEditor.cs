@@ -15,15 +15,17 @@ namespace SupportTools.FieldEditors;
 public sealed class SchemaNameFieldEditor : FieldEditor<string>
 {
     private readonly string _connectionString;
+    private readonly EDatabaseProvider _dataProvider;
     private readonly ILogger _logger;
     private readonly string _sideName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SchemaNameFieldEditor(string propertyName, ILogger logger, string sideName, string connectionString) :
-        base(propertyName)
+    public SchemaNameFieldEditor(string propertyName, ILogger logger, string sideName, EDatabaseProvider dataProvider,
+        string connectionString) : base(propertyName)
     {
         _logger = logger;
         _sideName = sideName;
+        _dataProvider = dataProvider;
         _connectionString = connectionString;
     }
 
@@ -45,8 +47,15 @@ public sealed class SchemaNameFieldEditor : FieldEditor<string>
         //    return ValueTask.CompletedTask;
         //}
 
+        //Access-ს სქემები არ აქვს — მნიშვნელობა ავტომატურად ცარიელი ხდება
+        if (_dataProvider == EDatabaseProvider.OleDb)
+        {
+            SetValue(recordForUpdate, string.Empty);
+            return ValueTask.CompletedTask;
+        }
+
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? tables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(_connectionString, _sideName, _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(_dataProvider, _connectionString, _sideName, _logger);
         if (tables is null)
         {
             return ValueTask.CompletedTask;

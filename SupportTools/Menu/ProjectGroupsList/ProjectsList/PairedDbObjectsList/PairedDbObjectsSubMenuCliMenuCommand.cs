@@ -53,8 +53,8 @@ public sealed class PairedDbObjectsSubMenuCliMenuCommand : CliMenuCommand
             return null;
         }
 
-        var cruder = PairedTableCruder.Create(pairedParMan, _logger, model.PairedTables,
-            resolver.ProdCopyConnectionString, resolver.DevConnectionString);
+        var cruder = PairedTableCruder.Create(pairedParMan, _logger, model.PairedTables, resolver.ProdCopyDataProvider,
+            resolver.ProdCopyConnectionString, resolver.DevDataProvider, resolver.DevConnectionString);
         return cruder.GetListMenu();
     }
 }

@@ -17,15 +17,16 @@ public sealed class PairedFieldCruder : ParCruder<PairedField>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PairedFieldCruder(IParametersManager parametersManager,
-        Dictionary<string, PairedField> currentValuesDictionary, ILogger logger, string prodCopyConnectionString,
+        Dictionary<string, PairedField> currentValuesDictionary, ILogger logger,
+        EDatabaseProvider prodCopyDataProvider, string prodCopyConnectionString, EDatabaseProvider devDataProvider,
         string devConnectionString, string prodCopySchemaName, string prodCopyTableName, string devSchemaName,
         string devTableName) : base(parametersManager, currentValuesDictionary, "Paired Field", "Paired Fields", true)
     {
         _pairedFields = currentValuesDictionary;
         FieldEditors.Add(new FieldNameFieldEditor(nameof(PairedField.ProdCopyFieldName), logger, "ProdCopy",
-            prodCopyConnectionString, prodCopySchemaName, prodCopyTableName));
-        FieldEditors.Add(new FieldNameFieldEditor(nameof(PairedField.DevFieldName), logger, "Dev", devConnectionString,
-            devSchemaName, devTableName));
+            prodCopyDataProvider, prodCopyConnectionString, prodCopySchemaName, prodCopyTableName));
+        FieldEditors.Add(new FieldNameFieldEditor(nameof(PairedField.DevFieldName), logger, "Dev", devDataProvider,
+            devConnectionString, devSchemaName, devTableName));
     }
 
     protected override void BeforeGetListMenu()

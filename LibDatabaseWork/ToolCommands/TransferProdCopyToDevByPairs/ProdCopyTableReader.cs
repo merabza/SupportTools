@@ -15,11 +15,11 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //ProdCopy-ის ცხრილის ჩატვირთვა Dictionary-ების სიად — Adjust ალგორითმისთვის
 public static class ProdCopyTableReader
 {
-    public static async Task<List<Dictionary<string, object?>>?> ReadAsync(string prodCopyConnectionString,
-        PairedTable pt, IReadOnlyList<PairedField> selectableFields, ILogger logger,
+    public static async Task<List<Dictionary<string, object?>>?> ReadAsync(EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, PairedTable pt, IReadOnlyList<PairedField> selectableFields, ILogger logger,
         CancellationToken cancellationToken)
     {
-        DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
+        DbKit dbKit = DbKitFactory.GetKit(prodCopyDataProvider);
         // ReSharper disable once using
         using var prodDbm = DbManager.Create(dbKit, prodCopyConnectionString);
         if (prodDbm is null)
@@ -29,7 +29,11 @@ public static class ProdCopyTableReader
         }
 
         string selectList = string.Join(", ", selectableFields.Select(f => $"[{f.ProdCopyFieldName}]"));
-        string selectSql = $"SELECT {selectList} FROM [{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
+        //Access-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება
+        string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
+            ? $"[{pt.ProdCopyTableName}]"
+            : $"[{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
+        string selectSql = $"SELECT {selectList} FROM {fromPart}";
 
         prodDbm.Open();
         try

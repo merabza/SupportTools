@@ -72,8 +72,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
     {
         //1. ProdCopy schema
         Dictionary<(string Schema, string Table), TableInfo>? prodCopySchema =
-            DbSchemaQueryHelper.ReadTablesAndColumnsCaseSensitive(Parameters.ProdCopyConnectionString, "ProdCopy",
-                _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumnsCaseSensitive(Parameters.ProdCopyDataProvider,
+                Parameters.ProdCopyConnectionString, "ProdCopy", _logger);
         if (prodCopySchema is null)
         {
             return false;
@@ -81,7 +81,8 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
 
         //2. Dev schema
         Dictionary<(string Schema, string Table), TableInfo>? devSchema =
-            DbSchemaQueryHelper.ReadTablesAndColumnsCaseSensitive(Parameters.DevConnectionString, "Dev", _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumnsCaseSensitive(Parameters.DevDataProvider,
+                Parameters.DevConnectionString, "Dev", _logger);
         if (devSchema is null)
         {
             return false;
@@ -98,9 +99,9 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                 return false;
             }
 
-            if (!await PairsAutoGenerator.GenerateAndSave(Parameters.ProdCopyConnectionString,
-                    Parameters.DevConnectionString, Parameters.PairedDbObjectsResultFileName, _logger,
-                    cancellationToken))
+            if (!await PairsAutoGenerator.GenerateAndSave(Parameters.ProdCopyDataProvider,
+                    Parameters.ProdCopyConnectionString, Parameters.DevDataProvider, Parameters.DevConnectionString,
+                    Parameters.PairedDbObjectsResultFileName, _logger, cancellationToken))
             {
                 return false;
             }
@@ -217,8 +218,9 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                     pt.DevSchemaName, pt.DevTableName, insertable.Count, hasIdentity);
             }
 
-            long rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyConnectionString,
-                Parameters.DevConnectionString, pt, insertable, meta.IdentityColumns, Parameters.CommandTimeOut,
+            long rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyDataProvider,
+                Parameters.ProdCopyConnectionString, Parameters.DevConnectionString, pt, insertable,
+                meta.IdentityColumns, Parameters.CommandTimeOut,
                 meta.PrimaryKeyColumns, meta.UniqueIndexes, Parameters.DataSeederRulesByTableStartupProjectFilePath,
                 Parameters.OldDataConvertorForDataSeeder, _logger, cancellationToken);
             totalRows += rows;

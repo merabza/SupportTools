@@ -5,27 +5,36 @@ using System.Threading.Tasks;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
+using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 
 //pairs ფაილის ავტო-დაგენერირება — იყენებს არსებულ DbSchemaQueryHelper-ის (case-insensitive) matching-ის ლოგიკას
 internal static class PairsAutoGenerator
 {
-    public static async ValueTask<bool> GenerateAndSave(string prodCopyConnectionString, string devConnectionString,
+    public static async ValueTask<bool> GenerateAndSave(EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, EDatabaseProvider devDataProvider, string devConnectionString,
         string resultFileName, ILogger logger, CancellationToken cancellationToken = default)
     {
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(prodCopyConnectionString, "ProdCopy", logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(prodCopyDataProvider, prodCopyConnectionString, "ProdCopy",
+                logger);
         if (prodCopyTables is null)
         {
             return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? devTables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(devConnectionString, "Dev", logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(devDataProvider, devConnectionString, "Dev", logger);
         if (devTables is null)
         {
             return false;
+        }
+
+        //Access ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
+        if (prodCopyDataProvider == EDatabaseProvider.OleDb)
+        {
+            devTables = DbSchemaQueryHelper.ReKeyDevTablesByTableNameOnly(devTables, logger);
         }
 
         var pairedTables = new Dictionary<string, PairedTable>();

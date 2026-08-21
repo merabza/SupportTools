@@ -19,8 +19,9 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //ერთი ცხრილის გადატანა ProdCopy → Dev; ქცევა იცვლება pt.SeedDataType-ის მიხედვით
 internal static class TableDataTransferrer
 {
-    public static async Task<long> TransferAsync(string prodCopyConnectionString, string devConnectionString,
-        PairedTable pt, IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
+    public static async Task<long> TransferAsync(EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, string devConnectionString, PairedTable pt,
+        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
         int commandTimeOut, IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
         string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
         CancellationToken cancellationToken)
@@ -74,8 +75,8 @@ internal static class TableDataTransferrer
         {
             if (convertorProjectFilePath is null)
             {
-                return await TransferStreamingFromProdCopyAsync(prodCopyConnectionString, devConnectionString, pt,
-                    insertableFields, hasIdentity, commandTimeOut, logger, cancellationToken);
+                return await TransferStreamingFromProdCopyAsync(prodCopyDataProvider, prodCopyConnectionString,
+                    devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut, logger, cancellationToken);
             }
 
             List<Dictionary<string, object?>>? convertorData = await LoadConvertorRowsAsync(convertorProjectFilePath,
@@ -129,8 +130,8 @@ internal static class TableDataTransferrer
         List<Dictionary<string, object?>>? dbData = convertorProjectFilePath is not null
             ? await LoadConvertorRowsAsync(convertorProjectFilePath, prodCopyConnectionString, devConnectionString, pt,
                 insertableFields, commandTimeOut, logger, cancellationToken)
-            : await ProdCopyTableReader.ReadAsync(prodCopyConnectionString, pt, insertableFields, logger,
-                cancellationToken);
+            : await ProdCopyTableReader.ReadAsync(prodCopyDataProvider, prodCopyConnectionString, pt, insertableFields,
+                logger, cancellationToken);
         if (dbData is null)
         {
             return 0;
@@ -161,11 +162,12 @@ internal static class TableDataTransferrer
     }
 
     //ProdCopy → Dev streaming SqlBulkCopy-ით (არსებული ქცევა OnlyDatabase-სთვის)
-    private static async Task<long> TransferStreamingFromProdCopyAsync(string prodCopyConnectionString,
-        string devConnectionString, PairedTable pt, IReadOnlyList<PairedField> insertableFields, bool hasIdentity,
-        int commandTimeOut, ILogger logger, CancellationToken cancellationToken)
+    private static async Task<long> TransferStreamingFromProdCopyAsync(EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, string devConnectionString, PairedTable pt,
+        IReadOnlyList<PairedField> insertableFields, bool hasIdentity, int commandTimeOut, ILogger logger,
+        CancellationToken cancellationToken)
     {
-        DbKit dbKit = DbKitFactory.GetKit(EDatabaseProvider.SqlServer);
+        DbKit dbKit = DbKitFactory.GetKit(prodCopyDataProvider);
         // ReSharper disable once using
         using var prodDbm = DbManager.Create(dbKit, prodCopyConnectionString);
         if (prodDbm is null)
@@ -184,7 +186,11 @@ internal static class TableDataTransferrer
             f => f.ProdCopyFieldName);
 
         string selectList = string.Join(", ", insertableFields.Select(f => $"[{f.ProdCopyFieldName}]"));
-        string selectSql = $"SELECT {selectList} FROM [{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
+        //Access-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება
+        string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
+            ? $"[{pt.ProdCopyTableName}]"
+            : $"[{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
+        string selectSql = $"SELECT {selectList} FROM {fromPart}";
 
         prodDbm.Open();
         try

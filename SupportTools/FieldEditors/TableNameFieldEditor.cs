@@ -16,6 +16,7 @@ namespace SupportTools.FieldEditors;
 public sealed class TableNameFieldEditor : FieldEditor<string>
 {
     private readonly string _connectionString;
+    private readonly EDatabaseProvider _dataProvider;
     private readonly ILogger _logger;
 
     private readonly string _sideName;
@@ -23,11 +24,12 @@ public sealed class TableNameFieldEditor : FieldEditor<string>
     //private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public TableNameFieldEditor(string propertyName, ILogger logger, string sideName, string connectionString) :
-        base(propertyName)
+    public TableNameFieldEditor(string propertyName, ILogger logger, string sideName, EDatabaseProvider dataProvider,
+        string connectionString) : base(propertyName)
     {
         _logger = logger;
         _sideName = sideName;
+        _dataProvider = dataProvider;
         _connectionString = connectionString;
         //_parametersManager = parametersManager;
         //_projectName = projectName;
@@ -52,14 +54,15 @@ public sealed class TableNameFieldEditor : FieldEditor<string>
         //}
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? tables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(_connectionString, _sideName, _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(_dataProvider, _connectionString, _sideName, _logger);
         if (tables is null)
         {
             return ValueTask.CompletedTask;
         }
 
         string? schemaName = GetValue<string>(recordForUpdate, $"{_sideName}SchemaName");
-        if (string.IsNullOrWhiteSpace(schemaName))
+        //Access-ს სქემები არ აქვს — სქემის მითითება საჭირო არ არის, ცხრილები ცარიელი სქემით იძებნება
+        if (_dataProvider != EDatabaseProvider.OleDb && string.IsNullOrWhiteSpace(schemaName))
         {
             StShared.WriteErrorLine($"Set {_sideName}SchemaName before choosing a table", true, _logger);
             return ValueTask.CompletedTask;
@@ -67,7 +70,8 @@ public sealed class TableNameFieldEditor : FieldEditor<string>
 
         List<string> tableNames =
         [
-            .. tables.Values.Where(t => string.Equals(t.SchemaName, schemaName, StringComparison.OrdinalIgnoreCase))
+            .. tables.Values.Where(t =>
+                    string.Equals(t.SchemaName, schemaName ?? string.Empty, StringComparison.OrdinalIgnoreCase))
                 .Select(t => t.TableName).OrderBy(n => n)
         ];
 

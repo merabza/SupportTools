@@ -75,17 +75,25 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? prodCopyTables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.ProdCopyConnectionString, "ProdCopy", _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.ProdCopyDataProvider,
+                Parameters.ProdCopyConnectionString, "ProdCopy", _logger);
         if (prodCopyTables is null)
         {
             return false;
         }
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? devTables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.DevConnectionString, "Dev", _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(Parameters.DevDataProvider, Parameters.DevConnectionString, "Dev",
+                _logger);
         if (devTables is null)
         {
             return false;
+        }
+
+        //Access ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
+        if (Parameters.ProdCopyDataProvider == EDatabaseProvider.OleDb)
+        {
+            devTables = DbSchemaQueryHelper.ReKeyDevTablesByTableNameOnly(devTables, _logger);
         }
 
         var pairedTables = new Dictionary<string, PairedTable>();

@@ -15,6 +15,7 @@ namespace SupportTools.FieldEditors;
 public sealed class FieldNameFieldEditor : FieldEditor<string>
 {
     private readonly string _connectionString;
+    private readonly EDatabaseProvider _dataProvider;
     private readonly ILogger _logger;
     private readonly string _schemaName;
     private readonly string _sideName;
@@ -23,11 +24,12 @@ public sealed class FieldNameFieldEditor : FieldEditor<string>
     //private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public FieldNameFieldEditor(string propertyName, ILogger logger, string sideName, string connectionString,
-        string schemaName, string tableName) : base(propertyName)
+    public FieldNameFieldEditor(string propertyName, ILogger logger, string sideName, EDatabaseProvider dataProvider,
+        string connectionString, string schemaName, string tableName) : base(propertyName)
     {
         _logger = logger;
         _sideName = sideName;
+        _dataProvider = dataProvider;
         _connectionString = connectionString;
         //_projectName = projectName;
         _schemaName = schemaName;
@@ -53,7 +55,7 @@ public sealed class FieldNameFieldEditor : FieldEditor<string>
         //}
 
         Dictionary<(string SchemaLower, string TableLower), TableInfo>? tables =
-            DbSchemaQueryHelper.ReadTablesAndColumns(_connectionString, _sideName, _logger);
+            DbSchemaQueryHelper.ReadTablesAndColumns(_dataProvider, _connectionString, _sideName, _logger);
         if (tables is null)
         {
             return ValueTask.CompletedTask;
