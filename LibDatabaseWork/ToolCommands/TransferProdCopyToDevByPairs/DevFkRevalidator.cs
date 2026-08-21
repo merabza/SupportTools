@@ -158,6 +158,11 @@ internal static class DevFkRevalidator
             : $" Missing values (first {samples.Count}): {string.Join(", ", samples)}.";
     }
 
-    private sealed record FkColumn(string FkName, int Ordinal, string Column, string RefSchema, string RefTable,
+    private sealed record FkColumn(
+        string FkName,
+        int Ordinal,
+        string Column,
+        string RefSchema,
+        string RefTable,
         string RefColumn);
 }

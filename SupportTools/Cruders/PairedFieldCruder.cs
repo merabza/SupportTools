@@ -17,10 +17,10 @@ public sealed class PairedFieldCruder : ParCruder<PairedField>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PairedFieldCruder(IParametersManager parametersManager,
-        Dictionary<string, PairedField> currentValuesDictionary, ILogger logger,
-        EDatabaseProvider prodCopyDataProvider, string prodCopyConnectionString, EDatabaseProvider devDataProvider,
-        string devConnectionString, string prodCopySchemaName, string prodCopyTableName, string devSchemaName,
-        string devTableName) : base(parametersManager, currentValuesDictionary, "Paired Field", "Paired Fields", true)
+        Dictionary<string, PairedField> currentValuesDictionary, ILogger logger, EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, EDatabaseProvider devDataProvider, string devConnectionString,
+        string prodCopySchemaName, string prodCopyTableName, string devSchemaName, string devTableName) : base(
+        parametersManager, currentValuesDictionary, "Paired Field", "Paired Fields", true)
     {
         _pairedFields = currentValuesDictionary;
         FieldEditors.Add(new FieldNameFieldEditor(nameof(PairedField.ProdCopyFieldName), logger, "ProdCopy",

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbToolsFactory;
 using DatabaseTools.OleDbTools;
@@ -140,12 +141,9 @@ public static class DbSchemaQueryHelper
     {
         var result = new Dictionary<(string SchemaLower, string TableLower), TableInfo>();
         var duplicates = new HashSet<string>();
-        foreach (KeyValuePair<(string SchemaLower, string TableLower), TableInfo> kvp in devTables)
+        foreach (var kvp in devTables.Where(kvp => !result.TryAdd((string.Empty, kvp.Key.TableLower), kvp.Value)))
         {
-            if (!result.TryAdd((string.Empty, kvp.Key.TableLower), kvp.Value))
-            {
-                duplicates.Add(kvp.Key.TableLower);
-            }
+            duplicates.Add(kvp.Key.TableLower);
         }
 
         foreach (string duplicate in duplicates)

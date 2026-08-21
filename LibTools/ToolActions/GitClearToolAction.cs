@@ -57,8 +57,7 @@ public sealed class GitClearToolAction : ToolAction
     {
         string projectFolderName =
             Path.Combine(_gitClearParameters.GitsFolder, _gitClearParameters.GitData.GitProjectFolderName);
-        var gitProcessor = new GitProcessor(true, _logger, projectFolderName,
-            _gitClearParameters.GitExecutablePath);
+        var gitProcessor = new GitProcessor(true, _logger, projectFolderName, _gitClearParameters.GitExecutablePath);
         if (!Directory.Exists(projectFolderName))
         {
             return ValueTask.FromResult(gitProcessor.Clone(_gitClearParameters.GitData.GitProjectAddress));

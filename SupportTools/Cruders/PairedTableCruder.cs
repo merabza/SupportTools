@@ -19,10 +19,9 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PairedTableCruder(IParametersManager parametersManager,
-        Dictionary<string, PairedTable> currentValuesDictionary, ILogger logger,
-        EDatabaseProvider prodCopyDataProvider, string prodCopyConnectionString, EDatabaseProvider devDataProvider,
-        string devConnectionString) : base(parametersManager, currentValuesDictionary, "Paired Table", "Paired Tables",
-        true)
+        Dictionary<string, PairedTable> currentValuesDictionary, ILogger logger, EDatabaseProvider prodCopyDataProvider,
+        string prodCopyConnectionString, EDatabaseProvider devDataProvider, string devConnectionString) : base(
+        parametersManager, currentValuesDictionary, "Paired Table", "Paired Tables", true)
     {
         _pairedTables = currentValuesDictionary;
         FieldEditors.Add(new SchemaNameFieldEditor(nameof(PairedTable.ProdCopySchemaName), logger, "ProdCopy",
@@ -43,8 +42,8 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
     }
 
     public static PairedTableCruder Create(IParametersManager parametersManager, ILogger logger,
-        Dictionary<string, PairedTable> tables, EDatabaseProvider prodCopyDataProvider,
-        string prodCopyConnectionString, EDatabaseProvider devDataProvider, string devConnectionString)
+        Dictionary<string, PairedTable> tables, EDatabaseProvider prodCopyDataProvider, string prodCopyConnectionString,
+        EDatabaseProvider devDataProvider, string devConnectionString)
     {
         return new PairedTableCruder(parametersManager, tables, logger, prodCopyDataProvider, prodCopyConnectionString,
             devDataProvider, devConnectionString);

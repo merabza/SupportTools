@@ -21,8 +21,8 @@ internal static class TableDataTransferrer
 {
     public static async Task<long> TransferAsync(EDatabaseProvider prodCopyDataProvider,
         string prodCopyConnectionString, string devConnectionString, PairedTable pt,
-        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns,
-        int commandTimeOut, IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
+        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns, int commandTimeOut,
+        IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
         string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
         CancellationToken cancellationToken)
     {
