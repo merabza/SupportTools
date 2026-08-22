@@ -61,7 +61,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     _logger.LogInformation("Try to get parameters Version {TryCount}...", tryCount);
                 }
 
-                var errors = new List<Error>();
+                var errors = new List<ErrorOmd>();
 
                 if (_proxySettings is ProxySettings proxySettings)
                 {
@@ -75,7 +75,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, UseConsole);
-                    OneOf<string, Error[]> getAppSettingsVersionByProxyResult =
+                    OneOf<string, ErrorOmd[]> getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getAppSettingsVersionByProxyResult.IsT1)
@@ -98,7 +98,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient =
                         new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
-                    OneOf<string, Error[]> getAppSettingsVersionResult =
+                    OneOf<string, ErrorOmd[]> getAppSettingsVersionResult =
                         await testApiClient.GetAppSettingsVersion(cancellationToken);
                     if (getAppSettingsVersionResult.IsT1)
                     {
@@ -112,7 +112,7 @@ public sealed class CheckParametersVersionAction : ToolAction
 
                 if (errors.Count > 0)
                 {
-                    Error.PrintErrorsOnConsole(errors);
+                    ErrorOmd.PrintErrorsOnConsole(errors);
                 }
                 else
                 {

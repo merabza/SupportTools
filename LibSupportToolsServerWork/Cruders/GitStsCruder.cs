@@ -81,7 +81,7 @@ public sealed class GitStsCruder : Cruder
 
             try
             {
-                OneOf<List<StsGitDataModel>, Error[]> remoteGitReposResult =
+                OneOf<List<StsGitDataModel>, ErrorOmd[]> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsT0)
                 {
@@ -89,7 +89,7 @@ public sealed class GitStsCruder : Cruder
                 }
 
                 StShared.WriteErrorLine("could not received remoteGits", true, _logger);
-                Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
             catch (Exception e)
             {
@@ -112,7 +112,7 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            OneOf<StsGitDataModel, Error[]> getGitRepoByKeyResult =
+            OneOf<StsGitDataModel, ErrorOmd[]> getGitRepoByKeyResult =
                 supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
             if (getGitRepoByKeyResult.IsT0)
             {
@@ -125,7 +125,7 @@ public sealed class GitStsCruder : Cruder
                 return false;
             }
 
-            Error.PrintErrorsOnConsole(getGitRepoByKeyResult.AsT1);
+            ErrorOmd.PrintErrorsOnConsole(getGitRepoByKeyResult.AsT1);
 
             return false;
         }
@@ -187,11 +187,11 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            Option<Error[]> updateGitRepoByKeyResult = supportToolsServerApiClient
+            Option<ErrorOmd[]> updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
+                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)
@@ -219,11 +219,11 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            Option<Error[]> updateGitRepoByKeyResult =
+            Option<ErrorOmd[]> updateGitRepoByKeyResult =
                 await supportToolsServerApiClient.RemoveGitRepoByKey(recordKey, cancellationToken);
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
+                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)
@@ -259,7 +259,7 @@ public sealed class GitStsCruder : Cruder
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error occurred while validating GitDataModel");
+            _logger.LogError(e, "ErrorOmd occurred while validating GitDataModel");
             return false;
         }
     }

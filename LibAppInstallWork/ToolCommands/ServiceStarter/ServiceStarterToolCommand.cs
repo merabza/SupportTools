@@ -71,7 +71,7 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        Option<Error[]> startServiceResult = await projectManager.StartService(_parameters.ProjectName,
+        Option<ErrorOmd[]> startServiceResult = await projectManager.StartService(_parameters.ProjectName,
             _parameters.EnvironmentName, CancellationToken.None);
         if (startServiceResult.IsSome)
         {

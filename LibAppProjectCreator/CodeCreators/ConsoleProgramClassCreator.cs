@@ -41,7 +41,7 @@ public sealed class ConsoleProgramClassCreator : CodeCreator
                 //თუ მენიუს გამოყენება არ ხდება, მაშინ დაშიფვრას აზრი არ აქვს, რადგან ასეთ შემთხვევაში საჭირო იქნება ცალკე რედაქტორის და დამშიფრავის არსებობა
                 $"var argParser = new ArgumentsParser<{parametersClassName}>(args, appName, null)",
                 new CodeBlock("switch (argParser.Analysis())", "case EParseResult.Ok: break",
-                    "case EParseResult.Usage: return 1", "case EParseResult.Error: return 2",
+                    "case EParseResult.Usage: return 1", "case EParseResult.ErrorOmd: return 2",
                     "default: throw new ArgumentOutOfRangeException()"), string.Empty,
                 $"var par = ({parametersClassName}?)argParser.Par",
                 new CodeBlock("if (par is null)", "StShared.WriteErrorLine(\"ConsoleTestParameters is null\", true)",

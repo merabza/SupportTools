@@ -66,7 +66,7 @@ public sealed class ServiceStopperToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        Option<Error[]> stopServiceResult =
+        Option<ErrorOmd[]> stopServiceResult =
             await projectManager.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsSome)
         {

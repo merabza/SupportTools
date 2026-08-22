@@ -27,7 +27,7 @@ public static class SupportToolsServerWork
                 return [];
             }
 
-            OneOf<List<StsGitDataModel>, Error[]> remoteGitReposResult =
+            OneOf<List<StsGitDataModel>, ErrorOmd[]> remoteGitReposResult =
                 supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
@@ -35,7 +35,7 @@ public static class SupportToolsServerWork
             }
 
             StShared.WriteErrorLine("could not received remoteGits", true, logger);
-            Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
         }
         catch (Exception e)
         {

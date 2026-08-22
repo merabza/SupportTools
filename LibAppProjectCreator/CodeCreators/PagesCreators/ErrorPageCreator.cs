@@ -16,10 +16,10 @@ public sealed class ErrorPageCreator : CodeCreator
         var text = new TextCode(@"@page
 @model ErrorModel
 @{
-    ViewData[""Title""] = ""Error"";
+    ViewData[""Title""] = ""ErrorOmd"";
 }
 
-<h1 sealed class=""text-danger"">Error.</h1>
+<h1 sealed class=""text-danger"">ErrorOmd.</h1>
 <h2 sealed class=""text-danger"">An error occurred while processing your request.</h2>
 
 @if (Model.ShowRequestId)

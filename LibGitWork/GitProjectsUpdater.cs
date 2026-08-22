@@ -116,7 +116,7 @@ public sealed class GitProjectsUpdater
     //        var getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
     //        if (getRemoteOriginUrlResult.IsT1)
     //        {
-    //            Error.PrintErrorsOnConsole(Error.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+    //            ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(getRemoteOriginUrlResult.AsT1,
     //                SqlDbClientErrors.GetRemoteOriginUrlError));
     //            return null;
     //        }
@@ -140,7 +140,7 @@ public sealed class GitProjectsUpdater
     //        var needCommitResult = gitProcessor.NeedCommit();
     //        if (needCommitResult.IsT1)
     //        {
-    //            Error.PrintErrorsOnConsole(Error.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
+    //            ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(needCommitResult.AsT1, SqlDbClientErrors.NeedCommitError));
     //            return null;
     //        }
 

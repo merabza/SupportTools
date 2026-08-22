@@ -34,10 +34,10 @@ public sealed class GitOneProjectUpdater
             //თუ ფოლდერი არსებობს, მაშინ დადგინდეს შეესაბამება თუ არა Git-ი პროექტის მისამართს. ანუ თავის დროზე ამ მისამართიდანაა დაკლონილი?
             // თუ ეს ასე არ არის, წაიშალოს ფოლდერი თავისი შიგთავსით
 
-            OneOf<string, Error[]> getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
+            OneOf<string, ErrorOmd[]> getRemoteOriginUrlResult = gitProcessor.GetRemoteOriginUrl();
             if (getRemoteOriginUrlResult.IsT1)
             {
-                Error.PrintErrorsOnConsole(Error.RecreateErrors(getRemoteOriginUrlResult.AsT1,
+                ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(getRemoteOriginUrlResult.AsT1,
                     SqlDbClientErrors.GetRemoteOriginUrlError));
                 return null;
             }
@@ -62,10 +62,10 @@ public sealed class GitOneProjectUpdater
         else
         {
             //თუ ფოლდერი არსებობს, მოხდეს სტატუსის შემოწმება (იდეაში აქ ცვლილებები არ უნდა მომხდარიყო, მაგრამ მაინც)
-            OneOf<bool, Error[]> needCommitResult = gitProcessor.NeedCommit();
+            OneOf<bool, ErrorOmd[]> needCommitResult = gitProcessor.NeedCommit();
             if (needCommitResult.IsT1)
             {
-                Error.PrintErrorsOnConsole(Error.RecreateErrors(needCommitResult.AsT1,
+                ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(needCommitResult.AsT1,
                     SqlDbClientErrors.NeedCommitError));
                 return null;
             }

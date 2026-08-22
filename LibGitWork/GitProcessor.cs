@@ -34,7 +34,7 @@ public sealed class GitProcessor
         LastRemoteId = GitGetRemoteId();
     }
 
-    //public OneOf<bool, Error[]> NeedPull(bool updateRemote = false)
+    //public OneOf<bool, ErrorOmd[]> NeedPull(bool updateRemote = false)
     //{
     //    if (updateRemote && !GitRemoteUpdate())
     //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
@@ -134,14 +134,14 @@ fi*/
 
     private string? GitGetId(string parameters)
     {
-        OneOf<(string, int), Error[]> localResult =
+        OneOf<(string, int), ErrorOmd[]> localResult =
             StShared.RunProcessWithOutput(false, null, _git, $"{_switchToProjectPath} {parameters}");
         if (!localResult.IsT1)
         {
             return localResult.AsT0.Item1;
         }
 
-        StShared.WriteErrorLine($"{_git} {parameters} Error", _useConsole, _logger);
+        StShared.WriteErrorLine($"{_git} {parameters} ErrorOmd", _useConsole, _logger);
         return null;
     }
 
@@ -167,9 +167,9 @@ fi*/
         return false;
     }
 
-    public OneOf<string, Error[]> GetRemoteOriginUrl()
+    public OneOf<string, ErrorOmd[]> GetRemoteOriginUrl()
     {
-        OneOf<(string, int), Error[]> result = StShared.RunProcessWithOutput(false, null, _git,
+        OneOf<(string, int), ErrorOmd[]> result = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} config --get remote.origin.url");
         if (result.IsT1)
         {
@@ -191,9 +191,9 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Error[]> NeedCommit()
+    public OneOf<bool, ErrorOmd[]> NeedCommit()
     {
-        OneOf<(string, int), Error[]> gitStatusOutputResult =
+        OneOf<(string, int), ErrorOmd[]> gitStatusOutputResult =
             StShared.RunProcessWithOutput(false, null, _git, $"{_switchToProjectPath} status --porcelain");
         if (gitStatusOutputResult.IsT1)
         {
@@ -248,10 +248,10 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, Error[]> HaveUnTrackedFiles()
+    public OneOf<bool, ErrorOmd[]> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), Error[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
+        OneOf<(string, int), ErrorOmd[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} status --porcelain --untracked-files");
 
         if (statusCommandOutputResult.IsT1)
@@ -354,10 +354,10 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], Error[]> GetRedundantCachedFilesList()
+    public OneOf<string[], ErrorOmd[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), Error[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
+        OneOf<(string, int), ErrorOmd[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
 
         if (statusCommandOutputResult.IsT1)
@@ -384,14 +384,14 @@ fi*/
         return false;
     }
 
-    public Option<Error[]> Initialise()
+    public Option<ErrorOmd[]> Initialise()
     {
         return StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} init");
     }
 
     public bool IsFolderPartOfGitWorkingTree(string appFolderForDiffFullName)
     {
-        OneOf<(string, int), Error[]> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, _git,
+        OneOf<(string, int), ErrorOmd[]> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, _git,
             $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
         if (isInsideWorkTreeResult.IsT1)
         {

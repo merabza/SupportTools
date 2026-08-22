@@ -80,7 +80,7 @@
 //    //        new XElement("Exec", new XAttribute("Command", "node --version"), new XAttribute("ContinueOnError", "true"),
 //    //            new XElement("Output", new XAttribute("TaskParameter", "ExitCode"),
 //    //                new XAttribute("PropertyName", "Code"))),
-//    //        new XElement("Error", new XAttribute("Condition", "'$(Code)' != '0'"),
+//    //        new XElement("ErrorOmd", new XAttribute("Condition", "'$(Code)' != '0'"),
 //    //            new XAttribute("Text",
 //    //                "Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE.")),
 //    //        new XElement("Message", new XAttribute("Importance", "high"),

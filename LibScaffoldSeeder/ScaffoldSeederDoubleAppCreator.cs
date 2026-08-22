@@ -75,7 +75,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
 
         if (appCreatorBaseData is null)
         {
-            StShared.WriteErrorLine("Error when creating Scaffold Seeder Solution Parameters", true, _logger);
+            StShared.WriteErrorLine("ErrorOmd when creating Scaffold Seeder Solution Parameters", true, _logger);
             return null;
         }
 

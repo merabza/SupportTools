@@ -4,32 +4,33 @@ namespace SupportTools.Errors;
 
 public static class DotnetToolsManagerErrors
 {
-    public static readonly Error CreateListOfDotnetToolsError = new()
+    public static readonly ErrorOmd CreateListOfDotnetToolsError = new()
     {
-        Code = nameof(CreateListOfDotnetToolsError), Name = "Error when Create List Of Dotnet Tools"
+        Code = nameof(CreateListOfDotnetToolsError), Name = "ErrorOmd when Create List Of Dotnet Tools"
     };
 
-    public static readonly Error CreateListOfDotnetToolsInstalledError = new()
+    public static readonly ErrorOmd CreateListOfDotnetToolsInstalledError = new()
     {
         Code = nameof(CreateListOfDotnetToolsInstalledError),
-        Name = "Error when Create List Of Dotnet Tools Installed"
+        Name = "ErrorOmd when Create List Of Dotnet Tools Installed"
     };
 
-    public static readonly Error PackageIdIsEmpty = new()
+    public static readonly ErrorOmd PackageIdIsEmpty = new()
     {
         Code = nameof(PackageIdIsEmpty), Name = "Package Id Is Empty"
     };
 
-    public static readonly Error GetAvailableVersionOfToolError = new()
+    public static readonly ErrorOmd GetAvailableVersionOfToolError = new()
     {
-        Code = nameof(GetAvailableVersionOfToolError), Name = "Error when detect Available Version Of Tool"
+        Code = nameof(GetAvailableVersionOfToolError), Name = "ErrorOmd when detect Available Version Of Tool"
     };
 
-    public static Error CheckVersionsForOneToolError(string toolName)
+    public static ErrorOmd CheckVersionsForOneToolError(string toolName)
     {
-        return new Error
+        return new ErrorOmd
         {
-            Code = nameof(CheckVersionsForOneToolError), Name = $"Error when Check Versions Of package {toolName}"
+            Code = nameof(CheckVersionsForOneToolError),
+            Name = $"ErrorOmd when Check Versions Of package {toolName}"
         };
     }
 }

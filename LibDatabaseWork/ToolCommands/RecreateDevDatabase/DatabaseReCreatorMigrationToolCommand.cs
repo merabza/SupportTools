@@ -65,7 +65,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დავადგინოთ თუ არსებობს დეველოპერ ბაზა
-        OneOf<bool, Error[]> isDatabaseExistsResult =
+        OneOf<bool, ErrorOmd[]> isDatabaseExistsResult =
             await DatabaseMigrationParameters.DatabaseManager.IsDatabaseExists(DatabaseMigrationParameters.DatabaseName,
                 cancellationToken);
 
@@ -98,10 +98,10 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return false;
         }
 
-        Option<Error[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
+        Option<ErrorOmd[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
         if (changeDatabaseRecoveryModelResult.IsSome)
         {
-            _logger.LogError("Error in ChangeDatabaseRecoveryModel");
+            _logger.LogError("ErrorOmd in ChangeDatabaseRecoveryModel");
         }
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
@@ -109,9 +109,10 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         return await correctNewDatabase.Run(cancellationToken);
     }
 
-    private async ValueTask<Option<Error[]>> ChangeDatabaseRecoveryModel(CancellationToken cancellationToken = default)
+    private async ValueTask<Option<ErrorOmd[]>> ChangeDatabaseRecoveryModel(
+        CancellationToken cancellationToken = default)
     {
-        var errors = new List<Error>();
+        var errors = new List<ErrorOmd>();
 
         string? dbConnectionName = _devDatabaseParameters.DbConnectionName;
 
@@ -122,13 +123,13 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return errors.ToArray();
         }
 
-        OneOf<IDatabaseManager, Error[]> createDatabaseManagerResult =
+        OneOf<IDatabaseManager, ErrorOmd[]> createDatabaseManagerResult =
             await DatabaseManagersFactory.CreateDatabaseManager(_appName, _logger, true, dbConnectionName,
                 _databaseServerConnections, _apiClients, _httpClientFactory, null, null, cancellationToken);
 
         if (createDatabaseManagerResult.IsT1)
         {
-            _logger.LogError("Error in CreateDatabaseManager");
+            _logger.LogError("ErrorOmd in CreateDatabaseManager");
             errors.AddRange(createDatabaseManagerResult.AsT1);
         }
 
@@ -148,12 +149,12 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
 
         IDatabaseManager? dbManager = createDatabaseManagerResult.AsT0;
 
-        Option<Error[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
+        Option<ErrorOmd[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
             _devDatabaseParameters.DatabaseName, databaseRecoveryModel, cancellationToken);
 
         if (changeDatabaseRecoveryModelResult.IsSome)
         {
-            return (Error[])changeDatabaseRecoveryModelResult;
+            return (ErrorOmd[])changeDatabaseRecoveryModelResult;
         }
 
         return null;

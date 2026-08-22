@@ -122,14 +122,14 @@
 //        //npx create-react-app {projectName}
 //        //if (!StShared.RunProcess(_logger, "C:\\Program Files\\nodejs\\npx", $"create-react-app {_projectName}"))
 //        //{
-//        //  StShared.WriteErrorLine("Error When creating react app");
+//        //  StShared.WriteErrorLine("ErrorOmd When creating react app");
 //        //  return false;
 //        //}
 //        //if (!RunNodeProcess(
 //        //        $"npx create-react-app {_projectName.ToLower()}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? string.Empty : $" --template {_reactTemplateName}")}",
 //        //        _tempFolderPath))
 //        //{
-//        //    StShared.WriteErrorLine("Error When creating react app", true, _logger);
+//        //    StShared.WriteErrorLine("ErrorOmd When creating react app", true, _logger);
 //        //    return false;
 //        //}
 
@@ -148,7 +148,7 @@
 //            var srcPath = Path.Combine(_destinationFolderPath, "src");
 //            if (!StShared.CreateFolder(srcPath, true))
 //            {
-//                StShared.WriteErrorLine($"Error When creating folder {srcPath}", true, _logger);
+//                StShared.WriteErrorLine($"ErrorOmd When creating folder {srcPath}", true, _logger);
 //                return false;
 //            }
 
@@ -157,7 +157,7 @@
 //            if (StShared.RunProcess(true, _logger, "git", $"clone {carcassGitProjectName} {srcCarcassPath}").IsSome)
 //            {
 //                StShared.WriteErrorLine(
-//                    $"Error When cloning git {carcassGitProjectName} to folder {srcCarcassPath}",
+//                    $"ErrorOmd When cloning git {carcassGitProjectName} to folder {srcCarcassPath}",
 //                    true, _logger);
 //                return false;
 //            }
@@ -166,7 +166,7 @@
 //            var srcProjectPath = Path.Combine(srcPath, "project");
 //            if (!StShared.CreateFolder(srcProjectPath, true))
 //            {
-//                StShared.WriteErrorLine($"Error When creating folder {srcProjectPath}", true, _logger);
+//                StShared.WriteErrorLine($"ErrorOmd When creating folder {srcProjectPath}", true, _logger);
 //                return false;
 //            }
 
@@ -174,7 +174,7 @@
 //            var srcProjectStorePath = Path.Combine(srcProjectPath, "store");
 //            if (!StShared.CreateFolder(srcProjectStorePath, true))
 //            {
-//                StShared.WriteErrorLine($"Error When creating folder {srcProjectStorePath}", true, _logger);
+//                StShared.WriteErrorLine($"ErrorOmd When creating folder {srcProjectStorePath}", true, _logger);
 //                return false;
 //            }
 
@@ -246,7 +246,7 @@
 
 //            //if (!RunNodeProcess("npm i", _destinationFolderPath))
 //            //{
-//            //    StShared.WriteErrorLine("Error when installing packages", true, _logger);
+//            //    StShared.WriteErrorLine("ErrorOmd when installing packages", true, _logger);
 //            //    return false;
 //            //}
 //        }

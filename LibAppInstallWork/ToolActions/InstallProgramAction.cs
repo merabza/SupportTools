@@ -69,15 +69,15 @@ public sealed class InstallProgramAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        OneOf<string, Error[]> installProgramResult = await projectManager.InstallProgram(_projectName,
+        OneOf<string, ErrorOmd[]> installProgramResult = await projectManager.InstallProgram(_projectName,
             _environmentName, _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask,
             _parametersFileExtension, cancellationToken);
 
         if (installProgramResult.IsT1)
         {
-            _logger.LogError("Error when Install program project {ProjectName}/{EnvironmentName}", _projectName,
+            _logger.LogError("ErrorOmd when Install program project {ProjectName}/{EnvironmentName}", _projectName,
                 _environmentName);
-            Error.PrintErrorsOnConsole(installProgramResult.AsT1);
+            ErrorOmd.PrintErrorsOnConsole(installProgramResult.AsT1);
             return false;
         }
 

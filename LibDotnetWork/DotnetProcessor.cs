@@ -23,117 +23,117 @@ public sealed class DotnetProcessor
         _useConsole = useConsole;
     }
 
-    public Option<Error[]> PublishRelease(string runtime, string outputFolderPath, string mainProjectFileName,
+    public Option<ErrorOmd[]> PublishRelease(string runtime, string outputFolderPath, string mainProjectFileName,
         string assemblyVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:AssemblyVersion={assemblyVersion}");
     }
 
-    public Option<Error[]> CreateNewSolution(string solutionPath, string solutionName)
+    public Option<ErrorOmd[]> CreateNewSolution(string solutionPath, string solutionName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"new sln --output {solutionPath} --name {solutionName}");
     }
 
-    public Option<Error[]> CreateNewProject(EDotnetProjectType dotnetProjectType, string? projectCreateParameters,
+    public Option<ErrorOmd[]> CreateNewProject(EDotnetProjectType dotnetProjectType, string? projectCreateParameters,
         string projectFullPath, string projectName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"new {dotnetProjectType.ToString().ToLowerInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
     }
 
-    public Option<Error[]> AddProjectToSolution(string solutionPath, string? solutionFolderName,
+    public Option<ErrorOmd[]> AddProjectToSolution(string solutionPath, string? solutionFolderName,
         string projectFileFullName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"sln {solutionPath} add {(solutionFolderName is null ? string.Empty : $"--solution-folder {solutionFolderName} ")}{projectFileFullName}");
     }
 
-    public Option<Error[]> AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
+    public Option<ErrorOmd[]> AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"add {projectFilePath} reference {referenceProjectFilePath}");
     }
 
-    public Option<Error[]> AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
+    public Option<ErrorOmd[]> AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}");
     }
 
-    public Option<Error[]> RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
+    public Option<ErrorOmd[]> RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"remove {projectFilePath} reference {referenceProjectFilePath}");
     }
 
-    public Option<Error[]> RemovePackageFromProject(string projectFilePath, string packageName)
+    public Option<ErrorOmd[]> RemovePackageFromProject(string projectFilePath, string packageName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"remove {projectFilePath} package {packageName}");
     }
 
-    public Option<Error[]> InitUserSecrets(string projectFullPath)
+    public Option<ErrorOmd[]> InitUserSecrets(string projectFullPath)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"user-secrets init --project {projectFullPath}");
     }
 
-    public Option<Error[]> EfDropDatabase(string dbContextName, string migrationStartupProjectFilePath,
+    public Option<ErrorOmd[]> EfDropDatabase(string dbContextName, string migrationStartupProjectFilePath,
         string migrationProjectFileName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"ef database drop --force --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
-    public Option<Error[]> EfAddDatabaseMigration(string migrationName, string dbContextName,
+    public Option<ErrorOmd[]> EfAddDatabaseMigration(string migrationName, string dbContextName,
         string migrationStartupProjectFilePath, string migrationProjectFileName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"ef migrations add \"{migrationName}\" --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
-    public Option<Error[]> EfUpdateDatabaseByMigration(string dbContextName, string migrationStartupProjectFilePath,
+    public Option<ErrorOmd[]> EfUpdateDatabaseByMigration(string dbContextName, string migrationStartupProjectFilePath,
         string migrationProjectFileName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"ef database update --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
-    public OneOf<(string, int), Error[]> UpdateOutdatedPackagesForProjectFolder(string projectFolderName)
+    public OneOf<(string, int), ErrorOmd[]> UpdateOutdatedPackagesForProjectFolder(string projectFolderName)
     {
         return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"outdated -r -u {projectFolderName}");
     }
 
-    public Option<Error[]> RunToolUsingParametersFile(string projectFilePath, string projectParametersFilePath)
+    public Option<ErrorOmd[]> RunToolUsingParametersFile(string projectFilePath, string projectParametersFilePath)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"run --project {projectFilePath} --use {projectParametersFilePath}");
     }
 
-    public Option<Error[]> Restore(string projectFileFullName)
+    public Option<ErrorOmd[]> Restore(string projectFileFullName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
     }
 
     //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს
-    public Option<Error[]> Build(string solutionFileName)
+    public Option<ErrorOmd[]> Build(string solutionFileName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"build {solutionFileName}", null, false);
     }
 
-    public Option<Error[]> Pack(string projectFileName, string outputFolderPath, string packageVersion)
+    public Option<ErrorOmd[]> Pack(string projectFileName, string outputFolderPath, string packageVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"pack {projectFileName} --configuration Release --output {outputFolderPath} -p:PackageVersion={packageVersion}");
     }
 
-    public Option<Error[]> NugetPush(string nupkgPath, string source, string? apiKey)
+    public Option<ErrorOmd[]> NugetPush(string nupkgPath, string source, string? apiKey)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"nuget push {nupkgPath} --source {source} --skip-duplicate{(string.IsNullOrWhiteSpace(apiKey) ? string.Empty : $" --api-key {apiKey}")}");
     }
 
-    public Option<Error[]> EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
+    public Option<ErrorOmd[]> EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
         string prodCopyDatabaseConnectionString, string providerPackageName,
         string createProjectSeederCodeProjectFileFullName, string dbScContextName,
         string databaseScaffoldClassLibProjectFullPath)
@@ -142,14 +142,14 @@ public sealed class DotnetProcessor
             $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring");
     }
 
-    public OneOf<(string, int), Error[]> SearchTool(string toolName)
+    public OneOf<(string, int), ErrorOmd[]> SearchTool(string toolName)
     {
         return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"tool search {toolName} --take 1");
     }
 
-    public OneOf<IEnumerable<string>, Error[]> GetToolsRawList()
+    public OneOf<IEnumerable<string>, ErrorOmd[]> GetToolsRawList()
     {
-        OneOf<(string, int), Error[]> processResult =
+        OneOf<(string, int), ErrorOmd[]> processResult =
             StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
         if (processResult.IsT1)
         {
@@ -162,9 +162,9 @@ public sealed class DotnetProcessor
 
     //სოლუშენში შემავალი პროექტების ჩამონათვალის მიღება dotnet sln list ბრძანებით.
     //აბრუნებს პროექტების გზებს სოლუშენის ფოლდერის მიმართ
-    public OneOf<List<string>, Error[]> GetSolutionProjectsList(string solutionFileName)
+    public OneOf<List<string>, ErrorOmd[]> GetSolutionProjectsList(string solutionFileName)
     {
-        OneOf<(string, int), Error[]> processResult =
+        OneOf<(string, int), ErrorOmd[]> processResult =
             StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"sln {solutionFileName} list");
         if (processResult.IsT1)
         {
@@ -194,13 +194,13 @@ public sealed class DotnetProcessor
         return projects;
     }
 
-    public Option<Error[]> InstallTool(string packageId, string? version = null)
+    public Option<ErrorOmd[]> InstallTool(string packageId, string? version = null)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"tool install --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");
     }
 
-    public Option<Error[]> UpdateTool(string packageId, string? version = null)
+    public Option<ErrorOmd[]> UpdateTool(string packageId, string? version = null)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"tool update --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");

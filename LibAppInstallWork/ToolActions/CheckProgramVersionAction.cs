@@ -71,12 +71,12 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _useConsole);
-                    OneOf<string, Error[]> getVersionByProxyResult =
+                    OneOf<string, ErrorOmd[]> getVersionByProxyResult =
                         await projectsApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
                     if (getVersionByProxyResult.IsT1)
                     {
-                        Error.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);
+                        ErrorOmd.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);
                         break;
                     }
 
@@ -93,10 +93,10 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _useConsole);
-                    OneOf<string, Error[]> getVersionResult = await testApiClient.GetVersion(cancellationToken);
+                    OneOf<string, ErrorOmd[]> getVersionResult = await testApiClient.GetVersion(cancellationToken);
                     if (getVersionResult.IsT1)
                     {
-                        Error.PrintErrorsOnConsole(getVersionResult.AsT1);
+                        ErrorOmd.PrintErrorsOnConsole(getVersionResult.AsT1);
                         break;
                     }
 

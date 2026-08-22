@@ -71,7 +71,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
             try
             {
-                OneOf<List<StsGitIgnoreFileTypeDataModel>, Error[]> remoteGitReposResult =
+                OneOf<List<StsGitIgnoreFileTypeDataModel>, ErrorOmd[]> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
                 if (remoteGitReposResult.IsT0)
                 {
@@ -79,7 +79,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
                 }
 
                 StShared.WriteErrorLine("could not received GitIgnore File Types List", true, _logger);
-                Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
             catch (Exception e)
             {
@@ -116,11 +116,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<Error[]> updateGitRepoByKeyResult = supportToolsServerApiClient
+            Option<ErrorOmd[]> updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
+                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)
@@ -148,11 +148,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<Error[]> updateGitRepoByKeyResult =
+            Option<ErrorOmd[]> updateGitRepoByKeyResult =
                 await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken);
             if (updateGitRepoByKeyResult.IsSome)
             {
-                Error.PrintErrorsOnConsole((Error[])updateGitRepoByKeyResult);
+                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
             }
         }
         catch (Exception e)

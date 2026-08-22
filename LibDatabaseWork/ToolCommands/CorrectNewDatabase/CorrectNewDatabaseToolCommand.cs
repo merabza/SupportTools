@@ -120,7 +120,7 @@ public sealed class CorrectNewDatabaseToolCommand : ToolCommand
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error when execute command {StrCommand}", strCommand);
+            _logger.LogError(ex, "ErrorOmd when execute command {StrCommand}", strCommand);
         }
         finally
         {

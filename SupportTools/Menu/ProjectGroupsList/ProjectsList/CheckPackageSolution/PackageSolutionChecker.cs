@@ -89,7 +89,7 @@ public sealed class PackageSolutionChecker
 
         //სოლუშენში შემავალი პროექტების ჩამონათვალის მიღება
         var dotnetProcessor = new DotnetProcessor(_logger, true);
-        OneOf<List<string>, Error[]> projectsListResult = dotnetProcessor.GetSolutionProjectsList(solutionFileName);
+        OneOf<List<string>, ErrorOmd[]> projectsListResult = dotnetProcessor.GetSolutionProjectsList(solutionFileName);
         if (projectsListResult.IsT1)
         {
             StShared.WriteErrorLine($"Cannot get projects list for solution {solutionFileName}", true, _logger);

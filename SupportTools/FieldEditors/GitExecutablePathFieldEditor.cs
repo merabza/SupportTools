@@ -34,7 +34,7 @@ public sealed class GitExecutablePathFieldEditor : FilePathFieldEditor
 
     private static string? DetectGitExecutablePath()
     {
-        OneOf<(string, int), Error[]> runProcessWithOutputResult = SystemStat.IsWindows()
+        OneOf<(string, int), ErrorOmd[]> runProcessWithOutputResult = SystemStat.IsWindows()
             ? StShared.RunProcessWithOutput(false, null, "powershell",
                 "-NoProfile -Command \"(Get-Command git).Source\"")
             : StShared.RunProcessWithOutput(false, null, "which", "git");

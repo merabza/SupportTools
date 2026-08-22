@@ -65,7 +65,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
                     remoteGitRepos);
             }
 
-            OneOf<List<StsGitDataModel>, Error[]> remoteGitReposResult =
+            OneOf<List<StsGitDataModel>, ErrorOmd[]> remoteGitReposResult =
                 supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsT0)
             {
@@ -74,7 +74,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
             else
             {
                 StShared.WriteErrorLine("could not received remoteGits", true, logger);
-                Error.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
             }
         }
         catch (Exception e)
@@ -156,7 +156,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error occurred during git validation");
+            _logger.LogError(e, "ErrorOmd occurred during git validation");
             return false;
         }
     }

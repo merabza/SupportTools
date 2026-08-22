@@ -64,7 +64,7 @@ public sealed class InstallParametersAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
-        Option<Error[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
+        Option<ErrorOmd[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
             _environmentName, _appSettingsJsonFileName, _parametersFileDateMask, _parametersFileExtension,
             cancellationToken);
 

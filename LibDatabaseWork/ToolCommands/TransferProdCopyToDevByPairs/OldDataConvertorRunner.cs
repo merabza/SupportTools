@@ -27,7 +27,7 @@ public static class OldDataConvertorRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --connection-string \"{prodCopyConnectionString}\" --log-folder \"{LogFolder}\"";
-        OneOf<(string, int), Error[]> processResult =
+        OneOf<(string, int), ErrorOmd[]> processResult =
             StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
         if (processResult.IsT1)
         {
