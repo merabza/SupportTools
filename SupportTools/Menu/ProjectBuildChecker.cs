@@ -9,7 +9,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu;
 
-//"Check ... build" მენიუს ბრძანებების საერთო ლოგიკა - პროექტების დაბილდვა და სტატუსების მეხსიერებაში ჩაწერა
+//"Check ... build" მენიუს ბრძანებების საერთო ლოგიკა - პროექტების დაბილდვა და შედეგების მეხსიერებაში ჩაწერა
 public static class ProjectBuildChecker
 {
     public static void CheckProjects(string appName, IEnumerable<KeyValuePair<string, ProjectModel>> projects,
@@ -20,37 +20,51 @@ public static class ProjectBuildChecker
         foreach ((string projectName, ProjectModel project) in projects)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            EProjectBuildCheckStatus status = CheckProjectBuild(projectName, appName, project, dotnetProcessor);
-            menuParameters.ProjectBuildCheckStatuses[projectName] = status;
-            Console.WriteLine($"{projectName}: {status}");
+            ProjectBuildCheckResult result = CheckProjectBuild(projectName, appName, project, dotnetProcessor);
+            menuParameters.ProjectBuildCheckResults[projectName] = result;
+            ProjectBuildCheckStatusView.WriteResultLine(projectName, result);
         }
     }
 
-    private static EProjectBuildCheckStatus CheckProjectBuild(string projectName, string appName, ProjectModel project,
-        DotnetProcessor dotnetProcessor)
+    private static ProjectBuildCheckResult CheckProjectBuild(string projectName, string appName,
+        ProjectModel project, DotnetProcessor dotnetProcessor)
     {
         if (string.IsNullOrWhiteSpace(project.SolutionFileName))
         {
-            return EProjectBuildCheckStatus.SolutionFileNameIsEmpty;
+            return new ProjectBuildCheckResult(EProjectBuildCheckStatus.SolutionFileNameIsEmpty);
         }
 
         if (!File.Exists(project.SolutionFileName))
         {
-            return EProjectBuildCheckStatus.SolutionFileDoesNotExists;
+            return new ProjectBuildCheckResult(EProjectBuildCheckStatus.SolutionFileDoesNotExists);
         }
 
         if (!IsSolutionFile(project.SolutionFileName))
         {
-            return EProjectBuildCheckStatus.InvalidSolutionFile;
+            return new ProjectBuildCheckResult(EProjectBuildCheckStatus.InvalidSolutionFile);
         }
 
         if (projectName == appName)
         {
-            return EProjectBuildCheckStatus.CannotBuildSelf;
+            return new ProjectBuildCheckResult(EProjectBuildCheckStatus.CannotBuildSelf);
         }
 
-        var buildResult = dotnetProcessor.Build(project.SolutionFileName);
-        return buildResult.IsNone ? EProjectBuildCheckStatus.Success : EProjectBuildCheckStatus.BuildFailed;
+        DotnetBuildResult buildResult = dotnetProcessor.Build(project.SolutionFileName);
+        return new ProjectBuildCheckResult(GetBuildStatus(buildResult), buildResult.ErrorCount,
+            buildResult.WarningCount);
+    }
+
+    //ჩავარდნილი build - BuildFailed, წარმატებული გაფრთხილებებით - SuccessWithWarnings, სხვაგვარად - Success
+    private static EProjectBuildCheckStatus GetBuildStatus(DotnetBuildResult buildResult)
+    {
+        if (!buildResult.Succeeded)
+        {
+            return EProjectBuildCheckStatus.BuildFailed;
+        }
+
+        return buildResult.WarningCount > 0
+            ? EProjectBuildCheckStatus.SuccessWithWarnings
+            : EProjectBuildCheckStatus.Success;
     }
 
     private static bool IsSolutionFile(string solutionFileName)

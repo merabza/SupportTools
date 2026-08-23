@@ -65,24 +65,18 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
     protected override string? GetStatus()
     {
         //სტატუსი ჩანს მხოლოდ მაშინ, თუ ეს პროექტი უკვე შემოწმდა
-        return GetProjectStatus()?.ToString();
+        ProjectBuildCheckResult? result = GetProjectResult();
+        return result is null ? null : ProjectBuildCheckStatusView.GetText(result);
     }
 
     protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
     {
-        EProjectBuildCheckStatus? status = GetProjectStatus();
-        if (status is null)
-        {
-            return null;
-        }
-
-        return [new StatusColorPart(status.Value.ToString(), ProjectBuildCheckStatusView.GetColor(status))];
+        ProjectBuildCheckResult? result = GetProjectResult();
+        return result is null ? null : ProjectBuildCheckStatusView.BuildParts(result);
     }
 
-    private EProjectBuildCheckStatus? GetProjectStatus()
+    private ProjectBuildCheckResult? GetProjectResult()
     {
-        return _menuParameters.ProjectBuildCheckStatuses.TryGetValue(_projectName, out EProjectBuildCheckStatus status)
-            ? status
-            : null;
+        return _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(_projectName);
     }
 }

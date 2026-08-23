@@ -119,14 +119,16 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        //პროექტის build-ის შემოწმება
+        //პროექტის build-ის შემოწმება. გაფრთხილებებით აგებული პროექტის გავრცელება არ ჩერდება
         ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(projectName, project)],
             _menuParameters, _logger, cancellationToken);
-        if (!_menuParameters.ProjectBuildCheckStatuses.TryGetValue(projectName, out EProjectBuildCheckStatus status) ||
-            status != EProjectBuildCheckStatus.Success)
+        ProjectBuildCheckResult? buildCheckResult =
+            _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
+        if (buildCheckResult is null || !buildCheckResult.IsBuildSucceeded)
         {
-            StShared.WriteErrorLine($"Build check failed for project {projectName} with status {status}", true,
-                _logger);
+            StShared.WriteErrorLine(
+                $"Build check failed for project {projectName} with status {ProjectBuildCheckStatusView.GetText(buildCheckResult)}",
+                true, _logger);
             return false;
         }
 

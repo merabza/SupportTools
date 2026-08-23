@@ -45,9 +45,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         }
 
         //ჯგუფში შემავალი პროექტების სტატუსები და მათი რაოდენობები
-        return string.Join(", ",
-            BuildBreakdown(projectNames).Select(b =>
-                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}"));
+        return string.Join(", ", BuildStatusParts(projectNames).Select(p => p.Text));
     }
 
     protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
@@ -55,17 +53,25 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         List<string> projectNames = GetGroupProjectNames();
 
         //სანამ ამ ჯგუფის არცერთი პროექტი არ შემოწმებულა, ფერადი სტატუსები არ გვინდა (რჩება ჩვეულებრივი რაოდენობა)
-        if (!projectNames.Any(IsProjectChecked))
-        {
-            return null;
-        }
+        return projectNames.Any(IsProjectChecked) ? BuildStatusParts(projectNames) : null;
+    }
 
-        return
+    //ჯგუფის სტატუსის ნაწილები: სტატუსების რაოდენობები და შემოწმებული პროექტების შეცდომების/გაფრთხილებების ჯამი.
+    //GetStatus-ის ტექსტი ზუსტად ამ ნაწილების ტექსტია (მენიუ ნაწილებს ", "-ით აერთებს)
+    private List<StatusColorPart> BuildStatusParts(List<string> projectNames)
+    {
+        List<StatusColorPart> parts =
         [
             .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
                 $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
                 ProjectBuildCheckStatusView.GetColor(b.Status)))
         ];
+
+        int errorCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.ErrorCount ?? 0);
+        int warningCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.WarningCount ?? 0);
+        parts.Add(ProjectBuildCheckStatusView.CreateErrorCountPart(errorCount));
+        parts.Add(ProjectBuildCheckStatusView.CreateWarningCountPart(warningCount));
+        return parts;
     }
 
     private List<string> GetGroupProjectNames()
@@ -79,20 +85,23 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         ];
     }
 
-    private List<(EProjectBuildCheckStatus? Status, int Count)> BuildBreakdown(IEnumerable<string> projectNames)
+    private List<(EProjectBuildCheckStatus? Status, int Count)> BuildBreakdown(List<string> projectNames)
     {
         return [.. projectNames.GroupBy(GetProjectStatus).OrderBy(g => g.Key).Select(g => (g.Key, g.Count()))];
     }
 
     private bool IsProjectChecked(string projectName)
     {
-        return _menuParameters.ProjectBuildCheckStatuses.ContainsKey(projectName);
+        return _menuParameters.ProjectBuildCheckResults.ContainsKey(projectName);
+    }
+
+    private ProjectBuildCheckResult? GetProjectResult(string projectName)
+    {
+        return _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
     }
 
     private EProjectBuildCheckStatus? GetProjectStatus(string projectName)
     {
-        return _menuParameters.ProjectBuildCheckStatuses.TryGetValue(projectName, out EProjectBuildCheckStatus status)
-            ? status
-            : null;
+        return GetProjectResult(projectName)?.Status;
     }
 }

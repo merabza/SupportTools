@@ -32,7 +32,7 @@ public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //ყველა პროექტი თავიდან მოწმდება, ამიტომ წინა შედეგებს ვასუფთავებთ
-        _menuParameters.ProjectBuildCheckStatuses.Clear();
+        _menuParameters.ProjectBuildCheckResults.Clear();
         ProjectBuildChecker.CheckProjects(_appName, parameters.Projects, _menuParameters, _logger, cancellationToken);
 
         return ValueTask.FromResult(true);
