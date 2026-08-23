@@ -18,6 +18,9 @@ public enum EProjectBuildCheckStatus
     //სოლუშენის აგება (build) ვერ შესრულდა
     BuildFailed,
 
+    //სოლუშენი აიგო (build), მაგრამ გაფრთხილებებით (warnings)
+    SuccessWithWarnings,
+
     //სოლუშენი წარმატებით აიგო (build)
     Success
 }

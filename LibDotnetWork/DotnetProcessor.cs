@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using LanguageExt;
@@ -13,6 +14,8 @@ namespace LibDotnetWork;
 public sealed class DotnetProcessor
 {
     private const string Dotnet = "dotnet";
+    private const string WarningCountSuffix = " Warning(s)";
+    private const string ErrorCountSuffix = " Error(s)";
     private readonly ILogger? _logger;
     private readonly bool _useConsole;
 
@@ -115,10 +118,53 @@ public sealed class DotnetProcessor
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
     }
 
-    //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს
-    public Option<ErrorOmd[]> Build(string solutionFileName)
+    //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს.
+    //შეცდომებისა და გაფრთხილებების რაოდენობა იკითხება MSBuild-ის ფაილური ლოგერის (-flp) შეჯამებიდან და არა
+    //კონსოლიდან, რათა კონსოლში build-ის გამოტანა უცვლელი დარჩეს. --no-incremental საჭიროა, რადგან
+    //up-to-date პროექტებზე კომპილაცია არ ეშვება და გაფრთხილებები არ ითვლება
+    public DotnetBuildResult Build(string solutionFileName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"build {solutionFileName}", null, false);
+        string logFolderPath = Path.Combine(Path.GetTempPath(), "SupportTools", "BuildLogs");
+        Directory.CreateDirectory(logFolderPath);
+        string logFileName = Path.Combine(logFolderPath, "LastBuild.log");
+        //წინა build-ის ლოგი არ უნდა წაიკითხოს, თუ MSBuild ამჯერად ფაილს ვერ შექმნის
+        File.Delete(logFileName);
+
+        Option<ErrorOmd[]> runResult = StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"build {solutionFileName} --no-incremental \"-flp:LogFile={logFileName};Verbosity=quiet;Summary\"",
+            null, false);
+        (int errorCount, int warningCount) = ReadBuildCounts(logFileName);
+        return new DotnetBuildResult(runResult.IsNone, errorCount, warningCount);
+    }
+
+    //MSBuild-ის შეჯამების ხაზები: "    N Warning(s)" და "    N Error(s)". ბოლო შეხვედრა იგებს.
+    //ლოგის არარსებობისას - ნულები
+    private static (int ErrorCount, int WarningCount) ReadBuildCounts(string logFileName)
+    {
+        int errorCount = 0;
+        int warningCount = 0;
+        if (!File.Exists(logFileName))
+        {
+            return (errorCount, warningCount);
+        }
+
+        foreach (string line in File.ReadLines(logFileName))
+        {
+            string trimmedLine = line.Trim();
+            warningCount = ParseCount(trimmedLine, WarningCountSuffix) ?? warningCount;
+            errorCount = ParseCount(trimmedLine, ErrorCountSuffix) ?? errorCount;
+        }
+
+        return (errorCount, warningCount);
+    }
+
+    private static int? ParseCount(string line, string suffix)
+    {
+        return line.EndsWith(suffix, StringComparison.Ordinal) && int.TryParse(
+            line.AsSpan(0, line.Length - suffix.Length), NumberStyles.None, CultureInfo.InvariantCulture,
+            out int count)
+            ? count
+            : null;
     }
 
     public Option<ErrorOmd[]> Pack(string projectFileName, string outputFolderPath, string packageVersion)
