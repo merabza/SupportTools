@@ -120,9 +120,9 @@ public sealed class DotnetProcessor
 
     //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს.
     //შეცდომებისა და გაფრთხილებების რაოდენობა იკითხება MSBuild-ის ფაილური ლოგერის (-flp) შეჯამებიდან და არა
-    //კონსოლიდან, რათა კონსოლში build-ის გამოტანა უცვლელი დარჩეს. --no-incremental საჭიროა, რადგან
-    //up-to-date პროექტებზე კომპილაცია არ ეშვება და გაფრთხილებები არ ითვლება
-    public DotnetBuildResult Build(string solutionFileName)
+    //კონსოლიდან, რათა კონსოლში build-ის გამოტანა უცვლელი დარჩეს. noIncremental (--no-incremental) ზუსტი დათვლისთვისაა -
+    //მის გარეშე up-to-date პროექტებზე კომპილაცია არ ეშვება და გაფრთხილებები არ ითვლება
+    public DotnetBuildResult Build(string solutionFileName, bool noIncremental)
     {
         string logFolderPath = Path.Combine(Path.GetTempPath(), "SupportTools", "BuildLogs");
         Directory.CreateDirectory(logFolderPath);
@@ -131,7 +131,7 @@ public sealed class DotnetProcessor
         File.Delete(logFileName);
 
         Option<ErrorOmd[]> runResult = StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"build {solutionFileName} --no-incremental \"-flp:LogFile={logFileName};Verbosity=quiet;Summary\"",
+            $"build {solutionFileName}{(noIncremental ? " --no-incremental" : string.Empty)} \"-flp:LogFile={logFileName};Verbosity=quiet;Summary\"",
             null, false);
         (int errorCount, int warningCount) = ReadBuildCounts(logFileName);
         return new DotnetBuildResult(runResult.IsNone, errorCount, warningCount);

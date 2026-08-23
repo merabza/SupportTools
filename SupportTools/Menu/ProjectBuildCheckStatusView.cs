@@ -32,17 +32,11 @@ public static class ProjectBuildCheckStatusView
         };
     }
 
-    //შედეგის ფერადი ნაწილები: სტატუსი და, თუ build გაეშვა, შეცდომებისა და გაფრთხილებების რაოდენობები
+    //შედეგის ფერადი ნაწილები: სტატუსი და შეცდომებისა და გაფრთხილებების რაოდენობები (მხოლოდ ნულზე მეტი)
     public static List<StatusColorPart> BuildParts(ProjectBuildCheckResult result)
     {
         List<StatusColorPart> parts = [new StatusColorPart(GetName(result.Status), GetColor(result.Status))];
-        if (!result.IsBuildExecuted)
-        {
-            return parts;
-        }
-
-        parts.Add(CreateErrorCountPart(result.ErrorCount));
-        parts.Add(CreateWarningCountPart(result.WarningCount));
+        AddCountParts(parts, result.ErrorCount, result.WarningCount);
         return parts;
     }
 
@@ -52,14 +46,18 @@ public static class ProjectBuildCheckStatusView
         return result is null ? NotCheckedName : string.Join(", ", BuildParts(result).Select(p => p.Text));
     }
 
-    public static StatusColorPart CreateErrorCountPart(int errorCount)
+    //რაოდენობის ნაწილები ემატება მხოლოდ მაშინ, თუ რაოდენობა ნულზე მეტია: შეცდომები წითლად, გაფრთხილებები ყვითლად
+    public static void AddCountParts(List<StatusColorPart> parts, int errorCount, int warningCount)
     {
-        return CreateCountPart("errors", errorCount, ConsoleColor.Red);
-    }
+        if (errorCount > 0)
+        {
+            parts.Add(CreateCountPart("errors", errorCount, ConsoleColor.Red));
+        }
 
-    public static StatusColorPart CreateWarningCountPart(int warningCount)
-    {
-        return CreateCountPart("warnings", warningCount, ConsoleColor.Yellow);
+        if (warningCount > 0)
+        {
+            parts.Add(CreateCountPart("warnings", warningCount, ConsoleColor.Yellow));
+        }
     }
 
     //ერთი პროექტის შედეგის კონსოლში გამოტანა build-ის დასრულების შემდეგ, ნაწილები თავიანთი ფერებით
@@ -84,10 +82,8 @@ public static class ProjectBuildCheckStatusView
         Console.WriteLine();
     }
 
-    //რაოდენობის ნაწილი: ნულზე მეტი - შესაბამისი ფერით, ნული - მწვანედ
-    private static StatusColorPart CreateCountPart(string label, int count, ConsoleColor nonZeroColor)
+    private static StatusColorPart CreateCountPart(string label, int count, ConsoleColor color)
     {
-        return new StatusColorPart($"{label}: {count.ToString(CultureInfo.InvariantCulture)}",
-            count > 0 ? nonZeroColor : ConsoleColor.Green);
+        return new StatusColorPart($"{label}: {count.ToString(CultureInfo.InvariantCulture)}", color);
     }
 }

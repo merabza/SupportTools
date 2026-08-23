@@ -69,8 +69,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
         int errorCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.ErrorCount ?? 0);
         int warningCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.WarningCount ?? 0);
-        parts.Add(ProjectBuildCheckStatusView.CreateErrorCountPart(errorCount));
-        parts.Add(ProjectBuildCheckStatusView.CreateWarningCountPart(warningCount));
+        ProjectBuildCheckStatusView.AddCountParts(parts, errorCount, warningCount);
         return parts;
     }
 

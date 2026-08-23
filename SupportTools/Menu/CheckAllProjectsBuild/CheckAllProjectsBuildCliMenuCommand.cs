@@ -31,9 +31,12 @@ public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
+        bool noIncremental = ProjectBuildChecker.InputNoIncremental();
+
         //ყველა პროექტი თავიდან მოწმდება, ამიტომ წინა შედეგებს ვასუფთავებთ
         _menuParameters.ProjectBuildCheckResults.Clear();
-        ProjectBuildChecker.CheckProjects(_appName, parameters.Projects, _menuParameters, _logger, cancellationToken);
+        ProjectBuildChecker.CheckProjects(_appName, parameters.Projects, _menuParameters, _logger, noIncremental,
+            cancellationToken);
 
         return ValueTask.FromResult(true);
     }

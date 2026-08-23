@@ -119,9 +119,9 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        //პროექტის build-ის შემოწმება. გაფრთხილებებით აგებული პროექტის გავრცელება არ ჩერდება
+        //პროექტის build-ის შემოწმება (ინკრემენტული, კითხვის გარეშე). გაფრთხილებებით აგებული პროექტის გავრცელება არ ჩერდება
         ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(projectName, project)],
-            _menuParameters, _logger, cancellationToken);
+            _menuParameters, _logger, false, cancellationToken);
         ProjectBuildCheckResult? buildCheckResult =
             _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
         if (buildCheckResult is null || !buildCheckResult.IsBuildSucceeded)

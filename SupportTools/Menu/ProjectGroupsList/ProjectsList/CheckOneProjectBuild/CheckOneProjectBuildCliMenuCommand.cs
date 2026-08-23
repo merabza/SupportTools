@@ -41,9 +41,11 @@ public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
             return ValueTask.FromResult(false);
         }
 
+        bool noIncremental = ProjectBuildChecker.InputNoIncremental();
+
         //მხოლოდ ეს ერთი პროექტი მოწმდება და მისი სტატუსი ახლდება
         ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(_projectName, project)],
-            _menuParameters, _logger, cancellationToken);
+            _menuParameters, _logger, noIncremental, cancellationToken);
 
         return ValueTask.FromResult(true);
     }

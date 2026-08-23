@@ -21,7 +21,4 @@ public sealed class ProjectBuildCheckResult
     //build გაეშვა და წარმატებით დასრულდა (გაფრთხილებების გარეშე ან გაფრთხილებებით)
     public bool IsBuildSucceeded => Status is EProjectBuildCheckStatus.Success
         or EProjectBuildCheckStatus.SuccessWithWarnings;
-
-    //build საერთოდ გაეშვა - მხოლოდ ამ სტატუსებისთვის აქვს რაოდენობებს აზრი
-    public bool IsBuildExecuted => IsBuildSucceeded || Status == EProjectBuildCheckStatus.BuildFailed;
 }

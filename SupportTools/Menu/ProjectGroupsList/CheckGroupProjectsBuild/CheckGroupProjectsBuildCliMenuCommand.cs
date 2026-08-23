@@ -34,10 +34,13 @@ public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
+        bool noIncremental = ProjectBuildChecker.InputNoIncremental();
+
         //მხოლოდ ამ ჯგუფის პროექტები მოწმდება, დანარჩენი ჯგუფების სტატუსები ხელუხლებელი რჩება
         var groupProjects = parameters.Projects.Where(x =>
             SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName);
-        ProjectBuildChecker.CheckProjects(_appName, groupProjects, _menuParameters, _logger, cancellationToken);
+        ProjectBuildChecker.CheckProjects(_appName, groupProjects, _menuParameters, _logger, noIncremental,
+            cancellationToken);
 
         return ValueTask.FromResult(true);
     }
