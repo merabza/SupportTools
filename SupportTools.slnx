@@ -62,7 +62,6 @@
     <Project Path="../SystemTools/SystemTools.StringMessagesApiContracts/SystemTools.StringMessagesApiContracts.csproj" />
     <Project Path="../SystemTools/SystemTools.SystemToolsShared/SystemTools.SystemToolsShared.csproj" />
     <Project Path="../SystemTools/SystemTools.TestApiContracts/SystemTools.TestApiContracts.csproj" />
-    <Project Path="SupportTools.Application.Abstractions/SupportTools.Application.Abstractions.csproj" Id="022fe111-0af5-49f6-b1e9-ef152741968a" />
   </Folder>
   <Folder Name="/ToolsManagement/">
     <Project Path="../ToolsManagement/ToolsManagement.ApiClientsManagement/ToolsManagement.ApiClientsManagement.csproj" />
