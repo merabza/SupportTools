@@ -307,12 +307,12 @@ public sealed class ApiAppCreator : AppCreatorBase
         //    new ViewImportsPageCreator(Logger, pagesPath, ProjectName, "_ViewImports.cshtml");
         //viewImportsPageCreator.CreateFileStructure();
 
-        //Console.WriteLine("Creating ErrorOmd.cshtml...");
-        //var errorPageCreator = new ErrorPageCreator(Logger, pagesPath, "ErrorOmd.cshtml");
+        //Console.WriteLine("Creating Error.cshtml...");
+        //var errorPageCreator = new ErrorPageCreator(Logger, pagesPath, "Error.cshtml");
         //errorPageCreator.CreateFileStructure();
 
-        //Console.WriteLine("Creating ErrorOmd.cshtml.cs...");
-        //var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "ErrorOmd.cshtml.cs");
+        //Console.WriteLine("Creating Error.cshtml.cs...");
+        //var errorModelClassCreator = new ErrorModelClassCreator(Logger, pagesPath, ProjectName, "Error.cshtml.cs");
         //errorModelClassCreator.CreateFileStructure();
     }
 

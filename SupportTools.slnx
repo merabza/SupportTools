@@ -13,7 +13,9 @@
     <Project Path="../AppCliTools/AppCliTools.LibSeedCodeCreator/AppCliTools.LibSeedCodeCreator.csproj" />
   </Folder>
   <Folder Name="/BackendCarcass/">
+    <Project Path="../BackendCarcass/BackendCarcass.Application/BackendCarcass.Application.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.Database/BackendCarcass.Database.csproj" />
+    <Project Path="../BackendCarcass/BackendCarcass.Domain/BackendCarcass.Domain.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.LibCrud/BackendCarcass.LibCrud.csproj" />
     <Project Path="../BackendCarcass/BackendCarcass.MasterData/BackendCarcass.MasterData.csproj" />
   </Folder>
@@ -51,6 +53,7 @@
   </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
+    <Project Path="../SystemTools/SystemTools.Application.Abstractions/SystemTools.Application.Abstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.BackgroundTasks/SystemTools.BackgroundTasks.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
     <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />

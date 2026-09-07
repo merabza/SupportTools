@@ -1,51 +1,35 @@
-﻿using SystemTools.SystemToolsShared.Errors;
+﻿using SystemTools.SharedKernel;
 
 namespace LibGitWork.Errors;
 
 public static class GitSyncToolActionErrors
 {
-    public static readonly ErrorOmd CouldNotUpdateGitRemote = new()
-    {
-        Code = nameof(CouldNotUpdateGitRemote), Name = "Could not Update Git Remote"
-    };
+    public static readonly Error CouldNotUpdateGitRemote =
+        Error.Problem(nameof(CouldNotUpdateGitRemote), "Could not Update Git Remote");
 
-    public static readonly ErrorOmd CouldNotGetGitRemoteId = new()
-    {
-        Code = nameof(CouldNotGetGitRemoteId), Name = "Could not get git Remote Id"
-    };
+    public static readonly Error CouldNotGetGitRemoteId =
+        Error.Problem(nameof(CouldNotGetGitRemoteId), "Could not get git Remote Id");
 
-    public static readonly ErrorOmd CouldNotGetGitLocalId = new()
-    {
-        Code = nameof(CouldNotGetGitLocalId), Name = "Could not get git Local Id"
-    };
+    public static readonly Error CouldNotGetGitLocalId =
+        Error.Problem(nameof(CouldNotGetGitLocalId), "Could not get git Local Id");
 
-    public static readonly ErrorOmd CouldNotGetGitBaseId = new()
-    {
-        Code = nameof(CouldNotGetGitBaseId), Name = "Could not get git Base Id"
-    };
+    public static readonly Error CouldNotGetGitBaseId =
+        Error.Problem(nameof(CouldNotGetGitBaseId), "Could not get git Base Id");
 
-    public static readonly ErrorOmd GetRemoteOriginUrlError = new()
-    {
-        Code = nameof(GetRemoteOriginUrlError), Name = "ErrorOmd when detecting Remote Origin Url"
-    };
+    public static readonly Error GetRemoteOriginUrlError =
+        Error.Problem(nameof(GetRemoteOriginUrlError), "Error when detecting Remote Origin Url");
 
-    public static readonly ErrorOmd GetRedundantCachedFilesListError = new()
-    {
-        Code = nameof(GetRedundantCachedFilesListError), Name = "ErrorOmd when getting Redundant Cached Files List"
-    };
+    public static readonly Error GetRedundantCachedFilesListError =
+        Error.Problem(nameof(GetRedundantCachedFilesListError), "Error when getting Redundant Cached Files List");
 
-    public static readonly ErrorOmd HaveUnTrackedFilesError = new()
-    {
-        Code = nameof(HaveUnTrackedFilesError), Name = "ErrorOmd when detecting UnTracked Files"
-    };
+    public static readonly Error HaveUnTrackedFilesError =
+        Error.Problem(nameof(HaveUnTrackedFilesError), "Error when detecting UnTracked Files");
 
-    public static readonly ErrorOmd NeedCommitError = new()
-    {
-        Code = nameof(NeedCommitError), Name = "ErrorOmd when detecting Need Commit"
-    };
+    public static readonly Error NeedCommitError =
+        Error.Problem(nameof(NeedCommitError), "Error when detecting Need Commit");
 
-    public static ErrorOmd PropertyIsEmpty(string propertyName)
+    public static Error PropertyIsEmpty(string propertyName)
     {
-        return new ErrorOmd { Code = nameof(PropertyIsEmpty), Name = $"Property {propertyName} Is Empty " };
+        return Error.Problem(nameof(PropertyIsEmpty), $"Property {propertyName} Is Empty ");
     }
 }

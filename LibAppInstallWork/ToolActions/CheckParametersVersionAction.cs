@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using SystemTools.BackgroundTasks;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
+using SystemTools.SystemToolsShared;
 using SystemTools.TestApiContracts;
 using ToolsManagement.ApiClientsManagement;
 using WebAgentContracts.WebAgentProjectsApiContracts;
@@ -61,7 +61,7 @@ public sealed class CheckParametersVersionAction : ToolAction
                     _logger.LogInformation("Try to get parameters Version {TryCount}...", tryCount);
                 }
 
-                var errors = new List<ErrorOmd>();
+                var errors = new List<Error>();
 
                 if (_proxySettings is ProxySettings proxySettings)
                 {
@@ -75,16 +75,16 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, UseConsole);
-                    OneOf<string, ErrorOmd[]> getAppSettingsVersionByProxyResult =
+                    Result<string> getAppSettingsVersionByProxyResult =
                         await projectsApiClient.GetAppSettingsVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
-                    if (getAppSettingsVersionByProxyResult.IsT1)
+                    if (getAppSettingsVersionByProxyResult.IsFailure)
                     {
-                        errors.AddRange(getAppSettingsVersionByProxyResult.AsT1);
+                        errors.Add(getAppSettingsVersionByProxyResult.Error);
                     }
                     else
                     {
-                        version = getAppSettingsVersionByProxyResult.AsT0;
+                        version = getAppSettingsVersionByProxyResult.Value;
                     }
                 }
                 else
@@ -98,21 +98,24 @@ public sealed class CheckParametersVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient =
                         new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server, UseConsole);
-                    OneOf<string, ErrorOmd[]> getAppSettingsVersionResult =
+                    Result<string> getAppSettingsVersionResult =
                         await testApiClient.GetAppSettingsVersion(cancellationToken);
-                    if (getAppSettingsVersionResult.IsT1)
+                    if (getAppSettingsVersionResult.IsFailure)
                     {
-                        errors.AddRange(getAppSettingsVersionResult.AsT1);
+                        errors.Add(getAppSettingsVersionResult.Error);
                     }
                     else
                     {
-                        version = getAppSettingsVersionResult.AsT0;
+                        version = getAppSettingsVersionResult.Value;
                     }
                 }
 
                 if (errors.Count > 0)
                 {
-                    ErrorOmd.PrintErrorsOnConsole(errors);
+                    foreach (Error error in errors)
+                    {
+                        error.PrintErrorsOnConsole();
+                    }
                 }
                 else
                 {

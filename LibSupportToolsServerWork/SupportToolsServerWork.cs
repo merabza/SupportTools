@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork;
 
@@ -27,15 +26,15 @@ public static class SupportToolsServerWork
                 return [];
             }
 
-            OneOf<List<StsGitDataModel>, ErrorOmd[]> remoteGitReposResult =
+            Result<List<StsGitDataModel>> remoteGitReposResult =
                 supportToolsServerApiClient.GetGitRepos().Result;
-            if (remoteGitReposResult.IsT0)
+            if (remoteGitReposResult.IsSuccess)
             {
-                return remoteGitReposResult.AsT0;
+                return remoteGitReposResult.Value;
             }
 
             StShared.WriteErrorLine("could not received remoteGits", true, logger);
-            ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+            remoteGitReposResult.Error.PrintErrorsOnConsole();
         }
         catch (Exception e)
         {

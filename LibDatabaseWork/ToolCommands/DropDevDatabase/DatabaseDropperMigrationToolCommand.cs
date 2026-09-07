@@ -31,6 +31,6 @@ public sealed class DatabaseDropperMigrationToolCommand : MigrationToolCommand
         //ბაზის წაშლა
         return ValueTask.FromResult(dotnetProcessor.EfDropDatabase(DatabaseMigrationParameters.DbContextName,
             DatabaseMigrationParameters.MigrationStartupProjectFilePath,
-            DatabaseMigrationParameters.MigrationProjectFileName).IsNone);
+            DatabaseMigrationParameters.MigrationProjectFileName).IsSuccess);
     }
 }

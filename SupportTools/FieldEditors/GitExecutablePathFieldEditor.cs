@@ -3,9 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.LibMenuInput;
-using OneOf;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportTools.FieldEditors;
 
@@ -34,17 +33,17 @@ public sealed class GitExecutablePathFieldEditor : FilePathFieldEditor
 
     private static string? DetectGitExecutablePath()
     {
-        OneOf<(string, int), ErrorOmd[]> runProcessWithOutputResult = SystemStat.IsWindows()
+        Result<(string, int)> runProcessWithOutputResult = SystemStat.IsWindows()
             ? StShared.RunProcessWithOutput(false, null, "powershell",
                 "-NoProfile -Command \"(Get-Command git).Source\"")
             : StShared.RunProcessWithOutput(false, null, "which", "git");
 
-        if (runProcessWithOutputResult.IsT1)
+        if (runProcessWithOutputResult.IsFailure)
         {
             return null;
         }
 
-        string gitPath = runProcessWithOutputResult.AsT0.Item1.Trim('\0', ' ', '\t', '\r', '\n');
+        string gitPath = runProcessWithOutputResult.Value.Item1.Trim('\0', ' ', '\t', '\r', '\n');
         return !string.IsNullOrWhiteSpace(gitPath) && File.Exists(gitPath) ? gitPath : null;
     }
 }

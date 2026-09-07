@@ -23,6 +23,6 @@ public sealed class JetBrainsCleanupCodeRunnerToolCommand : ToolCommand
     {
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
         var processor = new JetBrainsResharperGlobalToolsProcessor(_logger, true);
-        return ValueTask.FromResult(processor.Cleanupcode(_parameters.SolutionFileName, true).IsNone);
+        return ValueTask.FromResult(processor.Cleanupcode(_parameters.SolutionFileName, true).IsSuccess);
     }
 }

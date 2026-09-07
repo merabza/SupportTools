@@ -21,6 +21,6 @@ public sealed class GitApi
 
     public bool IsGitRemoteAddressValid(string remoteAddress)
     {
-        return StShared.RunProcess(_useConsole, _logger, _git, $"ls-remote {remoteAddress}").IsNone;
+        return StShared.RunProcess(_useConsole, _logger, _git, $"ls-remote {remoteAddress}").IsSuccess;
     }
 }

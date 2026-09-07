@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using SystemTools.BackgroundTasks;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
+using SystemTools.SystemToolsShared;
 using SystemTools.TestApiContracts;
 using ToolsManagement.ApiClientsManagement;
 using WebAgentContracts.WebAgentProjectsApiContracts;
@@ -71,16 +71,16 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var projectsApiClient = new ProjectsApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _webAgentForCheck.ApiKey, _useConsole);
-                    OneOf<string, ErrorOmd[]> getVersionByProxyResult =
+                    Result<string> getVersionByProxyResult =
                         await projectsApiClient.GetVersionByProxy(proxySettings.ServerSidePort,
                             proxySettings.ApiVersionId, cancellationToken);
-                    if (getVersionByProxyResult.IsT1)
+                    if (getVersionByProxyResult.IsFailure)
                     {
-                        ErrorOmd.PrintErrorsOnConsole(getVersionByProxyResult.AsT1);
+                        getVersionByProxyResult.Error.PrintErrorsOnConsole();
                         break;
                     }
 
-                    version = getVersionByProxyResult.AsT0;
+                    version = getVersionByProxyResult.Value;
                 }
                 else
                 {
@@ -93,14 +93,14 @@ public sealed class CheckProgramVersionAction : ToolAction
                     //კლიენტის შექმნა ვერსიის შესამოწმებლად
                     var testApiClient = new TestApiClient(_logger, _httpClientFactory, _webAgentForCheck.Server,
                         _useConsole);
-                    OneOf<string, ErrorOmd[]> getVersionResult = await testApiClient.GetVersion(cancellationToken);
-                    if (getVersionResult.IsT1)
+                    Result<string> getVersionResult = await testApiClient.GetVersion(cancellationToken);
+                    if (getVersionResult.IsFailure)
                     {
-                        ErrorOmd.PrintErrorsOnConsole(getVersionResult.AsT1);
+                        getVersionResult.Error.PrintErrorsOnConsole();
                         break;
                     }
 
-                    version = getVersionResult.AsT0;
+                    version = getVersionResult.Value;
                 }
 
                 if (_installingProgramVersion == null)

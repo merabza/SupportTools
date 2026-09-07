@@ -179,7 +179,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "obj"));
 
         //მთავარი პროექტის შექმნა
-        if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsSome)
+        if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsFailure)
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return false;

@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.BackgroundTasks;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
+using SystemTools.SystemToolsShared;
 using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -79,27 +79,20 @@ public sealed class InstallServiceAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        OneOf<string, ErrorOmd[]> installServiceResult = await projectManager.InstallService(_projectName,
+        Result<string> installServiceResult = await projectManager.InstallService(_projectName,
             _environmentName, _serviceUserName, Path.GetFileName(_appSettingsJsonFileName), _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature,
             _projectDescription, cancellationToken);
 
-        if (installServiceResult.IsT1)
+        if (installServiceResult.IsFailure)
         {
-            _logger.LogError("ErrorOmd when Install service project {_projectName}/{_environmentName}", _projectName,
+            _logger.LogError("Error when Install service project {_projectName}/{_environmentName}", _projectName,
                 _environmentName);
-            ErrorOmd.PrintErrorsOnConsole(installServiceResult.AsT1);
+            installServiceResult.Error.PrintErrorsOnConsole();
             return false;
         }
 
-        InstallingProgramVersion = installServiceResult.AsT0;
-
-        if (InstallingProgramVersion != null)
-        {
-            return true;
-        }
-
-        _logger.LogError("project {_projectName}/{_environmentName} does not updated", _projectName, _environmentName);
-        return false;
+        InstallingProgramVersion = installServiceResult.Value;
+        return true;
     }
 }

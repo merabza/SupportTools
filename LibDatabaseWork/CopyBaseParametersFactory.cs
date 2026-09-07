@@ -5,13 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibDatabaseWork.Models;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibFileParameters.Models;
 using SupportToolsData.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Models;
 using ToolsManagement.FileManagersMain;
@@ -37,27 +36,27 @@ public static class CopyBaseParametersFactory
 
         var createSourceBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(appName, logger, null, null, true);
-        OneOf<BaseBackupParameters, ErrorOmd[]> createSourceBaseBackupParametersResult =
+        Result<BaseBackupParameters> createSourceBaseBackupParametersResult =
             await createSourceBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 fromDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
-        if (createSourceBaseBackupParametersResult.IsT1)
+        if (createSourceBaseBackupParametersResult.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(createSourceBaseBackupParametersResult.AsT1);
+            createSourceBaseBackupParametersResult.Error.PrintErrorsOnConsole();
             return null;
         }
 
         var createDestinationBaseBackupParametersFactory =
             new CreateBaseBackupParametersFactory(appName, logger, null, null, true);
-        OneOf<BaseBackupParameters, ErrorOmd[]> createDestinationBaseBackupParametersResult =
+        Result<BaseBackupParameters> createDestinationBaseBackupParametersResult =
             await createDestinationBaseBackupParametersFactory.CreateBaseBackupParameters(httpClientFactory,
                 toDatabaseParameters, databaseServerConnections, apiClients, fileStorages, smartSchemas,
                 databasesBackupFilesExchangeParameters, cancellationToken);
 
-        if (createDestinationBaseBackupParametersResult.IsT1)
+        if (createDestinationBaseBackupParametersResult.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(createDestinationBaseBackupParametersResult.AsT1);
+            createDestinationBaseBackupParametersResult.Error.PrintErrorsOnConsole();
             return null;
         }
 
@@ -150,24 +149,24 @@ public static class CopyBaseParametersFactory
 
         //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
         //წყაროს სერვერის აგენტის შექმნა
-        OneOf<IDatabaseManager, ErrorOmd[]> createDatabaseManagerResultForSource =
+        Result<IDatabaseManager> createDatabaseManagerResultForSource =
             await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, sourceDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
-        if (createDatabaseManagerResultForSource.IsT1)
+        if (createDatabaseManagerResultForSource.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(createDatabaseManagerResultForSource.AsT1);
+            createDatabaseManagerResultForSource.Error.PrintErrorsOnConsole();
             logger.LogError("Can not create client for source Database server");
             return null;
         }
 
-        OneOf<IDatabaseManager, ErrorOmd[]> createDatabaseManagerResultForDestination =
+        Result<IDatabaseManager> createDatabaseManagerResultForDestination =
             await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, destinationDbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
 
-        if (createDatabaseManagerResultForDestination.IsT1)
+        if (createDatabaseManagerResultForDestination.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(createDatabaseManagerResultForDestination.AsT1);
+            createDatabaseManagerResultForDestination.Error.PrintErrorsOnConsole();
             logger.LogError("Can not create client for destination Database server");
             return null;
         }
@@ -212,8 +211,8 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        return new CopyBaseParameters(createSourceBaseBackupParametersResult.AsT0,
-            createDestinationBaseBackupParametersResult.AsT0, exchangeFileManager, needUploadToDestination,
+        return new CopyBaseParameters(createSourceBaseBackupParametersResult.Value,
+            createDestinationBaseBackupParametersResult.Value, exchangeFileManager, needUploadToDestination,
             needDownloadFromExchange, exchangeSmartSchema,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"

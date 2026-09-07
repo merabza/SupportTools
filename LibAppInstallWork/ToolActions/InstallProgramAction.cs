@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.BackgroundTasks;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
+using SystemTools.SystemToolsShared;
 using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -69,24 +69,18 @@ public sealed class InstallProgramAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        OneOf<string, ErrorOmd[]> installProgramResult = await projectManager.InstallProgram(_projectName,
+        Result<string> installProgramResult = await projectManager.InstallProgram(_projectName,
             _environmentName, _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask,
             _parametersFileExtension, cancellationToken);
 
-        if (installProgramResult.IsT1)
+        if (installProgramResult.IsFailure)
         {
-            _logger.LogError("ErrorOmd when Install program project {ProjectName}/{EnvironmentName}", _projectName,
+            _logger.LogError("Error when Install program project {ProjectName}/{EnvironmentName}", _projectName,
                 _environmentName);
-            ErrorOmd.PrintErrorsOnConsole(installProgramResult.AsT1);
+            installProgramResult.Error.PrintErrorsOnConsole();
             return false;
         }
 
-        if (installProgramResult.AsT0 is not null)
-        {
-            return true;
-        }
-
-        _logger.LogError("project {ProjectName}/{EnvironmentName} does not updated", _projectName, _environmentName);
-        return false;
+        return true;
     }
 }

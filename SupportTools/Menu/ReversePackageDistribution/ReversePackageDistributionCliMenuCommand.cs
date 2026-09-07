@@ -133,20 +133,20 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
                     continue;
                 }
 
-                if (dotnetProcessor.RemovePackageFromProject(csprojFile, packageId).IsSome)
+                if (dotnetProcessor.RemovePackageFromProject(csprojFile, packageId).IsFailure)
                 {
                     StShared.WriteErrorLine($"Cannot remove package {packageId} from {csprojFile}", true, _logger);
                     hadErrors = true;
                     continue;
                 }
 
-                if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsSome)
+                if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsFailure)
                 {
                     hadErrors = true;
 
                     //თუ რეფერენსის ჩასმა ვერ მოხერხდა, წაშლილი პაკეტი უბრუნდება პროექტს,
                     //რომ შეცვლილი პროექტი შეცდომაზე არ გავიდეს
-                    if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, null).IsSome)
+                    if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, null).IsFailure)
                     {
                         StShared.WriteErrorLine(
                             $"Cannot add reference {refFullPath} to {csprojFile} and cannot restore removed package {packageId}. Recover the file from git",

@@ -94,7 +94,7 @@ public sealed class PackageBuilder
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
         //პაკეტების დაბილდვა
-        if (dotnetProcessor.Pack(solutionFileName, outputFolderPath, packageVersion).IsSome)
+        if (dotnetProcessor.Pack(solutionFileName, outputFolderPath, packageVersion).IsFailure)
         {
             StShared.WriteErrorLine($"Cannot pack solution for project {_projectName}", true, _logger);
             return false;
@@ -104,7 +104,7 @@ public sealed class PackageBuilder
 
         //პაკეტის ატვირთვა package manager-ზე
         if (!dotnetProcessor.NugetPush(Path.Combine(outputFolderPath, "*.nupkg"), nugetSourceUrl,
-                apiClientSettings.ApiKey).IsSome)
+                apiClientSettings.ApiKey).IsFailure)
         {
             return true;
         }

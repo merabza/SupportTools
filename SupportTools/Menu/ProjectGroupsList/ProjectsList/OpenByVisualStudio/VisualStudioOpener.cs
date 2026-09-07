@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using OneOf;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 
@@ -23,12 +22,12 @@ public static class VisualStudioOpener
 
         if (File.Exists(vswherePath))
         {
-            OneOf<(string, int), ErrorOmd[]> runProcessWithOutputResult = StShared.RunProcessWithOutput(true, logger,
+            Result<(string, int)> runProcessWithOutputResult = StShared.RunProcessWithOutput(true, logger,
                 vswherePath, "-latest -products * -requires Microsoft.Component.MSBuild -property installationPath");
 
-            if (runProcessWithOutputResult.IsT0)
+            if (runProcessWithOutputResult.IsSuccess)
             {
-                string installPath = runProcessWithOutputResult.AsT0.Item1.RemoveNotNeedLastPart("\r\n");
+                string installPath = runProcessWithOutputResult.Value.Item1.RemoveNotNeedLastPart("\r\n");
                 if (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath))
                 {
                     string devenvPath = Path.Combine(installPath, "Common7", "IDE", "devenv.exe");

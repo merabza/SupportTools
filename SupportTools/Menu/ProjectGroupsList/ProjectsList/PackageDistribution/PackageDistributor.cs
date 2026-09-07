@@ -213,20 +213,20 @@ public sealed class PackageDistributor
                     continue;
                 }
 
-                if (dotnetProcessor.RemoveReferenceFromProject(csprojFile, refFullPath).IsSome)
+                if (dotnetProcessor.RemoveReferenceFromProject(csprojFile, refFullPath).IsFailure)
                 {
                     StShared.WriteErrorLine($"Cannot remove reference {refFullPath} from {csprojFile}", true, _logger);
                     hadErrors = true;
                     continue;
                 }
 
-                if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, latestVersion).IsSome)
+                if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, latestVersion).IsFailure)
                 {
                     hadErrors = true;
 
                     //თუ პაკეტის ჩასმა ვერ მოხერხდა, წაშლილი რეფერენსი უბრუნდება პროექტს,
                     //რომ შეცვლილი პროექტი შეცდომაზე არ გავიდეს
-                    if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsSome)
+                    if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsFailure)
                     {
                         StShared.WriteErrorLine(
                             $"Cannot add package {packageId} to {csprojFile} and cannot restore removed reference {refFullPath}. Recover the file from git",

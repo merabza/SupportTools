@@ -4,11 +4,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
-using LanguageExt;
 using LibAppInstallWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -71,9 +70,9 @@ public sealed class ServiceStarterToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაშვების მცდელობა.
-        Option<ErrorOmd[]> startServiceResult = await projectManager.StartService(_parameters.ProjectName,
+        Result startServiceResult = await projectManager.StartService(_parameters.ProjectName,
             _parameters.EnvironmentName, CancellationToken.None);
-        if (startServiceResult.IsSome)
+        if (startServiceResult.IsFailure)
         {
             _logger.LogError("Service {ProjectName}/{EnvironmentName} can not started", projectName, environmentName);
             return false;

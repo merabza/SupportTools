@@ -113,7 +113,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
 
         //ბაზის მიგრაციის დაწყება
         if (dotnetProcessor.EfAddDatabaseMigration("Initial", dbContextName, migrationStartupProjectFilePath,
-                migrationProjectFileName).IsSome)
+                migrationProjectFileName).IsFailure)
         {
             return ValueTask.FromResult(false);
         }
@@ -121,7 +121,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         _logger.LogInformation("Update Database for Initial");
         //ბაზის განახლება
         if (dotnetProcessor.EfUpdateDatabaseByMigration(dbContextName,
-                migrationStartupProjectFilePath, migrationProjectFileName).IsSome)
+                migrationStartupProjectFilePath, migrationProjectFileName).IsFailure)
         {
             return ValueTask.FromResult(false);
         }
@@ -148,7 +148,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //ბაზის sql მიგრაციის დაწყება
         if (dotnetProcessor
             .EfAddDatabaseMigration("Sql", dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
-            .IsSome)
+            .IsFailure)
         {
             return ValueTask.FromResult(false);
         }
@@ -176,6 +176,6 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //ბაზის განახლება
         return ValueTask.FromResult(dotnetProcessor
             .EfUpdateDatabaseByMigration(dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
-            .IsNone);
+            .IsSuccess);
     }
 }

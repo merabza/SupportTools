@@ -50,7 +50,7 @@ public sealed class ReCreateReactAppFiles
         if (!StShared.RunCmdProcess(
                 $"npx create-react-app {appFolderFullName}{(string.IsNullOrWhiteSpace(_reactTemplateName) ? string.Empty : $" --template {_reactTemplateName}")}"))
         {
-            StShared.WriteErrorLine("ErrorOmd When creating react app", true, _logger);
+            StShared.WriteErrorLine("Error When creating react app", true, _logger);
             return false;
         }
 
@@ -85,7 +85,7 @@ public sealed class ReCreateReactAppFiles
             return true;
         }
 
-        if (gitProcessor.Initialise().IsSome)
+        if (gitProcessor.Initialise().IsFailure)
         {
             return false;
         }

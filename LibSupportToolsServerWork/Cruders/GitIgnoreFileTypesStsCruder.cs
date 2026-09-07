@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
-using LanguageExt;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
@@ -71,15 +69,15 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
             try
             {
-                OneOf<List<StsGitIgnoreFileTypeDataModel>, ErrorOmd[]> remoteGitReposResult =
+                Result<List<StsGitIgnoreFileTypeDataModel>> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
-                if (remoteGitReposResult.IsT0)
+                if (remoteGitReposResult.IsSuccess)
                 {
-                    return remoteGitReposResult.AsT0;
+                    return remoteGitReposResult.Value;
                 }
 
                 StShared.WriteErrorLine("could not received GitIgnore File Types List", true, _logger);
-                ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                remoteGitReposResult.Error.PrintErrorsOnConsole();
             }
             catch (Exception e)
             {
@@ -116,11 +114,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<ErrorOmd[]> updateGitRepoByKeyResult = supportToolsServerApiClient
+            Result updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
-            if (updateGitRepoByKeyResult.IsSome)
+            if (updateGitRepoByKeyResult.IsFailure)
             {
-                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
+                updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
             }
         }
         catch (Exception e)
@@ -148,11 +146,11 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
         try
         {
-            Option<ErrorOmd[]> updateGitRepoByKeyResult =
+            Result updateGitRepoByKeyResult =
                 await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken);
-            if (updateGitRepoByKeyResult.IsSome)
+            if (updateGitRepoByKeyResult.IsFailure)
             {
-                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
+                updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
             }
         }
         catch (Exception e)

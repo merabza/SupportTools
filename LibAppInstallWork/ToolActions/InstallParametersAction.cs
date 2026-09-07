@@ -1,12 +1,11 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LanguageExt;
 using LibAppInstallWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibFileParameters.Models;
 using SystemTools.BackgroundTasks;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -64,11 +63,11 @@ public sealed class InstallParametersAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით პარამეტრების ფაილის განახლების პროცესის გაშვება.
-        Option<ErrorOmd[]> updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
+        Result updateAppParametersFileResult = await projectManager.UpdateAppParametersFile(_projectName,
             _environmentName, _appSettingsJsonFileName, _parametersFileDateMask, _parametersFileExtension,
             cancellationToken);
 
-        if (updateAppParametersFileResult.IsNone)
+        if (updateAppParametersFileResult.IsSuccess)
         {
             return true;
         }

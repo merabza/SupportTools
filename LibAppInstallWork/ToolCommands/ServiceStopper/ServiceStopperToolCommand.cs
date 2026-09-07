@@ -4,11 +4,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
-using LanguageExt;
 using LibAppInstallWork.ToolCommands.ServiceStarter;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 using ToolsManagement.Installer.ProjectManagers;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -66,9 +65,9 @@ public sealed class ServiceStopperToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        Option<ErrorOmd[]> stopServiceResult =
+        Result stopServiceResult =
             await projectManager.StopService(projectName, environmentName, cancellationToken);
-        if (stopServiceResult.IsSome)
+        if (stopServiceResult.IsFailure)
         {
             _logger.LogError("Service {ProjectName}/{EnvironmentName} can not be stopped", projectName,
                 environmentName);

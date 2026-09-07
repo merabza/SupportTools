@@ -8,7 +8,6 @@ using AppCliTools.CliParameters;
 using AppCliTools.DbContextAnalyzer.Domain;
 using AppCliTools.DbContextAnalyzer.Models;
 using AppCliTools.LibSeedCodeCreator;
-using LanguageExt;
 using LibAppProjectCreator;
 using LibDotnetWork;
 using LibScaffoldSeeder.Models;
@@ -18,8 +17,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibScaffoldSeeder.ToolCommands.ScaffoldSeederCreator;
 
@@ -227,7 +226,7 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
         if (dotnetProcessor
             .RunToolUsingParametersFile(
                 scaffoldSeederDoubleAppCreator.ScaffoldSeederMainCreatorData.CreateProjectSeederCodeProject
-                    .ProjectFileFullName, createProjectSeederCodeParametersFileFullName).IsSome)
+                    .ProjectFileFullName, createProjectSeederCodeParametersFileFullName).IsFailure)
         {
             return false;
         }
@@ -279,15 +278,15 @@ public sealed class ScaffoldSeederCreatorToolCommand : ToolCommand
     {
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         //dotnetProcessor.Restore(databaseScaffoldClassLibProjectFileFullName);
-        Option<ErrorOmd[]> restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
-        if (restoreResult.IsSome)
+        Result restoreResult = dotnetProcessor.Restore(createProjectSeederCodeProjectFileFullName);
+        if (restoreResult.IsFailure)
         {
             return false;
         }
 
         return dotnetProcessor.EfDatabaseScaffold(databaseScaffoldClassLibProjectFileFullName,
             prodCopyDatabaseConnectionString, providerPackageName, createProjectSeederCodeProjectFileFullName,
-            dbScContextName, databaseScaffoldClassLibProjectFullPath).IsNone;
+            dbScContextName, databaseScaffoldClassLibProjectFullPath).IsSuccess;
     }
 
     private static bool SaveParameters(object parameters, string saveAsFilePath, string projectFullPath,

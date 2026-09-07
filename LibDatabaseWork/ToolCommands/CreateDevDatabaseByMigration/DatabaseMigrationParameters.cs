@@ -1,11 +1,10 @@
 ﻿using System.Net.Http;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 using ToolsManagement.DatabasesManagement;
 using ToolsManagement.DatabasesManagement.Errors;
 
@@ -103,19 +102,19 @@ public sealed class DatabaseMigrationParameters : IParameters
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
         var apiClients = new ApiClients(supportToolsParameters.ApiClients);
 
-        OneOf<IDatabaseManager, ErrorOmd[]> createDatabaseManagerResult = DatabaseManagersFactory
+        Result<IDatabaseManager> createDatabaseManagerResult = DatabaseManagersFactory
             .CreateDatabaseManager(appName, logger, true, devDatabaseParameters.DbConnectionName,
                 databaseServerConnections, apiClients, httpClientFactory, null, null).Result;
-        if (createDatabaseManagerResult.IsT1)
+        if (createDatabaseManagerResult.IsFailure)
         {
 #pragma warning disable CA2254
-            logger.LogError(DatabaseManagerErrors.CanNotCreateDatabaseServerClient.Name);
+            logger.LogError(DatabaseManagerErrors.CanNotCreateDatabaseServerClient.Description);
 #pragma warning restore CA2254
             return null;
         }
 
         var databaseMigrationParameters = new DatabaseMigrationParameters(project.MigrationStartupProjectFilePath,
-            project.MigrationProjectFilePath, project.DbContextName, createDatabaseManagerResult.AsT0,
+            project.MigrationProjectFilePath, project.DbContextName, createDatabaseManagerResult.Value,
             devDatabaseParameters.DatabaseName);
 
         return databaseMigrationParameters;

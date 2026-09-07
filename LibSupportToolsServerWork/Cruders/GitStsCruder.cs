@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
-using LanguageExt;
 using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibSupportToolsServerWork.Cruders;
 
@@ -81,15 +79,15 @@ public sealed class GitStsCruder : Cruder
 
             try
             {
-                OneOf<List<StsGitDataModel>, ErrorOmd[]> remoteGitReposResult =
+                Result<List<StsGitDataModel>> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitRepos().Result;
-                if (remoteGitReposResult.IsT0)
+                if (remoteGitReposResult.IsSuccess)
                 {
-                    return remoteGitReposResult.AsT0;
+                    return remoteGitReposResult.Value;
                 }
 
                 StShared.WriteErrorLine("could not received remoteGits", true, _logger);
-                ErrorOmd.PrintErrorsOnConsole(remoteGitReposResult.AsT1);
+                remoteGitReposResult.Error.PrintErrorsOnConsole();
             }
             catch (Exception e)
             {
@@ -112,20 +110,19 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            OneOf<StsGitDataModel, ErrorOmd[]> getGitRepoByKeyResult =
+            Result<StsGitDataModel> getGitRepoByKeyResult =
                 supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
-            if (getGitRepoByKeyResult.IsT0)
+            if (getGitRepoByKeyResult.IsSuccess)
             {
                 return true;
             }
 
-            if (getGitRepoByKeyResult.AsT1 is
-                [{ Code: nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound) } _])
+            if (getGitRepoByKeyResult.Error is { Code: nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound) })
             {
                 return false;
             }
 
-            ErrorOmd.PrintErrorsOnConsole(getGitRepoByKeyResult.AsT1);
+            getGitRepoByKeyResult.Error.PrintErrorsOnConsole();
 
             return false;
         }
@@ -187,11 +184,11 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            Option<ErrorOmd[]> updateGitRepoByKeyResult = supportToolsServerApiClient
+            Result updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
-            if (updateGitRepoByKeyResult.IsSome)
+            if (updateGitRepoByKeyResult.IsFailure)
             {
-                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
+                updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
             }
         }
         catch (Exception e)
@@ -219,11 +216,11 @@ public sealed class GitStsCruder : Cruder
 
         try
         {
-            Option<ErrorOmd[]> updateGitRepoByKeyResult =
+            Result updateGitRepoByKeyResult =
                 await supportToolsServerApiClient.RemoveGitRepoByKey(recordKey, cancellationToken);
-            if (updateGitRepoByKeyResult.IsSome)
+            if (updateGitRepoByKeyResult.IsFailure)
             {
-                ErrorOmd.PrintErrorsOnConsole((ErrorOmd[])updateGitRepoByKeyResult);
+                updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
             }
         }
         catch (Exception e)
@@ -259,7 +256,7 @@ public sealed class GitStsCruder : Cruder
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "ErrorOmd occurred while validating GitDataModel");
+            _logger.LogError(e, "Error occurred while validating GitDataModel");
             return false;
         }
     }

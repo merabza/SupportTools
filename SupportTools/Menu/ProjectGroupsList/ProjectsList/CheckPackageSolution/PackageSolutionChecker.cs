@@ -6,12 +6,11 @@ using System.Xml;
 using System.Xml.Linq;
 using LibDotnetWork;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 using ToolsManagement.ApiClientsManagement;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
@@ -89,8 +88,8 @@ public sealed class PackageSolutionChecker
 
         //სოლუშენში შემავალი პროექტების ჩამონათვალის მიღება
         var dotnetProcessor = new DotnetProcessor(_logger, true);
-        OneOf<List<string>, ErrorOmd[]> projectsListResult = dotnetProcessor.GetSolutionProjectsList(solutionFileName);
-        if (projectsListResult.IsT1)
+        Result<List<string>> projectsListResult = dotnetProcessor.GetSolutionProjectsList(solutionFileName);
+        if (projectsListResult.IsFailure)
         {
             StShared.WriteErrorLine($"Cannot get projects list for solution {solutionFileName}", true, _logger);
             return false;
@@ -98,7 +97,7 @@ public sealed class PackageSolutionChecker
 
         List<string> solutionProjectFullPaths =
         [
-            .. projectsListResult.AsT0.Select(relativePath =>
+            .. projectsListResult.Value.Select(relativePath =>
                 Path.GetFullPath(Path.Combine(solutionFolder, relativePath)))
         ];
 

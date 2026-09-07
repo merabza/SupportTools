@@ -29,6 +29,6 @@ public sealed class ExternalScaffoldSeedToolCommand : ToolCommand
         //დეველოპერ ბაზაში მონაცემების ჩაყრის პროცესის გაშვება არსებული პროექტის საშუალებით და არსებული json ფაილების გამოყენებით
         var dotnetProcessor = new DotnetProcessor(_logger, true);
         return ValueTask.FromResult(dotnetProcessor
-            .RunToolUsingParametersFile(_parameters.ProjectFilePath, _parameters.ProjectParametersFilePath).IsNone);
+            .RunToolUsingParametersFile(_parameters.ProjectFilePath, _parameters.ProjectParametersFilePath).IsSuccess);
     }
 }

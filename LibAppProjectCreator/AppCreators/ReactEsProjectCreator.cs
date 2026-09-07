@@ -126,7 +126,7 @@ public sealed class ReactEsProjectCreator
         }
         catch
         {
-            StShared.WriteErrorLine($"ErrorOmd when downloading {uri}", true, _logger, false);
+            StShared.WriteErrorLine($"Error when downloading {uri}", true, _logger, false);
             //StShared.WriteException(e, true);
         }
 

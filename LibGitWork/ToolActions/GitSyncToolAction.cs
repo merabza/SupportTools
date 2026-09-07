@@ -9,12 +9,11 @@ using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.BackgroundTasks;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibGitWork.ToolActions;
 
@@ -70,14 +69,16 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<bool, ErrorOmd[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
-        if (haveUnTrackedFilesResult.IsT0)
+        Result<bool> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        if (haveUnTrackedFilesResult.IsSuccess)
         {
-            return haveUnTrackedFilesResult.AsT0;
+            return haveUnTrackedFilesResult.Value;
         }
 
-        ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(haveUnTrackedFilesResult.AsT1,
-            GitSyncToolActionErrors.HaveUnTrackedFilesError));
+        Result.CreateValidationError([
+            .. haveUnTrackedFilesResult.Error.ToErrorArray(),
+            GitSyncToolActionErrors.HaveUnTrackedFilesError
+        ]).PrintErrorsOnConsole();
         return false;
     }
 
@@ -121,15 +122,17 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<string, ErrorOmd[]> getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
-        if (getRemoteOriginUrlResult.IsT1)
+        Result<string> getRemoteOriginUrlResult = GitProcessor.GetRemoteOriginUrl();
+        if (getRemoteOriginUrlResult.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(getRemoteOriginUrlResult.AsT1,
-                GitSyncToolActionErrors.GetRedundantCachedFilesListError));
+            Result.CreateValidationError([
+                .. getRemoteOriginUrlResult.Error.ToErrorArray(),
+                GitSyncToolActionErrors.GetRedundantCachedFilesListError
+            ]).PrintErrorsOnConsole();
             return false;
         }
 
-        string? remoteOriginUrl = getRemoteOriginUrlResult.AsT0;
+        string remoteOriginUrl = getRemoteOriginUrlResult.Value;
 
         if (remoteOriginUrl != _gitSyncParameters.GitData.GitProjectAddress)
         {
@@ -139,15 +142,17 @@ public sealed class GitSyncToolAction : ToolAction
 
         //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
         //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-        OneOf<string[], ErrorOmd[]> getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
-        if (getRedundantCachedFilesListResult.IsT1)
+        Result<string[]> getRedundantCachedFilesListResult = GitProcessor.GetRedundantCachedFilesList();
+        if (getRedundantCachedFilesListResult.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(getRedundantCachedFilesListResult.AsT1,
-                GitSyncToolActionErrors.GetRedundantCachedFilesListError));
+            Result.CreateValidationError([
+                .. getRedundantCachedFilesListResult.Error.ToErrorArray(),
+                GitSyncToolActionErrors.GetRedundantCachedFilesListError
+            ]).PrintErrorsOnConsole();
             return false;
         }
 
-        string[]? redundantCachedFilesList = getRedundantCachedFilesListResult.AsT0;
+        string[] redundantCachedFilesList = getRedundantCachedFilesListResult.Value;
 
         //და წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
         //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
@@ -157,30 +162,34 @@ public sealed class GitSyncToolAction : ToolAction
             return false;
         }
 
-        OneOf<bool, ErrorOmd[]> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
-        if (haveUnTrackedFilesResult.IsT1)
+        Result<bool> haveUnTrackedFilesResult = GitProcessor.HaveUnTrackedFiles();
+        if (haveUnTrackedFilesResult.IsFailure)
         {
-            ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(haveUnTrackedFilesResult.AsT1,
-                GitSyncToolActionErrors.HaveUnTrackedFilesError));
+            Result.CreateValidationError([
+                .. haveUnTrackedFilesResult.Error.ToErrorArray(),
+                GitSyncToolActionErrors.HaveUnTrackedFilesError
+            ]).PrintErrorsOnConsole();
             return false;
         }
 
-        bool haveUnTrackedFiles = haveUnTrackedFilesResult.AsT0;
+        bool haveUnTrackedFiles = haveUnTrackedFilesResult.Value;
 
         if (haveUnTrackedFiles && !GitProcessor.Add())
         {
             return false;
         }
 
-        OneOf<bool, ErrorOmd[]> needCommitResult = GitProcessor.NeedCommit();
-        if (needCommitResult.IsT0)
+        Result<bool> needCommitResult = GitProcessor.NeedCommit();
+        if (needCommitResult.IsSuccess)
         {
-            Phase1Result = needCommitResult.AsT0 ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
+            Phase1Result = needCommitResult.Value ? EFirstPhaseResult.NeedCommit : EFirstPhaseResult.NotNeedCommit;
             return true;
         }
 
-        ErrorOmd.PrintErrorsOnConsole(ErrorOmd.RecreateErrors(needCommitResult.AsT1,
-            GitSyncToolActionErrors.NeedCommitError));
+        Result.CreateValidationError([
+            .. needCommitResult.Error.ToErrorArray(),
+            GitSyncToolActionErrors.NeedCommitError
+        ]).PrintErrorsOnConsole();
         return false;
     }
 

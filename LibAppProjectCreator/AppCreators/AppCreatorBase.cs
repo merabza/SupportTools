@@ -248,7 +248,7 @@ public abstract class AppCreatorBase
         //სოლუშენის შექმნა
         var dotnetProcessor = new DotnetProcessor(Logger, true);
 
-        if (dotnetProcessor.CreateNewSolution(SolutionPath, ProjectName).IsSome)
+        if (dotnetProcessor.CreateNewSolution(SolutionPath, ProjectName).IsFailure)
         {
             return false;
         }
@@ -276,7 +276,7 @@ public abstract class AppCreatorBase
                             //პროექტების შექმნა
                             if (dotnetProcessor.CreateNewProject(projectForCreate.DotnetProjectType,
                                     projectForCreate.ProjectCreateParameters, projectForCreate.ProjectFullPath,
-                                    projectForCreate.ProjectName).IsSome)
+                                    projectForCreate.ProjectName).IsFailure)
                             {
                                 return false;
                             }
@@ -297,7 +297,7 @@ public abstract class AppCreatorBase
                         }
 
                         if (dotnetProcessor.AddProjectToSolution(SolutionPath, projectForCreate.SolutionFolderName,
-                                projectForCreate.ProjectFileFullName).IsSome)
+                                projectForCreate.ProjectFileFullName).IsFailure)
                         {
                             return false;
                         }
@@ -309,7 +309,7 @@ public abstract class AppCreatorBase
                         string projPath = Path.Combine(WorkPath, projectFromGit.GitProjectFolderName,
                             projectFromGit.ProjectName, $"{projectFromGit.ProjectName}.csproj");
                         if (dotnetProcessor
-                            .AddProjectToSolution(SolutionPath, projectFromGit.SolutionFolderName, projPath).IsSome)
+                            .AddProjectToSolution(SolutionPath, projectFromGit.SolutionFolderName, projPath).IsFailure)
                         {
                             return false;
                         }
@@ -339,7 +339,7 @@ public abstract class AppCreatorBase
                 continue;
             }
 
-            if (dotnetProcessor.AddReferenceToProject(refData.ProjectFilePath, refData.ReferenceProjectFilePath).IsSome)
+            if (dotnetProcessor.AddReferenceToProject(refData.ProjectFilePath, refData.ReferenceProjectFilePath).IsFailure)
             {
                 return false;
             }
@@ -348,14 +348,14 @@ public abstract class AppCreatorBase
         //პაკეტების მიერთება პროექტებში, სიის მიხედვით
         if (!Packages.All(packageData =>
                 dotnetProcessor.AddPackageToProject(packageData.ProjectFilePath, packageData.PackageName,
-                    packageData.Version).IsNone))
+                    packageData.Version).IsSuccess))
         {
             return false;
         }
 
         var jb = new JetBrainsResharperGlobalToolsProcessor(Logger, true);
 
-        return !jb.Cleanupcode(SolutionPath).IsSome;
+        return jb.Cleanupcode(SolutionPath).IsSuccess;
 
         //if (createAppVersions == ECreateAppVersions.Temp) return true;
 

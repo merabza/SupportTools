@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AppCliTools.CliParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
+using SystemTools.SharedKernel;
 using ToolsManagement.Installer.ProjectManagers;
 
 namespace LibAppInstallWork.ToolCommands.ProgRemover;
@@ -50,8 +51,9 @@ public sealed class ProgramRemoverToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით წაშლის პროცესის გაშვება.
-        if (await projectManager.RemoveProjectAndService(projectName, _parameters.EnvironmentName,
-                _parameters.IsService, CancellationToken.None))
+        Result removeProjectAndServiceResult = await projectManager.RemoveProjectAndService(projectName,
+            _parameters.EnvironmentName, _parameters.IsService, CancellationToken.None);
+        if (removeProjectAndServiceResult.IsSuccess)
         {
             return true;
         }

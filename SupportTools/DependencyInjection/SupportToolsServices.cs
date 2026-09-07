@@ -45,7 +45,7 @@ public static class SupportToolsServices
                 typeof(JsonFromProjectDbProjectGetterFactoryStrategy).Assembly,
                 typeof(GenerateApiRoutesToolCommandFactoryStrategy).Assembly,
                 typeof(ApplicationSettingsEncoderToolCommandFactoryStrategy).Assembly)
-            .AddApplication(x =>
+            .AddApp(x =>
             {
                 x.AppName = appName;
             })

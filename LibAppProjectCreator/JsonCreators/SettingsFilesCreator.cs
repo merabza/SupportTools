@@ -57,7 +57,7 @@ public sealed class SettingsFilesCreator
         foreach (string jsonKey in _forEncodeAppSettingsJsonKeys)
         {
             keysJArray.Add(new JValue(jsonKey));
-            if (dotnetProcessor.InitUserSecrets(_projectFullPath).IsSome)
+            if (dotnetProcessor.InitUserSecrets(_projectFullPath).IsFailure)
             {
                 return false;
             }

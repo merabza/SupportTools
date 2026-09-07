@@ -109,7 +109,7 @@ public sealed class RazorAppCreator : AppCreatorBase
         //mainProjectGitIgnoreCreator.CreateFileStructure();
 
         var gitProcessor = new GitProcessor(true, Logger, SolutionPath, GitExecutablePath);
-        return Task.FromResult(gitProcessor.Initialise().IsNone);
+        return Task.FromResult(gitProcessor.Initialise().IsSuccess);
     }
 
     //private void MakeFilesWhenNotUseMenu()

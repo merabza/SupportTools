@@ -4,17 +4,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using DatabaseTools.DbTools;
 using DatabaseTools.DbTools.Errors;
-using LanguageExt;
 using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 using LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 using LibDatabaseWork.ToolCommands.DropDevDatabase;
 using LibDotnetWork;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
-using SystemTools.SystemToolsShared.Errors;
+using SystemTools.SharedKernel;
 using ToolsManagement.DatabasesManagement;
 
 // ReSharper disable ConvertToPrimaryConstructor
@@ -65,11 +63,11 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //დავადგინოთ თუ არსებობს დეველოპერ ბაზა
-        OneOf<bool, ErrorOmd[]> isDatabaseExistsResult =
+        Result<bool> isDatabaseExistsResult =
             await DatabaseMigrationParameters.DatabaseManager.IsDatabaseExists(DatabaseMigrationParameters.DatabaseName,
                 cancellationToken);
 
-        if (isDatabaseExistsResult.IsT1)
+        if (isDatabaseExistsResult.IsFailure)
         {
             _logger.LogInformation("The existence of the base could not be determined");
             return false;
@@ -79,7 +77,7 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         dotnetProcessor.Restore(DatabaseMigrationParameters.MigrationProjectFileName);
         dotnetProcessor.Restore(DatabaseMigrationParameters.MigrationStartupProjectFilePath);
 
-        if (isDatabaseExistsResult.AsT0)
+        if (isDatabaseExistsResult.Value)
         {
             //თუ არსებობს წაიშალოს დეველოპერ ბაზა
             var databaseDropper =
@@ -98,10 +96,10 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
             return false;
         }
 
-        Option<ErrorOmd[]> changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
-        if (changeDatabaseRecoveryModelResult.IsSome)
+        Result changeDatabaseRecoveryModelResult = await ChangeDatabaseRecoveryModel(cancellationToken);
+        if (changeDatabaseRecoveryModelResult.IsFailure)
         {
-            _logger.LogError("ErrorOmd in ChangeDatabaseRecoveryModel");
+            _logger.LogError("Error in ChangeDatabaseRecoveryModel");
         }
 
         //გადამოწმდეს ახალი ბაზა და ჩასწორდეს საჭიროების მიხედვით
@@ -109,28 +107,26 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
         return await correctNewDatabase.Run(cancellationToken);
     }
 
-    private async ValueTask<Option<ErrorOmd[]>> ChangeDatabaseRecoveryModel(
-        CancellationToken cancellationToken = default)
+    private async ValueTask<Result> ChangeDatabaseRecoveryModel(CancellationToken cancellationToken = default)
     {
-        var errors = new List<ErrorOmd>();
+        var errors = new List<Error>();
 
         string? dbConnectionName = _devDatabaseParameters.DbConnectionName;
 
         if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
         {
             _logger.LogError("dev database DbConnectionName is not specified");
-            errors.Add(DbToolsErrors.DatabaseConnectionNameIsNotSpecified);
-            return errors.ToArray();
+            return DbToolsErrors.DatabaseConnectionNameIsNotSpecified;
         }
 
-        OneOf<IDatabaseManager, ErrorOmd[]> createDatabaseManagerResult =
+        Result<IDatabaseManager> createDatabaseManagerResult =
             await DatabaseManagersFactory.CreateDatabaseManager(_appName, _logger, true, dbConnectionName,
                 _databaseServerConnections, _apiClients, _httpClientFactory, null, null, cancellationToken);
 
-        if (createDatabaseManagerResult.IsT1)
+        if (createDatabaseManagerResult.IsFailure)
         {
-            _logger.LogError("ErrorOmd in CreateDatabaseManager");
-            errors.AddRange(createDatabaseManagerResult.AsT1);
+            _logger.LogError("Error in CreateDatabaseManager");
+            errors.Add(createDatabaseManagerResult.Error);
         }
 
         if (string.IsNullOrWhiteSpace(_devDatabaseParameters.DatabaseName))
@@ -144,19 +140,12 @@ public sealed class DatabaseReCreatorMigrationToolCommand : MigrationToolCommand
 
         if (errors.Count > 0)
         {
-            return errors.ToArray();
+            return Result.CreateValidationError([.. errors]);
         }
 
-        IDatabaseManager? dbManager = createDatabaseManagerResult.AsT0;
+        IDatabaseManager dbManager = createDatabaseManagerResult.Value;
 
-        Option<ErrorOmd[]> changeDatabaseRecoveryModelResult = await dbManager.ChangeDatabaseRecoveryModel(
-            _devDatabaseParameters.DatabaseName, databaseRecoveryModel, cancellationToken);
-
-        if (changeDatabaseRecoveryModelResult.IsSome)
-        {
-            return (ErrorOmd[])changeDatabaseRecoveryModelResult;
-        }
-
-        return null;
+        return await dbManager.ChangeDatabaseRecoveryModel(_devDatabaseParameters.DatabaseName, databaseRecoveryModel,
+            cancellationToken);
     }
 }

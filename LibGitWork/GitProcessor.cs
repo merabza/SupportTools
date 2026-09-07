@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using LanguageExt;
 using Microsoft.Extensions.Logging;
-using OneOf;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibGitWork;
 
@@ -34,7 +32,7 @@ public sealed class GitProcessor
         LastRemoteId = GitGetRemoteId();
     }
 
-    //public OneOf<bool, ErrorOmd[]> NeedPull(bool updateRemote = false)
+    //public OneOf<bool, Error[]> NeedPull(bool updateRemote = false)
     //{
     //    if (updateRemote && !GitRemoteUpdate())
     //        return new[] { GitSyncToolActionErrors.CouldNotUpdateGitRemote };
@@ -134,20 +132,20 @@ fi*/
 
     private string? GitGetId(string parameters)
     {
-        OneOf<(string, int), ErrorOmd[]> localResult =
+        Result<(string, int)> localResult =
             StShared.RunProcessWithOutput(false, null, _git, $"{_switchToProjectPath} {parameters}");
-        if (!localResult.IsT1)
+        if (localResult.IsSuccess)
         {
-            return localResult.AsT0.Item1;
+            return localResult.Value.Item1;
         }
 
-        StShared.WriteErrorLine($"{_git} {parameters} ErrorOmd", _useConsole, _logger);
+        StShared.WriteErrorLine($"{_git} {parameters} Error", _useConsole, _logger);
         return null;
     }
 
     public bool GitRemoteUpdate()
     {
-        if (!StShared.RunProcess(false, _logger, _git, $"{_switchToProjectPath} remote update").IsSome)
+        if (StShared.RunProcess(false, _logger, _git, $"{_switchToProjectPath} remote update").IsSuccess)
         {
             return true;
         }
@@ -158,7 +156,7 @@ fi*/
 
     public bool Pull()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} pull").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} pull").IsSuccess)
         {
             return true;
         }
@@ -167,22 +165,22 @@ fi*/
         return false;
     }
 
-    public OneOf<string, ErrorOmd[]> GetRemoteOriginUrl()
+    public Result<string> GetRemoteOriginUrl()
     {
-        OneOf<(string, int), ErrorOmd[]> result = StShared.RunProcessWithOutput(false, null, _git,
+        Result<(string, int)> result = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} config --get remote.origin.url");
-        if (result.IsT1)
+        if (result.IsFailure)
         {
-            return result.AsT1;
+            return result.Error;
         }
 
-        return result.AsT0.Item1.Trim(Environment.NewLine.ToCharArray());
+        return result.Value.Item1.Trim(Environment.NewLine.ToCharArray());
     }
 
     public bool Commit(string commitMessage)
     {
         if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"")
-            .IsNone)
+            .IsSuccess)
         {
             return true;
         }
@@ -191,22 +189,22 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, ErrorOmd[]> NeedCommit()
+    public Result<bool> NeedCommit()
     {
-        OneOf<(string, int), ErrorOmd[]> gitStatusOutputResult =
+        Result<(string, int)> gitStatusOutputResult =
             StShared.RunProcessWithOutput(false, null, _git, $"{_switchToProjectPath} status --porcelain");
-        if (gitStatusOutputResult.IsT1)
+        if (gitStatusOutputResult.IsFailure)
         {
-            return gitStatusOutputResult.AsT1;
+            return gitStatusOutputResult.Error;
         }
 
-        string gitStatusOutput = gitStatusOutputResult.AsT0.Item1;
+        string gitStatusOutput = gitStatusOutputResult.Value.Item1;
         return !string.IsNullOrEmpty(gitStatusOutput);
     }
 
     public bool Add()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} add .").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} add .").IsSuccess)
         {
             return true;
         }
@@ -217,7 +215,7 @@ fi*/
 
     public bool Reset()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} reset").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} reset").IsSuccess)
         {
             return true;
         }
@@ -228,7 +226,7 @@ fi*/
 
     public bool Checkout()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} checkout .").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} checkout .").IsSuccess)
         {
             return true;
         }
@@ -239,7 +237,7 @@ fi*/
 
     public bool Clean_fdx()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} clean -fdx").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} clean -fdx").IsSuccess)
         {
             return true;
         }
@@ -248,30 +246,30 @@ fi*/
         return false;
     }
 
-    public OneOf<bool, ErrorOmd[]> HaveUnTrackedFiles()
+    public Result<bool> HaveUnTrackedFiles()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), ErrorOmd[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
+        Result<(string, int)> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} status --porcelain --untracked-files");
 
-        if (statusCommandOutputResult.IsT1)
+        if (statusCommandOutputResult.IsFailure)
         {
-            return statusCommandOutputResult.AsT1;
+            return statusCommandOutputResult.Error;
         }
 
-        string statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
+        string statusCommandOutput = statusCommandOutputResult.Value.Item1;
 
         return !string.IsNullOrWhiteSpace(statusCommandOutput);
     }
 
     public bool IsGitInitialized()
     {
-        return StShared.RunProcess(false, _logger, _git, $"{_switchToProjectPath} rev-parse").IsNone;
+        return StShared.RunProcess(false, _logger, _git, $"{_switchToProjectPath} rev-parse").IsSuccess;
     }
 
     private bool Push()
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} push").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} push").IsSuccess)
         {
             return true;
         }
@@ -282,7 +280,7 @@ fi*/
 
     public bool Clone(string remoteAddress)
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"clone {remoteAddress} {_projectPath}").IsNone)
+        if (StShared.RunProcess(_useConsole, _logger, _git, $"clone {remoteAddress} {_projectPath}").IsSuccess)
         {
             CheckRemoteId();
             return true;
@@ -354,18 +352,18 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
-    public OneOf<string[], ErrorOmd[]> GetRedundantCachedFilesList()
+    public Result<string[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
-        OneOf<(string, int), ErrorOmd[]> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
+        Result<(string, int)> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
             $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
 
-        if (statusCommandOutputResult.IsT1)
+        if (statusCommandOutputResult.IsFailure)
         {
-            return statusCommandOutputResult.AsT1;
+            return statusCommandOutputResult.Error;
         }
 
-        string statusCommandOutput = statusCommandOutputResult.AsT0.Item1;
+        string statusCommandOutput = statusCommandOutputResult.Value.Item1;
 
         return string.IsNullOrWhiteSpace(statusCommandOutput) ? [] : statusCommandOutput.Split(Environment.NewLine);
     }
@@ -375,7 +373,7 @@ fi*/
     public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
     {
         if (StShared.RunProcess(_useConsole, _logger, _git,
-                $"{_switchToProjectPath} rm --cached \"{redundantCachedFileName}\"").IsNone)
+                $"{_switchToProjectPath} rm --cached \"{redundantCachedFileName}\"").IsSuccess)
         {
             return true;
         }
@@ -384,21 +382,21 @@ fi*/
         return false;
     }
 
-    public Option<ErrorOmd[]> Initialise()
+    public Result Initialise()
     {
         return StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} init");
     }
 
     public bool IsFolderPartOfGitWorkingTree(string appFolderForDiffFullName)
     {
-        OneOf<(string, int), ErrorOmd[]> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, _git,
+        Result<(string, int)> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, _git,
             $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
-        if (isInsideWorkTreeResult.IsT1)
+        if (isInsideWorkTreeResult.IsFailure)
         {
             return false;
         }
 
-        (string, int) isInsideWorkTree = isInsideWorkTreeResult.AsT0;
+        (string, int) isInsideWorkTree = isInsideWorkTreeResult.Value;
 
         return isInsideWorkTree.Item2 == 0 && isInsideWorkTree.Item1 == "true" + Environment.NewLine;
     }

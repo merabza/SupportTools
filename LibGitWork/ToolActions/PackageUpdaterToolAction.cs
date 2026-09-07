@@ -3,12 +3,11 @@ using LibDotnetWork;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
-using OneOf;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.BackgroundTasks;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
-using SystemTools.SystemToolsShared.Errors;
 
 namespace LibGitWork.ToolActions;
 
@@ -56,9 +55,9 @@ public sealed class PackageUpdaterToolAction : ToolAction
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
-        OneOf<(string, int), ErrorOmd[]> localResult =
+        Result<(string, int)> localResult =
             dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
-        if (!localResult.IsT1)
+        if (localResult.IsSuccess)
         {
             return;
         }
