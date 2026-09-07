@@ -13,6 +13,6 @@ public class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStra
     public CliMenuCommand CreateMenuCommand()
     {
         return new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(logger, parametersManager,
-            menuParameters.ProjectGroupName);
+            menuParameters.ProjectName);
     }
 }
