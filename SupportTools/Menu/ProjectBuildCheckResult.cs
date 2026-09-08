@@ -19,6 +19,6 @@ public sealed class ProjectBuildCheckResult
     public int WarningCount { get; }
 
     //build გაეშვა და წარმატებით დასრულდა (გაფრთხილებების გარეშე ან გაფრთხილებებით)
-    public bool IsBuildSucceeded => Status is EProjectBuildCheckStatus.Success
-        or EProjectBuildCheckStatus.SuccessWithWarnings;
+    public bool IsBuildSucceeded =>
+        Status is EProjectBuildCheckStatus.Success or EProjectBuildCheckStatus.SuccessWithWarnings;
 }

@@ -79,8 +79,7 @@ public sealed class GitStsCruder : Cruder
 
             try
             {
-                Result<List<StsGitDataModel>> remoteGitReposResult =
-                    supportToolsServerApiClient.GetGitRepos().Result;
+                Result<List<StsGitDataModel>> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsSuccess)
                 {
                     return remoteGitReposResult.Value;

@@ -36,8 +36,8 @@ public static class ProjectBuildChecker
         }
     }
 
-    private static ProjectBuildCheckResult CheckProjectBuild(string projectName, string appName,
-        ProjectModel project, DotnetProcessor dotnetProcessor, bool noIncremental)
+    private static ProjectBuildCheckResult CheckProjectBuild(string projectName, string appName, ProjectModel project,
+        DotnetProcessor dotnetProcessor, bool noIncremental)
     {
         if (string.IsNullOrWhiteSpace(project.SolutionFileName))
         {

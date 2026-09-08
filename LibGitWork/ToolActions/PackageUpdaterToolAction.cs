@@ -55,8 +55,7 @@ public sealed class PackageUpdaterToolAction : ToolAction
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
-        Result<(string, int)> localResult =
-            dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
+        Result<(string, int)> localResult = dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
         if (localResult.IsSuccess)
         {
             return;

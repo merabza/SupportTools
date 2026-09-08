@@ -298,7 +298,8 @@ public static class DotnetToolsVersionsCheckerUpdater
 
         List<DotnetToolData> listOfTools =
         [
-            .. getToolsRawListResult.Value.Skip(2).Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+            .. getToolsRawListResult.Value.Skip(2)
+                .Select(line => line.Split(" ", StringSplitOptions.RemoveEmptyEntries))
                 .Where(lineParts => lineParts.Length == 3).Select(lineParts => new DotnetToolData
                 {
                     PackageId = lineParts[0],

@@ -79,8 +79,8 @@ public sealed class InstallServiceAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        Result<string> installServiceResult = await projectManager.InstallService(_projectName,
-            _environmentName, _serviceUserName, Path.GetFileName(_appSettingsJsonFileName), _programArchiveDateMask,
+        Result<string> installServiceResult = await projectManager.InstallService(_projectName, _environmentName,
+            _serviceUserName, Path.GetFileName(_appSettingsJsonFileName), _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature,
             _projectDescription, cancellationToken);
 

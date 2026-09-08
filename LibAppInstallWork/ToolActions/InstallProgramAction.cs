@@ -69,9 +69,9 @@ public sealed class InstallProgramAction : ToolAction
         }
 
         //Web-აგენტის საშუალებით ინსტალაციის პროცესის გაშვება.
-        Result<string> installProgramResult = await projectManager.InstallProgram(_projectName,
-            _environmentName, _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask,
-            _parametersFileExtension, cancellationToken);
+        Result<string> installProgramResult = await projectManager.InstallProgram(_projectName, _environmentName,
+            _programArchiveDateMask, _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension,
+            cancellationToken);
 
         if (installProgramResult.IsFailure)
         {

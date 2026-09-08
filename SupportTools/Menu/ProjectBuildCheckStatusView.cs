@@ -35,7 +35,7 @@ public static class ProjectBuildCheckStatusView
     //შედეგის ფერადი ნაწილები: სტატუსი და შეცდომებისა და გაფრთხილებების რაოდენობები (მხოლოდ ნულზე მეტი)
     public static List<StatusColorPart> BuildParts(ProjectBuildCheckResult result)
     {
-        List<StatusColorPart> parts = [new StatusColorPart(GetName(result.Status), GetColor(result.Status))];
+        List<StatusColorPart> parts = [new(GetName(result.Status), GetColor(result.Status))];
         AddCountParts(parts, result.ErrorCount, result.WarningCount);
         return parts;
     }

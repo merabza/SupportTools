@@ -22,8 +22,7 @@ public static class SeederRulesRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --log-folder \"{LogFolder}\"";
-        Result<(string, int)> processResult =
-            StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
+        Result<(string, int)> processResult = StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
         if (processResult.IsFailure)
         {
             StShared.WriteErrorLine($"DataSeederRules process failed for table '{tableName}'", true, logger);

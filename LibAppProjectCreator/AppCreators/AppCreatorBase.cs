@@ -339,7 +339,8 @@ public abstract class AppCreatorBase
                 continue;
             }
 
-            if (dotnetProcessor.AddReferenceToProject(refData.ProjectFilePath, refData.ReferenceProjectFilePath).IsFailure)
+            if (dotnetProcessor.AddReferenceToProject(refData.ProjectFilePath, refData.ReferenceProjectFilePath)
+                .IsFailure)
             {
                 return false;
             }

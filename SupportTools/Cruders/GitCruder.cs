@@ -64,8 +64,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
                     remoteGitRepos);
             }
 
-            Result<List<StsGitDataModel>> remoteGitReposResult =
-                supportToolsServerApiClient.GetGitRepos().Result;
+            Result<List<StsGitDataModel>> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
             if (remoteGitReposResult.IsSuccess)
             {
                 remoteGitRepos = remoteGitReposResult.Value;

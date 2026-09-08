@@ -65,8 +65,7 @@ public sealed class ServiceStopperToolCommand : ToolCommand
         }
 
         //Web-აგენტის საშუალებით პროცესის გაჩერების მცდელობა.
-        Result stopServiceResult =
-            await projectManager.StopService(projectName, environmentName, cancellationToken);
+        Result stopServiceResult = await projectManager.StopService(projectName, environmentName, cancellationToken);
         if (stopServiceResult.IsFailure)
         {
             _logger.LogError("Service {ProjectName}/{EnvironmentName} can not be stopped", projectName,

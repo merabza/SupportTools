@@ -26,8 +26,7 @@ public static class OldDataConvertorRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --connection-string \"{prodCopyConnectionString}\" --log-folder \"{LogFolder}\"";
-        Result<(string, int)> processResult =
-            StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
+        Result<(string, int)> processResult = StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
         if (processResult.IsFailure)
         {
             StShared.WriteErrorLine($"OldDataConvertor process failed for table '{tableName}'", true, logger);

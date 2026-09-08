@@ -44,8 +44,7 @@ public sealed class DotnetProcessor
             $"new {dotnetProjectType.ToString().ToLowerInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
     }
 
-    public Result AddProjectToSolution(string solutionPath, string? solutionFolderName,
-        string projectFileFullName)
+    public Result AddProjectToSolution(string solutionPath, string? solutionFolderName, string projectFileFullName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"sln {solutionPath} add {(solutionFolderName is null ? string.Empty : $"--solution-folder {solutionFolderName} ")}{projectFileFullName}");
@@ -159,8 +158,7 @@ public sealed class DotnetProcessor
     private static int? ParseCount(string line, string suffix)
     {
         return line.EndsWith(suffix, StringComparison.Ordinal) && int.TryParse(
-            line.AsSpan(0, line.Length - suffix.Length), NumberStyles.None, CultureInfo.InvariantCulture,
-            out int count)
+            line.AsSpan(0, line.Length - suffix.Length), NumberStyles.None, CultureInfo.InvariantCulture, out int count)
             ? count
             : null;
     }

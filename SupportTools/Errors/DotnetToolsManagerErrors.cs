@@ -8,12 +8,13 @@ public static class DotnetToolsManagerErrors
         Error.Problem(nameof(CreateListOfDotnetToolsError), "Error when Create List Of Dotnet Tools");
 
     public static readonly Error CreateListOfDotnetToolsInstalledError =
-        Error.Problem(nameof(CreateListOfDotnetToolsInstalledError), "Error when Create List Of Dotnet Tools Installed");
+        Error.Problem(nameof(CreateListOfDotnetToolsInstalledError),
+            "Error when Create List Of Dotnet Tools Installed");
 
     public static readonly Error PackageIdIsEmpty = Error.Problem(nameof(PackageIdIsEmpty), "Package Id Is Empty");
 
-    public static readonly Error GetAvailableVersionOfToolError =
-        Error.Problem(nameof(GetAvailableVersionOfToolError), "Error when detect Available Version Of Tool");
+    public static readonly Error GetAvailableVersionOfToolError = Error.Problem(nameof(GetAvailableVersionOfToolError),
+        "Error when detect Available Version Of Tool");
 
     public static Error CheckVersionsForOneToolError(string toolName)
     {

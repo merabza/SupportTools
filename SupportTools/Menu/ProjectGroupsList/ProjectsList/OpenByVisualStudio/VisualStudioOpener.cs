@@ -22,8 +22,8 @@ public static class VisualStudioOpener
 
         if (File.Exists(vswherePath))
         {
-            Result<(string, int)> runProcessWithOutputResult = StShared.RunProcessWithOutput(true, logger,
-                vswherePath, "-latest -products * -requires Microsoft.Component.MSBuild -property installationPath");
+            Result<(string, int)> runProcessWithOutputResult = StShared.RunProcessWithOutput(true, logger, vswherePath,
+                "-latest -products * -requires Microsoft.Component.MSBuild -property installationPath");
 
             if (runProcessWithOutputResult.IsSuccess)
             {
