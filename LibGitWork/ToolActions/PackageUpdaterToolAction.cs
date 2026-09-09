@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using LibDotnetWork;
 using LibGitData;
 using LibGitWork.ToolCommandParameters;
@@ -14,6 +17,9 @@ namespace LibGitWork.ToolActions;
 public sealed class PackageUpdaterToolAction : ToolAction
 {
     private const string CSharp = "CSharp";
+
+    //dotnet outdated-ის შიდა race დროებითია, განმეორება თითქმის ყოველთვის გადის
+    private const int MaxAttempts = 3;
     private readonly string _gitIgnorePathName;
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
@@ -44,23 +50,71 @@ public sealed class PackageUpdaterToolAction : ToolAction
         return null;
     }
 
-    public void RunPackageUpdate()
+    //აბრუნებს false-ს, თუ dotnet outdated ყველა ცდაზე ჩავარდა. პაუზა არ კეთდება, რომ დანარჩენი რეპოების დამუშავება
+    //არ შეფერხდეს - ჩავარდნილი რეპოების შეჯამებას UpdateOutdatedPackagesToolAction ბოლოს ბეჭდავს
+    public bool RunPackageUpdate()
     {
-        //_projectFolderName
-
         if (_gitIgnorePathName != CSharp)
         {
-            return;
+            return true;
         }
 
         var dotnetProcessor = new DotnetProcessor(_logger, true);
 
-        Result<(string, int)> localResult = dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName);
-        if (localResult.IsSuccess)
+        RestoreBeforeOutdated(dotnetProcessor);
+
+        for (int attempt = 1; attempt <= MaxAttempts; attempt++)
+        {
+            Result<(string, int)> localResult =
+                dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName, false);
+            if (localResult.IsSuccess)
+            {
+                return true;
+            }
+
+            string message =
+                $"dotnet outdated failed for {_projectFolderName} (attempt {attempt} of {MaxAttempts}){Environment.NewLine}{localResult.Error.Description}";
+            if (attempt < MaxAttempts)
+            {
+                StShared.WriteWarningLine(message, true, _logger);
+            }
+            else
+            {
+                StShared.WriteErrorLine(message, true, _logger, false);
+            }
+        }
+
+        return false;
+    }
+
+    //dotnet outdated პროექტებს პარალელურად აანალიზებს და თითოეულზე რეკურსიულ restore-ს უშვებს, რომლებიც საერთო
+    //obj-ფაილებზე ერთმანეთს ეჯახება ("Cannot create a file when that file already exists"). წინასწარი restore ამ
+    //გაშვებებს no-op-ად აქცევს. კეთდება მხოლოდ მაშინ, როცა ფოლდერში ზუსტად ერთი სოლუშენია; ჩავარდნა არ აჩერებს,
+    //dotnet outdated მაინც გაეშვება
+    private void RestoreBeforeOutdated(DotnetProcessor dotnetProcessor)
+    {
+        if (!Directory.Exists(_projectFolderName))
         {
             return;
         }
 
-        StShared.WriteErrorLine($"dotnet outdated finished with errors for {_projectFolderName})", true, _logger);
+        List<string> solutionFiles = [.. Directory.EnumerateFiles(_projectFolderName).Where(IsSolutionFile)];
+        if (solutionFiles.Count != 1)
+        {
+            return;
+        }
+
+        if (dotnetProcessor.RestoreForOutdated(solutionFiles[0]).IsFailure)
+        {
+            StShared.WriteWarningLine($"restore before dotnet outdated failed for {solutionFiles[0]}, continuing", true,
+                _logger);
+        }
+    }
+
+    private static bool IsSolutionFile(string fileName)
+    {
+        string extension = Path.GetExtension(fileName);
+        return extension.Equals(".sln", StringComparison.OrdinalIgnoreCase) ||
+               extension.Equals(".slnx", StringComparison.OrdinalIgnoreCase);
     }
 }

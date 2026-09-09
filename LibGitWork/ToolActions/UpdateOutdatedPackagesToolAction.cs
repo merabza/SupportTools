@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.BackgroundTasks;
+using SystemTools.SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
 
@@ -59,6 +60,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         var projectGitProjectNames = new Dictionary<string, List<string>>();
         //var updatedGitProjectNames = new List<string>();
         const EGitCol gitCol = EGitCol.Main;
+        var failedGitProjectNames = new List<string>();
 
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
@@ -87,7 +89,10 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
                 var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
                     gitCol, gitProjectName, true);
-                packageUpdaterToolAction?.RunPackageUpdate();
+                if (packageUpdaterToolAction is null || !packageUpdaterToolAction.RunPackageUpdate())
+                {
+                    failedGitProjectNames.Add(gitProjectName);
+                }
 
                 foreach (KeyValuePair<string, List<string>> pair in projectGitProjectNames)
                 {
@@ -125,7 +130,15 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         //    packageUpdater.Run();
         //}
 
-        return true;
+        if (failedGitProjectNames.Count == 0)
+        {
+            return true;
+        }
+
+        //ჩავარდნილი რეპოების შეჯამება ბოლოს, ერთი პაუზით
+        StShared.WriteErrorLine($"dotnet outdated failed for: {string.Join(", ", failedGitProjectNames)}", true,
+            _logger);
+        return false;
     }
 
     private IEnumerable<KeyValuePair<string, ProjectModel>> GetProjectsList()

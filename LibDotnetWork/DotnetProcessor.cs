@@ -99,9 +99,20 @@ public sealed class DotnetProcessor
             $"ef database update --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
-    public Result<(string, int)> UpdateOutdatedPackagesForProjectFolder(string projectFolderName)
+    public Result<(string, int)> UpdateOutdatedPackagesForProjectFolder(string projectFolderName, bool useErrorLine)
     {
-        return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"outdated -r -u {projectFolderName}");
+        return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"outdated -r -u {projectFolderName}", null,
+            useErrorLine);
+    }
+
+    //dotnet outdated ანალიზისას თითო პროექტზე პარალელურად უშვებს "dotnet msbuild <proj> /p:NoWarn=NU1605
+    // /p:TreatWarningsAsErrors=false /t:Restore,GenerateRestoreGraphFile"-ს. იმავე თვისებებით წინასწარი restore-ის შემდეგ
+    //ეს გაშვებები no-op-ია და საერთო obj-ფაილებზე აღარ ეჯახება (თვისებების გარეშე restore-ისას NuGet-ის dgspec ჰეში
+    //განსხვავდება და restore ხელახლა კეთდება). useErrorLine=false - ჩავარდნისას პაუზა არ კეთდება
+    public Result RestoreForOutdated(string solutionFileFullName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            $"restore {solutionFileFullName} -p:NoWarn=NU1605 -p:TreatWarningsAsErrors=false", null, false);
     }
 
     public Result RunToolUsingParametersFile(string projectFilePath, string projectParametersFilePath)

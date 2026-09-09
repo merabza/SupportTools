@@ -115,12 +115,17 @@ Use during routine maintenance to bump dependencies.
 **What it does**
 
 * Syncs all Git repositories first (so updates land on current code)
-* Iterates over projects and identifies dependencies
-* Updates NuGet package versions in each `.csproj`
-* Re-syncs after each project's updates
+* Iterates over Git repositories; for each one runs `dotnet restore` on
+its solution (only when the folder holds exactly one `.sln`/`.slnx`) and
+then `dotnet outdated -r -u`, up to 3 attempts without pausing
+* Re-syncs after each repository's updates
+* Prints the repositories where `dotnet outdated` still failed at the end
 
-This is `.csproj`-based; it does **not** invoke `dotnet outdated`, and
-it does **not** consult `Directory.Packages.props` centrally.
+The pre-restore uses the same MSBuild properties as `dotnet outdated`, so
+the tool's parallel per-project restores become no-ops and stop colliding
+on shared `obj` files ("Cannot create a file when that file already
+exists"). When a run fails, the tool's own error text (its stderr) is
+shown with the error.
 
 **Common pitfalls**
 
