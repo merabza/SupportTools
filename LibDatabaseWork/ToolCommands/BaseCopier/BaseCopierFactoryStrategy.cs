@@ -23,7 +23,7 @@ public class BaseCopierFactoryStrategy
         _httpClientFactory = httpClientFactory;
     }
 
-    protected async ValueTask<IToolCommand> CreateToolCommand(IParametersManager parametersManager,
+    protected async ValueTask<IToolCommand?> CreateToolCommand(IParametersManager parametersManager,
         DatabaseParameters fromDatabaseParameters, DatabaseParameters toDatabaseParameters,
         CancellationToken cancellationToken = default)
     {

@@ -27,7 +27,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         _menuParameters = menuParameters;
     }
 
-    public override CliMenuSet GetSubMenu()
+    public override CliMenuSet? GetSubMenu()
     {
         _menuParameters.ProjectGroupName = _projectGroupName;
         return CliMenuSetFactory.CreateMenuSet(_projectGroupName,

@@ -31,7 +31,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         _menuParameters = menuParameters;
     }
 
-    public override CliMenuSet GetSubMenu()
+    public override CliMenuSet? GetSubMenu()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         ProjectModel? project = parameters.GetProject(_projectName);

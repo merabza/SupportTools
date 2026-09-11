@@ -15,7 +15,7 @@ public class ExternalScaffoldSeedToolCommandFactoryStrategy
         _logger = logger;
     }
 
-    protected IToolCommand CreateToolCommand(IParametersManager parametersManager, string projectName,
+    protected IToolCommand? CreateToolCommand(IParametersManager parametersManager, string projectName,
         Func<string, string>? externalToolProjectNameCounter, string? externalToolProjectDefFilePath = null,
         string? externalToolProjectDefParametersFilePath = null)
     {

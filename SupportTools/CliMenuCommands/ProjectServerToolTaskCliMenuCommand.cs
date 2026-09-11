@@ -5,6 +5,7 @@ using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 
 namespace SupportTools.CliMenuCommands;
 
@@ -29,7 +30,7 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
         _serviceProvider = serviceProvider;
     }
 
-    private async ValueTask<IToolCommand> MemoCreateToolCommand()
+    private async ValueTask<IToolCommand?> MemoCreateToolCommand()
     {
         _toolCommand ??= await ToolCommandFactory.CreateProjectServerToolCommand(_tool, _serviceProvider,
             _parametersManager, _projectName, _serverInfo);
@@ -43,7 +44,13 @@ public sealed class ProjectServerToolTaskCliMenuCommand : CliMenuCommand
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
-        IToolCommand toolCommand = await MemoCreateToolCommand();
-        return await toolCommand.Run(cancellationToken);
+        IToolCommand? toolCommand = await MemoCreateToolCommand();
+        if (toolCommand is not null)
+        {
+            return await toolCommand.Run(cancellationToken);
+        }
+
+        StShared.WriteErrorLine("Tool command not created. Tool not started.", true);
+        return false;
     }
 }
