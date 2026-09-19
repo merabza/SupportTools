@@ -21,7 +21,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         EDatabaseProvider prodCopyDatabaseDataProvider, string prodCopyDatabaseConnectionString, int prodCommandTimeout,
         string newDataSeedingClassLibProjectName, SmartSchema smartSchemaForLocal,
         string excludesRulesParametersFilePath, string fakeHostProjectName, string? migrationSqlFilesFolder,
-        GitProjects gitProjects, GitRepos gitRepos, Dictionary<string, string> gitIgnoreModelFilePaths,
+        GitProjects gitProjects, GitRepos gitRepos, string? folderForGitignoreFiles, List<string> gitIgnoreModels,
         string? gitExecutablePath = null)
     {
         LogFolder = logFolder;
@@ -46,7 +46,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         MigrationSqlFilesFolder = migrationSqlFilesFolder;
         GitProjects = gitProjects;
         GitRepos = gitRepos;
-        GitIgnoreModelFilePaths = gitIgnoreModelFilePaths;
+        FolderForGitignoreFiles = folderForGitignoreFiles;
+        GitIgnoreModels = gitIgnoreModels;
         GitExecutablePath = gitExecutablePath;
     }
 
@@ -69,7 +70,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public SmartSchema SmartSchemaForLocal { get; }
     public GitProjects GitProjects { get; }
     public GitRepos GitRepos { get; }
-    public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
+    public string? FolderForGitignoreFiles { get; }
+    public List<string> GitIgnoreModels { get; }
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
     public string FakeHostProjectName { get; }
@@ -199,8 +201,8 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
                 supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName,
                 project.MigrationSqlFilesFolder, gitProjects,
                 GitRepos.Create(logger, supportToolsParameters.Gits, project.SpaProjectFolderRelativePath(gitProjects),
-                    useConsole, false), supportToolsParameters.GitIgnoreModelFilePaths,
-                supportToolsParameters.GitExecutablePath);
+                    useConsole, false), supportToolsParameters.FolderForGitignoreFiles,
+                supportToolsParameters.GitIgnoreModels, supportToolsParameters.GitExecutablePath);
             return scaffoldSeederCreatorParameters;
         }
         catch (Exception e)

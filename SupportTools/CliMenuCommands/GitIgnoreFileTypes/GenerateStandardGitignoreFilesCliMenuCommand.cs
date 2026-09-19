@@ -31,13 +31,13 @@ public sealed class GenerateStandardGitignoreFilesCliMenuCommand : CliMenuComman
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var standardGitignoreFilesGenerator = new StandardGitignoreFilesGenerator(_logger, parameters);
-        if (!standardGitignoreFilesGenerator.Generate() && Inputer.InputBool("Continue ans Save Changes?", false))
+        if (!standardGitignoreFilesGenerator.Generate() && !Inputer.InputBool("Continue and Save Changes?", false))
         {
             return false;
         }
 
         //შენახვა
-        await _parametersManager.Save(parameters, "RunTimes generated success", null, cancellationToken);
+        await _parametersManager.Save(parameters, ".gitignore files generated success", null, cancellationToken);
         return true;
     }
 }

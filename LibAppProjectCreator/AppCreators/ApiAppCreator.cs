@@ -15,6 +15,7 @@ using LibGitData.Models;
 using LibGitWork;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
 namespace LibAppProjectCreator.AppCreators;
@@ -257,19 +258,28 @@ public sealed class ApiAppCreator : AppCreatorBase
     {
         Console.WriteLine("Coping .gitignore file...");
 
-        Dictionary<string, string> gitIgnoreModelFilePaths =
-            _apiAppCreatorData.AppCreatorBaseData.GitIgnoreModelFilePaths;
+        AppCreatorBaseData appCreatorBaseData = _apiAppCreatorData.AppCreatorBaseData;
         const string gitignore = ".gitignore";
 
-        if (!gitIgnoreModelFilePaths.TryGetValue(gitignoreFileKey, out string? value))
+        if (!appCreatorBaseData.GitIgnoreModels.Contains(gitignoreFileKey))
         {
-            Logger.LogError("gitIgnoreModelFilePaths are not contains {GitignoreFileKey} key", gitignoreFileKey);
+            Logger.LogError("GitIgnoreModels are not contains {GitignoreFileKey}", gitignoreFileKey);
             return false;
         }
 
+        if (string.IsNullOrWhiteSpace(appCreatorBaseData.FolderForGitignoreFiles))
+        {
+            Logger.LogError("FolderForGitignoreFiles is empty");
+            return false;
+        }
+
+        string value =
+            SupportToolsParameters.GetGitIgnoreModelFilePath(appCreatorBaseData.FolderForGitignoreFiles,
+                gitignoreFileKey);
+
         if (!File.Exists(value))
         {
-            Logger.LogError("{GitIgnoreModelFilePathsGitignoreFileKey} file is not found", value);
+            Logger.LogError("{GitIgnoreModelFilePath} file is not found", value);
             return false;
         }
 

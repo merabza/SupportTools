@@ -28,20 +28,23 @@ public sealed class StandardGitignoreFilesGenerator
             return false;
         }
 
-        string cSharpGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "CSharp.gitignore");
+        string cSharpGitIgnoreFileName =
+            SupportToolsParameters.GetGitIgnoreModelFilePath(_parameters.FolderForGitignoreFiles, "CSharp");
         var createCSharpGitIgnoreFile = new CreateCSharpGitIgnoreFile(_logger, cSharpGitIgnoreFileName);
-        bool allSuccess = !TryAdd("CSharp", cSharpGitIgnoreFileName, createCSharpGitIgnoreFile);
+        bool allSuccess = TryAdd("CSharp", cSharpGitIgnoreFileName, createCSharpGitIgnoreFile);
 
-        string reactGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "React.gitignore");
+        string reactGitIgnoreFileName =
+            SupportToolsParameters.GetGitIgnoreModelFilePath(_parameters.FolderForGitignoreFiles, "React");
         var createReactGitIgnoreFile = new CreateReactGitIgnoreFile(_logger, reactGitIgnoreFileName);
-        if (TryAdd("React", reactGitIgnoreFileName, createReactGitIgnoreFile))
+        if (!TryAdd("React", reactGitIgnoreFileName, createReactGitIgnoreFile))
         {
             allSuccess = false;
         }
 
-        string defaultGitIgnoreFileName = Path.Combine(_parameters.FolderForGitignoreFiles, "Default.gitignore");
+        string defaultGitIgnoreFileName =
+            SupportToolsParameters.GetGitIgnoreModelFilePath(_parameters.FolderForGitignoreFiles, "Default");
         var createDefaultGitIgnoreFile = new CreateDefaultGitIgnoreFile(_logger, defaultGitIgnoreFileName);
-        if (TryAdd("Default", defaultGitIgnoreFileName, createDefaultGitIgnoreFile))
+        if (!TryAdd("Default", defaultGitIgnoreFileName, createDefaultGitIgnoreFile))
         {
             allSuccess = false;
         }
@@ -51,12 +54,17 @@ public sealed class StandardGitignoreFilesGenerator
 
     private bool TryAdd(string recordName, string gitIgnoreFileFillName, ToolAction createGitIgnoreFileToolAction)
     {
-        _parameters.GitIgnoreModelFilePaths.TryAdd(recordName, gitIgnoreFileFillName);
+        if (!_parameters.GitIgnoreModels.Contains(recordName))
+        {
+            _parameters.GitIgnoreModels.Add(recordName);
+        }
+
         if (File.Exists(gitIgnoreFileFillName) &&
-            Inputer.InputBool($".gitignore file with name {gitIgnoreFileFillName} is already Exists. Regenerate?",
+            !Inputer.InputBool($".gitignore file with name {gitIgnoreFileFillName} is already Exists. Regenerate?",
                 false))
         {
-            return false;
+            //არსებული ფაილის თავიდან შექმნაზე უარი შეცდომა არ არის
+            return true;
         }
 
         return createGitIgnoreFileToolAction.Run(CancellationToken.None).Result;

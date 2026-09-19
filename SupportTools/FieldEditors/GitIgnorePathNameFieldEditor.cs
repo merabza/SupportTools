@@ -25,7 +25,7 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
     {
         string? currentGitIgnorePathName = GetValue(recordForUpdate);
 
-        var gitIgnorePathsCruder = GitIgnoreFilePathsCruder.Create(_logger, _parametersManager);
+        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _parametersManager);
 
         SetValue(recordForUpdate,
             await gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName, null, false,
@@ -41,7 +41,7 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
             return string.Empty;
         }
 
-        var gitIgnorePathsCruder = GitIgnoreFilePathsCruder.Create(_logger, _parametersManager);
+        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _parametersManager);
 
         string status = gitIgnorePathsCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";

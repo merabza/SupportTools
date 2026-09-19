@@ -12,6 +12,7 @@ using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
 using SystemTools.BackgroundTasks;
+using SystemTools.SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
 
@@ -41,9 +42,17 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
             return false;
         }
 
-        var gitIgnoreFiles = new List<StsGitIgnoreFileTypeDataModel>();
-        foreach ((string key, string fileName) in supportToolsParameters.GitIgnoreModelFilePaths)
+        string? folderForGitignoreFiles = supportToolsParameters.FolderForGitignoreFiles;
+        if (string.IsNullOrWhiteSpace(folderForGitignoreFiles))
         {
+            StShared.WriteErrorLine("supportToolsParameters.FolderForGitignoreFiles is empty", true, Logger);
+            return false;
+        }
+
+        var gitIgnoreFiles = new List<StsGitIgnoreFileTypeDataModel>();
+        foreach (string key in supportToolsParameters.GitIgnoreModels)
+        {
+            string fileName = SupportToolsParameters.GetGitIgnoreModelFilePath(folderForGitignoreFiles, key);
             string content = File.Exists(fileName)
                 ? await File.ReadAllTextAsync(fileName, cancellationToken)
                 : string.Empty;

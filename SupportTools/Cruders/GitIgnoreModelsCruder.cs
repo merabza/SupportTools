@@ -12,32 +12,32 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
 
-public sealed class GitIgnoreFilePathsCruder : SimpleNamesWithDescriptionsCruder
+public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
 {
-    private readonly Dictionary<string, string> _currentValuesDict;
+    private readonly List<string> _currentValuesList;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
-    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
+    //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesListFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
-    public GitIgnoreFilePathsCruder(ILogger logger, IParametersManager parametersManager,
-        Dictionary<string, string> currentValuesDict) : base("GitIgnore File Path", "GitIgnore File Paths", "Path")
+    public GitIgnoreModelsCruder(ILogger logger, IParametersManager parametersManager,
+        List<string> currentValuesList) : base("GitIgnore Model", "GitIgnore Models")
     {
         _logger = logger;
         _parametersManager = parametersManager;
-        _currentValuesDict = currentValuesDict;
+        _currentValuesList = currentValuesList;
     }
 
-    public static GitIgnoreFilePathsCruder Create(ILogger logger, IParametersManager parametersManager)
+    public static GitIgnoreModelsCruder Create(ILogger logger, IParametersManager parametersManager)
     {
-        return new GitIgnoreFilePathsCruder(logger, parametersManager,
-            ((SupportToolsParameters)parametersManager.Parameters).GitIgnoreModelFilePaths);
+        return new GitIgnoreModelsCruder(logger, parametersManager,
+            ((SupportToolsParameters)parametersManager.Parameters).GitIgnoreModels);
     }
 
-    protected override Dictionary<string, string> GetDictionary()
+    protected override List<string> GetList()
     {
-        return _currentValuesDict;
+        return _currentValuesList;
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

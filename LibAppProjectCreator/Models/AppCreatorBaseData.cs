@@ -8,21 +8,24 @@ namespace LibAppProjectCreator.Models;
 public sealed class AppCreatorBaseData
 {
     private AppCreatorBaseData(string workPath, string securityPath, string solutionPath,
-        Dictionary<string, string> gitIgnoreModelFilePaths)
+        string? folderForGitignoreFiles, List<string> gitIgnoreModels)
     {
         WorkPath = workPath;
         SecurityPath = securityPath;
         SolutionPath = solutionPath;
-        GitIgnoreModelFilePaths = gitIgnoreModelFilePaths;
+        FolderForGitignoreFiles = folderForGitignoreFiles;
+        GitIgnoreModels = gitIgnoreModels;
     }
 
     public string WorkPath { get; }
     public string SecurityPath { get; }
     public string SolutionPath { get; }
-    public Dictionary<string, string> GitIgnoreModelFilePaths { get; }
+    public string? FolderForGitignoreFiles { get; }
+    public List<string> GitIgnoreModels { get; }
 
     public static AppCreatorBaseData? Create(ILogger logger, string workFolderPath, string projectName,
-        string solutionFolderName, string securityWorkFolderPath, Dictionary<string, string> gitIgnoreModelFilePaths)
+        string solutionFolderName, string securityWorkFolderPath, string? folderForGitignoreFiles,
+        List<string> gitIgnoreModels)
     {
         //შევამოწმოთ და თუ არ არსებობს შევქმნათ სამუშაო ფოლდერი
         if (!StShared.CreateFolder(workFolderPath, true))
@@ -47,6 +50,7 @@ public sealed class AppCreatorBaseData
         //დავიანგარიშოთ სოლუშენის ფოლდერის სრული გზა
         string solutionPath = Path.Combine(workPath, solutionFolderName);
 
-        return new AppCreatorBaseData(workPath, securityPath, solutionPath, gitIgnoreModelFilePaths);
+        return new AppCreatorBaseData(workPath, securityPath, solutionPath, folderForGitignoreFiles,
+            gitIgnoreModels);
     }
 }

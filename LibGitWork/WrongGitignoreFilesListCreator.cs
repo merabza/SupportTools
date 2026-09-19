@@ -30,7 +30,14 @@ public sealed class WrongGitignoreFilesListCreator
     {
         var supportToolsParameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        Dictionary<string, string> gitIgnoreModelFilePaths = supportToolsParameters.GitIgnoreModelFilePaths;
+        string? folderForGitignoreFiles = supportToolsParameters.FolderForGitignoreFiles;
+        if (string.IsNullOrWhiteSpace(folderForGitignoreFiles))
+        {
+            StShared.WriteErrorLine("supportToolsParameters.FolderForGitignoreFiles is empty", true, _logger, false);
+            return [];
+        }
+
+        List<string> gitIgnoreModels = supportToolsParameters.GitIgnoreModels;
 
         Dictionary<string, ProjectModel> projectsList = supportToolsParameters.Projects;
         var gitIgnoreTemplateFileContents = new Dictionary<string, string>();
@@ -70,10 +77,13 @@ public sealed class WrongGitignoreFilesListCreator
                 foreach (GitData gd in gitData.OrderBy(x => x.GitProjectFolderName))
                 {
                     string gitIgnorePathName = gd.GitIgnorePathName;
-                    if (!gitIgnoreModelFilePaths.TryGetValue(gitIgnorePathName, out string? gitIgnoreTemplateFileName))
+                    if (!gitIgnoreModels.Contains(gitIgnorePathName))
                     {
                         continue;
                     }
+
+                    string gitIgnoreTemplateFileName =
+                        SupportToolsParameters.GetGitIgnoreModelFilePath(folderForGitignoreFiles, gitIgnorePathName);
 
                     if (missingGitIgnoreTemplateFiles.ContainsKey(gitIgnorePathName))
                     {

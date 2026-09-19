@@ -35,7 +35,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? TempFolder { get; set; }
     public string? CodeGenerateTestFolder { get; set; }
     public string? SecurityFolder { get; set; }
-    public string? GitIgnoreFilesFolder { get; set; }
     public string? ScaffoldSeedersWorkFolder { get; set; }
     public string? PublisherWorkFolder { get; set; }
     public string? ServiceDescriptionSignature { get; set; }
@@ -61,7 +60,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, string> NpmPackages { get; init; } = [];
     public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
-    public Dictionary<string, string> GitIgnoreModelFilePaths { get; init; } = [];
+    public List<string> GitIgnoreModels { get; init; } = [];
     public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
@@ -254,5 +253,11 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public static string FixProjectGroupName(string? projectGroupName)
     {
         return string.IsNullOrWhiteSpace(projectGroupName) ? "__No Group__" : projectGroupName;
+    }
+
+    //.gitignore მოდელის ფაილის სრული გზა: {FolderForGitignoreFiles}\{gitIgnoreModelName}.gitignore
+    public static string GetGitIgnoreModelFilePath(string folderForGitignoreFiles, string gitIgnoreModelName)
+    {
+        return Path.Combine(folderForGitignoreFiles, $"{gitIgnoreModelName}.gitignore");
     }
 }

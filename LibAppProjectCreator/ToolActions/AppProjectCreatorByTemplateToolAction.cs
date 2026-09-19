@@ -131,7 +131,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         AppCreatorBase? appCreator = AppCreatorFactory.CreateAppCreator(_logger, _httpClientFactory, par, templateModel,
             GitProjects.Create(_logger, supportToolsParameters.GitProjects),
             GitRepos.Create(_logger, supportToolsParameters.Gits, null, UseConsole, false), mediatRLicenseKey,
-            supportToolsParameters.GitIgnoreModelFilePaths);
+            supportToolsParameters.FolderForGitignoreFiles, supportToolsParameters.GitIgnoreModels);
 
         if (appCreator is null)
         {

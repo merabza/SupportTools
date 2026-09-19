@@ -45,7 +45,6 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.TempFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.CodeGenerateTestFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.SecurityFolder)));
-        FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.GitIgnoreFilesFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.ScaffoldSeedersWorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.PublisherWorkFolder)));
         FieldEditors.Add(new TextFieldEditor(nameof(SupportToolsParameters.ServiceDescriptionSignature)));
@@ -112,9 +111,9 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(
             nameof(SupportToolsParameters.RunTimes), x => new RunTimeCruder(parametersManager, x)));
 
-        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<GitIgnoreFilePathsCruder>(
-            nameof(SupportToolsParameters.GitIgnoreModelFilePaths),
-            x => new GitIgnoreFilePathsCruder(logger, parametersManager, x)));
+        FieldEditors.Add(new SimpleNamesListFieldEditor<GitIgnoreModelsCruder>(
+            nameof(SupportToolsParameters.GitIgnoreModels),
+            x => new GitIgnoreModelsCruder(logger, parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(
             nameof(SupportToolsParameters.Environments), x => new EnvironmentCruder(parametersManager, x)));

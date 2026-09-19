@@ -15,10 +15,10 @@ public static class AppCreatorFactory
 {
     public static AppCreatorBase? CreateAppCreator(ILogger logger, IHttpClientFactory httpClientFactory,
         AppProjectCreatorData par, TemplateModel template, GitProjects gitProjects, GitRepos gitRepos,
-        string? mediatRLicenseKey, Dictionary<string, string> gitIgnoreModelFilePaths)
+        string? mediatRLicenseKey, string? folderForGitignoreFiles, List<string> gitIgnoreModels)
     {
         var appCreatorBaseData = AppCreatorBaseData.Create(logger, par.WorkFolderPath, par.ProjectName,
-            par.SolutionFolderName, par.SecurityWorkFolderPath, gitIgnoreModelFilePaths);
+            par.SolutionFolderName, par.SecurityWorkFolderPath, folderForGitignoreFiles, gitIgnoreModels);
 
         if (appCreatorBaseData is not null)
         {
