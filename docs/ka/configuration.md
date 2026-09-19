@@ -25,12 +25,12 @@
 
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
-|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
+|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
 |ბრძანებების ისტორია|`RecentCommandsFileName`, `RecentCommandsCount`|მენიუს ისტორია|
 |არქივები|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|პაკეტირების კონვენციები|
 |კოლექციები|`Projects`, `Servers`, `Gits`, `GitProjects`|რეგისტრირებული პროექტები, server ჩანაწერები, git რეპოები, პერ-პროექტი git mapping-ები|
-|შაბლონები|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnoreModels`|პროექტის creator-ის შენატანი|
+|შაბლონები|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`|პროექტის creator-ის შენატანი|
 |ინფრასტრუქტურა|`DotnetTools`, `ApiClients`, `Archivers`, `DatabaseServerConnections`, `FileStorages`, `SmartSchemas`|გადასაბუნებელი გაზიარებული რესურსები|
 
 \---
@@ -91,7 +91,9 @@ swap-ის თვალყურის დევნება მიგრაც
 
 * `GitProjectAddress` — clone URL (SSH ან HTTPS)
 * `GitProjectFolderName` — ლოკალური ფოლდერის სახელი clone-ისთვის
-* `GitIgnorePathName` — მითითება კონფიგურირებულ `.gitignore` შაბლონზე
+* `GitIgnorePatternName` — მითითება კონფიგურირებულ `.gitignore` შაბლონზე
+(ერთ-ერთი `GitIgnorePatterns` სიიდან; მისი ფაილია
+`{FolderForGitignoreFiles}\{GitIgnorePatternName}.gitignore`)
 
 **`GitProjectDataModel`** — git რეპოს და მასში არსებული `.csproj`
 ფაილების mapping:

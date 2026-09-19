@@ -115,11 +115,31 @@ ignores missing properties and uses defaults for new ones
 
 ## Testing
 
-There's no integrated test project in this repo. The `stryker-report/`
-folder exists but is empty and not wired into any pipeline (see
-[Code Quality](use-cases/code-quality.md)).
+Unit tests live in the `SupportTools.Tests` project (xUnit + Moq),
+which is part of `SupportTools.slnx`:
 
-Verification is currently manual: build + run + exercise the menu.
+```bash
+dotnet test SupportTools.slnx
+```
+
+Coverage is still thin — only a few menu commands have tests — so
+verification is mostly manual: build + run + exercise the menu.
+
+When adding tests:
+
+* The test project inherits the strict build from
+`Directory.Build.props` (every analyzer warning is an error). Test
+names like `Method_State_Expected` are fine — `CA1707` is disabled in
+`.editorconfig`.
+* `SupportTools.csproj` exposes its `internal` members to
+`SupportTools.Tests` (`InternalsVisibleTo`).
+* `Inputer` prompts read the console directly (`Console.ReadKey`),
+which fails in the test host. To test an interactive menu command,
+give it an internal constructor that takes the input functions — see
+`SaveGitIgnoreAsNewTemplateCliMenuCommand`.
+
+The `stryker-report/` folder exists but is empty and not wired into any
+pipeline (see [Code Quality](use-cases/code-quality.md)).
 
 \---
 

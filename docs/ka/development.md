@@ -118,11 +118,31 @@ Newtonsoft.Json იგნორირებს გამოტოვებულ
 
 ## ტესტირება
 
-ამ რეპოში არ არის ინტეგრირებული სატესტო პროექტი. `stryker-report/`
-ფოლდერი არსებობს, მაგრამ ცარიელია და არცერთ pipeline-ში არ არის
-ჩართული (იხ. [კოდის ხარისხი](use-cases/code-quality.md)).
+unit ტესტები `SupportTools.Tests` პროექტშია (xUnit + Moq), რომელიც
+`SupportTools.slnx`-ის ნაწილია:
 
-დადასტურება ამჟამად ხელითაა: build + run + მენიუს გავლა.
+```bash
+dotnet test SupportTools.slnx
+```
+
+დაფარვა ჯერ მწირია — ტესტები მხოლოდ რამდენიმე მენიუს ბრძანებას აქვს —
+ამიტომ დადასტურება ძირითადად ისევ ხელითაა: build + run + მენიუს გავლა.
+
+ტესტების დამატებისას:
+
+* სატესტო პროექტზე `Directory.Build.props`-იდან იგივე მკაცრი build
+ვრცელდება (ანალიზატორის ყველა გაფრთხილება შეცდომაა). ტესტების
+სახელები `Method_State_Expected` ფორმით დასაშვებია — `CA1707`
+`.editorconfig`-ში გამორთულია.
+* `SupportTools.csproj` თავის `internal` წევრებს `SupportTools.Tests`-ს
+უხსნის (`InternalsVisibleTo`).
+* `Inputer`-ის მოთხოვნები კონსოლს პირდაპირ კითხულობს (`Console.ReadKey`),
+რაც სატესტო ჰოსტში არ მუშაობს. ინტერაქტიული მენიუს ბრძანების
+გასატესტად მიეცი მას internal კონსტრუქტორი, რომელიც შეყვანის
+ფუნქციებს იღებს — იხ. `SaveGitIgnoreAsNewTemplateCliMenuCommand`.
+
+`stryker-report/` ფოლდერი არსებობს, მაგრამ ცარიელია და არცერთ
+pipeline-ში არ არის ჩართული (იხ. [კოდის ხარისხი](use-cases/code-quality.md)).
 
 \---
 

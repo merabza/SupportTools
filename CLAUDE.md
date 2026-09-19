@@ -15,7 +15,7 @@ dotnet build SupportTools.slnx
 dotnet run --project SupportTools/SupportTools.csproj
 ```
 
-There is **no test project and no test runner** in this repo. The `stryker-report/` directory is empty and unwired. Verification is manual: build + run + exercise the menu.
+Unit tests live in `SupportTools.Tests` (xUnit + Moq; `dotnet test SupportTools.slnx`). Coverage is thin — only a few menu commands — so verification is still mostly manual: build + run + exercise the menu. `Inputer` prompts read the console directly (`Console.ReadKey`) and fail in the test host; to test an interactive command, give it an internal constructor that takes the input functions, as `SaveGitIgnoreAsNewTemplateCliMenuCommand` does (`SupportTools.csproj` already has `InternalsVisibleTo` for the test project). The `stryker-report/` directory is empty and unwired.
 
 ## Critical: sibling-repo layout
 

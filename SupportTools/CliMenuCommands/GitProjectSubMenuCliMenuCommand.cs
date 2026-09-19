@@ -38,6 +38,10 @@ public sealed class GitProjectSubMenuCliMenuCommand : CliMenuCommand
         gitProjectSubMenuSet.AddMenuItem(new GitSyncCliMenuCommand(_logger, _parametersManager, _projectName,
             _gitProjectName, _gitCol));
 
+        //მიმდინარე გიტის .gitignore ფაილის ახალ შაბლონად შენახვა
+        gitProjectSubMenuSet.AddMenuItem(new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger, _parametersManager,
+            _projectName, _gitProjectName, _gitCol));
+
         //პროექტის მენიუში დაბრუნება
         gitProjectSubMenuSet.AddEscapeCommand("Exit to Git menu");
 

@@ -83,6 +83,7 @@
   <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
   <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
   <Project Path="LibTools/LibTools.csproj" />
+  <Project Path="SupportTools.Tests/SupportTools.Tests.csproj" />
   <Project Path="SupportTools/SupportTools.csproj" />
   <Project Path="SupportToolsData/SupportToolsData.csproj" />
 </Solution>
