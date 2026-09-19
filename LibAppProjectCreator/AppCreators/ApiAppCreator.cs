@@ -261,9 +261,9 @@ public sealed class ApiAppCreator : AppCreatorBase
         AppCreatorBaseData appCreatorBaseData = _apiAppCreatorData.AppCreatorBaseData;
         const string gitignore = ".gitignore";
 
-        if (!appCreatorBaseData.GitIgnoreModels.Contains(gitignoreFileKey))
+        if (!appCreatorBaseData.GitIgnorePatterns.Contains(gitignoreFileKey))
         {
-            Logger.LogError("GitIgnoreModels are not contains {GitignoreFileKey}", gitignoreFileKey);
+            Logger.LogError("GitIgnorePatterns are not contains {GitignoreFileKey}", gitignoreFileKey);
             return false;
         }
 

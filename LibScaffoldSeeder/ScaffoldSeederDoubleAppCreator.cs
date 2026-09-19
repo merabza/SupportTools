@@ -72,7 +72,7 @@ public sealed class ScaffoldSeederDoubleAppCreator : DoubleAppCreator
         var appCreatorBaseData = AppCreatorBaseData.Create(_logger, appCreatorParameters.WorkFolderPath,
             _scaffoldSeederFolderName, appCreatorParameters.SolutionFolderName,
             appCreatorParameters.SecurityWorkFolderPath, _ssParameters.FolderForGitignoreFiles,
-            _ssParameters.GitIgnoreModels);
+            _ssParameters.GitIgnorePatterns);
 
         if (appCreatorBaseData is null)
         {

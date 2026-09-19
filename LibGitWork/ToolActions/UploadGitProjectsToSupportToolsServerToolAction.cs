@@ -50,7 +50,7 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
         }
 
         var gitIgnoreFiles = new List<StsGitIgnoreFileTypeDataModel>();
-        foreach (string key in supportToolsParameters.GitIgnoreModels)
+        foreach (string key in supportToolsParameters.GitIgnorePatterns)
         {
             string fileName = SupportToolsParameters.GetGitIgnoreModelFilePath(folderForGitignoreFiles, key);
             string content = File.Exists(fileName)

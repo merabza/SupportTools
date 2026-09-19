@@ -54,9 +54,9 @@ public sealed class StandardGitignoreFilesGenerator
 
     private bool TryAdd(string recordName, string gitIgnoreFileFillName, ToolAction createGitIgnoreFileToolAction)
     {
-        if (!_parameters.GitIgnoreModels.Contains(recordName))
+        if (!_parameters.GitIgnorePatterns.Contains(recordName))
         {
-            _parameters.GitIgnoreModels.Add(recordName);
+            _parameters.GitIgnorePatterns.Add(recordName);
         }
 
         if (File.Exists(gitIgnoreFileFillName) &&

@@ -14,14 +14,14 @@ public sealed class AppCreatorBaseData
         SecurityPath = securityPath;
         SolutionPath = solutionPath;
         FolderForGitignoreFiles = folderForGitignoreFiles;
-        GitIgnoreModels = gitIgnoreModels;
+       GitIgnorePatterns = gitIgnoreModels;
     }
 
     public string WorkPath { get; }
     public string SecurityPath { get; }
     public string SolutionPath { get; }
     public string? FolderForGitignoreFiles { get; }
-    public List<string> GitIgnoreModels { get; }
+    public List<string>GitIgnorePatterns { get; }
 
     public static AppCreatorBaseData? Create(ILogger logger, string workFolderPath, string projectName,
         string solutionFolderName, string securityWorkFolderPath, string? folderForGitignoreFiles,

@@ -32,7 +32,7 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
     public static GitIgnoreModelsCruder Create(ILogger logger, IParametersManager parametersManager)
     {
         return new GitIgnoreModelsCruder(logger, parametersManager,
-            ((SupportToolsParameters)parametersManager.Parameters).GitIgnoreModels);
+            ((SupportToolsParameters)parametersManager.Parameters).GitIgnorePatterns);
     }
 
     protected override List<string> GetList()

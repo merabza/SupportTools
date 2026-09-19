@@ -37,7 +37,7 @@ public sealed class WrongGitignoreFilesListCreator
             return [];
         }
 
-        List<string> gitIgnoreModels = supportToolsParameters.GitIgnoreModels;
+        List<string> gitIgnoreModels = supportToolsParameters.GitIgnorePatterns;
 
         Dictionary<string, ProjectModel> projectsList = supportToolsParameters.Projects;
         var gitIgnoreTemplateFileContents = new Dictionary<string, string>();

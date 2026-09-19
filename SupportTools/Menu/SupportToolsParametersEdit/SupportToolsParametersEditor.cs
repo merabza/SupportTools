@@ -112,7 +112,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             nameof(SupportToolsParameters.RunTimes), x => new RunTimeCruder(parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesListFieldEditor<GitIgnoreModelsCruder>(
-            nameof(SupportToolsParameters.GitIgnoreModels),
+            nameof(SupportToolsParameters.GitIgnorePatterns),
             x => new GitIgnoreModelsCruder(logger, parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(

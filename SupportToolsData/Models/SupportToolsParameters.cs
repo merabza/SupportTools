@@ -60,7 +60,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, string> NpmPackages { get; init; } = [];
     public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
-    public List<string> GitIgnoreModels { get; init; } = [];
+    public List<string>GitIgnorePatterns { get; init; } = [];
     public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
