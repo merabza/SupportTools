@@ -30,7 +30,7 @@ public sealed class PackageUpdaterToolAction : ToolAction
     {
         _logger = logger;
         _projectFolderName = Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName);
-        _gitIgnorePathName = gitSyncParameters.GitData.GitIgnorePathName;
+        _gitIgnorePathName = gitSyncParameters.GitData.GitIgnorePatternName;
     }
 
     public static PackageUpdaterToolAction? Create(ILogger? logger, ParametersManager parametersManager,

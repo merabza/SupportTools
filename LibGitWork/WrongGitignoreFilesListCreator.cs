@@ -76,7 +76,7 @@ public sealed class WrongGitignoreFilesListCreator
                     gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value);
                 foreach (GitData gd in gitData.OrderBy(x => x.GitProjectFolderName))
                 {
-                    string gitIgnorePathName = gd.GitIgnorePathName;
+                    string gitIgnorePathName = gd.GitIgnorePatternName;
                     if (!gitIgnoreModels.Contains(gitIgnorePathName))
                     {
                         continue;

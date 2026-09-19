@@ -84,7 +84,7 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
                         continue;
                     }
 
-                    if (git.GitIgnorePathName == name)
+                    if (git.GitIgnorePatternName == name)
                     {
                         usageCount++;
                     }

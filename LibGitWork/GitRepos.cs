@@ -38,9 +38,9 @@ public sealed class GitRepos
                 continue;
             }
 
-            if (string.IsNullOrWhiteSpace(gitData.GitIgnorePathName))
+            if (string.IsNullOrWhiteSpace(gitData.GitIgnorePatternName))
             {
-                StShared.WriteErrorLine($"GitIgnorePathName is empty for Git Repo with key {gitProjectName})",
+                StShared.WriteErrorLine($"GitIgnorePatternName is empty for Git Repo with key {gitProjectName})",
                     useConsole, logger);
                 continue;
             }
@@ -73,7 +73,7 @@ public sealed class GitRepos
                     GitProjectAddress = gitData.GitProjectAddress,
                     GitProjectFolderName = gitProjectFolderName,
                     GitProjectName = gitProjectFolderName,
-                    GitIgnorePathName = gitData.GitIgnorePathName
+                    GitIgnorePatternName = gitData.GitIgnorePatternName
                 });
         }
 

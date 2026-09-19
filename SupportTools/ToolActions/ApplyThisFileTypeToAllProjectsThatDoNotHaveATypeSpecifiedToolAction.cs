@@ -30,10 +30,10 @@ public sealed class ApplyThisFileTypeToAllProjectsThatDoNotHaveATypeSpecifiedToo
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         bool isAnyChanged = false;
-        foreach ((string _, GitDataModel git) in parameters.Gits.Where(x => x.Value.GitIgnorePathName is null))
+        foreach ((string _, GitDataModel git) in parameters.Gits.Where(x => x.Value.GitIgnorePatternName is null))
         {
             isAnyChanged = true;
-            git.GitIgnorePathName = _gitIgnoreFileName;
+            git.GitIgnorePatternName = _gitIgnoreFileName;
         }
 
         if (isAnyChanged)

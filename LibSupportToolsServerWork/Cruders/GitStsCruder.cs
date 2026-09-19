@@ -54,7 +54,7 @@ public sealed class GitStsCruder : Cruder
             ItemData (v) => new GitDataModel
             {
                 GitProjectAddress = v.GitProjectAddress,
-                GitIgnorePathName = v.GitIgnorePathName,
+                GitIgnorePatternName = v.GitIgnorePatternName,
                 GitProjectFolderName = v.GitProjectFolderName
             });
     }
@@ -155,9 +155,9 @@ public sealed class GitStsCruder : Cruder
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(model.GitIgnorePathName))
+        if (string.IsNullOrWhiteSpace(model.GitIgnorePatternName))
         {
-            StShared.WriteErrorLine("GitIgnorePathName is not entered", true);
+            StShared.WriteErrorLine("GitIgnorePatternName is not entered", true);
             return;
         }
 
@@ -175,7 +175,7 @@ public sealed class GitStsCruder : Cruder
 
         var gitDataDomain = new StsGitDataModel
         {
-            GitIgnorePathName = model.GitIgnorePathName,
+            GitIgnorePatternName = model.GitIgnorePatternName,
             GitProjectAddress = model.GitProjectAddress,
             GitProjectFolderName = model.GitProjectFolderName,
             GitProjectName = recordKey

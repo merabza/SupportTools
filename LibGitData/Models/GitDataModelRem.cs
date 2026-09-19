@@ -6,7 +6,7 @@
 //{
 //    public string? GitProjectAddress { get; set; }
 //    public string? GitProjectFolderName { get; set; }
-//    public string? GitIgnorePathName { get; set; }
+//    public string? GitIgnorePatternName { get; set; }
 //    public string? GitProjectRemoteName { get; set; }
 //    public required string GitProjectName { get; set; }
 //}
