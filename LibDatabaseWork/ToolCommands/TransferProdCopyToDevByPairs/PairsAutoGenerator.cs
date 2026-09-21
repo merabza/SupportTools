@@ -46,16 +46,18 @@ internal static class PairsAutoGenerator
             }
 
             Dictionary<string, string> devColumnLookup =
-                devTable.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c);
+                devTable.Columns.ToDictionary(c => c.ToUpperInvariant(), c => c);
 
             var pairedFields = new Dictionary<string, PairedField>();
             foreach (string prodColumn in prodCopyTable.Columns)
             {
-                if (devColumnLookup.TryGetValue(prodColumn.ToLowerInvariant(), out string? devColumn))
+                if (!devColumnLookup.TryGetValue(prodColumn.ToUpperInvariant(), out string? devColumn))
                 {
-                    var pairedField = new PairedField(prodColumn, devColumn);
-                    pairedFields.Add(pairedField.GetItemKey(), pairedField);
+                    continue;
                 }
+
+                var pairedField = new PairedField(prodColumn, devColumn);
+                pairedFields.Add(pairedField.GetItemKey(), pairedField);
             }
 
             var pairedTable = new PairedTable(prodCopyTable.SchemaName, prodCopyTable.TableName, devTable.SchemaName,

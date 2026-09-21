@@ -137,6 +137,11 @@ names like `Method_State_Expected` are fine — `CA1707` is disabled in
 which fails in the test host. To test an interactive menu command,
 give it an internal constructor that takes the input functions — see
 `SaveGitIgnoreAsNewTemplateCliMenuCommand`.
+* `Console.SetOut` is process-wide and xUnit runs test classes in
+parallel. A test class that captures console output must carry
+`[Collection(ConsoleCaptureCollection.Name)]` — that collection runs
+with parallelization disabled, so captured output is never mixed up or
+written to an already disposed writer.
 
 The `stryker-report/` folder exists but is empty and not wired into any
 pipeline (see [Code Quality](use-cases/code-quality.md)).

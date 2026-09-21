@@ -1,111 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using LibGitData;
-using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
-using SupportTools.CliMenuCommands;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData.Models;
 using Xunit;
 
-namespace SupportTools.Tests.CliMenuCommands;
+namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 
 [Collection(ConsoleCaptureCollection.Name)]
-public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
+public sealed class SaveEditorConfigAsNewTemplateCliMenuCommandTests : IDisposable
 {
-    private const string ProjectName = "TestProject";
-    private const string GitProjectName = "MyGit";
-    private const string MenuName = "Save .gitignore as New Template";
+    private const string ProjectName = EditorConfigTestEnvironment.ProjectName;
+    private const string MenuName = "Save .editorconfig as New Template";
     private const string NewTemplateName = "NewTemplate";
 
     //mixed line endings, non-ASCII text and no trailing newline: the template must be a byte-exact copy
-    private static readonly byte[] SourceGitIgnoreContent = [.. "bin/\r\nobj/\n# ქართული\n*.user"u8];
+    private static readonly byte[] SourceEditorConfigContent =
+        [.. "root = true\r\n[*.cs]\n# ქართული\nindent_size = 4"u8];
 
     private readonly Queue<bool> _boolAnswers = new();
     private readonly List<(string FieldName, bool DefaultValue)> _boolPrompts = [];
-    private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+    private readonly EditorConfigTestEnvironment _env = new();
     private readonly Mock<ILogger> _logger = new();
-    private readonly TextWriter _originalConsoleOutput;
-    private readonly SupportToolsParameters _parameters;
-    private readonly Mock<IParametersManager> _parametersManager = new();
-    private readonly string _rootFolder;
-    private readonly string _sourceGitIgnoreFileName;
-    private readonly string _templatesFolder;
     private readonly Queue<Func<string?, string?>> _textAnswers = new();
     private readonly List<(string FieldName, string? DefaultValue)> _textPrompts = [];
 
-    public SaveGitIgnoreAsNewTemplateCliMenuCommandTests()
+    public SaveEditorConfigAsNewTemplateCliMenuCommandTests()
     {
-        _rootFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
-        string gitsFolder = Path.Combine(_rootFolder, "gits");
-        _templatesFolder = Path.Combine(_rootFolder, "templates");
-        _sourceGitIgnoreFileName = Path.Combine(gitsFolder, GitProjectName, ".gitignore");
-        Directory.CreateDirectory(Path.Combine(gitsFolder, GitProjectName));
-        Directory.CreateDirectory(_templatesFolder);
-        File.WriteAllBytes(_sourceGitIgnoreFileName, SourceGitIgnoreContent);
-
-        _parameters = new SupportToolsParameters
-        {
-            FolderForGitignoreFiles = _templatesFolder,
-            GitIgnorePatterns = { "CSharp", "React" },
-            Projects =
-            {
-                [ProjectName] = new ProjectModel
-                {
-                    ProjectFolderName = gitsFolder, GitProjectNames = { GitProjectName }
-                }
-            },
-            Gits =
-            {
-                [GitProjectName] = new GitDataModel
-                {
-                    GitProjectAddress = "MyGitRemoteAddress",
-                    GitProjectFolderName = GitProjectName,
-                    GitIgnorePatternName = "CSharp"
-                }
-            }
-        };
-
-        _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
-        SetupSaveResult(true);
-
-        _originalConsoleOutput = Console.Out;
-        Console.SetOut(_consoleOutput);
+        _env.Parameters.EditorConfigPatterns.Add("React");
+        File.WriteAllBytes(_env.EditorConfigFileName, SourceEditorConfigContent);
     }
+
+    private SupportToolsParameters Parameters => _env.Parameters;
 
     public void Dispose()
     {
-        Console.SetOut(_originalConsoleOutput);
-        _consoleOutput.Dispose();
-        Directory.Delete(_rootFolder, true);
+        _env.Dispose();
     }
 
     [Fact]
     public void Constructor_WhenCreated_SetsMenuNameAndReloadsMenuAfterRun()
     {
         // Act
-        SaveGitIgnoreAsNewTemplateCliMenuCommand sut = CreateSut();
+        SaveEditorConfigAsNewTemplateCliMenuCommand sut = CreateSut();
 
         // Assert
         Assert.Equal(MenuName, sut.Name);
         Assert.Equal(EMenuAction.Reload, sut.MenuActionOnBodySuccess);
         Assert.Equal(EMenuAction.Reload, sut.MenuActionOnBodyFail);
+        Assert.Equal(ProjectName, sut.ParentMenuName);
     }
 
     [Fact]
     public void PublicConstructor_WhenCreated_SetsMenuName()
     {
         // Act
-        var sut = new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object,
-            ProjectName, GitProjectName, EGitCol.Main);
+        var sut = new SaveEditorConfigAsNewTemplateCliMenuCommand(_logger.Object, _env.ParametersManager.Object,
+            ProjectName);
 
         // Assert
         Assert.Equal(MenuName, sut.Name);
@@ -115,11 +74,11 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task RunBody_WhenFolderForGitignoreFilesIsNotSpecified_ReturnsFalseWithoutAskingName(
-        string? folderForGitignoreFiles)
+    public async Task RunBody_WhenFolderForEditorConfigFilesIsNotSpecified_ReturnsFalseWithoutAskingName(
+        string? folderForEditorConfigFiles)
     {
         // Arrange
-        _parameters.FolderForGitignoreFiles = folderForGitignoreFiles;
+        Parameters.FolderForEditorConfigFiles = folderForEditorConfigFiles;
 
         // Act
         bool result = await InvokeRunBody(CreateSut());
@@ -127,14 +86,14 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Empty(_textPrompts);
-        Assert.Contains("FolderForGitignoreFiles is not specified", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("FolderForEditorConfigFiles is not specified", _env.ConsoleText(), StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task RunBody_WhenGitIsNotInProject_ReturnsFalseWithoutAskingName()
+    public async Task RunBody_WhenProjectIsNotFound_ReportsItAndReturnsFalse()
     {
         // Arrange
-        _parameters.Projects[ProjectName].GitProjectNames.Clear();
+        Parameters.Projects.Clear();
 
         // Act
         bool result = await InvokeRunBody(CreateSut());
@@ -142,28 +101,33 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Empty(_textPrompts);
+        Assert.Contains($"Project {ProjectName} does not found", _env.ConsoleText(), StringComparison.Ordinal);
     }
 
-    [Fact]
-    public async Task RunBody_WhenGitHasNoGitIgnorePatternName_ReportsItAndReturnsFalse()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task RunBody_WhenProjectHasNoSolutionFile_ReportsItAndReturnsFalse(string? solutionFileName)
     {
         // Arrange
-        _parameters.Gits[GitProjectName].GitIgnorePatternName = null;
+        Parameters.Projects[ProjectName] = new ProjectModel { SolutionFileName = solutionFileName };
 
         // Act
         bool result = await InvokeRunBody(CreateSut());
 
         // Assert
         Assert.False(result);
-        Assert.Contains($"GitIgnorePatternName is empty for Git Repo with key {GitProjectName}", ConsoleText(),
+        Assert.Empty(_textPrompts);
+        Assert.Contains($"Project {ProjectName} does not have a solution file", _env.ConsoleText(),
             StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task RunBody_WhenGitFolderHasNoGitIgnoreFile_ReturnsFalseWithoutAskingName()
+    public async Task RunBody_WhenSolutionFolderHasNoEditorConfigFile_ReturnsFalseWithoutAskingName()
     {
         // Arrange
-        File.Delete(_sourceGitIgnoreFileName);
+        File.Delete(_env.EditorConfigFileName);
 
         // Act
         bool result = await InvokeRunBody(CreateSut());
@@ -171,11 +135,12 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Empty(_textPrompts);
-        Assert.Contains($"File {_sourceGitIgnoreFileName} does not exist", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains($"File {_env.EditorConfigFileName} does not exist", _env.ConsoleText(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task RunBody_WhenAskingName_OffersGitProjectNameAsDefault()
+    public async Task RunBody_WhenAskingName_OffersProjectNameAsDefault()
     {
         // Arrange
         AnswerWithDefault();
@@ -185,12 +150,12 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         (string fieldName, string? defaultValue) = Assert.Single(_textPrompts);
-        Assert.Equal("New .gitignore Template Name", fieldName);
-        Assert.Equal(GitProjectName, defaultValue);
+        Assert.Equal("New .editorconfig Template Name", fieldName);
+        Assert.Equal(ProjectName, defaultValue);
     }
 
     [Fact]
-    public async Task RunBody_WhenDefaultNameAccepted_CopiesGitIgnoreToTemplateFile()
+    public async Task RunBody_WhenDefaultNameAccepted_CopiesEditorConfigToTemplateFile()
     {
         // Arrange
         AnswerWithDefault();
@@ -200,21 +165,21 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(SourceGitIgnoreContent, await File.ReadAllBytesAsync(TemplateFileName(GitProjectName)));
+        Assert.Equal(SourceEditorConfigContent, await File.ReadAllBytesAsync(TemplateFileName(ProjectName)));
     }
 
     [Fact]
-    public async Task RunBody_WhenDefaultNameAccepted_AddsTemplateNameToGitIgnorePatterns()
+    public async Task RunBody_WhenDefaultNameAccepted_AddsTemplateNameToEditorConfigPatterns()
     {
         // Arrange
-        string[] expected = ["CSharp", "React", GitProjectName];
+        string[] expected = ["CSharp", "React", ProjectName];
         AnswerWithDefault();
 
         // Act
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 
     [Fact]
@@ -227,30 +192,48 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await InvokeRunBody(CreateSut());
 
         // Assert
-        _parametersManager.Verify(
-            x => x.Save(_parameters, $".gitignore template {GitProjectName} created", null,
+        _env.ParametersManager.Verify(
+            x => x.Save(Parameters, $".editorconfig template {ProjectName} created", null,
                 It.IsAny<CancellationToken>()), Times.Once);
         Assert.Empty(_boolPrompts);
     }
 
     [Fact]
-    public async Task RunBody_WhenTemplateCreated_KeepsGitIgnorePatternNameOfGit()
+    public async Task RunBody_WhenTemplateCreated_KeepsEditorConfigPatternNameOfProject()
     {
         // Arrange
-        AnswerWithDefault();
+        AnswerText(NewTemplateName);
 
         // Act
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal("CSharp", _parameters.Gits[GitProjectName].GitIgnorePatternName);
+        Assert.Equal(EditorConfigTestEnvironment.PatternName, Parameters.Projects[ProjectName].EditorConfigPatternName);
+    }
+
+    //EditorConfigPatternName is optional: a project without it is still a valid template source
+    [Fact]
+    public async Task RunBody_WhenProjectHasNoEditorConfigPatternName_CreatesTemplateAndLeavesItUnset()
+    {
+        // Arrange
+        Parameters.Projects[ProjectName].EditorConfigPatternName = null;
+        AnswerWithDefault();
+
+        // Act
+        bool result = await InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Null(Parameters.Projects[ProjectName].EditorConfigPatternName);
     }
 
     [Fact]
     public async Task RunBody_WhenSavingParametersFails_ReturnsFalse()
     {
         // Arrange
-        SetupSaveResult(false);
+        _env.ParametersManager
+            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(false);
         AnswerWithDefault();
 
         // Act
@@ -276,7 +259,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         // Assert
         Assert.True(result);
         Assert.Equal(2, _textPrompts.Count);
-        Assert.Contains("Template name is empty", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("Template name is empty", _env.ConsoleText(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -289,7 +272,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Contains(NewTemplateName, _parameters.GitIgnorePatterns);
+        Assert.Contains(NewTemplateName, Parameters.EditorConfigPatterns);
         Assert.True(File.Exists(TemplateFileName(NewTemplateName)));
     }
 
@@ -309,16 +292,15 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains($"Template with name {usedName} already exists", ConsoleText(), StringComparison.Ordinal);
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
+        Assert.Contains($"Template with name {usedName} already exists", _env.ConsoleText(),
+            StringComparison.Ordinal);
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 
     [Fact]
     public async Task RunBody_WhenNameAlreadyUsedIgnoringCase_KeepsExistingTemplateFile()
     {
         // Arrange
-        string existingTemplateFileName = TemplateFileName("CSharp");
-        await File.WriteAllTextAsync(existingTemplateFileName, "existing template");
         AnswerText("csharp");
         AnswerText(NewTemplateName);
 
@@ -326,7 +308,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal("existing template", await File.ReadAllTextAsync(existingTemplateFileName));
+        Assert.Equal(EditorConfigTestEnvironment.TemplateContent, await File.ReadAllTextAsync(_env.TemplateFileName));
     }
 
     //'|' is invalid in Windows file names; at index 0 it also guards the ">= 0" boundary of the check
@@ -345,9 +327,9 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains($"Template name {invalidName} contains invalid file name characters", ConsoleText(),
+        Assert.Contains($"Template name {invalidName} contains invalid file name characters", _env.ConsoleText(),
             StringComparison.Ordinal);
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 
     [Fact]
@@ -361,7 +343,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await Assert.ThrowsAsync<DataInputEscapeException>(() => InvokeRunBody(CreateSut()));
 
         // Assert
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 
     [Fact]
@@ -410,14 +392,14 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
-        _parametersManager.Verify(
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
+        _env.ParametersManager.Verify(
             x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
                 It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task RunBody_WhenOverwriteConfirmed_ReplacesFileWithGitIgnoreCopy()
+    public async Task RunBody_WhenOverwriteConfirmed_ReplacesFileWithEditorConfigCopy()
     {
         // Arrange
         string templateFileName = await CreateOrphanTemplateFile();
@@ -429,11 +411,11 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(SourceGitIgnoreContent, await File.ReadAllBytesAsync(templateFileName));
+        Assert.Equal(SourceEditorConfigContent, await File.ReadAllBytesAsync(templateFileName));
     }
 
     [Fact]
-    public async Task RunBody_WhenOverwriteConfirmed_AddsTemplateNameToGitIgnorePatterns()
+    public async Task RunBody_WhenOverwriteConfirmed_AddsTemplateNameToEditorConfigPatterns()
     {
         // Arrange
         string[] expected = ["CSharp", "React", "Orphan"];
@@ -445,15 +427,15 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         await InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal(expected, _parameters.GitIgnorePatterns);
+        Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 
     [Fact]
     public async Task RunBody_WhenTemplatesFolderDoesNotExist_CreatesItWithTemplateFile()
     {
         // Arrange
-        string missingTemplatesFolder = Path.Combine(_rootFolder, "missing", "templates");
-        _parameters.FolderForGitignoreFiles = missingTemplatesFolder;
+        string missingTemplatesFolder = Path.Combine(_env.RootFolder, "missing", "templates");
+        Parameters.FolderForEditorConfigFiles = missingTemplatesFolder;
         AnswerWithDefault();
 
         // Act
@@ -461,8 +443,8 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(SourceGitIgnoreContent,
-            await File.ReadAllBytesAsync(Path.Combine(missingTemplatesFolder, $"{GitProjectName}.gitignore")));
+        Assert.Equal(SourceEditorConfigContent,
+            await File.ReadAllBytesAsync(Path.Combine(missingTemplatesFolder, $"{ProjectName}.editorconfig")));
     }
 
     [Fact]
@@ -470,9 +452,9 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
     {
         // Arrange
         //a folder cannot be created below an existing file
-        string blockingFileName = Path.Combine(_rootFolder, "blocking-file");
+        string blockingFileName = Path.Combine(_env.RootFolder, "blocking-file");
         await File.WriteAllTextAsync(blockingFileName, string.Empty);
-        _parameters.FolderForGitignoreFiles = Path.Combine(blockingFileName, "templates");
+        Parameters.FolderForEditorConfigFiles = Path.Combine(blockingFileName, "templates");
         AnswerWithDefault();
 
         // Act
@@ -480,45 +462,21 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains("[ERROR]", ConsoleText(), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task RunBody_WhenGitIsScaffoldSeederGit_CopiesGitIgnoreFromScaffoldSeederFolder()
-    {
-        // Arrange
-        //ScaffoldSeeder gits live in {ScaffoldSeedersWorkFolder}\{ScaffoldSeederProjectName}\{ScaffoldSeederProjectName}ScaffoldSeeder
-        byte[] seederGitIgnoreContent = [.. "seeder-only/"u8];
-        string scaffoldSeedersWorkFolder = Path.Combine(_rootFolder, "seeders");
-        string seederGitFolder = Path.Combine(scaffoldSeedersWorkFolder, "Seeder", "SeederScaffoldSeeder", GitProjectName);
-        Directory.CreateDirectory(seederGitFolder);
-        await File.WriteAllBytesAsync(Path.Combine(seederGitFolder, ".gitignore"), seederGitIgnoreContent);
-        _parameters.ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
-        ProjectModel project = _parameters.Projects[ProjectName];
-        project.ScaffoldSeederProjectName = "Seeder";
-        project.ScaffoldSeederGitProjectNames = [GitProjectName];
-        AnswerWithDefault();
-
-        // Act
-        bool result = await InvokeRunBody(CreateSut(EGitCol.ScaffoldSeed));
-
-        // Assert
-        Assert.True(result);
-        Assert.Equal(seederGitIgnoreContent, await File.ReadAllBytesAsync(TemplateFileName(GitProjectName)));
+        Assert.Contains("[ERROR]", _env.ConsoleText(), StringComparison.Ordinal);
     }
 
     //RunBody is protected, and its result is not observable through Run(): success and failure both reload the menu
-    private static async Task<bool> InvokeRunBody(SaveGitIgnoreAsNewTemplateCliMenuCommand sut)
+    private static async Task<bool> InvokeRunBody(SaveEditorConfigAsNewTemplateCliMenuCommand sut)
     {
-        MethodInfo runBody = typeof(SaveGitIgnoreAsNewTemplateCliMenuCommand).GetMethod("RunBody",
+        MethodInfo runBody = typeof(SaveEditorConfigAsNewTemplateCliMenuCommand).GetMethod("RunBody",
             BindingFlags.Instance | BindingFlags.NonPublic)!;
         return await (ValueTask<bool>)runBody.Invoke(sut, [CancellationToken.None])!;
     }
 
-    private SaveGitIgnoreAsNewTemplateCliMenuCommand CreateSut(EGitCol gitCol = EGitCol.Main)
+    private SaveEditorConfigAsNewTemplateCliMenuCommand CreateSut()
     {
-        return new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object, ProjectName,
-            GitProjectName, gitCol, InputText, InputBool);
+        return new SaveEditorConfigAsNewTemplateCliMenuCommand(_logger.Object, _env.ParametersManager.Object,
+            ProjectName, InputText, InputBool);
     }
 
     private string? InputText(string fieldName, string? defaultValue)
@@ -544,13 +502,6 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         _textAnswers.Enqueue(_ => text);
     }
 
-    private void SetupSaveResult(bool result)
-    {
-        _parametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(result);
-    }
-
     private async Task<string> CreateOrphanTemplateFile()
     {
         string templateFileName = TemplateFileName("Orphan");
@@ -560,11 +511,6 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
     private string TemplateFileName(string templateName)
     {
-        return Path.Combine(_templatesFolder, $"{templateName}.gitignore");
-    }
-
-    private string ConsoleText()
-    {
-        return _consoleOutput.ToString();
+        return Path.Combine(_env.TemplatesFolder, $"{templateName}.editorconfig");
     }
 }

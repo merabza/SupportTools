@@ -379,7 +379,10 @@ public sealed class PackageDistributor
             return null;
         }
 
+        //NuGet-ის flat container-ის URL-ში პაკეტის id პატარა ასოებით ეწერება
+#pragma warning disable CA1308
         var uri = new Uri($"{packageBaseAddress}/{packageId.ToLowerInvariant()}/index.json");
+#pragma warning restore CA1308
 
         // ReSharper disable once using
         using HttpClient client = _httpClientFactory.CreateClient();

@@ -40,8 +40,11 @@ public sealed class DotnetProcessor
     public Result CreateNewProject(EDotnetProjectType dotnetProjectType, string? projectCreateParameters,
         string projectFullPath, string projectName)
     {
+        //dotnet new შაბლონის სახელის რეგისტრს არჩევს: CLASSLIB არ მუშაობს, classlib მუშაობს
+#pragma warning disable CA1308
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"new {dotnetProjectType.ToString().ToLowerInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
+#pragma warning restore CA1308
     }
 
     public Result AddProjectToSolution(string solutionPath, string? solutionFolderName, string projectFileFullName)

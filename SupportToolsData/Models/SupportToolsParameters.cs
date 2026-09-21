@@ -32,6 +32,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public string? WorkFolder { get; set; }
     public string? FolderForGitignoreFiles { get; set; }
+    public string? FolderForEditorConfigFiles { get; set; }
     public string? TempFolder { get; set; }
     public string? CodeGenerateTestFolder { get; set; }
     public string? SecurityFolder { get; set; }
@@ -61,6 +62,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, string> Environments { get; init; } = [];
     public Dictionary<string, string> RunTimes { get; init; } = [];
     public List<string>GitIgnorePatterns { get; init; } = [];
+    public List<string> EditorConfigPatterns { get; init; } = [];
     public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
@@ -259,5 +261,12 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public static string GetGitIgnoreModelFilePath(string folderForGitignoreFiles, string gitIgnoreModelName)
     {
         return Path.Combine(folderForGitignoreFiles, $"{gitIgnoreModelName}.gitignore");
+    }
+
+    //.editorconfig შაბლონის ფაილის სრული გზა: {FolderForEditorConfigFiles}\{editorConfigPatternName}.editorconfig
+    public static string GetEditorConfigPatternFilePath(string folderForEditorConfigFiles,
+        string editorConfigPatternName)
+    {
+        return Path.Combine(folderForEditorConfigFiles, $"{editorConfigPatternName}.editorconfig");
     }
 }

@@ -47,8 +47,11 @@ public sealed class ReCreateReactAppFilesByTemplateNameToolCommand : ToolCommand
             return ValueTask.FromResult(false);
         }
 
+        //npm-ის პაკეტის სახელი პატარა ასოებით ეწერება
+#pragma warning disable CA1308
         var reCreateReactAppFiles = new ReCreateReactAppFiles(_logger, supportToolsParameters.WorkFolder,
             _reactAppName.ToLowerInvariant(), _reactTemplateName, supportToolsParameters.GitExecutablePath);
+#pragma warning restore CA1308
         return ValueTask.FromResult(reCreateReactAppFiles.Run());
     }
 }

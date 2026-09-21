@@ -40,6 +40,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new GitExecutablePathFieldEditor(nameof(SupportToolsParameters.GitExecutablePath)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.WorkFolder)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.FolderForGitignoreFiles)));
+        FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.FolderForEditorConfigFiles)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(SupportToolsParameters.RecentCommandsFileName)));
         FieldEditors.Add(new IntFieldEditor(nameof(SupportToolsParameters.RecentCommandsCount)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(SupportToolsParameters.TempFolder)));
@@ -114,6 +115,10 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new SimpleNamesListFieldEditor<GitIgnoreModelsCruder>(
             nameof(SupportToolsParameters.GitIgnorePatterns),
             x => new GitIgnoreModelsCruder(logger, parametersManager, x)));
+
+        FieldEditors.Add(new SimpleNamesListFieldEditor<EditorConfigPatternsCruder>(
+            nameof(SupportToolsParameters.EditorConfigPatterns),
+            x => new EditorConfigPatternsCruder(logger, parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(
             nameof(SupportToolsParameters.Environments), x => new EnvironmentCruder(parametersManager, x)));

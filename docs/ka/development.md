@@ -140,6 +140,10 @@ dotnet test SupportTools.slnx
 რაც სატესტო ჰოსტში არ მუშაობს. ინტერაქტიული მენიუს ბრძანების
 გასატესტად მიეცი მას internal კონსტრუქტორი, რომელიც შეყვანის
 ფუნქციებს იღებს — იხ. `SaveGitIgnoreAsNewTemplateCliMenuCommand`.
+* `Console.SetOut` მთელ პროცესზე ვრცელდება, xUnit-ში კი სატესტო კლასები
+პარალელურად მუშაობს. სატესტო კლასს, რომელიც `Console.SetOut`-ს იყენებს,
+მიუთითე `[Collection(ConsoleCaptureCollection.Name)]` — ეს კოლექცია
+პარალელიზაციის გარეშე მუშაობს, ამიტომ ტესტები ერთმანეთს ხელს არ უშლის.
 
 `stryker-report/` ფოლდერი არსებობს, მაგრამ ცარიელია და არცერთ
 pipeline-ში არ არის ჩართული (იხ. [კოდის ხარისხი](use-cases/code-quality.md)).

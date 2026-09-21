@@ -61,7 +61,7 @@ public sealed class FieldNameFieldEditor : FieldEditor<string>
             return ValueTask.CompletedTask;
         }
 
-        (string SchemaLower, string TableLower) key = (_schemaName.ToLowerInvariant(), _tableName.ToLowerInvariant());
+        (string SchemaLower, string TableLower) key = (_schemaName.ToUpperInvariant(), _tableName.ToUpperInvariant());
 
         if (!tables.TryGetValue(key, out TableInfo? tableInfo))
         {

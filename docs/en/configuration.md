@@ -26,12 +26,12 @@ of properties:
 
 |Group|Properties|Used for|
 |-|-|-|
-|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
+|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
 |Recent commands|`RecentCommandsFileName`, `RecentCommandsCount`|Menu history|
 |Archives|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|Packaging conventions|
 |Collections|`Projects`, `Servers`, `Gits`, `GitProjects`|All registered projects, server entries, git repos, and per-project git mappings|
-|Templates|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`|Inputs to the project creator|
+|Templates|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`, `EditorConfigPatterns`|Inputs to the project creator; `GitIgnorePatterns` / `EditorConfigPatterns` are also the templates that `.gitignore` / `.editorconfig` files are checked against (see [templates](#gitignore-and-editorconfig-templates))|
 |Infrastructure|`DotnetTools`, `ApiClients`, `Archivers`, `DatabaseServerConnections`, `FileStorages`, `SmartSchemas`|Reusable shared resources|
 
 \---
@@ -43,7 +43,7 @@ The core of each registered project. Located at
 
 |Group|Fields|
 |-|-|
-|Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`|
+|Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (see [templates](#gitignore-and-editorconfig-templates))|
 |Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
 |Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |Migration \& seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
@@ -101,6 +101,28 @@ inside it:
 * `ProjectRelativePath`, `ProjectFileName` — `.csproj` location inside
 the repo
 * `DependsOnProjectNames` — build-dependency hints for ordering
+
+\---
+
+## `.gitignore` and `.editorconfig` templates
+
+Both kinds of templates are plain files in a templates folder, listed by
+name in the parameters, and both lists are edited in
+`Support Tools Parameters Editor` (`Git Ignore Patterns` /
+`Editor Config Patterns`). Each list menu has `Check ... Files` (the
+status shows how many files differ from their template or are missing)
+and `Update ... Files` (overwrites those files with the template).
+
+||`.gitignore`|`.editorconfig`|
+|-|-|-|
+|Bound to|a git repo: `GitDataModel.GitIgnorePatternName` (required)|a project: `ProjectModel.EditorConfigPatternName` (optional — a project without it is not checked)|
+|Checked file|`.gitignore` in the repo folder, in every project that uses the repo|`.editorconfig` beside the project's `SolutionFileName`; projects without a solution file are skipped|
+|Template file|`{FolderForGitignoreFiles}\{name}.gitignore`|`{FolderForEditorConfigFiles}\{name}.editorconfig`|
+|New template from an existing file|project → Git menu → the repo → `Save .gitignore as New Template`|project → `Save .editorconfig as New Template`|
+
+Saving a new template copies the file into the templates folder (the
+folder is created if it does not exist) and adds the name to the list;
+the repo's / project's own pattern name is not changed.
 
 \---
 

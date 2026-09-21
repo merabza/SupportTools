@@ -8,6 +8,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -53,6 +54,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (!SystemStat.IsWindows() || string.IsNullOrWhiteSpace(project?.SolutionFileName))
         {
             excludeList.Add(nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy));
+        }
+
+        //პროექტის .editorconfig ფაილი solution ფაილის ფოლდერში მდებარეობს
+        if (project?.EditorConfigFileName() is null)
+        {
+            excludeList.Add(nameof(SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy));
         }
 
         _menuParameters.ProjectName = _projectName;

@@ -40,6 +40,8 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ParametersFileExtension)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectFolderName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileName)));
+        FieldEditors.Add(new EditorConfigPatternNameFieldEditor(logger, nameof(ProjectModel.EditorConfigPatternName),
+            parametersManager));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.ProjectSecurityFolderPath)));
         FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.MainProjectName),
             gitProjectNamesParameterNames, CsProjExtension, parametersManager, true));

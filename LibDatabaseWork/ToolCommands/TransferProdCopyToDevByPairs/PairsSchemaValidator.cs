@@ -23,7 +23,7 @@ internal static class PairsSchemaValidator
 
         //case-insensitive lookup-ი diagnostic-ისთვის: მისახვედრად, რა სახელით არსებობს რეალურად
         Dictionary<(string, string), (string Schema, string Table)> insensitiveTables = schema.Keys.ToDictionary(
-            k => (k.Schema.ToLowerInvariant(), k.Table.ToLowerInvariant()), k => k);
+            k => (k.Schema.ToUpperInvariant(), k.Table.ToUpperInvariant()), k => k);
 
         foreach (PairedTable pt in pairs.PairedTables.Values)
         {
@@ -41,7 +41,7 @@ internal static class PairsSchemaValidator
             if (!schema.TryGetValue(key, out TableInfo? tableInfo))
             {
                 string suggestion =
-                    insensitiveTables.TryGetValue((pairedSchema.ToLowerInvariant(), pairedTable.ToLowerInvariant()),
+                    insensitiveTables.TryGetValue((pairedSchema.ToUpperInvariant(), pairedTable.ToUpperInvariant()),
                         out (string Schema, string Table) actual)
                         ? $"(no match — closest: {actual.Schema}.{actual.Table})"
                         : "(no match — table not found)";
@@ -52,7 +52,7 @@ internal static class PairsSchemaValidator
             //case-sensitive HashSet ცხრილის ველებზე
             var columnsExact = new HashSet<string>(tableInfo.Columns, StringComparer.Ordinal);
             Dictionary<string, string> columnsInsensitive =
-                tableInfo.Columns.ToDictionary(c => c.ToLowerInvariant(), c => c, StringComparer.Ordinal);
+                tableInfo.Columns.ToDictionary(c => c.ToUpperInvariant(), c => c, StringComparer.Ordinal);
 
             foreach (PairedField pf in pt.PairedFields.Values)
             {
@@ -63,7 +63,7 @@ internal static class PairsSchemaValidator
                 }
 
                 string fieldSuggestion =
-                    columnsInsensitive.TryGetValue(pairedField.ToLowerInvariant(), out string? actualField)
+                    columnsInsensitive.TryGetValue(pairedField.ToUpperInvariant(), out string? actualField)
                         ? $"(closest: {pairedSchema}.{pairedTable}.{actualField})"
                         : "(no match — field not found)";
                 report.MissingFields.Add($"{pairedSchema}.{pairedTable}.{pairedField} {fieldSuggestion}");

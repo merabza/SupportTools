@@ -25,12 +25,12 @@
 
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
-|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
+|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `FolderForEditorConfigFiles` — `.editorconfig` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
 |ბრძანებების ისტორია|`RecentCommandsFileName`, `RecentCommandsCount`|მენიუს ისტორია|
 |არქივები|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|პაკეტირების კონვენციები|
 |კოლექციები|`Projects`, `Servers`, `Gits`, `GitProjects`|რეგისტრირებული პროექტები, server ჩანაწერები, git რეპოები, პერ-პროექტი git mapping-ები|
-|შაბლონები|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`|პროექტის creator-ის შენატანი|
+|შაბლონები|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`, `EditorConfigPatterns`|პროექტის creator-ის შენატანი; `GitIgnorePatterns` / `EditorConfigPatterns` — ასევე შაბლონები, რომლების მიხედვით მოწმდება `.gitignore` / `.editorconfig` ფაილები (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
 |ინფრასტრუქტურა|`DotnetTools`, `ApiClients`, `Archivers`, `DatabaseServerConnections`, `FileStorages`, `SmartSchemas`|გადასაბუნებელი გაზიარებული რესურსები|
 
 \---
@@ -42,7 +42,7 @@
 
 |ჯგუფი|ველები|
 |-|-|
-|იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`|
+|იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
 |პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
 |ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |მიგრაცია და seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
@@ -103,6 +103,29 @@ swap-ის თვალყურის დევნება მიგრაც
 რეპოში
 * `DependsOnProjectNames` — build დამოკიდებულების მინიშნებები
 თანმიმდევრობისთვის
+
+\---
+
+## `.gitignore` და `.editorconfig` შაბლონები
+
+შაბლონების ორივე სახეობა ჩვეულებრივი ფაილია შაბლონების ფოლდერში,
+პარამეტრებში სახელების სიით. ორივე სია რედაქტირდება
+`Support Tools Parameters Editor`-ში (`Git Ignore Patterns` /
+`Editor Config Patterns`). თითოეული სიის მენიუში არის `Check ... Files`
+(სტატუსში ნაჩვენებია, რამდენი ფაილი განსხვავდება თავისი შაბლონისგან ან
+არ არსებობს) და `Update ... Files` (ასეთ ფაილებს შაბლონის შიგთავსით
+გადააწერს).
+
+||`.gitignore`|`.editorconfig`|
+|-|-|-|
+|ველი|`GitDataModel.GitIgnorePatternName` — git რეპოს ველი (აუცილებელი)|`ProjectModel.EditorConfigPatternName` — პროექტის ველი (არააუცილებელი; თუ ცარიელია, პროექტი არ მოწმდება)|
+|ფაილი|`.gitignore` რეპოს ფოლდერში, თითოეულ პროექტში, რომელშიც რეპო შედის|`.editorconfig` პროექტის `SolutionFileName` ფაილის ფოლდერში; solution ფაილის გარეშე პროექტი არ მოწმდება|
+|შაბლონის ფაილი|`{FolderForGitignoreFiles}\{სახელი}.gitignore`|`{FolderForEditorConfigFiles}\{სახელი}.editorconfig`|
+|ახალი შაბლონი|პროექტი → Git მენიუ → რეპო → `Save .gitignore as New Template`|პროექტი → `Save .editorconfig as New Template`|
+
+ახალი შაბლონის შენახვისას ბრძანება ფაილს შაბლონების ფოლდერში აკოპირებს
+(თუ ფოლდერი არ არსებობს, იქმნება) და სახელს სიაში ამატებს; თვითონ
+რეპოს / პროექტის შაბლონის სახელი არ იცვლება.
 
 \---
 

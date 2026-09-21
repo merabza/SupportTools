@@ -55,7 +55,7 @@ public static class DbSchemaQueryHelper
                     string table = (string)reader["TABLE_NAME"];
                     string column = (string)reader["COLUMN_NAME"];
 
-                    (string SchemaLower, string TableLower) key = (schema.ToLowerInvariant(), table.ToLowerInvariant());
+                    (string SchemaLower, string TableLower) key = (schema.ToUpperInvariant(), table.ToUpperInvariant());
                     if (!tables.TryGetValue(key, out TableInfo? tableInfo))
                     {
                         tableInfo = new TableInfo(schema, table);
@@ -170,7 +170,7 @@ public static class DbSchemaQueryHelper
             {
                 var tableInfo = new TableInfo(string.Empty, tableName);
                 tableInfo.Columns.AddRange(columns);
-                tables[(string.Empty, lowerCaseKeys ? tableName.ToLowerInvariant() : tableName)] = tableInfo;
+                tables[(string.Empty, lowerCaseKeys ? tableName.ToUpperInvariant() : tableName)] = tableInfo;
             }
 
             return tables;

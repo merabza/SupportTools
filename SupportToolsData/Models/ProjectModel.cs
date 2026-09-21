@@ -19,6 +19,9 @@ public sealed class ProjectModel : ItemData
     public bool UseAlternativeWebAgent { get; init; }
     public string? ProjectFolderName { get; init; }
     public string? SolutionFileName { get; init; }
+
+    //.editorconfig შაბლონის სახელი EditorConfigPatterns სიიდან. აუცილებელი არ არის: თუ ცარიელია, პროექტის .editorconfig ფაილი არ მოწმდება
+    public string? EditorConfigPatternName { get; set; }
     public string? ProjectSecurityFolderPath { get; init; }
     public string? MainProjectName { get; init; }
     public string? ApiContractsProjectName { get; init; }
@@ -68,6 +71,15 @@ public sealed class ProjectModel : ItemData
     private ServerInfoModel? GetServerInfo(string serverName)
     {
         return ServerInfos.GetValueOrDefault(serverName);
+    }
+
+    //პროექტის .editorconfig ფაილი solution ფაილის ფოლდერში მდებარეობს. თუ solution ფაილი მითითებული არ არის, აბრუნებს null
+    public string? EditorConfigFileName()
+    {
+        string? solutionFolder = string.IsNullOrWhiteSpace(SolutionFileName)
+            ? null
+            : Path.GetDirectoryName(SolutionFileName);
+        return string.IsNullOrWhiteSpace(solutionFolder) ? null : Path.Combine(solutionFolder, ".editorconfig");
     }
 
     public string? MainProjectFileName(GitProjects gitProjects)

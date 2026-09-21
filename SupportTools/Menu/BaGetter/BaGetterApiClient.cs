@@ -110,8 +110,11 @@ public sealed class BaGetterApiClient
                 return false;
             }
 
+            //NuGet-ის URL-ში პაკეტის id და ვერსია პატარა ასოებით ეწერება
+#pragma warning disable CA1308
             var requestUri = new Uri(
                 $"{_packagePublishAddress}/{packageId.ToLowerInvariant()}/{version.ToLowerInvariant()}");
+#pragma warning restore CA1308
 
             // ReSharper disable once using
             // ReSharper disable once DisposableConstructor

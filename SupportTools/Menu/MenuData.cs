@@ -25,6 +25,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
@@ -108,6 +109,8 @@ public static class MenuData
         nameof(GitSubMenuCliMenuCommandFactoryStrategy),
         //პროექტის Scaffold Seeder-ის გიტების ჩამონათვალი და მართვა
         nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy),
+        //პროექტის .editorconfig ფაილის ახალ შაბლონად შენახვა
+        nameof(SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy),
         //დასაშვები ინსტრუმენტების არჩევის საშუალება
         nameof(SelectProjectAllowToolsFactoryStrategy),
         //დასაშვები ინსტრუმენტები
