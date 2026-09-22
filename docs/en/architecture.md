@@ -94,7 +94,8 @@ These are sibling Git checkouts referenced via relative paths in
 
 `SupportTools/Program.cs` does the standard CLI bootstrap:
 
-1. `ArgumentsParser<SupportToolsParameters>` reads CLI args
+1. `ArgumentsAnalyzer` reads CLI args;
+`ParametersService<SupportToolsParameters>` loads the parameters file
 2. `ServiceCollection.AddServices(...)` (in
 `SupportTools.Application`) wires up DI
 3. `CliAppLoopParameters.Create<Program>(...)` builds the menu loop
@@ -110,7 +111,9 @@ Menu commands are registered as factory strategies in
 
 All persistent state — projects, groups, server infos, allow-tool
 lists, Git URLs — lives in a single JSON parameters file. The path is
-supplied by `ArgumentsParser` (defaults to a user-profile location).
+supplied by `ArgumentsAnalyzer` (the `--use` option) and the file is
+loaded by `ParametersService` (without `--use` it is searched for in
+the current directory and next to the executable).
 See [Configuration](configuration.md).
 
 \---

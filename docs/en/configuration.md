@@ -7,14 +7,16 @@ edit settings.
 
 ## File location
 
-The parameters file path is supplied by `ArgumentsParser` and defaults
-to a per-user location in the OS profile directory:
+The parameters file path is supplied by the `--use` argument and
+loaded by `ParametersService`. Without `--use`, `SupportTools.json` is
+searched for in two places, in this order:
 
-* Windows: `%USERPROFILE%\\<...>.json`
-* Unix-like: `\~/<...>.json`
+* the current directory
+* the folder that holds the executable
 
-You can pass an alternate path as a CLI argument. The file name uses
-the date mask from `SupportToolsParameters.ParametersFileDateMask` and
+The automatic search only uses a file that already exists — it never
+offers to create one. With `--use`, a missing or invalid file is
+offered for creation instead. The file name uses the date mask from `SupportToolsParameters.ParametersFileDateMask` and
 the extension from `ParametersFileExtension`.
 
 \---

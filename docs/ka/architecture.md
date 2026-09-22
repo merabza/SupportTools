@@ -97,7 +97,8 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 
 `SupportTools/Program.cs` აკეთებს სტანდარტულ CLI bootstrap-ს:
 
-1. `ArgumentsParser<SupportToolsParameters>` კითხულობს CLI args-ს
+1. `ArgumentsAnalyzer` კითხულობს CLI args-ს;
+`ParametersService<SupportToolsParameters>` ტვირთავს პარამეტრების ფაილს
 2. `ServiceCollection.AddServices(...)` (`SupportTools.Application`-ში)
 აყენებს DI-ს
 3. `CliAppLoopParameters.Create<Program>(...)` ააწყობს მენიუს ციკლს
@@ -113,7 +114,9 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 
 ყველა მუდმივი state — პროექტები, ჯგუფები, server info-ები, allow-tool
 სიები, Git URL-ები — ცხოვრობს ერთ JSON პარამეტრების ფაილში. ბილიკი
-მოწოდებულია `ArgumentsParser`-ით (default — user-profile location).
+მოწოდებულია `ArgumentsAnalyzer`-ით (`--use` პარამეტრი), ფაილს კი
+ტვირთავს `ParametersService` (`--use`-ის გარეშე მიმდინარე და გამშვები
+ფაილის ფოლდერში ეძებს).
 იხ. [კონფიგურაცია](configuration.md).
 
 \---

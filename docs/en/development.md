@@ -151,7 +151,7 @@ pipeline (see [Code Quality](use-cases/code-quality.md)).
 ## Debugging
 
 * The application loads slowly on first hit because it reads the full
-parameters JSON. For faster iteration, point `ArgumentsParser` at a
+parameters JSON. For faster iteration, point `--use` at a
 smaller scratch JSON file with one project.
 * `Serilog` is the logger; check the path under `LogFolder` in your
 parameters file.

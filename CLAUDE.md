@@ -47,7 +47,7 @@ Five layers, bottom-up: (1) data models in `SupportToolsData`/`LibGitData`/`LibT
 
 ## State and config
 
-All registered projects, servers, git repos, templates, API clients, and connection strings live in one JSON file at a user-profile path supplied by `ArgumentsParser<SupportToolsParameters>`. Top-level shape is `SupportToolsParameters` ([SupportToolsData/Models/SupportToolsParameters.cs](SupportToolsData/Models/SupportToolsParameters.cs)). `Newtonsoft.Json` is used so adding new fields to a model is safe — existing JSON loads fine.
+All registered projects, servers, git repos, templates, API clients, and connection strings live in one JSON file at a user-profile path supplied by the `--use` argument and loaded by `ParametersService<SupportToolsParameters>`. Top-level shape is `SupportToolsParameters` ([SupportToolsData/Models/SupportToolsParameters.cs](SupportToolsData/Models/SupportToolsParameters.cs)). `Newtonsoft.Json` is used so adding new fields to a model is safe — existing JSON loads fine.
 
 When editing fields: add property → add a `FieldEditor` under `SupportTools/FieldEditors/` → wire into the corresponding `*ParametersEditor` in `SupportTools/ParametersEditors/` or `Cruders/`. Direct JSON edits skip in-app validation.
 
