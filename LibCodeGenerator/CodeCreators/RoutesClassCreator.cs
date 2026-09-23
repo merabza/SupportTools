@@ -31,7 +31,7 @@ internal sealed class RoutesClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RoutesClassCreator)} at {DateTime.Now}"),
             string.Empty, $"namespace {_classNamespace}", string.Empty,
             new CodeBlock($"public static class {_className}",
                 $"private const string Root = \"{_root.ToLower(CultureInfo.CurrentCulture)}\"",

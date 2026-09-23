@@ -17,7 +17,7 @@ public sealed class RepositoryInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RepositoryInterfaceCreator)} at {DateTime.Now}"),
             //"using System.Collections.Generic",
             //"using System.Net",
             //$"using {_projectNamespace}Db.Models",

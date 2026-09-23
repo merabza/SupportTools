@@ -14,7 +14,7 @@ public sealed class EmptyConsoleProgramClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(EmptyConsoleProgramClassCreator)} at {DateTime.Now}"),
             "using System", string.Empty, "Console.WriteLine(\"Hello, World!\")");
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();

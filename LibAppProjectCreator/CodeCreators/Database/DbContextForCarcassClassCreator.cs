@@ -17,7 +17,7 @@ public sealed class DbContextForCarcassClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(DbContextForCarcassClassCreator)} at {DateTime.Now}"),
             string.Empty, "using Microsoft.EntityFrameworkCore",
             "using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal", "using System",
             "using System.Linq", string.Empty, "using BackendCarcass.Db", $"using {_projectNamespace}Db.Models",

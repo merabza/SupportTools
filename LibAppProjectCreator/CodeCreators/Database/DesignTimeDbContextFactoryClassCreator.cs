@@ -17,7 +17,7 @@ public sealed class DesignTimeDbContextFactoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(DesignTimeDbContextFactoryClassCreator)} at {DateTime.Now}"),
             string.Empty, "using System", "using System.IO", "using Microsoft.EntityFrameworkCore",
             "using Microsoft.EntityFrameworkCore.Design", "using Microsoft.Extensions.Configuration", string.Empty,
             $"namespace {_projectNamespace}Db", string.Empty,

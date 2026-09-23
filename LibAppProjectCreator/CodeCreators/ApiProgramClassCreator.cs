@@ -61,7 +61,7 @@ public sealed class ApiProgramClassCreator : CodeCreator
               """
             : null;
 
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ApiProgramClassCreator)} at {DateTime.Now}"),
             "using ConfigurationEncrypt", _useFluentValidation ? "using FluentValidationInstaller" : null,
             "using Microsoft.AspNetCore.Builder", "using Microsoft.Extensions.DependencyInjection", "using Serilog",
             _useSignalR ? "using SignalRMessages.Installers" : null, "using SwaggerTools", "using System",

@@ -22,7 +22,7 @@ public sealed class RepositoriesInstallerClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RepositoriesInstallerClassCreator)} at {DateTime.Now}"),
             "using Microsoft.AspNetCore.Builder", "using Microsoft.Extensions.DependencyInjection", "using System",
             "using System.Collections.Generic", string.Empty, "using CarcassDom", "using BackendCarcass.MasterData",
             "using CarcassRepositories", "using RepositoriesDom", "using WebInstallers", string.Empty,

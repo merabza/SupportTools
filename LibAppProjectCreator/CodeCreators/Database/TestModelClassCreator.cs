@@ -21,7 +21,7 @@ public sealed class TestModelClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(TestModelClassCreator)} at {DateTime.Now}"),
             _useCarcass || _isApi ? null : "using LibParameters", string.Empty,
             $"namespace {_projectNamespace}Db.Models", string.Empty,
             new OneLineComment(

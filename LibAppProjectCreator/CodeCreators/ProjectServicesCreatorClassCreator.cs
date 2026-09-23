@@ -17,7 +17,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ProjectServicesCreatorClassCreator)} at {DateTime.Now}"),
             //"using CliShared",
             "using System", "using CliParametersDataEdit", "using ParametersManagement.LibDatabaseParameters",
             $"using {_projectNamespace}Db", $"using Do{_projectNamespace}.Models",

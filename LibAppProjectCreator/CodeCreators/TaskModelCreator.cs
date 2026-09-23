@@ -19,7 +19,7 @@ public sealed class TaskModelCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(TaskModelCreator)} at {DateTime.Now}"),
             "using LibParameters", string.Empty,
             $"namespace {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models", string.Empty,
             new CodeBlock("public sealed class TaskModel : ItemData"));

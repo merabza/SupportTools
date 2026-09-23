@@ -33,7 +33,7 @@ public sealed class ProjectMainClassCreator : CodeCreator
             propertiesBlock.Add(new CodeCommand($"using {_projectNamespace}.Models"));
         }
 
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ProjectMainClassCreator)} at {DateTime.Now}"),
             "using AppCliTools.CliParameters", propertiesBlock, "using Microsoft.Extensions.Logging", string.Empty,
             $"namespace {_projectNamespace}", string.Empty, new CodeBlock(
                 $"public sealed class {_projectNamespace} : ToolCommand", "private readonly ILogger _logger",

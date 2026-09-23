@@ -19,7 +19,7 @@ public sealed class ErrorModelClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ErrorModelClassCreator)} at {DateTime.Now}"),
             "using Microsoft.AspNetCore.Mvc", "using Microsoft.AspNetCore.Mvc.RazorPages",
             "using Microsoft.Extensions.Logging", "using System", "using System.Collections.Generic",
             "using System.Diagnostics", "using System.Linq", "using System.Threading.Tasks", string.Empty,

@@ -44,7 +44,7 @@ reportWebVitals();
 ";
 
         File.WriteAllText(Path.Combine(_folderPathForSave, _fileName), @$"//{_fileName}
-//Created by {GetType().Name} at {DateTime.Now}
+//Created by {nameof(IndexJsCreator)} at {DateTime.Now}
 {code}");
 
         return true;

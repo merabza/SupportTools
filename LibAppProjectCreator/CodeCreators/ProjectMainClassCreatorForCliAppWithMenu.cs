@@ -42,7 +42,7 @@ public sealed class ProjectMainClassCreatorForCliAppWithMenu : CodeCreator
             "mainMenuSet.AddMenuItem(key, new ExitCliMenuCommand(), key.Length)", string.Empty, "return mainMenuSet");
         buildMainMenuBlock.AddRange(exitPart.CodeItems);
 
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ProjectMainClassCreatorForCliAppWithMenu)} at {DateTime.Now}"),
             "using CliMenu", "using AppCliTools.CliParameters.CliMenuCommands", "using CliTools",
             "using CliTools.CliMenuCommands", "using LibDataInput", "using LibParameters",
             "using Microsoft.Extensions.Logging", "using System", "using System.Linq",

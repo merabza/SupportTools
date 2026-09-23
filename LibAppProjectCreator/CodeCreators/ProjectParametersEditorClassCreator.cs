@@ -35,7 +35,7 @@ public sealed class ProjectParametersEditorClassCreator : CodeCreator
                 $"FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(logger, httpClientFactory, nameof({_projectNamespace}Parameters.DatabaseConnectionName), parametersManager, true))"));
         }
 
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ProjectParametersEditorClassCreator)} at {DateTime.Now}"),
             _useDatabase ? "using System.Net.Http" : null, "using AppCliTools.CliParameters",
             "using AppCliTools.CliParameters.FieldEditors", "using LibParameters", "using Microsoft.Extensions.Logging",
             //$"using {_projectNamespace}.Models",

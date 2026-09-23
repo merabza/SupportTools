@@ -17,7 +17,7 @@ public sealed class SqlMigrationCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {GetType().Name} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(SqlMigrationCreator)} at {DateTime.Now}"),
             "using Microsoft.EntityFrameworkCore.Migrations", "using System.IO", "using System.Linq",
             "using System.Reflection", string.Empty, $"namespace {_projectNamespace}.Migrations", string.Empty,
             new CodeBlock("public sealed partial class Sql : Migration", string.Empty,
@@ -26,7 +26,8 @@ public sealed class SqlMigrationCreator : CodeCreator
                     "var sqlFiles = assembly.GetManifestResourceNames().Where(file => file.EndsWith(\".sql\"))",
                     new CodeBlock("foreach (var sqlFile in sqlFiles)",
                         "using var stream = assembly.GetManifestResourceStream(sqlFile)",
-                        "if (stream is null) continue", "using var reader = new StreamReader(stream)",
+                        new CodeBlock("if (stream is null)","continue"), 
+                        "using var reader = new StreamReader(stream)",
                         "var sqlScript = reader.ReadToEnd()", "migrationBuilder.Sql($\"EXEC(N'{sqlScript}')\")")),
                 new CodeBlock("protected override void Down(MigrationBuilder migrationBuilder)", string.Empty)));
         CodeFile.AddRange(block.CodeItems);

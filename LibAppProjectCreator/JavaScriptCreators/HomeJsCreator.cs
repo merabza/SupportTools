@@ -35,7 +35,7 @@ export default Home;
 ";
 
         File.WriteAllText(Path.Combine(_folderPathForSave, _fileName), @$"//{_fileName}
-//Created by {GetType().Name} at {DateTime.Now}
+//Created by {nameof(HomeJsCreator)} at {DateTime.Now}
 {code}");
 
         return true;
