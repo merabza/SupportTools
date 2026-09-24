@@ -114,7 +114,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
 
         FieldEditors.Add(new SimpleNamesListFieldEditor<GitIgnoreModelsCruder>(
             nameof(SupportToolsParameters.GitIgnorePatterns),
-            x => new GitIgnoreModelsCruder(logger, parametersManager, x)));
+            x => new GitIgnoreModelsCruder(logger, httpClientFactory, parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesListFieldEditor<EditorConfigPatternsCruder>(
             nameof(SupportToolsParameters.EditorConfigPatterns),

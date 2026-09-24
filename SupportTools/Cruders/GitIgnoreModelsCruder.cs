@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using LibGitData;
@@ -15,23 +16,26 @@ namespace SupportTools.Cruders;
 public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
 {
     private readonly List<string> _currentValuesList;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesListFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
-    public GitIgnoreModelsCruder(ILogger logger, IParametersManager parametersManager,
-        List<string> currentValuesList) : base("GitIgnore Model", "GitIgnore Models")
+    public GitIgnoreModelsCruder(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, List<string> currentValuesList) : base("GitIgnore Model", "GitIgnore Models")
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _currentValuesList = currentValuesList;
     }
 
-    public static GitIgnoreModelsCruder Create(ILogger logger, IParametersManager parametersManager)
+    public static GitIgnoreModelsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager)
     {
-        return new GitIgnoreModelsCruder(logger, parametersManager,
+        return new GitIgnoreModelsCruder(logger, httpClientFactory, parametersManager,
             ((SupportToolsParameters)parametersManager.Parameters).GitIgnorePatterns);
     }
 
@@ -51,7 +55,7 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
         var generateCommand = new GenerateStandardGitignoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
 
-        var syncUpCommand = new SyncUpGitignoreFilesCliMenuCommand(_logger, _parametersManager);
+        var syncUpCommand = new SyncUpGitignoreFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
         cruderSubMenuSet.AddMenuItem(syncUpCommand);
     }
 

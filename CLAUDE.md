@@ -15,7 +15,7 @@ dotnet build SupportTools.slnx
 dotnet run --project SupportTools/SupportTools.csproj
 ```
 
-Unit tests live in `SupportTools.Tests` (xUnit + Moq; `dotnet test SupportTools.slnx`). Coverage is thin — only a few menu commands — so verification is still mostly manual: build + run + exercise the menu. `Inputer` prompts read the console directly (`Console.ReadKey`) and fail in the test host; to test an interactive command, give it an internal constructor that takes the input functions, as `SaveGitIgnoreAsNewTemplateCliMenuCommand` does (`SupportTools.csproj` already has `InternalsVisibleTo` for the test project). A test class that redirects `Console.Out` must be marked `[Collection(ConsoleCaptureCollection.Name)]` — `Console.SetOut` is process-wide and xUnit runs classes in parallel, so without it console-capturing classes race each other. The `stryker-report/` directory is empty and unwired.
+Unit tests live in `SupportTools.Tests` (xUnit + Moq; `dotnet test SupportTools.slnx`). Coverage is thin — only a few menu commands — so verification is still mostly manual: build + run + exercise the menu. `Inputer` prompts read the console directly (`Console.ReadKey`) and fail in the test host; to test an interactive command, give it an internal constructor that takes the input functions, as `SaveGitIgnoreAsNewTemplateCliMenuCommand` does (`SupportTools.csproj` already has `InternalsVisibleTo` for the test project). A test class that redirects `Console.Out` must be marked `[Collection(ConsoleCaptureCollection.Name)]` — `Console.SetOut` is process-wide and xUnit runs classes in parallel, so without it console-capturing classes race each other. `stryker-report/` holds git-ignored Stryker mutation-report output; no Stryker config is checked in.
 
 ## Critical: sibling-repo layout
 
@@ -37,7 +37,7 @@ Central via `Directory.Packages.props` (`ManagePackageVersionsCentrally=true`). 
 
 ## Architecture in one paragraph
 
-Five layers, bottom-up: (1) data models in `SupportToolsData`/`LibGitData`/`LibTools`; (2) process orchestration in `LibDotnetWork`/`LibGitWork`/`LibNpmWork`; (3) domain logic in `LibDatabaseWork`/`LibCodeGenerator`/`LibAppInstallWork`/`LibSupportToolsServerWork`; (4) high-level workflows in `LibAppProjectCreator`/`LibScaffoldSeeder`; (5) entry point in `SupportTools` (console) plus `SupportTools.Application` (currently a near-empty placeholder — DI actually lives in `SupportTools/DependencyInjection/SupportToolsServices.cs`). Menu commands are factory-strategy classes auto-discovered through `AddTransientAllStrategies<>` at startup.
+Five layers, bottom-up: (1) data models in `SupportToolsData`/`LibGitData`/`LibTools`; (2) process orchestration in `LibDotnetWork`/`LibGitWork`/`LibNpmWork`; (3) domain logic in `LibDatabaseWork`/`LibCodeGenerator`/`LibAppInstallWork`/`LibSupportToolsServerWork`; (4) high-level workflows in `LibAppProjectCreator`/`LibScaffoldSeeder`; (5) entry point in `SupportTools` (console), with DI registration in `SupportTools/DependencyInjection/SupportToolsServices.cs`. Menu commands are factory-strategy classes auto-discovered through `AddTransientAllStrategies<>` at startup.
 
 ## Adding work — the two main patterns
 

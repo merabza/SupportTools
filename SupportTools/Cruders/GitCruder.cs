@@ -44,8 +44,8 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         _remoteGitRepos = remoteGitRepos;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
-        FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, nameof(GitDataModel.GitIgnorePatternName),
-            ParametersManager, true));
+        FieldEditors.Add(new GitIgnorePathNameFieldEditor(logger, httpClientFactory,
+            nameof(GitDataModel.GitIgnorePatternName), ParametersManager, true));
     }
 
     public static GitCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,

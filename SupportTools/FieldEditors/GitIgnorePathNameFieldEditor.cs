@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
@@ -9,14 +10,16 @@ namespace SupportTools.FieldEditors;
 
 public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GitIgnorePathNameFieldEditor(ILogger logger, string propertyName, IParametersManager parametersManager,
-        bool enterFieldDataOnCreate = false) : base(propertyName, enterFieldDataOnCreate)
+    public GitIgnorePathNameFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
+        IParametersManager parametersManager, bool enterFieldDataOnCreate = false) : base(propertyName, enterFieldDataOnCreate)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
     }
 
@@ -25,7 +28,7 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
     {
         string? currentGitIgnorePathName = GetValue(recordForUpdate);
 
-        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _parametersManager);
+        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _httpClientFactory, _parametersManager);
 
         SetValue(recordForUpdate,
             await gitIgnorePathsCruder.GetNameWithPossibleNewName(FieldName, currentGitIgnorePathName, null, false,
@@ -41,7 +44,7 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
             return string.Empty;
         }
 
-        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _parametersManager);
+        var gitIgnorePathsCruder = GitIgnoreModelsCruder.Create(_logger, _httpClientFactory, _parametersManager);
 
         string status = gitIgnorePathsCruder.GetStatusFor(val);
         return $"{val} {(string.IsNullOrWhiteSpace(status) ? string.Empty : $"({status})")}";
