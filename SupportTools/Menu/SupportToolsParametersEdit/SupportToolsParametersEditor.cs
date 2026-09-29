@@ -118,7 +118,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
 
         FieldEditors.Add(new SimpleNamesListFieldEditor<EditorConfigPatternsCruder>(
             nameof(SupportToolsParameters.EditorConfigPatterns),
-            x => new EditorConfigPatternsCruder(logger, parametersManager, x)));
+            x => new EditorConfigPatternsCruder(logger, httpClientFactory, parametersManager, x)));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<EnvironmentCruder>(
             nameof(SupportToolsParameters.Environments), x => new EnvironmentCruder(parametersManager, x)));

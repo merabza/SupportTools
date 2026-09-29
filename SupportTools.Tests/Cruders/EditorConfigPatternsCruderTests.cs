@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,8 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
     public void Create_WhenCalled_UsesEditorConfigPatternsOfParameters()
     {
         // Act
-        var sut = EditorConfigPatternsCruder.Create(new Mock<ILogger>().Object, _env.ParametersManager.Object);
+        var sut = EditorConfigPatternsCruder.Create(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
+            _env.ParametersManager.Object);
 
         // Assert
         Assert.True(sut.ContainsRecordWithKey(EditorConfigTestEnvironment.PatternName));
@@ -58,13 +60,13 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
     }
 
     [Fact]
-    public void GetListMenu_WhenCalled_ListsPatternsFollowedByCheckAndUpdateCommands()
+    public void GetListMenu_WhenCalled_ListsPatternsFollowedByCheckUpdateAndSyncUpCommands()
     {
         // Arrange
         string[] expected =
         [
             "New EditorConfig Pattern", EditorConfigTestEnvironment.PatternName, "Check .editorconfig Files",
-            "Update .editorconfig Files"
+            "Update .editorconfig Files", "Sync Up .editorconfig files..."
         ];
 
         // Act
@@ -76,6 +78,7 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
         Assert.Equal(expected, menuItems.Take(expected.Length).Select(x => x.MenuItemName));
         Assert.IsType<CheckEditorConfigFilesCliMenuCommand>(menuItems[2].CliMenuCommand);
         Assert.IsType<UpdateEditorConfigFilesCliMenuCommand>(menuItems[3].CliMenuCommand);
+        Assert.IsType<SyncUpEditorConfigFilesCliMenuCommand>(menuItems[4].CliMenuCommand);
     }
 
     [Fact]
@@ -113,7 +116,7 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
 
     private EditorConfigPatternsCruder CreateSut()
     {
-        return new EditorConfigPatternsCruder(new Mock<ILogger>().Object, _env.ParametersManager.Object,
-            _env.Parameters.EditorConfigPatterns);
+        return new EditorConfigPatternsCruder(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
+            _env.ParametersManager.Object, _env.Parameters.EditorConfigPatterns);
     }
 }

@@ -112,8 +112,12 @@ Both kinds of templates are plain files in a templates folder, listed by
 name in the parameters, and both lists are edited in
 `Support Tools Parameters Editor` (`Git Ignore Patterns` /
 `Editor Config Patterns`). Each list menu has `Check ... Files` (the
-status shows how many files differ from their template or are missing)
-and `Update ... Files` (overwrites those files with the template).
+status shows how many files differ from their template or are missing),
+`Update ... Files` (overwrites those files with the template) and
+`Sync Up ... files...` (uploads every template of the list to
+SupportToolsServer, which stores them in its database; server records
+that are not in the list are deleted, so every template file must
+exist).
 
 ||`.gitignore`|`.editorconfig`|
 |-|-|-|

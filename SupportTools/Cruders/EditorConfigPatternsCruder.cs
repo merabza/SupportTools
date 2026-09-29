@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using Microsoft.Extensions.Logging;
@@ -12,21 +13,25 @@ namespace SupportTools.Cruders;
 public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
 {
     private readonly List<string> _currentValuesList;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public EditorConfigPatternsCruder(ILogger logger, IParametersManager parametersManager,
-        List<string> currentValuesList) : base("EditorConfig Pattern", "EditorConfig Patterns")
+    public EditorConfigPatternsCruder(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, List<string> currentValuesList) : base("EditorConfig Pattern",
+        "EditorConfig Patterns")
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _currentValuesList = currentValuesList;
     }
 
-    public static EditorConfigPatternsCruder Create(ILogger logger, IParametersManager parametersManager)
+    public static EditorConfigPatternsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager)
     {
-        return new EditorConfigPatternsCruder(logger, parametersManager,
+        return new EditorConfigPatternsCruder(logger, httpClientFactory, parametersManager,
             ((SupportToolsParameters)parametersManager.Parameters).EditorConfigPatterns);
     }
 
@@ -44,6 +49,9 @@ public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
         var updateEditorConfigFilesCliMenuCommand =
             new UpdateEditorConfigFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(updateEditorConfigFilesCliMenuCommand);
+
+        var syncUpCommand = new SyncUpEditorConfigFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        cruderSubMenuSet.AddMenuItem(syncUpCommand);
     }
 
     public override string GetStatusFor(string name)

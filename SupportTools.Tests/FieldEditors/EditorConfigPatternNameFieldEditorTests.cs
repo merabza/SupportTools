@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,8 @@ public sealed class EditorConfigPatternNameFieldEditorTests : IDisposable
     {
         // Act
         var sut = new EditorConfigPatternNameFieldEditor(new Mock<ILogger>().Object,
-            nameof(ProjectModel.EditorConfigPatternName), _env.ParametersManager.Object, true);
+            new Mock<IHttpClientFactory>().Object, nameof(ProjectModel.EditorConfigPatternName),
+            _env.ParametersManager.Object, true);
 
         // Assert
         Assert.Equal(nameof(ProjectModel.EditorConfigPatternName), sut.PropertyName);
@@ -107,7 +109,8 @@ public sealed class EditorConfigPatternNameFieldEditorTests : IDisposable
     private EditorConfigPatternNameFieldEditor CreateSut()
     {
         return new EditorConfigPatternNameFieldEditor(new Mock<ILogger>().Object,
-            nameof(ProjectModel.EditorConfigPatternName), _env.ParametersManager.Object, false, SelectPatternName);
+            new Mock<IHttpClientFactory>().Object, nameof(ProjectModel.EditorConfigPatternName),
+            _env.ParametersManager.Object, false, SelectPatternName);
     }
 
     private ValueTask<string?> SelectPatternName(string fieldName, string? currentName,
