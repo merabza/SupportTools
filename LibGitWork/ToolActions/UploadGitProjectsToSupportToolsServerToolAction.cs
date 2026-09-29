@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitWork.Mappers;
+using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -12,6 +11,7 @@ using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
 using SupportToolsServerApiContracts.V1.Requests;
 using SystemTools.BackgroundTasks;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
 
 namespace LibGitWork.ToolActions;
@@ -60,13 +60,36 @@ public sealed class UploadGitProjectsToSupportToolsServerToolAction : ToolAction
             gitIgnoreFiles.Add(new StsGitIgnoreFileTypeDataModel { Name = key, Content = content });
         }
 
-        var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits, null, UseConsole, true);
-
-        await supportToolsServerApiClient.UploadGitRepos(
-            new SyncGitRequest
+        //GitRepos.Create აქ არ გამოდგება: ის სახელს საქაღალდის სახელით ცვლის, შაბლონურ საქაღალდეს კი
+        //ჩანაწერის სახელით. სერვერზე ორივე ისე უნდა შეინახოს, როგორც პარამეტრებშია
+        var gits = new List<StsGitDataModel>();
+        foreach ((string gitProjectName, GitDataModel gitData) in supportToolsParameters.Gits)
+        {
+            if (string.IsNullOrWhiteSpace(gitData.GitProjectAddress) ||
+                string.IsNullOrWhiteSpace(gitData.GitProjectFolderName) ||
+                string.IsNullOrWhiteSpace(gitData.GitIgnorePatternName))
             {
-                GitIgnoreFiles = gitIgnoreFiles, Gits = [.. gitRepos.Gits.Values.Select(g => g.ToContractModel())]
-            }, cancellationToken);
+                StShared.WriteErrorLine($"Git Repo with key {gitProjectName} is not fully filled and is not uploaded",
+                    UseConsole, Logger);
+                continue;
+            }
+
+            gits.Add(new StsGitDataModel
+            {
+                GitProjectName = gitProjectName,
+                GitProjectAddress = gitData.GitProjectAddress,
+                GitProjectFolderName = gitData.GitProjectFolderName,
+                GitIgnorePatternName = gitData.GitIgnorePatternName
+            });
+        }
+
+        Result result = await supportToolsServerApiClient.UploadGitRepos(
+            new SyncGitRequest { GitIgnoreFiles = gitIgnoreFiles, Gits = gits }, cancellationToken);
+        if (result.IsFailure)
+        {
+            result.Error.PrintErrorsOnConsole();
+            return false;
+        }
 
         ////თითოეული გიტის პროექტი აიტვირთოს სერვერზე
 
