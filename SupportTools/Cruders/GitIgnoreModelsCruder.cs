@@ -55,8 +55,8 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
         var generateCommand = new GenerateStandardGitignoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
 
-        var syncUpCommand = new SyncUpGitignoreFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
-        cruderSubMenuSet.AddMenuItem(syncUpCommand);
+        var syncCommand = new SyncGitignoreFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        cruderSubMenuSet.AddMenuItem(syncCommand);
     }
 
     public override string GetStatusFor(string name)
