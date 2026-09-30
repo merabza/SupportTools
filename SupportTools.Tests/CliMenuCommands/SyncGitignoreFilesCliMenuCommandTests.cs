@@ -28,6 +28,10 @@ namespace SupportTools.Tests.CliMenuCommands;
 public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
 {
     private const string ApiClientName = "SupportToolsServer";
+
+    //the deletions also start the message hub, which really connects: on port 0 it fails at once
+    private const string Server = "http://127.0.0.1:0/api/v1";
+
     private const string ListPath = "GET /api/v1/git/gitignorefiletypeslist";
     private const string GitReposPath = "GET /api/v1/git/gitrepos";
     private const string ClientCSharpContent = "bin/\r\nobj/\r\n";
@@ -56,7 +60,7 @@ public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
             GitIgnorePatterns = { "CSharp", "React", "Local" },
             SupportToolsServerWebApiClientName = ApiClientName
         };
-        _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "http://localhost:5033/api/v1" };
+        _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = Server };
         _parameters.Gits["LocalGit"] = new GitDataModel
         {
             GitProjectAddress = "git@github.com:x/local.git",
