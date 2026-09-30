@@ -50,8 +50,8 @@ public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
             new UpdateEditorConfigFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(updateEditorConfigFilesCliMenuCommand);
 
-        var syncUpCommand = new SyncUpEditorConfigFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
-        cruderSubMenuSet.AddMenuItem(syncUpCommand);
+        var syncCommand = new SyncEditorConfigFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        cruderSubMenuSet.AddMenuItem(syncCommand);
     }
 
     public override string GetStatusFor(string name)

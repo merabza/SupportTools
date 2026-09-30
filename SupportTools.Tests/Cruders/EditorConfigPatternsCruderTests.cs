@@ -60,13 +60,13 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
     }
 
     [Fact]
-    public void GetListMenu_WhenCalled_ListsPatternsFollowedByCheckUpdateAndSyncUpCommands()
+    public void GetListMenu_WhenCalled_ListsPatternsFollowedByCheckUpdateAndSyncCommands()
     {
         // Arrange
         string[] expected =
         [
             "New EditorConfig Pattern", EditorConfigTestEnvironment.PatternName, "Check .editorconfig Files",
-            "Update .editorconfig Files", "Sync Up .editorconfig files..."
+            "Update .editorconfig Files", "Sync .editorconfig files..."
         ];
 
         // Act
@@ -78,7 +78,7 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
         Assert.Equal(expected, menuItems.Take(expected.Length).Select(x => x.MenuItemName));
         Assert.IsType<CheckEditorConfigFilesCliMenuCommand>(menuItems[2].CliMenuCommand);
         Assert.IsType<UpdateEditorConfigFilesCliMenuCommand>(menuItems[3].CliMenuCommand);
-        Assert.IsType<SyncUpEditorConfigFilesCliMenuCommand>(menuItems[4].CliMenuCommand);
+        Assert.IsType<SyncEditorConfigFilesCliMenuCommand>(menuItems[4].CliMenuCommand);
     }
 
     [Fact]
