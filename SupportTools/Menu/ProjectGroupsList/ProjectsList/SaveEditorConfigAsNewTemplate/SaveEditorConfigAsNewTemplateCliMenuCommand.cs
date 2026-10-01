@@ -80,8 +80,7 @@ public sealed class SaveEditorConfigAsNewTemplateCliMenuCommand : CliMenuCommand
             SupportToolsParameters.GetEditorConfigPatternFilePath(folderForEditorConfigFiles, templateName);
 
         //სახელი სიაში არ არის, მაგრამ ფოლდერში ამ სახელის ფაილი შეიძლება მაინც იყოს
-        if (File.Exists(templateFileName) &&
-            !_inputBool($"File {templateFileName} exists, overwrite?", false))
+        if (File.Exists(templateFileName) && !_inputBool($"File {templateFileName} exists, overwrite?", false))
         {
             return false;
         }

@@ -254,6 +254,7 @@ public sealed class ArgumentsAnalyzerTests : IDisposable
         Assert.Contains(nameof(EProjectTools.RecreateDevDatabase), ConsoleText(), StringComparison.Ordinal);
         Assert.Contains(nameof(EProjectServerTools.ServiceStarter), ConsoleText(), StringComparison.Ordinal);
     }
+
     [Fact]
     public async Task ShowHelp_AfterAnalysis_WritesDescriptionOfEveryOption()
     {

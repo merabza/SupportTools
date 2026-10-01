@@ -14,14 +14,14 @@ public sealed class AppCreatorBaseData
         SecurityPath = securityPath;
         SolutionPath = solutionPath;
         FolderForGitignoreFiles = folderForGitignoreFiles;
-       GitIgnorePatterns = gitIgnoreModels;
+        GitIgnorePatterns = gitIgnoreModels;
     }
 
     public string WorkPath { get; }
     public string SecurityPath { get; }
     public string SolutionPath { get; }
     public string? FolderForGitignoreFiles { get; }
-    public List<string>GitIgnorePatterns { get; }
+    public List<string> GitIgnorePatterns { get; }
 
     public static AppCreatorBaseData? Create(ILogger logger, string workFolderPath, string projectName,
         string solutionFolderName, string securityWorkFolderPath, string? folderForGitignoreFiles,
@@ -50,7 +50,6 @@ public sealed class AppCreatorBaseData
         //დავიანგარიშოთ სოლუშენის ფოლდერის სრული გზა
         string solutionPath = Path.Combine(workPath, solutionFolderName);
 
-        return new AppCreatorBaseData(workPath, securityPath, solutionPath, folderForGitignoreFiles,
-            gitIgnoreModels);
+        return new AppCreatorBaseData(workPath, securityPath, solutionPath, folderForGitignoreFiles, gitIgnoreModels);
     }
 }

@@ -43,6 +43,21 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         return new GitIgnoreFileTypesStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
     }
 
+    //სერვერზე ჩანაწერები სხვა ბრძანებებითაც იცვლება, ამიტომ სია ყოველ აწყობაზე სერვერიდან თავიდან იტვირთება.
+    //ქეში მხოლოდ აწყობილი სიის ჩანაწერებთან მუშაობისას გამოიყენება
+    protected override void BeforeGetListMenu()
+    {
+        _memoryCache.Remove(GitIgnoreFileTypesList);
+    }
+
+    //სერვერის git-ის gitignore ტიპი (GitIgnorePathNameStsFieldEditor) GetKeys-ით აწყობილი სიიდან აირჩევა,
+    //ამიტომ ესეც სერვერის მიმდინარე ჩანაწერებს უნდა აჩვენებდეს
+    public override List<string> GetKeys()
+    {
+        _memoryCache.Remove(GitIgnoreFileTypesList);
+        return base.GetKeys();
+    }
+
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
     {
         return GetGitIgnoreFileTypesListFromServer().ToDictionary(k => k.Name,
@@ -60,15 +75,18 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     {
         return _memoryCache.GetOrCreate(GitIgnoreFileTypesList, _ =>
         {
-            SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
-
-            if (supportToolsServerApiClient is null)
-            {
-                return [];
-            }
-
+            //სია GetSubMenu-დან იკითხება, საიდანაც ამოვარდნილი გამონაკლისი მთელ პროგრამას დაასრულებდა. არასწორი
+            //პარამეტრები (აპი კლიენტის სახელი, სერვერის მისამართი) გამონაკლისს იწვევს, ამიტომ კლიენტიც try-ში იქმნება.
+            //მენიუ ეკრანს ასუფთავებს, ამიტომ შეცდომა პაუზით იბეჭდება
             try
             {
+                SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+                if (supportToolsServerApiClient is null)
+                {
+                    return [];
+                }
+
                 Result<List<StsGitIgnoreFileTypeDataModel>> remoteGitReposResult =
                     supportToolsServerApiClient.GetGitIgnoreFileTypesList().Result;
                 if (remoteGitReposResult.IsSuccess)
@@ -81,8 +99,8 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                StShared.WriteException(e, true, _logger);
+                //throw;
             }
 
             return [];
@@ -125,6 +143,9 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         {
             Console.WriteLine(e);
         }
+
+        //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
+        _memoryCache.Remove(GitIgnoreFileTypesList);
     }
 
     protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
@@ -157,6 +178,9 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         {
             Console.WriteLine(e);
         }
+
+        //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
+        _memoryCache.Remove(GitIgnoreFileTypesList);
     }
 
     protected override ItemData CreateNewItem(string? recordKey, ItemData? defaultItemData)

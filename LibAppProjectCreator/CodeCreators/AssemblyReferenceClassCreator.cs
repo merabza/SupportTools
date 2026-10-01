@@ -17,8 +17,9 @@ internal sealed class AssemblyReferenceClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(AssemblyReferenceClassCreator)} at {DateTime.Now}"),
-            string.Empty, "using System.Reflection", string.Empty, $"namespace {_projectNamespace}", string.Empty,
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(AssemblyReferenceClassCreator)} at {DateTime.Now}"), string.Empty,
+            "using System.Reflection", string.Empty, $"namespace {_projectNamespace}", string.Empty,
             new CodeBlock("public static class AssemblyReference",
                 "public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly"), string.Empty);
         CodeFile.AddRange(block.CodeItems);

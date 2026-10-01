@@ -104,8 +104,8 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
     public void PublicConstructor_WhenCreated_SetsMenuName()
     {
         // Act
-        var sut = new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object,
-            ProjectName, GitProjectName, EGitCol.Main);
+        var sut = new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object, ProjectName,
+            GitProjectName, EGitCol.Main);
 
         // Assert
         Assert.Equal(MenuName, sut.Name);
@@ -490,7 +490,8 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         //ScaffoldSeeder gits live in {ScaffoldSeedersWorkFolder}\{ScaffoldSeederProjectName}\{ScaffoldSeederProjectName}ScaffoldSeeder
         byte[] seederGitIgnoreContent = [.. "seeder-only/"u8];
         string scaffoldSeedersWorkFolder = Path.Combine(_rootFolder, "seeders");
-        string seederGitFolder = Path.Combine(scaffoldSeedersWorkFolder, "Seeder", "SeederScaffoldSeeder", GitProjectName);
+        string seederGitFolder =
+            Path.Combine(scaffoldSeedersWorkFolder, "Seeder", "SeederScaffoldSeeder", GitProjectName);
         Directory.CreateDirectory(seederGitFolder);
         await File.WriteAllBytesAsync(Path.Combine(seederGitFolder, ".gitignore"), seederGitIgnoreContent);
         _parameters.ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
@@ -546,9 +547,8 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
 
     private void SetupSaveResult(bool result)
     {
-        _parametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(result);
+        _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(result);
     }
 
     private async Task<string> CreateOrphanTemplateFile()

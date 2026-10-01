@@ -93,7 +93,8 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
         }
 
         //სერვერის git რეპოზიტორიები საჭიროა იმის დასადგენად, შეიძლება თუ არა სერვერზე ზედმეტი ჩანაწერის წაშლა
-        Result<List<StsGitDataModel>> serverGitsResult = await supportToolsServerApiClient.GetGitRepos(cancellationToken);
+        Result<List<StsGitDataModel>> serverGitsResult =
+            await supportToolsServerApiClient.GetGitRepos(cancellationToken);
         if (serverGitsResult.IsFailure)
         {
             serverGitsResult.Error.PrintErrorsOnConsole();
@@ -108,9 +109,8 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
         List<string> different =
         [
             .. clientRecords.Where(x =>
-                    serverRecords.TryGetValue(x.Key, out string? serverContent) &&
-                    !string.Equals(x.Value, serverContent, StringComparison.Ordinal)).Select(x => x.Key)
-                .Order()
+                serverRecords.TryGetValue(x.Key, out string? serverContent) &&
+                !string.Equals(x.Value, serverContent, StringComparison.Ordinal)).Select(x => x.Key).Order()
         ];
 
         if (onlyOnClient.Count == 0 && onlyOnServer.Count == 0 && different.Count == 0)
@@ -120,20 +120,18 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
         }
 
         //ზედმეტი ჩანაწერის წაშლა შეუძლებელია, თუ მას იმავე მხარეს რომელიმე git რეპოზიტორია იყენებს
-        Dictionary<string, string[]> serverUsages = onlyOnServer.ToDictionary(x => x,
-            x => (string[])
-            [
-                .. serverGitsResult.Value
-                    .Where(g => string.Equals(g.GitIgnorePatternName, x, StringComparison.OrdinalIgnoreCase))
-                    .Select(g => g.GitProjectName).Order()
-            ]);
-        Dictionary<string, string[]> clientUsages = onlyOnClient.ToDictionary(x => x,
-            x => (string[])
-            [
-                .. parameters.Gits
-                    .Where(g => string.Equals(g.Value.GitIgnorePatternName, x, StringComparison.OrdinalIgnoreCase))
-                    .Select(g => g.Key).Order()
-            ]);
+        Dictionary<string, string[]> serverUsages = onlyOnServer.ToDictionary(x => x, x => (string[])
+        [
+            .. serverGitsResult.Value
+                .Where(g => string.Equals(g.GitIgnorePatternName, x, StringComparison.OrdinalIgnoreCase))
+                .Select(g => g.GitProjectName).Order()
+        ]);
+        Dictionary<string, string[]> clientUsages = onlyOnClient.ToDictionary(x => x, x => (string[])
+        [
+            .. parameters.Gits
+                .Where(g => string.Equals(g.Value.GitIgnorePatternName, x, StringComparison.OrdinalIgnoreCase))
+                .Select(g => g.Key).Order()
+        ]);
 
         Console.WriteLine("Differences between client and server .gitignore records:");
         foreach (string name in different)
@@ -196,8 +194,7 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
         {
             //merge=true-ს დროს სერვერი მხოლოდ ამატებს და ანახლებს. სერვერი არსებულ ჩანაწერს სახელით პოულობს,
             //ამიტომ კლიენტის მიერ გამოგზავნილი Id არ გამოიყენება
-            Result uploadResult = await supportToolsServerApiClient.SyncUpGitIgnoreFileTypes(
-            [
+            Result uploadResult = await supportToolsServerApiClient.SyncUpGitIgnoreFileTypes([
                 .. namesToUpload.Select(x => new StsGitIgnoreFileTypeDataModel
                 {
                     Id = Guid.NewGuid(), Name = x, Content = clientRecords[x]
@@ -213,7 +210,8 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
         //სერვერი წაშლის წინ გამოყენებას თავიდანაც ამოწმებს
         foreach (string name in namesToDelete)
         {
-            Result deleteResult = await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(name, cancellationToken);
+            Result deleteResult =
+                await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(name, cancellationToken);
             if (deleteResult.IsFailure)
             {
                 deleteResult.Error.PrintErrorsOnConsole();
@@ -286,8 +284,8 @@ public sealed class SyncGitignoreFilesCliMenuCommand : CliMenuCommand
     }
 
     //არჩევანის გასწვრივ ნაჩვენები ინფორმაცია: რა მოხდება ჩანაწერებზე და რომელ მხარეს
-    private static string DescribeChanges(string side, List<string> toAdd, List<string> toUpdate,
-        List<string> toDelete, List<string> notToDelete)
+    private static string DescribeChanges(string side, List<string> toAdd, List<string> toUpdate, List<string> toDelete,
+        List<string> notToDelete)
     {
         List<string> parts = [];
         AddPart(parts, "add", toAdd);

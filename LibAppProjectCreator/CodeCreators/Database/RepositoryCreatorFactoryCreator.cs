@@ -17,8 +17,9 @@ public sealed class RepositoryCreatorFactoryCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RepositoryCreatorFactoryCreator)} at {DateTime.Now}"),
-            string.Empty, "using System", "using Microsoft.Extensions.DependencyInjection", string.Empty,
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(RepositoryCreatorFactoryCreator)} at {DateTime.Now}"), string.Empty,
+            "using System", "using Microsoft.Extensions.DependencyInjection", string.Empty,
             $"namespace Lib{_projectNamespace}Repositories", string.Empty,
             new CodeBlock(
                 $"public sealed class {_projectNamespace}RepositoryCreatorFactory : I{_projectNamespace}RepositoryCreatorFactory",

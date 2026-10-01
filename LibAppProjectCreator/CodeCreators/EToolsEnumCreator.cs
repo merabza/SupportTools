@@ -17,8 +17,9 @@ public sealed class EToolsEnumCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(EToolsEnumCreator)} at {DateTime.Now}"),
-            string.Empty, $"namespace {_projectName}", string.Empty, new CodeEnum("public enum ETools", _projectName));
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(EToolsEnumCreator)} at {DateTime.Now}"), string.Empty,
+            $"namespace {_projectName}", string.Empty, new CodeEnum("public enum ETools", _projectName));
         CodeFile.AddRange(block.CodeItems);
         FinishAndSave();
     }

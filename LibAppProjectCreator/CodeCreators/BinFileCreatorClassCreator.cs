@@ -19,9 +19,10 @@ public sealed class BinFileCreatorClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(BinFileCreatorClassCreator)} at {DateTime.Now}"),
-            "using CodeTools", "using Microsoft.Extensions.Logging", string.Empty,
-            "namespace LibAppProjectCreator.CodeCreators.React", string.Empty,
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(BinFileCreatorClassCreator)} at {DateTime.Now}"), "using CodeTools",
+            "using Microsoft.Extensions.Logging", string.Empty, "namespace LibAppProjectCreator.CodeCreators.React",
+            string.Empty,
             new CodeBlock($"public sealed class {_creatorClassName} : BinFileCreator",
                 new CodeBlock(
                     $"public {_creatorClassName}(ILogger logger, string placePath, string binFileName) : base(logger, placePath, binFileName)",

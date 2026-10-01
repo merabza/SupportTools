@@ -130,8 +130,7 @@ public sealed class WrongEditorConfigFilesListCreatorTests : IDisposable
     public void Create_WhenSolutionFolderDoesNotExist_SkipsProject()
     {
         // Arrange
-        string editorConfigFileName =
-            _env.AddProject("NotCloned", EditorConfigTestEnvironment.PatternName, "changed");
+        string editorConfigFileName = _env.AddProject("NotCloned", EditorConfigTestEnvironment.PatternName, "changed");
         Directory.Delete(Path.GetDirectoryName(editorConfigFileName)!, true);
 
         // Act

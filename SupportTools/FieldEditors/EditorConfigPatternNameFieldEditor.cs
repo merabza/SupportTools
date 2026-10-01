@@ -17,9 +17,9 @@ public sealed class EditorConfigPatternNameFieldEditor : FieldEditor<string>
     private readonly Func<string, string?, CancellationToken, ValueTask<string?>> _selectPatternName;
 
     //.editorconfig შაბლონის მითითება აუცილებელი არ არის, ამიტომ სიაში (None) ვარიანტიც არის
-    public EditorConfigPatternNameFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory,
-        string propertyName, IParametersManager parametersManager, bool enterFieldDataOnCreate = false) : this(
-        logger, httpClientFactory, propertyName, parametersManager, enterFieldDataOnCreate,
+    public EditorConfigPatternNameFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
+        IParametersManager parametersManager, bool enterFieldDataOnCreate = false) : this(logger, httpClientFactory,
+        propertyName, parametersManager, enterFieldDataOnCreate,
         (fieldName, currentName, cancellationToken) => EditorConfigPatternsCruder
             .Create(logger, httpClientFactory, parametersManager)
             .GetNameWithPossibleNewName(fieldName, currentName, null, true, cancellationToken))

@@ -19,9 +19,10 @@ public sealed class CreatorClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(CreatorClassCreator)} at {DateTime.Now}"),
-            "using System", "using CodeTools", "using CodeTools.CodeCreators", "using Microsoft.Extensions.Logging",
-            string.Empty, "namespace LibAppProjectCreator.CodeCreators",
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(CreatorClassCreator)} at {DateTime.Now}"), "using System",
+            "using CodeTools", "using CodeTools.CodeCreators", "using Microsoft.Extensions.Logging", string.Empty,
+            "namespace LibAppProjectCreator.CodeCreators",
             new CodeBlock($"public sealed class {_creatorClassName} : CodeCreator",
                 "private readonly string _projectNamespace", string.Empty,
                 new CodeBlock(

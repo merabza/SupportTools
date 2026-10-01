@@ -73,11 +73,9 @@ public sealed class SyncGitProjectsCliMenuCommandTests : IDisposable
             }));
 
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
-        _parametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(true);
-        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_server, false));
+        _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(_server, false));
 
         _originalConsoleOutput = Console.Out;
         Console.SetOut(_consoleOutput);
@@ -166,15 +164,13 @@ public sealed class SyncGitProjectsCliMenuCommandTests : IDisposable
         List<CliMenuItem> items = CliMenuTestAccess.GetMenuItems(_shownMenuSet!);
         items.ForEach(x => x.CliMenuCommand.CountStatus());
         Assert.Equal(["Merge Up", "Sync Up", "Merge Down", "Sync Down"], items.Select(x => x.MenuItemName));
-        Assert.Equal(
-        [
+        Assert.Equal([
             "server: add NewRepo; update AppCliTools; cannot add Broken, Local",
             "server: add NewRepo; update AppCliTools; delete Front, OldRepo; cannot add Broken, Local",
             "client: add OldRepo; update AppCliTools; cannot add Front",
             "client: add OldRepo; update AppCliTools; delete Broken, NewRepo; cannot add Front; cannot delete (in use) Local"
         ], items.Select(x => x.CliMenuCommand.StatusString));
-        Assert.Equal(
-        [
+        Assert.Equal([
             "  AppCliTools: differs (folder name)",
             "  Broken: only on client, not fully filled - cannot be uploaded",
             "  Local: only on client, .gitignore pattern React is missing on server - cannot be uploaded, " +
@@ -198,7 +194,7 @@ public sealed class SyncGitProjectsCliMenuCommandTests : IDisposable
         Assert.True(result);
         (string _, string? body) = Assert.Single(_server.Requests,
             x => !x.Request.StartsWith("GET", StringComparison.Ordinal));
-        SyncGitRequest sent = JsonSerializer.Deserialize<SyncGitRequest>(body!)!;
+        var sent = JsonSerializer.Deserialize<SyncGitRequest>(body!)!;
         Assert.Empty(sent.GitIgnoreFiles);
         Assert.Equal(["NewRepo", "AppCliTools"], sent.Gits.Select(x => x.GitProjectName));
         Assert.Equal("AppCliTools", sent.Gits[1].GitProjectFolderName);
@@ -220,8 +216,7 @@ public sealed class SyncGitProjectsCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "DELETE /api/v1/git/deletegitrepo/Front", "DELETE /api/v1/git/deletegitrepo/OldRepo", UploadPath
         ], _server.Requests.Select(x => x.Request).Where(x => !x.StartsWith("GET", StringComparison.Ordinal)));
         Assert.Contains("2 git records uploaded to server, 2 deleted from server", ConsoleText(),
@@ -310,9 +305,8 @@ public sealed class SyncGitProjectsCliMenuCommandTests : IDisposable
     {
         // Arrange
         _selectedProcess = 2;
-        _parametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(false);
 
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());

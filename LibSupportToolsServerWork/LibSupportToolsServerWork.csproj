@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\AppCliTools\AppCliTools.CliParameters\AppCliTools.CliParameters.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportTools.Tests" />
+  </ItemGroup>
+
 </Project>

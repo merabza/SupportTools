@@ -82,8 +82,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
             SupportToolsParameters.GetGitIgnoreModelFilePath(folderForGitignoreFiles, templateName);
 
         //სახელი სიაში არ არის, მაგრამ ფოლდერში ამ სახელის ფაილი შეიძლება მაინც იყოს
-        if (File.Exists(templateFileName) &&
-            !_inputBool($"File {templateFileName} exists, overwrite?", false))
+        if (File.Exists(templateFileName) && !_inputBool($"File {templateFileName} exists, overwrite?", false))
         {
             return false;
         }
@@ -106,8 +105,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
     {
         while (true)
         {
-            string templateName =
-                (_inputText("New .gitignore Template Name", _gitProjectName) ?? string.Empty).Trim();
+            string templateName = (_inputText("New .gitignore Template Name", _gitProjectName) ?? string.Empty).Trim();
 
             if (templateName.Length == 0)
             {

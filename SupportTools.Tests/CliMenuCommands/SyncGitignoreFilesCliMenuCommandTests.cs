@@ -44,8 +44,8 @@ public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
     private readonly Mock<IParametersManager> _parametersManager = new();
     private readonly string _rootFolder;
     private readonly RoutingHttpMessageHandler _server = new();
-    private CliMenuSet? _shownMenuSet;
     private int _selectedProcess;
+    private CliMenuSet? _shownMenuSet;
 
     public SyncGitignoreFilesCliMenuCommandTests()
     {
@@ -88,11 +88,9 @@ public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
             }));
 
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
-        _parametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(true);
-        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_server, false));
+        _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(_server, false));
 
         _originalConsoleOutput = Console.Out;
         Console.SetOut(_consoleOutput);
@@ -202,8 +200,7 @@ public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
         List<CliMenuItem> items = CliMenuTestAccess.GetMenuItems(_shownMenuSet!);
         items.ForEach(x => x.CliMenuCommand.CountStatus());
         Assert.Equal(["Merge Up", "Sync Up", "Merge Down", "Sync Down"], items.Select(x => x.MenuItemName));
-        Assert.Equal(
-        [
+        Assert.Equal([
             "server: add Local, React; update CSharp",
             "server: add Local, React; update CSharp; delete Old; cannot delete (in use) Used",
             "client: add Old, Used; update CSharp",
@@ -232,7 +229,7 @@ public sealed class SyncGitignoreFilesCliMenuCommandTests : IDisposable
         Assert.True(result);
         (string _, string? body) =
             Assert.Single(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
-        List<StsGitIgnoreFileTypeDataModel> sent = JsonSerializer.Deserialize<List<StsGitIgnoreFileTypeDataModel>>(body!)!;
+        var sent = JsonSerializer.Deserialize<List<StsGitIgnoreFileTypeDataModel>>(body!)!;
         Assert.Equal(["Local", "React", "CSharp"], sent.Select(x => x.Name));
         Assert.Equal(ClientCSharpContent, sent[2].Content);
         Assert.Contains(_server.Requests, x => x.Request == "POST /api/v1/git/syncupgitignorefiletypes/True");

@@ -33,8 +33,9 @@ public sealed class DatabaseInstallerClassCreator : CodeCreator
         string databaseNameInParameters = _projectNamespace.Replace(".", string.Empty) + "Database";
         string connectionStringJsonKey = $"Data:{databaseNameInParameters}:ConnectionString";
 
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(DatabaseInstallerClassCreator)} at {DateTime.Now}"),
-            "using System", "using Microsoft.AspNetCore.Builder", "using Microsoft.EntityFrameworkCore",
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(DatabaseInstallerClassCreator)} at {DateTime.Now}"), "using System",
+            "using Microsoft.AspNetCore.Builder", "using Microsoft.EntityFrameworkCore",
             "using Microsoft.Extensions.DependencyInjection", "using System.Collections.Generic", "using WebInstallers",
             _useServerCarcass ? "using BackendCarcass.Db" : null, string.Empty,
             $"namespace {_projectNamespace}Db.Installers", string.Empty,

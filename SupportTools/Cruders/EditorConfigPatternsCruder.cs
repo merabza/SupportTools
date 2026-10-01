@@ -69,8 +69,7 @@ public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
         base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         var applyEditorConfigPatternCliMenuCommand =
-            new ApplyEditorConfigPatternToProjectsWithoutPatternCliMenuCommand(_logger, itemName,
-                _parametersManager);
+            new ApplyEditorConfigPatternToProjectsWithoutPatternCliMenuCommand(_logger, itemName, _parametersManager);
         itemSubMenuSet.AddMenuItem(applyEditorConfigPatternCliMenuCommand);
     }
 }

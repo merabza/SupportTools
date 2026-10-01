@@ -19,8 +19,9 @@ public sealed class ProjectTaskRunnerCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(ProjectTaskRunnerCreator)} at {DateTime.Now}"),
-            "using System", $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(ProjectTaskRunnerCreator)} at {DateTime.Now}"), "using System",
+            $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models",
             "using Microsoft.Extensions.Logging", "using SystemTools.SystemToolsShared", string.Empty,
             $"namespace {_projectNamespace}", string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}TaskRunner", "private readonly ILogger _logger",

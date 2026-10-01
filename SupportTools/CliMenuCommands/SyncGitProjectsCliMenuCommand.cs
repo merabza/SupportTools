@@ -115,8 +115,8 @@ public sealed class SyncGitProjectsCliMenuCommand : CliMenuCommand
             return true;
         }
 
-        var serverPatternNames =
-            new HashSet<string>(serverPatternsResult.Value.Select(x => x.Name), StringComparer.OrdinalIgnoreCase);
+        var serverPatternNames = new HashSet<string>(serverPatternsResult.Value.Select(x => x.Name),
+            StringComparer.OrdinalIgnoreCase);
         Dictionary<string, string?> uploadProblems = onlyOnClient.Concat(different).ToDictionary(x => x,
             x => GetUploadProblem(ToServerModel(x, clientRecords[x]), serverPatternNames));
         Dictionary<string, string?> downloadProblems = onlyOnServer.Concat(different)
@@ -227,9 +227,9 @@ public sealed class SyncGitProjectsCliMenuCommand : CliMenuCommand
         return true;
     }
 
-    private async Task<bool> Download(SupportToolsParameters parameters,
-        Dictionary<string, GitDataModel> clientRecords, Dictionary<string, StsGitDataModel> serverRecords,
-        Changes changes, bool withDeletion, CancellationToken cancellationToken)
+    private async Task<bool> Download(SupportToolsParameters parameters, Dictionary<string, GitDataModel> clientRecords,
+        Dictionary<string, StsGitDataModel> serverRecords, Changes changes, bool withDeletion,
+        CancellationToken cancellationToken)
     {
         foreach (string name in changes.ToAdd)
         {
@@ -346,7 +346,7 @@ public sealed class SyncGitProjectsCliMenuCommand : CliMenuCommand
     private static string GetClientPatternName(StsGitDataModel serverGit, List<string> clientPatternNames)
     {
         return clientPatternNames.Find(x =>
-            string.Equals(x, serverGit.GitIgnorePatternName, StringComparison.OrdinalIgnoreCase)) ??
+                   string.Equals(x, serverGit.GitIgnorePatternName, StringComparison.OrdinalIgnoreCase)) ??
                serverGit.GitIgnorePatternName;
     }
 

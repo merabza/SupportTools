@@ -33,6 +33,10 @@ public sealed class SupportToolsServerEditorCliMenuCommand : CliMenuCommand
             new GitIgnoreFileTypesStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitIgnoreFilePathsStsCliMenuCommand);
 
+        var editorConfigFileTypesStsCliMenuCommand =
+            new EditorConfigFileTypesStsCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        mainMenuSet.AddMenuItem(editorConfigFileTypesStsCliMenuCommand);
+
         var gitsSupportToolsServerCliMenuCommand =
             new GitsStsCliMenuCommand(_logger, _httpClientFactory, _memoryCache, _parametersManager);
         mainMenuSet.AddMenuItem(gitsSupportToolsServerCliMenuCommand);

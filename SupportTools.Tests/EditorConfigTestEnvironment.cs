@@ -35,9 +35,8 @@ internal sealed class EditorConfigTestEnvironment : IDisposable
         EditorConfigFileName = AddProject(ProjectName, PatternName, TemplateContent);
 
         ParametersManager.SetupGet(x => x.Parameters).Returns(Parameters);
-        ParametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        ParametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         _originalConsoleOutput = Console.Out;
         Console.SetOut(_consoleOutput);

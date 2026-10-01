@@ -17,8 +17,9 @@ public sealed class RepositoryClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RepositoryClassCreator)} at {DateTime.Now}"),
-            "using System", $"using {_projectNamespace}Db", "using Microsoft.EntityFrameworkCore.Storage",
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(RepositoryClassCreator)} at {DateTime.Now}"), "using System",
+            $"using {_projectNamespace}Db", "using Microsoft.EntityFrameworkCore.Storage",
             "using Microsoft.Extensions.Logging", string.Empty, $"namespace Lib{_projectNamespace}Repositories",
             string.Empty,
             new CodeBlock($"public sealed class {_projectNamespace}Repository : I{_projectNamespace}Repository",

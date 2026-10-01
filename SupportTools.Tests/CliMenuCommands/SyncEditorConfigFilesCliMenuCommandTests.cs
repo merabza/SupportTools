@@ -12,7 +12,6 @@ using AppCliTools.CliMenu;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibApiClientParameters;
-using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportToolsServerApiContracts.Models;
 using Xunit;
@@ -50,8 +49,7 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
                 new() { Name = EditorConfigTestEnvironment.PatternName, Content = ServerCSharpContent },
                 new() { Name = "Old", Content = "[*.old]\r\n" }
             }));
-        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_server, false));
+        _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(_server, false));
     }
 
     public void Dispose()
@@ -170,8 +168,7 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
         List<CliMenuItem> items = CliMenuTestAccess.GetMenuItems(_shownMenuSet!);
         items.ForEach(x => x.CliMenuCommand.CountStatus());
         Assert.Equal(["Merge Up", "Sync Up", "Merge Down", "Sync Down"], items.Select(x => x.MenuItemName));
-        Assert.Equal(
-        [
+        Assert.Equal([
             "server: add Local, React; update CSharp",
             "server: add Local, React; update CSharp; delete Old",
             "client: add Old; update CSharp",
@@ -179,8 +176,8 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
         ], items.Select(x => x.CliMenuCommand.StatusString));
         string console = _env.ConsoleText();
         Assert.Contains("CSharp: content differs", console, StringComparison.Ordinal);
-        Assert.Contains("Local: only on client, used by projects: LocalProject - cannot be deleted on client",
-            console, StringComparison.Ordinal);
+        Assert.Contains("Local: only on client, used by projects: LocalProject - cannot be deleted on client", console,
+            StringComparison.Ordinal);
         Assert.Contains("Old: only on server", console, StringComparison.Ordinal);
     }
 
@@ -195,11 +192,10 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        (string request, string? body) = Assert.Single(_server.Requests, x => x.Request.StartsWith("POST",
-            StringComparison.Ordinal));
+        (string request, string? body) =
+            Assert.Single(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
         Assert.Equal("POST /api/v1/git/syncupeditorconfigfiletypes/True", request);
-        List<StsEditorConfigFileTypeDataModel> sent =
-            JsonSerializer.Deserialize<List<StsEditorConfigFileTypeDataModel>>(body!)!;
+        var sent = JsonSerializer.Deserialize<List<StsEditorConfigFileTypeDataModel>>(body!)!;
         Assert.Equal(["Local", "React", "CSharp"], sent.Select(x => x.Name));
         Assert.Equal(EditorConfigTestEnvironment.TemplateContent, sent[2].Content);
     }
@@ -216,11 +212,10 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        (string request, string? body) = Assert.Single(_server.Requests, x => x.Request.StartsWith("POST",
-            StringComparison.Ordinal));
+        (string request, string? body) =
+            Assert.Single(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
         Assert.Equal("POST /api/v1/git/syncupeditorconfigfiletypes/False", request);
-        List<StsEditorConfigFileTypeDataModel> sent =
-            JsonSerializer.Deserialize<List<StsEditorConfigFileTypeDataModel>>(body!)!;
+        var sent = JsonSerializer.Deserialize<List<StsEditorConfigFileTypeDataModel>>(body!)!;
         Assert.Equal([EditorConfigTestEnvironment.PatternName, "React", "Local"], sent.Select(x => x.Name));
         Assert.Contains("3 .editorconfig records uploaded to server, 1 deleted from server", _env.ConsoleText(),
             StringComparison.Ordinal);
@@ -239,8 +234,7 @@ public sealed class SyncEditorConfigFilesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains("CSharp.Content Is Longer Than 65536 Characters", _env.ConsoleText(),
-            StringComparison.Ordinal);
+        Assert.Contains("CSharp.Content Is Longer Than 65536 Characters", _env.ConsoleText(), StringComparison.Ordinal);
         Assert.DoesNotContain("uploaded to server", _env.ConsoleText(), StringComparison.Ordinal);
     }
 

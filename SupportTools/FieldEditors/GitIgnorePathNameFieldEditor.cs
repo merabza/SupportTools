@@ -16,7 +16,8 @@ public sealed class GitIgnorePathNameFieldEditor : FieldEditor<string>
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitIgnorePathNameFieldEditor(ILogger logger, IHttpClientFactory httpClientFactory, string propertyName,
-        IParametersManager parametersManager, bool enterFieldDataOnCreate = false) : base(propertyName, enterFieldDataOnCreate)
+        IParametersManager parametersManager, bool enterFieldDataOnCreate = false) : base(propertyName,
+        enterFieldDataOnCreate)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

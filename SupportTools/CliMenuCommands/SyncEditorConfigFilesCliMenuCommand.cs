@@ -103,9 +103,8 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
         List<string> different =
         [
             .. clientRecords.Where(x =>
-                    serverRecords.TryGetValue(x.Key, out string? serverContent) &&
-                    !string.Equals(x.Value, serverContent, StringComparison.Ordinal)).Select(x => x.Key)
-                .Order()
+                serverRecords.TryGetValue(x.Key, out string? serverContent) &&
+                !string.Equals(x.Value, serverContent, StringComparison.Ordinal)).Select(x => x.Key).Order()
         ];
 
         if (onlyOnClient.Count == 0 && onlyOnServer.Count == 0 && different.Count == 0)
@@ -115,13 +114,12 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
         }
 
         //კლიენტზე ზედმეტი ჩანაწერის წაშლა შეუძლებელია, თუ მას რომელიმე პროექტი იყენებს
-        Dictionary<string, string[]> clientUsages = onlyOnClient.ToDictionary(x => x,
-            x => (string[])
-            [
-                .. parameters.Projects
-                    .Where(p => string.Equals(p.Value.EditorConfigPatternName, x, StringComparison.OrdinalIgnoreCase))
-                    .Select(p => p.Key).Order()
-            ]);
+        Dictionary<string, string[]> clientUsages = onlyOnClient.ToDictionary(x => x, x => (string[])
+        [
+            .. parameters.Projects
+                .Where(p => string.Equals(p.Value.EditorConfigPatternName, x, StringComparison.OrdinalIgnoreCase))
+                .Select(p => p.Key).Order()
+        ]);
 
         Console.WriteLine("Differences between client and server .editorconfig records:");
         foreach (string name in different)
@@ -162,8 +160,8 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
         {
             case MergeUp:
                 //merge=true-ს დროს სერვერი მხოლოდ ამატებს და ანახლებს
-                return await Upload(supportToolsServerApiClient, clientRecords, [.. onlyOnClient, .. different],
-                    true, 0, cancellationToken);
+                return await Upload(supportToolsServerApiClient, clientRecords, [.. onlyOnClient, .. different], true,
+                    0, cancellationToken);
             case SyncUp:
                 //merge=false-ის დროს სერვერი ატვირთულ სიაში არარსებულ ჩანაწერებს შლის, ამიტომ მიდის სრული სია
                 return await Upload(supportToolsServerApiClient, clientRecords, [.. clientRecords.Keys], false,
@@ -185,8 +183,7 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
     {
         if (namesToUpload.Count > 0 || !merge)
         {
-            Result uploadResult = await supportToolsServerApiClient.SyncUpEditorConfigFileTypes(
-            [
+            Result uploadResult = await supportToolsServerApiClient.SyncUpEditorConfigFileTypes([
                 .. namesToUpload.Select(x => new StsEditorConfigFileTypeDataModel
                 {
                     Name = x, Content = clientRecords[x]
@@ -242,8 +239,8 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
         if (namesNotToDelete.Count > 0)
         {
             StShared.WriteWarningLine(
-                $"Records used by projects were not deleted from client: {string.Join(", ", namesNotToDelete)}",
-                true, _logger);
+                $"Records used by projects were not deleted from client: {string.Join(", ", namesNotToDelete)}", true,
+                _logger);
         }
 
         Console.WriteLine(
@@ -252,8 +249,8 @@ public sealed class SyncEditorConfigFilesCliMenuCommand : CliMenuCommand
     }
 
     //არჩევანის გასწვრივ ნაჩვენები ინფორმაცია: რა მოხდება ჩანაწერებზე და რომელ მხარეს
-    private static string DescribeChanges(string side, List<string> toAdd, List<string> toUpdate,
-        List<string> toDelete, List<string> notToDelete)
+    private static string DescribeChanges(string side, List<string> toAdd, List<string> toUpdate, List<string> toDelete,
+        List<string> notToDelete)
     {
         List<string> parts = [];
         AddPart(parts, "add", toAdd);

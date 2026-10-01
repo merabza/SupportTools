@@ -108,9 +108,8 @@ public sealed class EditorConfigPatternNameFieldEditorTests : IDisposable
 
     private EditorConfigPatternNameFieldEditor CreateSut()
     {
-        return new EditorConfigPatternNameFieldEditor(new Mock<ILogger>().Object,
-            new Mock<IHttpClientFactory>().Object, nameof(ProjectModel.EditorConfigPatternName),
-            _env.ParametersManager.Object, false, SelectPatternName);
+        return new EditorConfigPatternNameFieldEditor(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
+            nameof(ProjectModel.EditorConfigPatternName), _env.ParametersManager.Object, false, SelectPatternName);
     }
 
     private ValueTask<string?> SelectPatternName(string fieldName, string? currentName,

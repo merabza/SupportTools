@@ -19,8 +19,9 @@ public sealed class DeleteTaskCommandCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(DeleteTaskCommandCreator)} at {DateTime.Now}"),
-            "using System", "using CliMenu", "using LibParameters",
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(DeleteTaskCommandCreator)} at {DateTime.Now}"), "using System",
+            "using CliMenu", "using LibParameters",
             $"using {(_useDatabase ? "Do" : string.Empty)}{_projectNamespace}.Models", "using LibDataInput",
             "using SystemTools.SystemToolsShared", string.Empty, $"namespace {_projectNamespace}.MenuCommands",
             string.Empty, new OneLineComment(" ReSharper disable once ConvertToPrimaryConstructor"),

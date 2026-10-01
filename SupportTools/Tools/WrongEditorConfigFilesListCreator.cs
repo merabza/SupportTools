@@ -29,8 +29,7 @@ public sealed class WrongEditorConfigFilesListCreator
         string? folderForEditorConfigFiles = supportToolsParameters.FolderForEditorConfigFiles;
         if (string.IsNullOrWhiteSpace(folderForEditorConfigFiles))
         {
-            StShared.WriteErrorLine("supportToolsParameters.FolderForEditorConfigFiles is empty", true, _logger,
-                false);
+            StShared.WriteErrorLine("supportToolsParameters.FolderForEditorConfigFiles is empty", true, _logger, false);
             return [];
         }
 

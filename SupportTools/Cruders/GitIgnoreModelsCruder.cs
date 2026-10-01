@@ -24,7 +24,8 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public GitIgnoreModelsCruder(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, List<string> currentValuesList) : base("GitIgnore Model", "GitIgnore Models")
+        IParametersManager parametersManager, List<string> currentValuesList) : base("GitIgnore Model",
+        "GitIgnore Models")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

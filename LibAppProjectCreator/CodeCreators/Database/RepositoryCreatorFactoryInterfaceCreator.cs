@@ -17,7 +17,8 @@ public sealed class RepositoryCreatorFactoryInterfaceCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(RepositoryCreatorFactoryInterfaceCreator)} at {DateTime.Now}"),
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(RepositoryCreatorFactoryInterfaceCreator)} at {DateTime.Now}"),
             $"namespace Lib{_projectNamespace}Repositories", string.Empty,
             new CodeBlock($"public interface I{_projectNamespace}RepositoryCreatorFactory",
                 $"I{_projectNamespace}Repository Get{_projectNamespace}Repository()"));

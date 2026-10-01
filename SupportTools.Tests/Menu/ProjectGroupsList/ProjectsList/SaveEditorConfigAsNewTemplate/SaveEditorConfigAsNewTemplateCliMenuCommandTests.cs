@@ -231,9 +231,8 @@ public sealed class SaveEditorConfigAsNewTemplateCliMenuCommandTests : IDisposab
     public async Task RunBody_WhenSavingParametersFails_ReturnsFalse()
     {
         // Arrange
-        _env.ParametersManager
-            .Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _env.ParametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(false);
         AnswerWithDefault();
 
         // Act
@@ -292,8 +291,7 @@ public sealed class SaveEditorConfigAsNewTemplateCliMenuCommandTests : IDisposab
 
         // Assert
         Assert.True(result);
-        Assert.Contains($"Template with name {usedName} already exists", _env.ConsoleText(),
-            StringComparison.Ordinal);
+        Assert.Contains($"Template with name {usedName} already exists", _env.ConsoleText(), StringComparison.Ordinal);
         Assert.Equal(expected, Parameters.EditorConfigPatterns);
     }
 

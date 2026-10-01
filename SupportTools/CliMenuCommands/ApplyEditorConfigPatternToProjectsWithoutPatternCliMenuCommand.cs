@@ -16,8 +16,7 @@ public sealed class ApplyEditorConfigPatternToProjectsWithoutPatternCliMenuComma
     // ReSharper disable once ConvertToPrimaryConstructor
     public ApplyEditorConfigPatternToProjectsWithoutPatternCliMenuCommand(ILogger logger,
         string editorConfigPatternName, IParametersManager parametersManager) : base(
-        "Apply this pattern to all projects that do not have an .editorconfig pattern specified",
-        EMenuAction.Reload)
+        "Apply this pattern to all projects that do not have an .editorconfig pattern specified", EMenuAction.Reload)
     {
         _logger = logger;
         _editorConfigPatternName = editorConfigPatternName;

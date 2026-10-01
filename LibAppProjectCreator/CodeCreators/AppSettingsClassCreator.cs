@@ -17,8 +17,9 @@ public sealed class AppSettingsClassCreator : CodeCreator
 
     public override void CreateFileStructure()
     {
-        var block = new CodeBlock(string.Empty, new OneLineComment($"Created by {nameof(AppSettingsClassCreator)} at {DateTime.Now}"),
-            string.Empty, $"namespace {_projectNamespace}.Models", string.Empty,
+        var block = new CodeBlock(string.Empty,
+            new OneLineComment($"Created by {nameof(AppSettingsClassCreator)} at {DateTime.Now}"), string.Empty,
+            $"namespace {_projectNamespace}.Models", string.Empty,
             new CodeBlock("public sealed class IdentitySettings",
                 new CodeBlock("public string? JwtSecret", true, "get", "set")));
         CodeFile.AddRange(block.CodeItems);

@@ -47,7 +47,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
         GitProjects = gitProjects;
         GitRepos = gitRepos;
         FolderForGitignoreFiles = folderForGitignoreFiles;
-       GitIgnorePatterns = gitIgnoreModels;
+        GitIgnorePatterns = gitIgnoreModels;
         GitExecutablePath = gitExecutablePath;
     }
 
@@ -71,7 +71,7 @@ public sealed class ScaffoldSeederCreatorParameters : IParameters
     public GitProjects GitProjects { get; }
     public GitRepos GitRepos { get; }
     public string? FolderForGitignoreFiles { get; }
-    public List<string>GitIgnorePatterns { get; }
+    public List<string> GitIgnorePatterns { get; }
     public string ExcludesRulesParametersFilePath { get; }
     public string? MigrationSqlFilesFolder { get; }
     public string FakeHostProjectName { get; }

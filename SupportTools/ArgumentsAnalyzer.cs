@@ -19,10 +19,7 @@ public sealed class ArgumentsAnalyzer
 
     public ArgumentsAnalyzer()
     {
-        _useOption = new Option<string?>("--use", "-u")
-        {
-            Description = "File name for use as parameters json."
-        };
+        _useOption = new Option<string?>("--use", "-u") { Description = "File name for use as parameters json." };
 
         _projectOption = new Option<string?>("--project", "-p")
         {
@@ -84,7 +81,6 @@ public sealed class ArgumentsAnalyzer
 
         WarnAboutUnusedOptions();
         return true;
-
     }
 
     //პარამეტრების გამოყენების ინსტრუქციის გამოტანა

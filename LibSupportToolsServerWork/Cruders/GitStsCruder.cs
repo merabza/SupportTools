@@ -9,12 +9,12 @@ using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
 using LibGitData.Models;
 using LibGitWork;
+using LibSupportToolsServerWork.FieldEditors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
-using SupportToolsServerApiContracts.Errors;
 using SupportToolsServerApiContracts.Models;
 using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
@@ -38,14 +38,23 @@ public sealed class GitStsCruder : Cruder
         _parametersManager = parametersManager;
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectAddress)));
         FieldEditors.Add(new TextFieldEditor(nameof(GitDataModel.GitProjectFolderName)));
-        //FieldEditors.Add(new GitIgnoreFileTypeNameFieldEditor(logger, nameof(GitDataModel.GitIgnoreFileTypeName),
-        //    ParametersManager, true));
+        //სერვერი git-ს gitignore ტიპის გარეშე არ ინახავს და ტიპი სერვერზე უნდა არსებობდეს, ამიტომ ის სერვერის
+        //ტიპებიდან აირჩევა და ახალი ჩანაწერის შექმნისასაც მოითხოვება
+        FieldEditors.Add(new GitIgnorePathNameStsFieldEditor(logger, nameof(GitDataModel.GitIgnorePatternName),
+            parametersManager, httpClientFactory, memoryCache, true));
     }
 
     public static GitStsCruder Create(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         IParametersManager parametersManager)
     {
         return new GitStsCruder(logger, httpClientFactory, memoryCache, parametersManager);
+    }
+
+    //სერვერზე ჩანაწერები სხვა ბრძანებებითაც იცვლება, ამიტომ სია ყოველ აწყობაზე სერვერიდან თავიდან იტვირთება.
+    //ქეში მხოლოდ აწყობილი სიის ჩანაწერებთან მუშაობისას გამოიყენება (მაგალითად, თითოეული ჩანაწერის სტატუსისთვის)
+    protected override void BeforeGetListMenu()
+    {
+        _memoryCache.Remove(GitsList);
     }
 
     protected override Dictionary<string, ItemData> GetCrudersDictionary()
@@ -70,15 +79,18 @@ public sealed class GitStsCruder : Cruder
     {
         return _memoryCache.GetOrCreate(GitsList, _ =>
         {
-            SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
-
-            if (supportToolsServerApiClient is null)
-            {
-                return [];
-            }
-
+            //სია GetSubMenu-დან იკითხება, საიდანაც ამოვარდნილი გამონაკლისი მთელ პროგრამას დაასრულებდა. არასწორი
+            //პარამეტრები (აპი კლიენტის სახელი, სერვერის მისამართი) გამონაკლისს იწვევს, ამიტომ კლიენტიც try-ში იქმნება.
+            //მენიუ ეკრანს ასუფთავებს, ამიტომ შეცდომა პაუზით იბეჭდება
             try
             {
+                SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
+
+                if (supportToolsServerApiClient is null)
+                {
+                    return [];
+                }
+
                 Result<List<StsGitDataModel>> remoteGitReposResult = supportToolsServerApiClient.GetGitRepos().Result;
                 if (remoteGitReposResult.IsSuccess)
                 {
@@ -90,7 +102,7 @@ public sealed class GitStsCruder : Cruder
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                StShared.WriteException(e, true, _logger);
                 //throw;
             }
 
@@ -98,38 +110,13 @@ public sealed class GitStsCruder : Cruder
         }) ?? [];
     }
 
+    //სახელი უკვე ჩამოტვირთულ სიაში მოწმდება. გასაღებით მოთხოვნაზე არარსებული სახელისთვის სერვერი 404-ს აბრუნებს,
+    //რომელსაც ApiClient შეცდომად ბეჭდავდა, თუმცა ახალი ჩანაწერისთვის სწორედ ეს არის მოსალოდნელი პასუხი.
+    //სერვერი გასაღებებს რეგისტრის გარეშე ადარებს
     public override bool ContainsRecordWithKey(string recordKey)
     {
-        SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
-
-        if (supportToolsServerApiClient is null)
-        {
-            return false;
-        }
-
-        try
-        {
-            Result<StsGitDataModel> getGitRepoByKeyResult =
-                supportToolsServerApiClient.GetGitRepoByKey(recordKey).Result;
-            if (getGitRepoByKeyResult.IsSuccess)
-            {
-                return true;
-            }
-
-            if (getGitRepoByKeyResult.Error is { Code: nameof(SupportToolsServerApiClientErrors.GitWithKeyNotFound) })
-            {
-                return false;
-            }
-
-            getGitRepoByKeyResult.Error.PrintErrorsOnConsole();
-
-            return false;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return false;
-        }
+        return GetGitReposFromServer().Exists(x =>
+            string.Equals(x.GitProjectName, recordKey, StringComparison.OrdinalIgnoreCase));
     }
 
     public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
@@ -194,6 +181,9 @@ public sealed class GitStsCruder : Cruder
         {
             Console.WriteLine(e);
         }
+
+        //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
+        _memoryCache.Remove(GitsList);
     }
 
     protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
@@ -226,6 +216,9 @@ public sealed class GitStsCruder : Cruder
         {
             Console.WriteLine(e);
         }
+
+        //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
+        _memoryCache.Remove(GitsList);
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         Dictionary<string, GitDataModel> gits = parameters.Gits;

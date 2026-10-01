@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,8 +46,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
         string[] names = ProjectToolRunner.GetAllToolNames();
 
         // Assert
-        Assert.Equal(Enum.GetNames<EProjectTools>().Length + Enum.GetNames<EProjectServerTools>().Length,
-            names.Length);
+        Assert.Equal(Enum.GetNames<EProjectTools>().Length + Enum.GetNames<EProjectServerTools>().Length, names.Length);
         Assert.Contains(nameof(EProjectTools.RecreateDevDatabase), names, StringComparer.Ordinal);
         Assert.Contains(nameof(EProjectServerTools.ServiceStarter), names, StringComparer.Ordinal);
     }
@@ -113,8 +111,8 @@ public sealed class ProjectToolRunnerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains($"Tool {EProjectTools.DropDevDatabase} is not allowed for project {ProjectName}",
-            ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains($"Tool {EProjectTools.DropDevDatabase} is not allowed for project {ProjectName}", ConsoleText(),
+            StringComparison.Ordinal);
         Assert.Contains("Allowed tools are: RecreateDevDatabase, SeedData", ConsoleText(), StringComparison.Ordinal);
     }
 
@@ -164,8 +162,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains(
-            $"Tool {EProjectTools.RecreateDevDatabase} for project {ProjectName} could not be created",
+        Assert.Contains($"Tool {EProjectTools.RecreateDevDatabase} for project {ProjectName} could not be created",
             ConsoleText(), StringComparison.Ordinal);
     }
 
@@ -335,6 +332,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
         Assert.False(result);
         Assert.Contains($"Server with name {ServerName} not found", ConsoleText(), StringComparison.Ordinal);
     }
+
     [Fact]
     public async Task RunOnServer_WhenServerIsNotFound_ListsExistingServersSortedAndSeparated()
     {
@@ -393,8 +391,8 @@ public sealed class ProjectToolRunnerTests : IDisposable
     {
         var strategy = new Mock<IToolCommandFactoryStrategy>();
         strategy.SetupGet(x => x.ToolCommandName).Returns(toolCommandName);
-        strategy.Setup(x => x.CreateToolCommand(It.IsAny<IParametersManager>(),
-            It.IsAny<IFactoryStrategyParameters>(), It.IsAny<CancellationToken>())).ReturnsAsync(toolCommand);
+        strategy.Setup(x => x.CreateToolCommand(It.IsAny<IParametersManager>(), It.IsAny<IFactoryStrategyParameters>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(toolCommand);
         return strategy.Object;
     }
 
