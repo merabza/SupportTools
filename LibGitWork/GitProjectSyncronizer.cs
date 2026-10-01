@@ -100,7 +100,7 @@ public sealed class GitProjectSyncronizer
                             {
                                 if (!UseSameMessageForNextCommits || UsedCommitMessage is null)
                                 {
-                                    UsedCommitMessage ??= Inputer.InputTextRequired("Message",
+                                    UsedCommitMessage = Inputer.InputTextRequired("Message",
                                         UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm",
                                             CultureInfo.InvariantCulture));
 
@@ -124,6 +124,12 @@ public sealed class GitProjectSyncronizer
                         default:
                             throw new SwitchExpressionException();
                     }
+                }
+                else if (gitSyncToolAction.Phase1Result == EFirstPhaseResult.FinishedWithErrors)
+                {
+                    //პირველ გავლაში შეცდომით დასრულებულ ფოლდერს (მაგალითად, სხვა მისამართიდან დაკლონილს)
+                    //მეორე გავლაში აღარ ვეხებით
+                    continue;
                 }
 
                 gitSyncToolAction.GitProcessor.CheckRemoteId();

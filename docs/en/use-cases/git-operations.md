@@ -26,12 +26,17 @@ Every sync command runs the same five-step pipeline against each repo:
 1. **Clone** — `git clone <url> <path>` if the folder is missing
 2. **Stage and inspect** — `git add .`, then check `git status --porcelain`
 3. **Commit** — if there are uncommitted changes, prompt for a message
-(reused across the batch) and run `git commit`
+and run `git commit`; in a batch you are also asked whether to reuse
+that message for the remaining repos
 4. **Pull** — `git pull` if the remote has new commits
 5. **Push** — `git push` if local has commits the remote does not
 
 The processor classifies each repo into one of four states using
 merge-base: `UpToDate`, `NeedToPull`, `NeedToPush`, or `Diverged`.
+A `Diverged` repo gets the same `git pull` as `NeedToPull` (Git merges
+or rebases according to its `pull.rebase` setting) and the result is
+then pushed; the repo stops with an error only if that pull fails, for
+example on a merge conflict.
 
 \---
 
@@ -49,20 +54,24 @@ changes)
 
 * Each repo reports its starting state and final state
 * Repos with no changes complete instantly
-* Repos with diverged history are skipped with an error — they need
-manual resolution
+* Repos with diverged history print a `Diverged` warning, then get
+pulled and pushed; only a repo whose pull fails (e.g. a merge conflict)
+stops with an error and needs manual resolution
 
 **Common pitfalls**
 
 * **Diverged branches.** If a repo has both local and remote commits,
-the tool stops with an error. There is no automatic merge or rebase.
-Resolve manually in the affected repo before re-running.
+the tool runs `git pull`, which merges or rebases according to your Git
+`pull.rebase` setting, and then pushes. If the pull fails (for example
+on a merge conflict), that repo stops with an error — resolve it
+manually before re-running.
 * **No locking between repos.** If two sync runs overlap (e.g., two
 shells), repos sharing the same URL can race. Don't run sync
 concurrently.
-* **Reused commit message.** A single message is applied to every repo
-in the batch. If you want per-repo messages, sync one project at a
-time instead.
+* **Reused commit message.** After the first message the tool asks
+`Use this message for next commits?`. Answer `y` to apply it to every
+remaining repo in the batch, or `n` to be asked again at the next
+commit, with the previous message as the default.
 * **Silent auth failure.** The tool relies on whatever Git credentials
 your OS provides (SSH key, credential manager). If auth fails, the
 output is a generic "cannot clone/push" — verify `git push` works

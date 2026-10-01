@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using LibGitData.Models;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
@@ -82,6 +81,6 @@ public sealed class GitRepos
 
     public GitData? GetGitRepoByKey(string key)
     {
-        return Gits.FirstOrDefault(git => git.Value.GitProjectName == key).Value;
+        return Gits.GetValueOrDefault(key);
     }
 }

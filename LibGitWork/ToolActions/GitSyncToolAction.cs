@@ -20,17 +20,19 @@ namespace LibGitWork.ToolActions;
 public sealed class GitSyncToolAction : ToolAction
 {
     private readonly bool _askCommitMessage;
+    private readonly bool _askUseSameMessage;
     private readonly GitSyncParameters _gitSyncParameters;
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSyncToolAction(ILogger? logger, GitSyncParameters gitSyncParameters, string? commitMessage = null,
-        bool askCommitMessage = true) : base(logger, "Git Sync", null, null)
+        bool askCommitMessage = true, bool askUseSameMessage = false) : base(logger, "Git Sync", null, null)
     {
         _logger = logger;
         _gitSyncParameters = gitSyncParameters;
         _askCommitMessage = askCommitMessage;
+        _askUseSameMessage = askUseSameMessage;
         UsedCommitMessage = commitMessage;
         _projectFolderName =
             Path.Combine(_gitSyncParameters.GitsFolder, _gitSyncParameters.GitData.GitProjectFolderName);
@@ -44,6 +46,9 @@ public sealed class GitSyncToolAction : ToolAction
 
     public bool Changed { get; private set; }
     public string? UsedCommitMessage { get; private set; }
+
+    //null ნიშნავს, რომ ეს შეკითხვა არ დასმულა
+    public bool? UseSameMessageForNextCommits { get; private set; }
 
     public static GitSyncToolAction? Create(ILogger? logger, IParametersManager parametersManager, string projectName,
         EGitCol gitCol, string gitProjectName, bool useConsole)
@@ -100,13 +105,13 @@ public sealed class GitSyncToolAction : ToolAction
         Phase1Result = EFirstPhaseResult.FinishedWithErrors;
         if (!Directory.Exists(_projectFolderName))
         {
-            if (GitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
+            if (!GitProcessor.Clone(_gitSyncParameters.GitData.GitProjectAddress))
             {
-                Phase1Result = EFirstPhaseResult.Cloned;
-                return true;
+                return false;
             }
 
-            return false;
+            Phase1Result = EFirstPhaseResult.Cloned;
+            return true;
         }
         //თუ ფოლდერი არსებობს, მაშინ დადგინდეს
         //1. არის თუ არა გიტი ინიციალიზებულია ამ ფოლდერში
@@ -210,6 +215,12 @@ public sealed class GitSyncToolAction : ToolAction
         {
             UsedCommitMessage = Inputer.InputTextRequired("Message",
                 UsedCommitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture));
+
+            //მესიჯის შეყვანის შემდეგ ვეკითხებით, გავრცელდეს თუ არა იგივე მესიჯი დანარჩენ ცვლილებებზე
+            if (_askUseSameMessage)
+            {
+                UseSameMessageForNextCommits = Inputer.InputBool("Use this message for next commits?", true);
+            }
         }
 
         if (!GitProcessor.Commit(UsedCommitMessage))

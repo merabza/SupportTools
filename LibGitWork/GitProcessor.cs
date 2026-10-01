@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
@@ -21,7 +24,7 @@ public sealed class GitProcessor
         _useConsole = useConsole;
         _logger = logger;
         _projectPath = projectPath;
-        _switchToProjectPath = $"-C {_projectPath}";
+        _switchToProjectPath = $"-C {QuoteArgument(_projectPath)}";
         _git = string.IsNullOrWhiteSpace(gitExecutablePath) ? Git : gitExecutablePath;
     }
 
@@ -112,7 +115,7 @@ fi*/
         }
 
         StShared.WriteWarningLine("Diverged", _useConsole, _logger);
-        return GitState.NeedToPull;
+        return GitState.Diverged;
     }
 
     private string? GitGetLocalId()
@@ -179,8 +182,8 @@ fi*/
 
     public bool Commit(string commitMessage)
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} commit -m \"{commitMessage}\"")
-            .IsSuccess)
+        if (StShared.RunProcess(_useConsole, _logger, _git,
+                $"{_switchToProjectPath} commit -m {QuoteArgument(commitMessage)}").IsSuccess)
         {
             return true;
         }
@@ -280,7 +283,8 @@ fi*/
 
     public bool Clone(string remoteAddress)
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git, $"clone {remoteAddress} {_projectPath}").IsSuccess)
+        if (StShared.RunProcess(_useConsole, _logger, _git,
+                $"clone {QuoteArgument(remoteAddress)} {QuoteArgument(_projectPath)}").IsSuccess)
         {
             CheckRemoteId();
             return true;
@@ -324,6 +328,10 @@ fi*/
                 case GitState.UpToDate:
                     return (true, pushed);
                 case GitState.NeedToPull:
+                case GitState.Diverged:
+                    //Diverged-ის დროს pull აერთიანებს ლოკალურ და სერვერის ცვლილებებს
+                    //(pull.rebase პარამეტრის მიხედვით merge-ით ან rebase-ით),
+                    //შემდეგ კი ციკლის მომდევნო ბიჯი push-ს გააკეთებს
                     if (!Pull())
                     {
                         return (false, pushed);
@@ -338,9 +346,6 @@ fi*/
 
                     pushed = true;
                     break;
-                case GitState.Diverged:
-                    StShared.WriteErrorLine($"{_projectPath} Diverged", _useConsole, _logger);
-                    return (false, pushed);
                 case GitState.Unknown:
                     StShared.WriteErrorLine($"{_projectPath} Unknown state", _useConsole, _logger);
                     return (false, pushed);
@@ -352,11 +357,13 @@ fi*/
 
     //ამოვკრიფოთ ყველა ფაილის სახელი, რომელიც .gitignore ფაილის მიხედვით არ ეკუთვნის ქეშირებას
     //git -C {GitPatch} ls-files -i --exclude-from=.gitignore -c
+    //core.quotePath=true-ით git ყველა არა-ASCII ბაიტს რვაობითი კოდით ბეჭდავს, ამიტომ გამოტანა კონსოლის
+    //კოდირებაზე არ არის დამოკიდებული, ნამდვილ სახელს კი UnquoteGitPath აღადგენს
     public Result<string[]> GetRedundantCachedFilesList()
     {
         //return !StShared.RunProcess(_useConsole, null, Git, $"{_switchToProjectPath} diff-files --quiet", false);
         Result<(string, int)> statusCommandOutputResult = StShared.RunProcessWithOutput(false, null, _git,
-            $"{_switchToProjectPath} ls-files -i --exclude-from=.gitignore -c");
+            $"{_switchToProjectPath} -c core.quotePath=true ls-files -i --exclude-from=.gitignore -c");
 
         if (statusCommandOutputResult.IsFailure)
         {
@@ -365,7 +372,58 @@ fi*/
 
         string statusCommandOutput = statusCommandOutputResult.Value.Item1;
 
-        return string.IsNullOrWhiteSpace(statusCommandOutput) ? [] : statusCommandOutput.Split(Environment.NewLine);
+        string[] fileNames = string.IsNullOrWhiteSpace(statusCommandOutput)
+            ? []
+            : [.. statusCommandOutput.Split(Environment.NewLine).Select(UnquoteGitPath)];
+        return fileNames;
+    }
+
+    //git-ის მიერ C სტილში დაბრჭყალებული ფაილის სახელის აღდგენა. მაგალითად, "\341\203\244.log" არის ფ.log:
+    //\ooo რვაობითი ბაიტია, \a \b \t \n \v \f \r მართვის სიმბოლოებია, \" და \\ კი თავად ეს სიმბოლოები.
+    //ბაიტებიდან სახელი UTF-8-ით აიწყობა. ბრჭყალების გარეშე დაბეჭდილი სახელი უცვლელი რჩება
+    private static string UnquoteGitPath(string path)
+    {
+        if (path.Length < 2 || path[0] != '"' || path[^1] != '"')
+        {
+            return path;
+        }
+
+        List<byte> bytes = [];
+        int i = 1;
+        while (i < path.Length - 1)
+        {
+            char c = path[i];
+            if (c != '\\')
+            {
+                bytes.Add((byte)c);
+                i++;
+                continue;
+            }
+
+            char escaped = path[i + 1];
+            if (escaped is >= '0' and <= '7')
+            {
+                bytes.Add(Convert.ToByte(path[(i + 1)..(i + 4)], 8));
+                i += 4;
+                continue;
+            }
+
+            byte value = escaped switch
+            {
+                'a' => 7,
+                'b' => 8,
+                't' => 9,
+                'n' => 10,
+                'v' => 11,
+                'f' => 12,
+                'r' => 13,
+                _ => (byte)escaped
+            };
+            bytes.Add(value);
+            i += 2;
+        }
+
+        return Encoding.UTF8.GetString([.. bytes]);
     }
 
     //წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
@@ -373,7 +431,7 @@ fi*/
     public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
     {
         if (StShared.RunProcess(_useConsole, _logger, _git,
-                $"{_switchToProjectPath} rm --cached \"{redundantCachedFileName}\"").IsSuccess)
+                $"{_switchToProjectPath} rm --cached {QuoteArgument(redundantCachedFileName)}").IsSuccess)
         {
             return true;
         }
@@ -390,7 +448,7 @@ fi*/
     public bool IsFolderPartOfGitWorkingTree(string appFolderForDiffFullName)
     {
         Result<(string, int)> isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, _git,
-            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
+            $"-C {QuoteArgument(appFolderForDiffFullName)} rev-parse --is-inside-work-tree", [128]);
         if (isInsideWorkTreeResult.IsFailure)
         {
             return false;
@@ -405,4 +463,30 @@ fi*/
         var isInsideWorkTreeResult = StShared.RunProcessWithOutput(false, _logger, "git",
            $"-C \"{appFolderForDiffFullName}\" rev-parse --is-inside-work-tree", [128]);
      */
+
+    //არგუმენტის ბრჭყალებში ჩასმა ბრძანების ხაზის სტანდარტული წესებით (CommandLineToArgvW), რომ ჰარების ან
+    //ბრჭყალების შემცველი გზა თუ მესიჯი git-მა ერთ, უცვლელ არგუმენტად მიიღოს: ბრჭყალის და დამხურავი
+    //ბრჭყალის წინ მდგომი უკუხაზები ორმაგდება, თვითონ ბრჭყალი კი \"-ად იწერება
+    private static string QuoteArgument(string argument)
+    {
+        var sb = new StringBuilder();
+        sb.Append('"');
+        int backslashCount = 0;
+        foreach (char c in argument)
+        {
+            if (c == '\\')
+            {
+                backslashCount++;
+                continue;
+            }
+
+            sb.Append('\\', c == '"' ? backslashCount * 2 + 1 : backslashCount);
+            sb.Append(c);
+            backslashCount = 0;
+        }
+
+        sb.Append('\\', backslashCount * 2);
+        sb.Append('"');
+        return sb.ToString();
+    }
 }

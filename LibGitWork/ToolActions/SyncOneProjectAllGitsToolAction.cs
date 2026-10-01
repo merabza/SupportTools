@@ -51,6 +51,7 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         string? commitMessage = null;
+        bool useSameMessageForNextCommits = false;
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects =
             _syncOneProjectAllGitsParameters.ChangedGitProjects;
         string? projectName = _syncOneProjectAllGitsParameters.ProjectName;
@@ -82,13 +83,16 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
 
                 var gitSync = new GitSyncToolAction(_logger,
                     new GitSyncParameters(gitData, _syncOneProjectAllGitsParameters.GitsFolder,
-                        _syncOneProjectAllGitsParameters.GitExecutablePath), commitMessage, commitMessage == null);
+                        _syncOneProjectAllGitsParameters.GitExecutablePath), commitMessage,
+                    !useSameMessageForNextCommits || commitMessage == null, true);
                 if (!await gitSync.Run(cancellationToken))
                 {
                     return false;
                 }
 
                 commitMessage = gitSync.UsedCommitMessage;
+                //თუ შეკითხვა არ დასმულა, წინა პასუხი რჩება ძალაში
+                useSameMessageForNextCommits = gitSync.UseSameMessageForNextCommits ?? useSameMessageForNextCommits;
                 if (projectName is null || changedGitProjects is null || !gitSync.Changed)
                 {
                     continue;
