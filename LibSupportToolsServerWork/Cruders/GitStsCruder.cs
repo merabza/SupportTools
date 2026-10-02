@@ -274,8 +274,7 @@ public sealed class GitStsCruder : Cruder
         }
 
         parameters.Gits.Remove(localGitKey);
-        return await _parametersManager.Save(parameters, $"Local git {localGitKey} removed", null,
-            cancellationToken);
+        return await _parametersManager.Save(parameters, $"Local git {localGitKey} removed", null, cancellationToken);
     }
 
     //სერვერზე გადარქმეული git ლოკალურადაც გადაერქმევა, მასზე მიმთითებელ პროექტებთან და GitProjects-თან ერთად

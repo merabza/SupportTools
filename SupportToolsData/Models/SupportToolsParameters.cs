@@ -22,6 +22,16 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 {
     public const string DefaultUploadFileTempExtension = ".up!";
 
+    //კომპიუტერის სახელი. თუ ცარიელია, გამოიყენება Environment.MachineName
+    public string? MachineName { get; set; }
+
+    //Servers-ის ის ჩანაწერი, რომელიც ეს კომპიუტერია. თუ შევსებულია, IsLocal=true მხოლოდ ამ ჩანაწერს აქვს.
+    //null ნიშნავს, რომ ასეთი ჩანაწერი არ არის
+    public string? CurrentMachineServerName { get; set; }
+
+    //კანონიკური გზების ამ კომპიუტერის გზებად გარდაქმნის წესები
+    public List<PathMappingModel> PathMappings { get; init; } = [];
+
     public string? SupportToolsServerWebApiClientName { get; set; }
     public string? LocalPackageManagerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
@@ -100,6 +110,11 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string GetUploadTempExtensionOrDefault()
     {
         return UploadTempExtension ?? DefaultUploadFileTempExtension;
+    }
+
+    public string GetMachineNameOrDefault()
+    {
+        return string.IsNullOrWhiteSpace(MachineName) ? Environment.MachineName : MachineName;
     }
 
     public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)

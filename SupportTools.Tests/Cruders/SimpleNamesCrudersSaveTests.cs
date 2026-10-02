@@ -46,8 +46,7 @@ public sealed class SimpleNamesCrudersSaveTests
 
         // Assert
         Assert.True(result);
-        _parametersManager.Verify(x => x.Save(_parameters, "Saved", null, It.IsAny<CancellationToken>()),
-            Times.Once);
+        _parametersManager.Verify(x => x.Save(_parameters, "Saved", null, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     private Cruder CreateCruder(string cruderName)
@@ -60,8 +59,7 @@ public sealed class SimpleNamesCrudersSaveTests
             nameof(EditorConfigPatternsCruder) => EditorConfigPatternsCruder.Create(logger, httpClientFactory,
                 parametersManager),
             nameof(EnvironmentCruder) => EnvironmentCruder.Create(parametersManager),
-            nameof(GitIgnoreModelsCruder) => GitIgnoreModelsCruder.Create(logger, httpClientFactory,
-                parametersManager),
+            nameof(GitIgnoreModelsCruder) => GitIgnoreModelsCruder.Create(logger, httpClientFactory, parametersManager),
             nameof(KeyFieldNamesLisCruder) => new KeyFieldNamesLisCruder(parametersManager, []),
             nameof(NpmPackagesCruder) => NpmPackagesCruder.Create(parametersManager),
             nameof(ProjectNpmPackagesLisCruder) => new ProjectNpmPackagesLisCruder(logger, httpClientFactory,

@@ -43,12 +43,63 @@
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
 |ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `FolderForEditorConfigFiles` — `.editorconfig` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
+|კომპიუტერის პროფილი|`MachineName`, `CurrentMachineServerName`, `PathMappings`|ამ კომპიუტერის პარამეტრები, სხვა კომპიუტერებს არ ეზიარება (იხ. [კომპიუტერის პროფილი და გზების გარდაქმნა](#კომპიუტერის-პროფილი-და-გზების-გარდაქმნა))|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
 |ბრძანებების ისტორია|`RecentCommandsFileName`, `RecentCommandsCount`|მენიუს ისტორია|
 |არქივები|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|პაკეტირების კონვენციები|
 |კოლექციები|`Projects`, `Servers`, `Gits`, `GitProjects`|რეგისტრირებული პროექტები, server ჩანაწერები, git რეპოები, პერ-პროექტი git mapping-ები|
 |შაბლონები|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`, `EditorConfigPatterns`|პროექტის creator-ის შენატანი; `GitIgnorePatterns` / `EditorConfigPatterns` — ასევე შაბლონები, რომლების მიხედვით მოწმდება `.gitignore` / `.editorconfig` ფაილები (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
 |ინფრასტრუქტურა|`DotnetTools`, `ApiClients`, `Archivers`, `DatabaseServerConnections`, `FileStorages`, `SmartSchemas`|გადასაბუნებელი გაზიარებული რესურსები|
+
+\---
+
+## კომპიუტერის პროფილი და გზების გარდაქმნა
+
+SupportTools რამდენიმე კომპიუტერზე მუშაობს. ეს ველები იმ კომპიუტერს
+ეკუთვნის, რომელზეც პროგრამა ეშვება, და სხვა კომპიუტერებს არ ეზიარება.
+ისინი `Support Tools Parameters Editor`-ის თავში რედაქტირდება:
+
+* `MachineName` — ამ კომპიუტერის სახელი. თუ ცარიელია, გამოიყენება
+`Environment.MachineName`-ის სახელი. შეთავაზებულ სახელზე დათანხმება ველს
+ცარიელს ტოვებს, ამიტომ სხვა კომპიუტერზე გადატანილი ფაილი იქ სწორ სახელს
+მისცემს. ფაილში მხოლოდ განსხვავებული სახელი ჩაიწერება.
+* `CurrentMachineServerName` — `Servers`-ის ის ჩანაწერი, რომელიც ეს
+კომპიუტერია. აირჩევა არსებული სერვერებიდან (`(None)`, თუ ასეთი ჩანაწერი
+არ არის). თუ შევსებულია, `IsLocal` პროგრამის გაშვებისას გამოითვლება:
+ლოკალურია მხოლოდ ეს სერვერი, `Servers`-ის რედაქტორი კი `IsLocal`-ს აღარ
+აჩვენებს. თუ ცარიელია, `IsLocal`-ის შენახული მნიშვნელობები ძველებურად
+გამოიყენება.
+* `PathMappings` — წესები, რომლებიც კანონიკურ გზებს ამ კომპიუტერის
+გზებად გარდაქმნის.
+
+გზები კანონიკური ფორმით ინახება: ეს Windows-ის აბსოლუტური გზაა, როგორც
+მთავარ კომპიუტერზე (PAZISI), მაგალითად
+`D:\1WorkDotnet\AppGrammarGe\AppGrammarGe\AppGrammarGe.slnx`. წესი
+კანონიკურ prefix-ს ლოკალურ prefix-ად ცვლის, მაგალითად `D:\1WorkDotnet` →
+`/home/merab/1WorkDotnet`:
+
+* რამდენიმე შესაფერისი წესიდან იმარჯვებს ის, რომლის prefix-იც ყველაზე
+გრძელია;
+* prefix-ი მხოლოდ ფოლდერის საზღვარზე ემთხვევა: `D:\1WorkDotnet` არ
+ემთხვევა `D:\1WorkDotnetX`-ს;
+* რეგისტრი და ბოლო გამყოფი არ ითვლება;
+* Linux-ზე გზის დარჩენილ ნაწილში გამყოფებიც იცვლება (`\` ↔ `/`);
+* შეფარდებით გზებში, მაგალითად `GitProjectFolderName`-ში, მხოლოდ
+გამყოფები იცვლება;
+* გზა, რომელსაც არცერთი წესი არ ემთხვევა, უცვლელი რჩება. Linux-ზე ის
+გაფრთხილებადაც ჩაიწერება;
+* Windows კომპიუტერს, რომელსაც ფოლდერების იგივე განლაგება აქვს, წესები არ
+სჭირდება.
+
+`Path Mappings` → `Suggest Path Mappings...` აგროვებს ფესვებს (დისკი და
+პირველი ფოლდერი, მაგალითად `D:\1WorkDotnet`) პროექტების გზებიდან,
+ServerInfo-ების appsettings გზებიდან, პროექტის შემქმნელის ფოლდერებიდან და
+ფაილსაცავების ლოკალური გზებიდან, და თითო ფესვზე ლოკალურ prefix-ს
+ეკითხება. Enter ახლანდელ მნიშვნელობას ტოვებს. თვითონ ფესვის ან ცარიელი
+ტექსტის შეყვანა ნიშნავს, რომ ფესვს წესი არ სჭირდება.
+
+ველები, რომლებიც კომპიუტერზე რჩება და არასოდეს სინქრონიზდება,
+ჩამოთვლილია `LibSupportToolsServerWork/Registry/MachineLocalFields.cs`-ში.
 
 \---
 
@@ -92,7 +143,8 @@ swap-ის თვალყურის დევნება მიგრაც
 **`ServerDataModel`** — გლობალური, გადასაბუნებელი პროექტებში:
 
 * `IsLocal` — მართავს ტრანსპორტს (`true` = ლოკალური install folder,
-`false` = WebAgent HTTP-ით)
+`false` = WebAgent HTTP-ით). თუ `CurrentMachineServerName` შევსებულია, ის
+გამოითვლება (იხ. [კომპიუტერის პროფილი და გზების გარდაქმნა](#კომპიუტერის-პროფილი-და-გზების-გარდაქმნა))
 * `WebAgentName`, `WebAgentInstallerName` — API client იდენტიფიკატორები
 `ApiClients` ლექსიკონში
 * `FilesUserName`, `FilesUsersGroupName` — OS-დონის ანგარიში

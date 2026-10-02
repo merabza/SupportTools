@@ -269,11 +269,68 @@ public static class DotnetToolsVersionsCheckerUpdater
 
         string? availableVersion = getAvailableVersionOfToolResult.Value;
 
-        DotnetToolData? nesTool = installedTools.FirstOrDefault(tool => tool.PackageId == packageId);
+        string? latestVersion = availableVersion ?? "N/A";
+
+        bool haveChanges = ApplyInstalledVersion(dotnetToolData, installedTools);
+
+        if (latestVersion == dotnetToolData.LatestVersion)
+        {
+            return haveChanges;
+        }
+
+        dotnetToolData.LatestVersion = latestVersion;
+
+        return true;
+    }
+
+    //სიის გახსნისას: დაყენებული ვერსიები და ბრძანებები dotnet tool list-ით ახლდება. ის ქსელს არ იყენებს და სწრაფია,
+    //ბოლო ვერსიას კი Check ამოწმებს. თუ დაყენებული ვერსია შეიცვალა, შენახული ბოლო ვერსია ძველი ვერსიისთვის შემოწმდა,
+    //ამიტომ იშლება. თუ სია ვერ მივიღეთ, შენახული მონაცემი რჩება და შეცდომას Check აჩვენებს. ეკრანზე არაფერი იბეჭდება,
+    //რადგან მენიუ მას მაშინვე ასუფთავებს. აბრუნებს, შეიცვალა თუ არა რამე
+    internal static bool RefreshInstalledVersions(IParametersManager parametersManager,
+        IDotnetToolsRunner dotnetToolsRunner)
+    {
+        Result<List<DotnetToolData>> createListOfDotnetToolsInstalledResult =
+            CreateListOfDotnetToolsInstalled(dotnetToolsRunner);
+        if (createListOfDotnetToolsInstalledResult.IsFailure)
+        {
+            return false;
+        }
+
+        var parameters = (SupportToolsParameters)parametersManager.Parameters;
+
+        bool madeChanges = false;
+        foreach (DotnetToolData dotnetToolData in parameters.DotnetTools.Values)
+        {
+            //PackageId-ის გარეშე ხელსაწყოს ვერსიას Check-იც ვერ ადგენს
+            if (string.IsNullOrEmpty(dotnetToolData.PackageId))
+            {
+                continue;
+            }
+
+            string? storedInstalledVersion = dotnetToolData.InstalledVersion;
+            if (!ApplyInstalledVersion(dotnetToolData, createListOfDotnetToolsInstalledResult.Value))
+            {
+                continue;
+            }
+
+            madeChanges = true;
+            if (dotnetToolData.InstalledVersion != storedInstalledVersion)
+            {
+                dotnetToolData.LatestVersion = null;
+            }
+        }
+
+        return madeChanges;
+    }
+
+    //დაყენებული ხელსაწყოების სიიდან ხელსაწყოს დაყენებულ ვერსიასა და ბრძანებას ადგენს. აბრუნებს, შეიცვალა თუ არა რამე
+    private static bool ApplyInstalledVersion(DotnetToolData dotnetToolData, List<DotnetToolData> installedTools)
+    {
+        DotnetToolData? nesTool = installedTools.FirstOrDefault(tool => tool.PackageId == dotnetToolData.PackageId);
 
         string? installedVersion = nesTool is null ? "N/A" : nesTool.InstalledVersion;
         string? installedCommandName = nesTool?.CommandName;
-        string? latestVersion = availableVersion ?? "N/A";
 
         bool haveChanges = false;
 
@@ -283,21 +340,14 @@ public static class DotnetToolsVersionsCheckerUpdater
             dotnetToolData.CommandName = installedCommandName;
         }
 
-        if (installedVersion != dotnetToolData.InstalledVersion)
-        {
-            haveChanges = true;
-            dotnetToolData.InstalledVersion = installedVersion;
-        }
-
-        if (latestVersion == dotnetToolData.LatestVersion)
+        if (installedVersion == dotnetToolData.InstalledVersion)
         {
             return haveChanges;
         }
 
-        haveChanges = true;
-        dotnetToolData.LatestVersion = latestVersion;
+        dotnetToolData.InstalledVersion = installedVersion;
 
-        return haveChanges;
+        return true;
     }
 
     private static Result<string> GetAvailableVersionOfTool(string toolName, IDotnetToolsRunner dotnetToolsRunner)

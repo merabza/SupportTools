@@ -67,8 +67,9 @@ public sealed class GitProcessorTests : IDisposable
     public void CreateCloneStartInfo_WhenGitPathIsGiven_RunsThatGit(string? gitExecutablePath, string expected)
     {
         // Act
-        ProcessStartInfo startInfo = new GitProcessor(false, null, _tempFolder, gitExecutablePath)
-            .CreateCloneStartInfo("git@github.com:x/a.git");
+        ProcessStartInfo startInfo =
+            new GitProcessor(false, null, _tempFolder, gitExecutablePath)
+                .CreateCloneStartInfo("git@github.com:x/a.git");
 
         // Assert
         Assert.Equal(expected, startInfo.FileName);
@@ -536,8 +537,8 @@ public sealed class GitProcessorTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal([".git", SeedFileName], Directory.EnumerateFileSystemEntries(clone).Select(Path.GetFileName)
-            .Order(StringComparer.Ordinal));
+        Assert.Equal([".git", SeedFileName],
+            Directory.EnumerateFileSystemEntries(clone).Select(Path.GetFileName).Order(StringComparer.Ordinal));
     }
 
     [Fact]

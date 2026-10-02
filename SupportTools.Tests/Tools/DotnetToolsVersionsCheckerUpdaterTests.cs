@@ -552,6 +552,146 @@ public sealed class DotnetToolsVersionsCheckerUpdaterTests : IDisposable
         Assert.DoesNotContain("Updating process Finished.", ConsoleText, StringComparison.Ordinal);
     }
 
+    //RefreshInstalledVersions (runs whenever the Dotnet Tools list is built: only dotnet tool list, no network)
+
+    [Fact]
+    public void RefreshInstalledVersions_WhenInstalledVersionChanged_UpdatesItAndClearsLatestVersion()
+    {
+        // Arrange
+        DotnetToolData tool = AddTool(ToolKey, PackageId, "9.0.11");
+        tool.LatestVersion = "10.0.0";
+        _runner.Install(PackageId, "10.0.12");
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("10.0.12", tool.InstalledVersion);
+        Assert.Null(tool.LatestVersion);
+    }
+
+    [Fact]
+    public void RefreshInstalledVersions_WhenNothingChanged_ReportsNoChangeAndKeepsLatestVersion()
+    {
+        // Arrange
+        DotnetToolData tool = AddTool(ToolKey, PackageId, "1.0.0");
+        tool.LatestVersion = "2.0.0";
+        _runner.Install(PackageId, "1.0.0");
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("1.0.0", tool.InstalledVersion);
+        Assert.Equal("2.0.0", tool.LatestVersion);
+    }
+
+    [Fact]
+    public void RefreshInstalledVersions_WhenOnlyCommandNameChanged_UpdatesItAndKeepsLatestVersion()
+    {
+        // Arrange
+        DotnetToolData tool = AddTool(ToolKey, PackageId, "1.0.0");
+        tool.CommandName = "old-command";
+        tool.LatestVersion = "2.0.0";
+        _runner.Install(PackageId, "1.0.0");
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(FakeDotnetToolsRunner.CommandName(PackageId), tool.CommandName);
+        Assert.Equal("2.0.0", tool.LatestVersion);
+    }
+
+    [Fact]
+    public void RefreshInstalledVersions_WhenToolIsNotInstalled_MarksItNotAvailable()
+    {
+        // Arrange
+        DotnetToolData tool = AddTool(ToolKey, PackageId, "1.0.0");
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("N/A", tool.InstalledVersion);
+        Assert.Null(tool.LatestVersion);
+    }
+
+    //only the tool that changed loses its latest version
+    [Fact]
+    public void RefreshInstalledVersions_WhenOneOfTwoToolsChanged_ClearsOnlyItsLatestVersion()
+    {
+        // Arrange
+        DotnetToolData first = AddTool("First", "first.tool", "1.0.0");
+        DotnetToolData second = AddTool("Second", "second.tool", "1.0.0");
+        _runner.Install("first.tool", "1.1.0");
+        _runner.Install("second.tool", "1.0.0");
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.True(result);
+        Assert.Null(first.LatestVersion);
+        Assert.Equal("1.0.0", second.LatestVersion);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void RefreshInstalledVersions_WhenPackageIdIsEmpty_LeavesToolUnchanged(string? packageId)
+    {
+        // Arrange
+        var tool = new DotnetToolData { PackageId = packageId, InstalledVersion = "1.0.0", LatestVersion = "2.0.0" };
+        _parameters.DotnetTools[ToolKey] = tool;
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("1.0.0", tool.InstalledVersion);
+        Assert.Equal("2.0.0", tool.LatestVersion);
+    }
+
+    //the stored data stays as it is; Check Dotnet Tools Versions reports the error
+    [Fact]
+    public void RefreshInstalledVersions_WhenListFails_ReportsNoChangeAndKeepsStoredData()
+    {
+        // Arrange
+        DotnetToolData tool = AddTool(ToolKey, PackageId, "1.0.0");
+        _runner.Install(PackageId, "1.1.0");
+        _runner.ListFailsFromCall = 1;
+
+        // Act
+        bool result = DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("1.0.0", tool.InstalledVersion);
+        Assert.Equal("1.0.0", tool.LatestVersion);
+    }
+
+    //the list is rebuilt after every menu action, so the refresh must stay fast and quiet
+    [Fact]
+    public void RefreshInstalledVersions_WhenCalled_NeitherSearchesNorPrints()
+    {
+        // Arrange
+        AddTool(ToolKey, PackageId, "1.0.0");
+        _runner.Install(PackageId, "1.1.0");
+
+        // Act
+        DotnetToolsVersionsCheckerUpdater.RefreshInstalledVersions(_parametersManager.Object, _runner);
+
+        // Assert
+        Assert.Equal(0, _runner.SearchCalls);
+        Assert.Empty(ConsoleText);
+    }
+
     //the stored record already matches the fake's latest version; the tests install it into the fake themselves
     private DotnetToolData AddTool(string toolKey, string packageId, string installedVersion)
     {
@@ -583,6 +723,7 @@ public sealed class DotnetToolsVersionsCheckerUpdaterTests : IDisposable
 
         //the call of GetToolsRawList (counted from 1) from which on the list fails
         public int ListFailsFromCall { get; set; } = int.MaxValue;
+        public int SearchCalls { get; private set; }
         public bool SearchFails { get; set; }
         public string? SearchOutput { get; set; }
         public bool UpdateFails { get; set; }
@@ -605,6 +746,7 @@ public sealed class DotnetToolsVersionsCheckerUpdaterTests : IDisposable
 
         public Result<(string, int)> SearchTool(string toolName)
         {
+            SearchCalls++;
             if (SearchFails)
             {
                 return Failure;

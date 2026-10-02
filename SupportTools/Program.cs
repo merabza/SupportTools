@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using AppCliTools.CliParameters;
 using AppCliTools.CliTools;
+using LibSupportToolsServerWork.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -40,6 +41,9 @@ try
         default:
             throw new SwitchExpressionException();
     }
+
+    //IsLocal კომპიუტერზეა დამოკიდებული, ამიტომ მენიუმდე და --run-მდე CurrentMachineServerName-ით გამოითვლება
+    ServersIsLocalCalculator.Recalculate(parametersService.Par!);
 
     var serviceCollection = new ServiceCollection();
 

@@ -55,10 +55,11 @@ internal static class CliMenuTestAccess
     //the New command of a list menu keeps the cruder that built the menu in a private field
     public static Cruder GetListMenuCruder(CliMenuSet listMenu)
     {
-        NewItemCliMenuCommand newItemCommand =
-            GetMenuItems(listMenu).Select(x => x.CliMenuCommand).OfType<NewItemCliMenuCommand>().Single();
-        return (Cruder)typeof(NewItemCliMenuCommand)
-            .GetField("_cruder", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(newItemCommand)!;
+        NewItemCliMenuCommand newItemCommand = GetMenuItems(listMenu).Select(x => x.CliMenuCommand)
+            .OfType<NewItemCliMenuCommand>().Single();
+        return (Cruder)
+            typeof(NewItemCliMenuCommand).GetField("_cruder", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(
+                newItemCommand)!;
     }
 
     //the records of a cruder are reachable only through its protected methods

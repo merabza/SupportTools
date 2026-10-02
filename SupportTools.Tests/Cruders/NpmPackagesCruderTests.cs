@@ -50,7 +50,7 @@ public sealed class NpmPackagesCruderTests
     public async Task Create_WhenCalled_EditsTheNpmPackagesOfTheParameters()
     {
         // Arrange
-        NpmPackagesCruder sut = NpmPackagesCruder.Create(_parametersManager.Object);
+        var sut = NpmPackagesCruder.Create(_parametersManager.Object);
 
         // Act
         await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "fake-forms", new TextItemData { Text = "Fake forms" });

@@ -25,6 +25,12 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         IParameters parameters, IParametersManager parametersManager) : base("Support Tools Parameters Editor",
         parameters, parametersManager)
     {
+        //კომპიუტერის პროფილი: ეს ველები ამ კომპიუტერისაა და სინქრონიზაციით არ გადადის
+        FieldEditors.Add(new MachineNameFieldEditor(nameof(SupportToolsParameters.MachineName)));
+        FieldEditors.Add(
+            new CurrentMachineServerNameFieldEditor(nameof(SupportToolsParameters.CurrentMachineServerName)));
+        FieldEditors.Add(new PathMappingsFieldEditor(nameof(SupportToolsParameters.PathMappings), parametersManager));
+
         FieldEditors.Add(new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(
             nameof(SupportToolsParameters.DotnetTools), x => new DotnetToolCruder(parametersManager, x)));
 
@@ -85,9 +91,8 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
             nameof(SupportToolsParameters.ReactAppTemplates),
             x => new ReactAppTypeCruder(logger, parametersManager, x)));
 
-        FieldEditors.Add(
-            new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(nameof(SupportToolsParameters.NpmPackages),
-                x => new NpmPackagesCruder(parametersManager, x)));
+        FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(
+            nameof(SupportToolsParameters.NpmPackages), x => new NpmPackagesCruder(parametersManager, x)));
 
         FieldEditors.Add(new DictionaryFieldEditor<FileStorageCruder, FileStorageData>(
             nameof(SupportToolsParameters.FileStorages), x => new FileStorageCruder(logger, parametersManager, x)));

@@ -13,8 +13,8 @@ public sealed class UpdateAllToolsToLatestVersionCliMenuCommand : CliMenuCommand
     private readonly Func<string, bool> _confirm;
     private readonly IParametersManager _parametersManager;
 
-    public UpdateAllToolsToLatestVersionCliMenuCommand(IParametersManager parametersManager) : this(
-        parametersManager, question => Inputer.InputBool(question, true, false))
+    public UpdateAllToolsToLatestVersionCliMenuCommand(IParametersManager parametersManager) : this(parametersManager,
+        question => Inputer.InputBool(question, true, false))
     {
     }
 

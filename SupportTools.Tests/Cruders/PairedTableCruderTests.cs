@@ -25,9 +25,9 @@ public sealed class PairedTableCruderTests
     private const string CustomersKey = "dbo.Customers - dbo.Clients";
     private const string DevConnectionString = "Fake dev connection";
     private const string ProdCopyConnectionString = "Fake prod copy connection";
+    private readonly SupportToolsParameters _parameters = new();
 
     private readonly Mock<IParametersManager> _parametersManager = new();
-    private readonly SupportToolsParameters _parameters = new();
     private readonly Dictionary<string, PairedTable> _tables = [];
 
     public PairedTableCruderTests()
@@ -55,8 +55,7 @@ public sealed class PairedTableCruderTests
         List<FieldEditor> fieldEditors = CliMenuTestAccess.GetFieldEditors(CreateSut());
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             nameof(PairedTable.ProdCopySchemaName), nameof(PairedTable.ProdCopyTableName),
             nameof(PairedTable.DevSchemaName), nameof(PairedTable.DevTableName), nameof(PairedTable.SeedDataType),
             nameof(PairedTable.UseOldDataConvertor), nameof(PairedTable.KeyFieldNames),
@@ -139,9 +138,8 @@ public sealed class PairedTableCruderTests
         _tables[CustomersKey] = CreateCustomersTable();
 
         // Act
-        PairedTableCruder sut = PairedTableCruder.Create(_parametersManager.Object, new Mock<ILogger>().Object,
-            _tables, EDatabaseProvider.OleDb, ProdCopyConnectionString, EDatabaseProvider.SqlServer,
-            DevConnectionString);
+        var sut = PairedTableCruder.Create(_parametersManager.Object, new Mock<ILogger>().Object, _tables,
+            EDatabaseProvider.OleDb, ProdCopyConnectionString, EDatabaseProvider.SqlServer, DevConnectionString);
 
         // Assert
         Assert.Equal("Paired Table", sut.CrudName);
@@ -234,8 +232,7 @@ public sealed class PairedTableCruderTests
         Assert.Equal([CustomersKey], _tables.Keys);
         Assert.Same(customers, _tables[CustomersKey]);
         _parametersManager.Verify(
-            x => x.Save(_parameters, $"record {CustomersKey} Added", null, It.IsAny<CancellationToken>()),
-            Times.Once);
+            x => x.Save(_parameters, $"record {CustomersKey} Added", null, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -8,6 +9,7 @@ using AppCliTools.CliParameters.FieldEditors;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
+using SupportTools.FieldEditors;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -20,6 +22,9 @@ public sealed class SupportToolsParametersEditorTests
     //the order is the order of the fields in the parameters editor menu
     private static readonly string[] ExpectedPropertyNames =
     [
+        nameof(SupportToolsParameters.MachineName),
+        nameof(SupportToolsParameters.CurrentMachineServerName),
+        nameof(SupportToolsParameters.PathMappings),
         nameof(SupportToolsParameters.DotnetTools),
         nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
         nameof(SupportToolsParameters.LocalPackageManagerWebApiClientName),
@@ -106,6 +111,36 @@ public sealed class SupportToolsParametersEditorTests
         // Assert
         Assert.Equal("EditorConfig Patterns", subMenu?.Caption);
         Assert.Contains("CSharp", CliMenuTestAccess.GetMenuItems(subMenu!).Select(x => x.MenuItemName));
+    }
+
+    //MachineName is optional: an empty value means the name of this computer, and the editor shows it
+    [Fact]
+    public void MachineNameEditor_WhenMachineNameIsNotSet_ShowsNameOfThisComputer()
+    {
+        // Arrange
+        FieldEditor machineNameEditor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.MachineName));
+
+        // Act
+        string status = machineNameEditor.GetValueStatus(_parameters);
+
+        // Assert
+        Assert.IsType<MachineNameFieldEditor>(machineNameEditor);
+        Assert.Equal(Environment.MachineName, status);
+    }
+
+    [Fact]
+    public void PathMappingsEditor_WhenSubMenuRequested_OpensPathMappingsList()
+    {
+        // Arrange
+        FieldEditor pathMappingsEditor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.PathMappings));
+
+        // Act
+        CliMenuSet? subMenu = pathMappingsEditor.GetSubMenu(_parameters);
+
+        // Assert
+        Assert.Equal("Path Mappings", subMenu?.Caption);
     }
 
     private SupportToolsParametersEditor CreateSut()

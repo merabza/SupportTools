@@ -18,8 +18,7 @@ public sealed class ReactAppTypeCruder : SimpleNamesWithDescriptionsCruder
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public ReactAppTypeCruder(ILogger logger, IParametersManager parametersManager,
-        Dictionary<string, string> currentValuesDict) : base(parametersManager, "React App Type",
-        "React App Types")
+        Dictionary<string, string> currentValuesDict) : base(parametersManager, "React App Type", "React App Types")
     {
         _logger = logger;
         _parametersManager = parametersManager;

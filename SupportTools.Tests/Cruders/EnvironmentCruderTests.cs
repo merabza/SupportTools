@@ -54,7 +54,7 @@ public sealed class EnvironmentCruderTests
     public async Task Create_WhenCalled_EditsTheEnvironmentsOfTheParameters()
     {
         // Arrange
-        EnvironmentCruder sut = EnvironmentCruder.Create(_parametersManager.Object);
+        var sut = EnvironmentCruder.Create(_parametersManager.Object);
 
         // Act
         await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "Production", new TextItemData { Text = "Live servers" });

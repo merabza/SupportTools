@@ -816,8 +816,7 @@ public sealed class GitStsCruderTests : IDisposable
     //local changes are saved as the whole parameters object
     private void VerifyParametersSavedOnce(string message)
     {
-        _parametersManager.Verify(x => x.Save(_parameters, message, null, It.IsAny<CancellationToken>()),
-            Times.Once);
+        _parametersManager.Verify(x => x.Save(_parameters, message, null, It.IsAny<CancellationToken>()), Times.Once);
         _parametersManager.Verify(
             x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
                 It.IsAny<CancellationToken>()), Times.Once);

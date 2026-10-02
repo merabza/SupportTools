@@ -13,8 +13,8 @@ public sealed class NpmPackagesCruder : SimpleNamesWithDescriptionsCruder
     //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesWithDescriptionsFieldEditor-ში
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
-    public NpmPackagesCruder(IParametersManager parametersManager, Dictionary<string, string> currentValuesDict) :
-        base(parametersManager, "Npm Package", "Npm Packages")
+    public NpmPackagesCruder(IParametersManager parametersManager, Dictionary<string, string> currentValuesDict) : base(
+        parametersManager, "Npm Package", "Npm Packages")
     {
         _currentValuesDict = currentValuesDict;
     }

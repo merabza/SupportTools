@@ -18,6 +18,7 @@
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibSupportToolsServerWork\LibSupportToolsServerWork.csproj" />
     <ProjectReference Include="..\SupportTools\SupportTools.csproj" />
+    <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 
 </Project>

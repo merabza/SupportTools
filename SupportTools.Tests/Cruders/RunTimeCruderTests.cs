@@ -54,7 +54,7 @@ public sealed class RunTimeCruderTests
     public async Task Create_WhenCalled_EditsTheRunTimesOfTheParameters()
     {
         // Arrange
-        RunTimeCruder sut = RunTimeCruder.Create(_parametersManager.Object);
+        var sut = RunTimeCruder.Create(_parametersManager.Object);
 
         // Act
         await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "linux-x64", new TextItemData { Text = "Linux 64 bit" });

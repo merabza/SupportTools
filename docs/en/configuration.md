@@ -45,12 +45,60 @@ of properties:
 |Group|Properties|Used for|
 |-|-|-|
 |Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
+|Machine profile|`MachineName`, `CurrentMachineServerName`, `PathMappings`|Settings of this computer, never shared with other computers (see [Machine profile and path mapping](#machine-profile-and-path-mapping))|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
 |Recent commands|`RecentCommandsFileName`, `RecentCommandsCount`|Menu history|
 |Archives|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|Packaging conventions|
 |Collections|`Projects`, `Servers`, `Gits`, `GitProjects`|All registered projects, server entries, git repos, and per-project git mappings|
 |Templates|`Templates`, `ReactAppTemplates`, `NpmPackages`, `Environments`, `RunTimes`, `GitIgnorePatterns`, `EditorConfigPatterns`|Inputs to the project creator; `GitIgnorePatterns` / `EditorConfigPatterns` are also the templates that `.gitignore` / `.editorconfig` files are checked against (see [templates](#gitignore-and-editorconfig-templates))|
 |Infrastructure|`DotnetTools`, `ApiClients`, `Archivers`, `DatabaseServerConnections`, `FileStorages`, `SmartSchemas`|Reusable shared resources|
+
+\---
+
+## Machine profile and path mapping
+
+SupportTools runs on more than one computer. These fields belong to the
+computer it runs on and are never shared with other computers. They are
+edited at the top of `Support Tools Parameters Editor`:
+
+* `MachineName` — the name of this computer. When it is empty, the name
+from `Environment.MachineName` is used. Accepting the offered name leaves
+the field empty, so a copied file still gives the right name on the other
+computer; only a different name is stored.
+* `CurrentMachineServerName` — the `Servers` entry that is this computer,
+picked from the existing servers (`(None)` when there is no such entry).
+When it is set, `IsLocal` is computed at start-up: only this server is
+local, and the `Servers` editor no longer shows `IsLocal`. When it is
+empty, the stored `IsLocal` values are used as before.
+* `PathMappings` — rules that turn canonical paths into the paths of this
+computer.
+
+Paths are kept in the canonical form: the Windows absolute path as on the
+main computer (PAZISI), for example
+`D:\1WorkDotnet\AppGrammarGe\AppGrammarGe\AppGrammarGe.slnx`. A rule maps a
+canonical prefix to a local prefix, for example `D:\1WorkDotnet` →
+`/home/merab/1WorkDotnet`:
+
+* of several matching rules, the one with the longest prefix wins;
+* a prefix matches only at a folder boundary: `D:\1WorkDotnet` does not
+match `D:\1WorkDotnetX`;
+* case and trailing separators are ignored;
+* on Linux the separators in the rest of the path change too (`\` ↔ `/`);
+* relative paths, such as `GitProjectFolderName`, only get their
+separators changed;
+* a path that no rule matches stays as it is; on Linux it is also recorded
+as a warning;
+* a Windows computer with the same folder layout needs no rules.
+
+`Path Mappings` → `Suggest Path Mappings...` collects the roots (drive and
+first folder, for example `D:\1WorkDotnet`) of the project paths, the
+ServerInfo appsettings paths, the project creator folders and the local
+file storage paths, and asks for the local prefix of each root. Enter keeps
+the current value; the root itself or empty text means that the root needs
+no rule.
+
+The fields that stay on the computer and are never synced are listed in
+`LibSupportToolsServerWork/Registry/MachineLocalFields.cs`.
 
 \---
 
@@ -93,7 +141,8 @@ swap tracking during migrations
 **`ServerDataModel`** — global, reused across projects:
 
 * `IsLocal` — controls transport (`true` = local install folder,
-`false` = WebAgent over HTTP)
+`false` = WebAgent over HTTP). When `CurrentMachineServerName` is set, it
+is computed (see [Machine profile and path mapping](#machine-profile-and-path-mapping))
 * `WebAgentName`, `WebAgentInstallerName` — API client identifiers in
 the `ApiClients` dictionary
 * `FilesUserName`, `FilesUsersGroupName` — OS-level account
