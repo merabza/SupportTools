@@ -25,7 +25,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 |`LibDatabaseWork`|ბაზის სასიცოცხლო ციკლი: create, drop, migrate, correct|LibDotnetWork, SupportToolsData|
 |`LibCodeGenerator`|კოდის გენერაცია (API რაუტები, პროექტის არტიფაქტები)|LibGitWork, SupportToolsData|
 |`LibAppInstallWork`|Install/uninstall pipeline-ები (ლოკალური და მოშორებული)|LibDotnetWork, SupportToolsData|
-|`LibSupportToolsServerWork`|მოშორებული სერვერის ოპერაციები WebAgent-ით|LibDotnetWork, LibGitData, SupportToolsData|
+|`LibSupportToolsServerWork`|SupportToolsServer-ის რედაქტორები (`Support Tools Server Editor`), რომლებიც სერვერს `SupportToolsServerApiClient` კლიენტით მიმართავენ|LibDotnetWork, LibGitData, SupportToolsData|
 |`LibAppProjectCreator`|პროექტის scaffolding შაბლონებიდან|LibAppInstallWork, LibGitWork, LibNpmWork|
 |`LibScaffoldSeeder`|Scaffold + seed კოდი არსებული ბაზებიდან|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, კონფიგურაცია, პარამეტრების მართვა|გარე: AppCliTools.CliTools, ParametersManagement.\*|

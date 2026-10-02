@@ -16,7 +16,7 @@ public sealed class EnvironmentCruder : SimpleNamesWithDescriptionsCruder
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public EnvironmentCruder(IParametersManager parametersManager, Dictionary<string, string> currentValuesDict) : base(
-        "Environment", "Environments")
+        parametersManager, "Environment", "Environments")
     {
         _parametersManager = parametersManager;
         _currentValuesDict = currentValuesDict;

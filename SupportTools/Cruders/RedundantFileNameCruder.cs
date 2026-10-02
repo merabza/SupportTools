@@ -12,7 +12,7 @@ public sealed class RedundantFileNameCruder : SimpleNamesListCruder
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public RedundantFileNameCruder(IParametersManager parametersManager, string projectName) : base(
-        "Redundant File Name", "Redundant File Names", false, false)
+        parametersManager, "Redundant File Name", "Redundant File Names", false, false)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;

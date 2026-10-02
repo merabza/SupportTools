@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,19 +18,32 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 {
     private readonly List<string> _currentValuesList;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Func<string, CancellationToken, ValueTask<string?>> _inputNpmPackageName;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
     //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით SimpleNamesListFieldEditor-ში
-    // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public ProjectNpmPackagesLisCruder(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, List<string> currentValuesList) : base("Npm Package", "Npm Packages")
+        IParametersManager parametersManager, List<string> currentValuesList) : this(logger, httpClientFactory,
+        parametersManager, currentValuesList,
+        (fieldName, cancellationToken) => NpmPackagesCruder.Create(parametersManager)
+            .GetNameWithPossibleNewName(fieldName, null, null, false, cancellationToken))
+    {
+    }
+
+    //პაკეტის სახელის შეყვანა კონსოლის მენიუდან პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხი თვითონ მიაწოდონ
+    // ReSharper disable once ConvertToPrimaryConstructor
+    internal ProjectNpmPackagesLisCruder(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, List<string> currentValuesList,
+        Func<string, CancellationToken, ValueTask<string?>> inputNpmPackageName) : base(parametersManager,
+        "Npm Package", "Npm Packages")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _currentValuesList = currentValuesList;
+        _inputNpmPackageName = inputNpmPackageName;
     }
 
     //public static ProjectNpmPackagesLisCruder Create(ProjectModel project, IParametersManager parametersManager)
@@ -44,9 +58,7 @@ public sealed class ProjectNpmPackagesLisCruder : SimpleNamesListCruder
 
     protected override async ValueTask<string?> InputNewRecordName(CancellationToken cancellationToken = default)
     {
-        var npmPackageCruder = NpmPackagesCruder.Create(_parametersManager);
-        string? newNpmPackageName =
-            await npmPackageCruder.GetNameWithPossibleNewName("Npm Package Name", null, null, false, cancellationToken);
+        string? newNpmPackageName = await _inputNpmPackageName("Npm Package Name", cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(newNpmPackageName))
         {

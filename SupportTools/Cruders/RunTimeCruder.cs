@@ -16,7 +16,7 @@ public sealed class RunTimeCruder : SimpleNamesWithDescriptionsCruder
     // ReSharper disable once ConvertToPrimaryConstructor
     // ReSharper disable once MemberCanBePrivate.Global
     public RunTimeCruder(IParametersManager parametersManager, Dictionary<string, string> currentValuesDict) : base(
-        "RunTime", "RunTimes")
+        parametersManager, "RunTime", "RunTimes")
     {
         _parametersManager = parametersManager;
         _currentValuesDict = currentValuesDict;

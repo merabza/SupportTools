@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using SystemTools.SystemToolsShared;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 // ReSharper disable ConvertToPrimaryConstructor
 
@@ -21,6 +21,13 @@ public sealed class GitApi
 
     public bool IsGitRemoteAddressValid(string remoteAddress)
     {
-        return StShared.RunProcess(_useConsole, _logger, _git, $"ls-remote {remoteAddress}").IsSuccess;
+        return GitCommandRunner.Run(CreateLsRemoteStartInfo(remoteAddress), _useConsole, _logger);
+    }
+
+    //მისამართი ცალკე არგუმენტად გადაეცემა, ამიტომ whitespace-ით ვერ გაიყოფა. "--"-ის შემდეგ "-"-ით დაწყებული
+    //მისამართიც (მაგალითად --upload-pack=...) git-ის ოფციად აღარ წაიკითხება
+    internal ProcessStartInfo CreateLsRemoteStartInfo(string remoteAddress)
+    {
+        return GitCommandRunner.CreateStartInfo(_git, "ls-remote", "--", remoteAddress);
     }
 }

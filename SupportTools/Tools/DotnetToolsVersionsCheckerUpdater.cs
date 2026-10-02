@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LibDotnetWork;
 using ParametersManagement.LibParameters;
 using SupportTools.Errors;
 using SupportToolsData.Models;
@@ -10,14 +9,21 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Tools;
 
+//internal მეთოდები dotnet tool-ის ბრძანებებს dotnetToolsRunner-ით უშვებს, რომ ტესტებმა ისინი შეცვალონ
 public static class DotnetToolsVersionsCheckerUpdater
 {
     public static bool Check(IParametersManager parametersManager)
     {
+        return Check(parametersManager, new DotnetToolsRunner());
+    }
+
+    internal static bool Check(IParametersManager parametersManager, IDotnetToolsRunner dotnetToolsRunner)
+    {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
         StShared.ConsoleWriteInformationLine(null, true, "Checking versions for all tools...");
-        Result<bool> checkVersionsForAllToolsResult = CheckVersionsForAllTools(parameters.DotnetTools);
+        Result<bool> checkVersionsForAllToolsResult =
+            CheckVersionsForAllTools(parameters.DotnetTools, dotnetToolsRunner);
         StShared.ConsoleWriteInformationLine(null, true, "Checking versions for all tools Finished.");
 
         if (checkVersionsForAllToolsResult.IsSuccess)
@@ -31,6 +37,12 @@ public static class DotnetToolsVersionsCheckerUpdater
 
     public static bool CheckOne(IParametersManager parametersManager, string toolKey)
     {
+        return CheckOne(parametersManager, toolKey, new DotnetToolsRunner());
+    }
+
+    internal static bool CheckOne(IParametersManager parametersManager, string toolKey,
+        IDotnetToolsRunner dotnetToolsRunner)
+    {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         if (!parameters.DotnetTools.TryGetValue(toolKey, out DotnetToolData? value))
         {
@@ -39,7 +51,7 @@ public static class DotnetToolsVersionsCheckerUpdater
         }
 
         StShared.ConsoleWriteInformationLine(null, true, "Checking versions for tool {0}...", toolKey);
-        Result<bool> checkVersionsForOneToolResult = CheckVersionsForOneTool(value, null);
+        Result<bool> checkVersionsForOneToolResult = CheckVersionsForOneTool(value, null, dotnetToolsRunner);
         if (checkVersionsForOneToolResult.IsSuccess)
         {
             return true;
@@ -51,6 +63,12 @@ public static class DotnetToolsVersionsCheckerUpdater
 
     public static bool UpdateOne(IParametersManager parametersManager, string toolKey)
     {
+        return UpdateOne(parametersManager, toolKey, new DotnetToolsRunner());
+    }
+
+    internal static bool UpdateOne(IParametersManager parametersManager, string toolKey,
+        IDotnetToolsRunner dotnetToolsRunner)
+    {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         if (!parameters.DotnetTools.TryGetValue(toolKey, out DotnetToolData? dotnetTool))
         {
@@ -58,26 +76,29 @@ public static class DotnetToolsVersionsCheckerUpdater
             return false;
         }
 
-        Result<bool> checkVersionsForOneToolResult = CheckVersionsForOneTool(dotnetTool, null);
+        Result<bool> checkVersionsForOneToolResult = CheckVersionsForOneTool(dotnetTool, null, dotnetToolsRunner);
         if (checkVersionsForOneToolResult.IsFailure)
         {
             checkVersionsForOneToolResult.Error.PrintErrorsOnConsole();
             return false;
         }
 
-        if (!checkVersionsForOneToolResult.Value)
-        {
-            return true;
-        }
-
-        Result<bool> updateOneToolToLatestVersionResult = UpdateOneToolToLatestVersion(dotnetTool);
+        //განახლება დაყენებული და ბოლო ვერსიების შედარებით წყდება და არა იმით, შეიცვალა თუ არა შენახული ვერსიები:
+        //შემოწმების შემდეგ ისინი უკვე მიმდინარეა, ხელსაწყო კი შეიძლება ისევ მოძველებული იყოს
+        Result<bool> updateOneToolToLatestVersionResult = UpdateOneToolToLatestVersion(dotnetTool, dotnetToolsRunner);
         if (updateOneToolToLatestVersionResult.IsFailure)
         {
             updateOneToolToLatestVersionResult.Error.PrintErrorsOnConsole();
             return false;
         }
 
-        checkVersionsForOneToolResult = CheckVersionsForOneTool(dotnetTool, null);
+        //ხელსაწყო უკვე ბოლო ვერსიაზეა და მისი ვერსიები ზემოთ შემოწმდა
+        if (!updateOneToolToLatestVersionResult.Value)
+        {
+            return true;
+        }
+
+        checkVersionsForOneToolResult = CheckVersionsForOneTool(dotnetTool, null, dotnetToolsRunner);
         if (checkVersionsForOneToolResult.IsSuccess)
         {
             return true;
@@ -89,10 +110,17 @@ public static class DotnetToolsVersionsCheckerUpdater
 
     public static bool UpdateAllToolsToLatestVersion(IParametersManager parametersManager)
     {
+        return UpdateAllToolsToLatestVersion(parametersManager, new DotnetToolsRunner());
+    }
+
+    internal static bool UpdateAllToolsToLatestVersion(IParametersManager parametersManager,
+        IDotnetToolsRunner dotnetToolsRunner)
+    {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
         StShared.ConsoleWriteInformationLine(null, true, "Checking for tools Updates...");
-        Result<bool> checkVersionsForAllToolsResult = CheckVersionsForAllTools(parameters.DotnetTools);
+        Result<bool> checkVersionsForAllToolsResult =
+            CheckVersionsForAllTools(parameters.DotnetTools, dotnetToolsRunner);
         if (checkVersionsForAllToolsResult.IsFailure)
         {
             checkVersionsForAllToolsResult.Error.PrintErrorsOnConsole();
@@ -103,7 +131,7 @@ public static class DotnetToolsVersionsCheckerUpdater
 
         bool atLeastOneUpdatedOrInstalled = false;
         foreach (Result<bool> updateOneToolToLatestVersionResult in dotnetTools.Select(kvp =>
-                     UpdateOneToolToLatestVersion(kvp.Value)))
+                     UpdateOneToolToLatestVersion(kvp.Value, dotnetToolsRunner)))
         {
             if (updateOneToolToLatestVersionResult.IsFailure)
             {
@@ -117,7 +145,7 @@ public static class DotnetToolsVersionsCheckerUpdater
         if (atLeastOneUpdatedOrInstalled)
         {
             StShared.ConsoleWriteInformationLine(null, true, "Updating tools List...");
-            checkVersionsForAllToolsResult = CheckVersionsForAllTools(parameters.DotnetTools);
+            checkVersionsForAllToolsResult = CheckVersionsForAllTools(parameters.DotnetTools, dotnetToolsRunner);
             if (checkVersionsForAllToolsResult.IsFailure)
             {
                 checkVersionsForAllToolsResult.Error.PrintErrorsOnConsole();
@@ -134,7 +162,8 @@ public static class DotnetToolsVersionsCheckerUpdater
         return true;
     }
 
-    private static Result<bool> UpdateOneToolToLatestVersion(DotnetToolData dotnetToolData)
+    private static Result<bool> UpdateOneToolToLatestVersion(DotnetToolData dotnetToolData,
+        IDotnetToolsRunner dotnetToolsRunner)
     {
         if (string.IsNullOrWhiteSpace(dotnetToolData.PackageId) ||
             string.IsNullOrWhiteSpace(dotnetToolData.LatestVersion) || dotnetToolData.LatestVersion == "N/A" ||
@@ -149,10 +178,9 @@ public static class DotnetToolsVersionsCheckerUpdater
         string command = toolInstalled ? "update" : "install";
         StShared.ConsoleWriteInformationLine(null, true, "{0}ing {1}...", command, dotnetToolData.PackageId);
 
-        var dotnetProcessor = new DotnetProcessor(null, false);
         Result result = toolInstalled
-            ? dotnetProcessor.UpdateTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion)
-            : dotnetProcessor.InstallTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion);
+            ? dotnetToolsRunner.UpdateTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion)
+            : dotnetToolsRunner.InstallTool(dotnetToolData.PackageId, dotnetToolData.MaxVersion);
         if (result.IsFailure)
         {
             return result.Error;
@@ -161,10 +189,12 @@ public static class DotnetToolsVersionsCheckerUpdater
         return true;
     }
 
-    private static Result<bool> CheckVersionsForAllTools(Dictionary<string, DotnetToolData> necessaryDotnetTools)
+    private static Result<bool> CheckVersionsForAllTools(Dictionary<string, DotnetToolData> necessaryDotnetTools,
+        IDotnetToolsRunner dotnetToolsRunner)
     {
         StShared.ConsoleWriteInformationLine(null, true, "Create List of Installed tools...");
-        Result<List<DotnetToolData>> createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
+        Result<List<DotnetToolData>> createListOfDotnetToolsInstalledResult =
+            CreateListOfDotnetToolsInstalled(dotnetToolsRunner);
         if (createListOfDotnetToolsInstalledResult.IsFailure)
         {
             return Result.CreateValidationError([
@@ -180,7 +210,8 @@ public static class DotnetToolsVersionsCheckerUpdater
 
         foreach (KeyValuePair<string, DotnetToolData> kvp in necessaryDotnetTools)
         {
-            Result<bool> checkVersionsForOneToolResult = CheckVersionsForOneTool(kvp.Value, listOfToolsInstalled);
+            Result<bool> checkVersionsForOneToolResult =
+                CheckVersionsForOneTool(kvp.Value, listOfToolsInstalled, dotnetToolsRunner);
             if (checkVersionsForOneToolResult.IsFailure)
             {
                 errors.AddRange(checkVersionsForOneToolResult.Error.ToErrorArray());
@@ -188,7 +219,8 @@ public static class DotnetToolsVersionsCheckerUpdater
                 continue;
             }
 
-            madeChanges = checkVersionsForOneToolResult.Value;
+            //ცვლილება რომელიმე ხელსაწყოში ცვლილებაა და არა მხოლოდ ბოლოში
+            madeChanges = checkVersionsForOneToolResult.Value || madeChanges;
         }
 
         if (errors.Count > 0)
@@ -200,7 +232,7 @@ public static class DotnetToolsVersionsCheckerUpdater
     }
 
     private static Result<bool> CheckVersionsForOneTool(DotnetToolData dotnetToolData,
-        List<DotnetToolData>? listOfToolsInstalled)
+        List<DotnetToolData>? listOfToolsInstalled, IDotnetToolsRunner dotnetToolsRunner)
     {
         string? packageId = dotnetToolData.PackageId;
         if (string.IsNullOrEmpty(packageId))
@@ -213,7 +245,8 @@ public static class DotnetToolsVersionsCheckerUpdater
         List<DotnetToolData>? installedTools = listOfToolsInstalled;
         if (installedTools == null)
         {
-            Result<List<DotnetToolData>> createListOfDotnetToolsInstalledResult = CreateListOfDotnetToolsInstalled();
+            Result<List<DotnetToolData>> createListOfDotnetToolsInstalledResult =
+                CreateListOfDotnetToolsInstalled(dotnetToolsRunner);
             if (createListOfDotnetToolsInstalledResult.IsFailure)
             {
                 return Result.CreateValidationError([
@@ -225,7 +258,7 @@ public static class DotnetToolsVersionsCheckerUpdater
             installedTools = createListOfDotnetToolsInstalledResult.Value;
         }
 
-        Result<string> getAvailableVersionOfToolResult = GetAvailableVersionOfTool(packageId);
+        Result<string> getAvailableVersionOfToolResult = GetAvailableVersionOfTool(packageId, dotnetToolsRunner);
         if (getAvailableVersionOfToolResult.IsFailure)
         {
             return Result.CreateValidationError([
@@ -267,10 +300,9 @@ public static class DotnetToolsVersionsCheckerUpdater
         return haveChanges;
     }
 
-    private static Result<string> GetAvailableVersionOfTool(string toolName)
+    private static Result<string> GetAvailableVersionOfTool(string toolName, IDotnetToolsRunner dotnetToolsRunner)
     {
-        var dotnetProcessor = new DotnetProcessor(null, false);
-        Result<(string, int)> processResult = dotnetProcessor.SearchTool(toolName);
+        Result<(string, int)> processResult = dotnetToolsRunner.SearchTool(toolName);
         if (processResult.IsFailure)
         {
             return processResult.Error;
@@ -287,10 +319,9 @@ public static class DotnetToolsVersionsCheckerUpdater
         return lineParts.Length < 2 ? "N/A" : lineParts[1];
     }
 
-    private static Result<List<DotnetToolData>> CreateListOfDotnetToolsInstalled()
+    private static Result<List<DotnetToolData>> CreateListOfDotnetToolsInstalled(IDotnetToolsRunner dotnetToolsRunner)
     {
-        var dotnetProcessor = new DotnetProcessor(null, false);
-        Result<IEnumerable<string>> getToolsRawListResult = dotnetProcessor.GetToolsRawList();
+        Result<IEnumerable<string>> getToolsRawListResult = dotnetToolsRunner.GetToolsRawList();
         if (getToolsRawListResult.IsFailure)
         {
             return getToolsRawListResult.Error;

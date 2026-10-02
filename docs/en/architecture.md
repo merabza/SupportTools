@@ -24,7 +24,7 @@ the build expects all sibling repos to live alongside `SupportTools/`.
 |`LibDatabaseWork`|Database lifecycle: create, drop, migrate, correct|LibDotnetWork, SupportToolsData|
 |`LibCodeGenerator`|Code generation (API routes, project artifacts)|LibGitWork, SupportToolsData|
 |`LibAppInstallWork`|Install/uninstall pipelines (local \& remote)|LibDotnetWork, SupportToolsData|
-|`LibSupportToolsServerWork`|Remote server operations via WebAgent|LibDotnetWork, LibGitData, SupportToolsData|
+|`LibSupportToolsServerWork`|SupportToolsServer editors (`Support Tools Server Editor`) and their calls through the server client `SupportToolsServerApiClient`|LibDotnetWork, LibGitData, SupportToolsData|
 |`LibAppProjectCreator`|Project scaffolding from templates|LibAppInstallWork, LibGitWork, LibNpmWork|
 |`LibScaffoldSeeder`|Scaffold + seed code from existing databases|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, configuration, parameter management|External: AppCliTools.CliTools, ParametersManagement.\*|

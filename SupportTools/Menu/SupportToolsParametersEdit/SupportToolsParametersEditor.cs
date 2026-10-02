@@ -87,7 +87,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
 
         FieldEditors.Add(
             new SimpleNamesWithDescriptionsFieldEditor<NpmPackagesCruder>(nameof(SupportToolsParameters.NpmPackages),
-                x => new NpmPackagesCruder(x)));
+                x => new NpmPackagesCruder(parametersManager, x)));
 
         FieldEditors.Add(new DictionaryFieldEditor<FileStorageCruder, FileStorageData>(
             nameof(SupportToolsParameters.FileStorages), x => new FileStorageCruder(logger, parametersManager, x)));

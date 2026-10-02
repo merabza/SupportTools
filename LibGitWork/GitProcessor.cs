@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -283,8 +284,7 @@ fi*/
 
     public bool Clone(string remoteAddress)
     {
-        if (StShared.RunProcess(_useConsole, _logger, _git,
-                $"clone {QuoteArgument(remoteAddress)} {QuoteArgument(_projectPath)}").IsSuccess)
+        if (GitCommandRunner.Run(CreateCloneStartInfo(remoteAddress), _useConsole, _logger))
         {
             CheckRemoteId();
             return true;
@@ -292,6 +292,12 @@ fi*/
 
         StShared.WriteErrorLine($"cannot clone {remoteAddress} to {_projectPath}", _useConsole, _logger);
         return false;
+    }
+
+    //"--"-ის შემდეგ "-"-ით დაწყებული მისამართიც (მაგალითად --upload-pack=...) git-ის ოფციად აღარ წაიკითხება
+    internal ProcessStartInfo CreateCloneStartInfo(string remoteAddress)
+    {
+        return GitCommandRunner.CreateStartInfo(_git, "clone", "--", remoteAddress, _projectPath);
     }
 
     public (bool, bool) SyncRemote()
@@ -381,7 +387,7 @@ fi*/
     //git-ის მიერ C სტილში დაბრჭყალებული ფაილის სახელის აღდგენა. მაგალითად, "\341\203\244.log" არის ფ.log:
     //\ooo რვაობითი ბაიტია, \a \b \t \n \v \f \r მართვის სიმბოლოებია, \" და \\ კი თავად ეს სიმბოლოები.
     //ბაიტებიდან სახელი UTF-8-ით აიწყობა. ბრჭყალების გარეშე დაბეჭდილი სახელი უცვლელი რჩება
-    private static string UnquoteGitPath(string path)
+    internal static string UnquoteGitPath(string path)
     {
         if (path.Length < 2 || path[0] != '"' || path[^1] != '"')
         {
@@ -427,11 +433,13 @@ fi*/
     }
 
     //წავშალოთ ქეშიდან თითოეული ფაილისათვის შემდეგი ბრძანების გაშვებით
-    //git -C {GitPatch} rm --cached {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად, ანუ GitPatch-დან დაწყებული}
+    //git -C {GitPatch} rm --cached -- {წინა ბრძანების მიერ დაბრუნებული ფაილის სახელი სრულად,
+    //ანუ GitPatch-დან დაწყებული}
+    //"--"-ის შემდეგ "-"-ით დაწყებული ფაილის სახელიც git-ის ოფციად აღარ წაიკითხება
     public bool RemoveFromCacheRedundantCachedFile(string redundantCachedFileName)
     {
         if (StShared.RunProcess(_useConsole, _logger, _git,
-                $"{_switchToProjectPath} rm --cached {QuoteArgument(redundantCachedFileName)}").IsSuccess)
+                $"{_switchToProjectPath} rm --cached -- {QuoteArgument(redundantCachedFileName)}").IsSuccess)
         {
             return true;
         }
@@ -467,7 +475,7 @@ fi*/
     //არგუმენტის ბრჭყალებში ჩასმა ბრძანების ხაზის სტანდარტული წესებით (CommandLineToArgvW), რომ ჰარების ან
     //ბრჭყალების შემცველი გზა თუ მესიჯი git-მა ერთ, უცვლელ არგუმენტად მიიღოს: ბრჭყალის და დამხურავი
     //ბრჭყალის წინ მდგომი უკუხაზები ორმაგდება, თვითონ ბრჭყალი კი \"-ად იწერება
-    private static string QuoteArgument(string argument)
+    internal static string QuoteArgument(string argument)
     {
         var sb = new StringBuilder();
         sb.Append('"');

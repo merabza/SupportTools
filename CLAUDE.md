@@ -51,6 +51,8 @@ All registered projects, servers, git repos, templates, API clients, and connect
 
 When editing fields: add property → add a `FieldEditor` under `SupportTools/FieldEditors/` → wire into the corresponding `*ParametersEditor` in `SupportTools/ParametersEditors/` or `Cruders/`. Direct JSON edits skip in-app validation.
 
+Every change must end with `IParametersManager.Save` of the **root** object (`parametersManager.Parameters`). Passing a sub-object (e.g. `AppProjectCreatorAllParameters`) overwrites the whole file with it and replaces `IParametersManager.Parameters`, which breaks every later `(SupportToolsParameters)` cast. Cruders built on `SimpleNamesListCruder` / `SimpleNamesWithDescriptionsCruder` (AppCliTools) save only when constructed through their `IParametersManager` overload; the old overloads stay for other applications and save nothing. `ParametersManager.Save` replaces the file atomically (temp file in the same folder + `File.Move`), skips the write when the content is unchanged, and keeps the 10 newest `<file>.yyyyMMdd-HHmmss-fff.bak` copies next to it; manually named backups are never deleted.
+
 ## Conventions to match
 
 - Code comments are predominantly in Georgian — match the language of nearby comments rather than translating.

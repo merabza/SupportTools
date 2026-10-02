@@ -78,6 +78,7 @@ a project whose SupportTools tooling has been upgraded.
 ## Related
 
 * [Deployment](use-cases/deployment.md) — how the remote path is used
-* [Architecture](architecture.md) — `LibSupportToolsServerWork` is the
-client side
+* [Architecture](architecture.md) — the client side is `LibAppInstallWork`
+(programs, services, version checks) and `LibDatabaseWork` (database
+operations)
 

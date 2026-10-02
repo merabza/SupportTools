@@ -4,7 +4,6 @@ using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
-using SupportTools.Tools;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -24,11 +23,6 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
         FieldEditors.Add(new TextFieldEditor(nameof(DotnetToolData.Description)));
     }
 
-    protected override void BeforeGetListMenu()
-    {
-        DotnetToolsVersionsCheckerUpdater.Check(ParametersManager);
-    }
-
     public override string? GetStatusFor(string name)
     {
         var dotnetToolData = (DotnetToolData?)GetItemByName(name);
@@ -44,6 +38,8 @@ public sealed class DotnetToolCruder : ParCruder<DotnetToolData>
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
     {
         //Check versions for All Tools
+        //სიის აგება ვერსიებს აღარ ამოწმებს, რადგან ეს მონაცემს შენახვის გარეშე ცვლიდა. ვერსიები ამ ბრძანებით
+        //მოწმდება და შედეგი ინახება
         var checkDotnetToolsVersionsCommand = new CheckDotnetToolsVersionsCliMenuCommand(ParametersManager);
         cruderSubMenuSet.AddMenuItem(checkDotnetToolsVersionsCommand);
 

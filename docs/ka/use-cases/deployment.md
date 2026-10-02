@@ -178,8 +178,7 @@ IV-ით, რომელიც წინ მიერთება Base64 დ�
 ## დაკავშირებული
 
 * [კონფიგურაცია](../configuration.md) — server info, key settings
-* [არქიტექტურა](../architecture.md) — `LibAppInstallWork`,
-`LibSupportToolsServerWork`
+* [არქიტექტურა](../architecture.md) — `LibAppInstallWork`
 * [დაკავშირებული პროექტები](../related-projects.md) — WebAgent,
 WebAgentInstaller
 

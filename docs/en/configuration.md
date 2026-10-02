@@ -19,6 +19,22 @@ offers to create one. With `--use`, a missing or invalid file is
 offered for creation instead. The file name uses the date mask from `SupportToolsParameters.ParametersFileDateMask` and
 the extension from `ParametersFileExtension`.
 
+## Saving and backups
+
+Every change made through the menus is saved at once. `ParametersManager`
+writes the new content to a temporary file in the same folder and then
+replaces the parameters file with it, so an interrupted save cannot leave
+a damaged file. A save whose content did not change leaves the file
+untouched.
+
+Before the file is replaced, its previous version is copied next to it as
+`<file name>.yyyyMMdd-HHmmss-fff.bak`, for example
+`SupportTools.json.20261001-213015-123.bak`. The 10 newest copies are
+kept and older ones are deleted. Only files named exactly this way are
+deleted: copies made by hand under other names stay. The same applies to
+every file saved through `ParametersManager`, for example the recent
+commands file.
+
 \---
 
 ## Top-level: `SupportToolsParameters`
@@ -114,10 +130,29 @@ name in the parameters, and both lists are edited in
 `Editor Config Patterns`). Each list menu has `Check ... Files` (the
 status shows how many files differ from their template or are missing),
 `Update ... Files` (overwrites those files with the template) and
-`Sync Up ... files...` (uploads every template of the list to
-SupportToolsServer, which stores them in its database; server records
-that are not in the list are deleted, so every template file must
-exist).
+`Sync ... files...`.
+
+`Sync ... files...` compares the list with the templates that
+SupportToolsServer stores in its database. Records match by name,
+ignoring case. Every template file of the list must exist, otherwise
+the command stops. It first shows the differences: templates whose
+content differs, and templates that exist only on the client or only on
+the server. Then it offers four directions, each with a summary of what
+it would change:
+
+* `Merge Up` — uploads the new and changed templates to the server;
+* `Sync Up` — the same, and also deletes the server records that are
+not in the list;
+* `Merge Down` — writes the new and changed server templates into the
+templates folder and adds the new names to the list;
+* `Sync Down` — the same, and also removes the templates that are not
+on the server from the list and deletes their files.
+
+`Merge` never deletes anything. A template that is in use is not
+deleted: a `.gitignore` template that a git repo on the same side uses
+(`Gits` on the client, the server's git repos), or an `.editorconfig`
+template that a project uses (on the client only; nothing uses them on
+the server).
 
 ||`.gitignore`|`.editorconfig`|
 |-|-|-|
@@ -161,10 +196,19 @@ parameters file with file-system permissions.
 
 Most fields are editable through the in-app menu:
 
-* `Support Tools Parameters Edit` — top-level fields
-* `Support Tools Server Edit` — `ApiClients`, `Servers`,
-`DatabaseServerConnections`
+* `Support Tools Parameters Editor` — top-level fields, including the
+`ApiClients`, `Servers` and `DatabaseServerConnections` collections
+* `Support Tools Server Editor` — the records stored on
+SupportToolsServer: `GitIgnore File Types`, `EditorConfig File Types`
+and `Gits from SupportToolsServer`
 * Per-project menus — project-specific fields, server infos, git lists
+
+Deleting or renaming a git in `Gits from SupportToolsServer` also changes
+the local `Gits` record once the server accepts the change. A deleted git
+stays locally while a project still uses it. A rename also renames the
+references in the projects (`GitProjectNames`,
+`ScaffoldSeederGitProjectNames`) and in `GitProjects`, unless the new
+name is already taken locally.
 
 Editing the JSON file directly works for one-off fixes, but the menu
 editors run validation that the file does not.

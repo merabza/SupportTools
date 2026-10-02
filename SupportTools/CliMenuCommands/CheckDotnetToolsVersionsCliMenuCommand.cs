@@ -22,11 +22,11 @@ public sealed class CheckDotnetToolsVersionsCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        if (DotnetToolsVersionsCheckerUpdater.Check(_parametersManager))
-            //შენახვა
-        {
-            await _parametersManager.Save(parameters, "Dotnet Tools versions checked success", null, cancellationToken);
-        }
+        //შემოწმება ხელსაწყოების ვერსიებს ცვლის, ამიტომ შედეგი ყოველთვის ინახება: ერთი ხელსაწყოს შეცდომისას Check
+        //false-ს აბრუნებს, დანარჩენების ვერსიები კი შეიძლება უკვე შეცვლილი იყოს. უცვლელ ფაილს ParametersManager
+        //თავიდან აღარ წერს
+        DotnetToolsVersionsCheckerUpdater.Check(_parametersManager);
+        await _parametersManager.Save(parameters, "Dotnet Tools versions saved", null, cancellationToken);
 
         return true;
     }

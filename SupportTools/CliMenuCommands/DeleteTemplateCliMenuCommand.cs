@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
@@ -11,15 +12,23 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
 {
+    private readonly Func<string, bool> _confirm;
     private readonly IParametersManager _parametersManager;
     private readonly string _templateName;
 
+    public DeleteTemplateCliMenuCommand(IParametersManager parametersManager, string templateName) : this(
+        parametersManager, templateName, question => Inputer.InputBool(question, false, false))
+    {
+    }
+
+    //კონსოლიდან დასტური პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteTemplateCliMenuCommand(IParametersManager parametersManager, string templateName) : base(
-        "Delete Template", EMenuAction.LevelUp, EMenuAction.Reload, templateName)
+    internal DeleteTemplateCliMenuCommand(IParametersManager parametersManager, string templateName,
+        Func<string, bool> confirm) : base("Delete Template", EMenuAction.LevelUp, EMenuAction.Reload, templateName)
     {
         _parametersManager = parametersManager;
         _templateName = templateName;
+        _confirm = confirm;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
@@ -39,13 +48,15 @@ public sealed class DeleteTemplateCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        if (!Inputer.InputBool($"This will Delete Template {_templateName}. are you sure?", false, false))
+        if (!_confirm($"This will Delete Template {_templateName}. are you sure?"))
         {
             return false;
         }
 
         templates.Remove(_templateName);
-        await _parametersManager.Save(parameters, $"Template {_templateName} Deleted", null, cancellationToken);
+        //ინახება ძირეული ობიექტი: შაბლონების ობიექტის შენახვა მთელ ფაილს მხოლოდ მისით გადაწერდა
+        await _parametersManager.Save(supportToolsParameters, $"Template {_templateName} Deleted", null,
+            cancellationToken);
         MenuAction = EMenuAction.LevelUp;
         return true;
     }

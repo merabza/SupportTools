@@ -29,6 +29,10 @@ public sealed class GitStsCruder : Cruder
     private readonly IMemoryCache _memoryCache;
     private readonly IParametersManager _parametersManager;
 
+    //სერვერიდან წაშლილი git-ის სახელი, რომლის ლოკალური ასლი ჯერ არ დამუშავებულა. Cruder-ში გადარქმევა წაშლა და
+    //დამატებაა: თუ წაშლას დამატება მოსდევს, ლოკალური git ახალ სახელზე გადადის, თუ არა, ოპერაციის ბოლოს (Save) იშლება
+    private string? _removedGitKey;
+
     private GitStsCruder(ILogger logger, IHttpClientFactory httpClientFactory, IMemoryCache memoryCache,
         IParametersManager parametersManager) : base("GitFromServer", "GitsFromServer")
     {
@@ -126,38 +130,39 @@ public sealed class GitStsCruder : Cruder
         return ValueTask.CompletedTask;
     }
 
-    private void AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //აბრუნებს, მიიღო თუ არა სერვერმა ჩანაწერი
+    private bool AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
         if (supportToolsServerApiClient is null)
         {
             StShared.WriteErrorLine("supportToolsServerApiClient is null", true);
-            return;
+            return false;
         }
 
         if (newRecord is not GitDataModel model)
         {
             StShared.WriteErrorLine("newRecord is not GitDataModel", true);
-            return;
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(model.GitIgnorePatternName))
         {
             StShared.WriteErrorLine("GitIgnorePatternName is not entered", true);
-            return;
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(model.GitProjectAddress))
         {
             StShared.WriteErrorLine("GitProjectAddress is not entered", true);
-            return;
+            return false;
         }
 
         if (string.IsNullOrWhiteSpace(model.GitProjectFolderName))
         {
             StShared.WriteErrorLine("GitProjectFolderName is not entered", true);
-            return;
+            return false;
         }
 
         var gitDataDomain = new StsGitDataModel
@@ -168,10 +173,12 @@ public sealed class GitStsCruder : Cruder
             GitProjectName = recordKey
         };
 
+        bool updated = false;
         try
         {
             Result updateGitRepoByKeyResult = supportToolsServerApiClient
                 .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
+            updated = updateGitRepoByKeyResult.IsSuccess;
             if (updateGitRepoByKeyResult.IsFailure)
             {
                 updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
@@ -184,12 +191,20 @@ public sealed class GitStsCruder : Cruder
 
         //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
         _memoryCache.Remove(GitsList);
+        return updated;
     }
 
-    protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
+    protected override async ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
     {
-        return UpdateRecordWithKey(recordKey, newRecord, cancellationToken);
+        //წაშლის შემდეგ დამატება გადარქმევაა
+        string? renamedGitKey = _removedGitKey;
+        _removedGitKey = null;
+
+        if (AddOrUpdateRecordWithKey(recordKey, newRecord) && renamedGitKey is not null)
+        {
+            await RenameLocalGit(renamedGitKey, recordKey, cancellationToken);
+        }
     }
 
     protected override async ValueTask RemoveRecordWithKey(string recordKey,
@@ -211,6 +226,11 @@ public sealed class GitStsCruder : Cruder
             {
                 updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
             }
+            else
+            {
+                //ლოკალური git-ის ბედი მომდევნო ნაბიჯზეა დამოკიდებული: დამატება (გადარქმევა) თუ Save (წაშლა)
+                _removedGitKey = recordKey;
+            }
         }
         catch (Exception e)
         {
@@ -219,10 +239,109 @@ public sealed class GitStsCruder : Cruder
 
         //სერვერზე ცვლილების შემდეგ ქეშში დარჩენილი სია აღარ გამოდგება
         _memoryCache.Remove(GitsList);
+    }
 
+    //Cruder-ის ყოველი ცვლილება Save-ით სრულდება. თუ სერვერიდან წაშლას დამატება არ მოჰყოლია, ეს წაშლა იყო
+    public override async ValueTask<bool> Save(string message, CancellationToken cancellationToken = default)
+    {
+        if (_removedGitKey is null)
+        {
+            return true;
+        }
+
+        string removedGitKey = _removedGitKey;
+        _removedGitKey = null;
+        return await RemoveLocalGit(removedGitKey, cancellationToken);
+    }
+
+    //სერვერიდან წაშლილი git ლოკალურადაც იშლება, ოღონდ მხოლოდ მაშინ, თუ მას არცერთი პროექტი არ იყენებს
+    private async ValueTask<bool> RemoveLocalGit(string gitKey, CancellationToken cancellationToken)
+    {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        Dictionary<string, GitDataModel> gits = parameters.Gits;
-        gits.Remove(recordKey);
+        string? localGitKey = FindLocalGitKey(parameters, gitKey);
+        if (localGitKey is null)
+        {
+            return true;
+        }
+
+        List<string> projectNames = GetProjectNamesUsingGit(parameters, localGitKey);
+        if (projectNames.Count > 0)
+        {
+            StShared.WriteWarningLine(
+                $"Local git {localGitKey} is used by projects {string.Join(", ", projectNames)} and was not removed",
+                true, _logger, true);
+            return true;
+        }
+
+        parameters.Gits.Remove(localGitKey);
+        return await _parametersManager.Save(parameters, $"Local git {localGitKey} removed", null,
+            cancellationToken);
+    }
+
+    //სერვერზე გადარქმეული git ლოკალურადაც გადაერქმევა, მასზე მიმთითებელ პროექტებთან და GitProjects-თან ერთად
+    private async ValueTask RenameLocalGit(string gitKey, string newGitKey, CancellationToken cancellationToken)
+    {
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        string? localGitKey = FindLocalGitKey(parameters, gitKey);
+        if (localGitKey is null)
+        {
+            return;
+        }
+
+        string? existingLocalGitKey = FindLocalGitKey(parameters, newGitKey);
+        if (existingLocalGitKey is not null && existingLocalGitKey != localGitKey)
+        {
+            StShared.WriteWarningLine(
+                $"Local git {existingLocalGitKey} already exists, local git {localGitKey} was not renamed", true,
+                _logger, true);
+            return;
+        }
+
+        GitDataModel localGit = parameters.Gits[localGitKey];
+        parameters.Gits.Remove(localGitKey);
+        parameters.Gits.Add(newGitKey, localGit);
+
+        foreach (ProjectModel project in parameters.Projects.Values)
+        {
+            RenameGitName(project.GitProjectNames, localGitKey, newGitKey);
+            RenameGitName(project.ScaffoldSeederGitProjectNames, localGitKey, newGitKey);
+        }
+
+        foreach (GitProjectDataModel gitProject in parameters.GitProjects.Values.Where(x =>
+                     string.Equals(x.GitName, localGitKey, StringComparison.OrdinalIgnoreCase)))
+        {
+            gitProject.GitName = newGitKey;
+        }
+
+        await _parametersManager.Save(parameters, $"Local git {localGitKey} renamed to {newGitKey}", null,
+            cancellationToken);
+    }
+
+    //ლოკალური git სერვერის სახელს რეგისტრის გაუთვალისწინებლად ემთხვევა, როგორც Gits-ის სინქრონიზაციისას
+    private static string? FindLocalGitKey(SupportToolsParameters parameters, string gitKey)
+    {
+        return parameters.Gits.Keys.FirstOrDefault(x => string.Equals(x, gitKey, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static List<string> GetProjectNamesUsingGit(SupportToolsParameters parameters, string gitKey)
+    {
+        return
+        [
+            .. parameters.Projects
+                .Where(p => p.Value.GitProjectNames.Concat(p.Value.ScaffoldSeederGitProjectNames)
+                    .Contains(gitKey, StringComparer.OrdinalIgnoreCase)).Select(p => p.Key).Order()
+        ];
+    }
+
+    private static void RenameGitName(List<string> gitNames, string gitName, string newGitName)
+    {
+        for (int i = 0; i < gitNames.Count; i++)
+        {
+            if (string.Equals(gitNames[i], gitName, StringComparison.OrdinalIgnoreCase))
+            {
+                gitNames[i] = newGitName;
+            }
+        }
     }
 
     public override bool CheckValidation(ItemData item)

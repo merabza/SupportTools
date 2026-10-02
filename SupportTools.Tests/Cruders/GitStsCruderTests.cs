@@ -53,6 +53,8 @@ public sealed class GitStsCruderTests : IDisposable
         //DELETE starts the message hub, which really connects to the server: on port 0 it fails at once
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "http://127.0.0.1:0/api/v1" };
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
+        _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(true);
         ServerLists(GitRepo("RepoA", RepoAAddress));
         _httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(_server, false));
 
@@ -378,18 +380,296 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.Equal("CSharp", sent.GitIgnorePatternName);
     }
 
+    //Delete is RemoveRecordWithKey followed by Save: the local git goes too, if no project uses it
     [Fact]
-    public async Task RemoveRecordWithKey_WhenCalled_AlsoRemovesTheLocalGit()
+    public async Task RemoveThenSave_WhenLocalGitIsNotUsed_RemovesItLocallyAndSavesTheParameters()
     {
         // Arrange
         _parameters.Gits["RepoA"] = new GitDataModel { GitProjectAddress = RepoAAddress };
         _parameters.Gits["RepoB"] = new GitDataModel();
+        _parameters.Projects["Other"] = new ProjectModel { GitProjectNames = ["RepoB"] };
+        GitStsCruder sut = CreateSut();
 
         // Act
-        await CliMenuTestAccess.InvokeRemoveRecordWithKey(CreateSut(), "RepoA");
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        bool result = await sut.Save("GitFromServer with Name RepoA deleted successfully.");
 
         // Assert
+        Assert.True(result);
         Assert.Equal(["RepoB"], _parameters.Gits.Keys);
+        VerifyParametersSavedOnce("Local git RepoA removed");
+    }
+
+    //the server matches the names ignoring case, so does the local lookup
+    [Fact]
+    public async Task RemoveThenSave_WhenLocalNameDiffersInCase_RemovesTheLocalGit()
+    {
+        // Arrange
+        _parameters.Gits["repoa"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        await sut.Save("Deleted");
+
+        // Assert
+        Assert.Empty(_parameters.Gits);
+        VerifyParametersSavedOnce("Local git repoa removed");
+    }
+
+    //projects would refer to a missing git: such a local git stays
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RemoveThenSave_WhenAProjectUsesTheLocalGit_KeepsItAndSavesNothing(bool asScaffoldSeederGit)
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel { GitProjectAddress = RepoAAddress };
+        _parameters.Projects["Project"] = asScaffoldSeederGit
+            ? new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] }
+            : new ProjectModel { GitProjectNames = ["RepoA"] };
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        bool result = await sut.Save("Deleted");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        Assert.Contains("Local git RepoA is used by projects Project and was not removed", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+        VerifyNothingSaved();
+    }
+
+    //the warning names every project that uses the git, in the order of their names
+    [Fact]
+    public async Task RemoveThenSave_WhenSeveralProjectsUseTheLocalGit_NamesThemAll()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        _parameters.Projects["Zeta"] = new ProjectModel { GitProjectNames = ["RepoA"] };
+        _parameters.Projects["Middle"] = new ProjectModel { GitProjectNames = ["Other"] };
+        _parameters.Projects["Alpha"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] };
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        await sut.Save("Deleted");
+
+        // Assert
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyWarningLogged("Local git RepoA is used by projects Alpha, Zeta and was not removed");
+        VerifyNothingSaved();
+    }
+
+    [Fact]
+    public async Task RemoveThenSave_WhenServerRefuses_KeepsTheLocalGit()
+    {
+        // Arrange
+        _server.Respond("DELETE /api/v1/git/deletegitrepo/RepoA", HttpStatusCode.NotFound,
+            """{"title":"GitWithKeyNotFound","status":404,"detail":"Git With Key RepoA Not Found"}""");
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        await sut.Save("Deleted");
+
+        // Assert
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    [Fact]
+    public async Task RemoveThenSave_WhenThereIsNoLocalGit_SavesNothing()
+    {
+        // Arrange
+        _parameters.Gits["RepoB"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        bool result = await sut.Save("Deleted");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["RepoB"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    //Save also ends the other operations (an edit, a new record): only a deletion from the server reaches local gits
+    [Fact]
+    public async Task Save_WhenNothingWasRemovedFromServer_LeavesLocalGitsAlone()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+        await sut.UpdateRecordWithKey("RepoA", NewRepoA());
+
+        // Act
+        bool result = await sut.Save("Updated");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    //renaming is deleting and adding: the local git gets the new name, and so do the references to it
+    [Fact]
+    public async Task ChangeRecordKey_WhenLocalGitExists_RenamesItWithItsReferencesAndSavesOnce()
+    {
+        // Arrange
+        var localGit = new GitDataModel { GitProjectAddress = RepoAAddress };
+        _parameters.Gits["RepoA"] = localGit;
+        _parameters.Gits["Other"] = new GitDataModel();
+        _parameters.Projects["Direct"] = new ProjectModel { GitProjectNames = ["Other", "RepoA"] };
+        _parameters.Projects["Seeder"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] };
+        _parameters.GitProjects["App"] = new GitProjectDataModel { GitName = "RepoA" };
+        _parameters.GitProjects["OtherApp"] = new GitProjectDataModel { GitName = "Other" };
+
+        // Act
+        bool result = await CreateSut().ChangeRecordKey("RepoA", "RepoB");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Other", "RepoB"], _parameters.Gits.Keys.Order());
+        Assert.Same(localGit, _parameters.Gits["RepoB"]);
+        Assert.Equal(["Other", "RepoB"], _parameters.Projects["Direct"].GitProjectNames);
+        Assert.Equal(["RepoB"], _parameters.Projects["Seeder"].ScaffoldSeederGitProjectNames);
+        Assert.Equal("RepoB", _parameters.GitProjects["App"].GitName);
+        Assert.Equal("Other", _parameters.GitProjects["OtherApp"].GitName);
+        VerifyParametersSavedOnce("Local git RepoA renamed to RepoB");
+    }
+
+    [Fact]
+    public async Task ChangeRecordKey_WhenNewNameIsTakenLocally_LeavesLocalGitsAlone()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        _parameters.Gits["RepoB"] = new GitDataModel();
+        _parameters.Projects["Direct"] = new ProjectModel { GitProjectNames = ["RepoA"] };
+
+        // Act
+        bool result = await CreateSut().ChangeRecordKey("RepoA", "RepoB");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["RepoA", "RepoB"], _parameters.Gits.Keys.Order());
+        Assert.Equal(["RepoA"], _parameters.Projects["Direct"].GitProjectNames);
+        Assert.Contains("Local git RepoB already exists, local git RepoA was not renamed", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+        VerifyNothingSaved();
+    }
+
+    //the add half of a rename sends nothing for an incomplete record: the local git keeps its name
+    [Theory]
+    [InlineData(nameof(TextItemData))]
+    [InlineData(nameof(GitDataModel.GitIgnorePatternName))]
+    [InlineData(nameof(GitDataModel.GitProjectAddress))]
+    [InlineData(nameof(GitDataModel.GitProjectFolderName))]
+    public async Task RemoveThenAdd_WhenNewRecordIsIncomplete_LeavesTheLocalGitAlone(string missingPart)
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+        ItemData newRecord = missingPart switch
+        {
+            nameof(GitDataModel.GitIgnorePatternName) => new GitDataModel
+            {
+                GitProjectAddress = RepoAAddress, GitProjectFolderName = "RepoA"
+            },
+            nameof(GitDataModel.GitProjectAddress) => new GitDataModel
+            {
+                GitProjectFolderName = "RepoA", GitIgnorePatternName = "CSharp"
+            },
+            nameof(GitDataModel.GitProjectFolderName) => new GitDataModel
+            {
+                GitProjectAddress = RepoAAddress, GitIgnorePatternName = "CSharp"
+            },
+            _ => new TextItemData()
+        };
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "RepoB", newRecord);
+        await sut.Save("Updated");
+
+        // Assert
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        VerifyNothingSaved();
+    }
+
+    [Fact]
+    public async Task RemoveThenAdd_WhenServerIsNoLongerSpecified_LeavesTheLocalGitAlone()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        _parameters.SupportToolsServerWebApiClientName = null;
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "RepoB", NewRepoA());
+        await sut.Save("Updated");
+
+        // Assert
+        Assert.Contains("supportToolsServerApiClient is null", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    //a request that throws is not an accepted record
+    [Fact]
+    public async Task RemoveThenAdd_WhenAddingThrows_LeavesTheLocalGitAlone()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "not a server address" };
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "RepoB", NewRepoA());
+        await sut.Save("Updated");
+
+        // Assert
+        Assert.Contains("Invalid URI", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    //the server deleted the old key but refused the new one: the local git keeps its name
+    [Fact]
+    public async Task ChangeRecordKey_WhenServerRefusesTheNewKey_LeavesTheLocalGitAlone()
+    {
+        // Arrange
+        _server.Respond("POST /api/v1/git/updategitrepo/RepoB", HttpStatusCode.Conflict,
+            """{"title":"GitAddressIsInUse","status":409,"detail":"Git Address Is Used By RepoC"}""");
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+
+        // Act
+        await sut.ChangeRecordKey("RepoA", "RepoB");
+        await sut.Save("Updated");
+
+        // Assert
+        Assert.Equal(["RepoA"], _parameters.Gits.Keys);
+        VerifyNothingSaved();
+    }
+
+    [Fact]
+    public async Task ChangeRecordKey_WhenThereIsNoLocalGit_ChangesOnlyTheServer()
+    {
+        // Act
+        bool result = await CreateSut().ChangeRecordKey("RepoA", "RepoB");
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(_parameters.Gits);
+        VerifyNothingSaved();
     }
 
     [Fact]
@@ -404,6 +684,7 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.Contains("supportToolsServerApiClient is null", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.DoesNotContain("NullReferenceException", _consoleOutput.ToString(), StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
         Assert.True(_parameters.Gits.ContainsKey("RepoA"));
     }
@@ -469,7 +750,7 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains($"ls-remote {repository}", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains($"ls-remote -- {repository}", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -530,6 +811,31 @@ public sealed class GitStsCruderTests : IDisposable
     private GitStsCruder CreateSut()
     {
         return GitStsCruder.Create(_logger.Object, _httpClientFactory.Object, _memoryCache, _parametersManager.Object);
+    }
+
+    //local changes are saved as the whole parameters object
+    private void VerifyParametersSavedOnce(string message)
+    {
+        _parametersManager.Verify(x => x.Save(_parameters, message, null, It.IsAny<CancellationToken>()),
+            Times.Once);
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    private void VerifyWarningLogged(string message)
+    {
+        _logger.Verify(
+            x => x.Log(LogLevel.Warning, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((state, _) => state.ToString() == message), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+    }
+
+    private void VerifyNothingSaved()
+    {
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 
     private static GitDataModel NewRepoA()

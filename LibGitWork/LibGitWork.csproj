@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\DatabaseTools\DatabaseTools.SqlServerDbTools\DatabaseTools.SqlServerDbTools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportTools.Tests" />
+  </ItemGroup>
+
 </Project>

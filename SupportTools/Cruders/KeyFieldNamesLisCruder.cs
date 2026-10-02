@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 using AppCliTools.CliParameters.Cruders;
+using ParametersManagement.LibParameters;
 
 namespace SupportTools.Cruders;
 
-//PairedTable.KeyFieldNames-ის რედაქტორი — Adjust შერწყმის ბუნებრივი გასაღების ველების უბრალო სია
+//PairedTable.KeyFieldNames-ის რედაქტორი — Adjust შერწყმის ბუნებრივი გასაღების ველების უბრალო სია.
+//ცვლილება წყვილების ფაილის მენეჯერით ინახება
 public sealed class KeyFieldNamesLisCruder : SimpleNamesListCruder
 {
     private readonly List<string> _currentValuesList;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public KeyFieldNamesLisCruder(List<string> currentValuesList) : base("Key Field Name", "Key Field Names")
+    public KeyFieldNamesLisCruder(IParametersManager parametersManager, List<string> currentValuesList) : base(
+        parametersManager, "Key Field Name", "Key Field Names")
     {
         _currentValuesList = currentValuesList;
     }

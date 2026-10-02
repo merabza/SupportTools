@@ -176,7 +176,6 @@ service has on disk was produced with a different key.
 ## Related
 
 * [Configuration](../configuration.md) — server info, key settings
-* [Architecture](../architecture.md) — `LibAppInstallWork`,
-`LibSupportToolsServerWork`
+* [Architecture](../architecture.md) — `LibAppInstallWork`
 * [Related Projects](../related-projects.md) — WebAgent, WebAgentInstaller
 

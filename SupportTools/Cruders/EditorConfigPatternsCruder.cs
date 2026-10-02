@@ -19,8 +19,8 @@ public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public EditorConfigPatternsCruder(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, List<string> currentValuesList) : base("EditorConfig Pattern",
-        "EditorConfig Patterns")
+        IParametersManager parametersManager, List<string> currentValuesList) : base(parametersManager,
+        "EditorConfig Pattern", "EditorConfig Patterns")
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

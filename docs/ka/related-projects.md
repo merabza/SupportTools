@@ -84,6 +84,7 @@ WebAgent-ს.
 
 * [განთავსება](use-cases/deployment.md) — როგორ გამოიყენება მოშორებული
 გზა
-* [არქიტექტურა](architecture.md) — `LibSupportToolsServerWork` არის
-client-ის მხარე
+* [არქიტექტურა](architecture.md) — client-ის მხარეა `LibAppInstallWork`
+(პროგრამები, სერვისები, ვერსიის შემოწმება) და `LibDatabaseWork` (ბაზის
+ოპერაციები)
 

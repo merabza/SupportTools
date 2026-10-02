@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
+using AppCliTools.CliParameters.CliMenuCommands;
 using AppCliTools.CliParameters.Cruders;
 using AppCliTools.CliParameters.FieldEditors;
 using SystemTools.SystemToolsShared;
@@ -48,5 +50,38 @@ internal static class CliMenuTestAccess
         FieldInfo fieldEditorsField =
             typeof(Cruder).GetField("FieldEditors", BindingFlags.Instance | BindingFlags.NonPublic)!;
         return (List<FieldEditor>)fieldEditorsField.GetValue(cruder)!;
+    }
+
+    //the New command of a list menu keeps the cruder that built the menu in a private field
+    public static Cruder GetListMenuCruder(CliMenuSet listMenu)
+    {
+        NewItemCliMenuCommand newItemCommand =
+            GetMenuItems(listMenu).Select(x => x.CliMenuCommand).OfType<NewItemCliMenuCommand>().Single();
+        return (Cruder)typeof(NewItemCliMenuCommand)
+            .GetField("_cruder", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(newItemCommand)!;
+    }
+
+    //the records of a cruder are reachable only through its protected methods
+    public static Dictionary<string, ItemData> GetCrudersDictionary(Cruder cruder)
+    {
+        MethodInfo getCrudersDictionary = cruder.GetType()
+            .GetMethod("GetCrudersDictionary", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return (Dictionary<string, ItemData>)getCrudersDictionary.Invoke(cruder, [])!;
+    }
+
+    //AddRecordWithKey is protected, and CreateNewRecord asks for the record data on the console
+    public static async Task InvokeAddRecordWithKey(Cruder cruder, string recordKey, ItemData newRecord)
+    {
+        MethodInfo addRecordWithKey = cruder.GetType()
+            .GetMethod("AddRecordWithKey", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        await (ValueTask)addRecordWithKey.Invoke(cruder, [recordKey, newRecord, CancellationToken.None])!;
+    }
+
+    //InputNewRecordName is a protected override; CreateNewRecord calls it before asking for the record data
+    public static async Task<string?> InvokeInputNewRecordName(Cruder cruder)
+    {
+        MethodInfo inputNewRecordName = cruder.GetType()
+            .GetMethod("InputNewRecordName", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return await (ValueTask<string?>)inputNewRecordName.Invoke(cruder, [CancellationToken.None])!;
     }
 }
