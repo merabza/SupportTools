@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using LibGitData;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,6 +11,7 @@ using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibFileParameters.Models;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
+using SystemTools.SharedKernel;
 using ToolsManagement.ApiClientsManagement;
 using Xunit;
 
@@ -109,6 +111,29 @@ public sealed class SupportToolsParametersTests : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Empty(ConsoleText());
+    }
+
+    //the client is created for the console application: a failed request is reported on the console, without the
+    //API key. Nothing listens on port 0, so the request fails at once
+    [Fact]
+    public async Task GetSupportToolsServerApiClient_WhenRequestOfCreatedClientFails_ReportsItOnConsole()
+    {
+        // Arrange
+        _sut.SupportToolsServerWebApiClientName = "ServerClient";
+        _sut.ApiClients["ServerClient"] = new ApiClientSettings { Server = "http://127.0.0.1:0/", ApiKey = "fake" };
+        using var httpClient = new HttpClient();
+        var httpClientFactory = new Mock<IHttpClientFactory>();
+        httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
+        SupportToolsServerApiClient? client = _sut.GetSupportToolsServerApiClient(null, httpClientFactory.Object);
+        Assert.NotNull(client);
+
+        // Act
+        Result result = await client.GetGitRepos();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Contains("request to http://127.0.0.1:0/git/gitrepos failed", ConsoleText(), StringComparison.Ordinal);
+        Assert.DoesNotContain("apikey=", ConsoleText(), StringComparison.Ordinal);
     }
 
     [Fact]

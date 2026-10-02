@@ -62,6 +62,39 @@ SupportTools runs on more than one computer: **PAZISI** is the main Windows comp
 - Path rule — `LibSupportToolsServerWork/Registry/Paths/PathMapper`: the canonical form is the Windows absolute path as on PAZISI. `ToLocal` / `ToCanonical` swap the longest matching prefix; a prefix matches only on a separator boundary (`D:\1WorkDotnet` ≠ `D:\1WorkDotnetX`), case-insensitively, ignoring trailing separators. On non-Windows (`Path.DirectorySeparatorChar == '/'`) the rest of the path also swaps `\` ↔ `/`. An unmatched path is returned unchanged; on Linux a Windows-rooted path in `ToLocal` or a `/`-rooted path in `ToCanonical` is also added to `Issues` (the sync command shows them). Relative paths (`GitProjectFolderName`) use `NormalizeRelativeToLocal` / `NormalizeRelativeToCanonical` (separators only). null/empty pass through. The internal constructor takes the separator, so tests cover both modes on Windows.
 - Fields that never sync are listed in `LibSupportToolsServerWork/Registry/MachineLocalFields.cs`; add every new machine-local field there.
 
+## Registry sync engine (central registry)
+
+`LibSupportToolsServerWork/Registry/Sync/` is the 3-way, per-record sync engine (local / server / last successful sync, with the server's `Version`; plan README §4.3 in SupportToolsServer's `docs/CentralRegistry`). It has no UI and no concrete collections: the adapters (C3/C4), the "Sync Registry" command (C5) and auto-sync (D2) build on it. Tests in `SupportTools.Tests/Registry/Sync/` use `FakeRegistrySyncAdapter`, an in-memory server that follows the version rules below.
+
+- **State**: `SupportToolsParameters.RegistrySyncState` (`RegistrySyncStateModel`, a machine-local field) is saved with the data by the same `Save`. Per collection (`Collections[CollectionName]`): `Records` (key → server `Version` + hash of the local contract at the last successful sync) and `ExcludedKeys` (never pushed or pulled, e.g. a database connection that differs on Linux); plus `LastSyncUtc` (set by an execution that changed data or state). The dictionaries and the set are get-only and created with `OrdinalIgnoreCase`: Newtonsoft fills those instances on load, so keys stay case-insensitive (G8) and the instances are never replaced.
+- **Adapter** (`IRegistrySyncAdapter`, one per collection; the contract is the server's `Sts…DataModel`, an opaque `object` to the engine):
+  - `CollectionName`: the state key, so never rename it. `Order`: dependency order; a referenced collection has a lower order than the one that references it, and Projects is last.
+  - `Normalize(contract)`: `""` → null, sets sorted with `OrdinalIgnoreCase`, etc. It must be idempotent; the engine checks that normalizing again keeps the hash.
+  - `GetLocalRecords()`: key → contract with canonical paths and without machine fields. `GetServerRecords(ct)`: key → `RegistryServerRecord(contract, Version)`.
+  - `Upsert(key, contract, expectedVersion, ct)` returns `Result<int>` with the new version (expected version 0 = create). `Delete(key, expectedVersion, ct)`. Errors carry the server's code.
+  - `ApplyLocal(key, contract)` merges into the local model in place: it keeps machine fields and fields the contract lacks and never replaces dictionary instances. The key is the local spelling when the record exists locally. `RemoveLocal(key)`. Adapters never save.
+- **Hash** (`RegistryContractHasher`): SHA-256, upper-case hex, of canonical JSON. The root `Version` is removed; nulls and default values are omitted, so a new, still-empty contract field keeps the old hashes; object properties and dictionary keys are sorted ordinally; list order is kept. The serializer settings live only there. Changing them makes every stored hash look locally changed, and a golden-value test guards against that.
+- **Planner** (`RegistrySyncPlanner.CreatePlan`, a pure function):
+  - A key in `ExcludedKeys` → Skipped.
+  - Record on both sides: equal hashes → InSync (also when only one side changed); not in the state → Conflict(FirstSyncDiffers); otherwise localChanged = hash ≠ state.Hash and serverChanged = Version ≠ state.Version decide between InSync / Pull(Update) / Push(Update) / Conflict(BothChanged).
+  - Local only: not in the state → Push(Add); unchanged → Pull(Delete); changed → Conflict(DeletedOnServer).
+  - Server only: not in the state → Pull(Add); unchanged → Push(Delete); changed → Conflict(DeletedLocally).
+  - Only in the state (deleted on both sides) → InSync, and the executor forgets it.
+  - Plan items are ordered by `Order`, collection and key, and carry the local spelling of the key when the record exists locally.
+- **Engine** (`RegistrySyncEngine(adapters, parametersManager)`):
+  - `CreatePlan(ct)` reads, normalizes and hashes every adapter's records and changes nothing. It fails on a server read error (returned unchanged, e.g. `ApiRequestFailed` when offline), on keys that differ only by case (`DuplicateKeys`) and on unstable normalization (`NormalizationIsNotStable`).
+  - `Execute(plan, selection, ct)` runs `RegistrySyncExecutor`. `RegistrySyncSelection` has `IncludePulls`, `IncludePushes` and `ConflictResolutions` (plan item → Local / Server / Skip; a missing item = Skip), with the presets `AllNonConflicting`, `PullOnly` and `PushOnly`.
+  - Order: server upserts by ascending `Order`, then server deletes by descending order, then `ApplyLocal` ascending, then `RemoveLocal` descending, then one `IParametersManager.Save` of the root, only if local data or state changed.
+  - Each successful operation updates the record's state. After the local operations each touched adapter's local records are read again, and the state stores the hash of what the adapter now returns. A pulled record that does not show up, or a removed one that does not disappear, is `Failed` and gets no state, so the next sync cannot mistake it for a local delete.
+  - A plan is executed once; build a new plan afterwards. Cancellation propagates without saving; the next run recovers, because equal content on both sides plans as InSync.
+- **Server errors** (`RegistrySyncServerErrorCodes`, compared with `Error.Code`):
+  - `ConcurrencyConflict` → outcome Conflict, and the rest continues.
+  - `RecordWithNameNotFound` → Conflict on an upsert; on a delete the record is already gone, so the outcome is Done.
+  - `ApiRequestFailed` → Failed, and every remaining server operation is NotExecuted. Completed operations stay in the state and the local operations still run.
+  - Any other code (`RecordIsInUse`, validation, 5xx) → Failed, and the rest continues.
+  - The first two are the names of B1's error factories in `SupportToolsServerApiClientErrors`; they are literals here until B1 adds them.
+- **Report** (`RegistrySyncReport`): one `RegistrySyncReportItem(PlanItem, Outcome, Error)` per plan item, with outcome None, NotSelected, Done, Conflict, Failed or NotExecuted. It also has `TransportError`, `Changed` and `Saved`.
+
 ## Conventions to match
 
 - Code comments are predominantly in Georgian — match the language of nearby comments rather than translating.

@@ -32,6 +32,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     //კანონიკური გზების ამ კომპიუტერის გზებად გარდაქმნის წესები
     public List<PathMappingModel> PathMappings { get; init; } = [];
 
+    //რეესტრის სინქრონიზაციის მდგომარეობა. ეგზემპლარი არ იცვლება: ჩატვირთვაც და სინქრონიზაციაც მას ადგილზე ავსებს
+    public RegistrySyncStateModel RegistrySyncState { get; } = new();
+
     public string? SupportToolsServerWebApiClientName { get; set; }
     public string? LocalPackageManagerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
