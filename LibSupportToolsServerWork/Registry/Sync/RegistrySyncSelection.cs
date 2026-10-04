@@ -6,7 +6,8 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 public sealed class RegistrySyncSelection
 {
     //ყველა არაკონფლიქტური ოპერაცია
-    public static RegistrySyncSelection AllNonConflicting { get; } = new() { IncludePulls = true, IncludePushes = true };
+    public static RegistrySyncSelection AllNonConflicting { get; } =
+        new() { IncludePulls = true, IncludePushes = true };
 
     //მხოლოდ არაკონფლიქტური Pull-ები
     public static RegistrySyncSelection PullOnly { get; } = new() { IncludePulls = true };

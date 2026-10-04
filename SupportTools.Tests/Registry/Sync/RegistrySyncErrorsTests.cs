@@ -39,8 +39,7 @@ public sealed class RegistrySyncErrorsTests
 
         // Assert
         Assert.Equal("LocalRecordNotApplied", result.Code);
-        Assert.Equal("Projects/App: the record is not in the local records after it was applied",
-            result.Description);
+        Assert.Equal("Projects/App: the record is not in the local records after it was applied", result.Description);
         Assert.Equal(ErrorType.Problem, result.Type);
     }
 
@@ -52,8 +51,7 @@ public sealed class RegistrySyncErrorsTests
 
         // Assert
         Assert.Equal("LocalRecordNotRemoved", result.Code);
-        Assert.Equal("Projects/App: the record is still in the local records after it was removed",
-            result.Description);
+        Assert.Equal("Projects/App: the record is still in the local records after it was removed", result.Description);
         Assert.Equal(ErrorType.Problem, result.Type);
     }
 }

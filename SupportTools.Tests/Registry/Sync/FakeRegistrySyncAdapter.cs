@@ -65,7 +65,8 @@ internal sealed class FakeRegistrySyncAdapter : IRegistrySyncAdapter
     {
         if (ServerRecordsError is not null)
         {
-            return Task.FromResult(Result.Failure<IReadOnlyDictionary<string, RegistryServerRecord>>(ServerRecordsError));
+            return Task.FromResult(
+                Result.Failure<IReadOnlyDictionary<string, RegistryServerRecord>>(ServerRecordsError));
         }
 
         IReadOnlyDictionary<string, RegistryServerRecord> records =

@@ -157,7 +157,8 @@ public sealed class RegistrySyncEngineExecuteTests
         RegistrySyncReportItem dev = RegistrySyncTestContext.ReportItem(result, Environments, "Dev");
         Assert.Equal(ERegistrySyncOutcome.Conflict, dev.Outcome);
         Assert.Equal("ConcurrencyConflict", dev.Error?.Code);
-        Assert.Equal(ERegistrySyncOutcome.Done, RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
         Assert.Equal("theirs", environments.Server["Dev"].Value);
         //the record keeps the state of the last sync, so the next plan shows the conflict
         Assert.Equal(3, _context.State.Collections[Environments].Records["Dev"].Version);
@@ -238,14 +239,17 @@ public sealed class RegistrySyncEngineExecuteTests
         string[] expectedCalls =
             ["Upsert Environments/Dev/0", "Upsert Environments/Prod/0", "ApplyLocal Environments/Test"];
         Assert.Equal(expectedCalls, _context.Calls);
-        Assert.Equal(ERegistrySyncOutcome.Done, RegistrySyncTestContext.ReportItem(result, Environments, "Dev").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Dev").Outcome);
         RegistrySyncReportItem prod = RegistrySyncTestContext.ReportItem(result, Environments, "Prod");
         Assert.Equal(ERegistrySyncOutcome.Failed, prod.Outcome);
         Assert.Equal(RegistrySyncServerErrorCodes.RequestFailed, prod.Error?.Code);
         Assert.Equal(ERegistrySyncOutcome.NotExecuted,
             RegistrySyncTestContext.ReportItem(result, Servers, "Merinson").Outcome);
-        Assert.Equal(ERegistrySyncOutcome.NotExecuted, RegistrySyncTestContext.ReportItem(result, Servers, "Old").Outcome);
-        Assert.Equal(ERegistrySyncOutcome.Done, RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.NotExecuted,
+            RegistrySyncTestContext.ReportItem(result, Servers, "Old").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
         Assert.Equal(RegistrySyncServerErrorCodes.RequestFailed, result.TransportError?.Code);
         Dictionary<string, RegistryRecordSyncStateModel> records = _context.State.Collections[Environments].Records;
         Assert.Equal(1, records["Dev"].Version);
@@ -264,8 +268,7 @@ public sealed class RegistrySyncEngineExecuteTests
         FakeRegistrySyncAdapter servers = _context.CreateAdapter(Servers, 2);
         _context.AddSyncedRecord(servers, "Merinson", "m", 2);
         servers.Local.Remove("Merinson");
-        servers.ServerErrors["Merinson"] =
-            Error.Conflict("RecordIsInUse", "Server Merinson Is Used By Projects: App");
+        servers.ServerErrors["Merinson"] = Error.Conflict("RecordIsInUse", "Server Merinson Is Used By Projects: App");
         _context.AddSyncedRecord(environments, "Test", "t", 1);
         environments.Local.Remove("Test");
         RegistrySyncEngine sut = _context.CreateEngine(environments, servers);
@@ -281,7 +284,8 @@ public sealed class RegistrySyncEngineExecuteTests
         Assert.Equal(ERegistrySyncOutcome.Failed, merinson.Outcome);
         Assert.Equal("RecordIsInUse", merinson.Error?.Code);
         Assert.Null(result.TransportError);
-        Assert.Equal(ERegistrySyncOutcome.Done, RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
         Assert.True(_context.State.Collections[Servers].Records.ContainsKey("Merinson"));
         Assert.Empty(_context.State.Collections[Environments].Records);
     }
@@ -482,7 +486,8 @@ public sealed class RegistrySyncEngineExecuteTests
 
         // Assert
         Assert.Equal("Upsert Environments/Mine/0", Assert.Single(_context.Calls));
-        Assert.Equal(ERegistrySyncOutcome.Done, RegistrySyncTestContext.ReportItem(result, Environments, "Mine").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Mine").Outcome);
         Assert.Equal(ERegistrySyncOutcome.NotSelected,
             RegistrySyncTestContext.ReportItem(result, Environments, "Theirs").Outcome);
         Assert.False(environments.Local.ContainsKey("Theirs"));
@@ -497,12 +502,11 @@ public sealed class RegistrySyncEngineExecuteTests
     [InlineData(ERegistrySyncConflict.DeletedLocally, ERegistryConflictResolution.Local, "Delete Environments/Dev/4")]
     [InlineData(ERegistrySyncConflict.DeletedLocally, ERegistryConflictResolution.Server,
         "ApplyLocal Environments/Dev")]
-    [InlineData(ERegistrySyncConflict.FirstSyncDiffers, ERegistryConflictResolution.Local,
-        "Upsert Environments/Dev/4")]
+    [InlineData(ERegistrySyncConflict.FirstSyncDiffers, ERegistryConflictResolution.Local, "Upsert Environments/Dev/4")]
     [InlineData(ERegistrySyncConflict.FirstSyncDiffers, ERegistryConflictResolution.Server,
         "ApplyLocal Environments/Dev")]
-    public async Task Execute_WhenConflictIsResolved_MakesBothSidesEqualToTheChosenSide(
-        ERegistrySyncConflict conflict, ERegistryConflictResolution resolution, string expectedCall)
+    public async Task Execute_WhenConflictIsResolved_MakesBothSidesEqualToTheChosenSide(ERegistrySyncConflict conflict,
+        ERegistryConflictResolution resolution, string expectedCall)
     {
         // Arrange
         FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
@@ -513,10 +517,8 @@ public sealed class RegistrySyncEngineExecuteTests
         Assert.Equal(conflict, item.Conflict);
         var selection = new RegistrySyncSelection
         {
-            ConflictResolutions = new Dictionary<RegistrySyncPlanItem, ERegistryConflictResolution>
-            {
-                [item] = resolution
-            }
+            ConflictResolutions =
+                new Dictionary<RegistrySyncPlanItem, ERegistryConflictResolution> { [item] = resolution }
         };
 
         // Act
@@ -575,8 +577,7 @@ public sealed class RegistrySyncEngineExecuteTests
         {
             IncludePulls = true,
             IncludePushes = true,
-            ConflictResolutions =
-                plan.Items.ToDictionary(x => x, _ => ERegistryConflictResolution.Local)
+            ConflictResolutions = plan.Items.ToDictionary(x => x, _ => ERegistryConflictResolution.Local)
         };
 
         // Act
@@ -683,8 +684,8 @@ public sealed class RegistrySyncEngineExecuteTests
     public async Task Execute_WhenSaveFails_ReportsThatChangesWereNotSaved()
     {
         // Arrange
-        _context.ParametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(),
-            It.IsAny<string?>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _context.ParametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(false);
         FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
         environments.Local["Dev"] = "d";
         RegistrySyncEngine sut = _context.CreateEngine(environments);

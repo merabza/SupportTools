@@ -35,7 +35,8 @@ public sealed class RegistryContractHasherTests
         string result = RegistryContractHasher.ToCanonicalJson(contract);
 
         // Assert
-        Assert.Equal("""{"Child":{"Name":"c","Version":2},"GitNames":["b","a"],"Name":"P","Settings":{"A":"1","b":"2"}}""",
+        Assert.Equal(
+            """{"Child":{"Name":"c","Version":2},"GitNames":["b","a"],"Name":"P","Settings":{"A":"1","b":"2"}}""",
             result);
     }
 

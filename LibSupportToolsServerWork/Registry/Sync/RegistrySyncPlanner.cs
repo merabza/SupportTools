@@ -152,11 +152,11 @@ public static class RegistrySyncPlanner
         ERegistrySyncChange Change,
         ERegistrySyncConflict Conflict)
     {
-        public static Decision InSync => new(ERegistrySyncAction.InSync, ERegistrySyncChange.None,
-            ERegistrySyncConflict.None);
+        public static Decision InSync =>
+            new(ERegistrySyncAction.InSync, ERegistrySyncChange.None, ERegistrySyncConflict.None);
 
-        public static Decision Skipped => new(ERegistrySyncAction.Skipped, ERegistrySyncChange.None,
-            ERegistrySyncConflict.None);
+        public static Decision Skipped =>
+            new(ERegistrySyncAction.Skipped, ERegistrySyncChange.None, ERegistrySyncConflict.None);
 
         public static Decision Pull(ERegistrySyncChange change)
         {

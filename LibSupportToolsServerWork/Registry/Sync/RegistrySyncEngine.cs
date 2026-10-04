@@ -21,8 +21,8 @@ public sealed class RegistrySyncEngine
     private readonly IParametersManager _parametersManager;
     private readonly TimeProvider _timeProvider;
 
-    public RegistrySyncEngine(IEnumerable<IRegistrySyncAdapter> adapters, IParametersManager parametersManager) :
-        this(adapters, parametersManager, TimeProvider.System)
+    public RegistrySyncEngine(IEnumerable<IRegistrySyncAdapter> adapters, IParametersManager parametersManager) : this(
+        adapters, parametersManager, TimeProvider.System)
     {
     }
 

@@ -85,10 +85,8 @@ public sealed class RegistrySyncPlannerTests
     {
         // Arrange
         var state = new RegistrySyncStateModel();
-        state.GetOrAddCollection(Environments).Records["DEV"] = new RegistryRecordSyncStateModel
-        {
-            Version = 1, Hash = "A"
-        };
+        state.GetOrAddCollection(Environments).Records["DEV"] =
+            new RegistryRecordSyncStateModel { Version = 1, Hash = "A" };
         var collection = new RegistryCollectionSnapshot(Environments, 1,
             new Dictionary<string, RegistrySyncRecord> { ["dev"] = new("local", "A", 0) },
             new Dictionary<string, RegistrySyncRecord> { ["Dev"] = new("server", "B", 2) });

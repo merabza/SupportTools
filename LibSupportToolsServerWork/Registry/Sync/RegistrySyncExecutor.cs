@@ -112,8 +112,8 @@ internal sealed class RegistrySyncExecutor
     }
 
     //Order-ის მიხედვით დალაგება სტაბილურია, ამიტომ ერთი Order-ის ფარგლებში გეგმის რიგი (კოლექცია, გასაღები) რჩება
-    private static List<RegistrySyncPlanItem> Ascending(List<(RegistrySyncPlanItem Item, EOperation Operation)> operations,
-        EOperation operation)
+    private static List<RegistrySyncPlanItem> Ascending(
+        List<(RegistrySyncPlanItem Item, EOperation Operation)> operations, EOperation operation)
     {
         return [.. operations.Where(x => x.Operation == operation).Select(x => x.Item).OrderBy(x => x.Order)];
     }
@@ -183,8 +183,7 @@ internal sealed class RegistrySyncExecutor
         }
 
         //Delete-ს სერვერის ჩანაწერი ყოველთვის აქვს: ლოკალურად წაშლილი ჩანაწერი დამგეგმავმა სერვერზე იპოვა
-        Result result = await _adapters[item.CollectionName]
-            .Delete(item.Key, item.Server!.Version, cancellationToken);
+        Result result = await _adapters[item.CollectionName].Delete(item.Key, item.Server!.Version, cancellationToken);
         //RecordWithNameNotFound: ჩანაწერი სერვერზე უკვე აღარ არის, ანუ წაშლის მიზანი მიღწეულია
         if (result.IsFailure && result.Error.Code != RegistrySyncServerErrorCodes.RecordWithNameNotFound)
         {

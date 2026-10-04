@@ -59,18 +59,18 @@ public sealed class RegistrySyncStateModelTests : IDisposable
     {
         // Arrange
         await File.WriteAllTextAsync(_parametersFileName, """
-            {
-              "RegistrySyncState": {
-                "LastSyncUtc": "2026-10-02T12:30:15Z",
-                "Collections": {
-                  "Environments": {
-                    "Records": { "Dev": { "Version": 3, "Hash": "ABC" } },
-                    "ExcludedKeys": [ "LinuxDb" ]
-                  }
-                }
-              }
-            }
-            """);
+                                                          {
+                                                            "RegistrySyncState": {
+                                                              "LastSyncUtc": "2026-10-02T12:30:15Z",
+                                                              "Collections": {
+                                                                "Environments": {
+                                                                  "Records": { "Dev": { "Version": 3, "Hash": "ABC" } },
+                                                                  "ExcludedKeys": [ "LinuxDb" ]
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                          """);
 
         // Act
         SupportToolsParameters loaded = Load();
