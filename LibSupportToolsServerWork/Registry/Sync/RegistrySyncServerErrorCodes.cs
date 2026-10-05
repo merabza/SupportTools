@@ -1,11 +1,12 @@
-﻿using SystemTools.ApiContracts.Errors;
+﻿using SupportToolsServerApiContracts.Errors;
+using SystemTools.ApiContracts.Errors;
 
 namespace LibSupportToolsServerWork.Registry.Sync;
 
 //სერვერის შეცდომების კოდები (Error.Code), რომლებსაც შემსრულებელი ადაპტერის Upsert-ისა და Delete-ის შედეგში ცნობს.
 //ApiClient კოდს ProblemDetails-ის title-იდან კითხულობს. ConcurrencyConflict და RecordWithNameNotFound B1-ის ზოგადი
-//ფაბრიკების სახელებია (SupportToolsServerApiClientErrors); სანამ ისინი არ არსებობს, აქ ტექსტადაა და სახელები ზუსტად
-//უნდა დაემთხვეს.
+//ფაბრიკების სახელებია (SupportToolsServerApiClientErrors); ადაპტერებიც, რომლებიც ვერსიას თვითონ ამოწმებს, ამ
+//ფაბრიკებით ქმნის შეცდომას.
 //- ConcurrencyConflict (409): ჩანაწერი სერვერზე შუალედში შეიცვალა ან უკვე არსებობს → შედეგი Conflict, დანარჩენი
 //  გრძელდება.
 //- RecordWithNameNotFound (404): Upsert-ზე ჩანაწერი სერვერზე შუალედში წაიშალა → Conflict, დანარჩენი გრძელდება.
@@ -16,7 +17,7 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 //  ჩანაწერი უარყო → Failed, დანარჩენი გრძელდება
 public static class RegistrySyncServerErrorCodes
 {
-    public const string ConcurrencyConflict = "ConcurrencyConflict";
-    public const string RecordWithNameNotFound = "RecordWithNameNotFound";
+    public const string ConcurrencyConflict = nameof(SupportToolsServerApiClientErrors.ConcurrencyConflict);
+    public const string RecordWithNameNotFound = nameof(SupportToolsServerApiClientErrors.RecordWithNameNotFound);
     public const string RequestFailed = nameof(ApiClientErrors.ApiRequestFailed);
 }

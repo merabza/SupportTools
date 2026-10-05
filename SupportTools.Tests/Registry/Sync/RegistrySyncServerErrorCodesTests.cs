@@ -1,4 +1,5 @@
 ﻿using LibSupportToolsServerWork.Registry.Sync;
+using SupportToolsServerApiContracts.Errors;
 using SystemTools.ApiContracts.Errors;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -16,6 +17,34 @@ public sealed class RegistrySyncServerErrorCodesTests
 
         // Act
         string result = RegistrySyncServerErrorCodes.RequestFailed;
+
+        // Assert
+        Assert.Equal(error.Code, result);
+    }
+
+    //B1's generic factories: the server answers with them, and the adapters that check the version themselves
+    //create their errors with them too
+    [Fact]
+    public void ConcurrencyConflict_IsTheCodeOfTheServerFactory()
+    {
+        // Arrange
+        Error error = SupportToolsServerApiClientErrors.ConcurrencyConflict("Environment", "Production", 1, 2);
+
+        // Act
+        string result = RegistrySyncServerErrorCodes.ConcurrencyConflict;
+
+        // Assert
+        Assert.Equal(error.Code, result);
+    }
+
+    [Fact]
+    public void RecordWithNameNotFound_IsTheCodeOfTheServerFactory()
+    {
+        // Arrange
+        Error error = SupportToolsServerApiClientErrors.RecordWithNameNotFound("Environment", "Production");
+
+        // Act
+        string result = RegistrySyncServerErrorCodes.RecordWithNameNotFound;
 
         // Assert
         Assert.Equal(error.Code, result);
