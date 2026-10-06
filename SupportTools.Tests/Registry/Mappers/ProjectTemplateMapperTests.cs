@@ -45,7 +45,10 @@ public sealed class ProjectTemplateMapperTests
         // Arrange
         var local = new StsProjectTemplateDataModel
         {
-            Name = "T", SupportProjectType = "Api", TestProjectName = "", TestProjectShortName = "",
+            Name = "T",
+            SupportProjectType = "Api",
+            TestProjectName = "",
+            TestProjectShortName = "",
             ReactTemplateName = ""
         };
         var server = new StsProjectTemplateDataModel { Name = "T", SupportProjectType = "api", Version = 2 };

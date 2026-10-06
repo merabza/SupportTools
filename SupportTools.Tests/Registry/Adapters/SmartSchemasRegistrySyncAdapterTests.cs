@@ -22,7 +22,8 @@ public sealed class SmartSchemasRegistrySyncAdapterTests : IDisposable
     {
         _context.Parameters.SmartSchemas["Daily"] = new SmartSchema
         {
-            LastPreserveCount = 2, Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Day, PreserveCount = 7 }]
+            LastPreserveCount = 2,
+            Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Day, PreserveCount = 7 }]
         };
         _sut = new SmartSchemasRegistrySyncAdapter(_context.ApiClient, _context.Parameters, _context.Warnings);
     }
@@ -42,8 +43,7 @@ public sealed class SmartSchemasRegistrySyncAdapterTests : IDisposable
         _context.Server.Store(Area, "Hourly", NewContract("Hourly", "Hour"), 1);
 
         // Act
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
         IReadOnlyDictionary<string, object> localRecords = _sut.GetLocalRecords();
 
         // Assert

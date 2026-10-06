@@ -44,8 +44,8 @@ public sealed class RegistrySyncAdapterFactoryTests : IDisposable
         List<IRegistrySyncAdapter> result = CreateAdapters();
 
         // Assert
-        Assert.Equal(result.Count, result.Select(x => x.CollectionName).Distinct(StringComparer.OrdinalIgnoreCase)
-            .Count());
+        Assert.Equal(result.Count,
+            result.Select(x => x.CollectionName).Distinct(StringComparer.OrdinalIgnoreCase).Count());
         Assert.Equal(result.Count, result.Select(x => x.Order).Distinct().Count());
     }
 

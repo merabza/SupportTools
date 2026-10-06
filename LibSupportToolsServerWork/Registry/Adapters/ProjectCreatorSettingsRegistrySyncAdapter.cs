@@ -43,12 +43,10 @@ public sealed class ProjectCreatorSettingsRegistrySyncAdapter : SingletonRegistr
     protected override void ApplyContract(string key, StsProjectCreatorSettingsDataModel contract)
     {
         _parameters.AppProjectCreatorAllParameters ??= new AppProjectCreatorAllParameters();
-        ProjectCreatorSettingsMapper.ApplyToLocal(contract, _parameters.AppProjectCreatorAllParameters,
-            _pathMapper);
+        ProjectCreatorSettingsMapper.ApplyToLocal(contract, _parameters.AppProjectCreatorAllParameters, _pathMapper);
     }
 
-    protected override StsProjectCreatorSettingsDataModel NormalizeContract(
-        StsProjectCreatorSettingsDataModel contract)
+    protected override StsProjectCreatorSettingsDataModel NormalizeContract(StsProjectCreatorSettingsDataModel contract)
     {
         return ProjectCreatorSettingsMapper.Normalize(contract);
     }
@@ -64,8 +62,8 @@ public sealed class ProjectCreatorSettingsRegistrySyncAdapter : SingletonRegistr
         return contract.Version;
     }
 
-    protected override Task<Result<int>> WriteServerContract(StsProjectCreatorSettingsDataModel contract,
-        int version, CancellationToken cancellationToken)
+    protected override Task<Result<int>> WriteServerContract(StsProjectCreatorSettingsDataModel contract, int version,
+        CancellationToken cancellationToken)
     {
         contract.Version = version;
         return _apiClient.UpdateProjectCreatorSettings(contract, cancellationToken);

@@ -50,6 +50,7 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
     };
 
     private readonly Dictionary<string, Dictionary<string, JObject>> _areas = new(StringComparer.Ordinal);
+
     private readonly Dictionary<string, (HttpStatusCode StatusCode, string Code)> _failures =
         new(StringComparer.Ordinal);
 
@@ -181,8 +182,8 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
         }
 
         //?version=N&apikey=… (no key in the tests)
-        string? version = query.TrimStart('?').Split('&').Select(x => x.Split('='))
-            .Where(x => x[0] == "version").Select(x => x[1]).FirstOrDefault();
+        string? version = query.TrimStart('?').Split('&').Select(x => x.Split('=')).Where(x => x[0] == "version")
+            .Select(x => x[1]).FirstOrDefault();
         return Delete(area, segments[2], version is null ? null : int.Parse(version, CultureInfo.InvariantCulture));
     }
 

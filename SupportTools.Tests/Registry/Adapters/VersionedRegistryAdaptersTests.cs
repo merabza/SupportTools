@@ -27,133 +27,161 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
 
     private static readonly Dictionary<string, AdapterCase> Cases = new(StringComparer.Ordinal)
     {
-        [RegistryCollections.Environments] = new AdapterCase
-        {
-            Area = "environments",
-            Order = RegistryCollections.EnvironmentsOrder,
-            CreateAdapter = x => new EnvironmentsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsEnvironmentDataModel { Name = name, Description = "server" },
-            AddLocal = (parameters, name) => parameters.Environments[name] = "local",
-            LocalKeys = parameters => parameters.Environments.Keys
-        },
-        [RegistryCollections.RunTimes] = new AdapterCase
-        {
-            Area = "runtimes",
-            Order = RegistryCollections.RunTimesOrder,
-            CreateAdapter = x => new RunTimesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsRuntimeDataModel { Name = name, Description = "server" },
-            AddLocal = (parameters, name) => parameters.RunTimes[name] = "local",
-            LocalKeys = parameters => parameters.RunTimes.Keys
-        },
-        [RegistryCollections.NpmPackages] = new AdapterCase
-        {
-            Area = "npmpackages",
-            Order = RegistryCollections.NpmPackagesOrder,
-            RecordName = NpmPackageName,
-            CreateAdapter = x => new NpmPackagesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsNpmPackageDataModel { Name = name, Description = "server" },
-            AddLocal = (parameters, name) => parameters.NpmPackages[name] = "local",
-            LocalKeys = parameters => parameters.NpmPackages.Keys
-        },
-        [RegistryCollections.ReactAppTemplates] = new AdapterCase
-        {
-            Area = "reactapptemplates",
-            Order = RegistryCollections.ReactAppTemplatesOrder,
-            CreateAdapter = x => new ReactAppTemplatesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsReactAppTemplateDataModel { Name = name, Template = "cra-template-server" },
-            AddLocal = (parameters, name) => parameters.ReactAppTemplates[name] = "cra-template-local",
-            LocalKeys = parameters => parameters.ReactAppTemplates.Keys
-        },
-        [RegistryCollections.DotnetTools] = new AdapterCase
-        {
-            Area = "dotnettools",
-            Order = RegistryCollections.DotnetToolsOrder,
-            CreateAdapter = x => new DotnetToolsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsDotnetToolDataModel { Name = name, PackageId = "server-package" },
-            AddLocal = (parameters, name) =>
-                parameters.DotnetTools[name] = new DotnetToolData { PackageId = "local-package" },
-            LocalKeys = parameters => parameters.DotnetTools.Keys,
-            LocalRecord = (parameters, name) => parameters.DotnetTools[name]
-        },
-        [RegistryCollections.SmartSchemas] = new AdapterCase
-        {
-            Area = "smartschemas",
-            Order = RegistryCollections.SmartSchemasOrder,
-            CreateAdapter = x => new SmartSchemasRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsSmartSchemaDataModel
+        [RegistryCollections.Environments] =
+            new AdapterCase
             {
-                Name = name,
-                LastPreserveCount = 2,
-                Details = [new StsSmartSchemaDetailDataModel { PeriodType = "Day", PreserveCount = 7 }]
+                Area = "environments",
+                Order = RegistryCollections.EnvironmentsOrder,
+                CreateAdapter = x => new EnvironmentsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract = name => new StsEnvironmentDataModel { Name = name, Description = "server" },
+                AddLocal = (parameters, name) => parameters.Environments[name] = "local",
+                LocalKeys = parameters => parameters.Environments.Keys
             },
-            AddLocal = (parameters, name) => parameters.SmartSchemas[name] = new SmartSchema
+        [RegistryCollections.RunTimes] =
+            new AdapterCase
             {
-                LastPreserveCount = 1,
-                Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Month, PreserveCount = 3 }]
+                Area = "runtimes",
+                Order = RegistryCollections.RunTimesOrder,
+                CreateAdapter = x => new RunTimesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract = name => new StsRuntimeDataModel { Name = name, Description = "server" },
+                AddLocal = (parameters, name) => parameters.RunTimes[name] = "local",
+                LocalKeys = parameters => parameters.RunTimes.Keys
             },
-            LocalKeys = parameters => parameters.SmartSchemas.Keys
-        },
-        [RegistryCollections.FileStorages] = new AdapterCase
-        {
-            Area = "filestorages",
-            Order = RegistryCollections.FileStoragesOrder,
-            CreateAdapter = x =>
-                new FileStoragesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.PathMapper, x.Warnings),
-            NewContract = name => new StsFileStorageDataModel
+        [RegistryCollections.NpmPackages] =
+            new AdapterCase
             {
-                Name = name, FileStoragePath = "ftp://files.example.test/server", Password = "fake-password"
+                Area = "npmpackages",
+                Order = RegistryCollections.NpmPackagesOrder,
+                RecordName = NpmPackageName,
+                CreateAdapter = x => new NpmPackagesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract = name => new StsNpmPackageDataModel { Name = name, Description = "server" },
+                AddLocal = (parameters, name) => parameters.NpmPackages[name] = "local",
+                LocalKeys = parameters => parameters.NpmPackages.Keys
             },
-            AddLocal = (parameters, name) =>
-                parameters.FileStorages[name] = new FileStorageData { FileStoragePath = @"D:\Local\Storage" },
-            LocalKeys = parameters => parameters.FileStorages.Keys,
-            LocalRecord = (parameters, name) => parameters.FileStorages[name]
-        },
-        [RegistryCollections.ApiClients] = new AdapterCase
-        {
-            Area = "apiclients",
-            Order = RegistryCollections.ApiClientsOrder,
-            CreateAdapter = x => new ApiClientsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsApiClientDataModel
+        [RegistryCollections.ReactAppTemplates] =
+            new AdapterCase
             {
-                Name = name, Server = "http://server.example.test/api", ApiKey = "fake-server-key"
+                Area = "reactapptemplates",
+                Order = RegistryCollections.ReactAppTemplatesOrder,
+                CreateAdapter =
+                    x => new ReactAppTemplatesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract =
+                    name => new StsReactAppTemplateDataModel { Name = name, Template = "cra-template-server" },
+                AddLocal = (parameters, name) => parameters.ReactAppTemplates[name] = "cra-template-local",
+                LocalKeys = parameters => parameters.ReactAppTemplates.Keys
             },
-            AddLocal = (parameters, name) => parameters.ApiClients[name] =
-                new ApiClientSettings { Server = "http://local.example.test/api", ApiKey = "fake-local-key" },
-            LocalKeys = parameters => parameters.ApiClients.Keys,
-            LocalRecord = (parameters, name) => parameters.ApiClients[name]
-        },
-        [RegistryCollections.DatabaseServerConnections] = new AdapterCase
-        {
-            Area = "databaseserverconnections",
-            Order = RegistryCollections.DatabaseServerConnectionsOrder,
-            CreateAdapter = x =>
-                new DatabaseServerConnectionsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsDatabaseServerConnectionDataModel
+        [RegistryCollections.DotnetTools] =
+            new AdapterCase
             {
-                Name = name,
-                DatabaseServerProvider = "SqlServer",
-                ServerAddress = @"(localdb)\Server",
-                DatabaseFoldersSets = [new StsDatabaseFoldersSetDataModel { Name = "Default", Backup = @"D:\B" }]
+                Area = "dotnettools",
+                Order = RegistryCollections.DotnetToolsOrder,
+                CreateAdapter = x => new DotnetToolsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract = name => new StsDotnetToolDataModel { Name = name, PackageId = "server-package" },
+                AddLocal =
+                    (parameters, name) =>
+                        parameters.DotnetTools[name] = new DotnetToolData { PackageId = "local-package" },
+                LocalKeys = parameters => parameters.DotnetTools.Keys,
+                LocalRecord = (parameters, name) => parameters.DotnetTools[name]
             },
-            AddLocal = (parameters, name) =>
-                parameters.DatabaseServerConnections[name] = new DatabaseServerConnectionData
-                {
-                    DatabaseServerProvider = EDatabaseProvider.SqLite,
-                    DatabaseFoldersSets = new Dictionary<string, DatabaseFoldersSet> { ["Local"] = new() }
-                },
-            LocalKeys = parameters => parameters.DatabaseServerConnections.Keys,
-            LocalRecord = (parameters, name) => parameters.DatabaseServerConnections[name]
-        },
-        [RegistryCollections.Servers] = new AdapterCase
-        {
-            Area = "servers",
-            Order = RegistryCollections.ServersOrder,
-            CreateAdapter = x => new ServersRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
-            NewContract = name => new StsServerDataModel { Name = name, Runtime = "linux-x64" },
-            AddLocal = (parameters, name) => parameters.Servers[name] = new ServerDataModel { Runtime = "win-x64" },
-            LocalKeys = parameters => parameters.Servers.Keys,
-            LocalRecord = (parameters, name) => parameters.Servers[name]
-        },
+        [RegistryCollections.SmartSchemas] =
+            new AdapterCase
+            {
+                Area = "smartschemas",
+                Order = RegistryCollections.SmartSchemasOrder,
+                CreateAdapter = x => new SmartSchemasRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract =
+                    name => new StsSmartSchemaDataModel
+                    {
+                        Name = name,
+                        LastPreserveCount = 2,
+                        Details = [new StsSmartSchemaDetailDataModel { PeriodType = "Day", PreserveCount = 7 }]
+                    },
+                AddLocal =
+                    (parameters, name) => parameters.SmartSchemas[name] = new SmartSchema
+                    {
+                        LastPreserveCount = 1,
+                        Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Month, PreserveCount = 3 }]
+                    },
+                LocalKeys = parameters => parameters.SmartSchemas.Keys
+            },
+        [RegistryCollections.FileStorages] =
+            new AdapterCase
+            {
+                Area = "filestorages",
+                Order = RegistryCollections.FileStoragesOrder,
+                CreateAdapter =
+                    x => new FileStoragesRegistrySyncAdapter(x.ApiClient, x.Parameters, x.PathMapper, x.Warnings),
+                NewContract =
+                    name => new StsFileStorageDataModel
+                    {
+                        Name = name,
+                        FileStoragePath = "ftp://files.example.test/server",
+                        Password = "fake-password"
+                    },
+                AddLocal =
+                    (parameters, name) => parameters.FileStorages[name] =
+                        new FileStorageData { FileStoragePath = @"D:\Local\Storage" },
+                LocalKeys = parameters => parameters.FileStorages.Keys,
+                LocalRecord = (parameters, name) => parameters.FileStorages[name]
+            },
+        [RegistryCollections.ApiClients] =
+            new AdapterCase
+            {
+                Area = "apiclients",
+                Order = RegistryCollections.ApiClientsOrder,
+                CreateAdapter = x => new ApiClientsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract =
+                    name => new StsApiClientDataModel
+                    {
+                        Name = name, Server = "http://server.example.test/api", ApiKey = "fake-server-key"
+                    },
+                AddLocal =
+                    (parameters, name) => parameters.ApiClients[name] = new ApiClientSettings
+                    {
+                        Server = "http://local.example.test/api", ApiKey = "fake-local-key"
+                    },
+                LocalKeys = parameters => parameters.ApiClients.Keys,
+                LocalRecord = (parameters, name) => parameters.ApiClients[name]
+            },
+        [RegistryCollections.DatabaseServerConnections] =
+            new AdapterCase
+            {
+                Area = "databaseserverconnections",
+                Order = RegistryCollections.DatabaseServerConnectionsOrder,
+                CreateAdapter =
+                    x => new DatabaseServerConnectionsRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract =
+                    name => new StsDatabaseServerConnectionDataModel
+                    {
+                        Name = name,
+                        DatabaseServerProvider = "SqlServer",
+                        ServerAddress = @"(localdb)\Server",
+                        DatabaseFoldersSets =
+                            [new StsDatabaseFoldersSetDataModel { Name = "Default", Backup = @"D:\B" }]
+                    },
+                AddLocal =
+                    (parameters, name) => parameters.DatabaseServerConnections[name] =
+                        new DatabaseServerConnectionData
+                        {
+                            DatabaseServerProvider = EDatabaseProvider.SqLite,
+                            DatabaseFoldersSets =
+                                new Dictionary<string, DatabaseFoldersSet> { ["Local"] = new() }
+                        },
+                LocalKeys = parameters => parameters.DatabaseServerConnections.Keys,
+                LocalRecord = (parameters, name) => parameters.DatabaseServerConnections[name]
+            },
+        [RegistryCollections.Servers] =
+            new AdapterCase
+            {
+                Area = "servers",
+                Order = RegistryCollections.ServersOrder,
+                CreateAdapter = x => new ServersRegistrySyncAdapter(x.ApiClient, x.Parameters, x.Warnings),
+                NewContract = name => new StsServerDataModel { Name = name, Runtime = "linux-x64" },
+                AddLocal =
+                    (parameters, name) => parameters.Servers[name] = new ServerDataModel { Runtime = "win-x64" },
+                LocalKeys = parameters => parameters.Servers.Keys,
+                LocalRecord = (parameters, name) => parameters.Servers[name]
+            },
         [RegistryCollections.ProjectTemplates] = new AdapterCase
         {
             Area = "projecttemplates",
@@ -176,11 +204,11 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
 
     private readonly RegistryAdapterTestContext _context = new();
 
-    public static TheoryData<string> AllCases => new(Cases.Keys);
+    public static TheoryData<string> AllCases => [.. Cases.Keys];
 
     //the cases whose local records are objects that ApplyLocal updates in place
     public static TheoryData<string> CasesWithLocalObjects =>
-        new(Cases.Where(x => x.Value.LocalRecord is not null).Select(x => x.Key));
+        [.. Cases.Where(x => x.Value.LocalRecord is not null).Select(x => x.Key)];
 
     public void Dispose()
     {
@@ -207,8 +235,8 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
     {
         // Arrange
         AdapterCase adapterCase = Cases[collectionName];
-        _context.Server.Store(adapterCase.Area, adapterCase.RecordName,
-            adapterCase.NewContract(adapterCase.RecordName), 3);
+        _context.Server.Store(adapterCase.Area, adapterCase.RecordName, adapterCase.NewContract(adapterCase.RecordName),
+            3);
         IRegistrySyncAdapter sut = adapterCase.CreateAdapter(_context);
 
         // Act
@@ -276,8 +304,8 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
     {
         // Arrange
         AdapterCase adapterCase = Cases[collectionName];
-        _context.Server.Store(adapterCase.Area, adapterCase.RecordName,
-            adapterCase.NewContract(adapterCase.RecordName), 3);
+        _context.Server.Store(adapterCase.Area, adapterCase.RecordName, adapterCase.NewContract(adapterCase.RecordName),
+            3);
         IRegistrySyncAdapter sut = adapterCase.CreateAdapter(_context);
 
         // Act
@@ -295,8 +323,8 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
     {
         // Arrange
         AdapterCase adapterCase = Cases[collectionName];
-        _context.Server.Store(adapterCase.Area, adapterCase.RecordName,
-            adapterCase.NewContract(adapterCase.RecordName), 4);
+        _context.Server.Store(adapterCase.Area, adapterCase.RecordName, adapterCase.NewContract(adapterCase.RecordName),
+            4);
         IRegistrySyncAdapter sut = adapterCase.CreateAdapter(_context);
 
         // Act
@@ -313,8 +341,8 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
     {
         // Arrange
         AdapterCase adapterCase = Cases[collectionName];
-        _context.Server.Store(adapterCase.Area, adapterCase.RecordName,
-            adapterCase.NewContract(adapterCase.RecordName), 2);
+        _context.Server.Store(adapterCase.Area, adapterCase.RecordName, adapterCase.NewContract(adapterCase.RecordName),
+            2);
         IRegistrySyncAdapter sut = adapterCase.CreateAdapter(_context);
 
         // Act
@@ -323,8 +351,9 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(_context.Server.Records(adapterCase.Area));
-        Assert.Contains(_context.Server.Requests, x => x.StartsWith("DELETE", StringComparison.Ordinal) &&
-                                                       x.EndsWith("?version=2", StringComparison.Ordinal));
+        Assert.Contains(_context.Server.Requests,
+            x => x.StartsWith("DELETE", StringComparison.Ordinal) &&
+                 x.EndsWith("?version=2", StringComparison.Ordinal));
     }
 
     [Theory]
@@ -333,8 +362,8 @@ public sealed class VersionedRegistryAdaptersTests : IDisposable
     {
         // Arrange
         AdapterCase adapterCase = Cases[collectionName];
-        _context.Server.Store(adapterCase.Area, adapterCase.RecordName,
-            adapterCase.NewContract(adapterCase.RecordName), 3);
+        _context.Server.Store(adapterCase.Area, adapterCase.RecordName, adapterCase.NewContract(adapterCase.RecordName),
+            3);
         IRegistrySyncAdapter sut = adapterCase.CreateAdapter(_context);
 
         // Act

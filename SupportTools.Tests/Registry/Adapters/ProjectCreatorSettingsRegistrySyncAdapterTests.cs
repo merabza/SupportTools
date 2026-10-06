@@ -155,10 +155,11 @@ public sealed class ProjectCreatorSettingsRegistrySyncAdapterTests : IDisposable
     public void ApplyLocal_WhenProjectCreatorParametersAreMissing_CreatesThemWithLocalPaths()
     {
         // Act
-        _sut.ApplyLocal(Key, new StsProjectCreatorSettingsDataModel
-        {
-            IndentSize = 4, SecretsFolderPathReal = @"D:\1WorkDotnet\Secrets"
-        });
+        _sut.ApplyLocal(Key,
+            new StsProjectCreatorSettingsDataModel
+            {
+                IndentSize = 4, SecretsFolderPathReal = @"D:\1WorkDotnet\Secrets"
+            });
 
         // Assert
         AppProjectCreatorAllParameters result = _context.Parameters.AppProjectCreatorAllParameters!;

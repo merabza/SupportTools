@@ -28,8 +28,7 @@ public sealed class EditorConfigPatternsRegistrySyncAdapterTests : IDisposable
         File.WriteAllText(SupportToolsParameters.GetEditorConfigPatternFilePath(_folder, "default"), Content);
         _context.Parameters.FolderForEditorConfigFiles = _folder;
         _context.Parameters.EditorConfigPatterns.Add("default");
-        _sut = new EditorConfigPatternsRegistrySyncAdapter(_context.ApiClient, _context.Parameters,
-            _context.Warnings);
+        _sut = new EditorConfigPatternsRegistrySyncAdapter(_context.ApiClient, _context.Parameters, _context.Warnings);
     }
 
     public void Dispose()

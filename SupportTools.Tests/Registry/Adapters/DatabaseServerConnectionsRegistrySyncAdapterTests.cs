@@ -48,8 +48,7 @@ public sealed class DatabaseServerConnectionsRegistrySyncAdapterTests : IDisposa
             new StsDatabaseServerConnectionDataModel { Name = "Dev", DatabaseServerProvider = "Oracle" }, 2);
 
         // Act
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
         IReadOnlyDictionary<string, object> localRecords = _sut.GetLocalRecords();
 
         // Assert
@@ -66,12 +65,13 @@ public sealed class DatabaseServerConnectionsRegistrySyncAdapterTests : IDisposa
         Dictionary<string, DatabaseFoldersSet>? foldersSets = existing.DatabaseFoldersSets;
 
         // Act
-        _sut.ApplyLocal("Dev", new StsDatabaseServerConnectionDataModel
-        {
-            Name = "Dev",
-            DatabaseServerProvider = "SqLite",
-            DatabaseFoldersSets = [new StsDatabaseFoldersSetDataModel { Name = "Fast", Data = @"F:\Data" }]
-        });
+        _sut.ApplyLocal("Dev",
+            new StsDatabaseServerConnectionDataModel
+            {
+                Name = "Dev",
+                DatabaseServerProvider = "SqLite",
+                DatabaseFoldersSets = [new StsDatabaseFoldersSetDataModel { Name = "Fast", Data = @"F:\Data" }]
+            });
 
         // Assert
         Assert.Same(existing, _context.Parameters.DatabaseServerConnections["Dev"]);

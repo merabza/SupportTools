@@ -15,7 +15,8 @@ public static class GitMapper
         {
             GitProjectName = name,
             GitProjectAddress = git.GitProjectAddress ?? string.Empty,
-            GitProjectFolderName = pathMapper.NormalizeRelativeToCanonical(git.GitProjectFolderName) ?? string.Empty,
+            GitProjectFolderName =
+                pathMapper.NormalizeRelativeToCanonical(git.GitProjectFolderName) ?? string.Empty,
             GitIgnorePatternName = git.GitIgnorePatternName ?? string.Empty
         };
     }

@@ -63,8 +63,8 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
 
         // Assert
         Assert.Equal(SeededRecordCount, report.Items.Count);
-        Assert.All(report.Items, x => Assert.Equal((ERegistrySyncAction.Push, ERegistrySyncOutcome.Done),
-            (x.PlanItem.Action, x.Outcome)));
+        Assert.All(report.Items,
+            x => Assert.Equal((ERegistrySyncAction.Push, ERegistrySyncOutcome.Done), (x.PlanItem.Action, x.Outcome)));
         AssertInSyncWithEqualContent(nextPlan, SeededRecordCount);
         Assert.Empty(_main.Warnings.Items);
         Assert.Empty(_main.PathMapper.Issues);
@@ -82,8 +82,8 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
 
         // Assert
         Assert.Equal(SeededRecordCount, report.Items.Count);
-        Assert.All(report.Items, x => Assert.Equal((ERegistrySyncAction.Pull, ERegistrySyncOutcome.Done),
-            (x.PlanItem.Action, x.Outcome)));
+        Assert.All(report.Items,
+            x => Assert.Equal((ERegistrySyncAction.Pull, ERegistrySyncOutcome.Done), (x.PlanItem.Action, x.Outcome)));
         AssertInSyncWithEqualContent(nextPlan, SeededRecordCount);
         Assert.Empty(_linux.PathMapper.Issues);
 
@@ -93,10 +93,12 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
         Assert.Equal("/home/u/1WorkDotnet/Backups", linux.FileStorages["Exchange"].FileStoragePath);
         Assert.Equal("ftp://files.example.test/backups", linux.FileStorages["Ftp"].FileStoragePath);
         Assert.Equal("Front/app", linux.Gits["AppFront"].GitProjectFolderName);
-        Assert.Equal(GitIgnoreContent, await File.ReadAllTextAsync(
-            SupportToolsParameters.GetGitIgnoreModelFilePath(linux.FolderForGitignoreFiles!, "CSharp")));
-        Assert.Equal(EditorConfigContent, await File.ReadAllTextAsync(
-            SupportToolsParameters.GetEditorConfigPatternFilePath(linux.FolderForEditorConfigFiles!, "default")));
+        Assert.Equal(GitIgnoreContent,
+            await File.ReadAllTextAsync(
+                SupportToolsParameters.GetGitIgnoreModelFilePath(linux.FolderForGitignoreFiles!, "CSharp")));
+        Assert.Equal(EditorConfigContent,
+            await File.ReadAllTextAsync(
+                SupportToolsParameters.GetEditorConfigPatternFilePath(linux.FolderForEditorConfigFiles!, "default")));
         Assert.True(linux.Servers["Merinson"].IsLocal);
         Assert.False(linux.Servers["PAZISI"].IsLocal);
         Assert.Equal("http://sts.linux.example.test/api/v1", linux.ApiClients[BootstrapName].Server);
@@ -199,28 +201,36 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
             FileStorageNameForExchange = "Exchange",
             SmartSchemaNameForExchange = "Daily",
             LocalPackageManagerWebApiClientName = "Pc1.WebAgent",
-            DatabasesBackupFilesExchangeParameters = new DatabasesBackupFilesExchangeParameters
-            {
-                ExchangeFileStorageName = "Exchange", LocalPath = @"D:\Local\Backups"
-            },
-            AppProjectCreatorAllParameters = new AppProjectCreatorAllParameters
-            {
-                IndentSize = 4,
-                ProjectsFolderPathReal = @"D:\1WorkDotnet\Projects",
-                SecretsFolderPathReal = @"D:\1WorkDotnet\Secrets",
-                ProductionServerName = "PAZISI",
-                ProductionEnvironmentName = "Production",
-                DeveloperDbConnectionName = "Dev",
-                Templates =
+            DatabasesBackupFilesExchangeParameters =
+                new DatabasesBackupFilesExchangeParameters
                 {
-                    ["Console With Database"] =
-                        new TemplateModel { SupportProjectType = ESupportProjectType.Console, UseDatabase = true },
-                    ["Api"] = new TemplateModel
+                    ExchangeFileStorageName = "Exchange", LocalPath = @"D:\Local\Backups"
+                },
+            AppProjectCreatorAllParameters =
+                new AppProjectCreatorAllParameters
+                {
+                    IndentSize = 4,
+                    ProjectsFolderPathReal = @"D:\1WorkDotnet\Projects",
+                    SecretsFolderPathReal = @"D:\1WorkDotnet\Secrets",
+                    ProductionServerName = "PAZISI",
+                    ProductionEnvironmentName = "Production",
+                    DeveloperDbConnectionName = "Dev",
+                    Templates =
                     {
-                        SupportProjectType = ESupportProjectType.Api, UseReact = true, ReactTemplateName = "TypeScript"
+                        ["Console With Database"] =
+                            new TemplateModel
+                            {
+                                SupportProjectType = ESupportProjectType.Console, UseDatabase = true
+                            },
+                        ["Api"] =
+                            new TemplateModel
+                            {
+                                SupportProjectType = ESupportProjectType.Api,
+                                UseReact = true,
+                                ReactTemplateName = "TypeScript"
+                            }
                     }
-                }
-            },
+                },
             Environments = { ["Production"] = "Live", ["Development"] = "" },
             RunTimes = { ["win-x64"] = "Windows", ["linux-x64"] = "Linux" },
             NpmPackages = { ["react"] = "React" },
@@ -246,25 +256,23 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
             },
             FileStorages =
             {
-                ["Exchange"] = new FileStorageData
-                {
-                    FileStoragePath = @"D:\1WorkDotnet\Backups", Password = "fake-password"
-                },
-                ["Ftp"] = new FileStorageData
-                {
-                    FileStoragePath = "ftp://files.example.test/backups", UserName = "fake-user"
-                }
+                ["Exchange"] =
+                    new FileStorageData { FileStoragePath = @"D:\1WorkDotnet\Backups", Password = "fake-password" },
+                ["Ftp"] =
+                    new FileStorageData
+                    {
+                        FileStoragePath = "ftp://files.example.test/backups", UserName = "fake-user"
+                    }
             },
             ApiClients =
             {
-                [BootstrapName] = new ApiClientSettings
-                {
-                    Server = "http://sts.main.example.test/api/v1", ApiKey = "fake-main-key"
-                },
-                ["Pc1.WebAgent"] = new ApiClientSettings
-                {
-                    Server = "http://pc1.example.test/api", ApiKey = "fake-agent-key"
-                }
+                [BootstrapName] =
+                    new ApiClientSettings
+                    {
+                        Server = "http://sts.main.example.test/api/v1", ApiKey = "fake-main-key"
+                    },
+                ["Pc1.WebAgent"] =
+                    new ApiClientSettings { Server = "http://pc1.example.test/api", ApiKey = "fake-agent-key" }
             },
             DatabaseServerConnections =
             {
@@ -274,15 +282,18 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
                     DbWebAgentName = "Pc1.WebAgent",
                     ServerAddress = @"(localdb)\Dev",
                     ServerPass = "fake-password",
-                    DatabaseFoldersSets = new Dictionary<string, DatabaseFoldersSet>
-                    {
-                        ["Default"] = new() { Backup = @"D:\Backup" }, ["Archive"] = new() { Backup = @"E:\Archive" }
-                    }
+                    DatabaseFoldersSets =
+                        new Dictionary<string, DatabaseFoldersSet>
+                        {
+                            ["Default"] = new() { Backup = @"D:\Backup" },
+                            ["Archive"] = new() { Backup = @"E:\Archive" }
+                        }
                 }
             },
             Servers =
             {
-                ["PAZISI"] = new ServerDataModel { IsLocal = true, Runtime = "win-x64", WebAgentName = "Pc1.WebAgent" },
+                ["PAZISI"] =
+                    new ServerDataModel { IsLocal = true, Runtime = "win-x64", WebAgentName = "Pc1.WebAgent" },
                 ["Merinson"] = new ServerDataModel { Runtime = "linux-x64", ServerSideDeployFolder = "/srv/apps" }
             },
             GitIgnorePatterns = { "CSharp" },
@@ -324,8 +335,7 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
     {
         private readonly RegistrySyncEngine _engine;
 
-        public Computer(SupportToolsServerApiClient apiClient, SupportToolsParameters parameters,
-            PathMapper pathMapper)
+        public Computer(SupportToolsServerApiClient apiClient, SupportToolsParameters parameters, PathMapper pathMapper)
         {
             Parameters = parameters;
             PathMapper = pathMapper;

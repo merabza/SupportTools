@@ -52,8 +52,7 @@ public static class ProjectTemplateMapper
 
     public static StsProjectTemplateDataModel Normalize(StsProjectTemplateDataModel contract)
     {
-        contract.SupportProjectType =
-            ContractNormalization.EnumName<ESupportProjectType>(contract.SupportProjectType);
+        contract.SupportProjectType = ContractNormalization.EnumName<ESupportProjectType>(contract.SupportProjectType);
         contract.TestProjectName = ContractNormalization.EmptyToNull(contract.TestProjectName);
         contract.TestProjectShortName = ContractNormalization.EmptyToNull(contract.TestProjectShortName);
         contract.ReactTemplateName = ContractNormalization.EmptyToNull(contract.ReactTemplateName);

@@ -48,8 +48,8 @@ public sealed class GitMapperTests
     {
         // Arrange
         PathMapper pathMapper = MapperTestHelpers.LinuxPathMapper();
-        StsGitDataModel contract =
-            GitMapper.ToContract("AppFront", NewGit(CanonicalFolderName), MapperTestHelpers.WindowsPathMapper());
+        StsGitDataModel contract = GitMapper.ToContract("AppFront", NewGit(CanonicalFolderName),
+            MapperTestHelpers.WindowsPathMapper());
         var local = new GitDataModel();
 
         // Act

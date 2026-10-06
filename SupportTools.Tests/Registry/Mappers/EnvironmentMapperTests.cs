@@ -37,8 +37,7 @@ public sealed class EnvironmentMapperTests
     public void Normalize_WhenDescriptionIsEmptyOrNull_GivesTheSameHash()
     {
         // Act
-        string emptyHash =
-            MapperTestHelpers.HashOf(EnvironmentMapper.Normalize(EnvironmentMapper.ToContract("P", "")));
+        string emptyHash = MapperTestHelpers.HashOf(EnvironmentMapper.Normalize(EnvironmentMapper.ToContract("P", "")));
         string nullHash =
             MapperTestHelpers.HashOf(EnvironmentMapper.Normalize(EnvironmentMapper.ToContract("P", null)));
 

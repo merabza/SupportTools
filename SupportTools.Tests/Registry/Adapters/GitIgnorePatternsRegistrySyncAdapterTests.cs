@@ -108,8 +108,7 @@ public sealed class GitIgnorePatternsRegistrySyncAdapterTests : IDisposable
         _context.Server.Store(Area, "React", new StsGitIgnoreFileTypeDataModel { Name = "React", Content = "x" }, 2);
 
         // Act
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
         IReadOnlyDictionary<string, object> localRecords = _sut.GetLocalRecords();
 
         // Assert
@@ -128,8 +127,7 @@ public sealed class GitIgnorePatternsRegistrySyncAdapterTests : IDisposable
         _context.Server.Store(Area, "React", new StsGitIgnoreFileTypeDataModel { Name = "React", Content = "x" }, 2);
 
         // Act
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
         IReadOnlyDictionary<string, object> localRecords = _sut.GetLocalRecords();
 
         // Assert
@@ -148,8 +146,7 @@ public sealed class GitIgnorePatternsRegistrySyncAdapterTests : IDisposable
         // Arrange
         _context.Server.Store(Area, "CSharp",
             new StsGitIgnoreFileTypeDataModel { Id = Guid.NewGuid(), Name = "CSharp", Content = CSharpContent }, 3);
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
 
         // Act
         string serverHash = RegistryContractHasher.ComputeHash(_sut.Normalize(serverRecords.Value["CSharp"].Contract));
@@ -219,8 +216,7 @@ public sealed class GitIgnorePatternsRegistrySyncAdapterTests : IDisposable
     public async Task Upsert_WhenServerHasAnotherVersion_ReturnsConcurrencyConflictWithoutWriting()
     {
         // Arrange
-        _context.Server.Store(Area, "CSharp", new StsGitIgnoreFileTypeDataModel { Name = "CSharp", Content = "x" },
-            5);
+        _context.Server.Store(Area, "CSharp", new StsGitIgnoreFileTypeDataModel { Name = "CSharp", Content = "x" }, 5);
 
         // Act
         Result<int> result = await _sut.Upsert("CSharp", _sut.GetLocalRecords()["CSharp"], 4, default);

@@ -51,8 +51,7 @@ public sealed class RunTimesRegistrySyncAdapter : DictionaryRegistrySyncAdapter<
         return RuntimeMapper.Normalize(contract);
     }
 
-    protected override Task<Result<List<StsRuntimeDataModel>>> GetServerContracts(
-        CancellationToken cancellationToken)
+    protected override Task<Result<List<StsRuntimeDataModel>>> GetServerContracts(CancellationToken cancellationToken)
     {
         return _apiClient.GetRuntimes(cancellationToken);
     }
@@ -68,8 +67,8 @@ public sealed class RunTimesRegistrySyncAdapter : DictionaryRegistrySyncAdapter<
     }
 
     //კონტრაქტის Version upsert-ის მოსალოდნელი ვერსიაა (B1)
-    protected override Task<Result<int>> UpsertContract(string key, StsRuntimeDataModel contract,
-        int expectedVersion, CancellationToken cancellationToken)
+    protected override Task<Result<int>> UpsertContract(string key, StsRuntimeDataModel contract, int expectedVersion,
+        CancellationToken cancellationToken)
     {
         contract.Version = expectedVersion;
         return _apiClient.UpdateRuntime(key, contract, cancellationToken);

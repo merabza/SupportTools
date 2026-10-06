@@ -39,8 +39,7 @@ public sealed class ApiClientsRegistrySyncAdapter : DictionaryRegistrySyncAdapte
 
     protected override bool IsSynced(string key)
     {
-        return !string.Equals(key, _parameters.SupportToolsServerWebApiClientName,
-            StringComparison.OrdinalIgnoreCase);
+        return !string.Equals(key, _parameters.SupportToolsServerWebApiClientName, StringComparison.OrdinalIgnoreCase);
     }
 
     protected override Dictionary<string, ApiClientSettings> GetLocalDictionary()
@@ -65,8 +64,7 @@ public sealed class ApiClientsRegistrySyncAdapter : DictionaryRegistrySyncAdapte
         return ApiClientMapper.Normalize(contract);
     }
 
-    protected override Task<Result<List<StsApiClientDataModel>>> GetServerContracts(
-        CancellationToken cancellationToken)
+    protected override Task<Result<List<StsApiClientDataModel>>> GetServerContracts(CancellationToken cancellationToken)
     {
         return _apiClient.GetApiClients(cancellationToken);
     }
@@ -82,8 +80,8 @@ public sealed class ApiClientsRegistrySyncAdapter : DictionaryRegistrySyncAdapte
     }
 
     //კონტრაქტის Version upsert-ის მოსალოდნელი ვერსიაა (B1)
-    protected override Task<Result<int>> UpsertContract(string key, StsApiClientDataModel contract,
-        int expectedVersion, CancellationToken cancellationToken)
+    protected override Task<Result<int>> UpsertContract(string key, StsApiClientDataModel contract, int expectedVersion,
+        CancellationToken cancellationToken)
     {
         contract.Version = expectedVersion;
         return _apiClient.UpdateApiClient(key, contract, cancellationToken);

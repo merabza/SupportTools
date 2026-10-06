@@ -47,8 +47,7 @@ public sealed class ProjectTemplatesRegistrySyncAdapterTests : IDisposable
         _sut.ApplyLocal("Console With Database", NewContract("Console With Database", "Console"));
 
         // Assert
-        TemplateModel template =
-            _context.Parameters.AppProjectCreatorAllParameters!.Templates["Console With Database"];
+        TemplateModel template = _context.Parameters.AppProjectCreatorAllParameters!.Templates["Console With Database"];
         Assert.Equal(ESupportProjectType.Console, template.SupportProjectType);
         Assert.True(template.UseDatabase);
         Assert.Equal(["Console With Database"], _sut.GetLocalRecords().Keys);

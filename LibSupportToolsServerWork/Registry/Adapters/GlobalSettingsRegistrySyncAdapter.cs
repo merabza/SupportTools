@@ -45,8 +45,7 @@ public sealed class GlobalSettingsRegistrySyncAdapter : SingletonRegistrySyncAda
         return GlobalSettingsMapper.Normalize(contract);
     }
 
-    protected override Task<Result<StsGlobalSettingsDataModel>> GetServerContract(
-        CancellationToken cancellationToken)
+    protected override Task<Result<StsGlobalSettingsDataModel>> GetServerContract(CancellationToken cancellationToken)
     {
         return _apiClient.GetGlobalSettings(cancellationToken);
     }

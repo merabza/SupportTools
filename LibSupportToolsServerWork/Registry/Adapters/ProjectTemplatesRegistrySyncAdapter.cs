@@ -18,8 +18,8 @@ public sealed class ProjectTemplatesRegistrySyncAdapter : DictionaryRegistrySync
     private readonly SupportToolsParameters _parameters;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ProjectTemplatesRegistrySyncAdapter(SupportToolsServerApiClient apiClient,
-        SupportToolsParameters parameters, RegistrySyncWarnings warnings) : base(warnings)
+    public ProjectTemplatesRegistrySyncAdapter(SupportToolsServerApiClient apiClient, SupportToolsParameters parameters,
+        RegistrySyncWarnings warnings) : base(warnings)
     {
         _apiClient = apiClient;
         _parameters = parameters;

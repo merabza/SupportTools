@@ -12,8 +12,7 @@ namespace LibSupportToolsServerWork.Registry.Mappers;
 //იბეჭდება. folders set-ის გზები DB სერვერისაა და არ გარდაიქმნება (README §4.4)
 public static class DatabaseServerConnectionMapper
 {
-    public static StsDatabaseServerConnectionDataModel ToContract(string name,
-        DatabaseServerConnectionData connection)
+    public static StsDatabaseServerConnectionDataModel ToContract(string name, DatabaseServerConnectionData connection)
     {
         return new StsDatabaseServerConnectionDataModel
         {

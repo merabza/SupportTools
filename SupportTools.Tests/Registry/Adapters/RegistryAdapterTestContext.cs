@@ -24,8 +24,7 @@ internal sealed class RegistryAdapterTestContext : IDisposable
     public RegistryAdapterTestContext()
     {
         var httpClientFactory = new Mock<IHttpClientFactory>();
-        httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(Server, false));
+        httpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() => new HttpClient(Server, false));
         ApiClient = new SupportToolsServerApiClient(null, httpClientFactory.Object, FakeSupportToolsServer.Address,
             null, false);
 

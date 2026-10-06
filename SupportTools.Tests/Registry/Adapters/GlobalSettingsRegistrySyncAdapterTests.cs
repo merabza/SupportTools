@@ -59,13 +59,12 @@ public sealed class GlobalSettingsRegistrySyncAdapterTests : IDisposable
         _context.Server.Store(Area, string.Empty, new StsGlobalSettingsDataModel { UploadTempExtension = ".up!" }, 3);
 
         // Act
-        Result<int> result = await _sut.Upsert(Key,
-            new StsGlobalSettingsDataModel { UploadTempExtension = ".new!" }, 3, default);
+        Result<int> result = await _sut.Upsert(Key, new StsGlobalSettingsDataModel { UploadTempExtension = ".new!" }, 3,
+            default);
 
         // Assert
         Assert.Equal(4, result.Value);
-        Assert.Equal(".new!",
-            _context.Server.Get<StsGlobalSettingsDataModel>(Area, string.Empty)?.UploadTempExtension);
+        Assert.Equal(".new!", _context.Server.Get<StsGlobalSettingsDataModel>(Area, string.Empty)?.UploadTempExtension);
     }
 
     [Fact]
@@ -95,8 +94,7 @@ public sealed class GlobalSettingsRegistrySyncAdapterTests : IDisposable
 
         // Assert
         Assert.Equal("Global", Key);
-        Assert.Equal("fake-license-key",
-            Assert.IsType<StsGlobalSettingsDataModel>(result[Key]).MediatRLicenseKey);
+        Assert.Equal("fake-license-key", Assert.IsType<StsGlobalSettingsDataModel>(result[Key]).MediatRLicenseKey);
     }
 
     //before the first create the server answers an empty record with version 0
@@ -146,8 +144,7 @@ public sealed class GlobalSettingsRegistrySyncAdapterTests : IDisposable
     {
         // Arrange
         _context.Server.Store(Area, string.Empty, new StsGlobalSettingsDataModel(), 4);
-        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords =
-            await _sut.GetServerRecords(default);
+        Result<IReadOnlyDictionary<string, RegistryServerRecord>> serverRecords = await _sut.GetServerRecords(default);
 
         // Act
         Result<int> result = await _sut.Upsert(Key,
@@ -197,7 +194,8 @@ public sealed class GlobalSettingsRegistrySyncAdapterTests : IDisposable
         var contract = new StsGlobalSettingsDataModel
         {
             ProgramArchiveExtension = ".zip",
-            DatabasesBackupFilesExchange = new StsDatabasesBackupFilesExchangeDataModel { DownloadTempExtension = ".d" }
+            DatabasesBackupFilesExchange =
+                new StsDatabasesBackupFilesExchangeDataModel { DownloadTempExtension = ".d" }
         };
 
         // Act

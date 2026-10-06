@@ -22,8 +22,10 @@ public sealed class ApiClientsRegistrySyncAdapterTests : IDisposable
     public ApiClientsRegistrySyncAdapterTests()
     {
         _context.Parameters.SupportToolsServerWebApiClientName = BootstrapName;
-        _context.Parameters.ApiClients[BootstrapName] =
-            new ApiClientSettings { Server = "http://sts.example.test/api/v1", ApiKey = "fake-bootstrap-key" };
+        _context.Parameters.ApiClients[BootstrapName] = new ApiClientSettings
+        {
+            Server = "http://sts.example.test/api/v1", ApiKey = "fake-bootstrap-key"
+        };
         _context.Parameters.ApiClients["Pc1.WebAgent"] =
             new ApiClientSettings { Server = "http://pc1.example.test/api", ApiKey = "fake-agent-key" };
         _sut = new ApiClientsRegistrySyncAdapter(_context.ApiClient, _context.Parameters, _context.Warnings);
@@ -49,8 +51,7 @@ public sealed class ApiClientsRegistrySyncAdapterTests : IDisposable
     public async Task GetServerRecords_WhenServerHasRecordWithBootstrapNameInOtherCase_LeavesItOut()
     {
         // Arrange
-        _context.Server.Store(Area, "supporttoolsserver", new StsApiClientDataModel { Name = "supporttoolsserver" },
-            1);
+        _context.Server.Store(Area, "supporttoolsserver", new StsApiClientDataModel { Name = "supporttoolsserver" }, 1);
         _context.Server.Store(Area, "Pc1.WebAgent", new StsApiClientDataModel { Name = "Pc1.WebAgent" }, 1);
 
         // Act

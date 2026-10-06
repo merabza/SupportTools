@@ -38,8 +38,7 @@ public sealed class ProjectCreatorSettingsMapperTests
 
         // Act
         StsProjectCreatorSettingsDataModel result =
-            ProjectCreatorSettingsMapper.ToContract(NewParameters(LinuxProjectsFolder, LinuxSecretsFolder),
-                pathMapper);
+            ProjectCreatorSettingsMapper.ToContract(NewParameters(LinuxProjectsFolder, LinuxSecretsFolder), pathMapper);
 
         // Assert
         Assert.Equal(CanonicalProjectsFolder, result.ProjectsFolderPathReal);

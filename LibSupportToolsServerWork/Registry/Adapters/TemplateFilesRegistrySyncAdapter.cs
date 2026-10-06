@@ -70,8 +70,7 @@ public abstract class TemplateFilesRegistrySyncAdapter<TContract> : RegistrySync
         CancellationToken cancellationToken)
     {
         return UpsertCheckingVersionOnClient(key, expectedVersion,
-            () => WriteServerContract(CreateContract(key, GetContent(contract)), cancellationToken),
-            cancellationToken);
+            () => WriteServerContract(CreateContract(key, GetContent(contract)), cancellationToken), cancellationToken);
     }
 
     //key ლოკალური წერილობაა, თუ სახელი სიაში უკვე არის
