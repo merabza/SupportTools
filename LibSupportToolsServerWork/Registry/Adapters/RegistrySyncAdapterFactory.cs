@@ -6,32 +6,42 @@ using SupportToolsServerApiContracts;
 
 namespace LibSupportToolsServerWork.Registry.Adapters;
 
-//რეესტრის ყველა ადაპტერის აწყობა ერთ ადგილას (C3). C4 აქ Projects-ს დაამატებს, სინქრონიზაციის ბრძანება (C5) კი სიას
-//RegistrySyncEngine-ს გადასცემს. pathMapper (parameters.PathMappings-ით შექმნილი) და warnings ბრძანებას ეკუთვნის:
-//გეგმის აგებისა და შესრულების შემდეგ ის მათ Issues-სა და Items-ს აჩვენებს
+//რეესტრის ყველა ადაპტერის აწყობა ერთ ადგილას (C3, C4). Projects ბოლოა და მითითებული კოლექციების სერვერის გასაღებებს
+//მათი ადაპტერებიდან კითხულობს. სინქრონიზაციის ბრძანება (C5) სიას RegistrySyncEngine-ს გადასცემს. pathMapper
+//(parameters.PathMappings-ით შექმნილი) და warnings ბრძანებას ეკუთვნის: გეგმის აგებისა და შესრულების შემდეგ ის მათ
+//Issues-სა და Items-ს აჩვენებს
 public static class RegistrySyncAdapterFactory
 {
     public static List<IRegistrySyncAdapter> CreateAdapters(SupportToolsServerApiClient apiClient,
         SupportToolsParameters parameters, PathMapper pathMapper, RegistrySyncWarnings warnings)
     {
+        var npmPackages = new NpmPackagesRegistrySyncAdapter(apiClient, parameters, warnings);
+        var databaseServerConnections =
+            new DatabaseServerConnectionsRegistrySyncAdapter(apiClient, parameters, warnings);
+        var gits = new GitsRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings);
+        var editorConfigPatterns = new EditorConfigPatternsRegistrySyncAdapter(apiClient, parameters, warnings);
+        var referenceServerKeys =
+            new ProjectReferenceServerKeys(gits, npmPackages, editorConfigPatterns, databaseServerConnections);
+
         return
         [
             new EnvironmentsRegistrySyncAdapter(apiClient, parameters, warnings),
             new RunTimesRegistrySyncAdapter(apiClient, parameters, warnings),
-            new NpmPackagesRegistrySyncAdapter(apiClient, parameters, warnings),
+            npmPackages,
             new ReactAppTemplatesRegistrySyncAdapter(apiClient, parameters, warnings),
             new DotnetToolsRegistrySyncAdapter(apiClient, parameters, warnings),
             new SmartSchemasRegistrySyncAdapter(apiClient, parameters, warnings),
             new FileStoragesRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings),
             new ApiClientsRegistrySyncAdapter(apiClient, parameters, warnings),
-            new DatabaseServerConnectionsRegistrySyncAdapter(apiClient, parameters, warnings),
+            databaseServerConnections,
             new ServersRegistrySyncAdapter(apiClient, parameters, warnings),
             new GitIgnorePatternsRegistrySyncAdapter(apiClient, parameters, warnings),
-            new GitsRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings),
-            new EditorConfigPatternsRegistrySyncAdapter(apiClient, parameters, warnings),
+            gits,
+            editorConfigPatterns,
             new ProjectTemplatesRegistrySyncAdapter(apiClient, parameters, warnings),
             new GlobalSettingsRegistrySyncAdapter(apiClient, parameters, warnings),
-            new ProjectCreatorSettingsRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings)
+            new ProjectCreatorSettingsRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings),
+            new ProjectsRegistrySyncAdapter(apiClient, parameters, pathMapper, referenceServerKeys, warnings)
         ];
     }
 }

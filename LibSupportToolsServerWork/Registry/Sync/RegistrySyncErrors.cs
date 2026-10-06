@@ -25,6 +25,14 @@ public static class RegistrySyncErrors
             $"{collectionName}/{key}: the record is not in the local records after it was applied");
     }
 
+    //ლოკალური ჩანაწერი სერვერზე ვერ აიტვირთება, სანამ მომხმარებელი მას არ გაასწორებს (მაგ. პროექტის ServerInfo-ების
+    //ნატურალური გასაღები მეორდება). ადაპტერი სერვერს არ მიმართავს; შემსრულებლისთვის ეს Failed-ია
+    public static Error LocalRecordIsInvalid(string collectionName, string key, string problems)
+    {
+        return Error.Problem(nameof(LocalRecordIsInvalid),
+            $"{collectionName}/{key}: the local record is not pushed until it is fixed: {problems}");
+    }
+
     //RemoveLocal-ის შემდეგ ჩანაწერი ისევ ჩანს ადაპტერის ლოკალურ ჩანაწერებში
     public static Error LocalRecordNotRemoved(string collectionName, string key)
     {

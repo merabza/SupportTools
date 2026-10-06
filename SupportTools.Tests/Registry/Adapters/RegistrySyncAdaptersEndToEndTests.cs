@@ -34,8 +34,11 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
     private const string GitIgnoreContent = "bin/\r\nobj/\r\n";
     private const string EditorConfigContent = "root = true\r\n[*.cs]\r\nindent_size = 4\r\n";
 
+    //the key of the main computer's ServerInfo; a computer that pulls the project gives it the "Server|Env" key
+    private const string ProjectServerInfoKey = "3c2d0000-fake-guid";
+
     //the records of the main computer, without its bootstrap ApiClient
-    private const int SeededRecordCount = 21;
+    private const int SeededRecordCount = 22;
 
     private readonly RegistryAdapterTestContext _context = new();
     private readonly Computer _linux;
@@ -112,6 +115,11 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
         Assert.Equal(EPeriodType.Month, linux.SmartSchemas["Daily"].Details[1].PeriodType);
         Assert.Equal(["Archive", "Default"], linux.DatabaseServerConnections["Dev"].DatabaseFoldersSets!.Keys);
         Assert.Null(linux.DotnetTools["dotnet-ef"].InstalledVersion);
+        ProjectModel project = linux.Projects["AppFake"];
+        Assert.Equal("/home/u/1WorkDotnet/AppFake/AppFake.slnx", project.SolutionFileName);
+        Assert.Equal("/home/u/1WorkDotnet/Secrets/appsettings.json",
+            project.ServerInfos["PAZISI|Production"].AppSettingsJsonSourceFileName);
+        Assert.Equal("fake-key-guid-part", project.KeyGuidPart);
     }
 
     [Fact]
@@ -306,7 +314,33 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
                     GitIgnorePatternName = "CSharp"
                 }
             },
-            EditorConfigPatterns = { "default" }
+            EditorConfigPatterns = { "default" },
+            Projects =
+            {
+                ["AppFake"] = new ProjectModel
+                {
+                    ProjectType = EProjectType.IsService,
+                    SolutionFileName = @"D:\1WorkDotnet\AppFake\AppFake.slnx",
+                    EditorConfigPatternName = "default",
+                    KeyGuidPart = "fake-key-guid-part",
+                    DevDatabaseParameters =
+                        new DatabaseParameters { DbConnectionName = "Dev", DatabaseName = "AppFake" },
+                    GitProjectNames = ["AppFront"],
+                    FrontNpmPackageNames = ["react"],
+                    AllowToolsList = [EProjectTools.SeedData],
+                    ServerInfos =
+                    {
+                        [ProjectServerInfoKey] = new ServerInfoModel
+                        {
+                            ServerName = "PAZISI",
+                            EnvironmentName = "Production",
+                            WebAgentNameForCheck = "Pc1.WebAgent",
+                            AppSettingsJsonSourceFileName = @"D:\1WorkDotnet\Secrets\appsettings.json",
+                            AllowToolsList = [EProjectServerTools.ProgramUpdater]
+                        }
+                    }
+                }
+            }
         };
     }
 

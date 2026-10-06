@@ -16,8 +16,11 @@ namespace LibSupportToolsServerWork.Registry.Adapters;
 //- სერვერის კონტრაქტში ამ კლიენტისთვის უცნობი მნიშვნელობაა (FindUnsupportedField, მაგ. enum-ის ახალი სახელი). ასეთი
 //  ჩანაწერი ლოკალურად ვერ აისახება, ლოკალური ვერსიის ატვირთვა კი სერვერის მნიშვნელობას დაკარგავდა. იწერება
 //  გაფრთხილება და ჩანაწერი SupportTools-ის განახლებამდე სინქრონიზაციაში აღარ მონაწილეობს
-public abstract class RegistrySyncAdapter<TContract> : IRegistrySyncAdapter where TContract : class
+public abstract class RegistrySyncAdapter<TContract> : IRegistrySyncAdapter, IRegistryServerKeys where TContract : class
 {
+    //ბოლოს წაკითხული სერვერის ყველა ჩანაწერის გასაღები, გამორიცხულების ჩათვლით (IRegistryServerKeys)
+    private readonly HashSet<string> _serverKeys = new(StringComparer.OrdinalIgnoreCase);
+
     //სერვერის ჩანაწერები, რომლებიც ბოლო წაკითხვისას FindUnsupportedField-მა უარყო. ძრავა სერვერის ჩანაწერებს
     //ლოკალურზე ადრე კითხულობს, ამიტომ ლოკალური მხარეც მათ გამორიცხავს
     private readonly HashSet<string> _unsupportedServerKeys = new(StringComparer.OrdinalIgnoreCase);
@@ -28,6 +31,8 @@ public abstract class RegistrySyncAdapter<TContract> : IRegistrySyncAdapter wher
     }
 
     protected RegistrySyncWarnings Warnings { get; }
+
+    public IReadOnlyCollection<string> ServerKeys => _serverKeys;
 
     public abstract string CollectionName { get; }
     public abstract int Order { get; }
@@ -61,10 +66,12 @@ public abstract class RegistrySyncAdapter<TContract> : IRegistrySyncAdapter wher
         }
 
         _unsupportedServerKeys.Clear();
+        _serverKeys.Clear();
         Dictionary<string, RegistryServerRecord> records = [];
         foreach (TContract contract in contracts.Value)
         {
             string key = GetKey(contract);
+            _serverKeys.Add(key);
             if (!IsSynced(key))
             {
                 continue;

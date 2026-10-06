@@ -46,7 +46,8 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
         "apiclients",
         "databaseserverconnections",
         "servers",
-        "projecttemplates"
+        "projecttemplates",
+        "projects"
     };
 
     private readonly Dictionary<string, Dictionary<string, JObject>> _areas = new(StringComparer.Ordinal);

@@ -44,6 +44,19 @@ public sealed class RegistrySyncErrorsTests
     }
 
     [Fact]
+    public void LocalRecordIsInvalid_WhenCalled_NamesCollectionKeyAndProblems()
+    {
+        // Act
+        Error result = RegistrySyncErrors.LocalRecordIsInvalid("Projects", "App", "ServerInfos: A|B/a|b");
+
+        // Assert
+        Assert.Equal("LocalRecordIsInvalid", result.Code);
+        Assert.Equal("Projects/App: the local record is not pushed until it is fixed: ServerInfos: A|B/a|b",
+            result.Description);
+        Assert.Equal(ErrorType.Problem, result.Type);
+    }
+
+    [Fact]
     public void LocalRecordNotRemoved_WhenCalled_NamesCollectionAndKey()
     {
         // Act

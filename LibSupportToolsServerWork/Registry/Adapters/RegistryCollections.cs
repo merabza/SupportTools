@@ -2,7 +2,7 @@
 
 //რეესტრის კოლექციები. სახელი სინქრონიზაციის მდგომარეობის გასაღებია (RegistrySyncState.Collections), ამიტომ არ
 //იცვლება. Order დამოკიდებულების რიგია (README §4.3): მითითებულ კოლექციას ნაკლები აქვს, ვიდრე მიმთითებელს.
-//Projects (C4) ყველაზე ბოლოა
+//Projects ყველაზე ბოლოა
 public static class RegistryCollections
 {
     public const string Environments = "Environments";
@@ -21,6 +21,7 @@ public static class RegistryCollections
     public const string ProjectTemplates = "ProjectTemplates";
     public const string GlobalSettings = "GlobalSettings";
     public const string ProjectCreatorSettings = "ProjectCreatorSettings";
+    public const string Projects = "Projects";
 
     //ცნობარები და რესურსები სხვა კოლექციას არ მიმართავს
     public const int EnvironmentsOrder = 10;
@@ -53,4 +54,8 @@ public static class RegistryCollections
 
     //→ Servers, Environments, DatabaseServerConnections, FileStorages, SmartSchemas
     public const int ProjectCreatorSettingsOrder = 160;
+
+    //→ Gits, NpmPackages, EditorConfigPatterns, DatabaseServerConnections, SmartSchemas, FileStorages; ServerInfo-ებით
+    //Servers, Environments, ApiClients
+    public const int ProjectsOrder = 170;
 }
