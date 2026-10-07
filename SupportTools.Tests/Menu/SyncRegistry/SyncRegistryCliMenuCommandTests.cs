@@ -44,12 +44,14 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
     //an answer one past the last menu item
     private const string OutOfRangeAnswer = "<out of range>";
 
-    private readonly List<FakeRegistrySyncAdapter> _adapters = [];
+    private readonly List<IRegistrySyncAdapter> _adapters = [];
     private readonly Queue<string> _answers = new();
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly FakeRegistrySyncAdapter _environments;
     private readonly Mock<IHttpClientFactory> _httpClientFactory = new();
+
     private readonly TextWriter _originalConsoleOutput;
+
     //the field names of the menu questions, in order
     private readonly List<string> _questions = [];
 
@@ -104,8 +106,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains("SupportToolsServerWebApiClientName is not set: choose the ApiClient of SupportToolsServer " +
-                        "in Support Tools Parameters Editor", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains(
+            "SupportToolsServerWebApiClientName is not set: choose the ApiClient of SupportToolsServer " +
+            "in Support Tools Parameters Editor", ConsoleText(), StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
     }
 
@@ -157,8 +160,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         string console = ConsoleText();
-        Assert.Contains("Cannot connect to SupportToolsServer (ApiClient SupportToolsServer, address " +
-                        $"{FakeSupportToolsServer.Address})", console, StringComparison.Ordinal);
+        Assert.Contains(
+            "Cannot connect to SupportToolsServer (ApiClient SupportToolsServer, address " +
+            $"{FakeSupportToolsServer.Address})", console, StringComparison.Ordinal);
         Assert.Contains("check the ApiKey of ApiClient SupportToolsServer", console, StringComparison.Ordinal);
         Assert.DoesNotContain(ApiKey, console, StringComparison.Ordinal);
         //the API client is created without the console, so only the command reports the error
@@ -200,8 +204,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         string console = ConsoleText();
-        Assert.Contains("These local keys differ only by case, so they cannot be matched with the server records. " +
-                        "Rename or remove the extra records, then sync again:", console, StringComparison.Ordinal);
+        Assert.Contains(
+            "These local keys differ only by case, so they cannot be matched with the server records. " +
+            "Rename or remove the extra records, then sync again:", console, StringComparison.Ordinal);
         Assert.Contains("  Gits: AppA / appa", console, StringComparison.Ordinal);
         Assert.DoesNotContain("Registry sync plan", console, StringComparison.Ordinal);
         Assert.Empty(_shownMenus);
@@ -483,8 +488,7 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         // Assert
         Assert.True(result);
         List<string> lines = ConsoleLines();
-        int index = lines.IndexOf(
-            "Dry run: Apply would send 2 records to SupportToolsServer, nothing is sent now");
+        int index = lines.IndexOf("Dry run: Apply would send 2 records to SupportToolsServer, nothing is sent now");
         Assert.True(index >= 0);
         Assert.Equal([
             "  1. add Environments/Dev", "  2. add Environments/Prod", "Apply would change 1 records on this computer",
@@ -510,9 +514,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Contains("Dev", _sync.State.Collections[Environments].ExcludedKeys);
         Assert.Equal(["Upsert Environments/Prod/0"], _sync.Calls);
-        _sync.ParametersManager.Verify(x => x.Save(_sync.Parameters,
-            "Environments/Dev is excluded from the registry sync on this computer", null,
-            It.IsAny<CancellationToken>()), Times.Once);
+        _sync.ParametersManager.Verify(
+            x => x.Save(_sync.Parameters, "Environments/Dev is excluded from the registry sync on this computer", null,
+                It.IsAny<CancellationToken>()), Times.Once);
         _sync.VerifySaved(Times.Exactly(2));
         Assert.Contains("Environments                   0     1         0       0        1", ConsoleLines());
     }
@@ -571,8 +575,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
             StringComparison.Ordinal);
         Assert.Contains("Sync result: failed 1, not executed 2", console, StringComparison.Ordinal);
         Assert.Contains("[ERROR]   failed Environments/Dev: Name Is Longer Than 50 Characters", ConsoleLines());
-        Assert.Contains("[ERROR] The sync stopped after the failure of Environments/Dev: fix the record or exclude " +
-                        "it from the sync, then sync again", ConsoleLines());
+        Assert.Contains(
+            "[ERROR] The sync stopped after the failure of Environments/Dev: fix the record or exclude " +
+            "it from the sync, then sync again", ConsoleLines());
     }
 
     [Fact]
@@ -589,8 +594,9 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         string console = ConsoleText();
-        Assert.Contains("SupportToolsServer became unreachable, the remaining server operations were not executed: " +
-                        "Api request failed: http://sts/api: connection refused", console, StringComparison.Ordinal);
+        Assert.Contains(
+            "SupportToolsServer became unreachable, the remaining server operations were not executed: " +
+            "Api request failed: http://sts/api: connection refused", console, StringComparison.Ordinal);
         Assert.DoesNotContain("The sync stopped after the failure", console, StringComparison.Ordinal);
     }
 
@@ -743,6 +749,60 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         Assert.Contains("1/1 delete Environments/Dev: done", lines);
     }
 
+    //a stored file (C6) that was deleted on the server is a conflict: Apply keeps it here until the user deletes it
+    [Fact]
+    public async Task RunBody_WhenAFileWasDeletedOnServer_ApplyKeepsItHere()
+    {
+        // Arrange
+        const string file = @"D:\1WorkSecurity\AppFake\appsettings.json";
+        FakeFileRegistrySyncAdapter files = AddFileAdapter("StoredFiles", 165);
+        _sync.AddSyncedRecord(files.Inner, file, "a", 2);
+        files.Inner.Server.Remove(file);
+
+        // Act
+        bool result = await Run("Show details", "Apply");
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(_sync.Calls);
+        Assert.True(files.Inner.Local.ContainsKey(file));
+        List<string> lines = ConsoleLines();
+        Assert.Contains("StoredFiles                    0     0         1       0        0", lines);
+        Assert.Contains($"  StoredFiles/{file}: deleted on the server, delete it here too?", lines);
+        Assert.Contains("Sync result: not selected 1", lines);
+    }
+
+    //the delete of a stored file happens on the side that the user chooses
+    [Fact]
+    public async Task RunBody_WhenFileDeleteConflictsAreResolved_DeletesTheFilesOnTheChosenSides()
+    {
+        // Arrange
+        const string goneHere = @"D:\1WorkSecurity\AppFake\GoneHere.json";
+        const string goneOnServer = @"D:\1WorkSecurity\AppFake\GoneOnServer.json";
+        FakeFileRegistrySyncAdapter files = AddFileAdapter("StoredFiles", 165);
+        _sync.AddSyncedRecord(files.Inner, goneHere, "h", 4);
+        files.Inner.Local.Remove(goneHere);
+        _sync.AddSyncedRecord(files.Inner, goneOnServer, "s", 3);
+        files.Inner.Server.Remove(goneOnServer);
+
+        // Act
+        bool result = await Run("Resolve conflicts", "Local", "Server", "Apply");
+
+        // Assert
+        Assert.True(result);
+        List<string> lines = ConsoleLines();
+        Assert.Contains($"Conflict 1/2: StoredFiles/{goneHere} - deleted here, delete it on the server too?", lines);
+        Assert.Contains($"Conflict 2/2: StoredFiles/{goneOnServer} - deleted on the server, delete it here too?",
+            lines);
+        Assert.Equal(["Local (delete it on the server)", "Server (take the server's version to this computer)"],
+            MenuLines(_shownMenus[1]).Take(2));
+        Assert.Equal(["Local (send this computer's version to the server)", "Server (delete it on this computer)"],
+            MenuLines(_shownMenus[2]).Take(2));
+        Assert.Equal([$"Delete StoredFiles/{goneHere}/4", $"RemoveLocal StoredFiles/{goneOnServer}"], _sync.Calls);
+        Assert.Empty(files.Inner.Local);
+        Assert.Empty(files.Inner.Server);
+    }
+
     [Fact]
     public async Task RunBody_WhenRecordsAreUpdatedAndDeleted_DetailsNameTheChangesAndTheirFields()
     {
@@ -774,8 +834,7 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         // Assert
         Assert.True(result);
         List<string> lines = ConsoleLines();
-        int index = lines.IndexOf(
-            "Dry run: Apply would send 2 records to SupportToolsServer, nothing is sent now");
+        int index = lines.IndexOf("Dry run: Apply would send 2 records to SupportToolsServer, nothing is sent now");
         Assert.Equal([
             "  1. update Environments/Upd", "  2. delete Environments/Gone",
             "Apply would change 2 records on this computer", "  update Environments/PullUpd",
@@ -1049,6 +1108,14 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
     private FakeRegistrySyncAdapter AddAdapter(string collectionName, int order)
     {
         FakeRegistrySyncAdapter adapter = _sync.CreateAdapter(collectionName, order);
+        _adapters.Add(adapter);
+        return adapter;
+    }
+
+    //a file collection like the stored files (C6)
+    private FakeFileRegistrySyncAdapter AddFileAdapter(string collectionName, int order)
+    {
+        FakeFileRegistrySyncAdapter adapter = _sync.CreateFileAdapter(collectionName, order);
         _adapters.Add(adapter);
         return adapter;
     }

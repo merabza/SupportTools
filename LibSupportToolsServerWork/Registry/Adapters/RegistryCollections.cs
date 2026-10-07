@@ -21,6 +21,7 @@ public static class RegistryCollections
     public const string ProjectTemplates = "ProjectTemplates";
     public const string GlobalSettings = "GlobalSettings";
     public const string ProjectCreatorSettings = "ProjectCreatorSettings";
+    public const string StoredFiles = "StoredFiles";
     public const string Projects = "Projects";
 
     //ცნობარები და რესურსები სხვა კოლექციას არ მიმართავს
@@ -54,6 +55,9 @@ public static class RegistryCollections
 
     //→ Servers, Environments, DatabaseServerConnections, FileStorages, SmartSchemas
     public const int ProjectCreatorSettingsOrder = 160;
+
+    //საიდუმლო ფაილები (C6): Projects-ის ფაილის ველები მათ გზით მიმართავს, FK-ის გარეშე
+    public const int StoredFilesOrder = 165;
 
     //→ Gits, NpmPackages, EditorConfigPatterns, DatabaseServerConnections, SmartSchemas, FileStorages; ServerInfo-ებით
     //Servers, Environments, ApiClients

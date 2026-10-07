@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,10 @@ namespace SupportTools.Tests.Registry.Adapters;
 //- singletons (settings/global, settings/projectcreator): GET answers an empty record with Version 0 before the first
 //  create, POST update follows the upsert rules;
 //- the old git endpoints check no version: updategitrepo/{key} and syncup…/{merge} add or replace a record and
-//  increment its version; the deletes are unconditional and answer 404 with their own code for a missing record.
+//  increment its version; the deletes are unconditional and answer 404 with their own code for a missing record;
+//- stored files (B8) are keyed by their path, which travels in the query (GET files/content?path=…, DELETE
+//  files/delete?path=…&version=N) or in the body (POST files/update, the upsert). GET files lists them without the
+//  content; Sha256 and Length are computed from the UTF-8 bytes of the content, as the server does.
 //Every request is logged as "METHOD path?query"
 internal sealed class FakeSupportToolsServer : HttpMessageHandler
 {
@@ -30,6 +34,7 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
     public const string EditorConfigFileTypes = "editorconfigfiletypes";
     public const string GlobalSettings = "settings/global";
     public const string ProjectCreatorSettings = "settings/projectcreator";
+    public const string StoredFiles = "files";
 
     private const string ApiBase = "/api/v1/";
     private const string VersionProperty = "Version";
@@ -87,6 +92,24 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
     public T? Get<T>(string area, string name)
     {
         return Records(area).TryGetValue(name, out JObject? record) ? record.ToObject<T>() : default;
+    }
+
+    //stores a file as if the server had saved it with this version, with its Sha256 and Length
+    public void StoreFile(string path, string content, int version)
+    {
+        Records(StoredFiles).Remove(path);
+        Records(StoredFiles)[path] = StoredFileRecord(path, content, version);
+    }
+
+    public string? FileContent(string path)
+    {
+        return Records(StoredFiles).TryGetValue(path, out JObject? record) ? record.Value<string>("Content") : null;
+    }
+
+    //the hash of B8 (StoredFile.ComputeSha256): SHA-256 of the UTF-8 bytes of the content, upper-case hex
+    public static string Sha256Of(string content)
+    {
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(content)));
     }
 
     public int VersionOf(string area, string name)
@@ -155,6 +178,11 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
             return method == HttpMethod.Get ? GetSingleton(area) : Upsert(area, "Name", string.Empty, body);
         }
 
+        if (segments[0] == StoredFiles)
+        {
+            return RouteStoredFiles(method, segments, body, query);
+        }
+
         return segments[1] switch
         {
             "gitrepos" => List(GitRepos, "GitProjectName"),
@@ -189,6 +217,81 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
         string? version = query.TrimStart('?').Split('&').Select(x => x.Split('=')).Where(x => x[0] == "version")
             .Select(x => x[1]).FirstOrDefault();
         return Delete(area, segments[2], version is null ? null : int.Parse(version, CultureInfo.InvariantCulture));
+    }
+
+    private HttpResponseMessage RouteStoredFiles(HttpMethod method, string[] segments, string body, string query)
+    {
+        Dictionary<string, JObject> records = Records(StoredFiles);
+        if (method == HttpMethod.Post)
+        {
+            return UpsertFile(JObject.Parse(body));
+        }
+
+        string? path = QueryValue(query, "path");
+        if (method == HttpMethod.Delete)
+        {
+            string? version = QueryValue(query, "version");
+            return Delete(StoredFiles, path!,
+                version is null ? null : int.Parse(version, CultureInfo.InvariantCulture));
+        }
+
+        if (segments.Length == 1)
+        {
+            var infos = new JArray(records.Values
+                .OrderBy(x => x.Value<string>("Path"), StringComparer.OrdinalIgnoreCase).Select(x =>
+                    new JObject(x.Properties().Where(p => p.Name != "Content").Select(p => p.DeepClone()))));
+            return Json(infos.ToString(Formatting.None));
+        }
+
+        if (path is null || !records.TryGetValue(path, out JObject? stored))
+        {
+            return Problem(HttpStatusCode.NotFound, "RecordWithNameNotFound");
+        }
+
+        var storedFile = new JObject
+        {
+            ["Path"] = stored["Path"]?.DeepClone(),
+            ["Content"] = stored["Content"]?.DeepClone(),
+            [VersionProperty] = stored[VersionProperty]?.DeepClone()
+        };
+        return Json(storedFile.ToString(Formatting.None));
+    }
+
+    //the upsert of B1 with the path of the body as the key
+    private HttpResponseMessage UpsertFile(JObject storedFile)
+    {
+        string path = storedFile.Value<string>("Path")!;
+        int expectedVersion = storedFile.Value<int?>(VersionProperty) ?? 0;
+        int storedVersion = VersionOf(StoredFiles, path);
+        if (storedVersion != expectedVersion)
+        {
+            return storedVersion == 0
+                ? Problem(HttpStatusCode.NotFound, "RecordWithNameNotFound")
+                : Problem(HttpStatusCode.Conflict, "ConcurrencyConflict");
+        }
+
+        StoreFile(path, storedFile.Value<string>("Content")!, expectedVersion + 1);
+        return Json((expectedVersion + 1).ToString(CultureInfo.InvariantCulture));
+    }
+
+    private static JObject StoredFileRecord(string path, string content, int version)
+    {
+        return new JObject
+        {
+            ["Path"] = path,
+            ["Content"] = content,
+            ["Sha256"] = Sha256Of(content),
+            ["Length"] = Encoding.UTF8.GetByteCount(content),
+            ["UpdatedAtUtc"] = new DateTime(2026, 10, 7, 12, 0, 0, DateTimeKind.Utc),
+            [VersionProperty] = version
+        };
+    }
+
+    //a value of the query (?path=…&version=…), unescaped
+    private static string? QueryValue(string query, string name)
+    {
+        return query.TrimStart('?').Split('&').Select(x => x.Split('=', 2)).Where(x => x[0] == name)
+            .Select(x => Uri.UnescapeDataString(x[1])).FirstOrDefault();
     }
 
     private HttpResponseMessage List(string area, string nameProperty)

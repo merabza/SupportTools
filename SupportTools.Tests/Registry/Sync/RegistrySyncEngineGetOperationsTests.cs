@@ -39,11 +39,9 @@ public sealed class RegistrySyncEngineGetOperationsTests
         RegistrySyncOperations result = RegistrySyncEngine.GetOperations(plan, RegistrySyncSelection.AllNonConflicting);
 
         // Assert
-        Assert.Equal(
-            ["Environments/PushAdd", "Servers/PushAdd", "Servers/PushDelete", "Environments/PushDelete"],
+        Assert.Equal(["Environments/PushAdd", "Servers/PushAdd", "Servers/PushDelete", "Environments/PushDelete"],
             Names(result.ServerItems));
-        Assert.Equal(
-            ["Environments/PullAdd", "Servers/PullAdd", "Servers/PullDelete", "Environments/PullDelete"],
+        Assert.Equal(["Environments/PullAdd", "Servers/PullAdd", "Servers/PullDelete", "Environments/PullDelete"],
             Names(result.LocalItems));
         Assert.Empty(_context.Calls);
         _context.VerifySaved(Times.Never());
@@ -72,8 +70,8 @@ public sealed class RegistrySyncEngineGetOperationsTests
     [InlineData(ERegistryConflictResolution.Local, 1, 0)]
     [InlineData(ERegistryConflictResolution.Server, 0, 1)]
     [InlineData(ERegistryConflictResolution.Skip, 0, 0)]
-    public async Task GetOperations_WhenConflictIsResolved_PutsItOnTheChosenSide(
-        ERegistryConflictResolution resolution, int expectedServerCount, int expectedLocalCount)
+    public async Task GetOperations_WhenConflictIsResolved_PutsItOnTheChosenSide(ERegistryConflictResolution resolution,
+        int expectedServerCount, int expectedLocalCount)
     {
         // Arrange
         FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);

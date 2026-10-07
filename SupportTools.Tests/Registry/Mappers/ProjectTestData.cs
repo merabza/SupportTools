@@ -70,15 +70,16 @@ internal static class ProjectTestData
                     ReturnType = "List<ItemDto>",
                     SendMessageToCurrentUser = false
                 },
-                ["SaveItem"] = new EndpointModel
-                {
-                    EndpointName = "SaveItem",
-                    EndpointRoute = "items/save",
-                    HttpMethod = EHttpMethod.Post,
-                    EndpointType = EEndpointType.Command,
-                    ReturnType = "int",
-                    SendMessageToCurrentUser = true
-                }
+                ["SaveItem"] =
+                    new EndpointModel
+                    {
+                        EndpointName = "SaveItem",
+                        EndpointRoute = "items/save",
+                        HttpMethod = EHttpMethod.Post,
+                        EndpointType = EEndpointType.Command,
+                        ReturnType = "int",
+                        SendMessageToCurrentUser = true
+                    }
             },
             RouteClasses = { ["Items"] = new RouteClassModel { Root = "api", Version = "v2", Base = "items" } },
             GitProjectNames = ["AppFake", "SystemTools"],
@@ -92,10 +93,12 @@ internal static class ProjectTestData
                     WebAgentNameForCheck = "Pc1.WebAgent",
                     ServerSidePort = 5050,
                     ApiVersionId = "v1",
-                    AppSettingsJsonSourceFileName = @"D:\1WorkDotnet\Security\AppFake\appsettings.Production.json",
+                    AppSettingsJsonSourceFileName =
+                        @"D:\1WorkDotnet\Security\AppFake\appsettings.Production.json",
                     AppSettingsEncodedJsonFileName = $@"{Folder}\Encoded\appsettings.Production.json",
                     ServiceUserName = "appfake",
-                    AllowToolsList = [EProjectServerTools.ProgramUpdater, EProjectServerTools.AppSettingsUpdater],
+                    AllowToolsList =
+                        [EProjectServerTools.ProgramUpdater, EProjectServerTools.AppSettingsUpdater],
                     CurrentDatabaseParameters = NewDatabaseParameters("AppFake"),
                     NewDatabaseParameters = NewDatabaseParameters("AppFakeNew")
                 },
@@ -105,7 +108,8 @@ internal static class ProjectTestData
                     EnvironmentName = "Test",
                     WebAgentNameForCheck = "Merinson.WebAgent",
                     ApiVersionId = "v1",
-                    AppSettingsJsonSourceFileName = @"D:\1WorkDotnet\Security\AppFake\appsettings.Test.json",
+                    AppSettingsJsonSourceFileName =
+                        @"D:\1WorkDotnet\Security\AppFake\appsettings.Test.json",
                     AppSettingsEncodedJsonFileName = $@"{Folder}\Encoded\appsettings.Test.json",
                     ServiceUserName = "appfake-test",
                     AllowToolsList = [EProjectServerTools.VersionChecker]

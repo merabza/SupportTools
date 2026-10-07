@@ -346,8 +346,7 @@ public static class ProjectMapper
         return existing.ProjectType == candidate.ProjectType &&
                existing.UseAlternativeWebAgent == candidate.UseAlternativeWebAgent &&
                existing.DevDatabaseParameters is null == candidate.DevDatabaseParameters is null &&
-               existing.ProdCopyDatabaseParameters is null == candidate.ProdCopyDatabaseParameters is null &&
-               new[]
+               existing.ProdCopyDatabaseParameters is null == candidate.ProdCopyDatabaseParameters is null && new[]
                {
                    (existing.ProjectGroupName, candidate.ProjectGroupName),
                    (existing.ProjectFolderName, candidate.ProjectFolderName),

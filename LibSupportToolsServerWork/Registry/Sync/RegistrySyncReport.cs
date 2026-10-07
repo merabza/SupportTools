@@ -8,7 +8,8 @@ public sealed class RegistrySyncReport
 {
     public required IReadOnlyList<RegistrySyncReportItem> Items { get; init; }
 
-    //ტრანსპორტის შეცდომა (სერვერი მიუწვდომელია), რომლის შემდეგაც სერვერის დარჩენილი ოპერაციები აღარ შესრულდა
+    //ტრანსპორტის შეცდომა (სერვერი მიუწვდომელია), რომლის შემდეგაც სერვერის დარჩენილი ოპერაციები აღარ შესრულდა და
+    //ფაილების შიგთავსი აღარ ჩამოვიდა
     public Error? TransportError { get; init; }
 
     //ლოკალური მონაცემი ან მდგომარეობა შეიცვალა, ამიტომ Save გამოიძახა

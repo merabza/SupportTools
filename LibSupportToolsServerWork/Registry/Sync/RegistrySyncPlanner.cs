@@ -20,6 +20,10 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 //- ჩანაწერი მხოლოდ სერვერზეა: მდგომარეობაში არ არის → Pull(Add). არის, ანუ ლოკალურად წაიშალა: სერვერზე არ შეცვლილა →
 //  Push(Delete), შეიცვალა → Conflict(DeletedLocally).
 //- ჩანაწერი მხოლოდ მდგომარეობაშია, ანუ ორივე მხარეს წაიშალა → InSync; შემსრულებელი მას მდგომარეობიდან შლის.
+//ფაილების კოლექციაში (IRegistryFileSyncAdapter, C6) ორი გამონაკლისია:
+//- ჩანაწერი, რომელიც ლოკალურად აკლია, მაგრამ აქ უნდა იყოს (MissingLocalKeys), ლოკალურად წაშლილად არ ითვლება: თუ
+//  სერვერზეა → Pull(Add), მდგომარეობის მიუხედავად;
+//- Pull(Delete) და Push(Delete) → Conflict(DeleteNeedsConfirmation): წაშლას მომხმარებელი ადასტურებს.
 //გასაღებები რეგისტრის გარეშე შედარდება (G8)
 public static class RegistrySyncPlanner
 {
@@ -50,6 +54,7 @@ public static class RegistrySyncPlanner
         Dictionary<string, RegistryRecordSyncStateModel> stateRecords = new(collectionState?.Records ?? [],
             StringComparer.OrdinalIgnoreCase);
         HashSet<string> excludedKeys = new(collectionState?.ExcludedKeys ?? [], StringComparer.OrdinalIgnoreCase);
+        HashSet<string> missingLocalKeys = new(collection.MissingLocalKeys, StringComparer.OrdinalIgnoreCase);
 
         //ერთი ჩანაწერის გასაღები სამივე წყაროში შეიძლება სხვადასხვა რეგისტრით ეწეროს. გეგმაში რჩება პირველი: ლოკალური,
         //მერე სერვერის, მერე მდგომარეობის
@@ -59,14 +64,21 @@ public static class RegistrySyncPlanner
             .. localRecords.Keys.Concat(serverRecords.Keys).Concat(stateRecords.Keys).Where(seenKeys.Add)
                 .Order(StringComparer.OrdinalIgnoreCase).Select(key => PlanRecord(collection, key,
                     localRecords.GetValueOrDefault(key), serverRecords.GetValueOrDefault(key),
-                    stateRecords.GetValueOrDefault(key), excludedKeys.Contains(key)))
+                    stateRecords.GetValueOrDefault(key), excludedKeys.Contains(key), missingLocalKeys.Contains(key)))
         ];
     }
 
     private static RegistrySyncPlanItem PlanRecord(RegistryCollectionSnapshot collection, string key,
-        RegistrySyncRecord? local, RegistrySyncRecord? server, RegistryRecordSyncStateModel? state, bool isExcluded)
+        RegistrySyncRecord? local, RegistrySyncRecord? server, RegistryRecordSyncStateModel? state, bool isExcluded,
+        bool isMissingLocally)
     {
-        Decision decision = isExcluded ? Decision.Skipped : Decide(local, server, state);
+        Decision decision = isExcluded ? Decision.Skipped : Decide(local, server, state, isMissingLocally);
+        //ფაილების კოლექციაში წაშლას მომხმარებელი წყვეტს
+        if (collection.DeletesNeedConfirmation && decision.Change == ERegistrySyncChange.Delete)
+        {
+            decision = Decision.Conflicted(ERegistrySyncConflict.DeleteNeedsConfirmation);
+        }
+
         return new RegistrySyncPlanItem
         {
             CollectionName = collection.CollectionName,
@@ -81,7 +93,7 @@ public static class RegistrySyncPlanner
     }
 
     private static Decision Decide(RegistrySyncRecord? local, RegistrySyncRecord? server,
-        RegistryRecordSyncStateModel? state)
+        RegistryRecordSyncStateModel? state, bool isMissingLocally)
     {
         if (local is not null && server is not null)
         {
@@ -94,7 +106,13 @@ public static class RegistrySyncPlanner
         }
 
         //ჩანაწერი მხოლოდ მდგომარეობაშია: ორივე მხარეს წაიშალა
-        return server is null ? Decision.InSync : DecideOnServerOnly(server, state);
+        if (server is null)
+        {
+            return Decision.InSync;
+        }
+
+        //ლოკალურად აკლია, მაგრამ აქ უნდა იყოს: ლოკალურად წაშლილი არ არის და სერვერიდან ჩამოდის
+        return isMissingLocally ? Decision.Pull(ERegistrySyncChange.Add) : DecideOnServerOnly(server, state);
     }
 
     private static Decision DecideOnBothSides(RegistrySyncRecord local, RegistrySyncRecord server,

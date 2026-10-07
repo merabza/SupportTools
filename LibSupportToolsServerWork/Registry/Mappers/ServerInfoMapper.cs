@@ -131,16 +131,16 @@ public static class ServerInfoMapper
             DatabaseParametersMapper.ToLocal(contract.CurrentDatabaseParameters, existing?.CurrentDatabaseParameters);
         DatabaseParameters? newDatabaseParameters =
             DatabaseParametersMapper.ToLocal(contract.NewDatabaseParameters, existing?.NewDatabaseParameters);
-        ServerInfoModel serverInfo = existing is not null &&
-                                     ReferenceEquals(existing.CurrentDatabaseParameters, currentDatabaseParameters) &&
-                                     ReferenceEquals(existing.NewDatabaseParameters, newDatabaseParameters)
-            ? existing
-            : new ServerInfoModel
-            {
-                CurrentDatabaseParameters = currentDatabaseParameters,
-                NewDatabaseParameters = newDatabaseParameters,
-                AllowToolsList = existing?.AllowToolsList
-            };
+        ServerInfoModel serverInfo =
+            existing is not null && ReferenceEquals(existing.CurrentDatabaseParameters, currentDatabaseParameters) &&
+            ReferenceEquals(existing.NewDatabaseParameters, newDatabaseParameters)
+                ? existing
+                : new ServerInfoModel
+                {
+                    CurrentDatabaseParameters = currentDatabaseParameters,
+                    NewDatabaseParameters = newDatabaseParameters,
+                    AllowToolsList = existing?.AllowToolsList
+                };
 
         serverInfo.ServerName = contract.ServerName;
         serverInfo.EnvironmentName = contract.EnvironmentName;

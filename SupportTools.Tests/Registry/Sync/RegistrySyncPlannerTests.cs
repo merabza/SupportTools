@@ -79,6 +79,86 @@ public sealed class RegistrySyncPlannerTests
         Assert.Equal("Skipped", Describe(item));
     }
 
+    //a file collection (C6): a delete in either direction waits for the user's choice, so it is a conflict; the other
+    //decisions are those of the table
+    [Theory]
+    [InlineData("A", null, null, "A", 1, "Conflict(DeleteNeedsConfirmation)")]
+    [InlineData(null, "A", 1, "A", 1, "Conflict(DeleteNeedsConfirmation)")]
+    [InlineData("B", null, null, "A", 1, "Conflict(DeletedOnServer)")]
+    [InlineData(null, "B", 2, "A", 1, "Conflict(DeletedLocally)")]
+    [InlineData("A", null, null, null, null, "Push(Add)")]
+    [InlineData(null, "A", 1, null, null, "Pull(Add)")]
+    [InlineData("A", "B", 2, "A", 1, "Pull(Update)")]
+    [InlineData("B", "A", 1, "A", 1, "Push(Update)")]
+    [InlineData(null, null, null, "A", 1, "InSync")]
+    public void CreatePlan_WhenDeletesNeedConfirmation_TurnsEveryDeleteIntoAConflict(string? localHash,
+        string? serverHash, int? serverVersion, string? stateHash, int? stateVersion, string expected)
+    {
+        // Arrange
+        RegistrySyncStateModel state = CreateState(stateHash, stateVersion);
+        RegistryCollectionSnapshot collection = CreateCollection(localHash, serverHash, serverVersion) with
+        {
+            DeletesNeedConfirmation = true
+        };
+
+        // Act
+        RegistrySyncPlan result = RegistrySyncPlanner.CreatePlan([collection], state);
+
+        // Assert
+        Assert.Equal(expected, Describe(Assert.Single(result.Items)));
+    }
+
+    //a record that belongs on this computer but is missing locally (a file that the registry points to) was not
+    //deleted here: it is taken from the server, whatever the state says, and never deleted on the server
+    [Theory]
+    [InlineData("A", 1, "A", 1)]
+    [InlineData("B", 2, "A", 1)]
+    [InlineData("A", 1, null, null)]
+    public void CreatePlan_WhenServerRecordIsMissingLocally_PullsIt(string serverHash, int serverVersion,
+        string? stateHash, int? stateVersion)
+    {
+        // Arrange
+        RegistrySyncStateModel state = CreateState(stateHash, stateVersion);
+        RegistryCollectionSnapshot collection = CreateCollection(null, serverHash, serverVersion) with
+        {
+            DeletesNeedConfirmation = true, MissingLocalKeys = ["DEV"]
+        };
+
+        // Act
+        RegistrySyncPlan result = RegistrySyncPlanner.CreatePlan([collection], state);
+
+        // Assert
+        RegistrySyncPlanItem item = Assert.Single(result.Items);
+        Assert.Equal("Pull(Add)", Describe(item));
+        Assert.Equal(Dev, item.Key);
+    }
+
+    //missing on both sides: nothing to take, the state is forgotten; an excluded key stays excluded
+    [Theory]
+    [InlineData(null, null, false, "InSync")]
+    [InlineData("A", 1, true, "Skipped")]
+    public void CreatePlan_WhenMissingRecordIsNotTaken_DoesNotPullIt(string? serverHash, int? serverVersion,
+        bool isExcluded, string expected)
+    {
+        // Arrange
+        RegistrySyncStateModel state = CreateState("A", 1);
+        if (isExcluded)
+        {
+            state.GetOrAddCollection(Environments).ExcludedKeys.Add(Dev);
+        }
+
+        RegistryCollectionSnapshot collection = CreateCollection(null, serverHash, serverVersion) with
+        {
+            MissingLocalKeys = [Dev]
+        };
+
+        // Act
+        RegistrySyncPlan result = RegistrySyncPlanner.CreatePlan([collection], state);
+
+        // Assert
+        Assert.Equal(expected, Describe(Assert.Single(result.Items)));
+    }
+
     //G8: one record, whatever case each side uses; the plan shows the local spelling
     [Fact]
     public void CreatePlan_WhenKeysDifferOnlyByCase_MatchesThemAsOneRecord()

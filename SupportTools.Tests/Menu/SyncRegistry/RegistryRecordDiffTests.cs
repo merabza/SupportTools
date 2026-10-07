@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibSupportToolsServerWork.Registry.Adapters;
 using SupportTools.Menu.SyncRegistry;
 using SupportToolsServerApiContracts.Models;
 using Xunit;
@@ -139,7 +140,11 @@ public sealed class RegistryRecordDiffTests
         // Arrange
         var local = new
         {
-            Name = "Pc1", Port = 5, Enabled = true, Folders = Array.Empty<string>(), Options = new object()
+            Name = "Pc1",
+            Port = 5,
+            Enabled = true,
+            Folders = Array.Empty<string>(),
+            Options = new object()
         };
         var server = new { Name = "Pc1", Port = 6 };
 
@@ -153,6 +158,93 @@ public sealed class RegistryRecordDiffTests
             new RegistryFieldDifference("Options", "{}", null),
             new RegistryFieldDifference("Port", "5", "6")
         ], result);
+    }
+
+    //a stored file (C6) shows only its size and the beginning of its hash; the path is the record's name, not a field
+    [Fact]
+    public void Compare_WhenStoredFilesDiffer_ShowsTheSizeAndTheBeginningOfTheHash()
+    {
+        // Arrange
+        var local = new StoredFileContract
+        {
+            Path = @"D:\1WorkSecurity\AppFake\appsettings.json",
+            Sha256 = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
+            Length = 120
+        };
+        var server = new StoredFileContract
+        {
+            Path = @"D:\1WORKSECURITY\AppFake\appsettings.json",
+            Sha256 = "FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210",
+            Length = 98,
+            Version = 3
+        };
+
+        // Act
+        List<RegistryFieldDifference> result = RegistryRecordDiff.Compare(local, server);
+
+        // Assert
+        Assert.Equal([
+            new RegistryFieldDifference("Length", "120", "98"),
+            new RegistryFieldDifference("Sha256", "01234567...", "FEDCBA98...")
+        ], result);
+    }
+
+    //a hash of at most 8 characters has nothing to shorten
+    [Fact]
+    public void Compare_WhenHashIsShort_ShowsItWhole()
+    {
+        // Arrange
+        var local = new { Sha256 = "01234567" };
+        var server = new { Sha256 = "76543210" };
+
+        // Act
+        List<RegistryFieldDifference> result = RegistryRecordDiff.Compare(local, server);
+
+        // Assert
+        Assert.Equal([new RegistryFieldDifference("Sha256", "01234567", "76543210")], result);
+    }
+
+    [Fact]
+    public void Compare_WhenHashFieldHoldsAList_ShortensEveryElement()
+    {
+        // Arrange
+        var local = new { Sha256 = new[] { "0123456789", "ABCDEFGHIJ" } };
+        var server = new { Sha256 = new[] { "9876543210", "JIHGFEDCBA" } };
+
+        // Act
+        List<RegistryFieldDifference> result = RegistryRecordDiff.Compare(local, server);
+
+        // Assert
+        Assert.Equal([
+            new RegistryFieldDifference("Sha256[0]", "01234567...", "98765432..."),
+            new RegistryFieldDifference("Sha256[1]", "ABCDEFGH...", "JIHGFEDC...")
+        ], result);
+    }
+
+    //only a hash field is shortened: a contract that is a plain value is compared and shown whole
+    [Fact]
+    public void Compare_WhenContractIsAPlainValue_ShowsItWhole()
+    {
+        // Act
+        List<RegistryFieldDifference> result = RegistryRecordDiff.Compare("0123456789ABCDEF", "FEDCBA9876543210");
+
+        // Assert
+        Assert.Equal([new RegistryFieldDifference(string.Empty, "0123456789ABCDEF", "FEDCBA9876543210")], result);
+    }
+
+    //below a secret field even the beginning of a hash stays hidden
+    [Fact]
+    public void Compare_WhenHashIsBelowASecretField_HidesIt()
+    {
+        // Arrange
+        var local = new { Content = new { Sha256 = "0123456789ABCDEF" } };
+        var server = new { Content = new { Sha256 = "FEDCBA9876543210" } };
+
+        // Act
+        List<RegistryFieldDifference> result = RegistryRecordDiff.Compare(local, server);
+
+        // Assert
+        Assert.Equal([new RegistryFieldDifference("Content.Sha256", "***", "***")], result);
     }
 
     [Fact]

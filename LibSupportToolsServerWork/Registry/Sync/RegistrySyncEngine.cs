@@ -96,8 +96,14 @@ public sealed class RegistrySyncEngine
             return Result.Failure<RegistryCollectionSnapshot>(serverRecords.Error);
         }
 
+        //ფაილების კოლექციის წაშლას მომხმარებელი ადასტურებს, დაკარგული ფაილი კი სერვერიდან ჩამოდის
+        var fileAdapter = adapter as IRegistryFileSyncAdapter;
         return new RegistryCollectionSnapshot(adapter.CollectionName, adapter.Order, localRecords.Value,
-            serverRecords.Value);
+            serverRecords.Value)
+        {
+            DeletesNeedConfirmation = fileAdapter is not null,
+            MissingLocalKeys = fileAdapter is null ? [] : [.. fileAdapter.GetMissingLocalKeys()]
+        };
     }
 
     //კონტრაქტების ნორმალიზაცია და ჰეში. გასაღებები რეგისტრის გარეშე უნიკალური უნდა იყოს (G8). ნორმალიზაცია კი

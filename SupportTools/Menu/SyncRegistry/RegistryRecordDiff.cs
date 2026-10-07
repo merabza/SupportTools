@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LibSupportToolsServerWork.Registry.Adapters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SupportToolsServerApiContracts.Models;
@@ -16,6 +17,15 @@ internal static class RegistryRecordDiff
     public const string HiddenValue = "***";
 
     private const string VersionPropertyName = "Version";
+
+    //ჰეშის ველიდან ჩანს მხოლოდ დასაწყისი: მხარეების განსხვავებისთვის საკმარისია და საიდუმლო ფაილის შიგთავსის გამოცნობას
+    //არ უწყობს ხელს (C6: საიდუმლო ფაილის დიფში ჩანს მხოლოდ ზომა, Length, და ჰეშის დასაწყისი)
+    private const int ShownHashLength = 8;
+
+    private static readonly HashSet<string> HashFieldNames = new(StringComparer.Ordinal)
+    {
+        nameof(StoredFileContract.Sha256)
+    };
 
     //ველის გზაში ჩადგმული ველის და სიის ელემენტის გამყოფები: ServerInfos[0].ServerName
     private static readonly char[] PathSeparators = ['.', '['];
@@ -90,11 +100,11 @@ internal static class RegistryRecordDiff
             root.Remove(VersionPropertyName);
         }
 
-        AddFields(fields, token, string.Empty, false);
+        AddFields(fields, token, string.Empty, false, false);
         return fields;
     }
 
-    private static void AddFields(List<Field> fields, JToken token, string path, bool isSecret)
+    private static void AddFields(List<Field> fields, JToken token, string path, bool isSecret, bool isHash)
     {
         switch (token)
         {
@@ -102,23 +112,33 @@ internal static class RegistryRecordDiff
                 foreach (JProperty property in jObject.Properties().OrderBy(x => x.Name, StringComparer.Ordinal))
                 {
                     AddFields(fields, property.Value, path.Length == 0 ? property.Name : $"{path}.{property.Name}",
-                        isSecret || SecretFieldNames.Contains(property.Name));
+                        isSecret || SecretFieldNames.Contains(property.Name), HashFieldNames.Contains(property.Name));
                 }
 
                 break;
             case JArray { Count: > 0 } jArray:
                 for (int i = 0; i < jArray.Count; i++)
                 {
-                    AddFields(fields, jArray[i], $"{path}[{i}]", isSecret);
+                    AddFields(fields, jArray[i], $"{path}[{i}]", isSecret, isHash);
                 }
 
                 break;
             default:
                 //ტექსტი ბრჭყალების გარეშე, დანარჩენი JSON-ის ფორმით (რიცხვი, true, [], {})
                 string value = token is JValue { Value: string text } ? text : token.ToString(Formatting.None);
-                fields.Add(new Field(path, value, isSecret ? HiddenValue : value));
+                fields.Add(new Field(path, value, GetDisplay(value, isSecret, isHash)));
                 break;
         }
+    }
+
+    private static string GetDisplay(string value, bool isSecret, bool isHash)
+    {
+        if (isSecret)
+        {
+            return HiddenValue;
+        }
+
+        return isHash && value.Length > ShownHashLength ? $"{value[..ShownHashLength]}..." : value;
     }
 
     //Value შედარებისთვისაა და გარეთ არ გადის; Display გამოსატანია

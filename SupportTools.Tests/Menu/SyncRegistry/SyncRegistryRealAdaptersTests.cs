@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,6 +134,43 @@ public sealed class SyncRegistryRealAdaptersTests : IDisposable
         Assert.All(Secrets, secret => Assert.DoesNotContain(secret, console, StringComparison.Ordinal));
     }
 
+    //a stored file (C6) that differs on the server: the details, the differences, the dry run, the progress and the
+    //report show its size and the beginning of its hash, never the content of either side or a whole hash
+    [Fact]
+    public async Task RunBody_WhenStoredFilesDiffer_ShowsOnlyTheirSizeAndTheBeginningOfTheirHash()
+    {
+        // Arrange
+        const string localContent = "{\"ConnectionString\":\"fake-file-secret-0016\"}";
+        const string serverContent = "{\"ConnectionString\":\"fake-server-file-secret-0017\"}";
+        string path = Path.Combine(_context.TempFolder, "secrets", "AppFake", "appsettings.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await File.WriteAllTextAsync(path, localContent);
+        _context.Parameters.Projects["AppFake"].ServerInfos["PAZISI|Production"] = new ServerInfoModel
+        {
+            ServerName = "PAZISI", EnvironmentName = "Production", AppSettingsJsonSourceFileName = path
+        };
+        _context.Server.StoreFile(path, serverContent, 1);
+        string localHash = FakeSupportToolsServer.Sha256Of(localContent);
+        string serverHash = FakeSupportToolsServer.Sha256Of(serverContent);
+
+        // Act
+        bool result = await Run("Show details", "Resolve conflicts", "Dry run", "Apply");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(localContent, _context.Server.FileContent(path));
+        string console = _context.ConsoleOutput;
+        Assert.Contains($"StoredFiles/{path}: first sync, differs here and on the server (Length, Sha256)", console,
+            StringComparison.Ordinal);
+        Assert.Contains($"    local:  {localHash[..8]}...", console, StringComparison.Ordinal);
+        Assert.Contains($"    server: {serverHash[..8]}...", console, StringComparison.Ordinal);
+        string[] secrets =
+        [
+            localContent, serverContent, "fake-file-secret-0016", "fake-server-file-secret-0017", localHash, serverHash
+        ];
+        Assert.All(secrets, secret => Assert.DoesNotContain(secret, console, StringComparison.Ordinal));
+    }
+
     private async Task<bool> Run(params string[] actions)
     {
         foreach (string action in actions)
@@ -183,7 +219,9 @@ public sealed class SyncRegistryRealAdaptersTests : IDisposable
             new ApiClientSettings { Server = "http://pc1.example.test/api", ApiKey = AgentApiKey };
         parameters.FileStorages["Exchange"] = new FileStorageData
         {
-            FileStoragePath = @"D:\1WorkDotnet\Backups", UserName = "fake-storage-user-0004", Password = StoragePassword
+            FileStoragePath = @"D:\1WorkDotnet\Backups",
+            UserName = "fake-storage-user-0004",
+            Password = StoragePassword
         };
         parameters.DatabaseServerConnections["Dev"] = new DatabaseServerConnectionData
         {

@@ -6,8 +6,8 @@ using SupportToolsServerApiContracts;
 
 namespace LibSupportToolsServerWork.Registry.Adapters;
 
-//რეესტრის ყველა ადაპტერის აწყობა ერთ ადგილას (C3, C4). Projects ბოლოა და მითითებული კოლექციების სერვერის გასაღებებს
-//მათი ადაპტერებიდან კითხულობს. სინქრონიზაციის ბრძანება (C5) სიას RegistrySyncEngine-ს გადასცემს. pathMapper
+//რეესტრის ყველა ადაპტერის აწყობა ერთ ადგილას (C3, C4, C6). Projects ბოლოა და მითითებული კოლექციების სერვერის
+//გასაღებებს მათი ადაპტერებიდან კითხულობს. სინქრონიზაციის ბრძანება (C5) სიას RegistrySyncEngine-ს გადასცემს. pathMapper
 //(parameters.PathMappings-ით შექმნილი) და warnings ბრძანებას ეკუთვნის: გეგმის აგებისა და შესრულების შემდეგ ის მათ
 //Issues-სა და Items-ს აჩვენებს
 public static class RegistrySyncAdapterFactory
@@ -41,6 +41,7 @@ public static class RegistrySyncAdapterFactory
             new ProjectTemplatesRegistrySyncAdapter(apiClient, parameters, warnings),
             new GlobalSettingsRegistrySyncAdapter(apiClient, parameters, warnings),
             new ProjectCreatorSettingsRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings),
+            new StoredFilesRegistrySyncAdapter(apiClient, parameters, pathMapper, warnings),
             new ProjectsRegistrySyncAdapter(apiClient, parameters, pathMapper, referenceServerKeys, warnings)
         ];
     }

@@ -34,7 +34,12 @@ internal sealed class RegistrySyncTestContext
         return new FakeRegistrySyncAdapter(collectionName, order, Calls);
     }
 
-    public RegistrySyncEngine CreateEngine(params FakeRegistrySyncAdapter[] adapters)
+    public FakeFileRegistrySyncAdapter CreateFileAdapter(string collectionName, int order)
+    {
+        return new FakeFileRegistrySyncAdapter(CreateAdapter(collectionName, order), Calls);
+    }
+
+    public RegistrySyncEngine CreateEngine(params IRegistrySyncAdapter[] adapters)
     {
         return new RegistrySyncEngine(adapters, ParametersManager.Object, new FixedTimeProvider(Now));
     }

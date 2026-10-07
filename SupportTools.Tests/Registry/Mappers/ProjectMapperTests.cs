@@ -353,9 +353,8 @@ public sealed class ProjectMapperTests
         PathMapper pathMapper = MapperTestHelpers.WindowsPathMapper();
         StsProjectDataModel contract = ContractOf(ProjectTestData.NewProject());
         string hash = HashOf(contract);
-        StsProjectDataModel pulled =
-            ProjectMapper.ToContract(ProjectTestData.Name, ProjectMapper.ToLocal(contract, null, pathMapper),
-                pathMapper);
+        StsProjectDataModel pulled = ProjectMapper.ToContract(ProjectTestData.Name,
+            ProjectMapper.ToLocal(contract, null, pathMapper), pathMapper);
         StsProjectDataModel reordered = ContractOf(ProjectTestData.NewProject());
         reordered.ServerInfos[0].ServiceUserName = "";
         reordered.GitProjectNames.Reverse();
@@ -369,8 +368,9 @@ public sealed class ProjectMapperTests
 
         // Act
         string pulledHash = HashOf(pulled);
-        string normalizedAgainHash = MapperTestHelpers.HashOf(ProjectMapper.Normalize(ProjectMapper.Normalize(
-            ContractOf(ProjectTestData.NewProject()))));
+        string normalizedAgainHash =
+            MapperTestHelpers.HashOf(
+                ProjectMapper.Normalize(ProjectMapper.Normalize(ContractOf(ProjectTestData.NewProject()))));
 
         // Assert
         Assert.Equal(hash, pulledHash);

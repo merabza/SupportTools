@@ -61,7 +61,7 @@ public sealed class ProjectsRegistrySyncAdapterTests : IDisposable
 
         // Assert
         Assert.Equal(1, result.Value);
-        StsProjectDataModel? stored = _context.Server.Get<StsProjectDataModel>(Area, ProjectTestData.Name);
+        var stored = _context.Server.Get<StsProjectDataModel>(Area, ProjectTestData.Name);
         Assert.Equal(2, stored?.ServerInfos.Count);
         Assert.Equal("00000000-fake-key-guid-part", stored?.KeyGuidPart);
         Assert.Empty(_context.Warnings.Items);

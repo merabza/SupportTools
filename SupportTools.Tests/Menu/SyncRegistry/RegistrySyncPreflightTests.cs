@@ -81,9 +81,10 @@ public sealed class RegistrySyncPreflightTests
         Assert.Equal(["Servers: PAZISI / Pazisi", "Gits: AppA / appA / APPA", "Projects: AppX / APPX"], result);
     }
 
-    //a new collection adapter needs its local keys in the preflight too; the singletons have no keys
+    //a new collection adapter needs its local keys in the preflight too. The singletons have no keys, and the keys of
+    //the stored files are paths: paths that differ only by case are one file on Windows, and the adapter merges them
     [Fact]
-    public void GetLocalKeys_WhenCalled_CoversEveryCollectionOfTheAdapterFactoryExceptTheSingletons()
+    public void GetLocalKeys_WhenCalled_CoversEveryCollectionOfTheAdapterFactoryExceptTheSingletonsAndStoredFiles()
     {
         // Arrange
         var apiClient = new SupportToolsServerApiClient(null, new Mock<IHttpClientFactory>().Object,
@@ -91,9 +92,12 @@ public sealed class RegistrySyncPreflightTests
         var parameters = new SupportToolsParameters();
         List<string> expected =
         [
-            .. RegistrySyncAdapterFactory.CreateAdapters(apiClient, parameters, new PathMapper([]),
-                    new RegistrySyncWarnings()).OrderBy(x => x.Order).Select(x => x.CollectionName)
-                .Except([RegistryCollections.GlobalSettings, RegistryCollections.ProjectCreatorSettings])
+            .. RegistrySyncAdapterFactory
+                .CreateAdapters(apiClient, parameters, new PathMapper([]), new RegistrySyncWarnings())
+                .OrderBy(x => x.Order).Select(x => x.CollectionName).Except([
+                    RegistryCollections.GlobalSettings, RegistryCollections.ProjectCreatorSettings,
+                    RegistryCollections.StoredFiles
+                ])
         ];
 
         // Act

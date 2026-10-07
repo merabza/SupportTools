@@ -12,7 +12,9 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 //- RecordWithNameNotFound (404): Upsert-ზე ჩანაწერი სერვერზე შუალედში წაიშალა → Conflict, დანარჩენი გრძელდება.
 //  Delete-ზე ჩანაწერი სერვერზე უკვე აღარ არის, ანუ წაშლის მიზანი მიღწეულია → Done და მდგომარეობიდან წაშლა.
 //- ApiRequestFailed (ApiClientErrors): ქსელის შეცდომა ან timeout, ანუ სერვერი მიუწვდომელია → ეს ოპერაცია Failed,
-//  სერვერის დარჩენილი ოპერაციები NotExecuted; უკვე შესრულებულები მდგომარეობაში რჩება, ლოკალური ოპერაციები სრულდება.
+//  სერვერის დარჩენილი ოპერაციები NotExecuted; უკვე შესრულებულები მდგომარეობაში რჩება, ლოკალური ოპერაციები სრულდება,
+//  ფაილების ჩამოტანის გარდა (მათ შიგთავსი სერვერიდან სჭირდებათ: NotExecuted). ჩამოტანისას (PrepareApplyLocal) ეს
+//  შეცდომა დარჩენილ ჩამოტანებს იმავენაირად აჩერებს.
 //- ყველა სხვა კოდი (მაგ. RecordIsInUse, ReferencedRecordsNotFound, ვალიდაციის შეცდომები, სერვერის 5xx): სერვერმა ეს
 //  ჩანაწერი უარყო → Failed, დანარჩენი გრძელდება
 public static class RegistrySyncServerErrorCodes

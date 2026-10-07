@@ -28,6 +28,8 @@ namespace SupportTools.Menu.SyncRegistry;
 //  (StopOnFailure, მომხმარებლის გადაწყვეტილება): ასობით მოთხოვნიდან (seed) ჩავარდნილი ჩანაწერი სახელით ჩანს;
 //- ანგარიში. Pull-ის წინა პარამეტრების ფაილს ParametersManager.Save ინახავს .bak ასლად (A4), ამიტომ დამატებითი ასლი
 //  აღარ კეთდება.
+//საიდუმლო ფაილების (StoredFiles, C6) წაშლა, ორივე მიმართულებით, კონფლიქტია (DeleteNeedsConfirmation): ფაილი მხოლოდ
+//Resolve conflicts-ის არჩევანით იშლება.
 //საიდუმლოებები არსად იბეჭდება: ჩანაწერები სახელით ჩანს, ველები კი RegistryRecordDiff-ით, დაფარული მნიშვნელობებით
 internal sealed class RegistrySyncSession
 {
@@ -69,19 +71,6 @@ internal sealed class RegistrySyncSession
         _parameters = (SupportToolsParameters)parametersManager.Parameters;
         _inputIdFromMenuList = inputIdFromMenuList;
         _logger = logger;
-    }
-
-    private enum ESyncChoice
-    {
-        Apply,
-        PullOnly,
-        PushOnly,
-        ResolveConflicts,
-        LocalWinsFirstSyncConflicts,
-        ShowDetails,
-        DryRun,
-        ExcludeRecord,
-        Cancel
     }
 
     public async Task<bool> Run(CancellationToken cancellationToken)
@@ -181,10 +170,11 @@ internal sealed class RegistrySyncSession
 
         foreach (PathMappingIssue issue in _pathMapper.Issues.Skip(_shownPathIssuesCount))
         {
-            StShared.WriteWarningLine(issue.Direction == EPathMappingDirection.ToCanonical
-                ? $"The path {issue.Path} has no canonical form: add a path mapping in Support Tools Parameters Editor"
-                : $"The server path {issue.Path} has no form on this computer: add a path mapping in Support Tools " +
-                  "Parameters Editor", true, _logger);
+            StShared.WriteWarningLine(
+                issue.Direction == EPathMappingDirection.ToCanonical
+                    ? $"The path {issue.Path} has no canonical form: add a path mapping in Support Tools Parameters Editor"
+                    : $"The server path {issue.Path} has no form on this computer: add a path mapping in Support Tools " +
+                      "Parameters Editor", true, _logger);
         }
 
         _shownPathIssuesCount = _pathMapper.Issues.Count;
@@ -282,7 +272,7 @@ internal sealed class RegistrySyncSession
         string current = _resolutions.TryGetValue(recordName, out ERegistryConflictResolution resolution)
             ? $", current choice: {resolution}"
             : string.Empty;
-        Console.WriteLine($"{title}: {recordName} - {DescribeConflict(item.Conflict)}{current}");
+        Console.WriteLine($"{title}: {recordName} - {DescribeConflict(item)}{current}");
         while (true)
         {
             var menuSet = new CliMenuSet();
@@ -360,7 +350,7 @@ internal sealed class RegistrySyncSession
         {
             ERegistrySyncAction.Push => GetServerOperationName(item),
             ERegistrySyncAction.Pull => GetLocalOperationName(item),
-            ERegistrySyncAction.Conflict => DescribeConflict(item.Conflict),
+            ERegistrySyncAction.Conflict => DescribeConflict(item),
             _ => "excluded on this computer"
         };
         List<string> fieldNames = item.Local is null || item.Server is null
@@ -369,14 +359,18 @@ internal sealed class RegistrySyncSession
         return fieldNames.Count == 0 ? action : $"{action} ({string.Join(", ", fieldNames)})";
     }
 
-    //კონფლიქტის ჩანაწერს სახე ყოველთვის აქვს, ამიტომ ბოლო შემთხვევა FirstSyncDiffers-ია
-    private static string DescribeConflict(ERegistrySyncConflict conflict)
+    //კონფლიქტის ჩანაწერს სახე ყოველთვის აქვს, ამიტომ ბოლო შემთხვევა FirstSyncDiffers-ია. DeleteNeedsConfirmation-ის
+    //ჩანაწერი ერთ მხარეს აკლია: ის მხარე, სადაც წაიშალა
+    private static string DescribeConflict(RegistrySyncPlanItem item)
     {
-        return conflict switch
+        return item.Conflict switch
         {
             ERegistrySyncConflict.BothChanged => "changed here and on the server",
             ERegistrySyncConflict.DeletedOnServer => "deleted on the server, changed here",
             ERegistrySyncConflict.DeletedLocally => "deleted here, changed on the server",
+            ERegistrySyncConflict.DeleteNeedsConfirmation => item.Server is null
+                ? "deleted on the server, delete it here too?"
+                : "deleted here, delete it on the server too?",
             _ => "first sync, differs here and on the server"
         };
     }
@@ -572,5 +566,18 @@ internal sealed class RegistrySyncSession
     private static string GetRecordName(RegistrySyncPlanItem item)
     {
         return $"{item.CollectionName}/{item.Key}";
+    }
+
+    private enum ESyncChoice
+    {
+        Apply,
+        PullOnly,
+        PushOnly,
+        ResolveConflicts,
+        LocalWinsFirstSyncConflicts,
+        ShowDetails,
+        DryRun,
+        ExcludeRecord,
+        Cancel
     }
 }

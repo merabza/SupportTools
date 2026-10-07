@@ -12,7 +12,9 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 //გეგმის ერთი შესრულება (README §4.3). რიგი (GetOperations):
 //1. სერვერის ოპერაციები: upsert-ები Order-ის ზრდადობით, მერე წაშლები კლებადობით. ყოველი შესრულებული ოპერაციის შემდეგ
 //   იძახება progress;
-//2. ლოკალური ცვლილებები ადგილზე: ApplyLocal ზრდადობით, მერე RemoveLocal კლებადობით;
+//2. ლოკალური ცვლილებები ადგილზე: ApplyLocal ზრდადობით, მერე RemoveLocal კლებადობით. ფაილების ადაპტერზე
+//   (IRegistryFileSyncAdapter) ApplyLocal-ს PrepareApplyLocal უსწრებს: მისი შეცდომა ჩანაწერს Failed-ად აქცევს,
+//   ტრანსპორტის შეცდომის შემდეგ კი დარჩენილი მომზადებები აღარ სრულდება (NotExecuted);
 //3. ერთი IParametersManager.Save, თუ ლოკალური მონაცემი ან მდგომარეობა შეიცვალა.
 //ყოველი წარმატებული ოპერაციის შემდეგ ჩანაწერის მდგომარეობა ახლდება: სერვერის ახალი ვერსია და ლოკალური ჰეში.
 //სერვერის შეცდომების ცნობა RegistrySyncServerErrorCodes-შია აღწერილი. ტრანსპორტის შეცდომის შემდეგ, ხოლო
@@ -54,8 +56,8 @@ internal sealed class RegistrySyncExecutor
 
         await RunServerOperations(operations.ServerItems, progress, cancellationToken);
 
-        RunLocalOperations([.. operations.LocalItems.Where(x => x.Server is not null)],
-            [.. operations.LocalItems.Where(x => x.Server is null)]);
+        await RunLocalOperations([.. operations.LocalItems.Where(x => x.Server is not null)],
+            [.. operations.LocalItems.Where(x => x.Server is null)], cancellationToken);
 
         bool saved = await SaveIfChanged(cancellationToken);
         return new RegistrySyncReport
@@ -238,13 +240,16 @@ internal sealed class RegistrySyncExecutor
         Record(item, outcome, error);
     }
 
-    private void RunLocalOperations(List<RegistrySyncPlanItem> applyItems, List<RegistrySyncPlanItem> removeItems)
+    private async Task RunLocalOperations(List<RegistrySyncPlanItem> applyItems, List<RegistrySyncPlanItem> removeItems,
+        CancellationToken cancellationToken)
     {
+        List<RegistrySyncPlanItem> appliedItems = [];
         foreach (RegistrySyncPlanItem item in applyItems)
         {
-            //ApplyLocal-ს სერვერის ჩანაწერი ყოველთვის აქვს (ToLocal)
-            _adapters[item.CollectionName].ApplyLocal(item.Key, item.Server!.Contract);
-            _changed = true;
+            if (await ApplyLocal(item, cancellationToken))
+            {
+                appliedItems.Add(item);
+            }
         }
 
         foreach (RegistrySyncPlanItem item in removeItems)
@@ -256,7 +261,7 @@ internal sealed class RegistrySyncExecutor
         //ლოკალური ჩანაწერები ხელახლა იკითხება, თითო კოლექციაზე ერთხელ. მდგომარეობაში ის ჰეში ჩაიწერება, რომელსაც
         //ადაპტერი შემდეგ სინქრონიზაციაზე მისცემს, და მოწმდება, რომ ცვლილება ნამდვილად მოხდა. თორემ ჩამოტანილი, მაგრამ
         //ლოკალურად არგამოჩენილი ჩანაწერი შემდეგ სინქრონიზაციაზე ლოკალურად წაშლილად ჩაითვლებოდა და სერვერიდანაც წაიშლებოდა
-        foreach (IGrouping<string, RegistrySyncPlanItem> collectionItems in applyItems.Concat(removeItems)
+        foreach (IGrouping<string, RegistrySyncPlanItem> collectionItems in appliedItems.Concat(removeItems)
                      .GroupBy(x => x.CollectionName, StringComparer.OrdinalIgnoreCase))
         {
             IRegistrySyncAdapter adapter = _adapters[collectionItems.Key];
@@ -267,6 +272,39 @@ internal sealed class RegistrySyncExecutor
                 RecordLocalResult(adapter, item, [.. localRecords[item.Key]]);
             }
         }
+    }
+
+    //ApplyLocal-ს სერვერის ჩანაწერი ყოველთვის აქვს (ToLocal). ფაილების ადაპტერი ჯერ შიგთავსს ჩამოიტანს
+    //(PrepareApplyLocal); false — ჩანაწერი არ აისახა და მისი შედეგი უკვე ჩაიწერა
+    private async Task<bool> ApplyLocal(RegistrySyncPlanItem item, CancellationToken cancellationToken)
+    {
+        IRegistrySyncAdapter adapter = _adapters[item.CollectionName];
+        object contract = item.Server!.Contract;
+        if (adapter is IRegistryFileSyncAdapter fileAdapter)
+        {
+            //მომზადება სერვერს მიმართავს, ამიტომ ტრანსპორტის შეცდომის შემდეგ აღარ სრულდება
+            if (_transportError is not null)
+            {
+                Record(item, ERegistrySyncOutcome.NotExecuted);
+                return false;
+            }
+
+            Result prepared = await fileAdapter.PrepareApplyLocal(item.Key, contract, cancellationToken);
+            if (prepared.IsFailure)
+            {
+                if (prepared.Error.Code == RegistrySyncServerErrorCodes.RequestFailed)
+                {
+                    _transportError = prepared.Error;
+                }
+
+                Record(item, ERegistrySyncOutcome.Failed, prepared.Error);
+                return false;
+            }
+        }
+
+        adapter.ApplyLocal(item.Key, contract);
+        _changed = true;
+        return true;
     }
 
     private void RecordLocalResult(IRegistrySyncAdapter adapter, RegistrySyncPlanItem item, List<object> localContracts)

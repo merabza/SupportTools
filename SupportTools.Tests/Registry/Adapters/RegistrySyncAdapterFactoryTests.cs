@@ -21,7 +21,7 @@ public sealed class RegistrySyncAdapterFactoryTests : IDisposable
         _context.Dispose();
     }
 
-    //every collection of C3 in the dependency order of the task and Projects (C4) last
+    //every collection of C3 in the dependency order of the task, the stored files (C6) and Projects (C4) last
     [Fact]
     public void CreateAdapters_WhenCalled_CreatesAnAdapterForEveryCollectionInDependencyOrder()
     {
@@ -36,8 +36,20 @@ public sealed class RegistrySyncAdapterFactoryTests : IDisposable
             RegistryCollections.DatabaseServerConnections, RegistryCollections.Servers,
             RegistryCollections.GitIgnorePatterns, RegistryCollections.Gits, RegistryCollections.EditorConfigPatterns,
             RegistryCollections.ProjectTemplates, RegistryCollections.GlobalSettings,
-            RegistryCollections.ProjectCreatorSettings, RegistryCollections.Projects
+            RegistryCollections.ProjectCreatorSettings, RegistryCollections.StoredFiles, RegistryCollections.Projects
         ], result.OrderBy(x => x.Order).Select(x => x.CollectionName));
+    }
+
+    //the stored files are the only collection whose local records are files: the engine treats them as such
+    [Fact]
+    public void CreateAdapters_WhenCalled_GivesOnlyTheStoredFilesTheFileCapability()
+    {
+        // Act
+        List<IRegistrySyncAdapter> result = CreateAdapters();
+
+        // Assert
+        Assert.Equal([RegistryCollections.StoredFiles],
+            result.OfType<IRegistryFileSyncAdapter>().Select(x => x.CollectionName));
     }
 
     //the collection name is the key of the sync state
@@ -77,6 +89,7 @@ public sealed class RegistrySyncAdapterFactoryTests : IDisposable
     [InlineData(RegistryCollections.Servers, RegistryCollections.Projects)]
     [InlineData(RegistryCollections.Environments, RegistryCollections.Projects)]
     [InlineData(RegistryCollections.ApiClients, RegistryCollections.Projects)]
+    [InlineData(RegistryCollections.StoredFiles, RegistryCollections.Projects)]
     public void CreateAdapters_WhenCollectionReferencesAnother_OrdersTheReferencedOneFirst(string referenced,
         string referencing)
     {
