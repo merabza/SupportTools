@@ -210,12 +210,17 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         var updateGitProjectsCommand = new UpdateGitProjectsCliMenuCommand(_logger, ParametersManager);
         cruderSubMenuSet.InsertMenuItem(1, updateGitProjectsCommand);
 
+        //იგივე GitProjects, ლოკალური კლონირების გარეშე: სერვერი მათ თავისი კლონებიდან ითვლის
+        var updateGitProjectsFromServerCommand =
+            new UpdateGitProjectsFromServerCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
+        cruderSubMenuSet.InsertMenuItem(2, updateGitProjectsFromServerCommand);
+
         var syncGitProjectsCliMenuCommand =
             new SyncGitProjectsCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
-        cruderSubMenuSet.InsertMenuItem(2, syncGitProjectsCliMenuCommand);
+        cruderSubMenuSet.InsertMenuItem(3, syncGitProjectsCliMenuCommand);
 
         var findGitProjectsWithoutMatchingProjectsCliMenuCommand =
             new FindGitProjectsWithoutMatchingProjectsCliMenuCommand(this, ParametersManager);
-        cruderSubMenuSet.InsertMenuItem(3, findGitProjectsWithoutMatchingProjectsCliMenuCommand);
+        cruderSubMenuSet.InsertMenuItem(4, findGitProjectsWithoutMatchingProjectsCliMenuCommand);
     }
 }
