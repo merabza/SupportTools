@@ -58,11 +58,18 @@ public sealed class RegistrySyncEngine
         return RegistrySyncPlanner.CreatePlan(collections, parameters.RegistrySyncState);
     }
 
+    //progress სერვერის ყოველი შესრულებული ოპერაციის შემდეგ იძახება, შესრულების რიგით
     public Task<RegistrySyncReport> Execute(RegistrySyncPlan plan, RegistrySyncSelection selection,
-        CancellationToken cancellationToken = default)
+        Action<RegistrySyncProgress>? progress = null, CancellationToken cancellationToken = default)
     {
         var executor = new RegistrySyncExecutor(_adapters, _parametersManager, _timeProvider);
-        return executor.Execute(plan, selection, cancellationToken);
+        return executor.Execute(plan, selection, progress, cancellationToken);
+    }
+
+    //რას შეასრულებს Execute ამ გეგმიდან ამ არჩევანით, შესრულების რიგით. არაფერს ცვლის და არაფერს იძახებს (Dry run)
+    public static RegistrySyncOperations GetOperations(RegistrySyncPlan plan, RegistrySyncSelection selection)
+    {
+        return RegistrySyncExecutor.GetOperations(plan, selection);
     }
 
     private static async Task<Result<RegistryCollectionSnapshot>> CreateSnapshot(IRegistrySyncAdapter adapter,

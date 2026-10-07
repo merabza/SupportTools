@@ -18,6 +18,12 @@ public sealed class RegistrySyncSelection
     public bool IncludePulls { get; init; }
     public bool IncludePushes { get; init; }
 
+    //სერვერის პირველი წარუმატებელი ოპერაციის (Failed) შემდეგ სერვერის დარჩენილი ოპერაციები აღარ სრულდება და
+    //NotExecuted ხდება, ისევე როგორც ტრანსპორტის შეცდომისას; ლოკალური ოპერაციები მაინც სრულდება. C5 ასე ასობით
+    //მოთხოვნიდან (seed) პირველივე შეცდომაზე ჩერდება, რადგან ჩავარდნილ ჩანაწერზე დამოკიდებული ჩანაწერებიც ჩავარდებოდა.
+    //Conflict შედეგი გაჩერებას არ იწვევს
+    public bool StopOnFailure { get; init; }
+
     //კონფლიქტების გადაწყვეტა გეგმის ჩანაწერების მიხედვით. კონფლიქტი, რომელიც აქ არ არის, გამოიტოვება (Skip)
     public IReadOnlyDictionary<RegistrySyncPlanItem, ERegistryConflictResolution> ConflictResolutions { get; init; } =
         new Dictionary<RegistrySyncPlanItem, ERegistryConflictResolution>();

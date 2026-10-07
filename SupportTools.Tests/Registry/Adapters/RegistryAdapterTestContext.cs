@@ -38,6 +38,9 @@ internal sealed class RegistryAdapterTestContext : IDisposable
     public RegistrySyncWarnings Warnings { get; } = new();
     public PathMapper PathMapper { get; set; } = MapperTestHelpers.WindowsPathMapper();
 
+    //everything written to the console since the context was created
+    public string ConsoleOutput => _consoleOutput.ToString();
+
     //a temp folder, created on first use and deleted with the context
     public string TempFolder => _tempFolder ??= Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
 

@@ -9,12 +9,14 @@ using SystemTools.SharedKernel;
 
 namespace LibSupportToolsServerWork.Registry.Sync;
 
-//გეგმის ერთი შესრულება (README §4.3). რიგი:
-//1. სერვერის ოპერაციები: upsert-ები Order-ის ზრდადობით, მერე წაშლები კლებადობით;
+//გეგმის ერთი შესრულება (README §4.3). რიგი (GetOperations):
+//1. სერვერის ოპერაციები: upsert-ები Order-ის ზრდადობით, მერე წაშლები კლებადობით. ყოველი შესრულებული ოპერაციის შემდეგ
+//   იძახება progress;
 //2. ლოკალური ცვლილებები ადგილზე: ApplyLocal ზრდადობით, მერე RemoveLocal კლებადობით;
 //3. ერთი IParametersManager.Save, თუ ლოკალური მონაცემი ან მდგომარეობა შეიცვალა.
 //ყოველი წარმატებული ოპერაციის შემდეგ ჩანაწერის მდგომარეობა ახლდება: სერვერის ახალი ვერსია და ლოკალური ჰეში.
-//სერვერის შეცდომების ცნობა RegistrySyncServerErrorCodes-შია აღწერილი
+//სერვერის შეცდომების ცნობა RegistrySyncServerErrorCodes-შია აღწერილი. ტრანსპორტის შეცდომის შემდეგ, ხოლო
+//StopOnFailure-ისას ნებისმიერი Failed-ის შემდეგაც, სერვერის დარჩენილი ოპერაციები NotExecuted ხდება
 internal sealed class RegistrySyncExecutor
 {
     private readonly IReadOnlyDictionary<string, IRegistrySyncAdapter> _adapters;
@@ -23,6 +25,8 @@ internal sealed class RegistrySyncExecutor
     private readonly Dictionary<RegistrySyncPlanItem, RegistrySyncReportItem> _reportItems = [];
     private readonly TimeProvider _timeProvider;
     private bool _changed;
+    private bool _serverOperationsStopped;
+    private bool _stopOnFailure;
     private Error? _transportError;
 
     // ReSharper disable once ConvertToPrimaryConstructor
@@ -38,34 +42,20 @@ internal sealed class RegistrySyncExecutor
     private RegistrySyncStateModel State => _parameters.RegistrySyncState;
 
     public async Task<RegistrySyncReport> Execute(RegistrySyncPlan plan, RegistrySyncSelection selection,
-        CancellationToken cancellationToken)
+        Action<RegistrySyncProgress>? progress, CancellationToken cancellationToken)
     {
-        List<(RegistrySyncPlanItem Item, EOperation Operation)> operations = [];
-        foreach (RegistrySyncPlanItem item in plan.Items)
+        _stopOnFailure = selection.StopOnFailure;
+        RegistrySyncOperations operations = GetOperations(plan, selection);
+        HashSet<RegistrySyncPlanItem> itemsWithOperation = [.. operations.ServerItems, .. operations.LocalItems];
+        foreach (RegistrySyncPlanItem item in plan.Items.Where(x => !itemsWithOperation.Contains(x)))
         {
-            EOperation operation = GetOperation(item, selection);
-            if (operation == EOperation.None)
-            {
-                RecordWithoutOperation(item);
-            }
-            else
-            {
-                operations.Add((item, operation));
-            }
+            RecordWithoutOperation(item);
         }
 
-        foreach (RegistrySyncPlanItem item in Ascending(operations, EOperation.Upsert))
-        {
-            await Upsert(item, cancellationToken);
-        }
+        await RunServerOperations(operations.ServerItems, progress, cancellationToken);
 
-        foreach (RegistrySyncPlanItem item in Descending(operations, EOperation.Delete))
-        {
-            await Delete(item, cancellationToken);
-        }
-
-        RunLocalOperations(Ascending(operations, EOperation.ApplyLocal),
-            Descending(operations, EOperation.RemoveLocal));
+        RunLocalOperations([.. operations.LocalItems.Where(x => x.Server is not null)],
+            [.. operations.LocalItems.Where(x => x.Server is null)]);
 
         bool saved = await SaveIfChanged(cancellationToken);
         return new RegistrySyncReport
@@ -75,6 +65,20 @@ internal sealed class RegistrySyncExecutor
             Changed = _changed,
             Saved = saved
         };
+    }
+
+    //არჩეული ოპერაციები შესრულების რიგით. Order-ის მიხედვით დალაგება სტაბილურია, ამიტომ ერთი Order-ის ფარგლებში
+    //გეგმის რიგი (კოლექცია, გასაღები) რჩება
+    internal static RegistrySyncOperations GetOperations(RegistrySyncPlan plan, RegistrySyncSelection selection)
+    {
+        List<(RegistrySyncPlanItem Item, EOperation Operation)> operations =
+        [
+            .. plan.Items.Select(x => (Item: x, Operation: GetOperation(x, selection)))
+                .Where(x => x.Operation != EOperation.None)
+        ];
+        return new RegistrySyncOperations(
+            [.. Ascending(operations, EOperation.Upsert), .. Descending(operations, EOperation.Delete)],
+            [.. Ascending(operations, EOperation.ApplyLocal), .. Descending(operations, EOperation.RemoveLocal)]);
     }
 
     private static EOperation GetOperation(RegistrySyncPlanItem item, RegistrySyncSelection selection)
@@ -111,7 +115,6 @@ internal sealed class RegistrySyncExecutor
         return item.Server is null ? EOperation.RemoveLocal : EOperation.ApplyLocal;
     }
 
-    //Order-ის მიხედვით დალაგება სტაბილურია, ამიტომ ერთი Order-ის ფარგლებში გეგმის რიგი (კოლექცია, გასაღები) რჩება
     private static List<RegistrySyncPlanItem> Ascending(
         List<(RegistrySyncPlanItem Item, EOperation Operation)> operations, EOperation operation)
     {
@@ -154,15 +157,36 @@ internal sealed class RegistrySyncExecutor
         }
     }
 
-    private async Task Upsert(RegistrySyncPlanItem item, CancellationToken cancellationToken)
+    //ლოკალურად წაშლილი ჩანაწერი სერვერიდანაც იშლება (ToServer). გაჩერების შემდეგ დარჩენილი ოპერაციები აღარ
+    //სრულდება და მათზე პროგრესი არ იძახება
+    private async Task RunServerOperations(IReadOnlyList<RegistrySyncPlanItem> serverItems,
+        Action<RegistrySyncProgress>? progress, CancellationToken cancellationToken)
     {
-        if (StopIfServerIsUnavailable(item))
+        for (int i = 0; i < serverItems.Count; i++)
         {
-            return;
-        }
+            RegistrySyncPlanItem item = serverItems[i];
+            if (_serverOperationsStopped)
+            {
+                Record(item, ERegistrySyncOutcome.NotExecuted);
+                continue;
+            }
 
-        //Upsert-ს ლოკალური ჩანაწერი ყოველთვის აქვს (ToServer). სერვერზე არარსებული ჩანაწერი 0 ვერსიით იქმნება
-        RegistrySyncRecord local = item.Local!;
+            if (item.Local is null)
+            {
+                await Delete(item, cancellationToken);
+            }
+            else
+            {
+                await Upsert(item, item.Local, cancellationToken);
+            }
+
+            progress?.Invoke(new RegistrySyncProgress(i + 1, serverItems.Count, _reportItems[item]));
+        }
+    }
+
+    //სერვერზე არარსებული ჩანაწერი 0 ვერსიით იქმნება
+    private async Task Upsert(RegistrySyncPlanItem item, RegistrySyncRecord local, CancellationToken cancellationToken)
+    {
         Result<int> result = await _adapters[item.CollectionName]
             .Upsert(item.Key, local.Contract, item.Server?.Version ?? 0, cancellationToken);
         if (result.IsFailure)
@@ -177,11 +201,6 @@ internal sealed class RegistrySyncExecutor
 
     private async Task Delete(RegistrySyncPlanItem item, CancellationToken cancellationToken)
     {
-        if (StopIfServerIsUnavailable(item))
-        {
-            return;
-        }
-
         //Delete-ს სერვერის ჩანაწერი ყოველთვის აქვს: ლოკალურად წაშლილი ჩანაწერი დამგეგმავმა სერვერზე იპოვა
         Result result = await _adapters[item.CollectionName].Delete(item.Key, item.Server!.Version, cancellationToken);
         //RecordWithNameNotFound: ჩანაწერი სერვერზე უკვე აღარ არის, ანუ წაშლის მიზანი მიღწეულია
@@ -195,23 +214,14 @@ internal sealed class RegistrySyncExecutor
         Record(item, ERegistrySyncOutcome.Done);
     }
 
-    //ტრანსპორტის შეცდომის შემდეგ სერვერის დარჩენილი ოპერაციები აღარ სრულდება
-    private bool StopIfServerIsUnavailable(RegistrySyncPlanItem item)
-    {
-        if (_transportError is null)
-        {
-            return false;
-        }
-
-        Record(item, ERegistrySyncOutcome.NotExecuted);
-        return true;
-    }
-
+    //ტრანსპორტის შეცდომის შემდეგ, ხოლო StopOnFailure-ისას ნებისმიერი Failed-ის შემდეგაც, სერვერის დარჩენილი
+    //ოპერაციები აღარ სრულდება
     private void RecordServerError(RegistrySyncPlanItem item, Error error)
     {
         if (error.Code == RegistrySyncServerErrorCodes.RequestFailed)
         {
             _transportError = error;
+            _serverOperationsStopped = true;
         }
 
         ERegistrySyncOutcome outcome = error.Code switch
@@ -220,6 +230,11 @@ internal sealed class RegistrySyncExecutor
                 ERegistrySyncOutcome.Conflict,
             _ => ERegistrySyncOutcome.Failed
         };
+        if (outcome == ERegistrySyncOutcome.Failed && _stopOnFailure)
+        {
+            _serverOperationsStopped = true;
+        }
+
         Record(item, outcome, error);
     }
 

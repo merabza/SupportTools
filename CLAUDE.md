@@ -83,7 +83,8 @@ SupportTools runs on more than one computer: **PAZISI** is the main Windows comp
   - Plan items are ordered by `Order`, collection and key, and carry the local spelling of the key when the record exists locally.
 - **Engine** (`RegistrySyncEngine(adapters, parametersManager)`):
   - `CreatePlan(ct)` reads, normalizes and hashes every adapter's records and changes nothing. It fails on a server read error (returned unchanged, e.g. `ApiRequestFailed` when offline), on keys that differ only by case (`DuplicateKeys`) and on unstable normalization (`NormalizationIsNotStable`).
-  - `Execute(plan, selection, ct)` runs `RegistrySyncExecutor`. `RegistrySyncSelection` has `IncludePulls`, `IncludePushes` and `ConflictResolutions` (plan item → Local / Server / Skip; a missing item = Skip), with the presets `AllNonConflicting`, `PullOnly` and `PushOnly`.
+  - `Execute(plan, selection, progress, ct)` runs `RegistrySyncExecutor`. `RegistrySyncSelection` has `IncludePulls`, `IncludePushes` and `ConflictResolutions` (plan item → Local / Server / Skip; a missing item = Skip), with the presets `AllNonConflicting`, `PullOnly` and `PushOnly`, and `StopOnFailure` (C5): after the first Failed server operation the remaining server operations are NotExecuted, as after a transport error; the local operations still run, and a Conflict does not stop. The optional `progress` (`RegistrySyncProgress`: number, count, report item) runs after every executed server operation.
+  - `RegistrySyncEngine.GetOperations(plan, selection)` returns `RegistrySyncOperations` (server items, local items) in execution order and runs nothing; `Execute` runs exactly these lists. A server item without a local side is a delete, a local item without a server side is a `RemoveLocal`.
   - Order: server upserts by ascending `Order`, then server deletes by descending order, then `ApplyLocal` ascending, then `RemoveLocal` descending, then one `IParametersManager.Save` of the root, only if local data or state changed.
   - Each successful operation updates the record's state. After the local operations each touched adapter's local records are read again, and the state stores the hash of what the adapter now returns. A pulled record that does not show up, or a removed one that does not disappear, is `Failed` and gets no state, so the next sync cannot mistake it for a local delete.
   - A plan is executed once; build a new plan afterwards. Cancellation propagates without saving; the next run recovers, because equal content on both sides plans as InSync.
@@ -91,7 +92,7 @@ SupportTools runs on more than one computer: **PAZISI** is the main Windows comp
   - `ConcurrencyConflict` → outcome Conflict, and the rest continues.
   - `RecordWithNameNotFound` → Conflict on an upsert; on a delete the record is already gone, so the outcome is Done.
   - `ApiRequestFailed` → Failed, and every remaining server operation is NotExecuted. Completed operations stay in the state and the local operations still run.
-  - Any other code (`RecordIsInUse`, validation, 5xx) → Failed, and the rest continues.
+  - Any other code (`RecordIsInUse`, validation, 5xx) → Failed, and the rest continues (unless `StopOnFailure`).
   - The first two are `nameof` B1's error factories in `SupportToolsServerApiClientErrors`; the adapters that check the version themselves (see below) create their errors with the same factories.
 - **Report** (`RegistrySyncReport`): one `RegistrySyncReportItem(PlanItem, Outcome, Error)` per plan item, with outcome None, NotSelected, Done, Conflict, Failed or NotExecuted. It also has `TransportError`, `Changed` and `Saved`.
 
@@ -112,6 +113,40 @@ SupportTools runs on more than one computer: **PAZISI** is the main Windows comp
   - ServerInfos: the natural key is (ServerName, EnvironmentName), ignoring case. `ApplyLocal` replaces the whole set (G7) inside the existing dictionary, keeps the local key (a GUID or `Server|Env`) of a record it finds by the natural key, gives a new one `"{ServerName}|{EnvironmentName}"` (a new GUID when another record holds that key) and removes the rest.
   - `ApplyLocal` updates the existing `ProjectModel` (and `ServerInfoModel`) in place when the contract changes none of its `init`-only fields (the database parameters only in content); otherwise it creates a new object that takes over the old one's lists, dictionaries and database parameters, and puts it into the dictionary (safe, because a pull runs before the menu is rebuilt). Every field of the aggregate is in the contract today; a new local-only field must be kept there too (`ProjectMapperTests.LocalModels_…` lists the fields the contract lacks).
   - Warnings (C5 shows them): a git, npm package, `.editorconfig` template or DB connection that is neither local nor among the server keys; a path without a canonical form; repeated values in a set, in the endpoint or route class names or in the ServerInfo natural keys, ignoring case. A project with repeated values is not sent: `Upsert` returns `RegistrySyncErrors.LocalRecordIsInvalid` (outcome Failed), while a pull still works. Local project keys that differ only by case are left out on both sides with a warning (`IsSynced`), so the engine does not stop the whole plan with `DuplicateKeys`.
+
+## Registry sync command (central registry)
+
+"Sync Registry With SupportToolsServer..." (C5) is the manual sync and, on the main computer, the seed of the server. It is in the main menu right after "Support Tools Server Editor"; the code is in `SupportTools/Menu/SyncRegistry/`, the tests in `SupportTools.Tests/Menu/SyncRegistry/`.
+
+- **Flow** (`SyncRegistryCliMenuCommand`):
+  - Connect with the ApiClient that `SupportToolsServerWebApiClientName` names, checked with one `GET environments`. A failure names the ApiClient and its address; a 401 (empty body, or ProblemDetails `Unauthorized`) asks to check its ApiKey; a transport error says the server does not answer.
+  - Pre-flight (`RegistrySyncPreflight`): local keys that differ only by case, in any collection and Projects included, refuse the sync with a report (the user's choice). The Projects adapter's own exclusion stays for D2. A new collection adapter needs its keys in `GetLocalKeys` too; a test compares it with the factory.
+  - `RegistrySyncSession`: the plan over all the factory adapters; the adapter warnings and `PathMapper.Issues` (warnings only, the user's choice); the summary per collection (`RegistrySyncPlanSummary`); then the choice menu.
+- **Choices**:
+  - Apply (non-conflicting pulls and pushes), Pull only, Push only; the menu shows how many records each one sends and changes here (`GetOperations`).
+  - Resolve conflicts: Local / Server / Skip per conflict, with Show differences. Local wins for first sync conflicts is the group choice for the seed. The resolutions are kept by "collection/key" and run with their direction: Apply runs all of them, Pull only the Server ones, Push only the Local ones.
+  - Show details, Dry run (what Apply sends and changes here; nothing is sent), Exclude record from sync, Cancel.
+  - Exclude adds the key to `ExcludedKeys`, saves and plans again. The UI has no way back yet (the user's choice).
+  - When nothing is left to sync, the plan is still executed, so a first sync records the state of the equal records.
+- **Execution**: the selection always has `StopOnFailure` (the user's choice), so hundreds of seed requests stop at the first rejected record. Every executed server operation prints `n/count op Collection/Key: outcome`. The report counts the outcomes, names the conflicts and failures and where the sync stopped, and after a pull names the `.bak` copy that `ParametersManager.Save` (A4) made, so the command makes no copy of its own. Then the menu reloads (`EMenuAction.Reload`).
+- **Secrets**:
+  - The API client is created with `useConsole: false`: on an error `ApiClient` prints the request body (secrets, template contents), so the command prints the error descriptions itself.
+  - Records appear by name. Field values appear only through `RegistryRecordDiff`, which hides `Password`, `UserName` (FileStorage), `ServerPass`, `ServerUser`, `ApiKey`, `KeyGuidPart`, `MediatRLicenseKey` and `Content` at any depth: it compares the real values and shows `***`. Show details lists only the names of the changed top-level fields.
+  - `SyncRegistryRealAdaptersTests` checks, with made-up secrets on both sides, that none reaches the console.
+- **Tests**: `SyncRegistryCliMenuCommandTests` drive the command over `FakeRegistrySyncAdapter`s and the real engine (the internal constructor takes the menu input and the adapter factory; the answers are menu item names). `SyncRegistryRealAdaptersTests` use the real adapters with `FakeSupportToolsServer`: seed, a dry run that only reads, secrets.
+- **Manual check** (the tests never reach a real server):
+  1. Dev server on PAZISI: SupportToolsServer with every migration applied and an API key for PAZISI's address (A3). On PAZISI, an ApiClient with the server address and that key, chosen as `SupportToolsServerWebApiClientName`.
+  2. Main computer:
+     - Run the command: read the warnings and the summary. Everything should be Push(Add), except first sync conflicts for the gits and templates that the old commands already uploaded.
+     - Dry run, then Local wins for first sync conflicts if there are any, then Apply. Watch the progress.
+     - Run it again: everything is InSync.
+     - Compare the server counts (Swagger or the `GET` lists: projects, servers, apiclients, git/gitrepos, …) with the local ones. The bootstrap ApiClient stays local.
+  3. Second computer:
+     - Fill the machine fields first: the folders (`FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, …), `PathMappings`, `CurrentMachineServerName`, the bootstrap ApiClient and `SupportToolsServerWebApiClientName`.
+     - Run the command and choose Pull only or Apply.
+     - Check that the projects appear with this computer's paths and the templates are in the local folders.
+  4. Change a record on one computer, sync there, then sync on the other: the change is there.
+  5. Conflict: change the same record on both computers, sync the first, then sync the second. The record is a BothChanged conflict: Resolve conflicts, Show differences, choose a side, Apply. The next sync is InSync on both.
 
 ## Conventions to match
 

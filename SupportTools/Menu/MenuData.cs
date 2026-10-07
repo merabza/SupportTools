@@ -35,6 +35,7 @@ using SupportTools.Menu.ReversePackageDistribution;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
 using SupportTools.Menu.SyncAllProjectsAllGits;
+using SupportTools.Menu.SyncRegistry;
 using SupportTools.Menu.UpdateOutdatedPackages;
 
 namespace SupportTools.Menu;
@@ -47,6 +48,8 @@ public static class MenuData
         nameof(SupportToolsParametersEditorListCliMenuCommandFactoryStrategy),
         //სერვერის პარამეტრების რედაქტირება
         nameof(SupportToolsServerEditorListCliMenuCommandFactoryStrategy),
+        //რეესტრის სინქრონიზაცია SupportToolsServer-თან
+        nameof(SyncRegistryCliMenuCommandFactoryStrategy),
         //ახალი პროექტების შემქმნელი სუბმენიუ
         nameof(ProjectCreatorSubMenuCliMenuCommandFactoryStrategy),
         //ახალი პროექტის შექმნა

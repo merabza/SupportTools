@@ -94,7 +94,8 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
         return Records(area).TryGetValue(name, out JObject? record) ? record.Value<int>(VersionProperty) : 0;
     }
 
-    //answers this request ("METHOD path") with a ProblemDetails error instead of handling it
+    //answers this request ("METHOD path") with a ProblemDetails error instead of handling it. An empty code answers
+    //without a body, as the API key check of the real server does (401)
     public void Fail(string request, HttpStatusCode statusCode, string code)
     {
         _failures[request] = (statusCode, code);
@@ -133,7 +134,9 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
     {
         if (_failures.TryGetValue(requestKey, out (HttpStatusCode StatusCode, string Code) failure))
         {
-            return Problem(failure.StatusCode, failure.Code);
+            return failure.Code.Length == 0
+                ? new HttpResponseMessage(failure.StatusCode)
+                : Problem(failure.StatusCode, failure.Code);
         }
 
         return Route(method, segments, body, query);

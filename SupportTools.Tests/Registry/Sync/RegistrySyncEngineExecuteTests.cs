@@ -290,6 +290,114 @@ public sealed class RegistrySyncEngineExecuteTests
         Assert.Empty(_context.State.Collections[Environments].Records);
     }
 
+    //C5 (seed): the first rejected record stops the remaining server operations, the local changes still run
+    [Fact]
+    public async Task Execute_WhenStopOnFailureAndServerRejectsRecord_DoesNotRunTheRemainingServerOperations()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        FakeRegistrySyncAdapter servers = _context.CreateAdapter(Servers, 2);
+        environments.Local["Dev"] = "d";
+        environments.ServerErrors["Dev"] = Error.Problem("ValueTooLong", "Name Is Longer Than 50 Characters");
+        environments.Local["Prod"] = "p";
+        environments.Server["Test"] = new FakeContract("Test", "t", 1);
+        servers.Local["Merinson"] = "m";
+        RegistrySyncEngine sut = _context.CreateEngine(environments, servers);
+        RegistrySyncPlan plan = await RegistrySyncTestContext.CreatePlan(sut);
+        var selection = new RegistrySyncSelection { IncludePulls = true, IncludePushes = true, StopOnFailure = true };
+
+        // Act
+        RegistrySyncReport result = await sut.Execute(plan, selection);
+
+        // Assert
+        string[] expectedCalls = ["Upsert Environments/Dev/0", "ApplyLocal Environments/Test"];
+        Assert.Equal(expectedCalls, _context.Calls);
+        RegistrySyncReportItem dev = RegistrySyncTestContext.ReportItem(result, Environments, "Dev");
+        Assert.Equal(ERegistrySyncOutcome.Failed, dev.Outcome);
+        Assert.Equal("ValueTooLong", dev.Error?.Code);
+        Assert.Equal(ERegistrySyncOutcome.NotExecuted,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Prod").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.NotExecuted,
+            RegistrySyncTestContext.ReportItem(result, Servers, "Merinson").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
+        Assert.Null(result.TransportError);
+        Assert.Equal(["Test"], _context.State.Collections[Environments].Records.Keys);
+        Assert.False(_context.State.Collections.ContainsKey(Servers));
+        _context.VerifySaved(Times.Once());
+    }
+
+    //a conflict is not a failure: the record changed on the server meanwhile, the others still go
+    [Fact]
+    public async Task Execute_WhenStopOnFailureAndPushedRecordConflicts_ContinuesWithTheOtherOperations()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        _context.AddSyncedRecord(environments, "Dev", "old", 3);
+        environments.Local["Dev"] = "mine";
+        environments.Local["Test"] = "t";
+        RegistrySyncEngine sut = _context.CreateEngine(environments);
+        RegistrySyncPlan plan = await RegistrySyncTestContext.CreatePlan(sut);
+        environments.Server["Dev"] = new FakeContract("Dev", "theirs", 4);
+        var selection = new RegistrySyncSelection { IncludePushes = true, StopOnFailure = true };
+
+        // Act
+        RegistrySyncReport result = await sut.Execute(plan, selection);
+
+        // Assert
+        Assert.Equal(ERegistrySyncOutcome.Conflict,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Dev").Outcome);
+        Assert.Equal(ERegistrySyncOutcome.Done,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Test").Outcome);
+    }
+
+    //the progress follows the execution order of the server operations; the local changes are not reported
+    [Fact]
+    public async Task Execute_WhenProgressIsGiven_ReportsEveryServerOperationInExecutionOrder()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        FakeRegistrySyncAdapter servers = _context.CreateAdapter(Servers, 2);
+        environments.Local["Dev"] = "d";
+        _context.AddSyncedRecord(environments, "Old", "o", 2);
+        environments.Local.Remove("Old");
+        servers.Local["Merinson"] = "m";
+        servers.Server["Theirs"] = new FakeContract("Theirs", "t", 1);
+        RegistrySyncEngine sut = _context.CreateEngine(environments, servers);
+        RegistrySyncPlan plan = await RegistrySyncTestContext.CreatePlan(sut);
+        List<RegistrySyncProgress> progress = [];
+
+        // Act
+        await sut.Execute(plan, RegistrySyncSelection.AllNonConflicting, progress.Add);
+
+        // Assert
+        Assert.Equal(["1/3 Environments/Dev Done", "2/3 Servers/Merinson Done", "3/3 Environments/Old Done"],
+            progress.Select(x =>
+                $"{x.Number}/{x.Count} {x.Item.PlanItem.CollectionName}/{x.Item.PlanItem.Key} {x.Item.Outcome}"));
+    }
+
+    [Fact]
+    public async Task Execute_WhenServerOperationsStop_ReportsOnlyTheExecutedOnes()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        environments.Local["Dev"] = "d";
+        environments.ServerErrors["Dev"] = ApiClientErrors.ApiRequestFailed("http://sts/api: connection refused");
+        environments.Local["Prod"] = "p";
+        RegistrySyncEngine sut = _context.CreateEngine(environments);
+        RegistrySyncPlan plan = await RegistrySyncTestContext.CreatePlan(sut);
+        List<RegistrySyncProgress> progress = [];
+
+        // Act
+        await sut.Execute(plan, RegistrySyncSelection.PushOnly, progress.Add);
+
+        // Assert
+        RegistrySyncProgress dev = Assert.Single(progress);
+        Assert.Equal((1, 2), (dev.Number, dev.Count));
+        Assert.Equal(ERegistrySyncOutcome.Failed, dev.Item.Outcome);
+        Assert.Equal("Dev", dev.Item.PlanItem.Key);
+    }
+
     [Fact]
     public async Task Execute_WhenSeveralRecordsChange_SavesTheRootParametersOnce()
     {
