@@ -178,8 +178,8 @@ public sealed class FileStorageMapperTests
             FileStoragePath = storagePath,
             UserName = "fake-user",
             Password = "fake-password",
-            FileNameMaxLength = 255,
-            FileSizeSplitPositionInRow = 4,
+            //FileNameMaxLength = 255,
+            //FileSizeSplitPositionInRow = 4,
             FtpSiteLsFileOffset = 8
         };
     }

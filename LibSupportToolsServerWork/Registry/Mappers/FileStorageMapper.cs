@@ -18,8 +18,8 @@ public static class FileStorageMapper
             FileStoragePath = MapPath(fileStorage.FileStoragePath, pathMapper.ToCanonical),
             UserName = fileStorage.UserName,
             Password = fileStorage.Password,
-            FileNameMaxLength = fileStorage.FileNameMaxLength,
-            FileSizeSplitPositionInRow = fileStorage.FileSizeSplitPositionInRow,
+            //FileNameMaxLength = fileStorage.FileNameMaxLength,
+            //FileSizeSplitPositionInRow = fileStorage.FileSizeSplitPositionInRow,
             FtpSiteLsFileOffset = fileStorage.FtpSiteLsFileOffset
         };
     }
@@ -30,8 +30,8 @@ public static class FileStorageMapper
         fileStorage.FileStoragePath = MapPath(contract.FileStoragePath, pathMapper.ToLocal);
         fileStorage.UserName = contract.UserName;
         fileStorage.Password = contract.Password;
-        fileStorage.FileNameMaxLength = contract.FileNameMaxLength;
-        fileStorage.FileSizeSplitPositionInRow = contract.FileSizeSplitPositionInRow;
+        //fileStorage.FileNameMaxLength = contract.FileNameMaxLength;
+        //fileStorage.FileSizeSplitPositionInRow = contract.FileSizeSplitPositionInRow;
         fileStorage.FtpSiteLsFileOffset = contract.FtpSiteLsFileOffset;
     }
 
