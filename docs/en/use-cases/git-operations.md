@@ -14,6 +14,7 @@ via the project's `Git` submenu (see [Configuration](../configuration.md)).
 |`Sync All Projects All Gits V2`|Every repository across every project|
 |`Sync One Group All Projects Gits V2`|Every repository across every project in one group|
 |`Sync One Project All Gits With Scaffold Seeders V2`|All repositories of one project, including scaffold seeders|
+|`Clone Project To This Computer`|A `remote` project: create its folder and clone its repositories here|
 |`Git` submenu (per-project)|Manage individual repositories: list, add, remove, sync|
 |`Git ScaffoldSeeder projects` submenu|Same, but for the project's scaffold seeder repos|
 
@@ -47,7 +48,12 @@ Use when you've been away for a while and want every project up to date.
 **Steps**
 
 1. `Main Menu` → `Sync All Projects All Gits V2`
-2. Enter a commit message when prompted (used for any repos with local
+2. If some projects are `remote` (not on this computer, see
+[below](#if-a-project-is-not-on-this-computer-yet)), answer
+`Include N remote-only projects (their gits will be cloned to this computer)?`.
+The default `n` syncs only the local projects; `y` clones the remote ones
+as well, as every sync did before.
+3. Enter a commit message when prompted (used for any repos with local
 changes)
 
 **Expected output**
@@ -87,6 +93,8 @@ that scope updated.
 **Steps**
 
 1. `Main Menu` → `Project Groups List` → (select group) → `Sync One Group All Projects Gits V2`
+2. As in the full sync, the group's `remote` projects are cloned only when
+you answer `y` to the question about them.
 
 **Expected output**
 
@@ -122,6 +130,72 @@ repos linked to it
 seeder work folder doesn't exist, it's logged as a warning, not an
 error. The main repos still sync. Check the log if you expected
 scaffold work.
+
+\---
+
+## If a project is not on this computer yet
+
+After a registry sync every computer lists every project, but each project
+is physically on some computers only. A project is `local` when its
+`ProjectFolderName` exists on this computer, otherwise `remote`. The
+projects list shows the mark next to each project (`MyProject (remote)`),
+and each group shows `local: N, remote: N`. `HideRemoteOnlyProjects` in
+`Support Tools Parameters Editor` hides the remote projects from the lists.
+
+The group commands work on the local projects by default:
+
+* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`,
+`Update Outdated Packages` and `Distribute all packages` ask whether to
+include the remote projects too (default `n`), because their sync would
+clone them here;
+* `Check all projects build`, `Check group projects build`,
+`Clear All Groups All Solutions All Projects`,
+`Reverse Package Distribution`, `Remove Unused Package Versions` and
+`Open all projects By Visual Studio` always skip the remote projects and
+print how many they skipped: without the files they could only report
+that the folders do not exist.
+
+**Steps**
+
+1. `Main Menu` → `Project Groups List` → (group) → `Projects List` →
+(a `remote` project) → `Clone Project To This Computer` (shown only for
+remote projects)
+2. If the project has scaffold seeder repositories, answer whether to clone
+them too (default `n`)
+3. Confirm `Clone N gits of project ... to <folder>?`
+
+**What it does**
+
+1. Creates `ProjectFolderName`.
+2. For each of the project's repositories that has no record in
+`GitProjects`, runs the scan of `Update Git Projects` for that repository
+only, and saves. This comes before the clone: a repository whose folder
+name starts with `{SpaProjectFolderRelativePath}` needs the `GitProjects`
+record of the project's `SpaProjectName` to know its folder.
+3. Clones every repository with the same mechanism as the V2 sync.
+4. Checks the template files: the `.gitignore` template of each repository
+and the project's `.editorconfig` template exist, and the cloned files
+match them.
+5. Checks the project's secret files (`AppSettingsJsonSourceFileName` of
+its server infos, `SeedProjectParametersFilePath`,
+`PrepareProdCopyDatabaseProjectParametersFilePath`,
+`PairedDbObjectsResultFileName`). When some are missing it lists them and
+offers to run `Sync Registry With SupportToolsServer...`, which brings
+them, then checks again.
+6. Prints a report: the folder, the updated `GitProjects`, how many
+repositories were cloned and which were not, the template problems and the
+missing files.
+
+**Common pitfalls**
+
+* **Partial clone.** The folder is created first, so after a failed clone
+the project already counts as `local`. Fix the cause (see the report) and
+run `Sync One Project All Gits With Scaffold Seeders V2` on the project.
+* **`GitProjects has no X (SpaProjectName of project Y)`.** The scan found
+no project named like `SpaProjectName`. Check the name, or run
+`Update Git Projects` (or `Update Git Projects From SupportToolsServer`)
+from the Gits list. The V2 sync prints the same error instead of stopping
+with an exception, and the project's other repositories still sync.
 
 \---
 

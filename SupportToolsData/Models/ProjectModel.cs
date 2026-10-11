@@ -94,6 +94,14 @@ public sealed class ProjectModel : ItemData
             : ProjectFolderRelativePath(SpaProjectName, gitProjects);
     }
 
+    //SpaProjectName შევსებულია, მაგრამ GitProjects-ში მისი ჩანაწერი არ არის (Update Git Projects ჯერ არ გაშვებულა),
+    //ამიტომ SpaProjectFolderRelativePath exception-ს ისვრის
+    public bool IsSpaProjectMissing(GitProjects gitProjects)
+    {
+        return !string.IsNullOrWhiteSpace(SpaProjectName) &&
+               gitProjects.GetGitProjectIfExistsByKey(SpaProjectName) is null;
+    }
+
     private string? ProjectFileName(string projectName, GitProjects gitProjects)
     {
         if (string.IsNullOrWhiteSpace(ProjectFolderName))

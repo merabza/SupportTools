@@ -22,15 +22,24 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Reverse Package Distribution";
 
+    private readonly Func<IProjectReferencesEditor> _createReferencesEditor;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
+    public ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager) : this(
+        logger, parametersManager, () => new DotnetProjectReferencesEditor(new DotnetProcessor(logger, true)))
+    {
+    }
+
+    //csproj-ის ცვლილებები პარამეტრადაა გამოტანილი, რომ ტესტებმა dotnet არ გაუშვან
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
-        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
+    internal ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager,
+        Func<IProjectReferencesEditor> createReferencesEditor) : base(MenuCommandName, EMenuAction.Reload,
+        EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
+        _createReferencesEditor = createReferencesEditor;
     }
 
     protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
@@ -43,17 +52,18 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
-        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        IProjectReferencesEditor referencesEditor = _createReferencesEditor();
 
         bool hadErrors = false;
         int projectsCount = 0;
 
-        foreach ((string projectName, ProjectModel project) in parameters.Projects.OrderBy(x => x.Key,
-                     StringComparer.Ordinal))
+        //remote პროექტების მთავარი რეპოზიტორია ამ კომპიუტერზე არ არის (D3)
+        foreach ((string projectName, ProjectModel project) in RemoteOnlyProjects.Skip(parameters.Projects, _logger)
+                     .OrderBy(x => x.Key, StringComparer.Ordinal))
         {
             cancellationToken.ThrowIfCancellationRequested();
             projectsCount++;
-            hadErrors |= !ProcessProject(parameters, gitProjects, dotnetProcessor, projectName, project);
+            hadErrors |= !ProcessProject(parameters, gitProjects, referencesEditor, projectName, project);
         }
 
         if (_logger.IsEnabled(LogLevel.Information))
@@ -67,7 +77,7 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
 
     //ერთი პროექტის დამუშავება. ცვლილებები შედის მხოლოდ მთავარ რეპოზიტორიაში
     private bool ProcessProject(SupportToolsParameters parameters, GitProjects gitProjects,
-        DotnetProcessor dotnetProcessor, string projectName, ProjectModel project)
+        IProjectReferencesEditor referencesEditor, string projectName, ProjectModel project)
     {
         if (string.IsNullOrWhiteSpace(project.ProjectFolderName))
         {
@@ -133,20 +143,20 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
                     continue;
                 }
 
-                if (dotnetProcessor.RemovePackageFromProject(csprojFile, packageId).IsFailure)
+                if (referencesEditor.RemovePackageFromProject(csprojFile, packageId).IsFailure)
                 {
                     StShared.WriteErrorLine($"Cannot remove package {packageId} from {csprojFile}", true, _logger);
                     hadErrors = true;
                     continue;
                 }
 
-                if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsFailure)
+                if (referencesEditor.AddReferenceToProject(csprojFile, refFullPath).IsFailure)
                 {
                     hadErrors = true;
 
                     //თუ რეფერენსის ჩასმა ვერ მოხერხდა, წაშლილი პაკეტი უბრუნდება პროექტს,
                     //რომ შეცვლილი პროექტი შეცდომაზე არ გავიდეს
-                    if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, null).IsFailure)
+                    if (referencesEditor.AddPackageToProject(csprojFile, packageId, null).IsFailure)
                     {
                         StShared.WriteErrorLine(
                             $"Cannot add reference {refFullPath} to {csprojFile} and cannot restore removed package {packageId}. Recover the file from git",

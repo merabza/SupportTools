@@ -11,4 +11,8 @@
     <ProjectReference Include="..\SupportToolsData\SupportToolsData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportTools.Tests" />
+  </ItemGroup>
+
 </Project>

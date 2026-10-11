@@ -31,11 +31,12 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
     }
 
     public static SyncMultipleProjectsGitsToolActionV2 Create(ILogger? logger, IParametersManager parametersManager,
-        string? projectGroupName, string? projectName, bool useConsole, string? useMessage = null)
+        string? projectGroupName, string? projectName, bool useConsole, string? useMessage = null,
+        bool includeRemoteProjects = true)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
-        var syncMultipleProjectsGitsParametersV2 =
-            SyncMultipleProjectsGitsParametersV2.Create(supportToolsParameters, projectGroupName, projectName);
+        var syncMultipleProjectsGitsParametersV2 = SyncMultipleProjectsGitsParametersV2.Create(supportToolsParameters,
+            projectGroupName, projectName, includeRemoteProjects);
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         return new SyncMultipleProjectsGitsToolActionV2(loggerOrNull, parametersManager,
             syncMultipleProjectsGitsParametersV2, useConsole, useMessage);
@@ -58,7 +59,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList =
             GitProjectListHelper.CreateProjectsList(_syncMultipleProjectsGitsParametersV2.Projects,
                 _syncMultipleProjectsGitsParametersV2.ProjectGroupName,
-                _syncMultipleProjectsGitsParametersV2.ProjectName);
+                _syncMultipleProjectsGitsParametersV2.ProjectName,
+                _syncMultipleProjectsGitsParametersV2.IncludeRemoteProjects);
 
         List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 

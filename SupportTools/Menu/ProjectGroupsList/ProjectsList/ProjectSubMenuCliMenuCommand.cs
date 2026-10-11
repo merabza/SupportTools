@@ -5,6 +5,7 @@ using AppCliTools.CliMenu;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
@@ -62,6 +63,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy));
         }
 
+        //პროექტის ამ კომპიუტერზე ჩამოტანა ჩანს მხოლოდ remote პროექტებისთვის (D3)
+        if (project is null || ProjectPresence.IsLocal(project))
+        {
+            excludeList.Add(nameof(CloneProjectToThisComputerCliMenuCommandFactoryStrategy));
+        }
+
         _menuParameters.ProjectName = _projectName;
         return CliMenuSetFactory.CreateMenuSet(_projectName, [
             .. MenuData.ProjectSubMenuCommandFactoryStrategyNames.Where(menuCommandName =>
@@ -69,17 +76,35 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         ], _serviceProvider);
     }
 
-    protected override string? GetStatus()
+    protected override string GetStatus()
     {
-        //სტატუსი ჩანს მხოლოდ მაშინ, თუ ეს პროექტი უკვე შემოწმდა
-        ProjectBuildCheckResult? result = GetProjectResult();
-        return result is null ? null : ProjectBuildCheckStatusView.GetText(result);
+        return ProjectPresenceView.GetText(BuildStatusParts());
     }
 
-    protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
+    protected override IReadOnlyList<StatusColorPart> BuildStatusColorParts()
     {
+        return BuildStatusParts();
+    }
+
+    //სტატუსი: local ან remote (D3), მერე build-ის შედეგი, თუ ეს პროექტი უკვე შემოწმდა
+    private List<StatusColorPart> BuildStatusParts()
+    {
+        List<StatusColorPart> parts = [ProjectPresenceView.CreatePart(IsLocal())];
+
         ProjectBuildCheckResult? result = GetProjectResult();
-        return result is null ? null : ProjectBuildCheckStatusView.BuildParts(result);
+        if (result is not null)
+        {
+            parts.AddRange(ProjectBuildCheckStatusView.BuildParts(result));
+        }
+
+        return parts;
+    }
+
+    private bool IsLocal()
+    {
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        ProjectModel? project = parameters.GetProject(_projectName);
+        return project is not null && ProjectPresence.IsLocal(project);
     }
 
     private ProjectBuildCheckResult? GetProjectResult()

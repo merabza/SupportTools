@@ -43,7 +43,7 @@
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
 |ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `FolderForEditorConfigFiles` — `.editorconfig` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
-|კომპიუტერის პროფილი|`MachineName`, `CurrentMachineServerName`, `PathMappings`|ამ კომპიუტერის პარამეტრები, სხვა კომპიუტერებს არ ეზიარება (იხ. [კომპიუტერის პროფილი და გზების გარდაქმნა](#კომპიუტერის-პროფილი-და-გზების-გარდაქმნა))|
+|კომპიუტერის პროფილი|`MachineName`, `CurrentMachineServerName`, `PathMappings`, `HideRemoteOnlyProjects`|ამ კომპიუტერის პარამეტრები, სხვა კომპიუტერებს არ ეზიარება (იხ. [კომპიუტერის პროფილი და გზების გარდაქმნა](#კომპიუტერის-პროფილი-და-გზების-გარდაქმნა))|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
 |ბრძანებების ისტორია|`RecentCommandsFileName`, `RecentCommandsCount`|მენიუს ისტორია|
 |არქივები|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|პაკეტირების კონვენციები|
@@ -71,6 +71,14 @@ SupportTools რამდენიმე კომპიუტერზე მ�
 გამოიყენება.
 * `PathMappings` — წესები, რომლებიც კანონიკურ გზებს ამ კომპიუტერის
 გზებად გარდაქმნის.
+* `HideRemoteOnlyProjects` (ნაგულისხმევად `false`) — რეესტრის
+სინქრონიზაციის შემდეგ ყველა კომპიუტერზე ყველა პროექტი ჩანს, მაგრამ
+პროექტი ამ კომპიუტერზეა მხოლოდ მაშინ, როცა მისი `ProjectFolderName` აქ
+არსებობს. პროექტების სიებში ყოველ პროექტს `local` ან `remote` უწერია,
+ყოველ ჯგუფს კი `local: N, remote: N`. ამ პარამეტრის ჩართვისას სიებში
+მხოლოდ ლოკალური პროექტები ჩანს (და მხოლოდ ის ჯგუფები, რომლებსაც ასეთი
+პროექტი აქვს). იხ.
+[Git ოპერაციები](use-cases/git-operations.md#თუ-პროექტი-ამ-კომპიუტერზე-ჯერ-არ-არის).
 
 გზები კანონიკური ფორმით ინახება: ეს Windows-ის აბსოლუტური გზაა, როგორც
 მთავარ კომპიუტერზე (PAZISI), მაგალითად

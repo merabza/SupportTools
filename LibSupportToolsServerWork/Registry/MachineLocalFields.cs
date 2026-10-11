@@ -17,6 +17,8 @@ public static class MachineLocalFields
         nameof(SupportToolsParameters.MachineName),
         nameof(SupportToolsParameters.CurrentMachineServerName),
         nameof(SupportToolsParameters.PathMappings),
+        //რომელი პროექტია ამ კომპიუტერზე, თითო კომპიუტერზე ითვლება (D3)
+        nameof(SupportToolsParameters.HideRemoteOnlyProjects),
         //ამ კომპიუტერის ბოლო სინქრონიზაციის მდგომარეობა
         nameof(SupportToolsParameters.RegistrySyncState),
         nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),

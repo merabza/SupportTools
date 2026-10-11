@@ -20,32 +20,48 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
     //დაყოვნება გახსნებს შორის, რომ არ გაიჭედოს გახსნის პროცესი
     private const int DelayBetweenOpensMilliseconds = 5000;
 
+    private readonly Func<CancellationToken, Task> _delayBetweenOpens;
+    private readonly Func<ILogger?, string?> _detectDevEnvPath;
     private readonly ILogger? _logger;
+    private readonly Action<string, string, ILogger?> _openSolution;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectGroupName;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public OpenAllProjectsByVisualStudioCliMenuCommand(IParametersManager parametersManager, string projectGroupName,
-        ILogger? logger) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
+        ILogger? logger) : this(parametersManager, projectGroupName, logger, VisualStudioOpener.DetectDevEnvPath,
+        VisualStudioOpener.OpenSolution,
+        cancellationToken => Task.Delay(DelayBetweenOpensMilliseconds, cancellationToken))
+    {
+    }
+
+    //Visual Studio-ს მოძებნა, გახსნა და დაყოვნება პარამეტრებადაა გამოტანილი, რომ ტესტებმა devenv არ გაუშვან
+    // ReSharper disable once ConvertToPrimaryConstructor
+    internal OpenAllProjectsByVisualStudioCliMenuCommand(IParametersManager parametersManager,
+        string projectGroupName, ILogger? logger, Func<ILogger?, string?> detectDevEnvPath,
+        Action<string, string, ILogger?> openSolution, Func<CancellationToken, Task> delayBetweenOpens) : base(
+        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
         _logger = logger;
+        _detectDevEnvPath = detectDevEnvPath;
+        _openSolution = openSolution;
+        _delayBetweenOpens = delayBetweenOpens;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        //მხოლოდ ამ ჯგუფის პროექტები იხსნება, სახელების ანბანური თანმიმდევრობით
+        //მხოლოდ ამ ჯგუფის ამ კომპიუტერზე არსებული პროექტები იხსნება (D3), სახელების ანბანური თანმიმდევრობით
         List<KeyValuePair<string, ProjectModel>> groupProjects =
         [
-            .. parameters.Projects
-                .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
+            .. RemoteOnlyProjects.Skip(parameters.Projects.Where(x =>
+                    SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName), _logger)
                 .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
         ];
 
-        string? devenvPath = VisualStudioOpener.DetectDevEnvPath(_logger);
+        string? devenvPath = _detectDevEnvPath(_logger);
 
         if (string.IsNullOrWhiteSpace(devenvPath))
         {
@@ -75,11 +91,11 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
 
             if (!isFirst)
             {
-                await Task.Delay(DelayBetweenOpensMilliseconds, cancellationToken);
+                await _delayBetweenOpens(cancellationToken);
             }
 
             Console.WriteLine($"Opening {projectName} solution {project.SolutionFileName}...");
-            VisualStudioOpener.OpenSolution(devenvPath, project.SolutionFileName, _logger);
+            _openSolution(devenvPath, project.SolutionFileName, _logger);
             isFirst = false;
         }
 

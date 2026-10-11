@@ -30,6 +30,7 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(
             new CurrentMachineServerNameFieldEditor(nameof(SupportToolsParameters.CurrentMachineServerName)));
         FieldEditors.Add(new PathMappingsFieldEditor(nameof(SupportToolsParameters.PathMappings), parametersManager));
+        FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.HideRemoteOnlyProjects)));
 
         FieldEditors.Add(new DictionaryFieldEditor<DotnetToolCruder, DotnetToolData>(
             nameof(SupportToolsParameters.DotnetTools), x => new DotnetToolCruder(parametersManager, x)));

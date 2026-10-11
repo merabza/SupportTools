@@ -2,6 +2,7 @@
 using System.Linq;
 using LibGitData;
 using LibGitData.Models;
+using LibGitWork.Helpers;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -69,8 +70,16 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
 
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
-        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
+        (string? spaProjectFolderRelativePath, bool spaProjectIsMissing) =
+            SpaProjectFolderHelper.GetSpaProjectFolderRelativePath(logger, projectName, project, gitProjects,
+                supportToolsParameters.Gits, gitProjectNames, useConsole);
+        if (spaProjectIsMissing)
+        {
+            return null;
+        }
+
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, spaProjectFolderRelativePath, useConsole,
+            false);
 
         List<string> absentGitRepoNames = [.. gitProjectNames.Except(gitRepos.Gits.Keys)];
 

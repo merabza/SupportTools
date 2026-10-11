@@ -16,10 +16,10 @@ public class ProjectsListFactoryStrategy(
     public List<CliMenuCommand> CreateMenuCommandsList()
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
-        //პროექტების ჩამონათვალი
+        //პროექტების ჩამონათვალი (HideRemoteOnlyProjects-ისას მხოლოდ ამ კომპიუტერზე არსებულები)
         return
         [
-            .. parameters.Projects
+            .. ProjectPresenceView.GetVisibleProjects(parameters)
                 .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) ==
                             menuParameters.ProjectGroupName).OrderBy(o => o.Key).Select(kvp =>
                     new ProjectSubMenuCliMenuCommand(serviceProvider, parametersManager, kvp.Key, menuParameters))

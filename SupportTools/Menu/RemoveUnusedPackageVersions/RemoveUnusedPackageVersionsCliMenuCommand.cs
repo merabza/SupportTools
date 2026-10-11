@@ -50,8 +50,9 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
         int changedFilesCount = 0;
         int removedEntriesCount = 0;
 
-        foreach ((string projectName, ProjectModel project) in parameters.Projects.OrderBy(x => x.Key,
-                     StringComparer.Ordinal))
+        //remote პროექტების solution ფოლდერი ამ კომპიუტერზე არ არის (D3)
+        foreach ((string projectName, ProjectModel project) in RemoteOnlyProjects.Skip(parameters.Projects, _logger)
+                     .OrderBy(x => x.Key, StringComparer.Ordinal))
         {
             cancellationToken.ThrowIfCancellationRequested();
 

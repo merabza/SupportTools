@@ -16,6 +16,7 @@ URL-ები კონფიგურირებული პროექტ�
 |`Sync All Projects All Gits V2`|ყველა რეპოზიტორია ყველა პროექტში|
 |`Sync One Group All Projects Gits V2`|ერთი ჯგუფის ყველა პროექტის ყველა რეპო|
 |`Sync One Project All Gits With Scaffold Seeders V2`|ერთი პროექტის ყველა რეპო, scaffold seeder-ების ჩათვლით|
+|`Clone Project To This Computer`|`remote` პროექტი: მისი ფოლდერის შექმნა და რეპოების აქ დაკლონვა|
 |`Git` ქვემენიუ (პერ-პროექტი)|ცალკეული რეპოების მართვა: სია, დამატება, წაშლა, სინქი|
 |`Git ScaffoldSeeder projects` ქვემენიუ|იგივე, მაგრამ პროექტის scaffold seeder რეპოებისთვის|
 
@@ -52,7 +53,12 @@ URL-ები კონფიგურირებული პროექტ�
 **ნაბიჯები**
 
 1. `Main Menu` → `Sync All Projects All Gits V2`
-2. შეიყვანე commit მესიჯი (გამოიყენება ლოკალური ცვლილებების მქონე
+2. თუ ზოგი პროექტი `remote`-ია (ამ კომპიუტერზე არ არის, იხ.
+[ქვემოთ](#თუ-პროექტი-ამ-კომპიუტერზე-ჯერ-არ-არის)), უპასუხე კითხვას
+`Include N remote-only projects (their gits will be cloned to this computer)?`.
+ნაგულისხმევი `n` მხოლოდ ლოკალურ პროექტებს ასინქრონებს; `y` remote
+პროექტებსაც დაკლონავს, როგორც ადრე ყოველი სინქი აკეთებდა.
+3. შეიყვანე commit მესიჯი (გამოიყენება ლოკალური ცვლილებების მქონე
 რეპოებისთვის)
 
 **მოსალოდნელი შედეგი**
@@ -92,6 +98,8 @@ commit-ები ერთდროულად, ხელსაწყო უშ
 **ნაბიჯები**
 
 1. `Main Menu` → `Project Groups List` → (აარჩიე ჯგუფი) → `Sync One Group All Projects Gits V2`
+2. როგორც სრულ სინქში, ჯგუფის `remote` პროექტები მხოლოდ მაშინ
+დაიკლონება, თუ მათ შესახებ კითხვას `y`-ით უპასუხებ.
 
 **მოსალოდნელი შედეგი**
 
@@ -127,6 +135,74 @@ seeder რეპოები
 scaffold seeder სამუშაო ფოლდერი არ არსებობს, ეს ლოგდება როგორც
 warning, არა შეცდომა. ძირითადი რეპოები მაინც სინქდება. შეამოწმე ლოგი
 თუ scaffold-ის შედეგი გელოდა.
+
+\---
+
+## თუ პროექტი ამ კომპიუტერზე ჯერ არ არის
+
+რეესტრის სინქრონიზაციის შემდეგ ყველა კომპიუტერზე ყველა პროექტი ჩანს,
+ფიზიკურად კი თითოეული მხოლოდ ზოგიერთ კომპიუტერზეა. პროექტი `local`-ია,
+თუ მისი `ProjectFolderName` ამ კომპიუტერზე არსებობს, თორემ `remote`.
+პროექტების სიაში ნიშანი ყოველი პროექტის გვერდით ჩანს
+(`MyProject (remote)`), ყოველ ჯგუფს კი უწერია `local: N, remote: N`.
+`Support Tools Parameters Editor`-ის `HideRemoteOnlyProjects` remote
+პროექტებს სიებიდან მალავს.
+
+ჯგუფური ბრძანებები ნაგულისხმევად ლოკალურ პროექტებზე მუშაობს:
+
+* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`,
+`Update Outdated Packages` და `Distribute all packages` გეკითხება,
+ჩაირთოს თუ არა remote პროექტებიც (ნაგულისხმევად `n`), რადგან მათი
+სინქრონიზაცია მათ აქ დაკლონავს;
+* `Check all projects build`, `Check group projects build`,
+`Clear All Groups All Solutions All Projects`,
+`Reverse Package Distribution`, `Remove Unused Package Versions` და
+`Open all projects By Visual Studio` remote პროექტებს ყოველთვის
+ტოვებს და წერს, რამდენი გამოტოვა: ფაილების გარეშე ისინი მხოლოდ იმას
+დაწერდნენ, რომ ფოლდერები არ არსებობს.
+
+**ნაბიჯები**
+
+1. `Main Menu` → `Project Groups List` → (ჯგუფი) → `Projects List` →
+(`remote` პროექტი) → `Clone Project To This Computer` (ჩანს მხოლოდ
+remote პროექტებისთვის)
+2. თუ პროექტს scaffold seeder რეპოები აქვს, უპასუხე, დაიკლონოს თუ არა
+ისინიც (ნაგულისხმევად `n`)
+3. დაადასტურე `Clone N gits of project ... to <folder>?`
+
+**რას აკეთებს**
+
+1. ქმნის `ProjectFolderName`-ს.
+2. პროექტის ყოველი რეპოსთვის, რომლის ჩანაწერიც `GitProjects`-ში არ
+არის, უშვებს `Update Git Projects`-ის სკანირებას მხოლოდ ამ რეპოსთვის და
+ინახავს. ეს კლონამდე ხდება: რეპოს, რომლის ფოლდერის სახელიც
+`{SpaProjectFolderRelativePath}`-ით იწყება, ფოლდერის დასადგენად პროექტის
+`SpaProjectName`-ის `GitProjects` ჩანაწერი სჭირდება.
+3. ყველა რეპოს კლონავს იმავე მექანიზმით, რასაც V2 სინქი იყენებს.
+4. ამოწმებს შაბლონების ფაილებს: ყოველი რეპოს `.gitignore` შაბლონი და
+პროექტის `.editorconfig` შაბლონი არსებობს და დაკლონილი ფაილები მათ
+ემთხვევა.
+5. ამოწმებს პროექტის საიდუმლო ფაილებს (მისი server info-ების
+`AppSettingsJsonSourceFileName`, `SeedProjectParametersFilePath`,
+`PrepareProdCopyDatabaseProjectParametersFilePath`,
+`PairedDbObjectsResultFileName`). თუ რომელიმე აკლია, ჩამოთვლის მათ და
+გთავაზობს `Sync Registry With SupportToolsServer...`-ის გაშვებას,
+რომელიც მათ ჩამოიტანს, შემდეგ კი ისევ ამოწმებს.
+6. წერს ანგარიშს: ფოლდერი, განახლებული `GitProjects`, რამდენი რეპო
+დაიკლონა და რომელი არა, შაბლონების პრობლემები და დაკარგული ფაილები.
+
+**ხშირი შეცდომები**
+
+* **ნაწილობრივი კლონი.** ფოლდერი პირველ რიგში იქმნება, ამიტომ
+ჩავარდნილი კლონის შემდეგაც პროექტი უკვე `local`-ად ითვლება. გაასწორე
+მიზეზი (იხ. ანგარიში) და პროექტზე გაუშვი
+`Sync One Project All Gits With Scaffold Seeders V2`.
+* **`GitProjects has no X (SpaProjectName of project Y)`.** სკანირებამ
+`SpaProjectName`-ის სახელის პროექტი ვერ იპოვა. შეამოწმე სახელი, ან Gits
+სიიდან გაუშვი `Update Git Projects` (ან
+`Update Git Projects From SupportToolsServer`). V2 სინქიც იმავე შეცდომას
+წერს exception-ით გაჩერების ნაცვლად, პროექტის დანარჩენი რეპოები კი
+მაინც სინქდება.
 
 \---
 

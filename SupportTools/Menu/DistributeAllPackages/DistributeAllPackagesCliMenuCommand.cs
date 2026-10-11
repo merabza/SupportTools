@@ -23,20 +23,29 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
 
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Func<string, bool, bool> _inputBool;
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public DistributeAllPackagesCliMenuCommand(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : base(MenuCommandName,
-        EMenuAction.Reload, EMenuAction.Reload, null, true)
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : this(logger, appName,
+        httpClientFactory, parametersManager, menuParameters, RemoteOnlyProjects.InputBoolFromConsole)
+    {
+    }
+
+    //კონსოლიდან შეყვანა პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხი თვითონ მიაწოდონ
+    // ReSharper disable once ConvertToPrimaryConstructor
+    internal DistributeAllPackagesCliMenuCommand(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters,
+        Func<string, bool, bool> inputBool) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _appName = appName;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _menuParameters = menuParameters;
+        _inputBool = inputBool;
     }
 
     protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
@@ -49,9 +58,13 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        //პაკეტის ტიპის ყველა პროექტის შეგროვება
-        Dictionary<string, ProjectModel> packageProjects = parameters.Projects
-            .Where(x => x.Value.ProjectType == EProjectType.IsPackage)
+        //პაკეტის ტიპის ყველა პროექტის შეგროვება. remote პაკეტები მხოლოდ ცხადი თანხმობით მუშავდება, რადგან
+        //სინქრონიზაცია მათ ამ კომპიუტერზე დაკლონავს (D3)
+        List<KeyValuePair<string, ProjectModel>> allPackageProjects =
+            [.. parameters.Projects.Where(x => x.Value.ProjectType == EProjectType.IsPackage)];
+        bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(allPackageProjects, _inputBool);
+        Dictionary<string, ProjectModel> packageProjects = ProjectPresence
+            .Filter(allPackageProjects, includeRemoteProjects)
             .ToDictionary(x => x.Key, x => x.Value, StringComparer.Ordinal);
 
         if (packageProjects.Count == 0)

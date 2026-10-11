@@ -33,6 +33,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     //კანონიკური გზების ამ კომპიუტერის გზებად გარდაქმნის წესები
     public List<PathMappingModel> PathMappings { get; init; } = [];
 
+    //პროექტების სიებში მხოლოდ ამ კომპიუტერზე არსებული პროექტები ჩანს (D3, ProjectPresence)
+    public bool HideRemoteOnlyProjects { get; set; }
+
     //რეესტრის სინქრონიზაციის მდგომარეობა. ეგზემპლარი არ იცვლება: ჩატვირთვაც და სინქრონიზაციაც მას ადგილზე ავსებს
     public RegistrySyncStateModel RegistrySyncState { get; } = new();
 

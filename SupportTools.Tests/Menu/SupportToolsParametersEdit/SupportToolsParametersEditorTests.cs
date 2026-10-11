@@ -25,6 +25,7 @@ public sealed class SupportToolsParametersEditorTests
         nameof(SupportToolsParameters.MachineName),
         nameof(SupportToolsParameters.CurrentMachineServerName),
         nameof(SupportToolsParameters.PathMappings),
+        nameof(SupportToolsParameters.HideRemoteOnlyProjects),
         nameof(SupportToolsParameters.DotnetTools),
         nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
         nameof(SupportToolsParameters.AutoSyncWithSupportToolsServer),
@@ -151,6 +152,22 @@ public sealed class SupportToolsParametersEditorTests
         Assert.IsType<IntFieldEditor>(timeoutEditor);
         Assert.Equal(bool.FalseString, autoSyncStatus);
         Assert.Equal("10", timeoutStatus);
+    }
+
+    //D3: a new parameters file lists every project, the remote ones too
+    [Fact]
+    public void HideRemoteOnlyProjectsEditor_WhenParametersAreNew_ShowsOff()
+    {
+        // Arrange
+        FieldEditor editor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.HideRemoteOnlyProjects));
+
+        // Act
+        string status = editor.GetValueStatus(_parameters);
+
+        // Assert
+        Assert.IsType<BoolFieldEditor>(editor);
+        Assert.Equal(bool.FalseString, status);
     }
 
     [Fact]

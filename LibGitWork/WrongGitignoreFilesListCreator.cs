@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using LibGitData;
 using LibGitData.Models;
+using LibGitWork.Helpers;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -62,15 +63,21 @@ public sealed class WrongGitignoreFilesListCreator
 
                 var gitProjects = GitProjects.Create(_logger, supportToolsParameters.GitProjects);
 
-                var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits,
-                    project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
-
                 List<string> gitProjectNames = gitCol switch
                 {
                     EGitCol.Main => project.GitProjectNames,
                     EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
                     _ => null
                 } ?? [];
+
+                //SpaProjectName-ის GitProjects ჩანაწერის გარეშე შეცდომა იწერება და მხოლოდ ის git-ები გამოიტოვება,
+                //რომლებსაც ეს ფოლდერი სჭირდება
+                (string? spaProjectFolderRelativePath, _) = SpaProjectFolderHelper.GetSpaProjectFolderRelativePath(
+                    _logger, projectName, project, gitProjects, supportToolsParameters.Gits, gitProjectNames,
+                    _useConsole);
+
+                var gitRepos = GitRepos.Create(_logger, supportToolsParameters.Gits, spaProjectFolderRelativePath,
+                    _useConsole, false);
 
                 IEnumerable<GitData> gitData =
                     gitRepos.Gits.Where(x => gitProjectNames.Contains(x.Key)).Select(x => x.Value);

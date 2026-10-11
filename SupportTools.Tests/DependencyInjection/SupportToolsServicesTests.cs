@@ -36,10 +36,10 @@ public sealed class SupportToolsServicesTests
         // Act
         // ReSharper disable once using
         await using ServiceProvider serviceProvider = services.BuildServiceProvider();
-        IParametersManager result = serviceProvider.GetRequiredService<IParametersManager>();
+        var result = serviceProvider.GetRequiredService<IParametersManager>();
 
         // Assert
-        AutoSyncParametersManager decorator =
+        var decorator =
             Assert.IsType<AutoSyncParametersManager>(Assert.Single(serviceProvider.GetServices<IParametersManager>()));
         Assert.Same(decorator, result);
         Assert.Same(parameters, result.Parameters);
@@ -60,7 +60,7 @@ public sealed class SupportToolsServicesTests
         // Act
         // ReSharper disable once using
         await using ServiceProvider serviceProvider = services.BuildServiceProvider();
-        IApplication result = serviceProvider.GetRequiredService<IApplication>();
+        var result = serviceProvider.GetRequiredService<IApplication>();
 
         // Assert
         Assert.Equal("SupportToolsTests", result.AppName);
@@ -83,7 +83,7 @@ public sealed class SupportToolsServicesTests
         // Assert
         Assert.NotNull(result);
         List<string> commandTypeNames =
-            CliMenuTestAccess.GetMenuItems(result).Select(x => x.CliMenuCommand.GetType().Name).ToList();
+            [.. CliMenuTestAccess.GetMenuItems(result).Select(x => x.CliMenuCommand.GetType().Name)];
         Assert.Contains(nameof(SyncAllProjectsAllGitsCliMenuCommandV2), commandTypeNames);
         Assert.Contains(nameof(UpdateOutdatedPackagesCliMenuCommand), commandTypeNames);
         Assert.Contains(nameof(DistributeAllPackagesCliMenuCommand), commandTypeNames);

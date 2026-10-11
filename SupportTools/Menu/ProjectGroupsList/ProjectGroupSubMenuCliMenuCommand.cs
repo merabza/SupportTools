@@ -36,36 +36,34 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
 
     protected override string GetStatus()
     {
-        List<string> projectNames = GetGroupProjectNames();
+        return ProjectPresenceView.GetText(BuildStatusParts());
+    }
 
-        //სანამ ამ ჯგუფის არცერთი პროექტი არ შემოწმებულა, ისე ვტოვებთ, როგორც აქამდე იყო - მხოლოდ რაოდენობა
+    protected override IReadOnlyList<StatusColorPart> BuildStatusColorParts()
+    {
+        return BuildStatusParts();
+    }
+
+    //ჯგუფის სტატუსის ნაწილები: ჯერ local/remote რაოდენობები (D3), მერე, თუ ჯგუფის რომელიმე პროექტი უკვე შემოწმდა,
+    //სტატუსების რაოდენობები და შემოწმებული პროექტების შეცდომების/გაფრთხილებების ჯამი.
+    //GetStatus-ის ტექსტი ზუსტად ამ ნაწილების ტექსტია (მენიუ ნაწილებს ", "-ით აერთებს)
+    private List<StatusColorPart> BuildStatusParts()
+    {
+        List<KeyValuePair<string, ProjectModel>> groupProjects = GetGroupProjects();
+        List<StatusColorPart> parts = ProjectPresenceView.CreateCountParts(groupProjects.Select(x => x.Value));
+
+        List<string> projectNames = [.. groupProjects.Select(x => x.Key)];
         if (!projectNames.Any(IsProjectChecked))
         {
-            return projectNames.Count.ToString(CultureInfo.InvariantCulture);
+            return parts;
         }
 
-        //ჯგუფში შემავალი პროექტების სტატუსები და მათი რაოდენობები
-        return string.Join(", ", BuildStatusParts(projectNames).Select(p => p.Text));
-    }
-
-    protected override IReadOnlyList<StatusColorPart>? BuildStatusColorParts()
-    {
-        List<string> projectNames = GetGroupProjectNames();
-
-        //სანამ ამ ჯგუფის არცერთი პროექტი არ შემოწმებულა, ფერადი სტატუსები არ გვინდა (რჩება ჩვეულებრივი რაოდენობა)
-        return projectNames.Any(IsProjectChecked) ? BuildStatusParts(projectNames) : null;
-    }
-
-    //ჯგუფის სტატუსის ნაწილები: სტატუსების რაოდენობები და შემოწმებული პროექტების შეცდომების/გაფრთხილებების ჯამი.
-    //GetStatus-ის ტექსტი ზუსტად ამ ნაწილების ტექსტია (მენიუ ნაწილებს ", "-ით აერთებს)
-    private List<StatusColorPart> BuildStatusParts(List<string> projectNames)
-    {
-        List<StatusColorPart> parts =
+        parts.AddRange(
         [
             .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
                 $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
                 ProjectBuildCheckStatusView.GetColor(b.Status)))
-        ];
+        ]);
 
         int errorCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.ErrorCount ?? 0);
         int warningCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.WarningCount ?? 0);
@@ -73,14 +71,14 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         return parts;
     }
 
-    private List<string> GetGroupProjectNames()
+    //HideRemoteOnlyProjects-ისას მხოლოდ ამ კომპიუტერზე არსებული პროექტები ითვლება, ისევე როგორც პროექტების სიაში
+    private List<KeyValuePair<string, ProjectModel>> GetGroupProjects()
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         return
         [
-            .. parameters.Projects
-                .Where(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
-                .Select(x => x.Key)
+            .. ProjectPresenceView.GetVisibleProjects(parameters).Where(x =>
+                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName)
         ];
     }
 

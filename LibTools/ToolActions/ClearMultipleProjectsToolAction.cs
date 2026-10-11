@@ -35,7 +35,15 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         string? projectGroupName, string? projectName, bool useConsole)
     {
         //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net9.0
-        string baseFolder = AppContext.BaseDirectory;
+        return Create(logger, parametersManager, projectGroupName, projectName, useConsole,
+            AppContext.BaseDirectory);
+    }
+
+    //გაშვებული პროგრამის ფოლდერი პარამეტრადაა გამოტანილი, რომ ტესტებმა თავიანთი ფოლდერი გამორიცხონ და
+    //გაშვებული ტესტების bin-ს ხელი არ ახლონ
+    internal static ClearMultipleProjectsToolAction Create(ILogger logger, IParametersManager parametersManager,
+        string? projectGroupName, string? projectName, bool useConsole, string baseFolder)
+    {
         string? excludeFolder = null;
         var baseDir = new DirectoryInfo(baseFolder);
         if (baseDir.Parent is { Name: "Debug", Parent.Name: "bin" })
@@ -52,7 +60,8 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
 
     protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GetProjectsList();
+        //მხოლოდ ამ კომპიუტერზე არსებული პროექტები სუფთავდება: დანარჩენების ფოლდერი არ არსებობს (D3)
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = ProjectPresence.Filter(GetProjectsList(), false);
 
         List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 

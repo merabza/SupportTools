@@ -14,6 +14,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequence;
@@ -106,6 +107,8 @@ public static class MenuData
         nameof(BuildPackageCliMenuCommandFactoryStrategy),
         //პაკეტის გავრცელება მომხმარებელ პროექტებში (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
         nameof(PackageDistributionCliMenuCommandFactoryStrategy),
+        //პროექტის ამ კომპიუტერზე ჩამოტანა (მხოლოდ remote პროექტებისთვის)
+        nameof(CloneProjectToThisComputerCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
         nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა

@@ -16,8 +16,29 @@ internal static class CliMenuTestAccess
     //RunBody is protected, and its result is not observable through Run(): success and failure may both reload the menu
     public static async Task<bool> InvokeRunBody(CliMenuCommand command)
     {
+        return await InvokeRunBody(command, CancellationToken.None);
+    }
+
+    public static async Task<bool> InvokeRunBody(CliMenuCommand command, CancellationToken cancellationToken)
+    {
         MethodInfo runBody = command.GetType().GetMethod("RunBody", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        return await (ValueTask<bool>)runBody.Invoke(command, [CancellationToken.None])!;
+        return await (ValueTask<bool>)runBody.Invoke(command, [cancellationToken])!;
+    }
+
+    //whether Run asks before running the body ("Are you sure...?") is kept in a private field of CliMenuCommand
+    public static bool GetAskRunAction(CliMenuCommand command)
+    {
+        FieldInfo askRunActionField =
+            typeof(CliMenuCommand).GetField("_askRunAction", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return (bool)askRunActionField.GetValue(command)!;
+    }
+
+    //GetActionDescription is protected; Run shows it before asking whether to run the command
+    public static async Task<string?> InvokeGetActionDescription(CliMenuCommand command)
+    {
+        MethodInfo getActionDescription = command.GetType()
+            .GetMethod("GetActionDescription", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        return await (ValueTask<string?>)getActionDescription.Invoke(command, [CancellationToken.None])!;
     }
 
     //CliMenuSet keeps its items (and their order) in private state only

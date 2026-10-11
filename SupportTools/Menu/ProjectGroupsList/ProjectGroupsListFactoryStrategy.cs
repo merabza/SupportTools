@@ -17,9 +17,11 @@ public class ProjectGroupsListFactoryStrategy(
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
 
+        //HideRemoteOnlyProjects-ისას ჯგუფი, რომლის არცერთი პროექტი ამ კომპიუტერზე არ არის, არ ჩანს
         return
         [
-            .. parameters.Projects.Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
+            .. ProjectPresenceView.GetVisibleProjects(parameters)
+                .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
                 .Distinct().OrderBy(x => x).Select(projectGroupName =>
                     new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager, projectGroupName,
                         menuParameters))

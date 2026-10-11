@@ -38,6 +38,7 @@ public sealed class SupportToolsParametersMachineProfileTests : IDisposable
         Assert.Null(parameters.MachineName);
         Assert.Null(parameters.CurrentMachineServerName);
         Assert.Empty(parameters.PathMappings);
+        Assert.False(parameters.HideRemoteOnlyProjects);
         Assert.True(parameters.Servers["PAZISI"].IsLocal);
     }
 
@@ -49,6 +50,7 @@ public sealed class SupportToolsParametersMachineProfileTests : IDisposable
         {
             MachineName = "Merinson",
             CurrentMachineServerName = "Merinson",
+            HideRemoteOnlyProjects = true,
             PathMappings =
             {
                 new PathMappingModel
@@ -70,6 +72,7 @@ public sealed class SupportToolsParametersMachineProfileTests : IDisposable
         // Assert
         Assert.Equal("Merinson", loaded.MachineName);
         Assert.Equal("Merinson", loaded.CurrentMachineServerName);
+        Assert.True(loaded.HideRemoteOnlyProjects);
         Assert.Collection(loaded.PathMappings, x =>
         {
             Assert.Equal(@"D:\1WorkDotnet", x.CanonicalPrefix);

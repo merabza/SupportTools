@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
@@ -10,6 +11,7 @@ using SupportTools.Menu;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
@@ -33,6 +35,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
     private readonly SupportToolsParameters _parameters = new();
     private readonly ParametersManager _parametersManager;
     private readonly ServiceProvider _serviceProvider;
+    private readonly string _tempFolder = Path.Combine(Path.GetTempPath(), $"ProjectSubMenuTests_{Guid.NewGuid():N}");
 
     public ProjectSubMenuCliMenuCommandTests()
     {
@@ -48,12 +51,15 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
+            .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
             .BuildServiceProvider();
+        Directory.CreateDirectory(_tempFolder);
     }
 
     public void Dispose()
     {
         _serviceProvider.Dispose();
+        Directory.Delete(_tempFolder, true);
     }
 
     [Fact]
@@ -230,6 +236,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             typeof(CheckPackageSolutionCliMenuCommand),
             typeof(BuildPackageCliMenuCommand),
             typeof(PackageDistributionCliMenuCommand),
+            typeof(CloneProjectToThisComputerCliMenuCommand),
             typeof(GitSubMenuCliMenuCommand),
             typeof(SaveEditorConfigAsNewTemplateCliMenuCommand)
         ];
@@ -245,8 +252,35 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         Assert.Equal(expected, commands.Take(expected.Count).Select(x => x.GetType()));
     }
 
+    //D3: the clone command is offered only for a project whose folder is not on this computer
     [Fact]
-    public void CountStatus_WhenProjectBuildWasNotChecked_ShowsNoStatus()
+    public void GetSubMenu_WhenProjectFolderDoesNotExist_ShowsCloneProjectToThisComputer()
+    {
+        // Arrange
+        RegisterProject(new ProjectModel { ProjectFolderName = Path.Combine(_tempFolder, "Missing") });
+
+        // Act
+        List<CliMenuCommand> commands = GetSubMenuCommands();
+
+        // Assert
+        Assert.Single(commands.OfType<CloneProjectToThisComputerCliMenuCommand>());
+    }
+
+    [Fact]
+    public void GetSubMenu_WhenProjectFolderExists_HidesCloneProjectToThisComputer()
+    {
+        // Arrange
+        RegisterProject(new ProjectModel { ProjectFolderName = _tempFolder });
+
+        // Act
+        List<CliMenuCommand> commands = GetSubMenuCommands();
+
+        // Assert
+        Assert.Empty(commands.OfType<CloneProjectToThisComputerCliMenuCommand>());
+    }
+
+    [Fact]
+    public void CountStatus_WhenProjectBuildWasNotChecked_ShowsOnlyPresence()
     {
         // Arrange
         ProjectSubMenuCliMenuCommand sut = CreateSut();
@@ -255,12 +289,48 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         sut.CountStatus();
 
         // Assert
-        Assert.Null(sut.StatusString);
-        Assert.Null(sut.StatusColorParts);
+        Assert.Equal("remote", sut.StatusString);
+        StatusColorPart part = Assert.Single(sut.StatusColorParts!);
+        Assert.Equal(ConsoleColor.DarkGray, part.Color);
     }
 
     [Fact]
-    public void CountStatus_WhenProjectBuildWasChecked_ShowsCheckResult()
+    public void CountStatus_WhenProjectFolderExists_ShowsLocal()
+    {
+        // Arrange
+        RegisterProject(new ProjectModel { ProjectFolderName = _tempFolder });
+        ProjectSubMenuCliMenuCommand sut = CreateSut();
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("local", sut.StatusString);
+        Assert.Equal(["local"], sut.StatusColorParts?.Select(x => x.Text));
+    }
+
+    //the presence is checked on every render: a folder created after the first render makes the project local
+    [Fact]
+    public void CountStatus_WhenProjectFolderIsCreatedLater_ChangesFromRemoteToLocal()
+    {
+        // Arrange
+        string projectFolder = Path.Combine(_tempFolder, "Later");
+        RegisterProject(new ProjectModel { ProjectFolderName = projectFolder });
+        ProjectSubMenuCliMenuCommand sut = CreateSut();
+        sut.CountStatus();
+        string? before = sut.StatusString;
+        Directory.CreateDirectory(projectFolder);
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("remote", before);
+        Assert.Equal("local", sut.StatusString);
+    }
+
+    [Fact]
+    public void CountStatus_WhenProjectBuildWasChecked_ShowsPresenceAndCheckResult()
     {
         // Arrange
         _menuParameters.ProjectBuildCheckResults[ProjectName] =
@@ -271,13 +341,14 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         sut.CountStatus();
 
         // Assert
-        Assert.Equal("BuildFailed, errors: 2, warnings: 1", sut.StatusString);
-        Assert.Equal(["BuildFailed", "errors: 2", "warnings: 1"], sut.StatusColorParts?.Select(x => x.Text));
+        Assert.Equal("remote, BuildFailed, errors: 2, warnings: 1", sut.StatusString);
+        Assert.Equal(["remote", "BuildFailed", "errors: 2", "warnings: 1"],
+            sut.StatusColorParts?.Select(x => x.Text));
     }
 
     //results are kept per project: the result of another project must not leak into this one
     [Fact]
-    public void CountStatus_WhenOnlyAnotherProjectWasChecked_ShowsNoStatus()
+    public void CountStatus_WhenOnlyAnotherProjectWasChecked_ShowsOnlyPresence()
     {
         // Arrange
         _menuParameters.ProjectBuildCheckResults["AnotherProject"] =
@@ -288,8 +359,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         sut.CountStatus();
 
         // Assert
-        Assert.Null(sut.StatusString);
-        Assert.Null(sut.StatusColorParts);
+        Assert.Equal("remote", sut.StatusString);
     }
 
     private ProjectSubMenuCliMenuCommand CreateSut()

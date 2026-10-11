@@ -45,7 +45,7 @@ of properties:
 |Group|Properties|Used for|
 |-|-|-|
 |Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
-|Machine profile|`MachineName`, `CurrentMachineServerName`, `PathMappings`|Settings of this computer, never shared with other computers (see [Machine profile and path mapping](#machine-profile-and-path-mapping))|
+|Machine profile|`MachineName`, `CurrentMachineServerName`, `PathMappings`, `HideRemoteOnlyProjects`|Settings of this computer, never shared with other computers (see [Machine profile and path mapping](#machine-profile-and-path-mapping))|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
 |Recent commands|`RecentCommandsFileName`, `RecentCommandsCount`|Menu history|
 |Archives|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|Packaging conventions|
@@ -72,6 +72,13 @@ local, and the `Servers` editor no longer shows `IsLocal`. When it is
 empty, the stored `IsLocal` values are used as before.
 * `PathMappings` — rules that turn canonical paths into the paths of this
 computer.
+* `HideRemoteOnlyProjects` (default `false`) — after a registry sync every
+computer lists every project, but a project is on this computer only when
+its `ProjectFolderName` exists here. The project lists show `local` or
+`remote` next to each project and `local: N, remote: N` next to each group;
+with this setting on, the lists show only the local projects (and only the
+groups that have one). See
+[Git Operations](use-cases/git-operations.md#if-a-project-is-not-on-this-computer-yet).
 
 Paths are kept in the canonical form: the Windows absolute path as on the
 main computer (PAZISI), for example

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using LibGitData;
 using LibGitData.Models;
+using LibGitWork.Helpers;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -55,8 +56,17 @@ public sealed class GitSyncParameters : IParameters
 
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 
-        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits,
-            project.SpaProjectFolderRelativePath(gitProjects), useConsole, false);
+        //SpaProjectName-ის GitProjects ჩანაწერის გარეშე ჩერდება მხოლოდ ის git, რომელსაც ეს ფოლდერი სჭირდება
+        (string? spaProjectFolderRelativePath, bool spaProjectIsMissing) =
+            SpaProjectFolderHelper.GetSpaProjectFolderRelativePath(logger, projectName, project, gitProjects,
+                supportToolsParameters.Gits, [gitProjectName], useConsole);
+        if (spaProjectIsMissing)
+        {
+            return null;
+        }
+
+        var gitRepos = GitRepos.Create(logger, supportToolsParameters.Gits, spaProjectFolderRelativePath, useConsole,
+            false);
 
         if (!gitRepos.Gits.TryGetValue(gitProjectName, out GitData? gitDataDom))
         {
