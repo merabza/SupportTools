@@ -17,11 +17,11 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 public sealed class PackageBuilder
 {
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageBuilder(ILogger logger, ParametersManager parametersManager, string projectName)
+    public PackageBuilder(ILogger logger, IParametersManager parametersManager, string projectName)
     {
         _logger = logger;
         _parametersManager = parametersManager;

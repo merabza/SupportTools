@@ -11,11 +11,11 @@ public sealed class CheckPackageSolutionCliMenuCommand : CliMenuCommand
     public const string MenuCommandName = "Check Package Solution";
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckPackageSolutionCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) :
+    public CheckPackageSolutionCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName) :
         base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _logger = logger;

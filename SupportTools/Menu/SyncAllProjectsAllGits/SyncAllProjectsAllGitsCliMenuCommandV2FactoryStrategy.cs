@@ -11,7 +11,7 @@ public class SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        var parametersManager1 = (ParametersManager)parametersManager;
+        var parametersManager1 = parametersManager;
         return new SyncAllProjectsAllGitsCliMenuCommandV2(logger, parametersManager1);
     }
 }

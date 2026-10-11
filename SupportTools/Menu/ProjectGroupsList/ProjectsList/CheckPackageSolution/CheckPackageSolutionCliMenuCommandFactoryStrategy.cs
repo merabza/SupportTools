@@ -12,7 +12,7 @@ public class CheckPackageSolutionCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new CheckPackageSolutionCliMenuCommand(logger, (ParametersManager)parametersManager,
+        return new CheckPackageSolutionCliMenuCommand(logger, parametersManager,
             menuParameters.ProjectName);
     }
 }

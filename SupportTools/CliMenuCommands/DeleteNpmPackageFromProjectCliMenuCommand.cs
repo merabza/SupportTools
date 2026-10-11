@@ -12,11 +12,11 @@ namespace SupportTools.CliMenuCommands;
 public sealed class DeleteNpmPackageFromProjectCliMenuCommand : CliMenuCommand
 {
     private readonly string _npmPackageName;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DeleteNpmPackageFromProjectCliMenuCommand(ParametersManager parametersManager, string projectName,
+    public DeleteNpmPackageFromProjectCliMenuCommand(IParametersManager parametersManager, string projectName,
         string npmPackageName) : base("Delete Npm Package from project", EMenuAction.LevelUp, EMenuAction.Reload,
         npmPackageName)
     {

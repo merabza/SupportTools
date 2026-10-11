@@ -14,12 +14,12 @@ namespace SupportTools.CliMenuCommands;
 public sealed class NewFrontNpmPackageNameCliMenuCommand : CliMenuCommand
 {
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NewFrontNpmPackageNameCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName)
+    public NewFrontNpmPackageNameCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName)
         : base("Add Npm Package", EMenuAction.Reload)
     {
         _logger = logger;

@@ -21,6 +21,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     IParametersWithSmartSchemas, IParametersWithArchivers, IParametersWithApiClients, IParametersWithRecentData
 {
     public const string DefaultUploadFileTempExtension = ".up!";
+    public const int DefaultSupportToolsServerSyncTimeoutSeconds = 10;
 
     //კომპიუტერის სახელი. თუ ცარიელია, გამოიყენება Environment.MachineName
     public string? MachineName { get; set; }
@@ -36,6 +37,13 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public RegistrySyncStateModel RegistrySyncState { get; } = new();
 
     public string? SupportToolsServerWebApiClientName { get; set; }
+
+    //რეესტრის ავტომატური სინქრონიზაცია SupportToolsServer-თან (D2): გაშვებისას Pull, ყოველი შენახვის შემდეგ Push
+    public bool AutoSyncWithSupportToolsServer { get; set; }
+
+    //ავტომატური სინქრონიზაციის ერთი მოთხოვნის ლოდინის ზღვარი წამებში. ამის შემდეგ სერვერი მიუწვდომლად ითვლება
+    public int SupportToolsServerSyncTimeoutSeconds { get; set; } = DefaultSupportToolsServerSyncTimeoutSeconds;
+
     public string? LocalPackageManagerWebApiClientName { get; set; }
     public string? LogFolder { get; set; }
     public bool LogGitWork { get; set; }

@@ -16,6 +16,12 @@ public sealed class RegistrySyncSelection
     public static RegistrySyncSelection PushOnly { get; } = new() { IncludePushes = true };
 
     public bool IncludePulls { get; init; }
+
+    //IncludePulls-ისას Pull(Delete)-ებიც: სერვერზე წაშლილი ჩანაწერი ლოკალურადაც იშლება. D2-ის გაშვებისას ავტომატური
+    //Pull მათ არ ასრულებს (მომხმარებლის გადაწყვეტილება): ცარიელმა ან სხვა სერვერმა ლოკალური რეესტრი ჩუმად არ უნდა
+    //წაშალოს. კონფლიქტის გადაწყვეტას (ConflictResolutions) ეს არ ეხება
+    public bool IncludePullDeletes { get; init; } = true;
+
     public bool IncludePushes { get; init; }
 
     //სერვერის პირველი წარუმატებელი ოპერაციის (Failed) შემდეგ სერვერის დარჩენილი ოპერაციები აღარ სრულდება და

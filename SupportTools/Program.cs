@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using Serilog;
 using SupportTools;
+using SupportTools.AutoSync;
 using SupportTools.DependencyInjection;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -51,8 +52,16 @@ try
     await using ServiceProvider serviceProvider = serviceCollection
         .AddServices(appName, parametersService.Par!, parametersService.ParametersFileName!).BuildServiceProvider();
 
+    bool runsTool = argumentsAnalyzer.ProjectTool is not null || argumentsAnalyzer.ServerTool is not null;
+
+    //რეესტრის ავტომატური სინქრონიზაცია (D2), თუ ამ კომპიუტერზე ჩართულია: Pull მენიუმდე და --run-მდე, რომ ორივემ
+    //სერვერიდან ჩამოტანილი მონაცემი დაინახოს. მიუწვდომელი სერვერი პროგრამას არ აჩერებს. მენიუ გაშვებისას ეკრანს
+    //ასუფთავებს, ამიტომ მენიუს რეჟიმში შეჯამებას მთავარი მენიუს პირველი აგება წერს (SupportToolsMenuBuilder).
+    //Push-ს შენახვის შემდეგ IParametersManager-ის decorator აკეთებს
+    await serviceProvider.GetRequiredService<RegistryAutoSync>().PullOnStart(!runsTool);
+
     //თუ --run მითითებულია, მენიუ არ გამოჩნდება, გაეშვება მითითებული ინსტრუმენტი და პროგრამა დაიხურება
-    if (argumentsAnalyzer.ProjectTool is not null || argumentsAnalyzer.ServerTool is not null)
+    if (runsTool)
     {
         logger = serviceProvider.GetService<ILogger<Program>>();
 

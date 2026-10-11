@@ -13,12 +13,12 @@ public sealed class PackageDistributionCliMenuCommand : CliMenuCommand
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PackageDistributionCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, string projectName) : base(MenuCommandName, EMenuAction.Reload,
+        IParametersManager parametersManager, string projectName) : base(MenuCommandName, EMenuAction.Reload,
         EMenuAction.Reload, projectName, true)
     {
         _logger = logger;

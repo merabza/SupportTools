@@ -9,8 +9,8 @@ using LibDatabaseWork.ToolCommands.CorrectNewDatabase;
 using LibScaffoldSeeder.ToolCommands.ExternalScaffoldSeed.JsonFromProjectDbProjectGetter;
 using Microsoft.Extensions.DependencyInjection;
 using ParametersManagement.LibParameters;
-using ParametersManagement.LibParameters.DependencyInjection;
 using Serilog.Events;
+using SupportTools.AutoSync;
 using SupportTools.Menu;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.SupportToolsParametersEdit;
@@ -49,11 +49,17 @@ public static class SupportToolsServices
             {
                 x.AppName = appName;
             })
-            .AddMainParametersManager<SupportToolsMainParametersManager>(x =>
+            //IParametersManager ავტომატური სინქრონიზაციის decorator-ია (D2), რომელიც
+            //SupportToolsMainParametersManager-ს ფუთავს. AddMainParametersManager<T> T : ParametersManager-ს მოითხოვს
+            //და decorator-ს ვერ დაარეგისტრირებს, ამიტომ მისი options და singleton-ები აქ ხელითაა
+            .Configure<MainParametersManagerOptions>(x =>
             {
                 x.ParametersFileName = parametersFileName;
                 x.Par = par;
-            });
+            })
+            .AddSingleton<SupportToolsMainParametersManager>()
+            .AddSingleton<RegistryAutoSync>()
+            .AddSingleton<IParametersManager, AutoSyncParametersManager>();
 
         // @formatter:on
         services.AddRecentCommandsService(x =>

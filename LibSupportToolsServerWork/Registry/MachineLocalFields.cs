@@ -11,7 +11,7 @@ namespace LibSupportToolsServerWork.Registry;
 //ასახელებს, ლოკალური რჩება (bootstrap, G6)
 public static class MachineLocalFields
 {
-    //SupportToolsParameters-ის ზედა დონის ველები. აქ დაემატება ავტოსინქრონიზაციის ალამი (D2)
+    //SupportToolsParameters-ის ზედა დონის ველები
     public static IReadOnlyList<string> TopLevel { get; } =
     [
         nameof(SupportToolsParameters.MachineName),
@@ -20,6 +20,9 @@ public static class MachineLocalFields
         //ამ კომპიუტერის ბოლო სინქრონიზაციის მდგომარეობა
         nameof(SupportToolsParameters.RegistrySyncState),
         nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
+        //ავტომატური სინქრონიზაცია თითო კომპიუტერზე ირთვება (D2)
+        nameof(SupportToolsParameters.AutoSyncWithSupportToolsServer),
+        nameof(SupportToolsParameters.SupportToolsServerSyncTimeoutSeconds),
         nameof(SupportToolsParameters.LogFolder),
         nameof(SupportToolsParameters.LogGitWork),
         nameof(SupportToolsParameters.GitExecutablePath),

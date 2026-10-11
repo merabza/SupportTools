@@ -11,7 +11,7 @@ public class ReversePackageDistributionCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        var parametersManager1 = (ParametersManager)parametersManager;
+        var parametersManager1 = parametersManager;
         return new ReversePackageDistributionCliMenuCommand(logger, parametersManager1);
     }
 }

@@ -31,14 +31,14 @@ public sealed class PackageDistributor
     //ერთხელ მოთხოვნილი ვერსიები ინახება ქეშში, რომ ერთი და იგივე პაკეტისთვის სერვერს რამდენჯერმე არ მივმართოთ
     private readonly Dictionary<string, string> _latestVersionsCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     //flat container-ის საბაზისო მისამართი, რომელიც ერთხელ იკითხება სერვერის service index-იდან
     private string? _packageBaseAddress;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory, ParametersManager parametersManager,
+    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
         string projectName)
     {
         _logger = logger;

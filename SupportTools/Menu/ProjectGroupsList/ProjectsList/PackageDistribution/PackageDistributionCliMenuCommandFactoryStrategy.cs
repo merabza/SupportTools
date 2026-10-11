@@ -14,7 +14,7 @@ public class PackageDistributionCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new PackageDistributionCliMenuCommand(logger, httpClientFactory, (ParametersManager)parametersManager,
+        return new PackageDistributionCliMenuCommand(logger, httpClientFactory, parametersManager,
             menuParameters.ProjectName);
     }
 }

@@ -33,7 +33,7 @@ public sealed class PackageUpdaterToolAction : ToolAction
         _gitIgnorePathName = gitSyncParameters.GitData.GitIgnorePatternName;
     }
 
-    public static PackageUpdaterToolAction? Create(ILogger? logger, ParametersManager parametersManager,
+    public static PackageUpdaterToolAction? Create(ILogger? logger, IParametersManager parametersManager,
         string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

@@ -11,11 +11,11 @@ public sealed class PackageUpdater
     private readonly string _gitProjectName;
     private readonly ILogger? _logger;
     private readonly List<PackageUpdaterToolAction> _packageUpdaterToolActionList = [];
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly bool _useConsole;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageUpdater(ILogger? logger, ParametersManager parametersManager, string gitProjectName, bool useConsole)
+    public PackageUpdater(ILogger? logger, IParametersManager parametersManager, string gitProjectName, bool useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;

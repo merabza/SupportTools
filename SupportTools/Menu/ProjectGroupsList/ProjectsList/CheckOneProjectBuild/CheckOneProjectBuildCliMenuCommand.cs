@@ -16,11 +16,11 @@ public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
 
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckOneProjectBuildCliMenuCommand(ILogger logger, string appName, ParametersManager parametersManager,
+    public CheckOneProjectBuildCliMenuCommand(ILogger logger, string appName, IParametersManager parametersManager,
         SupportToolsMenuParameters menuParameters, string projectName) : base(MenuCommandName, EMenuAction.Reload,
         EMenuAction.Reload, projectName)
     {

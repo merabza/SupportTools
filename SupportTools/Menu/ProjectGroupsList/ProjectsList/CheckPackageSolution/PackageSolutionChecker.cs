@@ -24,11 +24,11 @@ public sealed class PackageSolutionChecker
     private static readonly char[] DirectorySeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageSolutionChecker(ILogger logger, ParametersManager parametersManager, string projectName)
+    public PackageSolutionChecker(ILogger logger, IParametersManager parametersManager, string projectName)
     {
         _logger = logger;
         _parametersManager = parametersManager;

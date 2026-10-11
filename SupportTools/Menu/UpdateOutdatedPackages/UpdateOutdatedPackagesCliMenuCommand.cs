@@ -12,10 +12,10 @@ public sealed class UpdateOutdatedPackagesCliMenuCommand : CliMenuCommand
     public const string MenuCommandName = "Update Outdated Packages";
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public UpdateOutdatedPackagesCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
+    public UpdateOutdatedPackagesCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
         "Update Outdated Packages", EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

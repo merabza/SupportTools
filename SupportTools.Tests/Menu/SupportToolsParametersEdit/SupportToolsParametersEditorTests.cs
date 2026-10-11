@@ -27,6 +27,8 @@ public sealed class SupportToolsParametersEditorTests
         nameof(SupportToolsParameters.PathMappings),
         nameof(SupportToolsParameters.DotnetTools),
         nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
+        nameof(SupportToolsParameters.AutoSyncWithSupportToolsServer),
+        nameof(SupportToolsParameters.SupportToolsServerSyncTimeoutSeconds),
         nameof(SupportToolsParameters.LocalPackageManagerWebApiClientName),
         nameof(SupportToolsParameters.LogFolder),
         nameof(SupportToolsParameters.LogGitWork),
@@ -127,6 +129,28 @@ public sealed class SupportToolsParametersEditorTests
         // Assert
         Assert.IsType<MachineNameFieldEditor>(machineNameEditor);
         Assert.Equal(Environment.MachineName, status);
+    }
+
+    //D2: auto-sync is opt-in, and the timeout of a new parameters file is the default one
+    [Fact]
+    public void AutoSyncEditors_WhenParametersAreNew_ShowAutoSyncOffAndDefaultTimeout()
+    {
+        // Arrange
+        List<FieldEditor> fieldEditors = GetFieldEditors(CreateSut());
+        FieldEditor autoSyncEditor = fieldEditors.Single(x =>
+            x.PropertyName == nameof(SupportToolsParameters.AutoSyncWithSupportToolsServer));
+        FieldEditor timeoutEditor = fieldEditors.Single(x =>
+            x.PropertyName == nameof(SupportToolsParameters.SupportToolsServerSyncTimeoutSeconds));
+
+        // Act
+        string autoSyncStatus = autoSyncEditor.GetValueStatus(_parameters);
+        string timeoutStatus = timeoutEditor.GetValueStatus(_parameters);
+
+        // Assert
+        Assert.IsType<BoolFieldEditor>(autoSyncEditor);
+        Assert.IsType<IntFieldEditor>(timeoutEditor);
+        Assert.Equal(bool.FalseString, autoSyncStatus);
+        Assert.Equal("10", timeoutStatus);
     }
 
     [Fact]

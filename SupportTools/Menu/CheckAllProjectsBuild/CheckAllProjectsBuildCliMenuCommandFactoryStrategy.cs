@@ -14,7 +14,7 @@ public class CheckAllProjectsBuildCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        var parametersManager1 = (ParametersManager)parametersManager;
+        var parametersManager1 = parametersManager;
         return new CheckAllProjectsBuildCliMenuCommand(logger, app.AppName, parametersManager1, menuParameters);
     }
 }

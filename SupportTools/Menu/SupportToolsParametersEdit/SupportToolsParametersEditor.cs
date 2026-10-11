@@ -37,6 +37,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new ApiClientNameFieldEditor(nameof(SupportToolsParameters.SupportToolsServerWebApiClientName),
             logger, httpClientFactory, parametersManager));
 
+        //რეესტრის ავტომატური სინქრონიზაცია ამ კომპიუტერზე (D2)
+        FieldEditors.Add(new BoolFieldEditor(nameof(SupportToolsParameters.AutoSyncWithSupportToolsServer)));
+        FieldEditors.Add(new IntFieldEditor(nameof(SupportToolsParameters.SupportToolsServerSyncTimeoutSeconds),
+            SupportToolsParameters.DefaultSupportToolsServerSyncTimeoutSeconds));
+
         FieldEditors.Add(new ApiClientNameFieldEditor(
             nameof(SupportToolsParameters.LocalPackageManagerWebApiClientName), logger, httpClientFactory,
             parametersManager));

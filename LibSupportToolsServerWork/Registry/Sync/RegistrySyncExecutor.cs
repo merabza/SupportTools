@@ -15,7 +15,8 @@ namespace LibSupportToolsServerWork.Registry.Sync;
 //2. ლოკალური ცვლილებები ადგილზე: ApplyLocal ზრდადობით, მერე RemoveLocal კლებადობით. ფაილების ადაპტერზე
 //   (IRegistryFileSyncAdapter) ApplyLocal-ს PrepareApplyLocal უსწრებს: მისი შეცდომა ჩანაწერს Failed-ად აქცევს,
 //   ტრანსპორტის შეცდომის შემდეგ კი დარჩენილი მომზადებები აღარ სრულდება (NotExecuted);
-//3. ერთი IParametersManager.Save, თუ ლოკალური მონაცემი ან მდგომარეობა შეიცვალა.
+//3. ერთი IParametersManager.Save, თუ ლოკალური მონაცემი ან მდგომარეობა შეიცვალა; სერვერის მისამართის (თუ ძრავას აქვს)
+//   შეცვლაც მდგომარეობის ცვლილებაა.
 //ყოველი წარმატებული ოპერაციის შემდეგ ჩანაწერის მდგომარეობა ახლდება: სერვერის ახალი ვერსია და ლოკალური ჰეში.
 //სერვერის შეცდომების ცნობა RegistrySyncServerErrorCodes-შია აღწერილი. ტრანსპორტის შეცდომის შემდეგ, ხოლო
 //StopOnFailure-ისას ნებისმიერი Failed-ის შემდეგაც, სერვერის დარჩენილი ოპერაციები NotExecuted ხდება
@@ -25,6 +26,7 @@ internal sealed class RegistrySyncExecutor
     private readonly SupportToolsParameters _parameters;
     private readonly IParametersManager _parametersManager;
     private readonly Dictionary<RegistrySyncPlanItem, RegistrySyncReportItem> _reportItems = [];
+    private readonly string? _serverAddress;
     private readonly TimeProvider _timeProvider;
     private bool _changed;
     private bool _serverOperationsStopped;
@@ -33,12 +35,13 @@ internal sealed class RegistrySyncExecutor
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public RegistrySyncExecutor(IReadOnlyDictionary<string, IRegistrySyncAdapter> adapters,
-        IParametersManager parametersManager, TimeProvider timeProvider)
+        IParametersManager parametersManager, TimeProvider timeProvider, string? serverAddress)
     {
         _adapters = adapters;
         _parametersManager = parametersManager;
         _parameters = (SupportToolsParameters)parametersManager.Parameters;
         _timeProvider = timeProvider;
+        _serverAddress = serverAddress;
     }
 
     private RegistrySyncStateModel State => _parameters.RegistrySyncState;
@@ -59,6 +62,7 @@ internal sealed class RegistrySyncExecutor
         await RunLocalOperations([.. operations.LocalItems.Where(x => x.Server is not null)],
             [.. operations.LocalItems.Where(x => x.Server is null)], cancellationToken);
 
+        RecordServerAddress();
         bool saved = await SaveIfChanged(cancellationToken);
         return new RegistrySyncReport
         {
@@ -87,7 +91,8 @@ internal sealed class RegistrySyncExecutor
     {
         return item.Action switch
         {
-            ERegistrySyncAction.Pull when selection.IncludePulls => ToLocal(item),
+            ERegistrySyncAction.Pull when selection.IncludePulls &&
+                                          (item.Server is not null || selection.IncludePullDeletes) => ToLocal(item),
             ERegistrySyncAction.Push when selection.IncludePushes => ToServer(item),
             ERegistrySyncAction.Conflict => ResolveConflict(item,
                 selection.ConflictResolutions.GetValueOrDefault(item)),
@@ -364,6 +369,18 @@ internal sealed class RegistrySyncExecutor
     private void Record(RegistrySyncPlanItem item, ERegistrySyncOutcome outcome, Error? error = null)
     {
         _reportItems[item] = new RegistrySyncReportItem(item, outcome, error);
+    }
+
+    //მდგომარეობა იმ სერვერის ვერსიებს ინახავს, რომლის გეგმაც შესრულდა (D2-ის დაცვა სხვა სერვერისგან)
+    private void RecordServerAddress()
+    {
+        if (_serverAddress is null || State.ServerAddress == _serverAddress)
+        {
+            return;
+        }
+
+        State.ServerAddress = _serverAddress;
+        _changed = true;
     }
 
     private async Task<bool> SaveIfChanged(CancellationToken cancellationToken)

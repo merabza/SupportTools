@@ -25,11 +25,11 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DistributeAllPackagesCliMenuCommand(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
-        ParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : base(MenuCommandName,
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : base(MenuCommandName,
         EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

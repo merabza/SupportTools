@@ -32,6 +32,9 @@ internal sealed class FakeRegistrySyncAdapter : IRegistrySyncAdapter
 
     public Error? ServerRecordsError { get; set; }
 
+    //how many times the server records were read, failed reads included (D2 checks that no request is made)
+    public int ServerReadCount { get; private set; }
+
     //simulates an adapter bug: ApplyLocal leaves the local model unchanged
     public bool IgnoresApplyLocal { get; set; }
 
@@ -63,6 +66,7 @@ internal sealed class FakeRegistrySyncAdapter : IRegistrySyncAdapter
     public Task<Result<IReadOnlyDictionary<string, RegistryServerRecord>>> GetServerRecords(
         CancellationToken cancellationToken)
     {
+        ServerReadCount++;
         if (ServerRecordsError is not null)
         {
             return Task.FromResult(

@@ -601,6 +601,90 @@ public sealed class RegistrySyncEngineExecuteTests
         Assert.False(environments.Local.ContainsKey("Theirs"));
     }
 
+    //D2's start-up pull: what was added or changed on the server comes, a record deleted on the server stays here and
+    //in the state until the manual sync
+    [Fact]
+    public async Task Execute_WhenPullDeletesAreNotIncluded_TakesAddsAndUpdatesButKeepsRecordsDeletedOnServer()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        _context.AddSyncedRecord(environments, "Changed", "old", 3);
+        environments.Server["Changed"] = new FakeContract("Changed", "new", 4);
+        _context.AddSyncedRecord(environments, "Gone", "g", 2);
+        environments.Server.Remove("Gone");
+        environments.Server["Added"] = new FakeContract("Added", "a", 1);
+        RegistrySyncEngine sut = _context.CreateEngine(environments);
+
+        // Act
+        RegistrySyncReport result = await RegistrySyncTestContext.PlanAndExecute(sut,
+            new RegistrySyncSelection { IncludePulls = true, IncludePullDeletes = false });
+
+        // Assert
+        Assert.Equal(["ApplyLocal Environments/Added", "ApplyLocal Environments/Changed"], _context.Calls);
+        Assert.Equal("new", environments.Local["Changed"]);
+        Assert.Equal("g", environments.Local["Gone"]);
+        Assert.Equal(ERegistrySyncOutcome.NotSelected,
+            RegistrySyncTestContext.ReportItem(result, Environments, "Gone").Outcome);
+        Assert.Equal(2, _context.State.Collections[Environments].Records["Gone"].Version);
+    }
+
+    //the state belongs to the server whose plan was executed (D2): the address is a change of the state, so it is saved
+    //even when every record is in sync
+    [Fact]
+    public async Task Execute_WhenEngineHasServerAddress_WritesItIntoTheStateAndSaves()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        _context.AddSyncedRecord(environments, "Dev", "d", 3);
+        _context.State.ServerAddress = "http://old.example.test/api/v1";
+        RegistrySyncEngine sut = CreateEngineWithServerAddress("http://sts.example.test/api/v1", environments);
+
+        // Act
+        RegistrySyncReport result =
+            await RegistrySyncTestContext.PlanAndExecute(sut, RegistrySyncSelection.AllNonConflicting);
+
+        // Assert
+        Assert.Equal("http://sts.example.test/api/v1", _context.State.ServerAddress);
+        Assert.True(result.Changed);
+        Assert.True(result.Saved);
+        _context.VerifySaved(Times.Once());
+    }
+
+    [Fact]
+    public async Task Execute_WhenServerAddressIsAlreadyStored_DoesNotSaveForIt()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        _context.AddSyncedRecord(environments, "Dev", "d", 3);
+        _context.State.ServerAddress = "http://sts.example.test/api/v1";
+        RegistrySyncEngine sut = CreateEngineWithServerAddress("http://sts.example.test/api/v1", environments);
+
+        // Act
+        RegistrySyncReport result =
+            await RegistrySyncTestContext.PlanAndExecute(sut, RegistrySyncSelection.AllNonConflicting);
+
+        // Assert
+        Assert.False(result.Changed);
+        _context.VerifySaved(Times.Never());
+    }
+
+    [Fact]
+    public async Task Execute_WhenEngineHasNoServerAddress_KeepsTheStoredOne()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter environments = _context.CreateAdapter(Environments, 1);
+        environments.Local["Dev"] = "d";
+        _context.State.ServerAddress = "http://sts.example.test/api/v1";
+        RegistrySyncEngine sut = _context.CreateEngine(environments);
+
+        // Act
+        await RegistrySyncTestContext.PlanAndExecute(sut, RegistrySyncSelection.AllNonConflicting);
+
+        // Assert
+        Assert.Equal("http://sts.example.test/api/v1", _context.State.ServerAddress);
+        _context.VerifySaved(Times.Once());
+    }
+
     [Theory]
     [InlineData(ERegistrySyncConflict.BothChanged, ERegistryConflictResolution.Local, "Upsert Environments/Dev/4")]
     [InlineData(ERegistrySyncConflict.BothChanged, ERegistryConflictResolution.Server, "ApplyLocal Environments/Dev")]
@@ -833,5 +917,12 @@ public sealed class RegistrySyncEngineExecuteTests
         {
             adapter.Server.Remove("Dev");
         }
+    }
+
+    private RegistrySyncEngine CreateEngineWithServerAddress(string serverAddress,
+        params IRegistrySyncAdapter[] adapters)
+    {
+        return new RegistrySyncEngine(adapters, _context.ParametersManager.Object,
+            new FixedTimeProvider(RegistrySyncTestContext.Now)) { ServerAddress = serverAddress };
     }
 }

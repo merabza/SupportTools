@@ -24,10 +24,10 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommand : CliMenuCommand
     private static readonly string[] ConsumerSearchPatterns = ["*.csproj", "*.props", "*.targets"];
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public RemoveUnusedPackageVersionsCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
+    public RemoveUnusedPackageVersionsCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
         MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

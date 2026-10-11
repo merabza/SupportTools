@@ -11,11 +11,11 @@ public sealed class BuildPackageCliMenuCommand : CliMenuCommand
     public const string MenuCommandName = "Build Package";
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public BuildPackageCliMenuCommand(ILogger logger, ParametersManager parametersManager, string projectName) : base(
+    public BuildPackageCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName) : base(
         MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _logger = logger;

@@ -13,6 +13,11 @@ public sealed class RegistrySyncStateModel
     //ბოლო სინქრონიზაციის დრო, რომელმაც ლოკალური მონაცემი ან მდგომარეობა შეცვალა
     public DateTime? LastSyncUtc { get; set; }
 
+    //SupportToolsServer-ის მისამართი, რომლის ვერსიებსაც მდგომარეობა ინახავს. მას სინქრონიზაციის ყოველი შესრულება
+    //წერს. ავტომატური სინქრონიზაცია (D2) სხვა მისამართის სერვერთან არ მუშაობს: ცარიელ ან სხვა სერვერთან ძველი
+    //მდგომარეობა ლოკალური ჩანაწერების წაშლას დაგეგმავდა. null — ჯერ არ ჩაწერილა (ძველი ფაილი)
+    public string? ServerAddress { get; set; }
+
     //კოლექციის სახელი (ადაპტერის CollectionName) → კოლექციის მდგომარეობა
     public Dictionary<string, RegistryCollectionSyncStateModel> Collections { get; } =
         new(StringComparer.OrdinalIgnoreCase);

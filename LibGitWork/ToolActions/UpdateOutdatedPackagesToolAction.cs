@@ -18,10 +18,10 @@ namespace LibGitWork.ToolActions;
 public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 {
     private readonly ILogger? _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly UpdateOutdatedPackagesParameters _updateOutdatedPackagesParameters;
 
-    private UpdateOutdatedPackagesToolAction(ILogger? logger, ParametersManager parametersManager,
+    private UpdateOutdatedPackagesToolAction(ILogger? logger, IParametersManager parametersManager,
         UpdateOutdatedPackagesParameters updateOutdatedPackagesParameters, bool useConsole) : base(logger,
         "Update Outdated Packages", null, null, useConsole)
     {
@@ -30,7 +30,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         _updateOutdatedPackagesParameters = updateOutdatedPackagesParameters;
     }
 
-    public static UpdateOutdatedPackagesToolAction Create(ILogger logger, ParametersManager parametersManager,
+    public static UpdateOutdatedPackagesToolAction Create(ILogger logger, IParametersManager parametersManager,
         string? projectGroupName, string? projectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;

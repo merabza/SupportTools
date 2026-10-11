@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibParameters;
+using SupportTools.AutoSync;
 using SupportTools.Menu.SyncRegistry;
 using SupportTools.Tests.Registry.Adapters;
 using SupportTools.Tests.Registry.Mappers;
@@ -328,6 +329,56 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         Assert.Equal(["ApplyLocal Environments/Test"], _sync.Calls);
         Assert.Contains("Sync result: done 1, not selected 1", ConsoleLines());
         Assert.DoesNotContain("Sending", ConsoleText(), StringComparison.Ordinal);
+    }
+
+    //the command chooses what to send: with auto-sync on, its saves go past the decorator and push nothing (D2)
+    [Fact]
+    public async Task RunBody_WhenGivenTheAutoSyncDecorator_SavesWithoutAutoPush()
+    {
+        // Arrange
+        _sync.Parameters.AutoSyncWithSupportToolsServer = true;
+        _environments.Local["Dev"] = "d";
+        _environments.Server["Test"] = new FakeContract("Test", "t", 1);
+        var autoSync = new RegistryAutoSync(new Mock<ILogger>().Object, _httpClientFactory.Object,
+            _sync.ParametersManager.Object, (_, _, _, _) => _adapters);
+        var decorator = new AutoSyncParametersManager(_sync.ParametersManager.Object, autoSync);
+
+        // Act
+        bool result = await Run(decorator, "Pull only");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["ApplyLocal Environments/Test"], _sync.Calls);
+        _sync.VerifySaved(Times.Once());
+    }
+
+    //the state belongs to the server of the executed sync: auto-sync (D2) works only with that server
+    [Fact]
+    public async Task RunBody_WhenSyncIsExecuted_RecordsTheServerAddressInTheState()
+    {
+        // Arrange
+        _environments.Local["Dev"] = "d";
+        _sync.State.ServerAddress = "http://old.example.test/api/v1";
+
+        // Act
+        await Run("Apply");
+
+        // Assert
+        Assert.Equal(FakeSupportToolsServer.Address, _sync.State.ServerAddress);
+    }
+
+    [Fact]
+    public async Task RunBody_WhenCanceled_KeepsTheRecordedServerAddress()
+    {
+        // Arrange
+        _environments.Local["Dev"] = "d";
+        _sync.State.ServerAddress = "http://old.example.test/api/v1";
+
+        // Act
+        await Run("Cancel");
+
+        // Assert
+        Assert.Equal("http://old.example.test/api/v1", _sync.State.ServerAddress);
     }
 
     [Fact]
@@ -1141,7 +1192,12 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         _environments.Server[key] = new FakeContract(key, "theirs", 4);
     }
 
-    private async Task<bool> Run(params string[] answers)
+    private Task<bool> Run(params string[] answers)
+    {
+        return Run(_sync.ParametersManager.Object, answers);
+    }
+
+    private async Task<bool> Run(IParametersManager parametersManager, params string[] answers)
     {
         foreach (string answer in answers)
         {
@@ -1149,7 +1205,7 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         }
 
         var sut = new SyncRegistryCliMenuCommand(new Mock<ILogger>().Object, _httpClientFactory.Object,
-            _sync.ParametersManager.Object, InputIdFromMenuList, (_, _, _, _) => _adapters);
+            parametersManager, InputIdFromMenuList, (_, _, _, _) => _adapters);
         bool result = await CliMenuTestAccess.InvokeRunBody(sut);
         Assert.Empty(_answers);
         return result;

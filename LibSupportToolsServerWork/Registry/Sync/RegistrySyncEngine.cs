@@ -37,13 +37,16 @@ public sealed class RegistrySyncEngine
         _timeProvider = timeProvider;
     }
 
+    //SupportToolsServer-ის მისამართი, რომელსაც Execute მდგომარეობაში წერს (RegistrySyncStateModel.ServerAddress).
+    //null — მისამართი არ იწერება
+    public string? ServerAddress { get; init; }
+
     //გეგმა ყველა ადაპტერზე. თუ რომელიმე ადაპტერმა სერვერის ჩანაწერები ვერ წაიკითხა, მის შეცდომას უცვლელად აბრუნებს
     //(მაგ. ApiRequestFailed, როცა სერვერი მიუწვდომელია). გეგმის აგება არაფერს ცვლის
     public async Task<Result<RegistrySyncPlan>> CreatePlan(CancellationToken cancellationToken = default)
     {
         List<RegistryCollectionSnapshot> collections = [];
-        foreach (IRegistrySyncAdapter adapter in _adapters.Values.OrderBy(x => x.Order)
-                     .ThenBy(x => x.CollectionName, StringComparer.OrdinalIgnoreCase))
+        foreach (IRegistrySyncAdapter adapter in GetOrderedAdapters())
         {
             Result<RegistryCollectionSnapshot> collection = await CreateSnapshot(adapter, cancellationToken);
             if (collection.IsFailure)
@@ -62,14 +65,61 @@ public sealed class RegistrySyncEngine
     public Task<RegistrySyncReport> Execute(RegistrySyncPlan plan, RegistrySyncSelection selection,
         Action<RegistrySyncProgress>? progress = null, CancellationToken cancellationToken = default)
     {
-        var executor = new RegistrySyncExecutor(_adapters, _parametersManager, _timeProvider);
+        var executor = new RegistrySyncExecutor(_adapters, _parametersManager, _timeProvider, ServerAddress);
         return executor.Execute(plan, selection, progress, cancellationToken);
+    }
+
+    //ლოკალური ცვლილებები ბოლო სინქრონიზაციის შემდეგ, სერვერის გარეშე (D2-ის Push შენახვის შემდეგ: ცვლილება რომ არ
+    //არის, სერვერს არაფერი ეკითხება). ცვლილებაა ჩანაწერი, რომლის ჰეშიც მდგომარეობისას არ ემთხვევა ან მდგომარეობაში არ
+    //არის (Hash — ახალი ჰეში), და მდგომარეობის ჩანაწერი, რომელიც ლოკალურად აღარ არის (Hash null). გამორიცხული
+    //ჩანაწერები და ფაილების კოლექციის დაკარგული ფაილები (ისინი სერვერიდან ჩამოდის) ცვლილება არ არის. ცარიელი სიისას
+    //დამგეგმავი Push-ს ვერ დაგეგმავს. შეცდომები CreatePlan-ისაა (DuplicateKeys, NormalizationIsNotStable)
+    public Result<List<RegistrySyncLocalChange>> GetLocalChanges()
+    {
+        RegistrySyncStateModel state = ((SupportToolsParameters)_parametersManager.Parameters).RegistrySyncState;
+        List<RegistrySyncLocalChange> changes = [];
+        foreach (IRegistrySyncAdapter adapter in GetOrderedAdapters())
+        {
+            Result<Dictionary<string, RegistrySyncRecord>> localRecords = CreateRecords(adapter, LocalSide,
+                adapter.GetLocalRecords().Select(x => (x.Key, x.Value, 0)));
+            if (localRecords.IsFailure)
+            {
+                return Result.Failure<List<RegistrySyncLocalChange>>(localRecords.Error);
+            }
+
+            if (!state.Collections.TryGetValue(adapter.CollectionName,
+                    out RegistryCollectionSyncStateModel? collectionState))
+            {
+                collectionState = new RegistryCollectionSyncStateModel();
+            }
+
+            HashSet<string> missingLocalKeys = new(
+                adapter is IRegistryFileSyncAdapter fileAdapter ? fileAdapter.GetMissingLocalKeys() : [],
+                StringComparer.OrdinalIgnoreCase);
+            changes.AddRange(localRecords.Value
+                .Where(x => !collectionState.Records.TryGetValue(x.Key,
+                                out RegistryRecordSyncStateModel? recordState) || recordState.Hash != x.Value.Hash)
+                .Select(x => new RegistrySyncLocalChange(adapter.CollectionName, x.Key, x.Value.Hash))
+                .Concat(collectionState.Records.Keys
+                    .Where(x => !localRecords.Value.ContainsKey(x) && !missingLocalKeys.Contains(x))
+                    .Select(x => new RegistrySyncLocalChange(adapter.CollectionName, x, null)))
+                .Where(x => !collectionState.ExcludedKeys.Contains(x.Key))
+                .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase));
+        }
+
+        return changes;
     }
 
     //რას შეასრულებს Execute ამ გეგმიდან ამ არჩევანით, შესრულების რიგით. არაფერს ცვლის და არაფერს იძახებს (Dry run)
     public static RegistrySyncOperations GetOperations(RegistrySyncPlan plan, RegistrySyncSelection selection)
     {
         return RegistrySyncExecutor.GetOperations(plan, selection);
+    }
+
+    //ადაპტერები დამოკიდებულების რიგით (Order), შემდეგ კოლექციის სახელით
+    private IOrderedEnumerable<IRegistrySyncAdapter> GetOrderedAdapters()
+    {
+        return _adapters.Values.OrderBy(x => x.Order).ThenBy(x => x.CollectionName, StringComparer.OrdinalIgnoreCase);
     }
 
     private static async Task<Result<RegistryCollectionSnapshot>> CreateSnapshot(IRegistrySyncAdapter adapter,

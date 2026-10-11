@@ -23,10 +23,10 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
     public const string MenuCommandName = "Reverse Package Distribution";
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public ReversePackageDistributionCliMenuCommand(ILogger logger, ParametersManager parametersManager) : base(
+    public ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager) : base(
         MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

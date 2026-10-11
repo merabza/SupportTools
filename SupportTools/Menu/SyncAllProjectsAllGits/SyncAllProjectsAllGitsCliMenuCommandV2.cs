@@ -12,10 +12,10 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV2 : CliMenuCommand
     public const string MenuCommandName = "Sync All Projects All Gits V2";
 
     private readonly ILogger _logger;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncAllProjectsAllGitsCliMenuCommandV2(ILogger logger, ParametersManager parametersManager) : base(
+    public SyncAllProjectsAllGitsCliMenuCommandV2(ILogger logger, IParametersManager parametersManager) : base(
         MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;

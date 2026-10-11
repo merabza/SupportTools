@@ -360,8 +360,8 @@ internal sealed class RegistrySyncSession
     }
 
     //კონფლიქტის ჩანაწერს სახე ყოველთვის აქვს, ამიტომ ბოლო შემთხვევა FirstSyncDiffers-ია. DeleteNeedsConfirmation-ის
-    //ჩანაწერი ერთ მხარეს აკლია: ის მხარე, სადაც წაიშალა
-    private static string DescribeConflict(RegistrySyncPlanItem item)
+    //ჩანაწერი ერთ მხარეს აკლია: ის მხარე, სადაც წაიშალა. ავტომატური სინქრონიზაციაც (D2) ამ აღწერას აჩვენებს
+    internal static string DescribeConflict(RegistrySyncPlanItem item)
     {
         return item.Conflict switch
         {

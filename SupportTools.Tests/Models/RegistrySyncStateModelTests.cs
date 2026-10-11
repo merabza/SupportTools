@@ -30,7 +30,11 @@ public sealed class RegistrySyncStateModelTests : IDisposable
         // Arrange
         var parameters = new SupportToolsParameters
         {
-            RegistrySyncState = { LastSyncUtc = new DateTime(2026, 10, 2, 12, 30, 15, DateTimeKind.Utc) }
+            RegistrySyncState =
+            {
+                LastSyncUtc = new DateTime(2026, 10, 2, 12, 30, 15, DateTimeKind.Utc),
+                ServerAddress = "http://sts.example.test/api/v1"
+            }
         };
         RegistryCollectionSyncStateModel environments = parameters.RegistrySyncState.GetOrAddCollection("Environments");
         environments.Records["Dev"] = new RegistryRecordSyncStateModel { Version = 3, Hash = "ABC" };
@@ -45,6 +49,7 @@ public sealed class RegistrySyncStateModelTests : IDisposable
         RegistrySyncStateModel state = loaded.RegistrySyncState;
         Assert.Equal(new DateTime(2026, 10, 2, 12, 30, 15, DateTimeKind.Utc), state.LastSyncUtc);
         Assert.Equal(DateTimeKind.Utc, state.LastSyncUtc?.Kind);
+        Assert.Equal("http://sts.example.test/api/v1", state.ServerAddress);
         RegistryCollectionSyncStateModel loadedEnvironments = Assert.Single(state.Collections).Value;
         RegistryRecordSyncStateModel record = Assert.Single(loadedEnvironments.Records).Value;
         Assert.Equal(3, record.Version);

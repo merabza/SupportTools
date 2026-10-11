@@ -11,7 +11,7 @@ public class RemoveUnusedPackageVersionsCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        var parametersManager1 = (ParametersManager)parametersManager;
+        var parametersManager1 = parametersManager;
         return new RemoveUnusedPackageVersionsCliMenuCommand(logger, parametersManager1);
     }
 }

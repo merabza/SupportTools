@@ -6,11 +6,11 @@ namespace SupportTools.CliMenuCommands;
 public sealed class NpmPackageInProjectSubMenuCliMenuCommand : CliMenuCommand
 {
     private readonly string _npmPackageName;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public NpmPackageInProjectSubMenuCliMenuCommand(ParametersManager parametersManager, string projectName,
+    public NpmPackageInProjectSubMenuCliMenuCommand(IParametersManager parametersManager, string projectName,
         string npmPackageName) : base(npmPackageName, EMenuAction.LoadSubMenu)
     {
         _parametersManager = parametersManager;

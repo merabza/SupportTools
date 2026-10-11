@@ -14,10 +14,10 @@ public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
 
     private readonly ILogger _logger;
     private readonly SupportToolsMenuParameters _menuParameters;
-    private readonly ParametersManager _parametersManager;
+    private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckAllProjectsBuildCliMenuCommand(ILogger logger, string appName, ParametersManager parametersManager,
+    public CheckAllProjectsBuildCliMenuCommand(ILogger logger, string appName, IParametersManager parametersManager,
         SupportToolsMenuParameters menuParameters) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null,
         true)
     {

@@ -13,6 +13,7 @@ using LibSupportToolsServerWork.Registry.Sync;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibParameters;
+using SupportTools.AutoSync;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
@@ -28,7 +29,8 @@ namespace SupportTools.Menu.SyncRegistry;
 //   სახელი, მისამართი და, 401-ისას, რჩევა ApiKey-ის შესამოწმებლად;
 //2. წინასწარი შემოწმება: ლოკალური გასაღებები, რომლებიც მხოლოდ რეგისტრით განსხვავდება, სინქრონიზაციას აჩერებს
 //   (RegistrySyncPreflight);
-//3. გეგმა, არჩევანი და შესრულება: RegistrySyncSession.
+//3. გეგმა, არჩევანი და შესრულება: RegistrySyncSession. შესრულება მდგომარეობაში სერვერის მისამართს წერს, ბრძანების
+//   შენახვები კი ავტომატურ Push-ს არ იწვევს (D2).
 //შესრულების შემდეგ მენიუ თავიდან იგება (Reload), რომ ჩამოტანილი პროექტები და სხვა ჩანაწერები მენიუშიც გამოჩნდეს
 public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
 {
@@ -68,8 +70,9 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        SupportToolsServerApiClient? apiClient = await Connect(parameters, cancellationToken);
-        if (apiClient is null)
+        (SupportToolsServerApiClient ApiClient, string ServerAddress)? connection =
+            await Connect(parameters, cancellationToken);
+        if (connection is null)
         {
             return false;
         }
@@ -89,18 +92,24 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
 
         var warnings = new RegistrySyncWarnings();
         var pathMapper = new PathMapper(parameters.PathMappings);
-        var engine = new RegistrySyncEngine(_createAdapters(apiClient, parameters, pathMapper, warnings),
-            _parametersManager);
-        var session = new RegistrySyncSession(engine, warnings, pathMapper, _parametersManager, _inputIdFromMenuList,
+        //ბრძანება თვითონ ირჩევს, რა გაიგზავნოს, ამიტომ მისი შენახვები ავტომატურ Push-ს (D2) არ იწვევს
+        IParametersManager parametersManager = AutoSyncParametersManager.WithoutAutoSync(_parametersManager);
+        var engine = new RegistrySyncEngine(
+            _createAdapters(connection.Value.ApiClient, parameters, pathMapper, warnings), parametersManager)
+        {
+            //მდგომარეობა ამ სერვერისაა: ავტომატური სინქრონიზაცია მხოლოდ მასთან მუშაობს
+            ServerAddress = connection.Value.ServerAddress
+        };
+        var session = new RegistrySyncSession(engine, warnings, pathMapper, parametersManager, _inputIdFromMenuList,
             _logger);
         return await session.Run(cancellationToken);
     }
 
     //SupportToolsServer-ის ApiClient და კავშირის შემოწმება მსუბუქი მოთხოვნით. კლიენტი კონსოლის გარეშე იქმნება:
     //შეცდომისას ის მოთხოვნის ტანს არ ბეჭდავს (ტანში საიდუმლოები და შაბლონების შიგთავსია), შეცდომებს ბრძანება თვითონ
-    //აჩვენებს. ApiKey არსად იბეჭდება
-    private async Task<SupportToolsServerApiClient?> Connect(SupportToolsParameters parameters,
-        CancellationToken cancellationToken)
+    //აჩვენებს. ApiKey არსად იბეჭდება. ბრუნდება კლიენტი და სერვერის მისამართი
+    private async Task<(SupportToolsServerApiClient ApiClient, string ServerAddress)?> Connect(
+        SupportToolsParameters parameters, CancellationToken cancellationToken)
     {
         string? apiClientName = parameters.SupportToolsServerWebApiClientName;
         if (string.IsNullOrWhiteSpace(apiClientName))
@@ -129,7 +138,7 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
         Result<List<StsEnvironmentDataModel>> connectionCheck = await apiClient.GetEnvironments(cancellationToken);
         if (connectionCheck.IsSuccess)
         {
-            return apiClient;
+            return (apiClient, server);
         }
 
         WriteConnectionError(apiClientName, server, connectionCheck.Error);
