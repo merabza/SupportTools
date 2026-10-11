@@ -1,0 +1,69 @@
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using LibGitWork.ToolActions;
+using Microsoft.Extensions.Logging;
+using ParametersManagement.LibParameters;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
+using SupportToolsData.Models;
+
+namespace SupportTools.Menu.DistributeAllPackages;
+
+//ნაბიჯები ნამდვილი ბრძანებებით: Sync ... Gits V2, ProjectBuildChecker, PackageSolutionChecker, PackageBuilder და
+//PackageDistributor, ისევე როგორც პროექტის მენიუს ცალკეული ბრძანებები
+internal sealed class PackageDistributionSteps : IPackageDistributionSteps
+{
+    private readonly string _appName;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
+    private readonly SupportToolsMenuParameters _menuParameters;
+    private readonly IParametersManager _parametersManager;
+
+    // ReSharper disable once ConvertToPrimaryConstructor
+    public PackageDistributionSteps(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters)
+    {
+        _logger = logger;
+        _appName = appName;
+        _httpClientFactory = httpClientFactory;
+        _parametersManager = parametersManager;
+        _menuParameters = menuParameters;
+    }
+
+    public async Task<bool> SyncProjectGits(string projectName, CancellationToken cancellationToken)
+    {
+        var syncProjectGitsToolAction =
+            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
+        return await syncProjectGitsToolAction.Run(cancellationToken);
+    }
+
+    //შედეგი ჩაიწერება მენიუს პარამეტრებში, ისევე როგორც Check ... build-ის ბრძანებებში
+    public ProjectBuildCheckResult? CheckBuild(string projectName, ProjectModel project, bool noIncremental,
+        CancellationToken cancellationToken)
+    {
+        ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(projectName, project)],
+            _menuParameters, _logger, noIncremental, cancellationToken);
+        return _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
+    }
+
+    public bool CheckPackageSolution(string projectName)
+    {
+        var packageSolutionChecker = new PackageSolutionChecker(_logger, _parametersManager, projectName);
+        return packageSolutionChecker.CheckPackageSolution();
+    }
+
+    public bool BuildAndUploadPackage(string projectName)
+    {
+        var packageBuilder = new PackageBuilder(_logger, _parametersManager, projectName);
+        return packageBuilder.BuildAndUploadPackage();
+    }
+
+    public Task<bool> DistributePackage(string projectName, CancellationToken cancellationToken)
+    {
+        var packageDistributor = new PackageDistributor(_logger, _httpClientFactory, _parametersManager, projectName);
+        return packageDistributor.DistributePackage(cancellationToken);
+    }
+}

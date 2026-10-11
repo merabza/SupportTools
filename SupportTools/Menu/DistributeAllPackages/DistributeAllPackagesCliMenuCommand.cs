@@ -5,12 +5,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
-using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -21,31 +17,29 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Distribute all packages";
 
-    private readonly string _appName;
-    private readonly IHttpClientFactory _httpClientFactory;
     private readonly Func<string, bool, bool> _inputBool;
     private readonly ILogger _logger;
-    private readonly SupportToolsMenuParameters _menuParameters;
     private readonly IParametersManager _parametersManager;
+    private readonly IPackageDistributionSteps _steps;
 
     public DistributeAllPackagesCliMenuCommand(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : this(logger, appName,
-        httpClientFactory, parametersManager, menuParameters, RemoteOnlyProjects.InputBoolFromConsole)
+        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters) : this(logger,
+        parametersManager, RemoteOnlyProjects.InputBoolFromConsole,
+        new PackageDistributionSteps(logger, appName, httpClientFactory, parametersManager, menuParameters))
     {
     }
 
-    //კონსოლიდან შეყვანა პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხი თვითონ მიაწოდონ
+    //კონსოლიდან შეყვანა და გარე ნაბიჯები (git, dotnet, პაკეტების სერვერი) პარამეტრებადაა გამოტანილი,
+    //რომ ტესტებმა ისინი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
-    internal DistributeAllPackagesCliMenuCommand(ILogger logger, string appName, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters,
-        Func<string, bool, bool> inputBool) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
+    internal DistributeAllPackagesCliMenuCommand(ILogger logger, IParametersManager parametersManager,
+        Func<string, bool, bool> inputBool, IPackageDistributionSteps steps) : base(MenuCommandName,
+        EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
-        _appName = appName;
-        _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
-        _menuParameters = menuParameters;
         _inputBool = inputBool;
+        _steps = steps;
     }
 
     protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
@@ -126,17 +120,14 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         CancellationToken cancellationToken)
     {
         //გიტების სინქრონიზაცია
-        if (!await SyncProjectGits(projectName, cancellationToken))
+        if (!await _steps.SyncProjectGits(projectName, cancellationToken))
         {
             StShared.WriteErrorLine($"Sync gits failed for project {projectName}", true, _logger);
             return false;
         }
 
         //პროექტის build-ის შემოწმება (ინკრემენტული, კითხვის გარეშე). გაფრთხილებებით აგებული პროექტის გავრცელება არ ჩერდება
-        ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(projectName, project)],
-            _menuParameters, _logger, false, cancellationToken);
-        ProjectBuildCheckResult? buildCheckResult =
-            _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
+        ProjectBuildCheckResult? buildCheckResult = _steps.CheckBuild(projectName, project, false, cancellationToken);
         if (buildCheckResult is null || !buildCheckResult.IsBuildSucceeded)
         {
             StShared.WriteErrorLine(
@@ -146,44 +137,34 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         }
 
         //პაკეტის სოლუშენის შემოწმება
-        var packageSolutionChecker = new PackageSolutionChecker(_logger, _parametersManager, projectName);
-        if (!packageSolutionChecker.CheckPackageSolution())
+        if (!_steps.CheckPackageSolution(projectName))
         {
             StShared.WriteErrorLine($"Package solution check failed for project {projectName}", true, _logger);
             return false;
         }
 
         //პაკეტის დაბილდვა და ატვირთვა package manager-ზე
-        var packageBuilder = new PackageBuilder(_logger, _parametersManager, projectName);
-        if (!packageBuilder.BuildAndUploadPackage())
+        if (!_steps.BuildAndUploadPackage(projectName))
         {
             StShared.WriteErrorLine($"Build package failed for project {projectName}", true, _logger);
             return false;
         }
 
         //პაკეტის გავრცელება ყველა მომხმარებელ პროექტში
-        var packageDistributor = new PackageDistributor(_logger, _httpClientFactory, _parametersManager, projectName);
-        if (!await packageDistributor.DistributePackage(cancellationToken))
+        if (!await _steps.DistributePackage(projectName, cancellationToken))
         {
             StShared.WriteErrorLine($"Package distribution failed for project {projectName}", true, _logger);
             return false;
         }
 
         //გიტების ხელახალი სინქრონიზაცია
-        if (!await SyncProjectGits(projectName, cancellationToken))
+        if (!await _steps.SyncProjectGits(projectName, cancellationToken))
         {
             StShared.WriteErrorLine($"Final sync gits failed for project {projectName}", true, _logger);
             return false;
         }
 
         return true;
-    }
-
-    private async Task<bool> SyncProjectGits(string projectName, CancellationToken cancellationToken)
-    {
-        var syncProjectGitsToolAction =
-            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
-        return await syncProjectGitsToolAction.Run(cancellationToken);
     }
 
     //Kahn-ის ალგორითმი: პაკეტი დამოკიდებულია იმ პაკეტებზე, რომელთა რეპოზიტორიებიც მის გიტების სიაშია
