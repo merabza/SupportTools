@@ -62,7 +62,7 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         _server.Dispose();
     }
 
-    //the server records also change through other commands (Sync .gitignore files, uploading gits)
+    //the server records also change through other commands (the registry sync, other computers)
     [Fact]
     public void GetListMenu_WhenServerChangedSinceThePreviousList_ListsTheCurrentServerRecords()
     {
@@ -107,25 +107,115 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         Assert.Equal([ListRequest], _server.Requests.Select(x => x.Request));
     }
 
+    //the version check reads the list before the write (D4): a new name must not be on the server yet
     [Fact]
-    public async Task UpdateRecordWithKey_WhenCalled_SendsTheNameAndReloadsTheList()
+    public async Task AddRecordWithKey_WhenCalled_SendsTheNameAndReloadsTheList()
     {
         // Arrange
         GitIgnoreFileTypesStsCruder sut = CreateSut();
         sut.GetListMenu();
+        _server.RespondOnce(ListRequest, HttpStatusCode.OK, ServerListJson(Type("CSharp")));
         ServerLists("CSharp", "React");
 
         // Act
-        await sut.UpdateRecordWithKey("React", new TextItemData { Text = "React" });
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "React", new TextItemData { Text = "React" });
 
         // Assert
         Assert.True(sut.ContainsRecordWithKey("React"));
-        Assert.Equal([ListRequest, "POST /api/v1/git/updategitignorefiletype/React", ListRequest],
+        Assert.Equal([ListRequest, ListRequest, "POST /api/v1/git/updategitignorefiletype/React", ListRequest],
             _server.Requests.Select(x => x.Request));
     }
 
     [Fact]
+    public async Task UpdateRecordWithKey_WhenTheServerVersionIsTheListedOne_SendsTheName()
+    {
+        // Arrange
+        ServerListsTypes(Type("CSharp", 2));
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+
+        // Act
+        await sut.UpdateRecordWithKey("CSharp", new TextItemData { Text = "CSharp" });
+
+        // Assert
+        Assert.Equal([ListRequest, ListRequest, "POST /api/v1/git/updategitignorefiletype/CSharp"],
+            _server.Requests.Select(x => x.Request));
+    }
+
+    //another computer (or a registry sync) changed the type after the list was loaded
+    [Fact]
+    public async Task UpdateRecordWithKey_WhenServerVersionChangedSinceTheList_SendsNothingAndReportsTheConflict()
+    {
+        // Arrange
+        ServerListsTypes(Type("CSharp", 2));
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerListsTypes(Type("CSharp", 3));
+
+        // Act
+        await sut.UpdateRecordWithKey("CSharp", new TextItemData { Text = "CSharp" });
+
+        // Assert
+        Assert.Equal([ListRequest, ListRequest], _server.Requests.Select(x => x.Request));
+        Assert.Contains("GitIgnoreFileType CSharp Version Conflict: Expected 2, Actual 3", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsOnTheServerAlready_SendsNothing()
+    {
+        // Arrange
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerListsTypes(Type("CSharp"), Type("React", 1));
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "React", new TextItemData { Text = "React" });
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        Assert.Contains("GitIgnoreFileType React Version Conflict: Expected 0, Actual 1", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    //a new type is checked against the server only: even a listed name with the listed version is refused
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsInTheLoadedList_SendsNothing()
+    {
+        // Arrange
+        ServerListsTypes(Type("CSharp", 2));
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "CSharp", new TextItemData { Text = "CSharp" });
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        Assert.Contains("GitIgnoreFileType CSharp Version Conflict: Expected 0, Actual 2", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task RemoveRecordWithKey_WhenCalled_DeletesTheNameAndReloadsTheList()
+    {
+        // Arrange
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        _server.RespondOnce(ListRequest, HttpStatusCode.OK, ServerListJson(Type("CSharp")));
+        ServerLists();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "CSharp");
+
+        // Assert
+        Assert.False(sut.ContainsRecordWithKey("CSharp"));
+        Assert.Equal([ListRequest, ListRequest, "DELETE /api/v1/git/deletegitignorefiletype/CSharp", ListRequest],
+            _server.Requests.Select(x => x.Request));
+    }
+
+    [Fact]
+    public async Task RemoveRecordWithKey_WhenTypeWasDeletedOnTheServerSinceTheList_DeletesNothing()
     {
         // Arrange
         GitIgnoreFileTypesStsCruder sut = CreateSut();
@@ -136,9 +226,9 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "CSharp");
 
         // Assert
-        Assert.False(sut.ContainsRecordWithKey("CSharp"));
-        Assert.Equal([ListRequest, "DELETE /api/v1/git/deletegitignorefiletype/CSharp", ListRequest],
-            _server.Requests.Select(x => x.Request));
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("DELETE", StringComparison.Ordinal));
+        Assert.Contains("GitIgnoreFileType With Name CSharp Not Found", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     //the list is built in GetSubMenu: an exception there would end the whole application
@@ -343,7 +433,7 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         // Assert
         Assert.True(result);
         Assert.Equal([
-            ListRequest, "DELETE /api/v1/git/deletegitignorefiletype/CSharp",
+            ListRequest, ListRequest, "DELETE /api/v1/git/deletegitignorefiletype/CSharp", ListRequest,
             "POST /api/v1/git/updategitignorefiletype/Python"
         ], _server.Requests.Select(x => x.Request));
     }
@@ -366,11 +456,25 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
 
     private void ServerLists(params string[] names)
     {
-        _server.Respond(ListRequest, HttpStatusCode.OK,
-            JsonSerializer.Serialize(names.Select(x => new StsGitIgnoreFileTypeDataModel
-            {
-                Id = Guid.NewGuid(), Name = x, Content = "bin/\r\n"
-            }).ToList()));
+        ServerListsTypes([.. names.Select(x => Type(x))]);
+    }
+
+    private void ServerListsTypes(params StsGitIgnoreFileTypeDataModel[] types)
+    {
+        _server.Respond(ListRequest, HttpStatusCode.OK, ServerListJson(types));
+    }
+
+    private static string ServerListJson(params StsGitIgnoreFileTypeDataModel[] types)
+    {
+        return JsonSerializer.Serialize(types.ToList());
+    }
+
+    private static StsGitIgnoreFileTypeDataModel Type(string name, int version = 0)
+    {
+        return new StsGitIgnoreFileTypeDataModel
+        {
+            Id = Guid.NewGuid(), Name = name, Content = "bin/\r\n", Version = version
+        };
     }
 
     private static List<string> ListedRecords(CliMenuSet listMenu)
@@ -382,9 +486,11 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         ];
     }
 
-    //remembers every request ("METHOD path" and body) and answers by "METHOD path" (200 without a body by default)
+    //remembers every request ("METHOD path" and body) and answers by "METHOD path" (200 without a body by default).
+    //A one-time answer comes before the lasting one, e.g. the list of the version check before the reloaded list
     private sealed class RoutingHttpMessageHandler : HttpMessageHandler
     {
+        private readonly Dictionary<string, Queue<(HttpStatusCode StatusCode, string Body)>> _onceResponses = [];
         private readonly Dictionary<string, (HttpStatusCode StatusCode, string Body)> _responses = [];
 
         public List<(string Request, string? Body)> Requests { get; } = [];
@@ -394,6 +500,17 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
             _responses[request] = (statusCode, body);
         }
 
+        public void RespondOnce(string request, HttpStatusCode statusCode, string body)
+        {
+            if (!_onceResponses.TryGetValue(request, out Queue<(HttpStatusCode StatusCode, string Body)>? queue))
+            {
+                queue = new Queue<(HttpStatusCode StatusCode, string Body)>();
+                _onceResponses[request] = queue;
+            }
+
+            queue.Enqueue((statusCode, body));
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
@@ -401,7 +518,9 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
             Requests.Add((key,
                 request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken)));
 
-            if (!_responses.TryGetValue(key, out (HttpStatusCode StatusCode, string Body) response))
+            if ((!_onceResponses.TryGetValue(key, out Queue<(HttpStatusCode StatusCode, string Body)>? queue) ||
+                 !queue.TryDequeue(out (HttpStatusCode StatusCode, string Body) response)) &&
+                !_responses.TryGetValue(key, out response))
             {
                 return new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = request };
             }

@@ -25,7 +25,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 |`LibDatabaseWork`|ბაზის სასიცოცხლო ციკლი: create, drop, migrate, correct|LibDotnetWork, SupportToolsData|
 |`LibCodeGenerator`|კოდის გენერაცია (API რაუტები, პროექტის არტიფაქტები)|LibGitWork, SupportToolsData|
 |`LibAppInstallWork`|Install/uninstall pipeline-ები (ლოკალური და მოშორებული)|LibDotnetWork, SupportToolsData|
-|`LibSupportToolsServerWork`|SupportToolsServer-ის რედაქტორები (`Support Tools Server Editor`), რომლებიც სერვერს `SupportToolsServerApiClient` კლიენტით მიმართავენ|LibDotnetWork, LibGitData, SupportToolsData|
+|`LibSupportToolsServerWork`|ცენტრალური რეესტრი: საერთო კოლექციების სინქრონიზაცია SupportToolsServer-თან (იხ. [რეესტრის ფენა](#რეესტრის-ფენა)); SupportToolsServer-ის რედაქტორები (`Support Tools Server Editor`); ყველაფერი სერვერის კლიენტით, `SupportToolsServerApiClient`|LibGitWork, SupportToolsData|
 |`LibAppProjectCreator`|პროექტის scaffolding შაბლონებიდან|LibAppInstallWork, LibGitWork, LibNpmWork|
 |`LibScaffoldSeeder`|Scaffold + seed კოდი არსებული ბაზებიდან|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, კონფიგურაცია, პარამეტრების მართვა|გარე: AppCliTools.CliTools, ParametersManagement.\*|
@@ -110,6 +110,40 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 
 \---
 
+## რეესტრის ფენა
+
+პარამეტრების ფაილის საერთო კოლექციები (პროექტები, სერვერები, git
+რეპოები, შაბლონები, API client-ები, …) SupportToolsServer-ზეც ინახება —
+ეს ცენტრალური რეესტრია, რომ ყველა კომპიუტერი ერთსა და იმავე მონაცემს
+ხედავდეს (იხ.
+[კონფიგურაცია](configuration.md#ცენტრალური-რეესტრი-supporttoolsserver)).
+სინქრონიზაცია `LibSupportToolsServerWork/Registry/`-შია:
+
+|ნაწილი|როლი|
+|-|-|
+|`Paths/`|`PathMapper`: კანონიკური გზები (Windows-ის, როგორც მთავარ კომპიუტერზე) ↔ ამ კომპიუტერის გზები, `PathMappings`-ით|
+|`Mappers/`|თითო სუფთა mapper-ი კოლექციაზე: ლოკალური მოდელი ↔ სერვერის კონტრაქტი (`Sts…DataModel`), კანონიკური გზებით და ჰეშისთვის ნორმალიზებული ფორმით|
+|`Adapters/`|თითო ადაპტერი კოლექციაზე (სულ 18): ლოკალურ და სერვერის ჩანაწერებს კითხულობს და ორივე მხარეს წერს. `RegistrySyncAdapterFactory` მათ აწყობს; `RegistryCollections` მათ სახელებს და რიგს ადგენს (მითითებული კოლექციები ჯერ, `Projects` ბოლოს)|
+|`Sync/`|ძრავა: `RegistrySyncPlanner` ყოველ ჩანაწერს ადარებს აქ, სერვერზე და ბოლო სინქრონიზაციისას (`RegistrySyncState`: სერვერის `Version` და ჰეში თითო ჩანაწერზე) და გეგმავს pull-ს, push-ს ან კონფლიქტს; `RegistrySyncEngine` არჩეულ ნაწილს ასრულებს და პარამეტრებს ერთხელ ინახავს|
+|`MachineLocalFields`|ველები, რომლებიც არასოდეს სინქრონიზდება|
+
+ძრავას UI არ აქვს. მას `SupportTools` პროექტი იყენებს:
+
+* `Menu/SyncRegistry/` — `Sync Registry With SupportToolsServer...` და
+მისი ერთკოლექციიანი მალსახმობები `Gits`-ისა და შაბლონების სიების
+მენიუებში;
+* `AutoSync/` — ჩამოტანა გაშვებისას და გაგზავნა ყოველი შენახვის შემდეგ:
+DI-ის `IParametersManager` დეკორატორია, `AutoSyncParametersManager`;
+* `Menu/ProjectGroupsList/ProjectsList/CloneProjectToThisComputer/` —
+`remote` პროექტი ამ კომპიუტერზე ჩამოაქვს.
+
+`LibSupportToolsServerWork`-შივეა `Support Tools Server Editor`, რომელიც
+სერვერის git რეპოებსა და შაბლონებს პირდაპირ არედაქტირებს (ყოველ
+ჩაწერამდე სერვერის `Version`-ს ამოწმებს), და `GitProjects/`, რომელიც იმ
+`GitProjects`-ს გარდაქმნის, რომლებსაც სერვერი თავისი კლონებიდან ითვლის.
+
+\---
+
 ## State
 
 ყველა მუდმივი state — პროექტები, ჯგუფები, server info-ები, allow-tool
@@ -117,7 +151,9 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 მოწოდებულია `ArgumentsAnalyzer`-ით (`--use` პარამეტრი), ფაილს კი
 ტვირთავს `ParametersService` (`--use`-ის გარეშე მიმდინარე და გამშვები
 ფაილის ფოლდერში ეძებს).
-იხ. [კონფიგურაცია](configuration.md).
+იხ. [კონფიგურაცია](configuration.md). ფაილის საერთო ნაწილი
+SupportToolsServer-ზეც ინახება (იხ. [რეესტრის ფენა](#რეესტრის-ფენა));
+ფაილი სამუშაო ასლად რჩება.
 
 \---
 

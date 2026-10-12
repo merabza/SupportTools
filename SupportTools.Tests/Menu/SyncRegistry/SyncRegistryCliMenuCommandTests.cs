@@ -21,6 +21,7 @@ using SupportTools.Menu.SyncRegistry;
 using SupportTools.Tests.Registry.Adapters;
 using SupportTools.Tests.Registry.Mappers;
 using SupportTools.Tests.Registry.Sync;
+using SupportToolsData.Models;
 using SystemTools.ApiContracts.Errors;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -572,21 +573,216 @@ public sealed class SyncRegistryCliMenuCommandTests : IDisposable
         Assert.Contains("Environments                   0     1         0       0        1", ConsoleLines());
     }
 
+    //nothing is left to sync, but the excluded record can be put back (D4): Finish records the state
     [Fact]
-    public async Task RunBody_WhenTheOnlyChangeIsExcluded_EndsWithoutAskingAgain()
+    public async Task RunBody_WhenTheOnlyChangeIsExcluded_OffersFinishAndTheWayBack()
     {
         // Arrange
         _environments.Local["Dev"] = "d";
 
         // Act
-        bool result = await Run("Exclude record from sync", "Environments/Dev");
+        bool result = await Run("Exclude record from sync", "Environments/Dev", "Finish");
 
         // Assert
         Assert.True(result);
-        Assert.Equal(2, _shownMenus.Count);
+        Assert.Equal(3, _shownMenus.Count);
+        Assert.Equal([
+            "Finish (nothing to send or to take)", "Include excluded record again (1 excluded on this computer)"
+        ], MenuLines(_shownMenus[2]));
         Assert.Empty(_sync.Calls);
         Assert.Contains("The local registry and SupportToolsServer are in sync", ConsoleText(),
             StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunBody_WhenAnExcludedRecordIsIncludedAgain_SavesAndPlansItAgain()
+    {
+        // Arrange
+        _environments.Local["Dev"] = "d";
+        _environments.Local["Prod"] = "p";
+        _sync.State.GetOrAddCollection(Environments).ExcludedKeys.Add("Dev");
+
+        // Act
+        bool result = await Run("Include excluded record again", "Environments/Dev", "Apply");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Environments/Dev (excluded on this computer)", "Back (include nothing)"],
+            MenuLines(_shownMenus[1]));
+        Assert.Equal(["action", "record to include", "action"], _questions);
+        Assert.Empty(_sync.State.Collections[Environments].ExcludedKeys);
+        _sync.ParametersManager.Verify(
+            x => x.Save(_sync.Parameters, "Environments/Dev is included in the registry sync on this computer again",
+                null, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(["Upsert Environments/Dev/0", "Upsert Environments/Prod/0"], _sync.Calls);
+    }
+
+    [Fact]
+    public async Task RunBody_WhenIncludingIsCanceled_KeepsTheExclusionAndSavesNothing()
+    {
+        // Arrange
+        _environments.Local["Prod"] = "p";
+        _sync.State.GetOrAddCollection(Environments).ExcludedKeys.Add("Dev");
+
+        // Act
+        bool result = await Run("Include excluded record again", "Back", "Cancel");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Dev"], _sync.State.Collections[Environments].ExcludedKeys);
+        _sync.VerifySaved(Times.Never());
+    }
+
+    [Fact]
+    public async Task RunBody_WhenIncludingIsNotSaved_StopsWithoutAskingAgain()
+    {
+        // Arrange
+        _sync.ParametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+            It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _environments.Local["Prod"] = "p";
+        _sync.State.GetOrAddCollection(Environments).ExcludedKeys.Add("Dev");
+
+        // Act
+        bool result = await Run("Include excluded record again", "Environments/Dev");
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(2, _shownMenus.Count);
+        Assert.Empty(_sync.Calls);
+    }
+
+    //the excluded records of the collections that are not synced now are not offered, and with none the choice
+    //is not offered either
+    [Fact]
+    public async Task RunBody_WhenOnlyAnotherCollectionHasExcludedRecords_DoesNotOfferThem()
+    {
+        // Arrange
+        _sync.State.GetOrAddCollection("Projects").ExcludedKeys.Add("AppA");
+        _environments.Local["Dev"] = "d";
+
+        // Act
+        bool result = await Run("Cancel");
+
+        // Assert
+        Assert.True(result);
+        Assert.DoesNotContain(MenuLines(Assert.Single(_shownMenus)),
+            x => x.StartsWith("Include excluded record again", StringComparison.Ordinal));
+    }
+
+    //the excluded records are offered by collection name, then by key
+    [Fact]
+    public async Task RunBody_WhenSeveralRecordsAreExcluded_OffersThemByCollectionAndKey()
+    {
+        // Arrange
+        AddAdapter(Servers, 100);
+        _environments.Local["Test"] = "t";
+        _sync.State.GetOrAddCollection(Servers).ExcludedKeys.Add("PAZISI");
+        RegistryCollectionSyncStateModel environments = _sync.State.GetOrAddCollection(Environments);
+        environments.ExcludedKeys.Add("Prod");
+        environments.ExcludedKeys.Add("Dev");
+
+        // Act
+        bool result = await Run("Include excluded record again", "Back", "Cancel");
+
+        // Assert
+        Assert.True(result);
+        Assert.Contains("Include excluded record again (3 excluded on this computer)", MenuLines(_shownMenus[0]));
+        Assert.Equal([
+            "Environments/Dev (excluded on this computer)", "Environments/Prod (excluded on this computer)",
+            "Servers/PAZISI (excluded on this computer)", "Back (include nothing)"
+        ], MenuLines(_shownMenus[1]));
+        Assert.Equal(2, environments.ExcludedKeys.Count);
+    }
+
+    //leaving the menu without an answer (the "-" key) includes nothing
+    [Fact]
+    public async Task RunBody_WhenTheIncludeMenuIsLeftWithoutAnAnswer_KeepsTheExclusion()
+    {
+        // Arrange
+        _environments.Local["Prod"] = "p";
+        _sync.State.GetOrAddCollection(Environments).ExcludedKeys.Add("Dev");
+
+        // Act
+        bool result = await Run("Include excluded record again", NoAnswer, "Cancel");
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Dev"], _sync.State.Collections[Environments].ExcludedKeys);
+        _sync.VerifySaved(Times.Never());
+    }
+
+    //the collection names of RegistryCollections are matched ignoring case
+    [Fact]
+    public async Task RunBody_WhenCreatedForOneCollectionSpelledInAnotherCase_SyncsThatCollection()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter servers = AddAdapter(Servers, 100);
+        servers.Local["PAZISI"] = "p";
+        _answers.Enqueue("Apply");
+        var sut = new SyncRegistryCliMenuCommand(new Mock<ILogger>().Object, _httpClientFactory.Object,
+            _sync.ParametersManager.Object, InputIdFromMenuList, (_, _, _, _) => _adapters, "SERVERS");
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(sut);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Upsert Servers/PAZISI/0"], _sync.Calls);
+    }
+
+    //the shortcut of one list menu (D4): only that collection is planned and synced
+    [Fact]
+    public async Task RunBody_WhenCreatedForOneCollection_SyncsOnlyThatCollection()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter servers = AddAdapter(Servers, 100);
+        _environments.Local["Dev"] = "d";
+        servers.Local["PAZISI"] = "p";
+        _answers.Enqueue("Apply");
+        var sut = new SyncRegistryCliMenuCommand(new Mock<ILogger>().Object, _httpClientFactory.Object,
+            _sync.ParametersManager.Object, InputIdFromMenuList, (_, _, _, _) => _adapters, Servers);
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(sut);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("Sync Servers With SupportToolsServer...", sut.Name);
+        Assert.Equal(["Upsert Servers/PAZISI/0"], _sync.Calls);
+        Assert.False(_sync.State.Collections.ContainsKey(Environments));
+    }
+
+    //keys that differ only by case stop the sync only when their collection is synced
+    [Fact]
+    public async Task RunBody_WhenAnotherCollectionHasKeysDifferingByCase_SyncsTheChosenCollection()
+    {
+        // Arrange
+        FakeRegistrySyncAdapter servers = AddAdapter(Servers, 100);
+        _sync.Parameters.Environments["Dev"] = "d";
+        _sync.Parameters.Environments["DEV"] = "d";
+        servers.Local["PAZISI"] = "p";
+        _answers.Enqueue("Apply");
+        var sut = new SyncRegistryCliMenuCommand(new Mock<ILogger>().Object, _httpClientFactory.Object,
+            _sync.ParametersManager.Object, InputIdFromMenuList, (_, _, _, _) => _adapters, Servers);
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(sut);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["Upsert Servers/PAZISI/0"], _sync.Calls);
+    }
+
+    [Fact]
+    public void ForCollection_WhenCreated_NamesTheCollectionAndReloadsMenuAfterRun()
+    {
+        // Act
+        SyncRegistryCliMenuCommand sut = SyncRegistryCliMenuCommand.ForCollection(new Mock<ILogger>().Object,
+            _httpClientFactory.Object, _sync.ParametersManager.Object, RegistryCollections.Gits);
+
+        // Assert
+        Assert.Equal("Sync Gits With SupportToolsServer...", sut.Name);
+        Assert.Equal(EMenuAction.Reload, sut.MenuActionOnBodySuccess);
     }
 
     [Fact]

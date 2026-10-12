@@ -22,6 +22,9 @@ namespace LibSupportToolsServerWork.Cruders;
 //რომელიც სხვა ჩანაწერებს არ ეხება
 public sealed class EditorConfigFileTypesStsCruder : Cruder
 {
+    //შეცდომების ტექსტებისთვის (ConcurrencyConflict, RecordWithNameNotFound)
+    private const string EntityName = "EditorConfigFileType";
+
     private readonly EditorConfigContentStsFieldEditor _contentFieldEditor;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -53,8 +56,16 @@ public sealed class EditorConfigFileTypesStsCruder : Cruder
         return GetServerRecords().Exists(x => string.Equals(x.Name, recordKey, StringComparison.OrdinalIgnoreCase));
     }
 
-    public override async ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
+    public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
+    {
+        return new ValueTask(AddOrUpdateRecordWithKey(recordKey, newRecord, false, cancellationToken));
+    }
+
+    //ახალი ჩანაწერი სერვერზე ჯერ არ უნდა იყოს, არსებული კი იმ ვერსიით უნდა იყოს, რომლითაც სიაში ჩაიტვირთა
+    //(StsRecordVersionCheck)
+    private async Task AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord, bool isNewRecord,
+        CancellationToken cancellationToken)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
         if (supportToolsServerApiClient is null)
@@ -62,12 +73,17 @@ public sealed class EditorConfigFileTypesStsCruder : Cruder
             return;
         }
 
+        int? loadedVersion = isNewRecord ? null : FindLoadedVersion(recordKey);
         var editorConfigFileType = new StsEditorConfigFileTypeDataModel
         {
             Name = recordKey, Content = ((TextItemData)newRecord).Text ?? string.Empty
         };
-        Result uploadResult = await supportToolsServerApiClient.SyncUpEditorConfigFileTypes([editorConfigFileType],
-            true, cancellationToken);
+        Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+            supportToolsServerApiClient.GetEditorConfigFileTypesList, x => x.Name, x => x.Version, cancellationToken);
+        Result uploadResult = versionError is null
+            ? await supportToolsServerApiClient.SyncUpEditorConfigFileTypes([editorConfigFileType], true,
+                cancellationToken)
+            : Result.Failure(versionError);
         _serverRecords = null;
         if (uploadResult.IsFailure)
         {
@@ -78,7 +94,13 @@ public sealed class EditorConfigFileTypesStsCruder : Cruder
     protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
     {
-        return UpdateRecordWithKey(recordKey, newRecord, cancellationToken);
+        return new ValueTask(AddOrUpdateRecordWithKey(recordKey, newRecord, true, cancellationToken));
+    }
+
+    //ჩანაწერის ვერსია სიაში, რომელიც რედაქტირებამდე ჩაიტვირთა
+    private int? FindLoadedVersion(string recordKey)
+    {
+        return StsRecordVersionCheck.FindVersion(GetServerRecords(), recordKey, x => x.Name, x => x.Version);
     }
 
     protected override async ValueTask RemoveRecordWithKey(string recordKey,
@@ -90,8 +112,12 @@ public sealed class EditorConfigFileTypesStsCruder : Cruder
             return;
         }
 
-        Result removeResult =
-            await supportToolsServerApiClient.RemoveEditorConfigFileTypeName(recordKey, cancellationToken);
+        int? loadedVersion = FindLoadedVersion(recordKey);
+        Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+            supportToolsServerApiClient.GetEditorConfigFileTypesList, x => x.Name, x => x.Version, cancellationToken);
+        Result removeResult = versionError is null
+            ? await supportToolsServerApiClient.RemoveEditorConfigFileTypeName(recordKey, cancellationToken)
+            : Result.Failure(versionError);
         _serverRecords = null;
         if (removeResult.IsFailure)
         {

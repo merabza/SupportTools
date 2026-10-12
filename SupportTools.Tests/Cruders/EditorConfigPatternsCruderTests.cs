@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SupportTools.CliMenuCommands;
 using SupportTools.Cruders;
+using SupportTools.Menu.SyncRegistry;
 using Xunit;
 
 namespace SupportTools.Tests.Cruders;
@@ -66,7 +67,7 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
         string[] expected =
         [
             "New EditorConfig Pattern", EditorConfigTestEnvironment.PatternName, "Check .editorconfig Files",
-            "Update .editorconfig Files", "Sync .editorconfig files..."
+            "Update .editorconfig Files", "Sync EditorConfigPatterns With SupportToolsServer..."
         ];
 
         // Act
@@ -78,7 +79,8 @@ public sealed class EditorConfigPatternsCruderTests : IDisposable
         Assert.Equal(expected, menuItems.Take(expected.Length).Select(x => x.MenuItemName));
         Assert.IsType<CheckEditorConfigFilesCliMenuCommand>(menuItems[2].CliMenuCommand);
         Assert.IsType<UpdateEditorConfigFilesCliMenuCommand>(menuItems[3].CliMenuCommand);
-        Assert.IsType<SyncEditorConfigFilesCliMenuCommand>(menuItems[4].CliMenuCommand);
+        //the shortcut of Sync Registry for the templates only (D4)
+        Assert.IsType<SyncRegistryCliMenuCommand>(menuItems[4].CliMenuCommand);
     }
 
     [Fact]

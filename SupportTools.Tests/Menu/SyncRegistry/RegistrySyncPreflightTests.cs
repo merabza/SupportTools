@@ -45,6 +45,62 @@ public sealed class RegistrySyncPreflightTests
         Assert.Equal([$"{collectionName}: AppFake / appfake"], result);
     }
 
+    //the sync of one collection (D4) checks only that collection, matched ignoring case
+    [Theory]
+    [InlineData(RegistryCollections.Gits)]
+    [InlineData("GITS")]
+    public void FindKeysDifferingOnlyByCase_WhenOneCollectionIsChecked_ReportsOnlyThatCollection(
+        string collectionName)
+    {
+        // Arrange
+        var parameters = new SupportToolsParameters
+        {
+            Gits = { ["AppA"] = new GitDataModel(), ["appA"] = new GitDataModel() },
+            Servers = { ["PAZISI"] = new ServerDataModel(), ["Pazisi"] = new ServerDataModel() }
+        };
+
+        // Act
+        List<string> result = RegistrySyncPreflight.FindKeysDifferingOnlyByCase(parameters, collectionName);
+
+        // Assert
+        Assert.Equal(["Gits: AppA / appA"], result);
+    }
+
+    [Fact]
+    public void FindKeysDifferingOnlyByCase_WhenTheCheckedCollectionHasUniqueKeys_ReportsNothing()
+    {
+        // Arrange
+        var parameters = new SupportToolsParameters
+        {
+            Gits = { ["AppA"] = new GitDataModel(), ["appA"] = new GitDataModel() },
+            Servers = { ["PAZISI"] = new ServerDataModel() }
+        };
+
+        // Act
+        List<string> result =
+            RegistrySyncPreflight.FindKeysDifferingOnlyByCase(parameters, RegistryCollections.Servers);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void FindKeysDifferingOnlyByCase_WhenNoCollectionIsNamed_ChecksEveryCollection()
+    {
+        // Arrange
+        var parameters = new SupportToolsParameters
+        {
+            Gits = { ["AppA"] = new GitDataModel(), ["appA"] = new GitDataModel() },
+            Servers = { ["PAZISI"] = new ServerDataModel(), ["Pazisi"] = new ServerDataModel() }
+        };
+
+        // Act
+        List<string> result = RegistrySyncPreflight.FindKeysDifferingOnlyByCase(parameters, null);
+
+        // Assert
+        Assert.Equal(["Servers: PAZISI / Pazisi", "Gits: AppA / appA"], result);
+    }
+
     [Fact]
     public void FindKeysDifferingOnlyByCase_WhenKeysAreUnique_ReportsNothing()
     {

@@ -17,9 +17,17 @@ internal static class RegistrySyncPreflight
     //თითო ჯგუფზე ერთი სტრიქონი: "კოლექცია: გასაღები1 / გასაღები2"
     public static List<string> FindKeysDifferingOnlyByCase(SupportToolsParameters parameters)
     {
+        return FindKeysDifferingOnlyByCase(parameters, null);
+    }
+
+    //collectionName: მხოლოდ ერთი კოლექციის შემოწმება (ერთი კოლექციის სინქრონიზაცია, D4); null — ყველა კოლექცია
+    public static List<string> FindKeysDifferingOnlyByCase(SupportToolsParameters parameters, string? collectionName)
+    {
         return
         [
-            .. GetLocalKeys(parameters).SelectMany(collection => collection.Keys
+            .. GetLocalKeys(parameters).Where(collection =>
+                collectionName is null || string.Equals(collection.CollectionName, collectionName,
+                    StringComparison.OrdinalIgnoreCase)).SelectMany(collection => collection.Keys
                 .GroupBy(x => x, StringComparer.OrdinalIgnoreCase).Where(x => x.Count() > 1)
                 .Select(x => $"{collection.CollectionName}: {string.Join(" / ", x)}"))
         ];

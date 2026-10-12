@@ -41,6 +41,9 @@ public sealed class RegistrySyncEngine
     //null — მისამართი არ იწერება
     public string? ServerAddress { get; init; }
 
+    //ადაპტერების კოლექციების სახელები (მდგომარეობის გასაღებები), მაგ. გამორიცხული ჩანაწერების საჩვენებლად
+    public IReadOnlyCollection<string> CollectionNames => _adapters.Keys;
+
     //გეგმა ყველა ადაპტერზე. თუ რომელიმე ადაპტერმა სერვერის ჩანაწერები ვერ წაიკითხა, მის შეცდომას უცვლელად აბრუნებს
     //(მაგ. ApiRequestFailed, როცა სერვერი მიუწვდომელია). გეგმის აგება არაფერს ცვლის
     public async Task<Result<RegistrySyncPlan>> CreatePlan(CancellationToken cancellationToken = default)

@@ -12,6 +12,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.CliMenuCommands.GitIgnoreFileTypes;
 using SupportTools.Cruders;
+using SupportTools.Menu.SyncRegistry;
 using SupportToolsData.Models;
 using Xunit;
 
@@ -85,7 +86,9 @@ public sealed class GitIgnoreModelsCruderTests
         Assert.Single(commands.OfType<CheckGitIgnoreFilesCliMenuCommand>());
         Assert.Single(commands.OfType<UpdateGitIgnoreFilesCliMenuCommand>());
         Assert.Single(commands.OfType<GenerateStandardGitignoreFilesCliMenuCommand>());
-        Assert.Single(commands.OfType<SyncGitignoreFilesCliMenuCommand>());
+        //the shortcut of Sync Registry for the templates only (D4)
+        Assert.Equal("Sync GitIgnorePatterns With SupportToolsServer...",
+            Assert.Single(commands.OfType<SyncRegistryCliMenuCommand>()).Name);
     }
 
     [Fact]

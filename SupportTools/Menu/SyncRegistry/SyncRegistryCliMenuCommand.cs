@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -31,10 +32,15 @@ namespace SupportTools.Menu.SyncRegistry;
 //   (RegistrySyncPreflight);
 //3. გეგმა, არჩევანი და შესრულება: RegistrySyncSession. შესრულება მდგომარეობაში სერვერის მისამართს წერს, ბრძანების
 //   შენახვები კი ავტომატურ Push-ს არ იწვევს (D2).
-//შესრულების შემდეგ მენიუ თავიდან იგება (Reload), რომ ჩამოტანილი პროექტები და სხვა ჩანაწერები მენიუშიც გამოჩნდეს
+//შესრულების შემდეგ მენიუ თავიდან იგება (Reload), რომ ჩამოტანილი პროექტები და სხვა ჩანაწერები მენიუშიც გამოჩნდეს.
+//ForCollection იგივე ბრძანებაა ერთ კოლექციაზე (D4): Gits-ის, .gitignore და .editorconfig შაბლონების სიების მალსახმობი,
+//რომელმაც ძველი Merge/Sync Up/Down ბრძანებები შეცვალა, რომ სინქრონიზაციის სემანტიკა (ვერსიები, კონფლიქტები) ერთი იყოს
 public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
 {
     public const string CommandName = "Sync Registry With SupportToolsServer...";
+
+    //null — ყველა კოლექცია
+    private readonly string? _collectionName;
 
     private readonly Func<SupportToolsServerApiClient, SupportToolsParameters, PathMapper, RegistrySyncWarnings,
         IEnumerable<IRegistrySyncAdapter>> _createAdapters;
@@ -53,17 +59,41 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
 
     //კონსოლიდან არჩევა და ადაპტერების აწყობა პარამეტრებადაა გამოტანილი, რომ ტესტებმა პასუხები და fake ადაპტერები
     //თვითონ მიაწოდონ
+    internal SyncRegistryCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, Func<string, CliMenuSet, int> inputIdFromMenuList,
+        Func<SupportToolsServerApiClient, SupportToolsParameters, PathMapper, RegistrySyncWarnings,
+            IEnumerable<IRegistrySyncAdapter>> createAdapters) : this(logger, httpClientFactory, parametersManager,
+        inputIdFromMenuList, createAdapters, null)
+    {
+    }
+
     // ReSharper disable once ConvertToPrimaryConstructor
     internal SyncRegistryCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager, Func<string, CliMenuSet, int> inputIdFromMenuList,
         Func<SupportToolsServerApiClient, SupportToolsParameters, PathMapper, RegistrySyncWarnings,
-            IEnumerable<IRegistrySyncAdapter>> createAdapters) : base(CommandName, EMenuAction.Reload)
+            IEnumerable<IRegistrySyncAdapter>> createAdapters, string? collectionName) : base(
+        collectionName is null ? CommandName : GetCollectionCommandName(collectionName), EMenuAction.Reload)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _inputIdFromMenuList = inputIdFromMenuList;
         _createAdapters = createAdapters;
+        _collectionName = collectionName;
+    }
+
+    //ერთი კოლექციის სინქრონიზაცია (RegistryCollections-ის სახელით), მაგალითად Gits-ის სიის მენიუდან
+    public static SyncRegistryCliMenuCommand ForCollection(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, string collectionName)
+    {
+        return new SyncRegistryCliMenuCommand(logger, httpClientFactory, parametersManager,
+            (fieldName, listSet) => MenuInputer.InputIdFromMenuList(fieldName, listSet),
+            RegistrySyncAdapterFactory.CreateAdapters, collectionName);
+    }
+
+    internal static string GetCollectionCommandName(string collectionName)
+    {
+        return $"Sync {collectionName} With SupportToolsServer...";
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
@@ -77,7 +107,8 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        List<string> keysDifferingByCase = RegistrySyncPreflight.FindKeysDifferingOnlyByCase(parameters);
+        List<string> keysDifferingByCase =
+            RegistrySyncPreflight.FindKeysDifferingOnlyByCase(parameters, _collectionName);
         if (keysDifferingByCase.Count > 0)
         {
             WriteError("These local keys differ only by case, so they cannot be matched with the server records. " +
@@ -94,8 +125,13 @@ public sealed class SyncRegistryCliMenuCommand : CliMenuCommand
         var pathMapper = new PathMapper(parameters.PathMappings);
         //ბრძანება თვითონ ირჩევს, რა გაიგზავნოს, ამიტომ მისი შენახვები ავტომატურ Push-ს (D2) არ იწვევს
         IParametersManager parametersManager = AutoSyncParametersManager.WithoutAutoSync(_parametersManager);
-        var engine = new RegistrySyncEngine(
-            _createAdapters(connection.Value.ApiClient, parameters, pathMapper, warnings), parametersManager)
+        List<IRegistrySyncAdapter> adapters =
+        [
+            .. _createAdapters(connection.Value.ApiClient, parameters, pathMapper, warnings).Where(x =>
+                _collectionName is null ||
+                string.Equals(x.CollectionName, _collectionName, StringComparison.OrdinalIgnoreCase))
+        ];
+        var engine = new RegistrySyncEngine(adapters, parametersManager)
         {
             //მდგომარეობა ამ სერვერისაა: ავტომატური სინქრონიზაცია მხოლოდ მასთან მუშაობს
             ServerAddress = connection.Value.ServerAddress

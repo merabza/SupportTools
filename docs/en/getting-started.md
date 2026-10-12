@@ -109,6 +109,41 @@ For the full state-file structure, see [Configuration](configuration.md).
 
 \---
 
+## A new computer
+
+When another computer already works with SupportToolsServer (the central
+registry, see
+[Configuration](configuration.md#central-registry-supporttoolsserver)), a
+new computer takes the registry from the server instead of a copied
+parameters file. In `Support Tools Parameters Editor`:
+
+1. **Folders** — set the folders of this computer: `WorkFolder`,
+`SecurityFolder`, `TempFolder`, `LogFolder`, `FolderForGitignoreFiles`,
+`FolderForEditorConfigFiles` and the others you use. They are never
+synced.
+2. **Path mappings** — when the folder layout differs from the main
+computer's (always on Linux), add a `PathMappings` rule for every root
+that the registry uses, for example `D:\1WorkDotnet` →
+`/home/merab/1WorkDotnet`, `D:\1WorkSecurity` → `/home/merab/1WorkSecurity`.
+Add them before the first sync: the sync warns about every path that no
+rule maps. A Windows computer with the main computer's layout needs none.
+3. **The server's API client** — add an `ApiClients` entry with the
+address of SupportToolsServer and the API key of this computer (the
+server must know the key for this computer's address), and choose it as
+`SupportToolsServerWebApiClientName`. When this computer is one of the
+`Servers`, choose it as `CurrentMachineServerName`.
+4. **Sync** — `Main Menu` → `Sync Registry With SupportToolsServer...` →
+`Pull only` (or `Apply`). The projects, servers, templates and secret
+files appear with this computer's paths. To keep them up to date from
+now on, turn on `AutoSyncWithSupportToolsServer`.
+5. **Projects** — every project is listed as `remote` until it is on this
+computer. Open the project you need and run
+`Clone Project To This Computer`: it creates the folder, clones the
+repositories, and checks the templates and the secret files (see
+[Git Operations](use-cases/git-operations.md#if-a-project-is-not-on-this-computer-yet)).
+
+\---
+
 ## Verifying the install
 
 A working install passes these checks:

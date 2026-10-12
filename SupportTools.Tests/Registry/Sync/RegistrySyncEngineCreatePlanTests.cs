@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using LibSupportToolsServerWork.Registry.Sync;
 using Moq;
@@ -13,6 +15,21 @@ public sealed class RegistrySyncEngineCreatePlanTests
     private const string Environments = "Environments";
 
     private readonly RegistrySyncTestContext _context = new();
+
+    //the collections of the engine's adapters (the session lists their excluded records, D4)
+    [Fact]
+    public void CollectionNames_WhenCreated_AreTheCollectionsOfTheAdapters()
+    {
+        // Arrange
+        RegistrySyncEngine sut = _context.CreateEngine(_context.CreateAdapter("Servers", 2),
+            _context.CreateAdapter(Environments, 1));
+
+        // Act
+        IReadOnlyCollection<string> result = sut.CollectionNames;
+
+        // Assert
+        Assert.Equal(["Environments", "Servers"], result.Order(StringComparer.Ordinal));
+    }
 
     [Fact]
     public async Task CreatePlan_WhenServerRecordsCannotBeRead_ReturnsTheServerErrorUnchanged()

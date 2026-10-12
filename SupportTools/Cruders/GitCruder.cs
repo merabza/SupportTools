@@ -10,10 +10,12 @@ using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliTools.CliMenuCommands;
 using LibGitData.Models;
 using LibGitWork;
+using LibSupportToolsServerWork.Registry.Adapters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.FieldEditors;
+using SupportTools.Menu.SyncRegistry;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts;
 using SupportToolsServerApiContracts.Models;
@@ -215,9 +217,10 @@ public sealed class GitCruder : ParCruder<GitDataModel>
             new UpdateGitProjectsFromServerCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
         cruderSubMenuSet.InsertMenuItem(2, updateGitProjectsFromServerCommand);
 
-        var syncGitProjectsCliMenuCommand =
-            new SyncGitProjectsCliMenuCommand(_logger, _httpClientFactory, ParametersManager);
-        cruderSubMenuSet.InsertMenuItem(3, syncGitProjectsCliMenuCommand);
+        //Sync Registry მხოლოდ Gits-ზე (D4)
+        var syncGitsCommand = SyncRegistryCliMenuCommand.ForCollection(_logger, _httpClientFactory,
+            ParametersManager, RegistryCollections.Gits);
+        cruderSubMenuSet.InsertMenuItem(3, syncGitsCommand);
 
         var findGitProjectsWithoutMatchingProjectsCliMenuCommand =
             new FindGitProjectsWithoutMatchingProjectsCliMenuCommand(this, ParametersManager);

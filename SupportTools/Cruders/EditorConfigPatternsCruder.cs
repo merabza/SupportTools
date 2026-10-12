@@ -3,9 +3,11 @@ using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
+using LibSupportToolsServerWork.Registry.Adapters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
+using SupportTools.Menu.SyncRegistry;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -50,7 +52,9 @@ public sealed class EditorConfigPatternsCruder : SimpleNamesListCruder
             new UpdateEditorConfigFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(updateEditorConfigFilesCliMenuCommand);
 
-        var syncCommand = new SyncEditorConfigFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        //Sync Registry მხოლოდ .editorconfig შაბლონებზე (D4)
+        var syncCommand = SyncRegistryCliMenuCommand.ForCollection(_logger, _httpClientFactory, _parametersManager,
+            RegistryCollections.EditorConfigPatterns);
         cruderSubMenuSet.AddMenuItem(syncCommand);
     }
 

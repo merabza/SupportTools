@@ -183,8 +183,10 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
         sut.GetStatusFor("default");
 
         // Assert
-        Assert.Equal([ListRequest, MergeUpRequest, ListRequest], _server.Requests.Select(x => x.Request));
-        StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(_server.Requests[1].Body));
+        //the version check reads the list before the write (D4)
+        Assert.Equal([ListRequest, ListRequest, MergeUpRequest, ListRequest],
+            _server.Requests.Select(x => x.Request));
+        StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(_server.Requests[2].Body));
         Assert.Equal("default", sent.Name);
         Assert.Equal("root = true\r\n", sent.Content);
     }
@@ -216,7 +218,8 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
         sut.ContainsRecordWithKey("BaGetter");
 
         // Assert
-        Assert.Equal([ListRequest, "DELETE /api/v1/git/deleteeditorconfigfiletype/Ba%20Getter", ListRequest],
+        Assert.Equal(
+            [ListRequest, ListRequest, "DELETE /api/v1/git/deleteeditorconfigfiletype/Ba%20Getter", ListRequest],
             _server.Requests.Select(x => x.Request));
     }
 
@@ -244,9 +247,11 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal([ListRequest, "DELETE /api/v1/git/deleteeditorconfigfiletype/BaGetter", MergeUpRequest],
-            _server.Requests.Select(x => x.Request));
-        StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(_server.Requests[2].Body));
+        Assert.Equal([
+            ListRequest, ListRequest, "DELETE /api/v1/git/deleteeditorconfigfiletype/BaGetter", ListRequest,
+            MergeUpRequest
+        ], _server.Requests.Select(x => x.Request));
+        StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(_server.Requests[4].Body));
         Assert.Equal("NuGetServer", sent.Name);
         Assert.Equal(BaGetterContent, sent.Content);
     }
@@ -299,8 +304,91 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
         await CreateSut().UpdateRecordWithKey("default", new TextItemData());
 
         // Assert
-        StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(Assert.Single(_server.Requests).Body));
+        StsEditorConfigFileTypeDataModel sent =
+            Assert.Single(SentRecords(Assert.Single(_server.Requests, x => x.Request == MergeUpRequest).Body));
         Assert.Equal(string.Empty, sent.Content);
+    }
+
+    //another computer (or a registry sync) changed the template after the list was loaded (D4)
+    [Fact]
+    public async Task UpdateRecordWithKey_WhenServerVersionChangedSinceTheList_UploadsNothingAndReportsTheConflict()
+    {
+        // Arrange
+        ServerLists(2);
+        EditorConfigFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerLists(3);
+
+        // Act
+        await sut.UpdateRecordWithKey("default", new TextItemData { Text = "root = true\r\n" });
+
+        // Assert
+        Assert.Equal([ListRequest, ListRequest], _server.Requests.Select(x => x.Request));
+        Assert.Contains("EditorConfigFileType default Version Conflict: Expected 2, Actual 3", _env.ConsoleText(),
+            StringComparison.Ordinal);
+    }
+
+    //a new template must not be on the server yet: the upload would replace the server's template of that name
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsOnTheServerAlready_UploadsNothing()
+    {
+        // Arrange
+        EditorConfigFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerLists(1);
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "default", new TextItemData { Text = "root = true\r\n" });
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request == MergeUpRequest);
+        Assert.Contains("EditorConfigFileType default Version Conflict: Expected 0, Actual 1", _env.ConsoleText(),
+            StringComparison.Ordinal);
+    }
+
+    //a new template is checked against the server only: even a listed name with the listed version is refused
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsInTheLoadedList_UploadsNothing()
+    {
+        // Arrange
+        ServerLists(2);
+        EditorConfigFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "default", new TextItemData { Text = "root = true\r\n" });
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request == MergeUpRequest);
+        Assert.Contains("EditorConfigFileType default Version Conflict: Expected 0, Actual 2", _env.ConsoleText(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsFree_UploadsTheTemplate()
+    {
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(CreateSut(), "React", new TextItemData { Text = "[*.ts]" });
+
+        // Assert
+        Assert.Equal([ListRequest, MergeUpRequest], _server.Requests.Select(x => x.Request));
+    }
+
+    [Fact]
+    public async Task RemoveRecordWithKey_WhenTemplateWasDeletedOnTheServerSinceTheList_DeletesNothing()
+    {
+        // Arrange
+        EditorConfigFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        _server.Respond(ListRequest, HttpStatusCode.OK, "[]");
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "BaGetter");
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("DELETE", StringComparison.Ordinal));
+        Assert.Contains("EditorConfigFileType With Name BaGetter Not Found", _env.ConsoleText(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -332,6 +420,20 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
     {
         return new EditorConfigFileTypesStsCruder(new Mock<ILogger>().Object, _httpClientFactory.Object,
             _env.ParametersManager.Object);
+    }
+
+    //the server's two templates; "default" has the given version
+    private void ServerLists(int defaultVersion)
+    {
+        _server.Respond(ListRequest, HttpStatusCode.OK,
+            JsonSerializer.Serialize(new List<StsEditorConfigFileTypeDataModel>
+            {
+                new()
+                {
+                    Name = "default", Content = EditorConfigTestEnvironment.TemplateContent, Version = defaultVersion
+                },
+                new() { Name = "BaGetter", Content = BaGetterContent }
+            }));
     }
 
     private static List<StsEditorConfigFileTypeDataModel> SentRecords(string? body)

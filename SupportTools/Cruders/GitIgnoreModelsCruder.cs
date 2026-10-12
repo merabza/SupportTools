@@ -5,10 +5,12 @@ using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
 using LibGitData;
 using LibGitData.Models;
+using LibSupportToolsServerWork.Registry.Adapters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.CliMenuCommands;
 using SupportTools.CliMenuCommands.GitIgnoreFileTypes;
+using SupportTools.Menu.SyncRegistry;
 using SupportToolsData.Models;
 
 namespace SupportTools.Cruders;
@@ -56,7 +58,9 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
         var generateCommand = new GenerateStandardGitignoreFilesCliMenuCommand(_logger, _parametersManager);
         cruderSubMenuSet.AddMenuItem(generateCommand);
 
-        var syncCommand = new SyncGitignoreFilesCliMenuCommand(_logger, _httpClientFactory, _parametersManager);
+        //Sync Registry მხოლოდ .gitignore შაბლონებზე (D4)
+        var syncCommand = SyncRegistryCliMenuCommand.ForCollection(_logger, _httpClientFactory, _parametersManager,
+            RegistryCollections.GitIgnorePatterns);
         cruderSubMenuSet.AddMenuItem(syncCommand);
     }
 

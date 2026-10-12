@@ -22,8 +22,10 @@ namespace SupportTools.Menu.SyncRegistry;
 //- შეჯამება კოლექციების მიხედვით და არჩევანი: Apply (არაკონფლიქტური Pull და Push), Pull only, Push only,
 //  კონფლიქტების გადაწყვეტა (Local / Server / Skip, ველების დიფით), ჯგუფური „Local wins“ პირველი სინქრონიზაციის
 //  კონფლიქტებისთვის (seed), დეტალები, Dry run (აჩვენებს, რა გაიგზავნება, და არაფერს აგზავნის), ჩანაწერის გამორიცხვა
-//  ამ კომპიუტერზე (ExcludedKeys) და Cancel. გადაწყვეტილი კონფლიქტი მიმართულებით სრულდება: Apply ყველას ასრულებს,
-//  Pull only მხოლოდ სერვერის სასარგებლოდ გადაწყვეტილ კონფლიქტებს, Push only კი ლოკალურის სასარგებლოდ გადაწყვეტილს;
+//  ამ კომპიუტერზე (ExcludedKeys), გამორიცხული ჩანაწერის დაბრუნება (D4) და Cancel. გამორიცხული ჩანაწერის დაბრუნება
+//  მაშინაც შეიძლება, როცა გადასატანი არაფერია (Finish). გადაწყვეტილი კონფლიქტი მიმართულებით სრულდება: Apply ყველას
+//  ასრულებს, Pull only მხოლოდ სერვერის სასარგებლოდ გადაწყვეტილ კონფლიქტებს, Push only კი ლოკალურის სასარგებლოდ
+//  გადაწყვეტილს;
 //- შესრულება პროგრესით. სერვერის პირველი წარუმატებელი ოპერაციის შემდეგ სერვერის დანარჩენი ოპერაციები ჩერდება
 //  (StopOnFailure, მომხმარებლის გადაწყვეტილება): ასობით მოთხოვნიდან (seed) ჩავარდნილი ჩანაწერი სახელით ჩანს;
 //- ანგარიში. Pull-ის წინა პარამეტრების ფაილს ParametersManager.Save ინახავს .bak ასლად (A4), ამიტომ დამატებითი ასლი
@@ -76,7 +78,7 @@ internal sealed class RegistrySyncSession
     public async Task<bool> Run(CancellationToken cancellationToken)
     {
         RegistrySyncPlan? plan = await CreatePlan(cancellationToken);
-        while (plan is not null && HasChanges(plan))
+        while (plan is not null && (HasChanges(plan) || GetExcludedRecords().Count > 0))
         {
             switch (InputChoice(plan))
             {
@@ -101,6 +103,11 @@ internal sealed class RegistrySyncSession
                 case ESyncChoice.ExcludeRecord:
                     plan = await ExcludeRecord(plan, cancellationToken);
                     break;
+                case ESyncChoice.IncludeExcludedRecord:
+                    plan = await IncludeExcludedRecord(plan, cancellationToken);
+                    break;
+                case ESyncChoice.Finish:
+                    return await RecordInSyncState(plan, cancellationToken);
                 default:
                     Console.WriteLine("Canceled, nothing was synced");
                     return true;
@@ -195,6 +202,15 @@ internal sealed class RegistrySyncSession
 
     private List<(ESyncChoice Choice, string Name, string Status)> CreateChoices(RegistrySyncPlan plan)
     {
+        int excludedCount = GetExcludedRecords().Count;
+        (ESyncChoice Choice, string Name, string Status) includeChoice = (ESyncChoice.IncludeExcludedRecord,
+            "Include excluded record again", $"{excludedCount} excluded on this computer");
+        //გადასატანი არაფერია, ჩანაწერები კი გამორიცხულია: მხოლოდ დასრულება ან გამორიცხულის დაბრუნება
+        if (!HasChanges(plan))
+        {
+            return [(ESyncChoice.Finish, "Finish", "nothing to send or to take"), includeChoice];
+        }
+
         List<RegistrySyncPlanItem> conflicts = GetConflicts(plan);
         int firstSyncConflictsCount = conflicts.Count(x => x.Conflict == ERegistrySyncConflict.FirstSyncDiffers);
         List<(ESyncChoice Choice, string Name, string Status)> choices =
@@ -219,6 +235,11 @@ internal sealed class RegistrySyncSession
         choices.Add((ESyncChoice.ShowDetails, "Show details", "the records to sync"));
         choices.Add((ESyncChoice.DryRun, "Dry run", "what Apply sends, nothing is sent"));
         choices.Add((ESyncChoice.ExcludeRecord, "Exclude record from sync", "on this computer"));
+        if (excludedCount > 0)
+        {
+            choices.Add(includeChoice);
+        }
+
         choices.Add((ESyncChoice.Cancel, "Cancel", "nothing changes"));
         return choices;
     }
@@ -446,6 +467,50 @@ internal sealed class RegistrySyncSession
         return await CreatePlan(cancellationToken);
     }
 
+    //ამ სესიის კოლექციების გამორიცხული ჩანაწერები (ExcludedKeys), კოლექციისა და გასაღების მიხედვით
+    private List<(string CollectionName, string Key)> GetExcludedRecords()
+    {
+        Dictionary<string, RegistryCollectionSyncStateModel> collections = _parameters.RegistrySyncState.Collections;
+        return
+        [
+            .. _engine.CollectionNames.Where(collections.ContainsKey).Order(StringComparer.OrdinalIgnoreCase)
+                .SelectMany(collectionName => collections[collectionName].ExcludedKeys
+                    .Order(StringComparer.OrdinalIgnoreCase).Select(key => (collectionName, key)))
+        ];
+    }
+
+    //გამორიცხვის გაუქმება (D4): გასაღები ExcludedKeys-იდან იშლება და შენახვის შემდეგ გეგმა თავიდან იგება, სადაც
+    //ჩანაწერი ისევ სინქრონიზდება
+    private async Task<RegistrySyncPlan?> IncludeExcludedRecord(RegistrySyncPlan plan,
+        CancellationToken cancellationToken)
+    {
+        List<(string CollectionName, string Key)> excludedRecords = GetExcludedRecords();
+        var menuSet = new CliMenuSet();
+        foreach ((string CollectionName, string Key) excludedRecord in excludedRecords)
+        {
+            menuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(
+                $"{excludedRecord.CollectionName}/{excludedRecord.Key}", "excluded on this computer"));
+        }
+
+        menuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand("Back", "include nothing"));
+        int id = _inputIdFromMenuList("record to include", menuSet);
+        if (id < 0 || id >= excludedRecords.Count)
+        {
+            return plan;
+        }
+
+        (string collectionName, string key) = excludedRecords[id];
+        _parameters.RegistrySyncState.Collections[collectionName].ExcludedKeys.Remove(key);
+        if (!await _parametersManager.Save(_parameters,
+                $"{collectionName}/{key} is included in the registry sync on this computer again", null,
+                cancellationToken))
+        {
+            return null;
+        }
+
+        return await CreatePlan(cancellationToken);
+    }
+
     private async Task<bool> Execute(RegistrySyncPlan plan, bool includePulls, bool includePushes,
         CancellationToken cancellationToken)
     {
@@ -578,6 +643,8 @@ internal sealed class RegistrySyncSession
         ShowDetails,
         DryRun,
         ExcludeRecord,
+        IncludeExcludedRecord,
+        Finish,
         Cancel
     }
 }

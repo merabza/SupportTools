@@ -21,6 +21,9 @@ namespace LibSupportToolsServerWork.Cruders;
 public sealed class GitIgnoreFileTypesStsCruder : Cruder
 {
     private const string GitIgnoreFileTypesList = nameof(GitIgnoreFileTypesList);
+
+    //შეცდომების ტექსტებისთვის (ConcurrencyConflict, RecordWithNameNotFound)
+    private const string EntityName = "GitIgnoreFileType";
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
@@ -116,11 +119,13 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
     {
-        AddOrUpdateRecordWithKey(recordKey);
-        return ValueTask.CompletedTask;
+        return new ValueTask(AddOrUpdateRecordWithKey(recordKey, false, cancellationToken));
     }
 
-    private void AddOrUpdateRecordWithKey(string recordKey)
+    //ახალი ჩანაწერი სერვერზე ჯერ არ უნდა იყოს, არსებული კი იმ ვერსიით უნდა იყოს, რომლითაც სიაში ჩაიტვირთა
+    //(StsRecordVersionCheck)
+    private async Task AddOrUpdateRecordWithKey(string recordKey, bool isNewRecord,
+        CancellationToken cancellationToken)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -130,10 +135,15 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
             return;
         }
 
+        int? loadedVersion = isNewRecord ? null : FindLoadedVersion(recordKey);
         try
         {
-            Result updateGitRepoByKeyResult = supportToolsServerApiClient
-                .UpdateGitIgnoreFileType(recordKey, CancellationToken.None).Result;
+            Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version,
+                cancellationToken);
+            Result updateGitRepoByKeyResult = versionError is null
+                ? await supportToolsServerApiClient.UpdateGitIgnoreFileType(recordKey, cancellationToken)
+                : Result.Failure(versionError);
             if (updateGitRepoByKeyResult.IsFailure)
             {
                 updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();
@@ -151,7 +161,14 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
     protected override ValueTask AddRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
     {
-        return UpdateRecordWithKey(recordKey, newRecord, cancellationToken);
+        return new ValueTask(AddOrUpdateRecordWithKey(recordKey, true, cancellationToken));
+    }
+
+    //ჩანაწერის ვერსია სიაში, რომელიც რედაქტირებამდე ჩაიტვირთა
+    private int? FindLoadedVersion(string recordKey)
+    {
+        return StsRecordVersionCheck.FindVersion(GetGitIgnoreFileTypesListFromServer(), recordKey, x => x.Name,
+            x => x.Version);
     }
 
     protected override async ValueTask RemoveRecordWithKey(string recordKey,
@@ -165,10 +182,15 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
             return;
         }
 
+        int? loadedVersion = FindLoadedVersion(recordKey);
         try
         {
-            Result updateGitRepoByKeyResult =
-                await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken);
+            Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version,
+                cancellationToken);
+            Result updateGitRepoByKeyResult = versionError is null
+                ? await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken)
+                : Result.Failure(versionError);
             if (updateGitRepoByKeyResult.IsFailure)
             {
                 updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();

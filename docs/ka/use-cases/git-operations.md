@@ -17,6 +17,8 @@ URL-ები კონფიგურირებული პროექტ�
 |`Sync One Group All Projects Gits V2`|ერთი ჯგუფის ყველა პროექტის ყველა რეპო|
 |`Sync One Project All Gits With Scaffold Seeders V2`|ერთი პროექტის ყველა რეპო, scaffold seeder-ების ჩათვლით|
 |`Clone Project To This Computer`|`remote` პროექტი: მისი ფოლდერის შექმნა და რეპოების აქ დაკლონვა|
+|`Update Git Projects` / `Update Git Projects From SupportToolsServer`|ყველა რეპოს `GitProjects`, ლოკალური ან სერვერის კლონებიდან|
+|`Sync Gits With SupportToolsServer...`|git რეპოების სია, სხვა კომპიუტერებთან გაზიარებული|
 |`Git` ქვემენიუ (პერ-პროექტი)|ცალკეული რეპოების მართვა: სია, დამატება, წაშლა, სინქი|
 |`Git ScaffoldSeeder projects` ქვემენიუ|იგივე, მაგრამ პროექტის scaffold seeder რეპოებისთვის|
 
@@ -203,6 +205,42 @@ remote პროექტებისთვის)
 `Update Git Projects From SupportToolsServer`). V2 სინქიც იმავე შეცდომას
 წერს exception-ით გაჩერების ნაცვლად, პროექტის დანარჩენი რეპოები კი
 მაინც სინქდება.
+
+\---
+
+## თუ git პროექტები კლონირების გარეშე გჭირდება
+
+`GitProjects` ყოველ git რეპოს მასში არსებულ `.csproj` / `.esproj`
+ფაილებთან აკავშირებს, მათი დამოკიდებულებებით; მას V2 სინქი და პაკეტების
+ბრძანებები იყენებს. ყოველი კომპიუტერი მას თვითონ ითვლის და ის არასოდეს
+სინქრონიზდება. ორივე ბრძანება `Support Tools Parameters Editor` → `Gits`-შია:
+
+* `Update Git Projects` ლოკალურ კლონებს ასკანირებს;
+* `Update Git Projects From SupportToolsServer` იმავე ჩანაწერებს
+SupportToolsServer-იდან იღებს, რომელიც ყოველი რეპოს თავის კლონებს
+ასკანირებს, ამიტომ ახალ კომპიუტერს კლონირება არ სჭირდება. ის მთელ
+`GitProjects`-ს ცვლის და ბეჭდავს, რამდენი ჩანაწერი დაემატა, შეიცვალა და
+წაიშალა. სერვერის ცარიელი სია (სერვერს ჯერ არ დაუსკანირებია) ან სერვერის
+შეცდომა არაფერს ცვლის.
+
+თუ პროექტის სახელი ორ რეპოშია, იმარჯვებს რეპო, რომელიც სახელების რიგით
+უფრო გვიანაა, როგორც ლოკალურ სკანირებაში, და სახელი გაფრთხილებით ჩანს.
+
+\---
+
+## თუ git რეპოები სხვა კომპიუტერებზე გჭირდება
+
+git რეპოების სია (`Gits`) ცენტრალური რეესტრის ნაწილია (იხ.
+[კონფიგურაცია](../configuration.md#ცენტრალური-რეესტრი-supporttoolsserver)):
+`Sync Registry With SupportToolsServer...` და ავტომატური სინქრონიზაცია მას
+დანარჩენთან ერთად ატარებს. `Support Tools Parameters Editor` → `Gits` →
+`Sync Gits With SupportToolsServer...` იმავე სინქრონიზაციას მხოლოდ git
+რეპოებზე უშვებს.
+
+რეპოს `.gitignore` შაბლონი სერვერზე რეპომდე უნდა იყოს: ჯერ
+`Git Ignore Patterns` დაასინქრონე, ან გამოიყენე სრული სინქრონიზაცია,
+რომელიც შაბლონებს პირველად აგზავნის. SupportToolsServer ყოველ მიღებულ
+რეპოს აკლონირებს (`Update Git Projects From SupportToolsServer`-ისთვის).
 
 \---
 

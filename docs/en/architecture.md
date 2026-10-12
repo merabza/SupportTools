@@ -24,7 +24,7 @@ the build expects all sibling repos to live alongside `SupportTools/`.
 |`LibDatabaseWork`|Database lifecycle: create, drop, migrate, correct|LibDotnetWork, SupportToolsData|
 |`LibCodeGenerator`|Code generation (API routes, project artifacts)|LibGitWork, SupportToolsData|
 |`LibAppInstallWork`|Install/uninstall pipelines (local \& remote)|LibDotnetWork, SupportToolsData|
-|`LibSupportToolsServerWork`|SupportToolsServer editors (`Support Tools Server Editor`) and their calls through the server client `SupportToolsServerApiClient`|LibDotnetWork, LibGitData, SupportToolsData|
+|`LibSupportToolsServerWork`|The central registry: sync of the shared collections with SupportToolsServer (see [Registry layer](#registry-layer)); the SupportToolsServer editors (`Support Tools Server Editor`); all through the server client `SupportToolsServerApiClient`|LibGitWork, SupportToolsData|
 |`LibAppProjectCreator`|Project scaffolding from templates|LibAppInstallWork, LibGitWork, LibNpmWork|
 |`LibScaffoldSeeder`|Scaffold + seed code from existing databases|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, configuration, parameter management|External: AppCliTools.CliTools, ParametersManagement.\*|
@@ -107,6 +107,38 @@ Menu commands are registered as factory strategies in
 
 \---
 
+## Registry layer
+
+The shared collections of the parameters file (projects, servers, git
+repos, templates, API clients, …) are also kept on SupportToolsServer,
+the central registry, so that every computer sees the same data (see
+[Configuration](configuration.md#central-registry-supporttoolsserver)).
+`LibSupportToolsServerWork/Registry/` holds the sync:
+
+|Part|Role|
+|-|-|
+|`Paths/`|`PathMapper`: the canonical paths (Windows, as on the main computer) ↔ the paths of this computer, by `PathMappings`|
+|`Mappers/`|One pure mapper per collection: the local model ↔ the server's contract (`Sts…DataModel`), with canonical paths and a normalized form for the hash|
+|`Adapters/`|One adapter per collection (18 of them): reads the local and the server records and writes either side. `RegistrySyncAdapterFactory` builds them; `RegistryCollections` names them and sets their order (the referenced collections first, `Projects` last)|
+|`Sync/`|The engine: `RegistrySyncPlanner` compares every record here, on the server and at the last sync (`RegistrySyncState`: the server `Version` and a hash per record) and plans a pull, a push or a conflict; `RegistrySyncEngine` runs the chosen part and saves the parameters once|
+|`MachineLocalFields`|The fields that never sync|
+
+The engine has no UI. It is used by the `SupportTools` project:
+
+* `Menu/SyncRegistry/` — `Sync Registry With SupportToolsServer...` and
+its one-collection shortcuts in the `Gits` and template list menus;
+* `AutoSync/` — the pull at start-up and the push after every save: the
+`IParametersManager` of DI is the decorator `AutoSyncParametersManager`;
+* `Menu/ProjectGroupsList/ProjectsList/CloneProjectToThisComputer/` —
+brings a `remote` project to this computer.
+
+`LibSupportToolsServerWork` also holds `Support Tools Server Editor`, which
+edits the server's git repos and templates directly (it checks the
+server's `Version` before every write), and `GitProjects/`, which maps
+the `GitProjects` that the server computes from its own clones.
+
+\---
+
 ## State
 
 All persistent state — projects, groups, server infos, allow-tool
@@ -114,7 +146,9 @@ lists, Git URLs — lives in a single JSON parameters file. The path is
 supplied by `ArgumentsAnalyzer` (the `--use` option) and the file is
 loaded by `ParametersService` (without `--use` it is searched for in
 the current directory and next to the executable).
-See [Configuration](configuration.md).
+See [Configuration](configuration.md). The shared part of the file is
+also kept on SupportToolsServer (see [Registry layer](#registry-layer));
+the file stays the working copy.
 
 \---
 

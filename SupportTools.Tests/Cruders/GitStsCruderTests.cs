@@ -90,7 +90,7 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.IsType<GitIgnorePathNameStsFieldEditor>(fieldEditors[2]);
     }
 
-    //the server records also change through other commands (Sync Git Projects, uploading gits)
+    //the server records also change through other commands (the registry sync, other computers)
     [Fact]
     public void GetListMenu_WhenServerChangedSinceThePreviousList_ListsTheCurrentServerRecords()
     {
@@ -177,9 +177,10 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.Equal("git@github.com:x/new.git Usage count is: 0", sut.GetStatusFor("RepoA"));
-        Assert.Equal([ListRequest, "POST /api/v1/git/updategitrepo/RepoA", ListRequest],
+        //the version check reads the list before the write (D4)
+        Assert.Equal([ListRequest, ListRequest, "POST /api/v1/git/updategitrepo/RepoA", ListRequest],
             _server.Requests.Select(x => x.Request));
-        var sent = JsonSerializer.Deserialize<StsGitDataModel>(_server.Requests[1].Body!)!;
+        var sent = JsonSerializer.Deserialize<StsGitDataModel>(_server.Requests[2].Body!)!;
         Assert.Equal("RepoA", sent.GitProjectName);
         Assert.Equal("git@github.com:x/new.git", sent.GitProjectAddress);
         Assert.Equal("A", sent.GitProjectFolderName);
@@ -192,6 +193,7 @@ public sealed class GitStsCruderTests : IDisposable
         // Arrange
         GitStsCruder sut = CreateSut();
         sut.GetListMenu();
+        _server.RespondOnce(ListRequest, HttpStatusCode.OK, ServerListJson(GitRepo("RepoA", RepoAAddress)));
         ServerLists();
 
         // Act
@@ -199,8 +201,104 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.Equal("ERROR: Git address Not found", sut.GetStatusFor("RepoA"));
-        Assert.Equal([ListRequest, "DELETE /api/v1/git/deletegitrepo/RepoA", ListRequest],
+        Assert.Equal([ListRequest, ListRequest, "DELETE /api/v1/git/deletegitrepo/RepoA", ListRequest],
             _server.Requests.Select(x => x.Request));
+    }
+
+    //another computer (or a registry sync) changed the record after the list was loaded: the edit would overwrite
+    //that change, so nothing is sent and the list is read again (D4)
+    [Fact]
+    public async Task UpdateRecordWithKey_WhenServerVersionChangedSinceTheList_SendsNothingAndReportsTheConflict()
+    {
+        // Arrange
+        ServerLists(VersionedGitRepo("RepoA", 3));
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerLists(VersionedGitRepo("RepoA", 4));
+
+        // Act
+        await sut.UpdateRecordWithKey("RepoA", NewRepoA());
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        Assert.Contains("Git RepoA Version Conflict: Expected 3, Actual 4", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+        Assert.Equal([ListRequest, ListRequest], _server.Requests.Select(x => x.Request));
+        sut.GetStatusFor("RepoA");
+        Assert.Equal(3, _server.Requests.Count);
+    }
+
+    [Fact]
+    public async Task UpdateRecordWithKey_WhenTheServerVersionIsTheListedOne_SendsTheRecord()
+    {
+        // Arrange
+        ServerLists(VersionedGitRepo("RepoA", 3));
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
+
+        // Act
+        await sut.UpdateRecordWithKey("RepoA", NewRepoA());
+
+        // Assert
+        Assert.Contains(_server.Requests, x => x.Request == "POST /api/v1/git/updategitrepo/RepoA");
+        Assert.DoesNotContain("Version Conflict", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RemoveRecordWithKey_WhenRecordWasDeletedOnTheServerSinceTheList_DeletesNothing()
+    {
+        // Arrange
+        _parameters.Gits["RepoA"] = new GitDataModel();
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerLists();
+
+        // Act
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
+        await sut.Save("Deleted");
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("DELETE", StringComparison.Ordinal));
+        Assert.Contains("Git With Name RepoA Not Found", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.True(_parameters.Gits.ContainsKey("RepoA"));
+        VerifyNothingSaved();
+    }
+
+    //a new record must not be on the server yet: adding it would overwrite the server's record of that name
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsOnTheServerAlready_SendsNothing()
+    {
+        // Arrange
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
+        ServerLists(GitRepo("RepoA", RepoAAddress), VersionedGitRepo("RepoB", 2));
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "RepoB", NewRepoA());
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        Assert.Contains("Git RepoB Version Conflict: Expected 0, Actual 2", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    //a new record is checked against the server only, never against the loaded list: even a listed name with the
+    //listed version is refused, because adding it would overwrite that record
+    [Fact]
+    public async Task AddRecordWithKey_WhenTheNameIsInTheLoadedList_SendsNothing()
+    {
+        // Arrange
+        ServerLists(VersionedGitRepo("RepoA", 2));
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
+
+        // Act
+        await CliMenuTestAccess.InvokeAddRecordWithKey(sut, "RepoA", NewRepoA());
+
+        // Assert
+        Assert.DoesNotContain(_server.Requests, x => x.Request.StartsWith("POST", StringComparison.Ordinal));
+        Assert.Contains("Git RepoA Version Conflict: Expected 0, Actual 2", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     //the list is built in GetSubMenu: an exception there would end the whole application
@@ -371,9 +469,11 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal([ListRequest, "DELETE /api/v1/git/deletegitrepo/RepoA", "POST /api/v1/git/updategitrepo/RepoB"],
-            _server.Requests.Select(x => x.Request));
-        var sent = JsonSerializer.Deserialize<StsGitDataModel>(_server.Requests[2].Body!)!;
+        Assert.Equal([
+            ListRequest, ListRequest, "DELETE /api/v1/git/deletegitrepo/RepoA", ListRequest,
+            "POST /api/v1/git/updategitrepo/RepoB"
+        ], _server.Requests.Select(x => x.Request));
+        var sent = JsonSerializer.Deserialize<StsGitDataModel>(_server.Requests[4].Body!)!;
         Assert.Equal("RepoB", sent.GitProjectName);
         Assert.Equal(RepoAAddress, sent.GitProjectAddress);
         Assert.Equal("RepoA", sent.GitProjectFolderName);
@@ -873,9 +973,21 @@ public sealed class GitStsCruderTests : IDisposable
         };
     }
 
+    private static StsGitDataModel VersionedGitRepo(string name, int version)
+    {
+        StsGitDataModel gitRepo = GitRepo(name, RepoAAddress);
+        gitRepo.Version = version;
+        return gitRepo;
+    }
+
     private void ServerLists(params StsGitDataModel[] gitRepos)
     {
-        _server.Respond(ListRequest, HttpStatusCode.OK, JsonSerializer.Serialize(gitRepos.ToList()));
+        _server.Respond(ListRequest, HttpStatusCode.OK, ServerListJson(gitRepos));
+    }
+
+    private static string ServerListJson(params StsGitDataModel[] gitRepos)
+    {
+        return JsonSerializer.Serialize(gitRepos.ToList());
     }
 
     //GET gitrepo/{key}: the stored repo for its key in any case, 404 GitWithKeyNotFound for another key
@@ -888,9 +1000,11 @@ public sealed class GitStsCruderTests : IDisposable
             """{"title":"GitWithKeyNotFound","status":404,"detail":"Git With Key RepoNew Not Found"}""");
     }
 
-    //remembers every request ("METHOD path" and body) and answers by "METHOD path" (200 without a body by default)
+    //remembers every request ("METHOD path" and body) and answers by "METHOD path" (200 without a body by default).
+    //A one-time answer comes before the lasting one, e.g. the list of the version check before the reloaded list
     private sealed class RoutingHttpMessageHandler : HttpMessageHandler
     {
+        private readonly Dictionary<string, Queue<(HttpStatusCode StatusCode, string Body)>> _onceResponses = [];
         private readonly Dictionary<string, (HttpStatusCode StatusCode, string Body)> _responses = [];
 
         public List<(string Request, string? Body)> Requests { get; } = [];
@@ -900,6 +1014,17 @@ public sealed class GitStsCruderTests : IDisposable
             _responses[request] = (statusCode, body);
         }
 
+        public void RespondOnce(string request, HttpStatusCode statusCode, string body)
+        {
+            if (!_onceResponses.TryGetValue(request, out Queue<(HttpStatusCode StatusCode, string Body)>? queue))
+            {
+                queue = new Queue<(HttpStatusCode StatusCode, string Body)>();
+                _onceResponses[request] = queue;
+            }
+
+            queue.Enqueue((statusCode, body));
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
@@ -907,7 +1032,9 @@ public sealed class GitStsCruderTests : IDisposable
             Requests.Add((key,
                 request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken)));
 
-            if (!_responses.TryGetValue(key, out (HttpStatusCode StatusCode, string Body) response))
+            if ((!_onceResponses.TryGetValue(key, out Queue<(HttpStatusCode StatusCode, string Body)>? queue) ||
+                 !queue.TryDequeue(out (HttpStatusCode StatusCode, string Body) response)) &&
+                !_responses.TryGetValue(key, out response))
             {
                 return new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = request };
             }

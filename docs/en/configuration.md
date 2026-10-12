@@ -46,6 +46,7 @@ of properties:
 |-|-|-|
 |Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
 |Machine profile|`MachineName`, `CurrentMachineServerName`, `PathMappings`, `HideRemoteOnlyProjects`|Settings of this computer, never shared with other computers (see [Machine profile and path mapping](#machine-profile-and-path-mapping))|
+|Registry sync|`SupportToolsServerWebApiClientName`, `AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`, `RegistrySyncState`|The connection to SupportToolsServer and the sync state of this computer, never shared (see [Central registry](#central-registry-supporttoolsserver))|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
 |Recent commands|`RecentCommandsFileName`, `RecentCommandsCount`|Menu history|
 |Archives|`ProgramArchiveDateMask`, `ProgramArchiveExtension`, `ParametersFileDateMask`, `ParametersFileExtension`|Packaging conventions|
@@ -106,6 +107,107 @@ no rule.
 
 The fields that stay on the computer and are never synced are listed in
 `LibSupportToolsServerWork/Registry/MachineLocalFields.cs`.
+
+\---
+
+## Central registry (SupportToolsServer)
+
+The shared collections of the parameters file are also kept on
+SupportToolsServer, so every computer sees the same projects, servers,
+templates and secret files. The local file stays the working copy and
+works offline; for the shared data the server is the source of truth.
+
+**What is shared and what stays here.** Every collection is shared
+except the machine fields:
+
+* the folders and tools of this computer (`LogFolder`, `WorkFolder`,
+`TempFolder`, `SecurityFolder`, `FolderForGitignoreFiles`,
+`FolderForEditorConfigFiles`, `GitExecutablePath`, …) and the recent
+commands;
+* the machine profile above and the fields of this section;
+* `GitProjects`, which every computer computes for itself (see
+[Git Operations](use-cases/git-operations.md#if-you-need-the-git-projects-without-cloning)),
+and `Archivers`;
+* inside shared records: `ServerDataModel.IsLocal`, the installed and
+latest versions and the command name of a dotnet tool, and the local
+folder of the database backup exchange.
+
+The full list is `LibSupportToolsServerWork/Registry/MachineLocalFields.cs`.
+Paths travel in the canonical form and are mapped by `PathMappings`.
+
+**Fields:**
+
+* `SupportToolsServerWebApiClientName` — the `ApiClients` entry that
+points to SupportToolsServer (its address and API key). This bootstrap
+API client is never synced: every computer has its own.
+* `AutoSyncWithSupportToolsServer` (default `false`) — turns on auto-sync
+on this computer (see below).
+* `SupportToolsServerSyncTimeoutSeconds` (default `10`) — the time limit
+of one auto-sync request.
+* `RegistrySyncState` — written by the sync, not edited by hand. Per
+collection it holds the server `Version` and a hash of every record at
+the last successful sync, and the keys excluded from the sync on this
+computer (`ExcludedKeys`); plus the time of the last sync
+(`LastSyncUtc`) and the address of the server the state belongs to
+(`ServerAddress`).
+
+**Manual sync.** `Main Menu` → `Sync Registry With SupportToolsServer...`
+compares every record on three sides: here, on the server and at the last
+sync. A record changed on one side only is taken (pull) or sent (push); a
+record changed on both sides is a conflict that you resolve. The command
+first lists the warnings (for example a path that no `PathMappings` rule
+maps) and a summary per collection, then offers:
+
+* `Apply`, `Pull only`, `Push only` — each with the number of records it
+sends and changes here;
+* `Resolve conflicts` — `Local`, `Server` or `Skip` per conflict, with
+`Show differences` field by field (secrets are shown as `***`);
+* `Local wins for first sync conflicts` — for the first sync of the main
+computer, which uploads everything (seed);
+* `Show details`, `Dry run` (what `Apply` would send; nothing is sent);
+* `Exclude record from sync` — keeps a record out of the sync on this
+computer only, for example a database connection that differs on Linux:
+it is neither sent nor taken;
+* `Include excluded record again` — lists the excluded records and puts
+one back into the sync. It is offered whenever a collection of the sync
+has an excluded record, also when nothing else is to sync (then next to
+`Finish`);
+* `Cancel`.
+
+The sync stops at the first record the server refuses and names it. After
+a pull the previous parameters file is kept as a `.bak` copy (see
+[Saving and backups](#saving-and-backups)). Deleting a secret file, in
+either direction, is always asked as a conflict.
+
+The `Gits`, `Git Ignore Patterns` and `Editor Config Patterns` list menus
+have the same command for their collection only:
+`Sync Gits With SupportToolsServer...`,
+`Sync GitIgnorePatterns With SupportToolsServer...` and
+`Sync EditorConfigPatterns With SupportToolsServer...`.
+
+**Auto-sync.** With `AutoSyncWithSupportToolsServer` on, SupportTools
+pulls the non-conflicting changes at start-up (one summary line above the
+main menu; a record deleted on the server is not deleted here then) and
+pushes after every save that changed shared data. Conflicts and records
+the server refuses wait for the manual sync, and the warning says so.
+Auto-sync works only with the server whose address is in
+`RegistrySyncState.ServerAddress`, which every manual sync writes: after
+pointing the API client to another server, run one manual sync. When the
+server does not answer within the time limit, auto-sync is suspended
+until SupportTools restarts and the local copy is used.
+
+**What the server stores in plain text.** The server keeps the shared
+records as they are, secrets included: API keys, database and file
+storage user names and passwords, `KeyGuidPart`, `MediatRLicenseKey` and
+the secret files that the registry points to
+(`AppSettingsJsonSourceFileName` of the server infos,
+`SeedProjectParametersFilePath`,
+`PrepareProdCopyDatabaseProjectParametersFilePath`,
+`PairedDbObjectsResultFileName`; a file inside a git working tree is left
+out, git carries it). Protect the server, its database and its backups
+like the parameters file. SupportTools never prints these values: a diff
+shows `***`, and a secret file shows only its length and the start of its
+hash.
 
 \---
 
@@ -186,29 +288,19 @@ name in the parameters, and both lists are edited in
 `Editor Config Patterns`). Each list menu has `Check ... Files` (the
 status shows how many files differ from their template or are missing),
 `Update ... Files` (overwrites those files with the template) and
-`Sync ... files...`.
+`Sync GitIgnorePatterns With SupportToolsServer...` /
+`Sync EditorConfigPatterns With SupportToolsServer...`.
 
-`Sync ... files...` compares the list with the templates that
-SupportToolsServer stores in its database. Records match by name,
-ignoring case. Every template file of the list must exist, otherwise
-the command stops. It first shows the differences: templates whose
-content differs, and templates that exist only on the client or only on
-the server. Then it offers four directions, each with a summary of what
-it would change:
-
-* `Merge Up` — uploads the new and changed templates to the server;
-* `Sync Up` — the same, and also deletes the server records that are
-not in the list;
-* `Merge Down` — writes the new and changed server templates into the
-templates folder and adds the new names to the list;
-* `Sync Down` — the same, and also removes the templates that are not
-on the server from the list and deletes their files.
-
-`Merge` never deletes anything. A template that is in use is not
-deleted: a `.gitignore` template that a git repo on the same side uses
-(`Gits` on the client, the server's git repos), or an `.editorconfig`
-template that a project uses (on the client only; nothing uses them on
-the server).
+The sync command is the registry sync (see
+[Central registry](#central-registry-supporttoolsserver)) limited to that
+list: a record is the template's name and the content of its file, and it
+matches the server's record by name, ignoring case. A template taken from
+the server is written into the templates folder (created when missing)
+and its name is added to the list. A template deleted on the server is
+removed from the list here, but its file stays. A listed name without its
+file, or the whole list when the templates folder is not set, is left out
+of the sync with a warning. The server refuses to delete a template that
+one of its git repos (`.gitignore`) or projects (`.editorconfig`) uses.
 
 ||`.gitignore`|`.editorconfig`|
 |-|-|-|
@@ -244,7 +336,9 @@ SupportToolsServer)
 * `FileStorages` — remote storage credentials
 
 All of these are stored plaintext in the parameters JSON. Protect the
-parameters file with file-system permissions.
+parameters file with file-system permissions. The central registry keeps
+them in plain text on SupportToolsServer as well (see
+[Central registry](#central-registry-supporttoolsserver)).
 
 \---
 
@@ -258,6 +352,15 @@ Most fields are editable through the in-app menu:
 SupportToolsServer: `GitIgnore File Types`, `EditorConfig File Types`
 and `Gits from SupportToolsServer`
 * Per-project menus — project-specific fields, server infos, git lists
+
+`Support Tools Server Editor` reads and writes the server directly, for
+looking at the server records or fixing one. Before every write it reads
+the server list again: when the record changed on the server since the
+list was loaded (another computer, or a registry sync), or a new name
+already exists there, the write is refused with `ConcurrencyConflict`
+(`RecordWithNameNotFound` when it was deleted there) and the list is
+loaded again. A change made here reaches the local
+parameters with the next registry sync.
 
 Deleting or renaming a git in `Gits from SupportToolsServer` also changes
 the local `Gits` record once the server accepts the change. A deleted git

@@ -24,6 +24,9 @@ namespace LibSupportToolsServerWork.Cruders;
 public sealed class GitStsCruder : Cruder
 {
     private const string GitsList = nameof(GitsList);
+
+    //შეცდომების ტექსტებისთვის (ConcurrencyConflict, RecordWithNameNotFound)
+    private const string EntityName = "Git";
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IMemoryCache _memoryCache;
@@ -114,6 +117,13 @@ public sealed class GitStsCruder : Cruder
         }) ?? [];
     }
 
+    //ჩანაწერის ვერსია სიაში, რომელიც რედაქტირებამდე ჩაიტვირთა
+    private int? FindLoadedVersion(string recordKey)
+    {
+        return StsRecordVersionCheck.FindVersion(GetGitReposFromServer(), recordKey, x => x.GitProjectName,
+            x => x.Version);
+    }
+
     //სახელი უკვე ჩამოტვირთულ სიაში მოწმდება. გასაღებით მოთხოვნაზე არარსებული სახელისთვის სერვერი 404-ს აბრუნებს,
     //რომელსაც ApiClient შეცდომად ბეჭდავდა, თუმცა ახალი ჩანაწერისთვის სწორედ ეს არის მოსალოდნელი პასუხი.
     //სერვერი გასაღებებს რეგისტრის გარეშე ადარებს
@@ -123,15 +133,16 @@ public sealed class GitStsCruder : Cruder
             string.Equals(x.GitProjectName, recordKey, StringComparison.OrdinalIgnoreCase));
     }
 
-    public override ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
+    public override async ValueTask UpdateRecordWithKey(string recordKey, ItemData newRecord,
         CancellationToken cancellationToken = default)
     {
-        AddOrUpdateRecordWithKey(recordKey, newRecord);
-        return ValueTask.CompletedTask;
+        await AddOrUpdateRecordWithKey(recordKey, newRecord, false, cancellationToken);
     }
 
-    //აბრუნებს, მიიღო თუ არა სერვერმა ჩანაწერი
-    private bool AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord)
+    //აბრუნებს, მიიღო თუ არა სერვერმა ჩანაწერი. ახალი ჩანაწერი სერვერზე ჯერ არ უნდა იყოს, არსებული კი იმ ვერსიით
+    //უნდა იყოს, რომლითაც სიაში ჩაიტვირთა (StsRecordVersionCheck)
+    private async Task<bool> AddOrUpdateRecordWithKey(string recordKey, ItemData newRecord, bool isNewRecord,
+        CancellationToken cancellationToken)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -173,11 +184,15 @@ public sealed class GitStsCruder : Cruder
             GitProjectName = recordKey
         };
 
+        int? loadedVersion = isNewRecord ? null : FindLoadedVersion(recordKey);
         bool updated = false;
         try
         {
-            Result updateGitRepoByKeyResult = supportToolsServerApiClient
-                .UpdateGitRepoByKey(recordKey, gitDataDomain).Result;
+            Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+                supportToolsServerApiClient.GetGitRepos, x => x.GitProjectName, x => x.Version, cancellationToken);
+            Result updateGitRepoByKeyResult = versionError is null
+                ? await supportToolsServerApiClient.UpdateGitRepoByKey(recordKey, gitDataDomain, cancellationToken)
+                : Result.Failure(versionError);
             updated = updateGitRepoByKeyResult.IsSuccess;
             if (updateGitRepoByKeyResult.IsFailure)
             {
@@ -201,7 +216,7 @@ public sealed class GitStsCruder : Cruder
         string? renamedGitKey = _removedGitKey;
         _removedGitKey = null;
 
-        if (AddOrUpdateRecordWithKey(recordKey, newRecord) && renamedGitKey is not null)
+        if (await AddOrUpdateRecordWithKey(recordKey, newRecord, true, cancellationToken) && renamedGitKey is not null)
         {
             await RenameLocalGit(renamedGitKey, recordKey, cancellationToken);
         }
@@ -218,10 +233,14 @@ public sealed class GitStsCruder : Cruder
             return;
         }
 
+        int? loadedVersion = FindLoadedVersion(recordKey);
         try
         {
-            Result updateGitRepoByKeyResult =
-                await supportToolsServerApiClient.RemoveGitRepoByKey(recordKey, cancellationToken);
+            Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
+                supportToolsServerApiClient.GetGitRepos, x => x.GitProjectName, x => x.Version, cancellationToken);
+            Result updateGitRepoByKeyResult = versionError is null
+                ? await supportToolsServerApiClient.RemoveGitRepoByKey(recordKey, cancellationToken)
+                : Result.Failure(versionError);
             if (updateGitRepoByKeyResult.IsFailure)
             {
                 updateGitRepoByKeyResult.Error.PrintErrorsOnConsole();

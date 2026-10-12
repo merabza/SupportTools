@@ -117,8 +117,10 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         ApiClientSettingsDomain supportToolsServerWebApiClient =
             GetApiClientSettingsRequired(supportToolsServerWebApiClientName);
 
+        //კლიენტი კონსოლის გარეშე იქმნება: შეცდომისას ის მოთხოვნის ტანს (შაბლონების შიგთავსს) არ ბეჭდავს, დაბრუნებულ
+        //შეცდომას გამომძახებელი თვითონ ბეჭდავს (D4)
         return new SupportToolsServerApiClient(logger, httpClientFactory, supportToolsServerWebApiClient.Server,
-            supportToolsServerWebApiClient.ApiKey, true);
+            supportToolsServerWebApiClient.ApiKey, false);
     }
 
     public string GetUploadTempExtensionOrDefault()
@@ -156,12 +158,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     {
         ProjectModel? project = GetProject(projectName);
         return project is null ? [] : project.GetGitProjectNamesByGitCollectionType(gitCol);
-    }
-
-    public List<string> GetNpmPackageNames(string projectName)
-    {
-        ProjectModel? project = GetProject(projectName);
-        return project is null ? [] : project.FrontNpmPackageNames;
     }
 
     public ApiClientSettingsDomain GetApiClientSettingsRequired(string apiClientName)

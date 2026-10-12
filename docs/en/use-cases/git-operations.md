@@ -15,6 +15,8 @@ via the project's `Git` submenu (see [Configuration](../configuration.md)).
 |`Sync One Group All Projects Gits V2`|Every repository across every project in one group|
 |`Sync One Project All Gits With Scaffold Seeders V2`|All repositories of one project, including scaffold seeders|
 |`Clone Project To This Computer`|A `remote` project: create its folder and clone its repositories here|
+|`Update Git Projects` / `Update Git Projects From SupportToolsServer`|`GitProjects` of every repository, from the local clones or from the server's|
+|`Sync Gits With SupportToolsServer...`|The list of git repositories, shared with the other computers|
 |`Git` submenu (per-project)|Manage individual repositories: list, add, remove, sync|
 |`Git ScaffoldSeeder projects` submenu|Same, but for the project's scaffold seeder repos|
 
@@ -196,6 +198,41 @@ no project named like `SpaProjectName`. Check the name, or run
 `Update Git Projects` (or `Update Git Projects From SupportToolsServer`)
 from the Gits list. The V2 sync prints the same error instead of stopping
 with an exception, and the project's other repositories still sync.
+
+\---
+
+## If you need the git projects without cloning
+
+`GitProjects` maps every git repository to the `.csproj` / `.esproj`
+files in it, with their dependencies; the V2 sync and the package commands
+use it. Every computer computes it for itself and it is never synced. Both
+commands are in `Support Tools Parameters Editor` → `Gits`:
+
+* `Update Git Projects` scans the local clones;
+* `Update Git Projects From SupportToolsServer` takes the same records from
+SupportToolsServer, which scans its own clones of every repository, so a
+new computer needs no clone. It replaces the whole `GitProjects` and
+prints how many records were added, changed and removed. An empty server
+list (the server has not scanned yet) or a server error changes nothing.
+
+When a project name is in two repositories, the repository that is later
+in name order wins, as in the local scan, and the name is reported.
+
+\---
+
+## If you need the git repositories on other computers
+
+The list of git repositories (`Gits`) is part of the central registry
+(see [Configuration](../configuration.md#central-registry-supporttoolsserver)):
+`Sync Registry With SupportToolsServer...` and auto-sync carry it with the
+rest. `Support Tools Parameters Editor` → `Gits` →
+`Sync Gits With SupportToolsServer...` runs the same sync for the git
+repositories only.
+
+A repository's `.gitignore` template must be on the server before the
+repository: sync `Git Ignore Patterns` first, or use the full sync, which
+sends the templates first. SupportToolsServer clones every repository it
+receives (for `Update Git Projects From SupportToolsServer`).
 
 \---
 

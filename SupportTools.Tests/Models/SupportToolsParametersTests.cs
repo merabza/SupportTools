@@ -113,10 +113,11 @@ public sealed class SupportToolsParametersTests : IDisposable
         Assert.Empty(ConsoleText());
     }
 
-    //the client is created for the console application: a failed request is reported on the console, without the
-    //API key. Nothing listens on port 0, so the request fails at once
+    //the client is created without the console (D4): it never prints a request body (template contents), the callers
+    //print the returned error, which names the address without the API key. Nothing listens on port 0, so the request
+    //fails at once
     [Fact]
-    public async Task GetSupportToolsServerApiClient_WhenRequestOfCreatedClientFails_ReportsItOnConsole()
+    public async Task GetSupportToolsServerApiClient_WhenRequestOfCreatedClientFails_ReturnsTheErrorWithoutConsole()
     {
         // Arrange
         _sut.SupportToolsServerWebApiClientName = "ServerClient";
@@ -132,8 +133,9 @@ public sealed class SupportToolsParametersTests : IDisposable
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Contains("request to http://127.0.0.1:0/git/gitrepos failed", ConsoleText(), StringComparison.Ordinal);
-        Assert.DoesNotContain("apikey=", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("http://127.0.0.1:0/git/gitrepos", result.Error.Description, StringComparison.Ordinal);
+        Assert.DoesNotContain("apikey=", result.Error.Description, StringComparison.Ordinal);
+        Assert.Empty(ConsoleText());
     }
 
     [Fact]
@@ -236,26 +238,6 @@ public sealed class SupportToolsParametersTests : IDisposable
 
         // Assert
         Assert.Same(_project.ScaffoldSeederGitProjectNames, result);
-    }
-
-    [Fact]
-    public void GetNpmPackageNames_WhenProjectDoesNotExist_ReturnsEmptyList()
-    {
-        // Act
-        List<string> result = _sut.GetNpmPackageNames("MissingProject");
-
-        // Assert
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public void GetNpmPackageNames_WhenProjectExists_ReturnsItsFrontPackages()
-    {
-        // Act
-        List<string> result = _sut.GetNpmPackageNames(ProjectName);
-
-        // Assert
-        Assert.Same(_project.FrontNpmPackageNames, result);
     }
 
     [Fact]
