@@ -784,7 +784,7 @@ public sealed class GitStsCruderTests : IDisposable
 
         // Assert
         Assert.Contains("supportToolsServerApiClient is null", _consoleOutput.ToString(), StringComparison.Ordinal);
-        Assert.DoesNotContain("NullReferenceException", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", _consoleOutput.ToString(), StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
         Assert.True(_parameters.Gits.ContainsKey("RepoA"));
     }
@@ -803,14 +803,17 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.Contains("Git With Key RepoA Not Found", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
+    //the list was loaded before the address became invalid, so the exception comes from the delete
     [Fact]
     public async Task RemoveRecordWithKey_WhenServerAddressIsInvalid_PrintsTheExceptionWithoutThrowing()
     {
         // Arrange
+        GitStsCruder sut = CreateSut();
+        sut.GetListMenu();
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "not a server address" };
 
         // Act
-        await CliMenuTestAccess.InvokeRemoveRecordWithKey(CreateSut(), "RepoA");
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "RepoA");
 
         // Assert
         Assert.Contains("Invalid URI", _consoleOutput.ToString(), StringComparison.Ordinal);

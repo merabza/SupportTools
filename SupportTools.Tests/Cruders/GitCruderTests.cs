@@ -112,6 +112,7 @@ public sealed class GitCruderTests : IDisposable
         Assert.Equal($"{RepoAAddress} Usage count is: 0", sut.GetStatusFor("RepoA"));
         Assert.Contains("supportToolsServerWebApiClientName does not specified", ConsoleText(),
             StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", ConsoleText(), StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
     }
 

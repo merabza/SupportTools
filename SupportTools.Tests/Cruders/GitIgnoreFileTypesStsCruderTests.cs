@@ -348,7 +348,7 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         // Assert
         string console = _consoleOutput.ToString();
         Assert.Contains("supportToolsServerApiClient is null", console, StringComparison.Ordinal);
-        Assert.DoesNotContain(nameof(NullReferenceException), console, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", console, StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
     }
 
@@ -366,14 +366,17 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         Assert.Contains("Name Is Longer Than 50 Characters", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
+    //the list was loaded before the address became invalid, so the exception comes from the write
     [Fact]
     public async Task UpdateRecordWithKey_WhenServerAddressIsInvalid_PrintsTheExceptionWithoutThrowing()
     {
         // Arrange
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "not a server address" };
 
         // Act
-        await CreateSut().UpdateRecordWithKey("React", new TextItemData { Text = "React" });
+        await sut.UpdateRecordWithKey("CSharp", new TextItemData { Text = "CSharp" });
 
         // Assert
         Assert.Contains("Invalid URI", _consoleOutput.ToString(), StringComparison.Ordinal);
@@ -391,7 +394,7 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
         // Assert
         string console = _consoleOutput.ToString();
         Assert.Contains("supportToolsServerApiClient is null", console, StringComparison.Ordinal);
-        Assert.DoesNotContain(nameof(NullReferenceException), console, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", console, StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
     }
 
@@ -410,14 +413,17 @@ public sealed class GitIgnoreFileTypesStsCruderTests : IDisposable
             StringComparison.Ordinal);
     }
 
+    //the list was loaded before the address became invalid, so the exception comes from the delete
     [Fact]
     public async Task RemoveRecordWithKey_WhenServerAddressIsInvalid_PrintsTheExceptionWithoutThrowing()
     {
         // Arrange
+        GitIgnoreFileTypesStsCruder sut = CreateSut();
+        sut.GetListMenu();
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "not a server address" };
 
         // Act
-        await CliMenuTestAccess.InvokeRemoveRecordWithKey(CreateSut(), "CSharp");
+        await CliMenuTestAccess.InvokeRemoveRecordWithKey(sut, "CSharp");
 
         // Assert
         Assert.Contains("Invalid URI", _consoleOutput.ToString(), StringComparison.Ordinal);
