@@ -16,6 +16,7 @@ URL-ები კონფიგურირებული პროექტ�
 |`Sync All Projects All Gits V2`|ყველა რეპოზიტორია ყველა პროექტში|
 |`Sync One Group All Projects Gits V2`|ერთი ჯგუფის ყველა პროექტის ყველა რეპო|
 |`Sync One Project All Gits With Scaffold Seeders V2`|ერთი პროექტის ყველა რეპო, scaffold seeder-ების ჩათვლით|
+|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits With Scaffold Seeders V3`|იგივე არეალი, რაც V2-ს, უფრო სწრაფად (იხ. [ქვემოთ](#თუ-გინდა-უფრო-სწრაფი-სინქი-v3))|
 |`Clone Project To This Computer`|`remote` პროექტი: მისი ფოლდერის შექმნა და რეპოების აქ დაკლონვა|
 |`Update Git Projects` / `Update Git Projects From SupportToolsServer`|ყველა რეპოს `GitProjects`, ლოკალური ან სერვერის კლონებიდან|
 |`Sync Gits With SupportToolsServer...`|git რეპოების სია, სხვა კომპიუტერებთან გაზიარებული|
@@ -140,6 +141,61 @@ warning, არა შეცდომა. ძირითადი რეპო�
 
 \---
 
+## თუ გინდა უფრო სწრაფი სინქი (V3)
+
+`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3` და
+`Sync One Project All Gits With Scaffold Seeders V3` მენიუში თავიანთი V2
+ბრძანებების ქვემოთ დგას და იგივე სამუშაოს აკეთებს (კლონირება,
+დაიგნორებული ფაილების ინდექსიდან ამოღება, commit, pull, push), ოღონდ
+უფრო სწრაფად:
+
+* SupportTools თავის კლონებს `WorkFolder\Gits`-ში აღარ აახლებს
+(SupportToolsServer-ს თავისი კლონები აქვს).
+* ყოველი რეპოს remote-ის commit-ი SupportToolsServer-იდან ერთი მოთხოვნით
+მოდის. სერვერი მას 10 წუთს ინახავს, ვადაგასულს კი `git ls-remote`-ით
+ამოწმებს. ცვლილებების გარეშე ფოლდერი, რომლის HEAD ეს commit-ია (სერვერის
+branch-ზე), git ჰოსტინგს საერთოდ არ მიმართავს.
+* ფოლდერები ლოკალურად პარალელურად მოწმდება, ერთდროულად 8, თითოეული
+ერთი `git status`-ით; შემდეგ რეპოები პარალელურად სინქდება, ერთდროულად 8
+(ერთი რეპოს ფოლდერები თანმიმდევრობით).
+* ყველა კითხვა (commit-ის მესიჯი) პარალელურ ნაწილამდე ისმება.
+* push-ის შემდეგ SupportTools SupportToolsServer-ს ატყობინებს, რომელიც იმ
+remote-ს თავიდან ამოწმებს და თავის კლონს აახლებს.
+
+**ნაბიჯები**
+
+იგივე მენიუები და remote პროექტების იგივე კითხვა, რაც V2-ში.
+
+**მოსალოდნელი შედეგი**
+
+* მუშაობისას კონსოლის ბოლოში ყოველ მიმდინარე სამუშაოს თავისი სტრიქონი
+აქვს, რომელიც ადგილზე ახლდება, როგორც `dotnet build`-ში; შედეგები მის
+ზემოთ რჩება: `RepoA  D:\...\RepoA: committed, pushed`, `...: pulled`,
+`...: cloned`, შეცდომები კი წითლად.
+* `Checked N folders: ... with changes, ... to clone, ... failed`, შემდეგ
+`Remote heads from SupportToolsServer: X of Y gits` (და
+`Checked with fetch: ...` იმ რეპოებისთვის, რომელთა commit-იც სერვერს არ აქვს).
+* `Synced N gits, M folders: K without a request to the git server, ... fetched, ... cloned, ... committed, ... pulled, ... pushed, ... failed`.
+* გადამისამართებული გამოტანისას (ფაილი, სხვა პროგრამა) დაფა არ იხატება,
+მხოლოდ შედეგების სტრიქონები იწერება.
+
+**ხშირი შეცდომები**
+
+* **SupportTools-ის გარეთ გაკეთებულ push-ს** (Visual Studio, GitHub-ის
+ვებგვერდი) სერვერი ვერ ხედავს, სანამ შენახული ვერსიის 10 წუთი არ გავა:
+მანამდე ძველ commit-ზე მდგარი სუფთა ფოლდერი გამოტოვდება. ცვლილებები არასოდეს იკარგება: ასეთი
+ფოლდერიდან push უარყოფილი იქნება, V3 კი თავიდან აკეთებს fetch-ს, merge-ს
+და push-ს (ერთხელ).
+* **SupportToolsServer-ის გარეშე** (`SupportToolsServerWebApiClientName`
+ცარიელია, ან სერვერი არ პასუხობს): გაფრთხილება, შემდეგ ყოველი რეპო ერთხელ
+აკეთებს fetch-ს; მისი დანარჩენი ფოლდერები ამ fetch-ის შედეგს იყენებს.
+* **პაროლს არ ეკითხება.** git `GIT_TERMINAL_PROMPT=0`-ით ეშვება, ამიტომ
+რეპო, რომელსაც ხელით შესაყვანი პაროლი სჭირდება, შეყვანის ლოდინის ნაცვლად
+git-ის შეცდომით სრულდება. გამოიყენე SSH agent ან credential manager.
+* **merge კონფლიქტი** იმ ფოლდერს git-ის შეცდომით აჩერებს, როგორც V2-ში.
+
+\---
+
 ## თუ პროექტი ამ კომპიუტერზე ჯერ არ არის
 
 რეესტრის სინქრონიზაციის შემდეგ ყველა კომპიუტერზე ყველა პროექტი ჩანს,
@@ -152,8 +208,8 @@ warning, არა შეცდომა. ძირითადი რეპო�
 
 ჯგუფური ბრძანებები ნაგულისხმევად ლოკალურ პროექტებზე მუშაობს:
 
-* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`,
-`Update Outdated Packages` და `Distribute all packages` გეკითხება,
+* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`, მათი
+V3 ვერსიები, `Update Outdated Packages` და `Distribute all packages` გეკითხება,
 ჩაირთოს თუ არა remote პროექტებიც (ნაგულისხმევად `n`), რადგან მათი
 სინქრონიზაცია მათ აქ დაკლონავს;
 * `Check all projects build`, `Check group projects build`,

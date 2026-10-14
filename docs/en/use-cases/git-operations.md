@@ -14,6 +14,7 @@ via the project's `Git` submenu (see [Configuration](../configuration.md)).
 |`Sync All Projects All Gits V2`|Every repository across every project|
 |`Sync One Group All Projects Gits V2`|Every repository across every project in one group|
 |`Sync One Project All Gits With Scaffold Seeders V2`|All repositories of one project, including scaffold seeders|
+|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits With Scaffold Seeders V3`|The same scopes as V2, faster (see [below](#if-you-want-the-faster-sync-v3))|
 |`Clone Project To This Computer`|A `remote` project: create its folder and clone its repositories here|
 |`Update Git Projects` / `Update Git Projects From SupportToolsServer`|`GitProjects` of every repository, from the local clones or from the server's|
 |`Sync Gits With SupportToolsServer...`|The list of git repositories, shared with the other computers|
@@ -135,6 +136,59 @@ scaffold work.
 
 \---
 
+## If you want the faster sync (V3)
+
+`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3` and
+`Sync One Project All Gits With Scaffold Seeders V3` sit right below their V2
+commands and do the same work (clone, remove the ignored files from the
+index, commit, pull, push), faster:
+
+* SupportTools no longer updates its own clones in `WorkFolder\Gits`
+(SupportToolsServer keeps clones of its own).
+* The remote commit of every repository comes from SupportToolsServer in one
+request. The server keeps it for 10 minutes and checks an expired one with
+`git ls-remote`. A folder without changes whose HEAD is that commit (on the
+server's branch) makes no request to the git host at all.
+* The folders are checked locally in parallel, 8 at a time, with one
+`git status` each; the repositories are then synced in parallel, 8 at a time
+(the folders of one repository one after another).
+* Every question (the commit message) is asked before the parallel part.
+* After a push SupportTools tells SupportToolsServer, which checks that remote
+again and updates its clone.
+
+**Steps**
+
+Same menus and the same remote-only question as V2.
+
+**Expected output**
+
+* While it runs, the bottom of the console shows one line per running job,
+updated in place, like `dotnet build`; results stay above it:
+`RepoA  D:\...\RepoA: committed, pushed`, `...: pulled`, `...: cloned`, and
+errors in red.
+* `Checked N folders: ... with changes, ... to clone, ... failed`, then
+`Remote heads from SupportToolsServer: X of Y gits` (and
+`Checked with fetch: ...` for the repositories the server has no commit of).
+* `Synced N gits, M folders: K without a request to the git server, ... fetched, ... cloned, ... committed, ... pulled, ... pushed, ... failed`.
+* With redirected output (a file, another program) the board is not drawn;
+only the result lines are written.
+
+**Common pitfalls**
+
+* **A push made outside SupportTools** (Visual Studio, the GitHub web site)
+is not seen by the server until its 10 minutes are over: until then a clean
+folder at the old commit is skipped. Changes are never lost: a push from such
+a folder is rejected, and V3 fetches, merges and pushes again (once).
+* **No SupportToolsServer** (`SupportToolsServerWebApiClientName` is empty, or
+the server does not answer): a warning, then every repository is fetched
+once; its other folders use that fetch.
+* **No password prompts.** Git runs with `GIT_TERMINAL_PROMPT=0`, so a
+repository that needs a typed password fails with git's error instead of
+waiting for input. Use an SSH agent or a credential manager.
+* **Merge conflicts** stop that folder with git's error, as in V2.
+
+\---
+
 ## If a project is not on this computer yet
 
 After a registry sync every computer lists every project, but each project
@@ -146,8 +200,8 @@ and each group shows `local: N, remote: N`. `HideRemoteOnlyProjects` in
 
 The group commands work on the local projects by default:
 
-* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`,
-`Update Outdated Packages` and `Distribute all packages` ask whether to
+* `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`, their
+V3 versions, `Update Outdated Packages` and `Distribute all packages` ask whether to
 include the remote projects too (default `n`), because their sync would
 clone them here;
 * `Check all projects build`, `Check group projects build`,

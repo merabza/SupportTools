@@ -59,6 +59,8 @@ public static class MenuData
         nameof(ImportProjectCliMenuCommandFactoryStrategy),
         //ყველა პროექტის git-ის სინქრონიზაცია V2
         nameof(SyncAllProjectsAllGitsCliMenuCommandV2FactoryStrategy),
+        //ყველა პროექტის git-ის სინქრონიზაცია V3 (SupportToolsServer-ის ვერსიებით, პარალელურად)
+        nameof(SyncAllProjectsAllGitsCliMenuCommandV3FactoryStrategy),
         //ყველა პროექტის პაკეტების განახლება
         nameof(UpdateOutdatedPackagesCliMenuCommandFactoryStrategy),
         //ყველა პაკეტის პროექტის სინქრონიზაცია, დაბილდვა, ატვირთვა და გავრცელება დამოკიდებულებების მიხედვით დალაგებული თანმიმდევრობით
@@ -83,6 +85,8 @@ public static class MenuData
     [
         //ჯგუფში შემავალი ყველა პროჯეცტის გიტების სინქრონიზაცია
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
+        //ჯგუფში შემავალი ყველა პროექტის გიტების სინქრონიზაცია V3
+        nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV3FactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
         nameof(CheckGroupProjectsBuildCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის Visual Studio-ში გახსნა
@@ -111,6 +115,8 @@ public static class MenuData
         nameof(CloneProjectToThisComputerCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
         nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
+        //პროექტის გიტების სინქრონიზაცია V3
+        nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა
         nameof(GitSubMenuCliMenuCommandFactoryStrategy),
         //პროექტის Scaffold Seeder-ის გიტების ჩამონათვალი და მართვა
