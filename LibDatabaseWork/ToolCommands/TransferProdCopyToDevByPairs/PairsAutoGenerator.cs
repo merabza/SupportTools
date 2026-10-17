@@ -31,8 +31,8 @@ internal static class PairsAutoGenerator
             return false;
         }
 
-        //Access ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
-        if (prodCopyDataProvider == EDatabaseProvider.OleDb)
+        //Access-ისა და MariaDB-ის ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
+        if (!DbSchemaQueryHelper.UsesSchemas(prodCopyDataProvider))
         {
             devTables = DbSchemaQueryHelper.ReKeyDevTablesByTableNameOnly(devTables, logger);
         }

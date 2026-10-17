@@ -61,8 +61,8 @@ public sealed class TableNameFieldEditor : FieldEditor<string>
         }
 
         string? schemaName = GetValue<string>(recordForUpdate, $"{_sideName}SchemaName");
-        //Access-ს სქემები არ აქვს — სქემის მითითება საჭირო არ არის, ცხრილები ცარიელი სქემით იძებნება
-        if (_dataProvider != EDatabaseProvider.OleDb && string.IsNullOrWhiteSpace(schemaName))
+        //Access-სა და MariaDB-ს სქემები არ აქვს — სქემის მითითება საჭირო არ არის, ცხრილები ცარიელი სქემით იძებნება
+        if (DbSchemaQueryHelper.UsesSchemas(_dataProvider) && string.IsNullOrWhiteSpace(schemaName))
         {
             StShared.WriteErrorLine($"Set {_sideName}SchemaName before choosing a table", true, _logger);
             return ValueTask.CompletedTask;

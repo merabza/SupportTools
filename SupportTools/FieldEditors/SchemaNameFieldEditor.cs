@@ -47,8 +47,8 @@ public sealed class SchemaNameFieldEditor : FieldEditor<string>
         //    return ValueTask.CompletedTask;
         //}
 
-        //Access-ს სქემები არ აქვს — მნიშვნელობა ავტომატურად ცარიელი ხდება
-        if (_dataProvider == EDatabaseProvider.OleDb)
+        //Access-სა და MariaDB-ს სქემები არ აქვს — მნიშვნელობა ავტომატურად ცარიელი ხდება
+        if (!DbSchemaQueryHelper.UsesSchemas(_dataProvider))
         {
             SetValue(recordForUpdate, string.Empty);
             return ValueTask.CompletedTask;

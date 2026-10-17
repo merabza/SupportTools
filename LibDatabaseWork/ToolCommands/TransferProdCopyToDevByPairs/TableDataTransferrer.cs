@@ -185,12 +185,7 @@ internal static class TableDataTransferrer
         using var bulkCopy = CreateBulkCopy(devConn, pt, insertableFields, hasIdentity, commandTimeOut,
             f => f.ProdCopyFieldName);
 
-        string selectList = string.Join(", ", insertableFields.Select(f => $"[{f.ProdCopyFieldName}]"));
-        //Access-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება
-        string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
-            ? $"[{pt.ProdCopyTableName}]"
-            : $"[{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
-        string selectSql = $"SELECT {selectList} FROM {fromPart}";
+        string selectSql = ProdCopyTableReader.BuildSelectSql(prodCopyDataProvider, pt, insertableFields);
 
         prodDbm.Open();
         try

@@ -28,12 +28,7 @@ public static class ProdCopyTableReader
             return null;
         }
 
-        string selectList = string.Join(", ", selectableFields.Select(f => $"[{f.ProdCopyFieldName}]"));
-        //Access-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება
-        string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
-            ? $"[{pt.ProdCopyTableName}]"
-            : $"[{pt.ProdCopySchemaName}].[{pt.ProdCopyTableName}]";
-        string selectSql = $"SELECT {selectList} FROM {fromPart}";
+        string selectSql = BuildSelectSql(prodCopyDataProvider, pt, selectableFields);
 
         prodDbm.Open();
         try
@@ -59,5 +54,19 @@ public static class ProdCopyTableReader
         {
             prodDbm.Close();
         }
+    }
+
+    //ProdCopy-ის ცხრილის წამკითხავი SELECT: MariaDB სახელებს `...`-ში სვამს, დანარჩენი ბაზები [...]-ში;
+    //Access-სა და MariaDB-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება
+    internal static string BuildSelectSql(EDatabaseProvider prodCopyDataProvider, PairedTable pt,
+        IEnumerable<PairedField> fields)
+    {
+        string selectList = string.Join(", ", fields.Select(f => Quote(f.ProdCopyFieldName)));
+        string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
+            ? Quote(pt.ProdCopyTableName)
+            : $"{Quote(pt.ProdCopySchemaName)}.{Quote(pt.ProdCopyTableName)}";
+        return $"SELECT {selectList} FROM {fromPart}";
+
+        string Quote(string name) => prodCopyDataProvider == EDatabaseProvider.MariaDb ? $"`{name}`" : $"[{name}]";
     }
 }

@@ -90,8 +90,8 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
             return false;
         }
 
-        //Access ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
-        if (Parameters.ProdCopyDataProvider == EDatabaseProvider.OleDb)
+        //Access-ისა და MariaDB-ის ProdCopy-ს სქემები არ აქვს — Dev ცხრილებთან წყვილდება მხოლოდ ცხრილის სახელით
+        if (!DbSchemaQueryHelper.UsesSchemas(Parameters.ProdCopyDataProvider))
         {
             devTables = DbSchemaQueryHelper.ReKeyDevTablesByTableNameOnly(devTables, _logger);
         }

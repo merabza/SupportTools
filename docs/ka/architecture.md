@@ -84,7 +84,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 |`BackendCarcass`|გაზიარებული backend framework პროექტები|
 |`BackendCarcassShared`|Carcass კონტრაქტები|
 |`ConnectionTools`|FTP/connection-pool utility-ები|
-|`DatabaseTools`|SQL Server, SQLite, OleDb ადაპტერები|
+|`DatabaseTools`|SQL Server, SQLite, OleDb, MariaDB ადაპტერები|
 |`ParametersManagement`|API client, file, database პარამეტრების მართვა|
 |`SupportToolsServerShared`|SupportToolsServer-თან გაზიარებული კონტრაქტები|
 |`SystemTools`|System აბსტრაქციები, background task-ები, ბაზის ხელსაწყოების გაზიარებული ტიპები|

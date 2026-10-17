@@ -81,7 +81,7 @@ These are sibling Git checkouts referenced via relative paths in
 |`BackendCarcass`|Shared backend framework projects|
 |`BackendCarcassShared`|Carcass contracts|
 |`ConnectionTools`|FTP/connection-pool utilities|
-|`DatabaseTools`|SQL Server, SQLite, OleDb adapters|
+|`DatabaseTools`|SQL Server, SQLite, OleDb, MariaDB adapters|
 |`ParametersManagement`|API client, file, and database parameter management|
 |`SupportToolsServerShared`|Contracts shared with SupportToolsServer|
 |`SystemTools`|System abstractions, background tasks, database tools shared types|

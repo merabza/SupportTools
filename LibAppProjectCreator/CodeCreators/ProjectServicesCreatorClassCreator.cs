@@ -41,7 +41,7 @@ public sealed class ProjectServicesCreatorClassCreator : CodeCreator
                         new CodeBlock("switch (dataProvider)",
                             $"case EDatabaseProvider.SqlServer: services.AddDbContext<{_projectNamespace}DbContext>(options => options.UseSqlServer(connectionString))",
                             "break",
-                            "case EDatabaseProvider.None: case EDatabaseProvider.SqLite: case EDatabaseProvider.OleDb: case EDatabaseProvider.WebAgent: case null: break",
+                            "case EDatabaseProvider.None: case EDatabaseProvider.SqLite: case EDatabaseProvider.OleDb: case EDatabaseProvider.WebAgent: case EDatabaseProvider.MariaDb: case null: break",
                             "default: throw new ArgumentOutOfRangeException(nameof(dataProvider))")),
                     $"services.AddScoped<I{_projectNamespace}Repository, {_projectNamespace}Repository>()",
                     $"services.AddSingleton<I{_projectNamespace}RepositoryCreatorFactory, {_projectNamespace}RepositoryCreatorFactory>()",

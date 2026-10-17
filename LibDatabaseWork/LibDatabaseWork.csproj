@@ -18,4 +18,8 @@
     <ProjectReference Include="..\..\SystemTools\SystemTools.DatabaseToolsShared\SystemTools.DatabaseToolsShared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportTools.Tests" />
+  </ItemGroup>
+
 </Project>

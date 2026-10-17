@@ -11,7 +11,7 @@ using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 
-//ცხრილებისა და სვეტების ერთიანი წამკითხავი ორივე ბაზისთვის — SQL Server-ის INFORMATION_SCHEMA-დან
+//ცხრილებისა და სვეტების ერთიანი წამკითხავი ორივე ბაზისთვის — SQL Server-ისა და MariaDB-ის INFORMATION_SCHEMA-დან
 //ან Access-ის (OleDb) სქემის rowset-ებიდან
 public static class DbSchemaQueryHelper
 {
@@ -24,6 +24,24 @@ public static class DbSchemaQueryHelper
                                    AND t.TABLE_NAME <> '__EFMigrationsHistory' -- EF-ის მიგრაციების ისტორია არ წყვილდება: Dev-ს საკუთარი აქვს
                                  ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, c.ORDINAL_POSITION
                                  """;
+
+    //MariaDB-ში სქემა ბაზაა — იკითხება მხოლოდ კავშირის მიმდინარე ბაზა, სქემის სახელად კი ცარიელი სტრიქონი ბრუნდება,
+    //როგორც Access-ის შემთხვევაში
+    private const string MariaDbQuery = """
+                                        SELECT '' AS TABLE_SCHEMA, c.TABLE_NAME, c.COLUMN_NAME
+                                        FROM INFORMATION_SCHEMA.COLUMNS c
+                                        INNER JOIN INFORMATION_SCHEMA.TABLES t
+                                          ON c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME
+                                        WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_TYPE = 'BASE TABLE'
+                                          AND t.TABLE_NAME <> '__EFMigrationsHistory'
+                                        ORDER BY c.TABLE_NAME, c.ORDINAL_POSITION
+                                        """;
+
+    //Access-ს (OleDb) და MariaDB-ს სქემები არ აქვს — სქემის სახელი ცარიელია და ცხრილები მხოლოდ სახელით წყვილდება
+    public static bool UsesSchemas(EDatabaseProvider dataProvider)
+    {
+        return dataProvider is not (EDatabaseProvider.OleDb or EDatabaseProvider.MariaDb);
+    }
 
     public static Dictionary<(string SchemaLower, string TableLower), TableInfo>? ReadTablesAndColumns(
         EDatabaseProvider dataProvider, string connectionString, string sideName, ILogger logger)
@@ -47,7 +65,7 @@ public static class DbSchemaQueryHelper
             {
                 dbm.Open();
                 // ReSharper disable once using
-                using IDataReader reader = dbm.ExecuteReader(Query);
+                using IDataReader reader = dbm.ExecuteReader(GetColumnsQuery(dataProvider));
                 var tables = new Dictionary<(string SchemaLower, string TableLower), TableInfo>();
                 while (reader.Read())
                 {
@@ -102,7 +120,7 @@ public static class DbSchemaQueryHelper
             {
                 dbm.Open();
                 // ReSharper disable once using
-                using IDataReader reader = dbm.ExecuteReader(Query);
+                using IDataReader reader = dbm.ExecuteReader(GetColumnsQuery(dataProvider));
                 var tables = new Dictionary<(string Schema, string Table), TableInfo>();
                 while (reader.Read())
                 {
@@ -134,7 +152,7 @@ public static class DbSchemaQueryHelper
         }
     }
 
-    //Access ProdCopy-ს სქემები არ აქვს — Dev ცხრილების ლექსიკონი მხოლოდ ცხრილის სახელით გადაიკეთება,
+    //Access-ისა და MariaDB-ის ProdCopy-ს სქემები არ აქვს — Dev ცხრილების ლექსიკონი მხოლოდ ცხრილის სახელით გადაიკეთება,
     //რომ ProdCopy-ის ("", table) გასაღებები დაემთხვეს; სხვადასხვა სქემაში ერთნაირსახელიანი ცხრილები გამოტოვდება გაფრთხილებით
     public static Dictionary<(string SchemaLower, string TableLower), TableInfo> ReKeyDevTablesByTableNameOnly(
         Dictionary<(string SchemaLower, string TableLower), TableInfo> devTables, ILogger logger)
@@ -150,11 +168,16 @@ public static class DbSchemaQueryHelper
         {
             result.Remove((string.Empty, duplicate));
             StShared.WriteWarningLine(
-                $"Dev table name '{duplicate}' exists in multiple schemas — cannot pair with Access table by name only, skipped",
+                $"Dev table name '{duplicate}' exists in multiple schemas — cannot pair with ProdCopy table by name only, skipped",
                 true, logger);
         }
 
         return result;
+    }
+
+    private static string GetColumnsQuery(EDatabaseProvider dataProvider)
+    {
+        return dataProvider == EDatabaseProvider.MariaDb ? MariaDbQuery : Query;
     }
 
     //Access-ის (OleDb) ბაზას INFORMATION_SCHEMA და სქემები არ აქვს — ცხრილები OleDbSchemaReader-ით იკითხება,
