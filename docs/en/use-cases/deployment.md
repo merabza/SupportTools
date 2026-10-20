@@ -11,6 +11,13 @@ These commands operate on a project after a server has been configured
 through `Project → Server Infos List → Create New Server Info`. See
 [Configuration](../configuration.md) for the field reference.
 
+To add a server like an existing one, open that server and run
+`Copy Server...`. It asks for the target project, the server name and the
+environment name (the current ones are the defaults) and copies every
+field of the record, the database parameters and the allowed tools
+included, under a new key. If the target project already has that server
+with that environment, nothing is copied.
+
 ## Quick Reference
 
 |Command|Purpose|

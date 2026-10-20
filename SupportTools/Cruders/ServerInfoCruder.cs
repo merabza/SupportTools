@@ -19,6 +19,8 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 {
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
     private readonly string _projectName;
     private readonly IServiceProvider _serviceProvider;
 
@@ -27,6 +29,8 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         string projectName, IServiceProvider serviceProvider) : base(parametersManager, currentValuesDictionary,
         "Server", "Servers", true)
     {
+        _logger = logger;
+        _httpClientFactory = httpClientFactory;
         _projectName = projectName;
         _serviceProvider = serviceProvider;
 
@@ -69,6 +73,10 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
     {
+        //სერვერის დაკოპირება არჩეულ პროექტში (ჩანაწერის წაშლისა და რედაქტირების ბრძანებების შემდეგ)
+        itemSubMenuSet.AddMenuItem(new CopyServerInfoCliMenuCommand(_logger, _httpClientFactory, ParametersManager,
+            _projectName, itemName));
+
         base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
         //დასაშვები ინსტრუმენტების არჩევა

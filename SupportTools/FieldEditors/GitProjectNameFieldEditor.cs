@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,18 +16,28 @@ namespace SupportTools.FieldEditors;
 public sealed class GitProjectNameFieldEditor : FieldEditor<string>
 {
     private readonly string[] _gitProjectNamesParameterNames;
+    private readonly Func<string, CliMenuSet, string?, int> _inputIdFromMenuList;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectExtension;
     private readonly bool _useNone;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public GitProjectNameFieldEditor(string propertyName, string[] gitProjectNamesParameterNames,
-        string projectExtension, IParametersManager parametersManager, bool useNone = false) : base(propertyName)
+        string projectExtension, IParametersManager parametersManager, bool useNone = false) : this(propertyName,
+        gitProjectNamesParameterNames, projectExtension, parametersManager, useNone, MenuInputer.InputIdFromMenuList)
+    {
+    }
+
+    //კონსოლიდან არჩევა პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხები თვითონ მიაწოდონ
+    // ReSharper disable once ConvertToPrimaryConstructor
+    internal GitProjectNameFieldEditor(string propertyName, string[] gitProjectNamesParameterNames,
+        string projectExtension, IParametersManager parametersManager, bool useNone,
+        Func<string, CliMenuSet, string?, int> inputIdFromMenuList) : base(propertyName)
     {
         _parametersManager = parametersManager;
         _useNone = useNone;
         _projectExtension = projectExtension;
         _gitProjectNamesParameterNames = gitProjectNamesParameterNames;
+        _inputIdFromMenuList = inputIdFromMenuList;
     }
 
     public override ValueTask UpdateField(string? recordKey, object recordForUpdate,
@@ -65,13 +76,16 @@ public sealed class GitProjectNameFieldEditor : FieldEditor<string>
             gitProjectNamesMenuSet.AddMenuItem("-", new CliMenuCommand("(None)"));
         }
 
+        //ელემენტის id მისი ინდექსია keys-ში. Enter მიმდინარე მნიშვნელობას ტოვებს: სია მისი ელემენტის id-ს აბრუნებს,
+        //id-ის გარეშე დამატებულ ელემენტს კი -1 აქვს, რაც (None)-ად ან არასწორ არჩევანად ჩაითვლებოდა
+        int id = 0;
         foreach (string listItem in keys)
             //listItem
         {
-            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem));
+            gitProjectNamesMenuSet.AddMenuItem(new MenuCommandWithStatusCliMenuCommand(listItem), id++);
         }
 
-        int index = MenuInputer.InputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
+        int index = _inputIdFromMenuList(FieldName, gitProjectNamesMenuSet, currentGitProjectName);
 
         if (_useNone && index == -1)
         {
