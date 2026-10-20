@@ -80,6 +80,18 @@ public sealed class GitFolderStatusTests
             status);
     }
 
+    //git prints the untracked file "branch.head x" as "? branch.head x": a file line is never read as a header, so the
+    //branch to publish stays the real one
+    [Fact]
+    public void Parse_WhenAnUntrackedFileNameLooksLikeAHeader_TakesItOnlyAsAChange()
+    {
+        // Act
+        var status = GitFolderStatus.Parse($"# branch.oid {Commit}\n# branch.head feature\n? branch.head x\n");
+
+        // Assert
+        Assert.Equal(new GitFolderStatus(Commit, null, true, true) { BranchWithoutUpstream = "feature" }, status);
+    }
+
     //a detached HEAD has no branch to publish
     [Fact]
     public void Parse_WhenTheHeadIsDetached_HasNoUpstreamBranch()
