@@ -403,7 +403,7 @@ public sealed class GitRepositorySyncerTests : IDisposable
     }
 
     [Fact]
-    public void Run_WhenTheFolderHasNoUpstream_ReportsIt()
+    public void Run_WhenTheHeadIsDetached_ReportsThatItHasNoUpstream()
     {
         // Arrange
         string folder = Clone("A");
@@ -415,6 +415,51 @@ public sealed class GitRepositorySyncerTests : IDisposable
 
         // Assert
         Assert.StartsWith("has no upstream branch: git rev-parse @{u} failed", outcome.Error, StringComparison.Ordinal);
+    }
+
+    //a branch made here and never pushed (a feature branch, for example) is published under its name and tracked from
+    //now on; the main branch of the remote stays as it was
+    [Fact]
+    public void Run_WhenTheBranchHasNoUpstream_CommitsAndPublishesIt()
+    {
+        // Arrange
+        string folder = Clone("A");
+        string headOfMain = Head(folder);
+        GitTestRepositories.RunGit("-C", folder, "checkout", "-q", "-b", "feature");
+        File.WriteAllText(Path.Combine(folder, "a.txt"), "a");
+
+        // Act
+        GitFolderSyncOutcome outcome = Assert.Single(Run(new GitHead("main", headOfMain), folder).Outcomes);
+
+        // Assert
+        Assert.Equal((true, true, "feature", null),
+            (outcome.Committed, outcome.Pushed, outcome.PublishedBranch, outcome.Error));
+        Assert.Equal(Head(folder), GitTestRepositories.RunGit("-C", _remote, "rev-parse", "feature"));
+        Assert.Equal(headOfMain, GitTestRepositories.RunGit("-C", _remote, "rev-parse", "main"));
+        Assert.Equal("origin/feature", GitTestRepositories.RunGit("-C", folder, "rev-parse", "--abbrev-ref", "@{u}"));
+        Assert.Equal(["commit", "status", "fetch", "publish"], _steps);
+    }
+
+    //origin already has a branch of that name with a commit this one lacks: the push is rejected and left for the user
+    [Fact]
+    public void Run_WhenTheRemoteHasTheBranchWithOtherCommits_ReportsTheRejectedPublish()
+    {
+        // Arrange
+        GitTestRepositories.RunGit("-C", _upstream, "checkout", "-q", "-b", "feature");
+        File.WriteAllText(Path.Combine(_upstream, "f.txt"), "f");
+        GitTestRepositories.RunGit("-C", _upstream, "add", "--all");
+        GitTestRepositories.RunGit("-C", _upstream, "commit", "-q", "-m", "Feature");
+        GitTestRepositories.RunGit("-C", _upstream, "push", "-q", "origin", "feature");
+        string folder = Clone("A");
+        GitTestRepositories.RunGit("-C", folder, "checkout", "-q", "-b", "feature");
+        File.WriteAllText(Path.Combine(folder, "a.txt"), "a");
+
+        // Act
+        GitFolderSyncOutcome outcome = Assert.Single(Run(null, folder).Outcomes);
+
+        // Assert
+        Assert.Equal((true, false, null), (outcome.Committed, outcome.Pushed, outcome.PublishedBranch));
+        Assert.StartsWith("git push --set-upstream origin feature failed", outcome.Error, StringComparison.Ordinal);
     }
 
     [Fact]

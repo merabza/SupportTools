@@ -17,6 +17,10 @@ internal sealed class GitFolderSyncOutcome
     public bool Fetched { get; set; }
     public bool Pulled { get; set; }
     public bool Pushed { get; set; }
+
+    //upstream-ის გარეშე branch, რომელიც ამ სინქრონიზაციამ origin-ზე გამოაქვეყნა (Pushed-იც true-ა)
+    public string? PublishedBranch { get; set; }
+
     public string? Error { get; set; }
 
     //git სერვერთან მიმართვის გარეშე: არც დაკლონილა, არც fetch გაკეთებულა და შეცდომაც არ ყოფილა

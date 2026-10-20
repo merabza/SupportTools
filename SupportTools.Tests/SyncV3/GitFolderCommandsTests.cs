@@ -365,6 +365,33 @@ public sealed class GitFolderCommandsTests : IDisposable
     }
 
     [Fact]
+    public void PushSetUpstream_WhenTheBranchIsOnlyHere_PublishesItAndTracksIt()
+    {
+        // Arrange
+        GitTestRepositories.RunGit("-C", _clone, "checkout", "-q", "-b", "feature");
+        string commit = CommitFile(_clone, "a.txt");
+
+        // Act
+        Result result = _sut.PushSetUpstream(_clone, "feature");
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(commit, GitTestRepositories.RunGit("-C", _remote, "rev-parse", "feature"));
+        Assert.Equal("origin/feature", GitTestRepositories.RunGit("-C", _clone, "rev-parse", "--abbrev-ref", "@{u}"));
+    }
+
+    [Fact]
+    public void PushSetUpstream_WhenTheBranchIsUnknown_Fails()
+    {
+        // Act
+        Result result = _sut.PushSetUpstream(_clone, "unknown-branch");
+
+        // Assert
+        Assert.StartsWith("git push --set-upstream origin unknown-branch failed (ExitCode=1): ",
+            result.Error.Description, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void UpdateTrackingRef_WhenTheCommitExists_MovesTheTrackingBranchThere()
     {
         // Arrange

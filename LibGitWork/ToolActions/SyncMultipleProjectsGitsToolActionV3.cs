@@ -359,7 +359,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
             AddIf(actions, outcome.Cloned, "cloned");
             AddIf(actions, outcome.Committed, "committed");
             AddIf(actions, outcome.Pulled, "pulled");
-            AddIf(actions, outcome.Pushed, "pushed");
+            AddIf(actions, outcome.Pushed,
+                outcome.PublishedBranch is null ? "pushed" : $"published branch {outcome.PublishedBranch}");
             if (actions.Count > 0)
             {
                 Report(board, $"{gitName}  {outcome.Folder.FolderPath}: {string.Join(", ", actions)}", false);

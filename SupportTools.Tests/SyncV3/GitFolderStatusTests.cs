@@ -56,6 +56,31 @@ public sealed class GitFolderStatusTests
         Assert.Null(status.UpstreamBranch);
     }
 
+    //the upstream of another remote is still an upstream: the branch is synced with it, not published
+    [Fact]
+    public void Parse_WhenTheUpstreamIsOfAnotherRemote_IsNotABranchWithoutUpstream()
+    {
+        // Act
+        var status = GitFolderStatus.Parse(
+            $"# branch.oid {Commit}\n# branch.head main\n# branch.upstream fork/main\n# branch.ab +0 -0\n");
+
+        // Assert
+        Assert.Null(status.BranchWithoutUpstream);
+    }
+
+    //a branch made here and never pushed: git writes no upstream line, and the sync publishes the branch
+    [Fact]
+    public void Parse_WhenTheBranchHasNoUpstream_ReadsItsName()
+    {
+        // Act
+        var status = GitFolderStatus.Parse($"# branch.oid {Commit}\r\n# branch.head download-temp-block\r\n");
+
+        // Assert
+        Assert.Equal(new GitFolderStatus(Commit, null, true, false) { BranchWithoutUpstream = "download-temp-block" },
+            status);
+    }
+
+    //a detached HEAD has no branch to publish
     [Fact]
     public void Parse_WhenTheHeadIsDetached_HasNoUpstreamBranch()
     {

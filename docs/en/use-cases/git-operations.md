@@ -186,6 +186,13 @@ once; its other folders use that fetch.
 repository that needs a typed password fails with git's error instead of
 waiting for input. Use an SSH agent or a credential manager.
 * **Merge conflicts** stop that folder with git's error, as in V2.
+* **A branch that exists only here** (made with `git checkout -b` and never
+pushed): V3 publishes it to `origin` under the same name
+(`git push --set-upstream`) and writes `...: published branch <name>`; from
+then on it is synced like any other branch. V2 stops such a folder with
+`Unknown state`. If `origin` already has a branch of that name with commits
+this one lacks, the push is rejected with git's error: run
+`git branch -u origin/<name>` in the folder and sync again.
 
 \---
 

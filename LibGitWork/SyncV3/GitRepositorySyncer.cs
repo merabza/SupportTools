@@ -9,7 +9,8 @@ namespace LibGitWork.SyncV3;
 //არ აქვს, მისი upstream remote-ის ცნობილი branch-ია და HEAD remote-ის ცნობილ commit-ზეა. ცნობილი ვერსია თავიდან
 //SupportToolsServer-ისაა (ან არ არის), შემდეგ კი ყოველი fetch-ის და push-ის შედეგით ახლდება. დანარჩენი ფოლდერები V2-ის
 //წესით სინქრონდება: commit, fetch (remote update), ჩამორჩენისას merge --ff-only, დაშორებისას pull, წინსწრებისას push.
-//უარყოფილი push-ის შემდეგ ერთხელ ხელახლა fetch და სინქრონიზაცია ხდება
+//უარყოფილი push-ის შემდეგ ერთხელ ხელახლა fetch და სინქრონიზაცია ხდება. upstream-ის გარეშე branch-ი (აქ შექმნილი და ჯერ
+//გამოუქვეყნებელი) fetch-ის შემდეგ origin-ზე იმავე სახელით ქვეყნდება
 internal sealed class GitRepositorySyncer
 {
     private const int MaxSyncSteps = 10;
@@ -124,7 +125,29 @@ internal sealed class GitRepositorySyncer
         }
 
         outcome.Fetched = true;
+        if (status.BranchWithoutUpstream is not null)
+        {
+            PublishBranch(outcome, status.BranchWithoutUpstream);
+            return;
+        }
+
         SyncWithUpstream(outcome, status.UpstreamBranch);
+    }
+
+    //branch origin-ზე იმავე სახელით იგზავნება და მისი upstream ხდება, ამიტომ შემდეგი სინქრონიზაცია მას ჩვეულებრივად
+    //ადარებს. თუ origin-ს ამ სახელის branch უკვე აქვს და მასზე აქ უცნობი commit-ებია, push უარყოფილია და შეცდომად რჩება
+    private void PublishBranch(GitFolderSyncOutcome outcome, string branchName)
+    {
+        _reportStep(outcome.Folder, "publish");
+        Result pushResult = _commands.PushSetUpstream(outcome.Folder.FolderPath, branchName);
+        if (pushResult.IsFailure)
+        {
+            outcome.Error = pushResult.Error.Description;
+            return;
+        }
+
+        outcome.Pushed = true;
+        outcome.PublishedBranch = branchName;
     }
 
     private bool CanSkip(GitFolderStatus status)

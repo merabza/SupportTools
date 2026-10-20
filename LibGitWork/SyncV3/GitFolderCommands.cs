@@ -97,6 +97,12 @@ internal sealed class GitFolderCommands
         return ToResult(Run(folder, "push"));
     }
 
+    //upstream-ის გარეშე branch origin-ზე იმავე სახელით იგზავნება და მისი upstream ხდება
+    public Result PushSetUpstream(string folder, string branchName)
+    {
+        return ToResult(Run(folder, "push", "--set-upstream", "origin", branchName));
+    }
+
     //remote-ის ცნობილი ვერსია ლოკალურ refs/remotes/origin/<branch>-ში იწერება ისე, როგორც ამას fetch გააკეთებდა
     public Result UpdateTrackingRef(string folder, string branchName, string commitId)
     {

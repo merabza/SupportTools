@@ -243,6 +243,26 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         Assert.Contains($"RepoC  {folder}: committed, pushed", output, StringComparison.Ordinal);
     }
 
+    //a branch made here and never pushed is published under its name; the line names it, the summary counts a push
+    [Fact]
+    public async Task Run_WhenAFolderIsOnABranchWithoutUpstream_PublishesTheBranch()
+    {
+        // Arrange
+        string folder = CloneInto("Local2", "RepoC");
+        GitTestRepositories.RunGit("-C", folder, "checkout", "-q", "-b", "feature");
+        await File.WriteAllTextAsync(Path.Combine(folder, "New.txt"), "new");
+
+        // Act
+        bool result = await Create(null, "Local2", true, "Sync message").Run();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(Head(folder), GitTestRepositories.RunGit("-C", _remotes["RepoC"], "rev-parse", "feature"));
+        string output = _consoleOutput.ToString();
+        Assert.Contains($"RepoC  {folder}: committed, published branch feature", output, StringComparison.Ordinal);
+        Assert.Contains("1 committed, 0 pulled, 1 pushed, 0 failed", output, StringComparison.Ordinal);
+    }
+
     //the message is asked once, before the parallel sync, and kept for the next folders on request
     [Fact]
     public async Task Run_WhenTheMessageIsKept_AsksOnceForEveryChangedFolder()
