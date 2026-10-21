@@ -62,7 +62,22 @@ public sealed class DotnetProcessor
     public Result AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}");
+            CreateAddPackageArguments(projectFilePath, packageName, packageVersion, false));
+    }
+
+    //dotnet add package-ის restore NuGet-ის HTTP ქეშს (30 წუთი) ყოველთვის იყენებს და წამის წინ ატვირთულ
+    //დამოკიდებულებას ვერ ხედავს, ამიტომ პაკეტი restore-ის გარეშე ჩაიწერება და restore-ს RestoreWithoutHttpCache უშვებს
+    public Result AddPackageToProjectWithoutRestore(string projectFilePath, string packageName, string packageVersion)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            CreateAddPackageArguments(projectFilePath, packageName, packageVersion, true));
+    }
+
+    internal static string CreateAddPackageArguments(string projectFilePath, string packageName,
+        string? packageVersion, bool noRestore)
+    {
+        return
+            $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}{(noRestore ? " --no-restore" : string.Empty)}";
     }
 
     public Result RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
@@ -127,6 +142,17 @@ public sealed class DotnetProcessor
     public Result Restore(string projectFileFullName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
+    }
+
+    public Result RestoreWithoutHttpCache(string projectFileFullName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+            CreateRestoreWithoutHttpCacheArguments(projectFileFullName));
+    }
+
+    internal static string CreateRestoreWithoutHttpCacheArguments(string projectFileFullName)
+    {
+        return $"restore {projectFileFullName} --no-http-cache";
     }
 
     //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს.

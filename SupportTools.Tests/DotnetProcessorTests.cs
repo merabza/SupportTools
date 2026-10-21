@@ -26,4 +26,28 @@ public sealed class DotnetProcessorTests
         // Assert
         Assert.Equal(expected, result);
     }
+
+    [Theory]
+    [InlineData(null, false, "add App.csproj package Lib.A")]
+    [InlineData("1.0.1", false, "add App.csproj package Lib.A --version 1.0.1")]
+    [InlineData("1.0.1", true, "add App.csproj package Lib.A --version 1.0.1 --no-restore")]
+    public void CreateAddPackageArguments_AddsTheSwitchesThatAreAskedFor(string? packageVersion, bool noRestore,
+        string expected)
+    {
+        // Act
+        string result = DotnetProcessor.CreateAddPackageArguments("App.csproj", "Lib.A", packageVersion, noRestore);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void CreateRestoreWithoutHttpCacheArguments_SkipsTheHttpCache()
+    {
+        // Act
+        string result = DotnetProcessor.CreateRestoreWithoutHttpCacheArguments("App.csproj");
+
+        // Assert
+        Assert.Equal("restore App.csproj --no-http-cache", result);
+    }
 }

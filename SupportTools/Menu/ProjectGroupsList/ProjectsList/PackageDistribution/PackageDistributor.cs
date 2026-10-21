@@ -177,7 +177,9 @@ public sealed class PackageDistributor
 
         string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
-        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        var referenceReplacer =
+            new ProjectReferenceReplacer(new DotnetPackageReferenceCommands(new DotnetProcessor(_logger, true)),
+                _logger);
 
         //მანამდე უკვე ჩასმული ამავე პაკეტის პროექტის პაკეტების ვერსიები უახლესზე აიწევა,
         //რომ ძველ ვერსიებზე მიბმის გამო ვერსიების კონფლიქტები (NU1107) არ წარმოიშვას
@@ -221,30 +223,9 @@ public sealed class PackageDistributor
                     continue;
                 }
 
-                if (dotnetProcessor.RemoveReferenceFromProject(csprojFile, refFullPath).IsFailure)
-                {
-                    StShared.WriteErrorLine($"Cannot remove reference {refFullPath} from {csprojFile}", true, _logger);
-                    hadErrors = true;
-                    continue;
-                }
-
-                if (dotnetProcessor.AddPackageToProject(csprojFile, packageId, latestVersion).IsFailure)
+                if (!referenceReplacer.Replace(csprojFile, refFullPath, packageId, latestVersion))
                 {
                     hadErrors = true;
-
-                    //თუ პაკეტის ჩასმა ვერ მოხერხდა, წაშლილი რეფერენსი უბრუნდება პროექტს,
-                    //რომ შეცვლილი პროექტი შეცდომაზე არ გავიდეს
-                    if (dotnetProcessor.AddReferenceToProject(csprojFile, refFullPath).IsFailure)
-                    {
-                        StShared.WriteErrorLine(
-                            $"Cannot add package {packageId} to {csprojFile} and cannot restore removed reference {refFullPath}. Recover the file from git",
-                            true, _logger);
-                        continue;
-                    }
-
-                    StShared.WriteErrorLine(
-                        $"Cannot add package {packageId} to {csprojFile}. Removed reference was restored", true,
-                        _logger);
                     continue;
                 }
 
