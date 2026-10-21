@@ -122,6 +122,24 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.Contains("distribute RemotePackage", _steps.Calls);
     }
 
+    [Fact]
+    public async Task RunBody_WhenAPackageDoesNotUseLocalPackages_SkipsIt()
+    {
+        // Arrange
+        AddProject("Package", EProjectType.IsPackage, true);
+        AddProject("OtherPackage", EProjectType.IsPackage, true);
+        _parameters.Projects["OtherPackage"].UseLocalPackages = false;
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Contains("Package projects processing order: Package" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(_steps.Calls, x => x.Contains("OtherPackage", StringComparison.Ordinal));
+    }
+
     //every step of a package runs in this order, and the next package comes only after the last step of the previous
     [Fact]
     public async Task RunBody_WhenEveryStepSucceeds_RunsAllStepsOfEveryPackageAndReportsTheCount()
@@ -331,6 +349,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
     {
         _parameters.Projects[projectName] = new ProjectModel
         {
+            UseLocalPackages = true,
             ProjectType = projectType,
             ProjectFolderName = isLocal ? _tempFolder : Path.Combine(_tempFolder, "Missing"),
             GitProjectNames = [.. gitNames]

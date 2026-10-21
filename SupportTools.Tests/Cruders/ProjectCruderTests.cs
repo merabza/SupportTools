@@ -30,6 +30,7 @@ public sealed class ProjectCruderTests
         nameof(ProjectModel.MajorVersion),
         nameof(ProjectModel.MinorVersion),
         nameof(ProjectModel.UseAlternativeWebAgent),
+        nameof(ProjectModel.UseLocalPackages),
         nameof(ProjectModel.ProgramArchiveDateMask),
         nameof(ProjectModel.ProgramArchiveExtension),
         nameof(ProjectModel.ParametersFileDateMask),

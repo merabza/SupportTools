@@ -61,6 +61,14 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
         foreach ((string projectName, ProjectModel project) in RemoteOnlyProjects.Skip(parameters.Projects, _logger)
                      .OrderBy(x => x.Key, StringComparer.Ordinal))
         {
+            //ლოკალური პაკეტების რეფერენსები მხოლოდ UseLocalPackages-ჩართულ პროექტებში ბრუნდება
+            if (!project.UseLocalPackages)
+            {
+                StShared.ConsoleWriteInformationLine(_logger, true,
+                    $"UseLocalPackages is off for project {projectName}, skipped");
+                continue;
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
             projectsCount++;
             hadErrors |= !ProcessProject(parameters, gitProjects, referencesEditor, projectName, project);

@@ -28,6 +28,7 @@ public static class ProjectMapper
             MajorVersion = project.MajorVersion,
             MinorVersion = project.MinorVersion,
             UseAlternativeWebAgent = project.UseAlternativeWebAgent,
+            UseLocalPackages = project.UseLocalPackages,
             EditorConfigPatternName = project.EditorConfigPatternName,
             MainProjectName = project.MainProjectName,
             ApiContractsProjectName = project.ApiContractsProjectName,
@@ -106,6 +107,7 @@ public static class ProjectMapper
         project.ProjectDescription = contract.ProjectDescription;
         project.MajorVersion = contract.MajorVersion;
         project.MinorVersion = contract.MinorVersion;
+        project.UseLocalPackages = contract.UseLocalPackages;
         project.EditorConfigPatternName = contract.EditorConfigPatternName;
         project.SpaProjectName = contract.SpaProjectName;
         project.ScaffoldSeederProjectName = contract.ScaffoldSeederProjectName;

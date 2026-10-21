@@ -108,6 +108,14 @@ public sealed class PackageDistributor
                 continue;
             }
 
+            //ლოკალურ პაკეტებს მხოლოდ UseLocalPackages-ჩართული პროექტები იღებენ
+            if (!consumerProject.UseLocalPackages)
+            {
+                StShared.ConsoleWriteInformationLine(_logger, true,
+                    $"UseLocalPackages is off for project {consumerProjectName}, skipped");
+                continue;
+            }
+
             consumersCount++;
             hadErrors |= !await ProcessConsumerProject(parameters, gitProjects, consumerProjectName, consumerProject,
                 apiClientSettings.Server, cancellationToken);

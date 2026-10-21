@@ -17,6 +17,10 @@ public sealed class ProjectModel : ItemData
     public int MajorVersion { get; set; } = 1;
     public int MinorVersion { get; set; }
     public bool UseAlternativeWebAgent { get; init; }
+
+    //პროექტი იყენებს ლოკალურ (საკუთარ) პაკეტებს. თუ გამორთულია, Distribute all packages და
+    //Reverse Package Distribution ამ პროექტს არ ეხება
+    public bool UseLocalPackages { get; set; }
     public string? ProjectFolderName { get; init; }
     public string? SolutionFileName { get; init; }
 

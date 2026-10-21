@@ -224,7 +224,7 @@ bootstrap API client-ი არასოდეს სინქრონიზდ
 |ჯგუფი|ველები|
 |-|-|
 |იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
-|პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
+|პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (საკუთარი პაკეტები: გამორთულ პროექტს `Distribute all packages` და `Reverse Package Distribution` გამოტოვებს)|
 |ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |მიგრაცია და seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
 |Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|

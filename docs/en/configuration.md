@@ -219,7 +219,7 @@ The core of each registered project. Located at
 |Group|Fields|
 |-|-|
 |Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (see [templates](#gitignore-and-editorconfig-templates))|
-|Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`|
+|Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (own packages: off = `Distribute all packages` and `Reverse Package Distribution` skip the project)|
 |Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
 |Migration \& seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
 |Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|

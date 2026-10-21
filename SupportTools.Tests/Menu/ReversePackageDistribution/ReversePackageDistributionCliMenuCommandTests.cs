@@ -56,7 +56,10 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         _libAProjectFile = Path.Combine(libAFolder, "Lib.A.csproj");
         File.WriteAllText(_libAProjectFile, "<Project />");
 
-        _parameters.Projects["App"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["App"] };
+        _parameters.Projects["App"] = new ProjectModel
+        {
+            UseLocalPackages = true, ProjectFolderName = _projectFolder, GitProjectNames = ["App"]
+        };
         _parameters.Gits["App"] = new GitDataModel
         {
             GitProjectAddress = "git@github.com:x/App.git", GitProjectFolderName = "App", GitIgnorePatternName = "CSharp"
@@ -234,11 +237,29 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
     }
 
     [Fact]
+    public async Task RunBody_WhenProjectDoesNotUseLocalPackages_SkipsIt()
+    {
+        // Arrange
+        _parameters.Projects["App"].UseLocalPackages = false;
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(_editor.Calls);
+        Assert.Contains("UseLocalPackages is off for project App, skipped", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+        VerifyLogged(LogLevel.Information, "Reverse package distribution finished. Projects processed: 0");
+    }
+
+    [Fact]
     public async Task RunBody_WhenProjectIsRemote_SkipsIt()
     {
         // Arrange
         _parameters.Projects["App"] = new ProjectModel
         {
+            UseLocalPackages = true,
             ProjectFolderName = Path.Combine(_tempFolder, "Missing"), GitProjectNames = ["App"]
         };
 
@@ -257,7 +278,10 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
     public async Task RunBody_WhenProjectHasNoMainGit_SkipsIt()
     {
         // Arrange
-        _parameters.Projects["App"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["Lib"] };
+        _parameters.Projects["App"] = new ProjectModel
+        {
+            UseLocalPackages = true, ProjectFolderName = _projectFolder, GitProjectNames = ["Lib"]
+        };
 
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
@@ -336,8 +360,10 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         string libAFolder = Path.Combine(projectFolder, "Lib", "Lib.A");
         Directory.CreateDirectory(libAFolder);
         File.WriteAllText(Path.Combine(libAFolder, "Lib.A.csproj"), "<Project />");
-        _parameters.Projects[projectName] =
-            new ProjectModel { ProjectFolderName = projectFolder, GitProjectNames = [projectName] };
+        _parameters.Projects[projectName] = new ProjectModel
+        {
+            UseLocalPackages = true, ProjectFolderName = projectFolder, GitProjectNames = [projectName]
+        };
         _parameters.Gits[projectName] = new GitDataModel
         {
             GitProjectAddress = $"git@github.com:x/{projectName}.git",

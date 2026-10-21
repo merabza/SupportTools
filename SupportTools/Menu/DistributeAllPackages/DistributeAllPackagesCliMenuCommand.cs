@@ -53,9 +53,12 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
         //პაკეტის ტიპის ყველა პროექტის შეგროვება. remote პაკეტები მხოლოდ ცხადი თანხმობით მუშავდება, რადგან
-        //სინქრონიზაცია მათ ამ კომპიუტერზე დაკლონავს (D3)
+        //სინქრონიზაცია მათ ამ კომპიუტერზე დაკლონავს (D3). UseLocalPackages-გამორთული პროექტები არ მუშავდება
         List<KeyValuePair<string, ProjectModel>> allPackageProjects =
-            [.. parameters.Projects.Where(x => x.Value.ProjectType == EProjectType.IsPackage)];
+        [
+            .. parameters.Projects.Where(x =>
+                x.Value.ProjectType == EProjectType.IsPackage && x.Value.UseLocalPackages)
+        ];
         bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(allPackageProjects, _inputBool);
         Dictionary<string, ProjectModel> packageProjects = ProjectPresence
             .Filter(allPackageProjects, includeRemoteProjects)

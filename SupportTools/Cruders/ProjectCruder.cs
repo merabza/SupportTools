@@ -34,6 +34,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new IntFieldEditor(nameof(ProjectModel.MajorVersion), 1));
         FieldEditors.Add(new IntFieldEditor(nameof(ProjectModel.MinorVersion)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseAlternativeWebAgent)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UseLocalPackages), true));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveDateMask)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProgramArchiveExtension)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ParametersFileDateMask)));

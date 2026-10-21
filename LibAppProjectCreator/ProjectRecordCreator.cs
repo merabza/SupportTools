@@ -256,6 +256,7 @@ internal sealed class ProjectRecordCreator
                     ? EProjectType.IsService
                     : EProjectType.Standard,
             UseAlternativeWebAgent = false,
+            UseLocalPackages = true,
             ProjectFolderName = Path.Combine(projectsFolderPathReal, _newProjectName),
             SolutionFileName =
                 Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName,
