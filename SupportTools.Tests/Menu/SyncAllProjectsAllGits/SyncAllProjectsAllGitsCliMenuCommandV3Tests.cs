@@ -19,6 +19,7 @@ namespace SupportTools.Tests.Menu.SyncAllProjectsAllGits;
 //the gits point to missing local repositories, so the clone of every folder fails at once (no network, nothing is
 //cloned) and the summary counts the synced gits. Local1 (git RepoA), Remote1 (folder missing, git RepoB). There is no
 //SupportToolsServer, so every git is checked with git itself
+//Every git also has its work folder clone, so the summary counts two folders per git
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class SyncAllProjectsAllGitsCliMenuCommandV3Tests : IDisposable
 {
@@ -74,7 +75,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV3Tests : IDisposable
             _questions);
         string output = _consoleOutput.ToString();
         Assert.Contains("Sync Multiple Projects Gits V3 Started", output, StringComparison.Ordinal);
-        Assert.Contains("Synced 1 gits, 1 folders", output, StringComparison.Ordinal);
+        Assert.Contains("Synced 1 gits, 2 folders", output, StringComparison.Ordinal);
         Assert.Contains("RepoA  ", output, StringComparison.Ordinal);
         Assert.DoesNotContain("RepoB  ", output, StringComparison.Ordinal);
     }
@@ -90,7 +91,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV3Tests : IDisposable
 
         // Assert
         string output = _consoleOutput.ToString();
-        Assert.Contains("Synced 2 gits, 2 folders", output, StringComparison.Ordinal);
+        Assert.Contains("Synced 2 gits, 4 folders", output, StringComparison.Ordinal);
         Assert.Contains("RepoB  ", output, StringComparison.Ordinal);
     }
 
@@ -105,7 +106,7 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV3Tests : IDisposable
 
         // Assert
         Assert.Empty(_questions);
-        Assert.Contains("Synced 1 gits, 1 folders", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Synced 1 gits, 2 folders", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

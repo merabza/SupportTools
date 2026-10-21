@@ -19,6 +19,7 @@ namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectA
 //the gits point to missing local repositories, so the clone of every folder fails at once (no network, nothing is
 //cloned) and the output names the synced gits. Remote1 (folder missing) has the main git RepoA and the ScaffoldSeeder
 //git RepoS; Local1 has RepoB
+//Every git also has its work folder clone, so the summary counts two folders per git
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Tests : IDisposable
 {
@@ -83,7 +84,7 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
         // Assert
         string output = _consoleOutput.ToString();
         Assert.Contains("Sync Multiple Projects Gits V3 Started", output, StringComparison.Ordinal);
-        Assert.Contains("Synced 2 gits, 2 folders", output, StringComparison.Ordinal);
+        Assert.Contains("Synced 2 gits, 4 folders", output, StringComparison.Ordinal);
         Assert.Contains("RepoA  ", output, StringComparison.Ordinal);
         Assert.Contains("RepoS  ", output, StringComparison.Ordinal);
         Assert.DoesNotContain("RepoB  ", output, StringComparison.Ordinal);

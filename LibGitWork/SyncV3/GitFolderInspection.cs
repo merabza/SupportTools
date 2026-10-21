@@ -41,6 +41,11 @@ internal sealed record GitFolderInspection(
             return Failed(folder, $"is cloned from {originUrlResult.Value}, not from {folder.GitAddress}");
         }
 
+        if (folder.IsWorkFolderClone)
+        {
+            return InspectWorkFolderClone(commands, folder);
+        }
+
         Result<string[]> redundantFilesResult = commands.GetRedundantCachedFiles(path);
         if (redundantFilesResult.IsFailure)
         {
@@ -72,6 +77,22 @@ internal sealed record GitFolderInspection(
         }
 
         return new GitFolderInspection(folder, EGitFolderInspectionKind.Ready, statusResult.Value, null);
+    }
+
+    //სამუშაო ფოლდერის კლონში არაფერი იცვლება და არაფერი კომიტდება, მხოლოდ remote-ს ეწევა. ცვლილებებს V2 სერვერის
+    //ვერსიით ანაცვლებს, ოღონდ კითხვით, ამიტომ აქ ისინი შეცდომაა
+    private static GitFolderInspection InspectWorkFolderClone(GitFolderCommands commands, GitSyncFolder folder)
+    {
+        Result<GitFolderStatus> statusResult = commands.ReadStatus(folder.FolderPath);
+        if (statusResult.IsFailure)
+        {
+            return Failed(folder, statusResult.Error.Description);
+        }
+
+        return statusResult.Value.HasChanges
+            ? Failed(folder,
+                "is the work folder clone of SupportTools and has changes: restore it (V2 offers to) and sync again")
+            : new GitFolderInspection(folder, EGitFolderInspectionKind.Ready, statusResult.Value, null);
     }
 
     private static GitFolderInspection Failed(GitSyncFolder folder, string errorMessage)

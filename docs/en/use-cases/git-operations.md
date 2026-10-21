@@ -143,8 +143,9 @@ scaffold work.
 commands and do the same work (clone, remove the ignored files from the
 index, commit, pull, push), faster:
 
-* SupportTools no longer updates its own clones in `WorkFolder\Gits`
-(SupportToolsServer keeps clones of its own).
+* SupportTools' own clone of every repository in `WorkFolder\Gits` is synced
+last, so V2 finds it up to date. Nothing is committed there: local changes
+are reported as an error.
 * The remote commit of every repository comes from SupportToolsServer in one
 request. The server keeps it for 10 minutes and checks an expired one with
 `git ls-remote`. A folder without changes whose HEAD is that commit (on the

@@ -52,7 +52,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         Console.SetOut(_consoleOutput);
 
         _projectsFolder = Path.Combine(_tempFolder, "Projects");
-        _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
+        //without WorkFolder the work folder clones are left out; the tests of the work folder clones set it
         _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         foreach (string gitName in (string[])["RepoA", "RepoB", "RepoC"])
         {
@@ -666,6 +666,119 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         // Assert
         Assert.True(Directory.Exists(Path.Combine(_tempFolder, "Seeders", "Local1", "Local1ScaffoldSeeder", "RepoS",
             ".git")));
+    }
+
+    [Fact]
+    public async Task Run_WhenThereIsNoWorkFolder_WarnsThatTheWorkFolderClonesAreNotSynced()
+    {
+        // Act
+        await Create(null, "Local1", false).Run();
+
+        // Assert
+        Assert.Contains("WorkFolder is not specified: the work folder clones are not synced",
+            _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //V2 updates the work folder clone of every git it syncs, so V3 does it too: a missing one is cloned
+    [Fact]
+    public async Task Run_WhenTheWorkFolderCloneIsMissing_ClonesIt()
+    {
+        // Arrange
+        UseWorkFolder();
+        CloneInto("Local1", "RepoA");
+
+        // Act
+        bool result = await Create(null, "Local1", false).Run();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(Head(_remotes["RepoA"]), Head(WorkFolderClone("RepoA")));
+        string output = _consoleOutput.ToString();
+        Assert.Contains($"RepoA  {WorkFolderClone("RepoA")}: cloned", output, StringComparison.Ordinal);
+        Assert.Contains("Synced 1 gits, 2 folders", output, StringComparison.Ordinal);
+    }
+
+    //the work folder clone is the last folder of its git: it takes the push of the project folder, so V2 has nothing
+    //to pull afterwards
+    [Fact]
+    public async Task Run_WhenAFolderPushes_TheWorkFolderCloneTakesThePush()
+    {
+        // Arrange
+        UseWorkFolder();
+        UseServer();
+        string folder = CloneInto("Local2", "RepoC");
+        string workClone = CloneWorkFolderClone("RepoC");
+        RespondHeads(("RepoC", "main", Head(folder)));
+        await File.WriteAllTextAsync(Path.Combine(folder, "New.txt"), "new");
+
+        // Act
+        bool result = await Create(null, "Local2", true, "Sync message").Run();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(Head(folder), Head(workClone));
+        Assert.Equal(Head(_remotes["RepoC"]), Head(workClone));
+        Assert.Contains($"RepoC  {workClone}: pulled", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //a work folder clone on the head of the server makes no request
+    [Fact]
+    public async Task Run_WhenTheWorkFolderCloneIsOnTheHeadOfTheServer_LeavesItWithoutFetching()
+    {
+        // Arrange
+        UseWorkFolder();
+        UseServer();
+        CloneInto("Local1", "RepoA");
+        CloneWorkFolderClone("RepoA");
+        RespondHeads(("RepoA", "main", Head(_remotes["RepoA"])));
+
+        // Act
+        await Create(null, "Local1", false).Run();
+
+        // Assert
+        Assert.Contains("2 folders: 2 without a request to the git server", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    //nothing is committed in the work folder clone: its changes are an error, the project folder is synced
+    [Fact]
+    public async Task Run_WhenTheWorkFolderCloneHasChanges_ReportsItWithoutCommitting()
+    {
+        // Arrange
+        UseWorkFolder();
+        CloneInto("Local1", "RepoA");
+        string workClone = CloneWorkFolderClone("RepoA");
+        await File.WriteAllTextAsync(Path.Combine(workClone, "New.txt"), "new");
+        string remoteHead = Head(_remotes["RepoA"]);
+
+        // Act
+        bool result = await Create(null, "Local1", false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(remoteHead, Head(_remotes["RepoA"]));
+        Assert.Empty(_textQuestions);
+        Assert.Contains(
+            $"RepoA  {workClone}: is the work folder clone of SupportTools and has changes: restore it (V2 offers to) and sync again",
+            _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    private void UseWorkFolder()
+    {
+        _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
+    }
+
+    private string WorkFolderClone(string gitName)
+    {
+        return Path.Combine(_tempFolder, "Work", "Gits", gitName);
+    }
+
+    private string CloneWorkFolderClone(string gitName)
+    {
+        string folder = WorkFolderClone(gitName);
+        GitTestRepositories.RunGit("clone", _remotes[gitName], folder);
+        GitTestRepositories.ConfigureRepository(folder);
+        return folder;
     }
 
     private static GitFolderInspection Inspection(string gitName, string projectName, bool hasChanges)

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AppCliTools.LibDataInput;
 using LibGitData;
 using LibGitWork.Helpers;
+using LibGitWork.Models;
 using LibGitWork.SyncV3;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -23,7 +24,8 @@ using SystemTools.SystemToolsShared;
 namespace LibGitWork.ToolActions;
 
 //V2-ის სამუშაო უფრო სწრაფად:
-//1. SupportTools-ის სამუშაო ფოლდერის კლონები (WorkFolder\Gits) აღარ ახლდება.
+//1. SupportTools-ის სამუშაო ფოლდერის კლონი (WorkFolder\Gits) git-ის ბოლო ფოლდერია და ჩვეულებრივად სინქრონდება (ამის
+//   შემდეგ V2-ს მისი გაახლება აღარ სჭირდება), პროექტების ხელახლა სკანირების გარეშე.
 //2. remote-ის ვერსიები SupportToolsServer-იდან ერთი მოთხოვნით იკითხება (სერვერი მათ 10 წუთს ინახავს), ფოლდერების
 //   ლოკალური შემოწმების პარალელურად.
 //3. ფოლდერები ლოკალურად პარალელურად მოწმდება (ერთი git status ყოველ ფოლდერზე).
@@ -109,11 +111,13 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
         return outcomes.TrueForAll(x => x.Error is null);
     }
 
-    //V2-ის წესით: პროექტები სახელით, თითოეულში ჯერ მთავარი, მერე ScaffoldSeeder-ის git-ები. ფოლდერი ერთხელ ითვლება
+    //V2-ის წესით: პროექტები სახელით, თითოეულში ჯერ მთავარი, მერე ScaffoldSeeder-ის git-ები. ფოლდერი ერთხელ ითვლება.
+    //ბოლოს ყოველი git-ის სამუშაო ფოლდერის კლონი, რომ მას git-ის push-ები უკვე დახვდეს
     private List<GitSyncFolder> CollectFolders()
     {
         List<GitSyncFolder> folders = [];
         var folderPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var gits = new Dictionary<string, GitData>(StringComparer.OrdinalIgnoreCase);
         IEnumerable<KeyValuePair<string, ProjectModel>> projects = GitProjectListHelper.CreateProjectsList(
             _syncParameters.Projects, _syncParameters.ProjectGroupName, _syncParameters.ProjectName,
             _syncParameters.IncludeRemoteProjects);
@@ -137,11 +141,41 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
                         folders.Add(new GitSyncFolder(gitName, gitSyncParameters.GitData.GitProjectAddress,
                             projectName, folderPath));
                     }
+
+                    gits.TryAdd(gitName, gitSyncParameters.GitData);
                 }
             }
         }
 
+        AddWorkFolderClones(folders, gits);
         return folders;
+    }
+
+    //V2-ის GitProjectsUpdater-ის ფოლდერები. სამუშაო ფოლდერის გარეშე V2 ვერ მუშაობს, V3 კი მხოლოდ ამ კლონებს ტოვებს
+    private void AddWorkFolderClones(List<GitSyncFolder> folders, Dictionary<string, GitData> gits)
+    {
+        string? workFolder = _parameters.WorkFolder;
+        if (gits.Count == 0)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(workFolder))
+        {
+            StShared.WriteWarningLine("WorkFolder is not specified: the work folder clones are not synced", true,
+                _logger);
+            return;
+        }
+
+        string gitsFolder = Path.Combine(workFolder, "Gits");
+        foreach ((string gitName, GitData gitData) in gits)
+        {
+            string? folderPath = GitFolderCountHelper.GetProjectFolderName(_logger, workFolder, gitsFolder, gitData);
+            if (folderPath is not null)
+            {
+                folders.Add(new GitSyncFolder(gitName, gitData.GitProjectAddress, null, folderPath));
+            }
+        }
     }
 
     private SupportToolsServerApiClient? CreateApiClient()
