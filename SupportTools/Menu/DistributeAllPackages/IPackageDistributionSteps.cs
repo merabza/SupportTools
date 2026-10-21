@@ -8,8 +8,8 @@ namespace SupportTools.Menu.DistributeAllPackages;
 //თანმიმდევრობას, შეტყობინებებსა და ჩავარდნისას გაჩერებას ბრძანება წყვეტს; ტესტები ნაბიჯების fake-ს აწვდიან
 internal interface IPackageDistributionSteps
 {
-    //პროექტის გიტების სინქრონიზაცია
-    Task<bool> SyncProjectGits(string projectName, CancellationToken cancellationToken);
+    //პროექტის გიტების სინქრონიზაცია; ცვლილებები ამ მესიჯით დაკომიტდება, კითხვის გარეშე
+    Task<bool> SyncProjectGits(string projectName, string commitMessage, CancellationToken cancellationToken);
 
     //პროექტის build-ის შემოწმება; null - შედეგი არ ჩაწერილა
     ProjectBuildCheckResult? CheckBuild(string projectName, ProjectModel project, bool noIncremental,

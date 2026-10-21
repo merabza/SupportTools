@@ -281,6 +281,28 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
+    //the first sync names the packages of this run that the project uses, so nothing asks for a commit message
+    [Fact]
+    public async Task RunBody_WhenPackagesAreSynced_CommitsWithMessagesThatNameTheDistributedPackages()
+    {
+        // Arrange
+        AddProject("Alpha", EProjectType.IsPackage, true, "Alpha", "Core", "Util");
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("Util", EProjectType.IsPackage, true, "Util");
+
+        // Act
+        await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.Equal(
+        [
+            "Distribute all packages: before Core package", "Distribute all packages: after Core package",
+            "Distribute all packages: before Util package", "Distribute all packages: after Util package",
+            "Distribute all packages: use new Core, Util packages in Alpha",
+            "Distribute all packages: after Alpha package"
+        ], _steps.CommitMessages);
+    }
+
     //a repeated git counts once, so the package does not wait for a second, never coming, dependency
     [Fact]
     public async Task RunBody_WhenADependencyIsListedTwice_CountsItOnce()
@@ -375,12 +397,15 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         private readonly HashSet<string> _syncedProjectNames = [];
 
         public List<string> Calls { get; } = [];
+        public List<string> CommitMessages { get; } = [];
         public string? FailingStep { get; set; }
         public string? FailingProject { get; set; }
         public ProjectBuildCheckResult? BuildResult { get; set; } = new(EProjectBuildCheckStatus.Success);
 
-        public Task<bool> SyncProjectGits(string projectName, CancellationToken cancellationToken)
+        public Task<bool> SyncProjectGits(string projectName, string commitMessage,
+            CancellationToken cancellationToken)
         {
+            CommitMessages.Add(commitMessage);
             string step = _syncedProjectNames.Add(projectName) ? "sync" : "final sync";
             return Task.FromResult(Run(step, projectName));
         }

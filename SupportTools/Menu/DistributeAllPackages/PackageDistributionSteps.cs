@@ -12,7 +12,7 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu.DistributeAllPackages;
 
-//ნაბიჯები ნამდვილი ბრძანებებით: Sync ... Gits V2, ProjectBuildChecker, PackageSolutionChecker, PackageBuilder და
+//ნაბიჯები ნამდვილი ბრძანებებით: Sync ... Gits V3, ProjectBuildChecker, PackageSolutionChecker, PackageBuilder და
 //PackageDistributor, ისევე როგორც პროექტის მენიუს ცალკეული ბრძანებები
 internal sealed class PackageDistributionSteps : IPackageDistributionSteps
 {
@@ -33,10 +33,12 @@ internal sealed class PackageDistributionSteps : IPackageDistributionSteps
         _menuParameters = menuParameters;
     }
 
-    public async Task<bool> SyncProjectGits(string projectName, CancellationToken cancellationToken)
+    //ერთი პროექტის V3 სინქრონიზაცია მის git-ებს ყოველთვის კლონავს, remote პროექტისასაც (როგორც V2)
+    public async Task<bool> SyncProjectGits(string projectName, string commitMessage,
+        CancellationToken cancellationToken)
     {
-        var syncProjectGitsToolAction =
-            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, projectName, true);
+        var syncProjectGitsToolAction = SyncMultipleProjectsGitsToolActionV3.Create(_logger, _httpClientFactory,
+            _parametersManager, null, projectName, true, commitMessage);
         return await syncProjectGitsToolAction.Run(cancellationToken);
     }
 

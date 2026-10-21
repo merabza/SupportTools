@@ -89,6 +89,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         Console.WriteLine($"Package projects processing order: {string.Join(", ", orderedProjectNames)}");
 
         int processedCount = 0;
+        List<string> distributedProjectNames = [];
         foreach (string projectName in orderedProjectNames)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -96,7 +97,8 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
                 $"Processing package project {projectName} ({processedCount + 1}/{orderedProjectNames.Count})");
 
             //ნებისმიერი ნაბიჯის ჩავარდნა აჩერებს პროექტების დამუშავების მთლიან ციკლს
-            if (!await ProcessPackageProject(projectName, packageProjects[projectName], cancellationToken))
+            if (!await ProcessPackageProject(projectName, packageProjects[projectName], distributedProjectNames,
+                    cancellationToken))
             {
                 StShared.WriteErrorLine(
                     $"Distribute all packages stopped on project {projectName}. Successfully processed {processedCount} of {orderedProjectNames.Count} package projects",
@@ -105,6 +107,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             }
 
             processedCount++;
+            distributedProjectNames.Add(projectName);
         }
 
         if (_logger.IsEnabled(LogLevel.Information))
@@ -120,10 +123,11 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     //ერთი პაკეტის პროექტის სრული დამუშავება: სინქრონიზაცია, build-ის შემოწმება, სოლუშენის შემოწმება,
     //პაკეტის დაბილდვა, გავრცელება და ხელახალი სინქრონიზაცია
     private async Task<bool> ProcessPackageProject(string projectName, ProjectModel project,
-        CancellationToken cancellationToken)
+        IReadOnlyCollection<string> distributedProjectNames, CancellationToken cancellationToken)
     {
         //გიტების სინქრონიზაცია
-        if (!await _steps.SyncProjectGits(projectName, cancellationToken))
+        if (!await _steps.SyncProjectGits(projectName,
+                CreateSyncCommitMessage(projectName, project, distributedProjectNames), cancellationToken))
         {
             StShared.WriteErrorLine($"Sync gits failed for project {projectName}", true, _logger);
             return false;
@@ -161,13 +165,26 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         }
 
         //გიტების ხელახალი სინქრონიზაცია
-        if (!await _steps.SyncProjectGits(projectName, cancellationToken))
+        if (!await _steps.SyncProjectGits(projectName, $"Distribute all packages: after {projectName} package",
+                cancellationToken))
         {
             StShared.WriteErrorLine($"Final sync gits failed for project {projectName}", true, _logger);
             return false;
         }
 
         return true;
+    }
+
+    //პირველი სინქრონიზაციის commit-ის მესიჯი. პროექტის git-ებში ცვლილებებს ძირითადად ამავე გაშვებაში უკვე
+    //გავრცელებული პაკეტები ტოვებს, რომლებსაც პროექტი იყენებს, ამიტომ მესიჯი მათ ასახელებს
+    internal static string CreateSyncCommitMessage(string projectName, ProjectModel project,
+        IEnumerable<string> distributedProjectNames)
+    {
+        List<string> usedPackageNames =
+            [.. distributedProjectNames.Where(x => project.GitProjectNames.Contains(x))];
+        return usedPackageNames.Count == 0
+            ? $"Distribute all packages: before {projectName} package"
+            : $"Distribute all packages: use new {string.Join(", ", usedPackageNames)} packages in {projectName}";
     }
 
     //Kahn-ის ალგორითმი: პაკეტი დამოკიდებულია იმ პაკეტებზე, რომელთა რეპოზიტორიებიც მის გიტების სიაშია

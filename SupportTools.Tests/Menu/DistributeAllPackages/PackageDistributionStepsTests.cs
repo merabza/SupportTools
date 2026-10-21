@@ -49,16 +49,16 @@ public sealed class PackageDistributionStepsTests : IDisposable
         Directory.Delete(_tempFolder, true);
     }
 
-    //the V2 sync of the project, with the console
+    //the V3 sync of the project, with the console
     [Fact]
     public async Task SyncProjectGits_WhenProjectHasNoGits_RunsTheSyncOnTheConsoleAndSucceeds()
     {
         // Act
-        bool result = await _sut.SyncProjectGits("App", CancellationToken.None);
+        bool result = await _sut.SyncProjectGits("App", "Message", CancellationToken.None);
 
         // Assert
         Assert.True(result);
-        Assert.Contains("Sync Multiple Projects Gits V2 Started", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Sync Multiple Projects Gits V3 Started", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
     //the result is the one the build check writes into the menu parameters
