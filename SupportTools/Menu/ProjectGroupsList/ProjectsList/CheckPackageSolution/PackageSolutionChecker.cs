@@ -267,6 +267,15 @@ public sealed class PackageSolutionChecker
                 nugetConfigDocument.Save(nugetConfigFilePath);
             }
 
+            //გამორთული BaGetter წყაროს შემთხვევაში რესტორი პაკეტს ვერ იპოვის (NU1100), ამიტომ გავრცელება არ უნდა დაიწყოს
+            if (IsPackageSourceDisabled(configurationElement, BaGetterSourceKey))
+            {
+                StShared.WriteErrorLine(
+                    $"Package source {BaGetterSourceKey} is disabled in {nugetConfigFilePath}. Enable it with: dotnet nuget enable source {BaGetterSourceKey}",
+                    true);
+                return false;
+            }
+
             return true;
         }
         catch (Exception e) when (e is XmlException or IOException or UnauthorizedAccessException)
@@ -274,5 +283,13 @@ public sealed class PackageSolutionChecker
             StShared.WriteException(e, true, _logger);
             return false;
         }
+    }
+
+    //NuGet-ის disabledPackageSources სექციაში value="true" ნიშნავს, რომ წყარო გამორთულია
+    internal static bool IsPackageSourceDisabled(XElement configurationElement, string sourceKey)
+    {
+        return configurationElement.Elements("disabledPackageSources").Elements("add").Any(addElement =>
+            string.Equals((string?)addElement.Attribute("key"), sourceKey, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals((string?)addElement.Attribute("value"), "true", StringComparison.OrdinalIgnoreCase));
     }
 }
