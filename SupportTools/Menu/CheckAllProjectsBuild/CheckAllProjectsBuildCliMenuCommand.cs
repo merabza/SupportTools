@@ -47,7 +47,7 @@ public sealed class CheckAllProjectsBuildCliMenuCommand : CliMenuCommand
         _menuParameters.ProjectBuildCheckResults.Clear();
         //remote პროექტების solution ფაილი ამ კომპიუტერზე არ არის, ამიტომ ისინი არ მოწმდება (D3)
         ProjectBuildChecker.CheckProjects(_appName, RemoteOnlyProjects.Skip(parameters.Projects, _logger),
-            _menuParameters, _logger, noIncremental, cancellationToken);
+            _menuParameters, _logger, noIncremental, false, cancellationToken);
 
         return ValueTask.FromResult(true);
     }

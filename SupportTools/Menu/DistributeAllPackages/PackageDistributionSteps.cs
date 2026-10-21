@@ -40,12 +40,13 @@ internal sealed class PackageDistributionSteps : IPackageDistributionSteps
         return await syncProjectGitsToolAction.Run(cancellationToken);
     }
 
-    //შედეგი ჩაიწერება მენიუს პარამეტრებში, ისევე როგორც Check ... build-ის ბრძანებებში
+    //შედეგი ჩაიწერება მენიუს პარამეტრებში, ისევე როგორც Check ... build-ის ბრძანებებში. restore NuGet-ის HTTP
+    //ქეშის გარეშე ეშვება: დამოკიდებულების პაკეტი ამავე გაშვებაში აიტვირთა და ქეშში ჩაწერილ ვერსიების სიაში ჯერ არ არის
     public ProjectBuildCheckResult? CheckBuild(string projectName, ProjectModel project, bool noIncremental,
         CancellationToken cancellationToken)
     {
         ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(projectName, project)],
-            _menuParameters, _logger, noIncremental, cancellationToken);
+            _menuParameters, _logger, noIncremental, true, cancellationToken);
         return _menuParameters.ProjectBuildCheckResults.GetValueOrDefault(projectName);
     }
 

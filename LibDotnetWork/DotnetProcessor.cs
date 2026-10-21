@@ -132,8 +132,10 @@ public sealed class DotnetProcessor
     //useErrorLine=false, რათა მრავალ პროექტზე ციკლში გაშვებისას ყოველ წარუმატებელ build-ზე არ შეჩერდეს.
     //შეცდომებისა და გაფრთხილებების რაოდენობა იკითხება MSBuild-ის ფაილური ლოგერის (-flp) შეჯამებიდან და არა
     //კონსოლიდან, რათა კონსოლში build-ის გამოტანა უცვლელი დარჩეს. noIncremental (--no-incremental) ზუსტი დათვლისთვისაა -
-    //მის გარეშე up-to-date პროექტებზე კომპილაცია არ ეშვება და გაფრთხილებები არ ითვლება
-    public DotnetBuildResult Build(string solutionFileName, bool noIncremental)
+    //მის გარეშე up-to-date პროექტებზე კომპილაცია არ ეშვება და გაფრთხილებები არ ითვლება. noHttpCache
+    //(-p:RestoreNoHttpCache=true) restore-ს NuGet-ის HTTP ქეშის (30 წუთი) გარეშე უშვებს, რომ წამის წინ ატვირთული
+    //პაკეტის ვერსია დაინახოს
+    public DotnetBuildResult Build(string solutionFileName, bool noIncremental, bool noHttpCache)
     {
         string logFolderPath = Path.Combine(Path.GetTempPath(), "SupportTools", "BuildLogs");
         Directory.CreateDirectory(logFolderPath);
@@ -142,10 +144,16 @@ public sealed class DotnetProcessor
         File.Delete(logFileName);
 
         Result runResult = StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"build {solutionFileName}{(noIncremental ? " --no-incremental" : string.Empty)} \"-flp:LogFile={logFileName};Verbosity=quiet;Summary\"",
-            null, false);
+            CreateBuildArguments(solutionFileName, noIncremental, noHttpCache, logFileName), null, false);
         (int errorCount, int warningCount) = ReadBuildCounts(logFileName);
         return new DotnetBuildResult(runResult.IsSuccess, errorCount, warningCount);
+    }
+
+    internal static string CreateBuildArguments(string solutionFileName, bool noIncremental, bool noHttpCache,
+        string logFileName)
+    {
+        return
+            $"build {solutionFileName}{(noIncremental ? " --no-incremental" : string.Empty)}{(noHttpCache ? " -p:RestoreNoHttpCache=true" : string.Empty)} \"-flp:LogFile={logFileName};Verbosity=quiet;Summary\"";
     }
 
     //MSBuild-ის შეჯამების ხაზები: "    N Warning(s)" და "    N Error(s)". ბოლო შეხვედრა იგებს.

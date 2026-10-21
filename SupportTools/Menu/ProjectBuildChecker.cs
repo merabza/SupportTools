@@ -21,7 +21,7 @@ public static class ProjectBuildChecker
     }
 
     public static void CheckProjects(string appName, IEnumerable<KeyValuePair<string, ProjectModel>> projects,
-        SupportToolsMenuParameters menuParameters, ILogger logger, bool noIncremental,
+        SupportToolsMenuParameters menuParameters, ILogger logger, bool noIncremental, bool noHttpCache,
         CancellationToken cancellationToken)
     {
         var dotnetProcessor = new DotnetProcessor(logger, true);
@@ -30,14 +30,14 @@ public static class ProjectBuildChecker
         {
             cancellationToken.ThrowIfCancellationRequested();
             ProjectBuildCheckResult result =
-                CheckProjectBuild(projectName, appName, project, dotnetProcessor, noIncremental);
+                CheckProjectBuild(projectName, appName, project, dotnetProcessor, noIncremental, noHttpCache);
             menuParameters.ProjectBuildCheckResults[projectName] = result;
             ProjectBuildCheckStatusView.WriteResultLine(projectName, result);
         }
     }
 
     private static ProjectBuildCheckResult CheckProjectBuild(string projectName, string appName, ProjectModel project,
-        DotnetProcessor dotnetProcessor, bool noIncremental)
+        DotnetProcessor dotnetProcessor, bool noIncremental, bool noHttpCache)
     {
         if (string.IsNullOrWhiteSpace(project.SolutionFileName))
         {
@@ -59,7 +59,7 @@ public static class ProjectBuildChecker
             return new ProjectBuildCheckResult(EProjectBuildCheckStatus.CannotBuildSelf);
         }
 
-        DotnetBuildResult buildResult = dotnetProcessor.Build(project.SolutionFileName, noIncremental);
+        DotnetBuildResult buildResult = dotnetProcessor.Build(project.SolutionFileName, noIncremental, noHttpCache);
         return new ProjectBuildCheckResult(GetBuildStatus(buildResult), buildResult.ErrorCount,
             buildResult.WarningCount);
     }

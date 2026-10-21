@@ -45,7 +45,7 @@ public sealed class CheckOneProjectBuildCliMenuCommand : CliMenuCommand
 
         //მხოლოდ ეს ერთი პროექტი მოწმდება და მისი სტატუსი ახლდება
         ProjectBuildChecker.CheckProjects(_appName, [new KeyValuePair<string, ProjectModel>(_projectName, project)],
-            _menuParameters, _logger, noIncremental, cancellationToken);
+            _menuParameters, _logger, noIncremental, false, cancellationToken);
 
         return ValueTask.FromResult(true);
     }

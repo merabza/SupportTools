@@ -51,7 +51,7 @@ public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
             SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName);
         //remote პროექტების solution ფაილი ამ კომპიუტერზე არ არის, ამიტომ ისინი არ მოწმდება (D3)
         ProjectBuildChecker.CheckProjects(_appName, RemoteOnlyProjects.Skip(groupProjects, _logger), _menuParameters,
-            _logger, noIncremental, cancellationToken);
+            _logger, noIncremental, false, cancellationToken);
 
         return ValueTask.FromResult(true);
     }
