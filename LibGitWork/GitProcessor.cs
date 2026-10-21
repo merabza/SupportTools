@@ -169,6 +169,12 @@ fi*/
         return false;
     }
 
+    //მხოლოდ fast-forward: დაშორებულ ისტორიებს pull არ აერთიანებს, ჩავარდება და ფოლდერს არ ცვლის
+    public Result PullFastForwardOnly()
+    {
+        return StShared.RunProcess(_useConsole, _logger, _git, $"{_switchToProjectPath} pull --ff-only");
+    }
+
     public Result<string> GetRemoteOriginUrl()
     {
         Result<(string, int)> result = StShared.RunProcessWithOutput(false, null, _git,

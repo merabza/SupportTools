@@ -17,6 +17,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
 using ToolsManagement.ApiClientsManagement;
 
@@ -175,6 +176,14 @@ public sealed class PackageDistributor
             return true;
         }
 
+        //პაკეტის git-ის ცვლილებები ამავე გაშვებაში ხშირად იგზავნება remote-ზე, მომხმარებელი პროექტის გვერდით მისი კლონი კი
+        //ძველი რჩება. ამ კლონის პროექტებზე დარჩენილი რეფერენსები მაშინ ძველ ვერსიებს ითხოვს და ახალ პაკეტთან კონფლიქტს
+        //იწვევს (NU1107, NU1605), ამიტომ კლონი ვერსიების აწევამდე და რეფერენსების ჩანაცვლებამდე ახლდება
+        if (!PullPackageRepoCopy(consumerProjectName, packageRepoPath))
+        {
+            return false;
+        }
+
         string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
         var referenceReplacer =
@@ -239,6 +248,45 @@ public sealed class PackageDistributor
         }
 
         return !hadErrors;
+    }
+
+    //მომხმარებელი პროექტის გვერდით მდებარე პაკეტის რეპოზიტორიის კლონის განახლება git pull --ff-only-ით. ლოკალური
+    //ცვლილებების მქონე კლონს pull არ ეხება (ცვლილებები მომხმარებლისაა), pull-ის ჩავარდნისას კი პროექტი გამოიტოვება
+    private bool PullPackageRepoCopy(string consumerProjectName, string packageRepoPath)
+    {
+        //კლონის გარეშე გასაახლებელი არაფერია
+        if (!Directory.Exists(packageRepoPath))
+        {
+            return true;
+        }
+
+        var gitProcessor = new GitProcessor(true, _logger, packageRepoPath);
+        Result<bool> needCommitResult = gitProcessor.NeedCommit();
+        if (needCommitResult.IsFailure)
+        {
+            StShared.WriteErrorLine(
+                $"Cannot check changes of package repository {packageRepoPath} for project {consumerProjectName}, skipped: {needCommitResult.Error.Description}",
+                true, _logger);
+            return false;
+        }
+
+        if (needCommitResult.Value)
+        {
+            StShared.WriteWarningLine(
+                $"Package repository {packageRepoPath} has local changes and was not pulled for project {consumerProjectName}",
+                true, _logger);
+            return true;
+        }
+
+        if (gitProcessor.PullFastForwardOnly().IsSuccess)
+        {
+            return true;
+        }
+
+        StShared.WriteErrorLine(
+            $"Cannot pull package repository {packageRepoPath} with --ff-only for project {consumerProjectName}, skipped",
+            true, _logger);
+        return false;
     }
 
     //მომხმარებელი პროექტის მთავარ რეპოზიტორიაში უკვე არსებული ამ პაკეტის პროექტის პაკეტების
