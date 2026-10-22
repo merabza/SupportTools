@@ -68,8 +68,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
     }
 
     public static SyncMultipleProjectsGitsToolActionV3 Create(ILogger? logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string? projectGroupName, string? projectName,
-        bool includeRemoteProjects, string? useMessage = null)
+        IParametersManager parametersManager, string? projectGroupName, string? projectName, bool includeRemoteProjects,
+        string? useMessage = null)
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         var syncParameters = SyncMultipleProjectsGitsParametersV2.Create(parameters, projectGroupName, projectName,
@@ -138,8 +138,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
                         gitSyncParameters.GitData.GitProjectFolderName);
                     if (folderPaths.Add(folderPath))
                     {
-                        folders.Add(new GitSyncFolder(gitName, gitSyncParameters.GitData.GitProjectAddress,
-                            projectName, folderPath));
+                        folders.Add(new GitSyncFolder(gitName, gitSyncParameters.GitData.GitProjectAddress, projectName,
+                            folderPath));
                     }
 
                     gits.TryAdd(gitName, gitSyncParameters.GitData);
@@ -246,8 +246,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
         return string.Create(CultureInfo.InvariantCulture, $"Checking {count} folders: {doneCount} done");
     }
 
-    private async Task<Dictionary<string, GitHead>> ReadHeads(
-        Task<Result<List<StsGitRemoteHeadDataModel>>>? headsTask, List<string> gitNames)
+    private async Task<Dictionary<string, GitHead>> ReadHeads(Task<Result<List<StsGitRemoteHeadDataModel>>>? headsTask,
+        List<string> gitNames)
     {
         var heads = new Dictionary<string, GitHead>(StringComparer.OrdinalIgnoreCase);
         if (headsTask is null)
@@ -305,8 +305,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
                 Console.WriteLine($"Commit message for {folder.GitName}  {folder.FolderPath}");
                 commitMessage = _inputText("Message",
                     commitMessage ?? DateTime.Now.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture));
-                useSameMessage = i < changedFolders.Count - 1 &&
-                                 _inputBool("Use this message for next commits?", true);
+                useSameMessage = i < changedFolders.Count - 1 && _inputBool("Use this message for next commits?", true);
             }
 
             commitMessages[folder.FolderPath] = commitMessage;

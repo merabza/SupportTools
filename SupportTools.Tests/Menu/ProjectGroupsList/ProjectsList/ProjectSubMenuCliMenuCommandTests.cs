@@ -342,8 +342,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal("remote, BuildFailed, errors: 2, warnings: 1", sut.StatusString);
-        Assert.Equal(["remote", "BuildFailed", "errors: 2", "warnings: 1"],
-            sut.StatusColorParts?.Select(x => x.Text));
+        Assert.Equal(["remote", "BuildFailed", "errors: 2", "warnings: 1"], sut.StatusColorParts?.Select(x => x.Text));
     }
 
     //results are kept per project: the result of another project must not leak into this one

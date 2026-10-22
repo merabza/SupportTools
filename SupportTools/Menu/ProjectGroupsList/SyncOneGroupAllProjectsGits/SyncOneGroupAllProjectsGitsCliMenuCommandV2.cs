@@ -41,8 +41,9 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommandV2 : CliMenuCommand
     {
         //remote პროექტები მხოლოდ ცხადი თანხმობით იკლონება (D3)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(parameters.Projects.Where(x =>
-            SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName), _inputBool);
+        bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(
+            parameters.Projects.Where(x =>
+                SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName), _inputBool);
 
         var syncOneGroupAllProjectsGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
             _parametersManager, _projectGroupName, null, true, null, includeRemoteProjects);

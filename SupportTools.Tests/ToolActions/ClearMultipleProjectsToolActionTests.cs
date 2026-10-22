@@ -174,8 +174,8 @@ public sealed class ClearMultipleProjectsToolActionTests : IDisposable
 
     private ClearMultipleProjectsToolAction CreateFrom(string baseFolder)
     {
-        return ClearMultipleProjectsToolAction.Create(new Mock<ILogger>().Object, _parametersManager.Object, null,
-            null, true, baseFolder);
+        return ClearMultipleProjectsToolAction.Create(new Mock<ILogger>().Object, _parametersManager.Object, null, null,
+            true, baseFolder);
     }
 
     //the sources of the running program: project Tool with the git ToolSources ({temp}\Projects\Tool\ToolSources)
@@ -192,7 +192,9 @@ public sealed class ClearMultipleProjectsToolActionTests : IDisposable
         _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         _parameters.Gits["RepoS"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/RepoS.git", GitProjectFolderName = "RepoS", GitIgnorePatternName = "CSharp"
+            GitProjectAddress = "git@github.com:x/RepoS.git",
+            GitProjectFolderName = "RepoS",
+            GitIgnorePatternName = "CSharp"
         };
         ProjectModel project = _parameters.Projects["Local1"];
         project.ScaffoldSeederProjectName = "Local1";

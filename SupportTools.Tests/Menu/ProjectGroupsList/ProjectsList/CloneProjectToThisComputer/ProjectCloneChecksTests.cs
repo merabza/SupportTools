@@ -17,7 +17,9 @@ public sealed class ProjectCloneChecksTests : IDisposable
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
-    private readonly string _tempFolder = Path.Combine(Path.GetTempPath(), $"ProjectCloneChecksTests_{Guid.NewGuid():N}");
+
+    private readonly string _tempFolder =
+        Path.Combine(Path.GetTempPath(), $"ProjectCloneChecksTests_{Guid.NewGuid():N}");
 
     public ProjectCloneChecksTests()
     {
@@ -40,7 +42,8 @@ public sealed class ProjectCloneChecksTests : IDisposable
     public void GetGitFolders_WhenAGitHasNoAddress_WritesNothing()
     {
         // Arrange
-        _parameters.Gits["NoAddress"] = new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
+        _parameters.Gits["NoAddress"] =
+            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
 
         // Act
         Dictionary<string, string?> result = ProjectCloneChecks.GetGitFolders(_parameters, "P",
@@ -206,8 +209,7 @@ public sealed class ProjectCloneChecksTests : IDisposable
             new Dictionary<string, string?> { ["RepoB"] = folderB, ["RepoA"] = folderA });
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"{Path.Combine(folderA, ".gitignore")} differs from the .gitignore template CSharp",
             $"{Path.Combine(folderB, ".gitignore")} does not exist (.gitignore template CSharp)"
         ], result);
@@ -279,7 +281,8 @@ public sealed class ProjectCloneChecksTests : IDisposable
             PairedDbObjectsResultFileName = paired
         };
         project.ServerInfos["A"] = new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings };
-        project.ServerInfos["B"] = new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings.ToUpperInvariant() };
+        project.ServerInfos["B"] =
+            new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings.ToUpperInvariant() };
         project.ServerInfos["C"] = new ServerInfoModel();
 
         // Act

@@ -56,11 +56,10 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
         //  ოღონდ სერვერის მხარეს ინფორმაციის წამოღება უნდა მოხდეს ერთხელ თავიდან
         //  და თუ რამე დაიფუშა, ყოველი დაფუშვის მერე, ოღონდ თუ დარჩენილია დასასინქრონიზებელი ფოლდერი
 
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList =
-            GitProjectListHelper.CreateProjectsList(_syncMultipleProjectsGitsParametersV2.Projects,
-                _syncMultipleProjectsGitsParametersV2.ProjectGroupName,
-                _syncMultipleProjectsGitsParametersV2.ProjectName,
-                _syncMultipleProjectsGitsParametersV2.IncludeRemoteProjects);
+        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList = GitProjectListHelper.CreateProjectsList(
+            _syncMultipleProjectsGitsParametersV2.Projects, _syncMultipleProjectsGitsParametersV2.ProjectGroupName,
+            _syncMultipleProjectsGitsParametersV2.ProjectName,
+            _syncMultipleProjectsGitsParametersV2.IncludeRemoteProjects);
 
         List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
 

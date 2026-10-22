@@ -11,4 +11,3 @@ public sealed record ServerGitProjects(
     List<string> UnknownGitNames);
 
 //პროექტის სახელი ორ რეპოზიტორიაშია: ReplacedGitName-ის პროექტი GitName-ის პროექტმა ჩაანაცვლა
-public sealed record GitProjectDuplicate(string ProjectName, string ReplacedGitName, string GitName);

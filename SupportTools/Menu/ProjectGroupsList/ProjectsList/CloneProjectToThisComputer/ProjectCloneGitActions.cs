@@ -23,7 +23,7 @@ internal sealed class ProjectCloneGitActions : IProjectCloneGitActions
 
     public bool ScanGitProjects(string gitName)
     {
-        GitProjectsUpdater? gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, gitName, true);
+        var gitProjectsUpdater = GitProjectsUpdater.Create(_logger, _parametersManager, gitName, true);
         return gitProjectsUpdater?.ProcessOneGitProject() is not null;
     }
 

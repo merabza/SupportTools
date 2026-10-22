@@ -15,8 +15,8 @@ public sealed class CheckPackageSolutionCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public CheckPackageSolutionCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName) :
-        base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName)
+    public CheckPackageSolutionCliMenuCommand(ILogger logger, IParametersManager parametersManager, string projectName)
+        : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName)
     {
         _logger = logger;
         _parametersManager = parametersManager;

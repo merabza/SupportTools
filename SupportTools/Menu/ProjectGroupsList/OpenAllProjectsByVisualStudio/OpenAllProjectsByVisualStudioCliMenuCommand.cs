@@ -36,10 +36,10 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
 
     //Visual Studio-ს მოძებნა, გახსნა და დაყოვნება პარამეტრებადაა გამოტანილი, რომ ტესტებმა devenv არ გაუშვან
     // ReSharper disable once ConvertToPrimaryConstructor
-    internal OpenAllProjectsByVisualStudioCliMenuCommand(IParametersManager parametersManager,
-        string projectGroupName, ILogger? logger, Func<ILogger?, string?> detectDevEnvPath,
-        Action<string, string, ILogger?> openSolution, Func<CancellationToken, Task> delayBetweenOpens) : base(
-        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
+    internal OpenAllProjectsByVisualStudioCliMenuCommand(IParametersManager parametersManager, string projectGroupName,
+        ILogger? logger, Func<ILogger?, string?> detectDevEnvPath, Action<string, string, ILogger?> openSolution,
+        Func<CancellationToken, Task> delayBetweenOpens) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload,
+        null, true)
     {
         _parametersManager = parametersManager;
         _projectGroupName = projectGroupName;
@@ -56,9 +56,11 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommand : CliMenuCommand
         //მხოლოდ ამ ჯგუფის ამ კომპიუტერზე არსებული პროექტები იხსნება (D3), სახელების ანბანური თანმიმდევრობით
         List<KeyValuePair<string, ProjectModel>> groupProjects =
         [
-            .. RemoteOnlyProjects.Skip(parameters.Projects.Where(x =>
-                    SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName), _logger)
-                .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
+            .. RemoteOnlyProjects
+                .Skip(
+                    parameters.Projects.Where(x =>
+                        SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName) == _projectGroupName),
+                    _logger).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
         ];
 
         string? devenvPath = _detectDevEnvPath(_logger);

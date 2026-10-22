@@ -90,8 +90,8 @@ public static class ServerGitProjectsMapper
     private static bool IsChanged(GitProjectDataModel old, GitProjectDataModel current)
     {
         return old.GitName != current.GitName || old.ProjectRelativePath != current.ProjectRelativePath ||
-               old.ProjectFileName != current.ProjectFileName ||
-               !old.DependsOnProjectNames.Order(StringComparer.Ordinal)
+               old.ProjectFileName != current.ProjectFileName || !old.DependsOnProjectNames
+                   .Order(StringComparer.Ordinal)
                    .SequenceEqual(current.DependsOnProjectNames.Order(StringComparer.Ordinal));
     }
 }

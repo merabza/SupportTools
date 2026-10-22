@@ -28,9 +28,9 @@ public sealed class CheckGroupProjectsBuildCliMenuCommand : CliMenuCommand
 
     //კონსოლიდან შეყვანა პარამეტრადაა გამოტანილი, რომ ტესტებმა პასუხი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
-    internal CheckGroupProjectsBuildCliMenuCommand(ILogger logger, string appName,
-        IParametersManager parametersManager, SupportToolsMenuParameters menuParameters, string projectGroupName,
-        Func<bool> inputNoIncremental) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
+    internal CheckGroupProjectsBuildCliMenuCommand(ILogger logger, string appName, IParametersManager parametersManager,
+        SupportToolsMenuParameters menuParameters, string projectGroupName, Func<bool> inputNoIncremental) : base(
+        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _appName = appName;

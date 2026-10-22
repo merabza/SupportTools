@@ -131,8 +131,8 @@ public sealed class StsRecordVersionCheckTests
     private static Task<Error?> Check(string key, int? loadedVersion, params FakeRecord[] serverRecords)
     {
         return StsRecordVersionCheck.Check(EntityName, key, loadedVersion,
-            _ => Task.FromResult(Result.Success<List<FakeRecord>>([.. serverRecords])), x => x.Name,
-            x => x.Version, CancellationToken.None);
+            _ => Task.FromResult(Result.Success<List<FakeRecord>>([.. serverRecords])), x => x.Name, x => x.Version,
+            CancellationToken.None);
     }
 
     private sealed record FakeRecord(string Name, int Version);

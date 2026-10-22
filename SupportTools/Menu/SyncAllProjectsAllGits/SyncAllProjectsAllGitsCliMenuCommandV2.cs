@@ -38,8 +38,8 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV2 : CliMenuCommand
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(parameters.Projects, _inputBool);
 
-        var syncOneProjectAllGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
-            _parametersManager, null, null, true, null, includeRemoteProjects);
+        var syncOneProjectAllGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager,
+            null, null, true, null, includeRemoteProjects);
         return await syncOneProjectAllGitsToolAction.Run(cancellationToken);
     }
 }

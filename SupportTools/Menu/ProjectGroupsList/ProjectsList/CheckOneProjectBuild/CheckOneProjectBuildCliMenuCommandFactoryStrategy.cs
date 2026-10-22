@@ -14,7 +14,7 @@ public class CheckOneProjectBuildCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new CheckOneProjectBuildCliMenuCommand(logger, app.AppName, parametersManager,
-            menuParameters, menuParameters.ProjectName);
+        return new CheckOneProjectBuildCliMenuCommand(logger, app.AppName, parametersManager, menuParameters,
+            menuParameters.ProjectName);
     }
 }

@@ -80,14 +80,15 @@ public sealed class SyncMultipleProjectsGitsToolActionV2Tests : IDisposable
     public async Task Run_WhenAGitHasNoAddress_ReportsItOnTheConsoleForTheActionAndTheSynchroniser()
     {
         // Arrange
-        _parameters.Gits["NoAddress"] = new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
+        _parameters.Gits["NoAddress"] =
+            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
 
         // Act
         await Create(null, "Local1", false).Run();
 
         // Assert
-        Assert.Equal(2, CountOccurrences(_consoleOutput.ToString(),
-            "GitProjectAddress is empty for Git Repo with key NoAddress)"));
+        Assert.Equal(2,
+            CountOccurrences(_consoleOutput.ToString(), "GitProjectAddress is empty for Git Repo with key NoAddress)"));
     }
 
     //a git that is not in Gits gives no sync action, so no synchroniser runs for it
@@ -229,19 +230,19 @@ public sealed class SyncMultipleProjectsGitsToolActionV2Tests : IDisposable
         // Assert
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+        _logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) =>
-                    value.ToString() == "supportToolsParameters.WorkFolder does not specified"),
-                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            logGitWork ? Times.Once() : Times.Never());
+                    value.ToString() == "supportToolsParameters.WorkFolder does not specified"), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), logGitWork ? Times.Once() : Times.Never());
 #pragma warning restore CA1873
     }
 
     private SyncMultipleProjectsGitsToolActionV2 Create(string? projectGroupName, string? projectName,
         bool includeRemoteProjects, string? useMessage = null)
     {
-        return SyncMultipleProjectsGitsToolActionV2.Create(_logger.Object, _parametersManager.Object,
-            projectGroupName, projectName, true, useMessage, includeRemoteProjects);
+        return SyncMultipleProjectsGitsToolActionV2.Create(_logger.Object, _parametersManager.Object, projectGroupName,
+            projectName, true, useMessage, includeRemoteProjects);
     }
 
     private void AddGit(string gitName)

@@ -44,7 +44,8 @@ public sealed class PackageBuilderTests : IDisposable
         WriteProjectFile(Path.Combine(_tempFolder, "Pkg", "Other"), "Other.Lib");
 
         _parameters.LocalPackageManagerWebApiClientName = ApiClientName;
-        _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = "http://127.0.0.1:0/", ApiKey = "key" };
+        _parameters.ApiClients[ApiClientName] =
+            new ApiClientSettings { Server = "http://127.0.0.1:0/", ApiKey = "key" };
         _parameters.Projects[_projectName] = new ProjectModel
         {
             ProjectType = EProjectType.IsPackage, SolutionFileName = Path.Combine(solutionFolder, "Pkg.slnx")
@@ -122,8 +123,7 @@ public sealed class PackageBuilderTests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Empty(commands.Pushes);
-        Assert.Contains($"No packages of project {_projectName} were created", ConsoleText(),
-            StringComparison.Ordinal);
+        Assert.Contains($"No packages of project {_projectName} were created", ConsoleText(), StringComparison.Ordinal);
     }
 
     private PackageBuilder CreateSut(IPackageBuildCommands commands)
@@ -191,17 +191,17 @@ public sealed class PackageBuilderTests : IDisposable
             string dependencies = string.Concat(package.Dependencies.Select(x =>
                 $"""<dependency id="{x.Id}" version="{x.Version ?? packageVersion}" exclude="Build,Analyzers" />"""));
             string nuspec = $"""
-                <?xml version="1.0" encoding="utf-8"?>
-                <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
-                  <metadata>
-                    <id>{package.Id}</id>
-                    <version>{packageVersion}</version>
-                    <dependencies>
-                      <group targetFramework="net10.0">{dependencies}</group>
-                    </dependencies>
-                  </metadata>
-                </package>
-                """;
+                             <?xml version="1.0" encoding="utf-8"?>
+                             <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+                               <metadata>
+                                 <id>{package.Id}</id>
+                                 <version>{packageVersion}</version>
+                                 <dependencies>
+                                   <group targetFramework="net10.0">{dependencies}</group>
+                                 </dependencies>
+                               </metadata>
+                             </package>
+                             """;
 
             // ReSharper disable once using
             using ZipArchive packageArchive = ZipFile.Open(packageFile, ZipArchiveMode.Create);

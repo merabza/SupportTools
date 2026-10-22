@@ -25,6 +25,9 @@ public sealed class SpaProjectFolderHelperTests : IDisposable
     private const string SpaGitName = "FrontSpa";
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+
+    private readonly Dictionary<string, GitProjectDataModel> _gitProjects = [];
+
     private readonly Dictionary<string, GitDataModel> _gits = new()
     {
         [BackGitName] = new GitDataModel { GitProjectFolderName = BackGitName },
@@ -34,7 +37,6 @@ public sealed class SpaProjectFolderHelperTests : IDisposable
         }
     };
 
-    private readonly Dictionary<string, GitProjectDataModel> _gitProjects = [];
     private readonly Mock<ILogger> _logger = new();
     private readonly TextWriter _originalConsoleOutput;
     private readonly ProjectModel _project = new() { SpaProjectName = "FrontApp" };
@@ -142,7 +144,8 @@ public sealed class SpaProjectFolderHelperTests : IDisposable
         bool expected)
     {
         // Act
-        bool result = SpaProjectFolderHelper.UsesSpaProjectFolder(new GitDataModel { GitProjectFolderName = folderName });
+        bool result =
+            SpaProjectFolderHelper.UsesSpaProjectFolder(new GitDataModel { GitProjectFolderName = folderName });
 
         // Assert
         Assert.Equal(expected, result);
@@ -156,8 +159,9 @@ public sealed class SpaProjectFolderHelperTests : IDisposable
 
     private void VerifyErrorLogged(Times times)
     {
-        _logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == MissingMessage), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        _logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString() == MissingMessage), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
     }
 }

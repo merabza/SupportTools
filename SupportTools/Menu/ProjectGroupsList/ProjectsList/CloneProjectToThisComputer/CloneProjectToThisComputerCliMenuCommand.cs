@@ -83,8 +83,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
         }
 
         List<(EGitCol GitCol, string GitName)> gits = ChooseGits(project);
-        if (!_inputBool(
-                $"Clone {Count(gits.Count)} gits of project {_projectName} to {projectFolderName}?", true))
+        if (!_inputBool($"Clone {Count(gits.Count)} gits of project {_projectName} to {projectFolderName}?", true))
         {
             return true;
         }
@@ -195,8 +194,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
             string? gitsFolder = gitColGits.Key == EGitCol.Main
                 ? project.ProjectFolderName
                 : parameters.GetGitsFolder(_projectName, gitColGits.Key);
-            foreach ((string gitName, string? gitFolder) in ProjectCloneChecks.GetGitFolders(parameters,
-                         _projectName, project, gitsFolder, gitColGits.Select(x => x.GitName)))
+            foreach ((string gitName, string? gitFolder) in ProjectCloneChecks.GetGitFolders(parameters, _projectName,
+                         project, gitsFolder, gitColGits.Select(x => x.GitName)))
             {
                 gitFolders[gitName] = gitFolder;
             }
@@ -214,8 +213,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
             .. gits.Select(x => x.GitName).Where(x =>
                 gitFolders.GetValueOrDefault(x) is not { } gitFolder || !Directory.Exists(gitFolder))
         ];
-        report.Add(
-            $"Gits cloned: {Count(gits.Count - notClonedGitNames.Count)} of {Count(gits.Count)}");
+        report.Add($"Gits cloned: {Count(gits.Count - notClonedGitNames.Count)} of {Count(gits.Count)}");
         if (notClonedGitNames.Count == 0)
         {
             return true;

@@ -57,8 +57,8 @@ public sealed class AutoSyncParametersManagerTests : IDisposable
         //the local save with its message, then the state of the push without one
         _sync.ParametersManager.Verify(x => x.Save(_sync.Parameters, "Saved", null, It.IsAny<CancellationToken>()),
             Times.Once);
-        _sync.ParametersManager.Verify(
-            x => x.Save(_sync.Parameters, string.Empty, null, It.IsAny<CancellationToken>()), Times.Once);
+        _sync.ParametersManager.Verify(x => x.Save(_sync.Parameters, string.Empty, null, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]

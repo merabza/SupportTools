@@ -42,8 +42,7 @@ public sealed class ProjectReferenceReplacerTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove reference {Project} {Reference}", $"add package without restore {Project} Lib.A 1.0.2",
             $"restore without http cache {Project}"
         ], _commands.Calls);
@@ -77,8 +76,7 @@ public sealed class ProjectReferenceReplacerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove reference {Project} {Reference}", $"add package without restore {Project} Lib.A 1.0.2",
             $"add reference {Project} {Reference}"
         ], _commands.Calls);
@@ -114,8 +112,7 @@ public sealed class ProjectReferenceReplacerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove reference {Project} {Reference}", $"add package without restore {Project} Lib.A 1.0.2",
             $"restore without http cache {Project}", $"remove package {Project} Lib.A",
             $"add reference {Project} {Reference}"
@@ -153,8 +150,7 @@ public sealed class ProjectReferenceReplacerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove reference {Project} {Reference}", $"add package without restore {Project} Lib.A 1.0.2",
             $"restore without http cache {Project}", $"remove package {Project} Lib.A"
         ], _commands.Calls);

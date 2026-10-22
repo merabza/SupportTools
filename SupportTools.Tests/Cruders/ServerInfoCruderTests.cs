@@ -35,9 +35,9 @@ public sealed class ServerInfoCruderTests
     {
         // Arrange
         string[] expected = ["Delete this record", "Edit All fields in sequence", "Copy Server..."];
-        ServerInfoCruder sut = ServerInfoCruder.Create(new Mock<IApplication>().Object,
-            new Mock<IServiceProvider>().Object, new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
-            _parametersManager.Object, ProjectTestData.Name);
+        var sut = ServerInfoCruder.Create(new Mock<IApplication>().Object, new Mock<IServiceProvider>().Object,
+            new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object, _parametersManager.Object,
+            ProjectTestData.Name);
 
         // Act
         List<CliMenuItem> menuItems = CliMenuTestAccess.GetMenuItems(sut.GetItemMenu(ProjectTestData.ProdKey));

@@ -87,8 +87,7 @@ public sealed class UploadedPackageCheckerTests : IDisposable
 
         // Assert
         Assert.Equal("1.0.2", result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "GET /v3/index.json", "GET /v3/package/pkg.a/index.json", "GET /v3/package/pkg.b/index.json",
             "GET /v3/package/pkg.tests/index.json", "GET /v3/package/pkg.a/1.0.2/pkg.a.nuspec"
         ], _server.Requests);
@@ -140,8 +139,8 @@ public sealed class UploadedPackageCheckerTests : IDisposable
         // Assert
         Assert.Null(result);
         Assert.Empty(_server.Requests);
-        Assert.Contains("Project Pkg has uncommitted changes, its packages will be built and uploaded",
-            ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("Project Pkg has uncommitted changes, its packages will be built and uploaded", ConsoleText(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -321,15 +320,15 @@ public sealed class UploadedPackageCheckerTests : IDisposable
     private static string Nuspec(string repositoryElement)
     {
         return "﻿" + $"""
-            <?xml version="1.0" encoding="utf-8"?>
-            <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
-              <metadata>
-                <id>Pkg.A</id>
-                <version>1.0.2</version>
-                {repositoryElement}
-              </metadata>
-            </package>
-            """;
+                      <?xml version="1.0" encoding="utf-8"?>
+                      <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+                        <metadata>
+                          <id>Pkg.A</id>
+                          <version>1.0.2</version>
+                          {repositoryElement}
+                        </metadata>
+                      </package>
+                      """;
     }
 
     private string ConsoleText()
@@ -358,8 +357,7 @@ public sealed class UploadedPackageCheckerTests : IDisposable
 
             if (IsUnreachable)
             {
-                return Task.FromException<HttpResponseMessage>(
-                    new HttpRequestException("No connection could be made"));
+                return Task.FromException<HttpResponseMessage>(new HttpRequestException("No connection could be made"));
             }
 
             (HttpStatusCode statusCode, string body) =

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using LibSupportToolsServerWork.Registry.Sync;
+using SupportToolsData.Models;
 using SystemTools.ApiContracts.Errors;
 using SystemTools.SharedKernel;
 using Xunit;
@@ -54,8 +55,7 @@ public sealed class RegistrySyncEngineGetLocalChangesTests
         Result<List<RegistrySyncLocalChange>> result = sut.GetLocalChanges();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             new RegistrySyncLocalChange(Environments, "Added", RegistrySyncTestContext.HashOf("Added", "a")),
             new RegistrySyncLocalChange(Environments, "Dev", RegistrySyncTestContext.HashOf("Dev", "new")),
             new RegistrySyncLocalChange(Environments, "Gone", null)
@@ -67,7 +67,7 @@ public sealed class RegistrySyncEngineGetLocalChangesTests
     public void GetLocalChanges_WhenRecordDiffersOnlyBeforeNormalization_ReturnsNothing()
     {
         // Arrange
-        _context.State.GetOrAddCollection(Environments).Records["Dev"] = new()
+        _context.State.GetOrAddCollection(Environments).Records["Dev"] = new RegistryRecordSyncStateModel
         {
             Version = 1, Hash = RegistryContractHasher.ComputeHash(new FakeContract("Dev", null, 0))
         };

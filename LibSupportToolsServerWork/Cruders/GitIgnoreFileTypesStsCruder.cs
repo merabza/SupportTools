@@ -124,8 +124,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
 
     //ახალი ჩანაწერი სერვერზე ჯერ არ უნდა იყოს, არსებული კი იმ ვერსიით უნდა იყოს, რომლითაც სიაში ჩაიტვირთა
     //(StsRecordVersionCheck)
-    private async Task AddOrUpdateRecordWithKey(string recordKey, bool isNewRecord,
-        CancellationToken cancellationToken)
+    private async Task AddOrUpdateRecordWithKey(string recordKey, bool isNewRecord, CancellationToken cancellationToken)
     {
         SupportToolsServerApiClient? supportToolsServerApiClient = GetSupportToolsServerApiClient();
 
@@ -139,8 +138,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         try
         {
             Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
-                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version,
-                cancellationToken);
+                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version, cancellationToken);
             Result updateGitRepoByKeyResult = versionError is null
                 ? await supportToolsServerApiClient.UpdateGitIgnoreFileType(recordKey, cancellationToken)
                 : Result.Failure(versionError);
@@ -186,8 +184,7 @@ public sealed class GitIgnoreFileTypesStsCruder : Cruder
         try
         {
             Error? versionError = await StsRecordVersionCheck.Check(EntityName, recordKey, loadedVersion,
-                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version,
-                cancellationToken);
+                supportToolsServerApiClient.GetGitIgnoreFileTypesList, x => x.Name, x => x.Version, cancellationToken);
             Result updateGitRepoByKeyResult = versionError is null
                 ? await supportToolsServerApiClient.RemoveGitIgnoreFileTypeName(recordKey, cancellationToken)
                 : Result.Failure(versionError);

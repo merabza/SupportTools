@@ -15,7 +15,9 @@ public sealed class RemoteOnlyProjectsTests : IDisposable
 {
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
-    private readonly string _tempFolder = Path.Combine(Path.GetTempPath(), $"RemoteOnlyProjectsTests_{Guid.NewGuid():N}");
+
+    private readonly string _tempFolder =
+        Path.Combine(Path.GetTempPath(), $"RemoteOnlyProjectsTests_{Guid.NewGuid():N}");
 
     public RemoteOnlyProjectsTests()
     {

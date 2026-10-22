@@ -30,14 +30,14 @@ public sealed class UpdateGitProjectsFromServerCliMenuCommandTests : IDisposable
     private const string GitProjectsPath = "GET /api/v1/git/gitprojects";
 
     private const string ServerGitProjectsJson = """
-        [
-          {"gitName":"CrawlerConsole","projectRelativePath":"CrawlerConsole\\SystemTools.DependencyInjection","projectFileName":"SystemTools.DependencyInjection.csproj","dependsOnProjectNames":[]},
-          {"gitName":"OnlyOnServer","projectRelativePath":"OnlyOnServer\\AppX","projectFileName":"AppX.csproj","dependsOnProjectNames":[]},
-          {"gitName":"RepoA","projectRelativePath":"RepoA\\AppA","projectFileName":"AppA.csproj","dependsOnProjectNames":["LibA","SystemTools.DependencyInjection"]},
-          {"gitName":"RepoA","projectRelativePath":"RepoA\\LibA","projectFileName":"LibA.csproj","dependsOnProjectNames":[]},
-          {"gitName":"SystemTools","projectRelativePath":"SystemTools\\SystemTools.DependencyInjection","projectFileName":"SystemTools.DependencyInjection.csproj","dependsOnProjectNames":["SystemTools.SystemToolsShared"]}
-        ]
-        """;
+                                                 [
+                                                   {"gitName":"CrawlerConsole","projectRelativePath":"CrawlerConsole\\SystemTools.DependencyInjection","projectFileName":"SystemTools.DependencyInjection.csproj","dependsOnProjectNames":[]},
+                                                   {"gitName":"OnlyOnServer","projectRelativePath":"OnlyOnServer\\AppX","projectFileName":"AppX.csproj","dependsOnProjectNames":[]},
+                                                   {"gitName":"RepoA","projectRelativePath":"RepoA\\AppA","projectFileName":"AppA.csproj","dependsOnProjectNames":["LibA","SystemTools.DependencyInjection"]},
+                                                   {"gitName":"RepoA","projectRelativePath":"RepoA\\LibA","projectFileName":"LibA.csproj","dependsOnProjectNames":[]},
+                                                   {"gitName":"SystemTools","projectRelativePath":"SystemTools\\SystemTools.DependencyInjection","projectFileName":"SystemTools.DependencyInjection.csproj","dependsOnProjectNames":["SystemTools.SystemToolsShared"]}
+                                                 ]
+                                                 """;
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly Mock<IHttpClientFactory> _httpClientFactory = new();
@@ -103,8 +103,9 @@ public sealed class UpdateGitProjectsFromServerCliMenuCommandTests : IDisposable
 
     private void VerifyNotSaved()
     {
-        _parametersManager.Verify(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]

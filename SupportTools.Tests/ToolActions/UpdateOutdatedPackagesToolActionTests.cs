@@ -34,7 +34,9 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         _parameters.Gits["GitA"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/GitA.git", GitProjectFolderName = "GitA", GitIgnorePatternName = "Node"
+            GitProjectAddress = "git@github.com:x/GitA.git",
+            GitProjectFolderName = "GitA",
+            GitIgnorePatternName = "Node"
         };
         AddProject("P1", "G1", true, "GitA");
         AddProject("P2", "G1", true, "GitA", "MissingB");
@@ -88,14 +90,15 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         _parameters.Projects.Remove("P2");
         _parameters.Projects.Remove("P3");
         _parameters.Projects.Remove("P5");
-        _parameters.Gits["NoAddress"] = new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "Node" };
+        _parameters.Gits["NoAddress"] =
+            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "Node" };
 
         // Act
         await Create(null, null, false).Run();
 
         // Assert
-        Assert.Equal(4, CountOccurrences(_consoleOutput.ToString(),
-            "GitProjectAddress is empty for Git Repo with key NoAddress)"));
+        Assert.Equal(4,
+            CountOccurrences(_consoleOutput.ToString(), "GitProjectAddress is empty for Git Repo with key NoAddress)"));
     }
 
     //the check sync commits the local changes with the given message and the "Check" suffix (real git, local remote)
@@ -221,7 +224,8 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         // Assert
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+        _logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) => value.ToString() == "dotnet outdated failed for: MissingP3"),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             logGitWork ? Times.Once() : Times.Never());

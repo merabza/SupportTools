@@ -35,8 +35,7 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         string? projectGroupName, string? projectName, bool useConsole)
     {
         //D:\1WorkDotnet\SupportTools\SupportTools\SupportTools\bin\Debug\net9.0
-        return Create(logger, parametersManager, projectGroupName, projectName, useConsole,
-            AppContext.BaseDirectory);
+        return Create(logger, parametersManager, projectGroupName, projectName, useConsole, AppContext.BaseDirectory);
     }
 
     //გაშვებული პროგრამის ფოლდერი პარამეტრადაა გამოტანილი, რომ ტესტებმა თავიანთი ფოლდერი გამორიცხონ და

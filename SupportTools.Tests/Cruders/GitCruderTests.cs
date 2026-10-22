@@ -106,7 +106,7 @@ public sealed class GitCruderTests : IDisposable
     public void Create_WhenSupportToolsServerIsNotSpecified_ListsTheLocalGitsWithoutCallingTheServer()
     {
         // Act
-        GitCruder sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
+        var sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
 
         // Assert
         Assert.Equal($"{RepoAAddress} Usage count is: 0", sut.GetStatusFor("RepoA"));
@@ -125,7 +125,7 @@ public sealed class GitCruderTests : IDisposable
         ServerLists(ServerGit("OtherRepo", "git@github.com:x/other.git"), ServerGit("ServerRepoA", RepoAAddress));
 
         // Act
-        GitCruder sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
+        var sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
 
         // Assert
         Assert.Equal($"{RepoAAddress} Usage count is: 0- rem name is: ServerRepoA", sut.GetStatusFor("RepoA"));
@@ -140,7 +140,7 @@ public sealed class GitCruderTests : IDisposable
         ServerLists(ServerGit("OtherRepo", "git@github.com:x/other.git"));
 
         // Act
-        GitCruder sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
+        var sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
 
         // Assert
         Assert.Equal($"{RepoAAddress} Usage count is: 0", sut.GetStatusFor("RepoA"));
@@ -155,7 +155,7 @@ public sealed class GitCruderTests : IDisposable
             """{"title":"SomeError","status":400,"detail":"Server list is broken"}""");
 
         // Act
-        GitCruder sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
+        var sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
 
         // Assert
         string console = ConsoleText();
@@ -172,7 +172,7 @@ public sealed class GitCruderTests : IDisposable
         _parameters.SupportToolsServerWebApiClientName = ApiClientName;
 
         // Act
-        GitCruder sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
+        var sut = GitCruder.Create(_logger.Object, _httpClientFactory.Object, _parametersManager.Object);
 
         // Assert
         Assert.Contains($"ApiClient with name {ApiClientName} does not exists", ConsoleText(),
@@ -420,8 +420,10 @@ public sealed class GitCruderTests : IDisposable
     public void FillDetailsSubMenu_WhenProjectsUseTheGit_AddsTheUpdateCommandAndLinksToTheProjects()
     {
         // Arrange
-        _parameters.Projects["ProjectB"] = new ProjectModel { ProjectGroupName = "Group1", GitProjectNames = ["RepoA"] };
-        _parameters.Projects["ProjectA"] = new ProjectModel { ProjectGroupName = "Group2", GitProjectNames = ["RepoA"] };
+        _parameters.Projects["ProjectB"] =
+            new ProjectModel { ProjectGroupName = "Group1", GitProjectNames = ["RepoA"] };
+        _parameters.Projects["ProjectA"] =
+            new ProjectModel { ProjectGroupName = "Group2", GitProjectNames = ["RepoA"] };
         _parameters.Projects["SeederOnly"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["RepoA"] };
         _parameters.Projects["Other"] = new ProjectModel { GitProjectNames = ["RepoB"] };
         var detailsMenu = new CliMenuSet("Details");
@@ -474,7 +476,9 @@ public sealed class GitCruderTests : IDisposable
     {
         return new StsGitDataModel
         {
-            GitProjectName = name, GitProjectAddress = address, GitProjectFolderName = name,
+            GitProjectName = name,
+            GitProjectAddress = address,
+            GitProjectFolderName = name,
             GitIgnorePatternName = "CSharp"
         };
     }

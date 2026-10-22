@@ -184,8 +184,7 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
 
         // Assert
         //the version check reads the list before the write (D4)
-        Assert.Equal([ListRequest, ListRequest, MergeUpRequest, ListRequest],
-            _server.Requests.Select(x => x.Request));
+        Assert.Equal([ListRequest, ListRequest, MergeUpRequest, ListRequest], _server.Requests.Select(x => x.Request));
         StsEditorConfigFileTypeDataModel sent = Assert.Single(SentRecords(_server.Requests[2].Body));
         Assert.Equal("default", sent.Name);
         Assert.Equal("root = true\r\n", sent.Content);
@@ -430,7 +429,9 @@ public sealed class EditorConfigFileTypesStsCruderTests : IDisposable
             {
                 new()
                 {
-                    Name = "default", Content = EditorConfigTestEnvironment.TemplateContent, Version = defaultVersion
+                    Name = "default",
+                    Content = EditorConfigTestEnvironment.TemplateContent,
+                    Version = defaultVersion
                 },
                 new() { Name = "BaGetter", Content = BaGetterContent }
             }));

@@ -12,7 +12,9 @@ namespace SupportTools.Tests.GitProjects;
 public sealed class GitProjectListHelperTests : IDisposable
 {
     private readonly Dictionary<string, ProjectModel> _projects;
-    private readonly string _tempFolder = Path.Combine(Path.GetTempPath(), $"GitProjectListHelperTests_{Guid.NewGuid():N}");
+
+    private readonly string _tempFolder =
+        Path.Combine(Path.GetTempPath(), $"GitProjectListHelperTests_{Guid.NewGuid():N}");
 
     public GitProjectListHelperTests()
     {
@@ -41,8 +43,7 @@ public sealed class GitProjectListHelperTests : IDisposable
         // Act
         List<string> result =
         [
-            .. GitProjectListHelper.CreateProjectsList(_projects, null, null, includeRemoteProjects)
-                .Select(x => x.Key)
+            .. GitProjectListHelper.CreateProjectsList(_projects, null, null, includeRemoteProjects).Select(x => x.Key)
         ];
 
         // Assert
@@ -52,14 +53,13 @@ public sealed class GitProjectListHelperTests : IDisposable
     [Theory]
     [InlineData(false, new[] { "LocalB" })]
     [InlineData(true, new[] { "LocalB", "RemoteB" })]
-    public void CreateProjectsList_WhenGroup_FiltersRemoteProjectsOfTheGroupUnlessIncluded(
-        bool includeRemoteProjects, string[] expected)
+    public void CreateProjectsList_WhenGroup_FiltersRemoteProjectsOfTheGroupUnlessIncluded(bool includeRemoteProjects,
+        string[] expected)
     {
         // Act
         List<string> result =
         [
-            .. GitProjectListHelper.CreateProjectsList(_projects, "G2", null, includeRemoteProjects)
-                .Select(x => x.Key)
+            .. GitProjectListHelper.CreateProjectsList(_projects, "G2", null, includeRemoteProjects).Select(x => x.Key)
         ];
 
         // Assert

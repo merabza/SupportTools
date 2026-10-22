@@ -43,14 +43,14 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         Directory.CreateDirectory(apiFolder);
         _csprojFile = Path.Combine(apiFolder, "App.Api.csproj");
         File.WriteAllText(_csprojFile, """
-            <Project Sdk="Microsoft.NET.Sdk">
-              <ItemGroup>
-                <PackageReference Include="Lib.A" />
-                <PackageReference Include="Newtonsoft.Json" />
-                <PackageReference Include="Lib.B" />
-              </ItemGroup>
-            </Project>
-            """);
+                                       <Project Sdk="Microsoft.NET.Sdk">
+                                         <ItemGroup>
+                                           <PackageReference Include="Lib.A" />
+                                           <PackageReference Include="Newtonsoft.Json" />
+                                           <PackageReference Include="Lib.B" />
+                                         </ItemGroup>
+                                       </Project>
+                                       """);
         string libAFolder = Path.Combine(_projectFolder, "Lib", "Lib.A");
         Directory.CreateDirectory(libAFolder);
         _libAProjectFile = Path.Combine(libAFolder, "Lib.A.csproj");
@@ -62,7 +62,9 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         };
         _parameters.Gits["App"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/App.git", GitProjectFolderName = "App", GitIgnorePatternName = "CSharp"
+            GitProjectAddress = "git@github.com:x/App.git",
+            GitProjectFolderName = "App",
+            GitIgnorePatternName = "CSharp"
         };
         _parameters.GitProjects["Lib.A"] = new GitProjectDataModel
         {
@@ -156,8 +158,7 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove {_csprojFile} Lib.A", $"reference {_csprojFile} {_libAProjectFile}",
             $"package {_csprojFile} Lib.A "
         ], _editor.Calls);
@@ -204,7 +205,8 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
     {
         // Arrange
         await File.WriteAllTextAsync(Path.Combine(_projectFolder, "App", "Readme.txt"), "not xml");
-        _parameters.Gits["NoAddress"] = new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
+        _parameters.Gits["NoAddress"] =
+            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
 
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
@@ -260,7 +262,8 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         _parameters.Projects["App"] = new ProjectModel
         {
             UseLocalPackages = true,
-            ProjectFolderName = Path.Combine(_tempFolder, "Missing"), GitProjectNames = ["App"]
+            ProjectFolderName = Path.Combine(_tempFolder, "Missing"),
+            GitProjectNames = ["App"]
         };
 
         // Act
@@ -377,9 +380,10 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
     {
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString()!.StartsWith(messageStart, StringComparison.Ordinal)),
-            It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
+        _logger.Verify(
+            x => x.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString()!.StartsWith(messageStart, StringComparison.Ordinal)),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
 #pragma warning restore CA1873
     }
 
@@ -387,9 +391,9 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
     {
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(logLevel, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+        _logger.Verify(
+            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((value, _) => value.ToString() == message),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
     }
 

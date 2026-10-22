@@ -8,8 +8,7 @@ namespace SupportTools.Tests;
 public sealed class DotnetProcessorTests
 {
     [Theory]
-    [InlineData(false, false,
-        "build App.slnx \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
+    [InlineData(false, false, "build App.slnx \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
     [InlineData(true, false,
         "build App.slnx --no-incremental \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
     [InlineData(false, true,

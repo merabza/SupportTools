@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
 using LibGitWork.Helpers;
@@ -19,9 +18,8 @@ internal static class ProjectCloneChecks
     public static List<string> GetGitsWithoutGitProjects(SupportToolsParameters parameters,
         IEnumerable<string> gitNames)
     {
-        HashSet<string> gitsWithProjects =
-            new(parameters.GitProjects.Values.Select(x => x.GitName).OfType<string>(),
-                StringComparer.OrdinalIgnoreCase);
+        HashSet<string> gitsWithProjects = new(parameters.GitProjects.Values.Select(x => x.GitName).OfType<string>(),
+            StringComparer.OrdinalIgnoreCase);
         return
         [
             .. gitNames.Distinct(StringComparer.OrdinalIgnoreCase)

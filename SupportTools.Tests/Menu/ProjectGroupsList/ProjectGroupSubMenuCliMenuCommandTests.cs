@@ -110,8 +110,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal("local: 2, remote: 1, NotChecked: 1, Success: 2", sut.StatusString);
-        Assert.Equal([ConsoleColor.Blue, ConsoleColor.Green],
-            sut.StatusColorParts!.Skip(2).Select(x => x.Color));
+        Assert.Equal([ConsoleColor.Blue, ConsoleColor.Green], sut.StatusColorParts!.Skip(2).Select(x => x.Color));
     }
 
     [Fact]
@@ -123,7 +122,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
         _menuParameters.ProjectBuildCheckResults["LocalB"] =
             new ProjectBuildCheckResult(EProjectBuildCheckStatus.SuccessWithWarnings, 0, 3);
         _menuParameters.ProjectBuildCheckResults["RemoteA"] =
-            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 5, 0);
+            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 5);
         ProjectGroupSubMenuCliMenuCommand sut = CreateSut("G1");
 
         // Act
@@ -140,7 +139,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
     {
         // Arrange
         _menuParameters.ProjectBuildCheckResults["LocalD"] =
-            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 1, 0);
+            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 1);
         ProjectGroupSubMenuCliMenuCommand sut = CreateSut("G1");
 
         // Act
@@ -156,7 +155,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
         // Arrange
         _parameters.HideRemoteOnlyProjects = true;
         _menuParameters.ProjectBuildCheckResults["RemoteA"] =
-            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 5, 0);
+            new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 5);
         ProjectGroupSubMenuCliMenuCommand sut = CreateSut("G1");
 
         // Act
@@ -183,8 +182,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
 
     private ProjectGroupSubMenuCliMenuCommand CreateSut(string groupName)
     {
-        return new ProjectGroupSubMenuCliMenuCommand(_serviceProvider, _parametersManager, groupName,
-            _menuParameters);
+        return new ProjectGroupSubMenuCliMenuCommand(_serviceProvider, _parametersManager, groupName, _menuParameters);
     }
 
     private void AddProject(string projectName, string? groupName, bool isLocal)

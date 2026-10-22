@@ -93,12 +93,13 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         // Assert
         Assert.True(result);
         Assert.True(Directory.Exists(_projectFolder));
-        Assert.DoesNotContain(_questions, x => x.Contains("files of the project are missing", StringComparison.Ordinal));
+        Assert.DoesNotContain(_questions,
+            x => x.Contains("files of the project are missing", StringComparison.Ordinal));
         Assert.Equal(["scan AppMain", "scan AppSpa", "sync Main AppMain", "sync Main AppSpa"], _gitActions.Calls);
         Assert.True(Directory.Exists(Path.Combine(_projectFolder, MainGitName)));
         Assert.True(Directory.Exists(Path.Combine(_projectFolder, @"AppMain\AppFront\ClientApp")));
-        _parametersManager.Verify(x => x.Save(_parameters, "Git Projects Updated", null,
-            It.IsAny<CancellationToken>()), Times.Once);
+        _parametersManager.Verify(x => x.Save(_parameters, "Git Projects Updated", null, It.IsAny<CancellationToken>()),
+            Times.Once);
         string output = _consoleOutput.ToString();
         //the report is the only output (the fake git steps write nothing) and starts with an empty line
         Assert.StartsWith($"{Environment.NewLine}Clone Project To This Computer App: finished", output,
@@ -124,8 +125,9 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(["sync Main AppMain", "sync Main AppSpa"], _gitActions.Calls);
-        _parametersManager.Verify(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 
     //without the SpaProjectName record the SPA git has no folder: a clear error instead of the old exception
@@ -140,7 +142,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 
         // Assert
         string output = _consoleOutput.ToString();
-        Assert.Contains("GitProjects has no AppFront (SpaProjectName of project App)", output, StringComparison.Ordinal);
+        Assert.Contains("GitProjects has no AppFront (SpaProjectName of project App)", output,
+            StringComparison.Ordinal);
         Assert.Contains("Gits cloned: 1 of 2", output, StringComparison.Ordinal);
         Assert.Contains("Gits not cloned: AppSpa", output, StringComparison.Ordinal);
         Assert.Contains("Clone Project To This Computer App: finished with errors", output, StringComparison.Ordinal);
@@ -161,7 +164,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         Assert.False(result);
         string output = _consoleOutput.ToString();
         Assert.Contains("Gits cloned: 1 of 1", output, StringComparison.Ordinal);
-        Assert.Contains("GitProjects has no AppFront (SpaProjectName of project App)", output, StringComparison.Ordinal);
+        Assert.Contains("GitProjects has no AppFront (SpaProjectName of project App)", output,
+            StringComparison.Ordinal);
         Assert.Contains("Clone Project To This Computer App: finished with errors", output, StringComparison.Ordinal);
     }
 
@@ -178,8 +182,9 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.False(result);
-        _parametersManager.Verify(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         Assert.DoesNotContain("GitProjects updated for gits", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -209,8 +214,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         await CreateSut().Run();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "scan AppMain", "scan AppSpa", "scan AppSeeder", "sync Main AppMain", "sync Main AppSpa",
             "sync ScaffoldSeed AppSeeder"
         ], _gitActions.Calls);
@@ -358,7 +362,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         await CreateSut().Run();
 
         // Assert
-        Assert.Contains("2 files of the project are missing. Run \"Sync Registry With SupportToolsServer...\" now?|True",
+        Assert.Contains(
+            "2 files of the project are missing. Run \"Sync Registry With SupportToolsServer...\" now?|True",
             _questions);
         Assert.Contains(
             $"Project files missing (run \"Sync Registry With SupportToolsServer...\"): {seedParameters}, {pairedObjects}",
@@ -375,7 +380,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         await CreateSut().Run();
 
         // Assert
-        Assert.Contains($"{Path.Combine(_projectFolder, MainGitName, ".gitignore")} differs from the .gitignore template CSharp",
+        Assert.Contains(
+            $"{Path.Combine(_projectFolder, MainGitName, ".gitignore")} differs from the .gitignore template CSharp",
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -398,7 +404,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(1, _syncRegistryRuns);
-        Assert.Contains("1 files of the project are missing. Run \"Sync Registry With SupportToolsServer...\" now?|True",
+        Assert.Contains(
+            "1 files of the project are missing. Run \"Sync Registry With SupportToolsServer...\" now?|True",
             _questions);
         string output = _consoleOutput.ToString();
         Assert.Contains($"Missing file: {appSettings}", output, StringComparison.Ordinal);
@@ -442,9 +449,10 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         // Assert
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
+        logger.Verify(
+            x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) => value.ToString() ==
-                                                   $"Clone Project To This Computer App finished, success: {!cloneFails}"),
+                                                  $"Clone Project To This Computer App finished, success: {!cloneFails}"),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
     }

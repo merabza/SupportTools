@@ -3,13 +3,6 @@ using SystemTools.SharedKernel;
 
 namespace LibGitWork.SyncV3;
 
-internal enum EGitFolderInspectionKind
-{
-    Ready,
-    NeedsClone,
-    Failed
-}
-
 //ფოლდერის ლოკალური შემოწმების შედეგი: Ready-ს Status აქვს, Failed-ს ErrorMessage
 internal sealed record GitFolderInspection(
     GitSyncFolder Folder,

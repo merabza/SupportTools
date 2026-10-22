@@ -81,8 +81,7 @@ public sealed class ServerGitProjectsMapperTests
         Assert.Equal(
             @"SystemTools|SystemTools\SystemTools.DependencyInjection|SystemTools.DependencyInjection.csproj|SystemTools.SystemToolsShared",
             Describe(kept));
-        Assert.Equal(
-            new GitProjectDuplicate("SystemTools.DependencyInjection", "CrawlerConsole", "SystemTools"),
+        Assert.Equal(new GitProjectDuplicate("SystemTools.DependencyInjection", "CrawlerConsole", "SystemTools"),
             Assert.Single(result.Duplicates));
     }
 
@@ -131,12 +130,10 @@ public sealed class ServerGitProjectsMapperTests
     public void ToLocal_WhenComputerIsLinux_StoresLinuxSeparators()
     {
         // Arrange
-        List<StsGitProjectDataModel> serverProjects =
-            [ServerProject("RepoA", @"RepoA\Libs\LibA", "LibA.csproj")];
+        List<StsGitProjectDataModel> serverProjects = [ServerProject("RepoA", @"RepoA\Libs\LibA", "LibA.csproj")];
 
         // Act
-        ServerGitProjects result =
-            ServerGitProjectsMapper.ToLocal(serverProjects, ["RepoA"], new PathMapper([], '/'));
+        ServerGitProjects result = ServerGitProjectsMapper.ToLocal(serverProjects, ["RepoA"], new PathMapper([], '/'));
 
         // Assert
         Assert.Equal("RepoA/Libs/LibA", result.GitProjects["LibA"].ProjectRelativePath);

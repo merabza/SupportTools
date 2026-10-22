@@ -70,8 +70,7 @@ public sealed class RegistryAutoSyncEndToEndTests : IDisposable
         Assert.Equal("Changed on the main computer", secondAgain.Parameters.Environments["Production"]);
         Assert.Equal("Changed on the main computer", second.LoadFile().Environments["Production"]);
         Assert.Equal(2, _server.VersionOf("environments", "Production"));
-        Assert.Equal(
-        [
+        Assert.Equal([
             "[warning] Registry auto-sync: nothing new on SupportToolsServer; run \"Sync Registry With " +
             "SupportToolsServer...\" for 1 to send",
             "Registry auto-sync: sent to SupportToolsServer: Environments/Production",

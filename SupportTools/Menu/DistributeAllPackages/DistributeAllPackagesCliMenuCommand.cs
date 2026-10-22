@@ -33,8 +33,8 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     //რომ ტესტებმა ისინი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
     internal DistributeAllPackagesCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        Func<string, bool, bool> inputBool, IPackageDistributionSteps steps) : base(MenuCommandName,
-        EMenuAction.Reload, EMenuAction.Reload, null, true)
+        Func<string, bool, bool> inputBool, IPackageDistributionSteps steps) : base(MenuCommandName, EMenuAction.Reload,
+        EMenuAction.Reload, null, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -56,8 +56,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         //სინქრონიზაცია მათ ამ კომპიუტერზე დაკლონავს (D3). UseLocalPackages-გამორთული პროექტები არ მუშავდება
         List<KeyValuePair<string, ProjectModel>> allPackageProjects =
         [
-            .. parameters.Projects.Where(x =>
-                x.Value.ProjectType == EProjectType.IsPackage && x.Value.UseLocalPackages)
+            .. parameters.Projects.Where(x => x.Value.ProjectType == EProjectType.IsPackage && x.Value.UseLocalPackages)
         ];
         bool includeRemoteProjects = RemoteOnlyProjects.AskInclude(allPackageProjects, _inputBool);
         Dictionary<string, ProjectModel> packageProjects = ProjectPresence
@@ -224,8 +223,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     {
         List<(string ProjectName, List<string> UsedPackageNames)> projects =
         [
-            .. parameters.Projects
-                .Where(x => x.Value.ProjectType != EProjectType.IsPackage && x.Value.UseLocalPackages)
+            .. parameters.Projects.Where(x => x.Value.ProjectType != EProjectType.IsPackage && x.Value.UseLocalPackages)
                 .OrderBy(x => x.Key, StringComparer.Ordinal)
                 .Select(x => (ProjectName: x.Key,
                     UsedPackageNames: GetUsedPackageNames(x.Value, distributedProjectNames)))

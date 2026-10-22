@@ -23,7 +23,8 @@ internal sealed class GitRepositorySyncer
 
     //commitMessages: ფოლდერის გზა => commit-ის მესიჯი (ცვლილებიანი ფოლდერებისთვის). reportStep: მიმდინარე ნაბიჯი
     public GitRepositorySyncer(GitFolderCommands commands, IEnumerable<GitFolderInspection> inspections,
-        GitHead? knownHead, IReadOnlyDictionary<string, string> commitMessages, Action<GitSyncFolder, string> reportStep)
+        GitHead? knownHead, IReadOnlyDictionary<string, string> commitMessages,
+        Action<GitSyncFolder, string> reportStep)
     {
         _commands = commands;
         _knownHead = knownHead;

@@ -49,8 +49,7 @@ public sealed class RegistrySyncPreflightTests
     [Theory]
     [InlineData(RegistryCollections.Gits)]
     [InlineData("GITS")]
-    public void FindKeysDifferingOnlyByCase_WhenOneCollectionIsChecked_ReportsOnlyThatCollection(
-        string collectionName)
+    public void FindKeysDifferingOnlyByCase_WhenOneCollectionIsChecked_ReportsOnlyThatCollection(string collectionName)
     {
         // Arrange
         var parameters = new SupportToolsParameters

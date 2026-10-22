@@ -228,8 +228,7 @@ public sealed class ProjectModelTests
     [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("  ", false)]
-    public void IsSpaProjectMissing_WhenCalled_TellsWhetherTheSpaRecordIsMissing(string? spaProjectName,
-        bool expected)
+    public void IsSpaProjectMissing_WhenCalled_TellsWhetherTheSpaRecordIsMissing(string? spaProjectName, bool expected)
     {
         // Arrange
         var sut = new ProjectModel { SpaProjectName = spaProjectName };
@@ -282,16 +281,18 @@ public sealed class ProjectModelTests
 
     private static LibGitData.Models.GitProjects CreateGitProjects()
     {
-        return LibGitData.Models.GitProjects.Create(null, new Dictionary<string, GitProjectDataModel>
-        {
-            ["AppApi"] = new()
+        return LibGitData.Models.GitProjects.Create(null,
+            new Dictionary<string, GitProjectDataModel>
             {
-                GitName = "App", ProjectRelativePath = @"App\AppApi", ProjectFileName = "AppApi.csproj"
-            },
-            ["AppFront"] = new()
-            {
-                GitName = "App", ProjectRelativePath = @"App\AppFront", ProjectFileName = "AppFront.esproj"
-            }
-        });
+                ["AppApi"] =
+                    new()
+                    {
+                        GitName = "App", ProjectRelativePath = @"App\AppApi", ProjectFileName = "AppApi.csproj"
+                    },
+                ["AppFront"] = new()
+                {
+                    GitName = "App", ProjectRelativePath = @"App\AppFront", ProjectFileName = "AppFront.esproj"
+                }
+            });
     }
 }

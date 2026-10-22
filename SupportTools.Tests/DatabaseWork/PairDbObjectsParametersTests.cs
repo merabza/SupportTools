@@ -41,8 +41,7 @@ public sealed class PairDbObjectsParametersTests
         AddProject(MariaDbConnectionName);
 
         // Act
-        PairDbObjectsParameters? parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters,
-            ProjectName);
+        var parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters, ProjectName);
 
         // Assert
         Assert.NotNull(parameters);
@@ -68,8 +67,7 @@ public sealed class PairDbObjectsParametersTests
         AddProject(MariaDbConnectionName);
 
         // Act
-        PairDbObjectsParameters? parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters,
-            ProjectName);
+        var parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters, ProjectName);
 
         // Assert
         Assert.NotNull(parameters);
@@ -88,8 +86,7 @@ public sealed class PairDbObjectsParametersTests
         AddProject(MariaDbConnectionName);
 
         // Act
-        PairDbObjectsParameters? parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters,
-            ProjectName);
+        var parameters = PairDbObjectsParameters.Create(NullLogger.Instance, _parameters, ProjectName);
 
         // Assert
         Assert.NotNull(parameters);

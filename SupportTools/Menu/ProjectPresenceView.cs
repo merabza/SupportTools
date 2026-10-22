@@ -50,8 +50,7 @@ public static class ProjectPresenceView
     }
 
     //HideRemoteOnlyProjects-ისას სიებში მხოლოდ ამ კომპიუტერზე არსებული პროექტები რჩება
-    public static IEnumerable<KeyValuePair<string, ProjectModel>> GetVisibleProjects(
-        SupportToolsParameters parameters)
+    public static IEnumerable<KeyValuePair<string, ProjectModel>> GetVisibleProjects(SupportToolsParameters parameters)
     {
         return ProjectPresence.Filter(parameters.Projects, !parameters.HideRemoteOnlyProjects);
     }

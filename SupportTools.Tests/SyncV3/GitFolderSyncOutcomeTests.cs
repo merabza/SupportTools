@@ -5,7 +5,8 @@ namespace SupportTools.Tests.SyncV3;
 
 public sealed class GitFolderSyncOutcomeTests
 {
-    private static readonly GitSyncFolder Folder = new("RepoA", "git@github.com:test/RepoA.git", "AppA", @"D:\AppA\RepoA");
+    private static readonly GitSyncFolder Folder = new("RepoA", "git@github.com:test/RepoA.git", "AppA",
+        @"D:\AppA\RepoA");
 
     //the error of the local check is the error of the folder, so the sync leaves the folder alone
     [Fact]
@@ -62,10 +63,7 @@ public sealed class GitFolderSyncOutcomeTests
     {
         // Arrange
         var sut = new GitFolderSyncOutcome(new GitFolderInspection(Folder, EGitFolderInspectionKind.Ready,
-            new GitFolderStatus("abc", "main", false, false), null))
-        {
-            Committed = true, Pulled = true, Pushed = true
-        };
+            new GitFolderStatus("abc", "main", false, false), null)) { Committed = true, Pulled = true, Pushed = true };
 
         // Act
         bool withoutRequest = sut.WithoutRequest;

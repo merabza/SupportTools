@@ -151,8 +151,8 @@ public sealed class GitFolderInspectionTests : IDisposable
 
         // Assert
         Assert.Equal(EGitFolderInspectionKind.Failed, inspection.Kind);
-        Assert.StartsWith("git status --porcelain=v2 --branch --untracked-files=normal failed",
-            inspection.ErrorMessage, StringComparison.Ordinal);
+        Assert.StartsWith("git status --porcelain=v2 --branch --untracked-files=normal failed", inspection.ErrorMessage,
+            StringComparison.Ordinal);
     }
 
     //git status still works with a locked index, git add does not

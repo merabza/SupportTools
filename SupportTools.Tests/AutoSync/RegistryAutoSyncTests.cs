@@ -263,9 +263,9 @@ public sealed class RegistryAutoSyncTests : IDisposable
         string warning = Assert.Single(_context.ConsoleLines());
         Assert.StartsWith("[warning] Registry auto-sync: SupportToolsServer is not reachable (", warning,
             StringComparison.Ordinal);
-        Assert.EndsWith("), working with the local copy. Auto-sync is off until SupportTools restarts, run " +
-                        "\"Sync Registry With SupportToolsServer...\" when the server is back", warning,
-            StringComparison.Ordinal);
+        Assert.EndsWith(
+            "), working with the local copy. Auto-sync is off until SupportTools restarts, run " +
+            "\"Sync Registry With SupportToolsServer...\" when the server is back", warning, StringComparison.Ordinal);
         _sync.VerifySaved(Times.Never());
     }
 
@@ -322,8 +322,7 @@ public sealed class RegistryAutoSyncTests : IDisposable
         await _context.CreateAutoSync().PullOnStart(false);
 
         // Assert
-        Assert.Equal(
-            "[warning] Registry auto-sync: the registry was not taken from SupportToolsServer: broken adapter",
+        Assert.Equal("[warning] Registry auto-sync: the registry was not taken from SupportToolsServer: broken adapter",
             Assert.Single(_context.ConsoleLines()));
     }
 
@@ -437,8 +436,7 @@ public sealed class RegistryAutoSyncTests : IDisposable
         await _context.CreateAutoSync().PullOnStart(false);
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "Registry auto-sync: 1 record taken from SupportToolsServer",
             "[warning] Registry auto-sync: the parameters were not saved after the sync"
         ], _context.ConsoleLines());

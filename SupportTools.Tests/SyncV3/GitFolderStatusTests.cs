@@ -108,7 +108,8 @@ public sealed class GitFolderStatusTests
     public void Parse_WhenThereIsNoCommitYet_HasNoHeadCommit()
     {
         // Act
-        var status = GitFolderStatus.Parse("# branch.oid (initial)\n# branch.head main\n# branch.upstream origin/main\n");
+        var status =
+            GitFolderStatus.Parse("# branch.oid (initial)\n# branch.head main\n# branch.upstream origin/main\n");
 
         // Assert
         Assert.Equal(new GitFolderStatus(null, "main", true, false), status);

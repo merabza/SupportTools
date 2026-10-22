@@ -35,9 +35,12 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
 
         _parameters.Gits["GitA"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/GitA.git", GitProjectFolderName = "GitA", GitIgnorePatternName = "Node"
+            GitProjectAddress = "git@github.com:x/GitA.git",
+            GitProjectFolderName = "GitA",
+            GitIgnorePatternName = "Node"
         };
-        _parameters.Projects["Local1"] = new ProjectModel { ProjectFolderName = _tempFolder, GitProjectNames = ["GitA"] };
+        _parameters.Projects["Local1"] =
+            new ProjectModel { ProjectFolderName = _tempFolder, GitProjectNames = ["GitA"] };
         _parameters.Projects["Remote1"] = new ProjectModel
         {
             ProjectFolderName = Path.Combine(_tempFolder, "Missing"), GitProjectNames = ["MissingGit"]

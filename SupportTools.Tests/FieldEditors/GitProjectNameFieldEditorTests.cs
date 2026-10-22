@@ -26,6 +26,8 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     //is the name of an offered project
     private const string EnterAnswer = "<Enter>";
     private const string NoneAnswer = "-";
+    private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+    private readonly TextWriter _originalConsoleOutput;
 
     //the project files of the project's gits (main and ScaffoldSeeder), of another git and of no git
     private readonly SupportToolsParameters _parameters = new()
@@ -34,14 +36,17 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
         {
             ["WebAgentContracts"] =
                 new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgentContracts.csproj" },
-            ["WebAgent"] = new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgent.csproj" },
+            ["WebAgent"] =
+                new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgent.csproj" },
             ["WebAgentFront"] =
                 new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgentFront.esproj" },
-            ["LibWebAgentRepositories"] = new GitProjectDataModel
-            {
-                GitName = "WebAgentScaffoldSeeder", ProjectFileName = "LibWebAgentRepositories.csproj"
-            },
-            ["OtherApp"] = new GitProjectDataModel { GitName = "OtherApp", ProjectFileName = "OtherApp.csproj" },
+            ["LibWebAgentRepositories"] =
+                new GitProjectDataModel
+                {
+                    GitName = "WebAgentScaffoldSeeder", ProjectFileName = "LibWebAgentRepositories.csproj"
+                },
+            ["OtherApp"] =
+                new GitProjectDataModel { GitName = "OtherApp", ProjectFileName = "OtherApp.csproj" },
             ["NoGitApp"] = new GitProjectDataModel { ProjectFileName = "NoGitApp.csproj" }
         }
     };
@@ -58,8 +63,6 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     };
 
     private readonly List<(string FieldName, CliMenuSet MenuSet, string? CurrentName)> _selections = [];
-    private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
-    private readonly TextWriter _originalConsoleOutput;
     private string _answer = EnterAnswer;
 
     public GitProjectNameFieldEditorTests()
@@ -134,8 +137,8 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     [InlineData(nameof(ProjectModel.MainProjectName), CsProjExtension, true, "WebAgent")]
     [InlineData(nameof(ProjectModel.ApiContractsProjectName), CsProjExtension, false, "WebAgentContracts")]
     [InlineData(nameof(ProjectModel.SpaProjectName), EsProjExtension, false, "WebAgentFront")]
-    public async Task UpdateField_WhenEnterPressed_KeepsCurrentProjectName(string propertyName,
-        string projectExtension, bool useNone, string currentName)
+    public async Task UpdateField_WhenEnterPressed_KeepsCurrentProjectName(string propertyName, string projectExtension,
+        bool useNone, string currentName)
     {
         // Arrange
         _answer = EnterAnswer;

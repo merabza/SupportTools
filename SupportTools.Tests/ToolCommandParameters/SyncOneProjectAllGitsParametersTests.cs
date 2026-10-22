@@ -97,7 +97,7 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
     public void Create_WhenProjectDoesNotExist_ReportsItAndReturnsNull()
     {
         // Act
-        SyncOneProjectAllGitsParameters? result = SyncOneProjectAllGitsParameters.Create(null, _parameters,
+        var result = SyncOneProjectAllGitsParameters.Create(null, _parameters,
             "Missing", EGitCol.Main, null, false, true);
 
         // Assert
@@ -152,8 +152,8 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
 
     private SyncOneProjectAllGitsParameters? Create(EGitCol gitCol)
     {
-        return SyncOneProjectAllGitsParameters.Create(null, _parameters, ProjectName, gitCol, _changedGitProjects,
-            true, true);
+        return SyncOneProjectAllGitsParameters.Create(null, _parameters, ProjectName, gitCol, _changedGitProjects, true,
+            true);
     }
 
     private void AssertErrorLine(string expected)

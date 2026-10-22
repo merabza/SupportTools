@@ -52,8 +52,8 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommandV2Tests : IDisposab
     public void Constructor_WhenCreated_AsksBeforeRunningAndReloadsTheMenu()
     {
         // Act
-        var sut = new SyncOneGroupAllProjectsGitsCliMenuCommandV2(new Mock<ILogger>().Object,
-            _parametersManager.Object, "G1");
+        var sut = new SyncOneGroupAllProjectsGitsCliMenuCommandV2(new Mock<ILogger>().Object, _parametersManager.Object,
+            "G1");
 
         // Assert
         Assert.Equal("Sync One Group All Projects Gits V2", sut.Name);
@@ -98,8 +98,8 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommandV2Tests : IDisposab
 
     private SyncOneGroupAllProjectsGitsCliMenuCommandV2 CreateSut(string projectGroupName)
     {
-        return new SyncOneGroupAllProjectsGitsCliMenuCommandV2(new Mock<ILogger>().Object,
-            _parametersManager.Object, projectGroupName, (question, defaultValue) =>
+        return new SyncOneGroupAllProjectsGitsCliMenuCommandV2(new Mock<ILogger>().Object, _parametersManager.Object,
+            projectGroupName, (question, defaultValue) =>
             {
                 _questions.Add((question, defaultValue));
                 return _answer;

@@ -21,8 +21,8 @@ public class ProjectGroupsListFactoryStrategy(
         return
         [
             .. ProjectPresenceView.GetVisibleProjects(parameters)
-                .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName))
-                .Distinct().OrderBy(x => x).Select(projectGroupName =>
+                .Select(x => SupportToolsParameters.FixProjectGroupName(x.Value.ProjectGroupName)).Distinct()
+                .OrderBy(x => x).Select(projectGroupName =>
                     new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager, projectGroupName,
                         menuParameters))
         ];

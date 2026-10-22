@@ -182,8 +182,7 @@ public sealed class GitRepositorySyncerTests : IDisposable
         sut.Run();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             ("Changed", "commit"), ("Changed", "status"), ("Changed", "fetch"), ("Changed", "push"),
             ("Clean", "fetch"), ("Clean", "merge")
         ], steps);
@@ -604,8 +603,7 @@ public sealed class GitRepositorySyncerTests : IDisposable
         GitTestRepositories.RunGit("-C", _upstream, "commit", "-q", "-m", "Feature");
         GitTestRepositories.RunGit("-C", _upstream, "push", "-q", "origin", "feature");
         string featureFolder = Clone("Feature");
-        GitTestRepositories.RunGit("-C", featureFolder, "checkout", "-q", "-b", "feature", "--track",
-            "origin/feature");
+        GitTestRepositories.RunGit("-C", featureFolder, "checkout", "-q", "-b", "feature", "--track", "origin/feature");
         string mainFolder = Clone("Main");
 
         // Act
@@ -692,7 +690,8 @@ public sealed class GitRepositorySyncerTests : IDisposable
 
     private GitRepositorySyncer Run(GitHead? knownHead, params string[] folders)
     {
-        List<GitFolderInspection> inspections = [.. folders.Select(x => GitFolderInspection.Inspect(_commands, Folder(x)))];
+        List<GitFolderInspection> inspections =
+            [.. folders.Select(x => GitFolderInspection.Inspect(_commands, Folder(x)))];
         Dictionary<string, string> commitMessages = inspections.Where(x => x.HasChanges)
             .ToDictionary(x => x.Folder.FolderPath, _ => "Sync message", StringComparer.OrdinalIgnoreCase);
         var sut = new GitRepositorySyncer(_commands, inspections, knownHead, commitMessages,

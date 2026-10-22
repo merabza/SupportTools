@@ -26,9 +26,8 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
     private readonly UpdateOutdatedPackagesParameters _updateOutdatedPackagesParameters;
 
     private UpdateOutdatedPackagesToolAction(ILogger? logger, IParametersManager parametersManager,
-        UpdateOutdatedPackagesParameters updateOutdatedPackagesParameters, bool includeRemoteProjects,
-        bool useConsole, Func<string, string, string> inputMessage) : base(logger, "Update Outdated Packages", null,
-        null, useConsole)
+        UpdateOutdatedPackagesParameters updateOutdatedPackagesParameters, bool includeRemoteProjects, bool useConsole,
+        Func<string, string, string> inputMessage) : base(logger, "Update Outdated Packages", null, null, useConsole)
     {
         _logger = logger;
         _parametersManager = parametersManager;
@@ -51,13 +50,11 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
-        string useMessage = _inputMessage("Message",
-            $"Update Packages {DateTime.Now.ToString("yyyyMMddHHmm",
-                CultureInfo.InvariantCulture)}");
+        string useMessage = _inputMessage("Message", $"Update Packages {DateTime.Now.ToString("yyyyMMddHHmm",
+            CultureInfo.InvariantCulture)}");
 
-        var syncOneProjectAllGitsToolAction =
-            SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager, null, null, true,
-                $"{useMessage} Check", _includeRemoteProjects);
+        var syncOneProjectAllGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager,
+            null, null, true, $"{useMessage} Check", _includeRemoteProjects);
         await syncOneProjectAllGitsToolAction.Run(cancellationToken);
 
         IEnumerable<KeyValuePair<string, ProjectModel>> projectsList =

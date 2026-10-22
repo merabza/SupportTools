@@ -58,8 +58,7 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
             return parts;
         }
 
-        parts.AddRange(
-        [
+        parts.AddRange([
             .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
                 $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
                 ProjectBuildCheckStatusView.GetColor(b.Status)))

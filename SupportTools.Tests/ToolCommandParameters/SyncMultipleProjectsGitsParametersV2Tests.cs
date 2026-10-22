@@ -34,8 +34,7 @@ public sealed class SyncMultipleProjectsGitsParametersV2Tests : IDisposable
         var parameters = new SupportToolsParameters { ScaffoldSeedersWorkFolder = @"D:\Seeders" };
 
         // Act
-        var result = SyncMultipleProjectsGitsParametersV2.Create(parameters, "Group", "Project",
-            includeRemoteProjects);
+        var result = SyncMultipleProjectsGitsParametersV2.Create(parameters, "Group", "Project", includeRemoteProjects);
 
         // Assert
         Assert.Equal(@"D:\Seeders", result.ScaffoldSeedersWorkFolder);

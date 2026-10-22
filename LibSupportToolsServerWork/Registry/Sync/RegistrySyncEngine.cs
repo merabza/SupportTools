@@ -100,8 +100,9 @@ public sealed class RegistrySyncEngine
                 adapter is IRegistryFileSyncAdapter fileAdapter ? fileAdapter.GetMissingLocalKeys() : [],
                 StringComparer.OrdinalIgnoreCase);
             changes.AddRange(localRecords.Value
-                .Where(x => !collectionState.Records.TryGetValue(x.Key,
-                                out RegistryRecordSyncStateModel? recordState) || recordState.Hash != x.Value.Hash)
+                .Where(x =>
+                    !collectionState.Records.TryGetValue(x.Key, out RegistryRecordSyncStateModel? recordState) ||
+                    recordState.Hash != x.Value.Hash)
                 .Select(x => new RegistrySyncLocalChange(adapter.CollectionName, x.Key, x.Value.Hash))
                 .Concat(collectionState.Records.Keys
                     .Where(x => !localRecords.Value.ContainsKey(x) && !missingLocalKeys.Contains(x))

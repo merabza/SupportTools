@@ -53,8 +53,10 @@ public sealed class CopyServerInfoCliMenuCommandTests : IDisposable
                 {
                     ServerInfos =
                     {
-                        ["3d4c5b6a-0000-4000-8000-000000000001"] =
-                            new ServerInfoModel { ServerName = "Merinson", EnvironmentName = EnvironmentName }
+                        ["3d4c5b6a-0000-4000-8000-000000000001"] = new ServerInfoModel
+                        {
+                            ServerName = "Merinson", EnvironmentName = EnvironmentName
+                        }
                     }
                 }
             }
@@ -281,8 +283,7 @@ public sealed class CopyServerInfoCliMenuCommandTests : IDisposable
     [Theory]
     [InlineData(ProjectName, "MissingKey")]
     [InlineData("MissingProject", ServerInfoKey)]
-    public async Task RunBody_WhenServerDoesNotExist_ReturnsFalseWithoutAsking(string projectName,
-        string serverInfoKey)
+    public async Task RunBody_WhenServerDoesNotExist_ReturnsFalseWithoutAsking(string projectName, string serverInfoKey)
     {
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut(projectName, serverInfoKey));

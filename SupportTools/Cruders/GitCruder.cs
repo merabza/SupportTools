@@ -218,8 +218,8 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         cruderSubMenuSet.InsertMenuItem(2, updateGitProjectsFromServerCommand);
 
         //Sync Registry მხოლოდ Gits-ზე (D4)
-        var syncGitsCommand = SyncRegistryCliMenuCommand.ForCollection(_logger, _httpClientFactory,
-            ParametersManager, RegistryCollections.Gits);
+        var syncGitsCommand = SyncRegistryCliMenuCommand.ForCollection(_logger, _httpClientFactory, ParametersManager,
+            RegistryCollections.Gits);
         cruderSubMenuSet.InsertMenuItem(3, syncGitsCommand);
 
         var findGitProjectsWithoutMatchingProjectsCliMenuCommand =

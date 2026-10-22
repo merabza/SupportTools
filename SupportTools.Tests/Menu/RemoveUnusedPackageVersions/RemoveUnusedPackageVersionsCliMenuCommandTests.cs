@@ -20,27 +20,27 @@ namespace SupportTools.Tests.Menu.RemoveUnusedPackageVersions;
 public sealed class RemoveUnusedPackageVersionsCliMenuCommandTests : IDisposable
 {
     private const string AppPropsContent = """
-        <Project>
-          <ItemGroup>
-            <PackageVersion Include="Used" Version="1.0.0" />
-            <PackageVersion Include="Unused" Version="1.0.0" />
-            <PackageVersion Include="UpdatedOnly" Version="1.0.0" />
-            <PackageVersion Include="Global" Version="1.0.0" />
-            <PackageVersion Include="$(OwnPackage)" Version="1.0.0" />
-            <PackageVersion Update="Updated" Version="2.0.0" />
-          </ItemGroup>
-          <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-            <PackageVersion Include="Conditional" Version="1.0.0" />
-          </ItemGroup>
-          <ItemGroup>
-            <PackageVersion Include="AlsoUnused" Version="1.0.0" />
-          </ItemGroup>
-          <ItemGroup>
-            <!-- kept for later -->
-            <PackageVersion Include="Commented" Version="1.0.0" />
-          </ItemGroup>
-        </Project>
-        """;
+                                           <Project>
+                                             <ItemGroup>
+                                               <PackageVersion Include="Used" Version="1.0.0" />
+                                               <PackageVersion Include="Unused" Version="1.0.0" />
+                                               <PackageVersion Include="UpdatedOnly" Version="1.0.0" />
+                                               <PackageVersion Include="Global" Version="1.0.0" />
+                                               <PackageVersion Include="$(OwnPackage)" Version="1.0.0" />
+                                               <PackageVersion Update="Updated" Version="2.0.0" />
+                                             </ItemGroup>
+                                             <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+                                               <PackageVersion Include="Conditional" Version="1.0.0" />
+                                             </ItemGroup>
+                                             <ItemGroup>
+                                               <PackageVersion Include="AlsoUnused" Version="1.0.0" />
+                                             </ItemGroup>
+                                             <ItemGroup>
+                                               <!-- kept for later -->
+                                               <PackageVersion Include="Commented" Version="1.0.0" />
+                                             </ItemGroup>
+                                           </Project>
+                                           """;
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly Mock<ILogger> _logger = new();
@@ -96,13 +96,13 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommandTests : IDisposable
     {
         // Arrange
         string props = CreateSolution("App", AppPropsContent, """
-            <Project Sdk="Microsoft.NET.Sdk">
-              <ItemGroup>
-                <PackageReference Include="Used" />
-                <PackageReference Update="UpdatedOnly" />
-              </ItemGroup>
-            </Project>
-            """);
+                                                              <Project Sdk="Microsoft.NET.Sdk">
+                                                                <ItemGroup>
+                                                                  <PackageReference Include="Used" />
+                                                                  <PackageReference Update="UpdatedOnly" />
+                                                                </ItemGroup>
+                                                              </Project>
+                                                              """);
         await File.WriteAllTextAsync(Path.Combine(Path.GetDirectoryName(props)!, "Directory.Build.targets"), """
             <Project>
               <ItemGroup>
@@ -145,13 +145,14 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommandTests : IDisposable
     {
         // Arrange
         string props = CreateSolution("App", """
-            <Project>
-              <ItemGroup>
-                <PackageVersion Include="Used" Version="1.0.0" />
-                <PackageVersion Include="Unused" Version="1.0.0" />
-              </ItemGroup>
-            </Project>
-            """, """<Project><ItemGroup><PackageReference Include="Used" /></ItemGroup></Project>""");
+                                             <Project>
+                                               <ItemGroup>
+                                                 <PackageVersion Include="Used" Version="1.0.0" />
+                                                 <PackageVersion Include="Unused" Version="1.0.0" />
+                                               </ItemGroup>
+                                             </Project>
+                                             """,
+            """<Project><ItemGroup><PackageReference Include="Used" /></ItemGroup></Project>""");
 
         // Act
         await CliMenuTestAccess.InvokeRunBody(CreateSut());
@@ -379,8 +380,8 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains("Directory.Packages.props does not found for project App, skipped",
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains("Directory.Packages.props does not found for project App, skipped", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -512,9 +513,10 @@ public sealed class RemoveUnusedPackageVersionsCliMenuCommandTests : IDisposable
     {
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
+        _logger.Verify(
+            x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
     }
 }

@@ -208,8 +208,7 @@ public sealed class RegistryAutoSync
             return;
         }
 
-        RegistrySyncReport report =
-            await engine.Execute(plan, RegistrySyncSelection.PushOnly, null, cancellationToken);
+        RegistrySyncReport report = await engine.Execute(plan, RegistrySyncSelection.PushOnly, null, cancellationToken);
         WritePushReport(report);
         WriteExecutionProblems(report);
     }
@@ -310,9 +309,8 @@ public sealed class RegistryAutoSync
                 (plan.Items.Count(x => x.Action == ERegistrySyncAction.Pull && x.Server is null),
                     "deleted on the server"),
                 (plan.Items.Count(x => x.Action == ERegistrySyncAction.Conflict), "in conflict"),
-                (report.Items.Count(x =>
-                    x.PlanItem.Action == ERegistrySyncAction.Pull &&
-                    x.Outcome is ERegistrySyncOutcome.Failed or ERegistrySyncOutcome.NotExecuted), "not taken"),
+                (report.Items.Count(x => x.PlanItem.Action == ERegistrySyncAction.Pull && x.Outcome is ERegistrySyncOutcome.Failed or ERegistrySyncOutcome.NotExecuted),
+                    "not taken"),
                 (warningsCount, warningsCount == 1 ? "warning" : "warnings")
             }.Where(x => x.Count > 0).Select(x => $"{x.Count} {x.Name}")
         ];
@@ -348,13 +346,12 @@ public sealed class RegistryAutoSync
         //გეგმის კონფლიქტი, ან სერვერის 409/404: ჩანაწერი შუალედში შეიცვალა ან წაიშალა
         List<string> conflicts =
         [
-            .. report.Items.Where(x => x.Outcome == ERegistrySyncOutcome.Conflict ||
-                                       x is
-                                       {
-                                           Outcome: ERegistrySyncOutcome.NotSelected,
-                                           PlanItem.Action: ERegistrySyncAction.Conflict
-                                       })
-                .Select(x => x.Outcome == ERegistrySyncOutcome.Conflict
+            .. report.Items.Where(x => x.Outcome == ERegistrySyncOutcome.Conflict || x is
+            {
+                Outcome: ERegistrySyncOutcome.NotSelected,
+                PlanItem.Action: ERegistrySyncAction.Conflict
+            }).Select(x =>
+                x.Outcome == ERegistrySyncOutcome.Conflict
                     ? $"{GetRecordName(x.PlanItem)} (changed on the server meanwhile)"
                     : $"{GetRecordName(x.PlanItem)} ({RegistrySyncSession.DescribeConflict(x.PlanItem)})")
         ];

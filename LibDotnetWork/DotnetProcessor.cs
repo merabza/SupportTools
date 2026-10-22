@@ -73,8 +73,8 @@ public sealed class DotnetProcessor
             CreateAddPackageArguments(projectFilePath, packageName, packageVersion, true));
     }
 
-    internal static string CreateAddPackageArguments(string projectFilePath, string packageName,
-        string? packageVersion, bool noRestore)
+    internal static string CreateAddPackageArguments(string projectFilePath, string packageName, string? packageVersion,
+        bool noRestore)
     {
         return
             $"add {projectFilePath} package {packageName}{(string.IsNullOrWhiteSpace(packageVersion) ? string.Empty : $" --version {packageVersion}")}{(noRestore ? " --no-restore" : string.Empty)}";

@@ -154,8 +154,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "sync Alpha", "check Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha",
             "final sync Alpha", "sync Beta", "check Beta", "build Beta noIncremental=False", "solution Beta",
             "package Beta", "final sync Beta"
@@ -186,8 +185,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "sync Alpha", "check Alpha", "solution Alpha", "sync Beta", "check Beta",
             "build Beta noIncremental=False", "solution Beta", "package Beta", "final sync Beta"
         ], _steps.Calls);
@@ -219,8 +217,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "sync Core", "check Core", "solution Core", "distribute Core to Alpha", "sync Alpha", "check Alpha",
             "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha",
             "distribute Core to App"
@@ -377,8 +374,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         await CliMenuTestAccess.InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "Distribute all packages: before Core package", "Distribute all packages: after Core package",
             "Distribute all packages: before Util package", "Distribute all packages: after Util package",
             "Distribute all packages: use new Core, Util packages in Alpha",
@@ -402,8 +398,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "sync Core", "check Core", "build Core noIncremental=False", "solution Core", "package Core",
             "final sync Core", "distribute Core to Util", "sync Util", "check Util", "build Util noIncremental=False",
             "solution Util", "package Util", "final sync Util", "distribute Core, Util to Alpha", "sync Alpha",
@@ -485,9 +480,8 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.Equal(["distribute Core to App", "distribute Core to Web"], _steps.Calls[^2..]);
         string output = _consoleOutput.ToString();
         Assert.Contains("Package distribution failed for project App", output, StringComparison.Ordinal);
-        Assert.Contains(
-            "Distribute all packages finished with errors. Packages were not distributed to projects: App", output,
-            StringComparison.Ordinal);
+        Assert.Contains("Distribute all packages finished with errors. Packages were not distributed to projects: App",
+            output, StringComparison.Ordinal);
         Assert.DoesNotContain("Distribute all packages finished. Package projects processed", output,
             StringComparison.Ordinal);
     }
@@ -589,9 +583,10 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
     {
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
-        _logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        _logger.Verify(
+            x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
 
@@ -610,16 +605,14 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         public ProjectBuildCheckResult? BuildResult { get; set; } = new(EProjectBuildCheckStatus.Success);
         public Dictionary<string, string> UnchangedVersions { get; } = [];
 
-        public Task<bool> SyncProjectGits(string projectName, string commitMessage,
-            CancellationToken cancellationToken)
+        public Task<bool> SyncProjectGits(string projectName, string commitMessage, CancellationToken cancellationToken)
         {
             CommitMessages.Add(commitMessage);
             string step = _syncedProjectNames.Add(projectName) ? "sync" : "final sync";
             return Task.FromResult(Run(step, projectName));
         }
 
-        public Task<string?> GetUnchangedUploadedPackageVersion(string projectName,
-            CancellationToken cancellationToken)
+        public Task<string?> GetUnchangedUploadedPackageVersion(string projectName, CancellationToken cancellationToken)
         {
             Calls.Add($"check {projectName}");
             return Task.FromResult(UnchangedVersions.GetValueOrDefault(projectName));
@@ -630,7 +623,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         {
             Calls.Add($"build {projectName} noIncremental={noIncremental}");
             return Fails("build", projectName)
-                ? new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 2, 0)
+                ? new ProjectBuildCheckResult(EProjectBuildCheckStatus.BuildFailed, 2)
                 : BuildResult;
         }
 

@@ -32,13 +32,13 @@ public sealed class PackageDistributorTests : IDisposable
     private const string Server = "http://127.0.0.1:0/";
 
     private const string PackagesProps = """
-        <Project>
-          <ItemGroup>
-            <PackageVersion Include="Lib.A" Version="1.0.0" />
-            <PackageVersion Include="Lib.B" Version="1.0.1" />
-          </ItemGroup>
-        </Project>
-        """;
+                                         <Project>
+                                           <ItemGroup>
+                                             <PackageVersion Include="Lib.A" Version="1.0.0" />
+                                             <PackageVersion Include="Lib.B" Version="1.0.1" />
+                                           </ItemGroup>
+                                         </Project>
+                                         """;
 
     private readonly string _appFolder;
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
@@ -64,7 +64,9 @@ public sealed class PackageDistributorTests : IDisposable
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = Server };
         _parameters.Gits["App"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/App.git", GitProjectFolderName = "App", GitIgnorePatternName = "CSharp"
+            GitProjectAddress = "git@github.com:x/App.git",
+            GitProjectFolderName = "App",
+            GitIgnorePatternName = "CSharp"
         };
         _parameters.Projects["App"] = new ProjectModel
         {
@@ -175,13 +177,13 @@ public sealed class PackageDistributorTests : IDisposable
             """);
         string projectFile = Path.Combine(_mainRepoFolder, "App.csproj");
         await File.WriteAllTextAsync(projectFile, """
-            <Project Sdk="Microsoft.NET.Sdk">
-              <ItemGroup>
-                <ProjectReference Include="..\Lib\Lib.A\Lib.A.csproj" />
-                <ProjectReference Include="..\Ext\Ext.A\Ext.A.csproj" />
-              </ItemGroup>
-            </Project>
-            """);
+                                                  <Project Sdk="Microsoft.NET.Sdk">
+                                                    <ItemGroup>
+                                                      <ProjectReference Include="..\Lib\Lib.A\Lib.A.csproj" />
+                                                      <ProjectReference Include="..\Ext\Ext.A\Ext.A.csproj" />
+                                                    </ItemGroup>
+                                                  </Project>
+                                                  """);
         _server.Respond("GET /v3/package/ext.a/index.json", """{"versions":["1.0.0","1.0.5"]}""");
         _server.Respond("GET /v3/package/ext.b/index.json", """{"versions":["1.0.1","1.0.4"]}""");
         var commands = new FakePackageReferenceCommands(() =>
@@ -194,8 +196,7 @@ public sealed class PackageDistributorTests : IDisposable
         Assert.True(result);
         string libReference = Path.Combine(_copyFolder, "Lib.A", "Lib.A.csproj");
         string extReference = Path.Combine(extCopyFolder, "Ext.A", "Ext.A.csproj");
-        Assert.Equal(
-        [
+        Assert.Equal([
             $"remove reference {projectFile} {libReference}", $"add package {projectFile} Lib.A 1.0.3",
             $"restore {projectFile}", $"remove reference {projectFile} {extReference}",
             $"add package {projectFile} Ext.A 1.0.5", $"restore {projectFile}"
@@ -267,10 +268,11 @@ public sealed class PackageDistributorTests : IDisposable
     //project {name}.B, so the copy is behind its remote. Returns the bare remote
     private string AddPackageGitBehindItsRemote(string name)
     {
-        string remote = GitTestRepositories.CreateRemote(_tempFolder, name, new Dictionary<string, string>
-        {
-            [".gitignore"] = "bin/", [$@"{name}.A\{name}.A.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
-        });
+        string remote = GitTestRepositories.CreateRemote(_tempFolder, name,
+            new Dictionary<string, string>
+            {
+                [".gitignore"] = "bin/", [$@"{name}.A\{name}.A.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
+            });
         string copyFolder = Path.Combine(_appFolder, name);
         GitTestRepositories.RunGit("clone", remote, copyFolder);
         GitTestRepositories.ConfigureRepository(copyFolder);

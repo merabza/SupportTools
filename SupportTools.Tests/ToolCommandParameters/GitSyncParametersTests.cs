@@ -105,8 +105,7 @@ public sealed class GitSyncParametersTests : IDisposable
     public void Create_WhenProjectDoesNotExist_ReportsItAndReturnsNull()
     {
         // Act
-        GitSyncParameters? result = GitSyncParameters.Create(null, _parameters, "Missing", EGitCol.Main,
-            BackGitName, true);
+        var result = GitSyncParameters.Create(null, _parameters, "Missing", EGitCol.Main, BackGitName, true);
 
         // Assert
         Assert.Null(result);

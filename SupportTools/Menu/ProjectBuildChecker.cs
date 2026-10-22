@@ -29,8 +29,8 @@ public static class ProjectBuildChecker
         foreach ((string projectName, ProjectModel project) in projects)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ProjectBuildCheckResult result =
-                CheckProjectBuild(projectName, appName, project, dotnetProcessor, noIncremental, noHttpCache);
+            ProjectBuildCheckResult result = CheckProjectBuild(projectName, appName, project, dotnetProcessor,
+                noIncremental, noHttpCache);
             menuParameters.ProjectBuildCheckResults[projectName] = result;
             ProjectBuildCheckStatusView.WriteResultLine(projectName, result);
         }

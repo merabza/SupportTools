@@ -197,12 +197,10 @@ public sealed class PackageBuilder
         List<string> missingDependencies =
         [
             .. ownPackageFiles.OrderBy(x => x.Key, StringComparer.Ordinal).SelectMany(x =>
-                ReadPackageDependencies(x.Key, x.Value)
-                    .Where(dependency => dependency.Id is not null &&
-                                         string.Equals(dependency.Version, packageVersion,
-                                             StringComparison.OrdinalIgnoreCase) &&
-                                         !ownPackageFiles.ContainsKey(dependency.Id))
-                    .Select(dependency => $"{x.Key} -> {dependency.Id}"))
+                ReadPackageDependencies(x.Key, x.Value).Where(dependency =>
+                    dependency.Id is not null &&
+                    string.Equals(dependency.Version, packageVersion, StringComparison.OrdinalIgnoreCase) &&
+                    !ownPackageFiles.ContainsKey(dependency.Id)).Select(dependency => $"{x.Key} -> {dependency.Id}"))
         ];
 
         if (missingDependencies.Count == 0)

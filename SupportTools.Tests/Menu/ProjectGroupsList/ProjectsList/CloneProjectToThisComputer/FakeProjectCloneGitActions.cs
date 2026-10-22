@@ -53,8 +53,7 @@ internal sealed class FakeProjectCloneGitActions : IProjectCloneGitActions
             return;
         }
 
-        GitSyncParameters? gitSyncParameters =
-            GitSyncParameters.Create(null, _parameters, projectName, gitCol, gitName, false);
+        var gitSyncParameters = GitSyncParameters.Create(null, _parameters, projectName, gitCol, gitName, false);
         if (gitSyncParameters is null)
         {
             return;

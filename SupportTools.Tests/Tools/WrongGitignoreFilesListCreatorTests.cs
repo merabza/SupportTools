@@ -100,16 +100,19 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
         // Arrange
         _parameters.Gits["SharedNode"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/SharedNode.git", GitProjectFolderName = "Shared",
+            GitProjectAddress = "git@github.com:x/SharedNode.git",
+            GitProjectFolderName = "Shared",
             GitIgnorePatternName = "Node"
         };
         _parameters.Gits["SharedCSharp"] = new GitDataModel
         {
-            GitProjectAddress = "git@github.com:x/SharedCSharp.git", GitProjectFolderName = "Shared",
+            GitProjectAddress = "git@github.com:x/SharedCSharp.git",
+            GitProjectFolderName = "Shared",
             GitIgnorePatternName = "CSharp"
         };
         _parameters.Projects.Clear();
-        _parameters.Projects["Zeta"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["SharedNode"] };
+        _parameters.Projects["Zeta"] =
+            new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["SharedNode"] };
         _parameters.Projects["Alpha"] =
             new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["SharedCSharp"] };
         string shared = WriteGitignore(_projectFolder, "Shared", "dist/");
@@ -177,7 +180,8 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
     {
         // Arrange
         string otherFolder = Path.Combine(_tempFolder, "Other");
-        _parameters.Projects["Other"] = new ProjectModel { ProjectFolderName = otherFolder, GitProjectNames = ["AppMain"] };
+        _parameters.Projects["Other"] =
+            new ProjectModel { ProjectFolderName = otherFolder, GitProjectNames = ["AppMain"] };
         string appMain = WriteGitignore(_projectFolder, "AppMain", "obj/");
         string otherMain = WriteGitignore(otherFolder, "AppMain", "obj/");
 
@@ -304,8 +308,9 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
 
     private void VerifyErrorLogged(string message, Times times)
     {
-        _logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        _logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
     }
 }

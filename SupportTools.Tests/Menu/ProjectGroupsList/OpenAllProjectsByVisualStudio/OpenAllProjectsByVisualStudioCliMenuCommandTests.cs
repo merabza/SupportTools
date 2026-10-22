@@ -72,8 +72,7 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommandTests : IDisposab
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "detect", $"open {DevEnvPath} {Solution("Alpha")}", "delay", $"open {DevEnvPath} {Solution("beta")}"
         ], _events);
         string output = _consoleOutput.ToString();
@@ -81,8 +80,8 @@ public sealed class OpenAllProjectsByVisualStudioCliMenuCommandTests : IDisposab
         Assert.Contains("Project NoSolution does not have a solution file", output, StringComparison.Ordinal);
         //a project without a solution file is reported once and not checked any further
         Assert.DoesNotContain("Project NoSolution solution file", output, StringComparison.Ordinal);
-        Assert.Contains($"Project MissingSolution solution file {Solution("MissingSolution")} does not exists",
-            output, StringComparison.Ordinal);
+        Assert.Contains($"Project MissingSolution solution file {Solution("MissingSolution")} does not exists", output,
+            StringComparison.Ordinal);
         Assert.Contains("1 remote-only projects are skipped", output, StringComparison.Ordinal);
     }
 

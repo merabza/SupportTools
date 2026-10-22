@@ -37,12 +37,12 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
         {
             [".gitignore"] = "bin/",
             [@"Lib\Lib.csproj"] = """
-                <Project Sdk="Microsoft.NET.Sdk">
-                  <ItemGroup>
-                    <ProjectReference Include="..\Core\Core.csproj" />
-                  </ItemGroup>
-                </Project>
-                """,
+                                  <Project Sdk="Microsoft.NET.Sdk">
+                                    <ItemGroup>
+                                      <ProjectReference Include="..\Core\Core.csproj" />
+                                    </ItemGroup>
+                                  </Project>
+                                  """,
             [@"Core\Core.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
         });
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
@@ -156,11 +156,11 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
         CreateSut().ScanGitProjects("RepoA");
 
         // Assert
-        _logger.Verify(x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+        _logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) =>
-                    value.ToString() == "supportToolsParameters.WorkFolder does not specified"),
-                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            logGitWork ? Times.Once() : Times.Never());
+                    value.ToString() == "supportToolsParameters.WorkFolder does not specified"), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), logGitWork ? Times.Once() : Times.Never());
     }
 
     [Fact]
@@ -207,7 +207,8 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
 
     private void AddGitWithoutAddress()
     {
-        _parameters.Gits["NoAddress"] = new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
+        _parameters.Gits["NoAddress"] =
+            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "CSharp" };
     }
 
     private static int CountOccurrences(string text, string value)

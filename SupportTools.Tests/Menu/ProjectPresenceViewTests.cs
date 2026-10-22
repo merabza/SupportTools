@@ -44,7 +44,8 @@ public sealed class ProjectPresenceViewTests : IDisposable
     public void CreateCountParts_WhenBothKindsExist_CountsLocalThenRemote()
     {
         // Act
-        List<StatusColorPart> result = ProjectPresenceView.CreateCountParts([Local(), Remote(), Local(), Remote(), Remote()]);
+        List<StatusColorPart> result =
+            ProjectPresenceView.CreateCountParts([Local(), Remote(), Local(), Remote(), Remote()]);
 
         // Assert
         Assert.Equal(["local: 2", "remote: 3"], result.Select(x => x.Text));

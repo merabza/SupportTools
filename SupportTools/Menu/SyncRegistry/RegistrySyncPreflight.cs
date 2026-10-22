@@ -25,11 +25,11 @@ internal static class RegistrySyncPreflight
     {
         return
         [
-            .. GetLocalKeys(parameters).Where(collection =>
-                collectionName is null || string.Equals(collection.CollectionName, collectionName,
+            .. GetLocalKeys(parameters)
+                .Where(collection => collectionName is null || string.Equals(collection.CollectionName, collectionName,
                     StringComparison.OrdinalIgnoreCase)).SelectMany(collection => collection.Keys
-                .GroupBy(x => x, StringComparer.OrdinalIgnoreCase).Where(x => x.Count() > 1)
-                .Select(x => $"{collection.CollectionName}: {string.Join(" / ", x)}"))
+                    .GroupBy(x => x, StringComparer.OrdinalIgnoreCase).Where(x => x.Count() > 1)
+                    .Select(x => $"{collection.CollectionName}: {string.Join(" / ", x)}"))
         ];
     }
 

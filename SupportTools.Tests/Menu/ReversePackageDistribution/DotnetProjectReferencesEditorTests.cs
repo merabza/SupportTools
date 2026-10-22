@@ -14,6 +14,7 @@ namespace SupportTools.Tests.Menu.ReversePackageDistribution;
 public sealed class DotnetProjectReferencesEditorTests : IDisposable
 {
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+
     private readonly string _missingProject =
         Path.Combine(Path.GetTempPath(), $"SupportToolsTests_{Guid.NewGuid():N}", "Missing.csproj");
 

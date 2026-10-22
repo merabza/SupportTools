@@ -119,8 +119,7 @@ public sealed class ParallelProgressBoardTests
 
         // Assert
         Assert.True(_console.ScrolledRowCount > 0);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "result 13", "result 14", "result 15", "result 16", "result 17", "result 18", "result 19",
             "Checking 20 folders", "RepoA  step 19"
         ], _console.Lines);

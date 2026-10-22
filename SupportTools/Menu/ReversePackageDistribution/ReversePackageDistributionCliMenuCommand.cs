@@ -26,8 +26,8 @@ public sealed class ReversePackageDistributionCliMenuCommand : CliMenuCommand
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
 
-    public ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager) : this(
-        logger, parametersManager, () => new DotnetProjectReferencesEditor(new DotnetProcessor(logger, true)))
+    public ReversePackageDistributionCliMenuCommand(ILogger logger, IParametersManager parametersManager) : this(logger,
+        parametersManager, () => new DotnetProjectReferencesEditor(new DotnetProcessor(logger, true)))
     {
     }
 

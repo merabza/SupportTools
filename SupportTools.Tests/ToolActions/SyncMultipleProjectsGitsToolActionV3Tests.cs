@@ -32,19 +32,19 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
 {
     private const string ApiClientName = "SupportToolsServer";
     private const string HeadsRequest = "GET /api/v1/git/gitremoteheads";
+    private readonly Queue<bool> _boolAnswers = new();
+    private readonly List<(string Question, bool DefaultValue)> _boolQuestions = [];
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly Mock<IHttpClientFactory> _httpClientFactory = new();
-    private readonly List<(string Question, bool DefaultValue)> _boolQuestions = [];
-    private readonly Queue<bool> _boolAnswers = new();
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
     private readonly string _projectsFolder;
     private readonly Dictionary<string, string> _remotes = [];
     private readonly RoutingHttpMessageHandler _server = new();
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
-    private readonly List<(string Question, string? DefaultValue)> _textQuestions = [];
     private readonly Queue<string> _textAnswers = new();
+    private readonly List<(string Question, string? DefaultValue)> _textQuestions = [];
 
     public SyncMultipleProjectsGitsToolActionV3Tests()
     {
@@ -117,7 +117,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         Assert.Equal([(HeadsRequest, "?names=RepoA")], _server.Requests.Select(x => (x.Request, x.Query)));
         string output = _consoleOutput.ToString();
         Assert.Contains("Remote heads from SupportToolsServer: 1 of 1 gits", output, StringComparison.Ordinal);
-        Assert.Contains("1 folders: 1 without a request to the git server, 0 fetched", output, StringComparison.Ordinal);
+        Assert.Contains("1 folders: 1 without a request to the git server, 0 fetched", output,
+            StringComparison.Ordinal);
         //the server answered during the local check, and it has the head of every git
         Assert.DoesNotContain("Waiting for the remote heads", output, StringComparison.Ordinal);
         Assert.DoesNotContain("Checked with fetch", output, StringComparison.Ordinal);
@@ -177,7 +178,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         string output = _consoleOutput.ToString();
         Assert.Contains("SupportToolsServer did not return the remote heads (Database failure)", output,
             StringComparison.Ordinal);
-        Assert.Contains("1 folders: 0 without a request to the git server, 1 fetched", output, StringComparison.Ordinal);
+        Assert.Contains("1 folders: 0 without a request to the git server, 1 fetched", output,
+            StringComparison.Ordinal);
     }
 
     //a git that the server has no complete head of is fetched, and its name is shown
@@ -328,9 +330,10 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         Assert.False(result);
         string output = _consoleOutput.ToString();
         //the error of the local check is written once, not again with the results of the sync
-        Assert.Single(output.Split(
-            $"RepoA  {folder}: is cloned from {_remotes["RepoC"]}, not from {_remotes["RepoA"]}").Skip(1));
-        Assert.Contains("[warning] Synced 2 gits, 2 folders: 0 without a request to the git server, 0 fetched, 1 cloned, 0 committed, 0 pulled, 0 pushed, 1 failed",
+        Assert.Single(output.Split($"RepoA  {folder}: is cloned from {_remotes["RepoC"]}, not from {_remotes["RepoA"]}")
+            .Skip(1));
+        Assert.Contains(
+            "[warning] Synced 2 gits, 2 folders: 0 without a request to the git server, 0 fetched, 1 cloned, 0 committed, 0 pulled, 0 pushed, 1 failed",
             output, StringComparison.Ordinal);
         //the summary is written once, as a warning
         Assert.Single(output.Split("Synced 2 gits").Skip(1));
@@ -386,7 +389,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         ];
 
         // Act
-        List<IGrouping<string, GitFolderInspection>> gits = SyncMultipleProjectsGitsToolActionV3.GroupByGit(inspections);
+        List<IGrouping<string, GitFolderInspection>>
+            gits = SyncMultipleProjectsGitsToolActionV3.GroupByGit(inspections);
 
         // Assert
         Assert.Equal(["RepoB", "repoa", "RepoC"], gits.Select(x => x.Key));
@@ -449,8 +453,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains(
-            "ApiClient with name MissingClient does not exists: every git is checked with fetch",
+        Assert.Contains("ApiClient with name MissingClient does not exists: every git is checked with fetch",
             _consoleOutput.ToString(), StringComparison.Ordinal);
         Assert.Empty(_server.Requests);
     }
@@ -586,8 +589,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         // Assert
         VerifyLog(logger, LogLevel.Information, $"RepoC  {folderC}: has changes", Times.Once());
         VerifyLog(logger, LogLevel.Information, $"RepoC  {folderC}: committed, pushed", Times.Once());
-        VerifyLog(logger, LogLevel.Information,
-            "Checked 2 folders: 1 with changes, 0 to clone, 1 failed", Times.Once());
+        VerifyLog(logger, LogLevel.Information, "Checked 2 folders: 1 with changes, 0 to clone, 1 failed",
+            Times.Once());
         VerifyLog(logger, LogLevel.Error,
             $"RepoA  {folderA}: is cloned from {_remotes["RepoC"]}, not from {_remotes["RepoA"]}", Times.Once());
     }
@@ -604,7 +607,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         await Create(null, "Local1", false, null, logger.Object).Run();
 
         // Assert
-        VerifyLog(logger, LogLevel.Information, $"Checked 1 folders: 0 with changes, 0 to clone, 1 failed",
+        VerifyLog(logger, LogLevel.Information, "Checked 1 folders: 0 with changes, 0 to clone, 1 failed",
             Times.Never());
         VerifyLog(logger, LogLevel.Error,
             $"RepoA  {folderA}: is cloned from {_remotes["RepoC"]}, not from {_remotes["RepoA"]}", Times.Once());
@@ -675,8 +678,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         await Create(null, "Local1", false).Run();
 
         // Assert
-        Assert.Contains("WorkFolder is not specified: the work folder clones are not synced",
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains("WorkFolder is not specified: the work folder clones are not synced", _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     //V2 updates the work folder clone of every git it syncs, so V3 does it too: a missing one is cloned
@@ -791,9 +794,10 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
     private static void VerifyLogStartsWith(Mock<ILogger> logger, LogLevel logLevel, string textStart, Times times)
     {
 #pragma warning disable CA1873
-        logger.Verify(x => x.Log(logLevel, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString()!.StartsWith(textStart, StringComparison.Ordinal)),
-            It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        logger.Verify(
+            x => x.Log(logLevel, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value.ToString()!.StartsWith(textStart, StringComparison.Ordinal)),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
 
@@ -801,9 +805,9 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
     private static void VerifyLog(Mock<ILogger> logger, LogLevel logLevel, string text, Times times)
     {
 #pragma warning disable CA1873
-        logger.Verify(x => x.Log(logLevel, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) => value.ToString() == text), It.IsAny<Exception?>(),
-            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        logger.Verify(
+            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((value, _) => value.ToString() == text),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
 
