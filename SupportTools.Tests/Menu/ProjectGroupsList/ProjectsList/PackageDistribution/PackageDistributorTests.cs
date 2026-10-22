@@ -15,6 +15,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SharedKernel;
 using Xunit;
 
 namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
@@ -22,7 +23,8 @@ namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.PackageDistribu
 //runs the real git over a throwaway bare remote Lib (a local path, no network) of package project Lib. Consumer App
 //(folder {temp}\Projects\App) has its main repository App and its copy of Lib. After the copy was cloned, another
 //computer pushed project Lib.B to Lib, so the copy is behind, as a copy of a package git is behind after Distribute all
-//packages pushed that git earlier in the same run. App has no project files, so no dotnet command runs
+//packages pushed that git earlier in the same run. App has a project file only in the tests whose csproj changes are a
+//fake, so no dotnet command runs
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class PackageDistributorTests : IDisposable
 {
@@ -38,6 +40,7 @@ public sealed class PackageDistributorTests : IDisposable
         </Project>
         """;
 
+    private readonly string _appFolder;
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly string _copyFolder;
     private readonly Mock<IHttpClientFactory> _httpClientFactory = new();
@@ -52,48 +55,26 @@ public sealed class PackageDistributorTests : IDisposable
 
     public PackageDistributorTests()
     {
-        _remote = GitTestRepositories.CreateRemote(_tempFolder, "Lib", new Dictionary<string, string>
-        {
-            [".gitignore"] = "bin/", [@"Lib.A\Lib.A.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
-        });
-        string appFolder = Path.Combine(_tempFolder, "Projects", "App");
-        _mainRepoFolder = Path.Combine(appFolder, "App");
+        _appFolder = Path.Combine(_tempFolder, "Projects", "App");
+        _mainRepoFolder = Path.Combine(_appFolder, "App");
         Directory.CreateDirectory(_mainRepoFolder);
         File.WriteAllText(Path.Combine(_mainRepoFolder, "Directory.Packages.props"), PackagesProps);
-        _copyFolder = Path.Combine(appFolder, "Lib");
-        GitTestRepositories.RunGit("clone", _remote, _copyFolder);
-        GitTestRepositories.ConfigureRepository(_copyFolder);
-        _initialCommit = Head(_copyFolder);
-
-        string otherComputerCopy = Path.Combine(_tempFolder, "OtherComputer", "Lib");
-        GitTestRepositories.RunGit("clone", _remote, otherComputerCopy);
-        GitTestRepositories.ConfigureRepository(otherComputerCopy);
-        Directory.CreateDirectory(Path.Combine(otherComputerCopy, "Lib.B"));
-        File.WriteAllText(Path.Combine(otherComputerCopy, "Lib.B", "Lib.B.csproj"),
-            """<Project Sdk="Microsoft.NET.Sdk" />""");
-        GitTestRepositories.RunGit("-C", otherComputerCopy, "add", "--all");
-        GitTestRepositories.RunGit("-C", otherComputerCopy, "commit", "-m", "Lib.B");
-        GitTestRepositories.RunGit("-C", otherComputerCopy, "push");
 
         _parameters.LocalPackageManagerWebApiClientName = ApiClientName;
         _parameters.ApiClients[ApiClientName] = new ApiClientSettings { Server = Server };
-        _parameters.Gits["Lib"] = new GitDataModel
-        {
-            GitProjectAddress = _remote, GitProjectFolderName = "Lib", GitIgnorePatternName = "CSharp"
-        };
         _parameters.Gits["App"] = new GitDataModel
         {
             GitProjectAddress = "git@github.com:x/App.git", GitProjectFolderName = "App", GitIgnorePatternName = "CSharp"
         };
-        _parameters.Projects["Lib"] = new ProjectModel
-        {
-            ProjectType = EProjectType.IsPackage, UseLocalPackages = true, GitProjectNames = ["Lib"]
-        };
         _parameters.Projects["App"] = new ProjectModel
         {
-            ProjectFolderName = appFolder, UseLocalPackages = true, GitProjectNames = ["App", "Lib"]
+            ProjectFolderName = _appFolder, UseLocalPackages = true, GitProjectNames = ["App"]
         };
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
+
+        _remote = AddPackageGitBehindItsRemote("Lib");
+        _copyFolder = Path.Combine(_appFolder, "Lib");
+        _initialCommit = Head(_copyFolder);
 
         _server.Respond("GET /v3/index.json",
             """{"resources":[{"@id":"http://127.0.0.1:0/v3/package/","@type":"PackageBaseAddress/3.0.0"}]}""");
@@ -119,7 +100,7 @@ public sealed class PackageDistributorTests : IDisposable
     public async Task DistributePackage_WhenTheCopyOfThePackageGitIsBehind_PullsItBeforeRaisingThePackageVersions()
     {
         // Act
-        bool result = await CreateSut().DistributePackage();
+        bool result = await CreateSut().DistributePackage("Lib");
 
         // Assert
         Assert.True(result);
@@ -141,7 +122,7 @@ public sealed class PackageDistributorTests : IDisposable
         await File.WriteAllTextAsync(localFile, "local");
 
         // Act
-        bool result = await CreateSut().DistributePackage();
+        bool result = await CreateSut().DistributePackage("Lib");
 
         // Assert
         Assert.True(result);
@@ -164,7 +145,7 @@ public sealed class PackageDistributorTests : IDisposable
         string localCommit = Head(_copyFolder);
 
         // Act
-        bool result = await CreateSut().DistributePackage();
+        bool result = await CreateSut().DistributePackage("Lib");
 
         // Assert
         Assert.False(result);
@@ -175,10 +156,145 @@ public sealed class PackageDistributorTests : IDisposable
         Assert.Equal(PackagesProps, ReadPackagesProps());
     }
 
+    //App takes Lib and then Ext, which come one after the other in Distribute all packages. The copies of both are
+    //pulled first, so the restore after the swap of Lib already sees the pulled copy of Ext too: a pulled copy next to
+    //one that is still old asks for different versions of the same package (NU1605)
+    [Fact]
+    public async Task DistributePackagesToProject_WhenSeveralCopiesAreBehind_PullsThemAllBeforeTheFirstRestore()
+    {
+        // Arrange
+        string extRemote = AddPackageGitBehindItsRemote("Ext");
+        string extCopyFolder = Path.Combine(_appFolder, "Ext");
+        await File.WriteAllTextAsync(Path.Combine(_mainRepoFolder, "Directory.Packages.props"), """
+            <Project>
+              <ItemGroup>
+                <PackageVersion Include="Lib.B" Version="1.0.1" />
+                <PackageVersion Include="Ext.B" Version="1.0.1" />
+              </ItemGroup>
+            </Project>
+            """);
+        string projectFile = Path.Combine(_mainRepoFolder, "App.csproj");
+        await File.WriteAllTextAsync(projectFile, """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup>
+                <ProjectReference Include="..\Lib\Lib.A\Lib.A.csproj" />
+                <ProjectReference Include="..\Ext\Ext.A\Ext.A.csproj" />
+              </ItemGroup>
+            </Project>
+            """);
+        _server.Respond("GET /v3/package/ext.a/index.json", """{"versions":["1.0.0","1.0.5"]}""");
+        _server.Respond("GET /v3/package/ext.b/index.json", """{"versions":["1.0.1","1.0.4"]}""");
+        var commands = new FakePackageReferenceCommands(() =>
+            Head(_copyFolder) == Head(_remote) && Head(extCopyFolder) == Head(extRemote));
+
+        // Act
+        bool result = await CreateSut(commands).DistributePackagesToProject("App", ["Lib", "Ext"]);
+
+        // Assert
+        Assert.True(result);
+        string libReference = Path.Combine(_copyFolder, "Lib.A", "Lib.A.csproj");
+        string extReference = Path.Combine(extCopyFolder, "Ext.A", "Ext.A.csproj");
+        Assert.Equal(
+        [
+            $"remove reference {projectFile} {libReference}", $"add package {projectFile} Lib.A 1.0.3",
+            $"restore {projectFile}", $"remove reference {projectFile} {extReference}",
+            $"add package {projectFile} Ext.A 1.0.5", $"restore {projectFile}"
+        ], commands.Calls);
+        Assert.Equal([true, true], commands.CopiesWereUpdatedAtRestore);
+        string packagesProps = ReadPackagesProps();
+        Assert.Contains("""<PackageVersion Include="Lib.B" Version="1.0.2" />""", packagesProps,
+            StringComparison.Ordinal);
+        Assert.Contains("""<PackageVersion Include="Ext.B" Version="1.0.4" />""", packagesProps,
+            StringComparison.Ordinal);
+    }
+
+    //every copy is pulled before anything changes, so a copy that cannot be fast-forwarded leaves App as it was, even
+    //when the copy of an earlier package was pulled already
+    [Fact]
+    public async Task DistributePackagesToProject_WhenACopyCannotBeFastForwarded_ChangesNothing()
+    {
+        // Arrange
+        AddPackageGitBehindItsRemote("Ext");
+        string extCopyFolder = Path.Combine(_appFolder, "Ext");
+        await File.WriteAllTextAsync(Path.Combine(extCopyFolder, "Local.txt"), "local");
+        GitTestRepositories.RunGit("-C", extCopyFolder, "add", "--all");
+        GitTestRepositories.RunGit("-C", extCopyFolder, "commit", "-m", "Local");
+        await File.WriteAllTextAsync(Path.Combine(_mainRepoFolder, "App.csproj"), """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup>
+                <ProjectReference Include="..\Lib\Lib.A\Lib.A.csproj" />
+              </ItemGroup>
+            </Project>
+            """);
+        var commands = new FakePackageReferenceCommands(() => true);
+
+        // Act
+        bool result = await CreateSut(commands).DistributePackagesToProject("App", ["Lib", "Ext"]);
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains($"Cannot pull package repository {extCopyFolder} with --ff-only for project App, skipped",
+            ConsoleText(), StringComparison.Ordinal);
+        Assert.Empty(commands.Calls);
+        Assert.Empty(_server.Requests);
+        Assert.Equal(PackagesProps, ReadPackagesProps());
+    }
+
+    [Fact]
+    public async Task DistributePackagesToProject_WhenTheProjectIsNotRegistered_FailsAndPullsNothing()
+    {
+        // Act
+        bool result = await CreateSut().DistributePackagesToProject("Missing", ["Lib"]);
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("Project Missing does not found", ConsoleText(), StringComparison.Ordinal);
+        Assert.Equal(_initialCommit, Head(_copyFolder));
+    }
+
     private PackageDistributor CreateSut()
     {
+        return new PackageDistributor(new Mock<ILogger>().Object, _httpClientFactory.Object, _parametersManager.Object);
+    }
+
+    private PackageDistributor CreateSut(IPackageReferenceCommands commands)
+    {
         return new PackageDistributor(new Mock<ILogger>().Object, _httpClientFactory.Object, _parametersManager.Object,
-            "Lib");
+            commands);
+    }
+
+    //package project {name}: its git has project {name}.A and is cloned next to App. Another computer then pushed
+    //project {name}.B, so the copy is behind its remote. Returns the bare remote
+    private string AddPackageGitBehindItsRemote(string name)
+    {
+        string remote = GitTestRepositories.CreateRemote(_tempFolder, name, new Dictionary<string, string>
+        {
+            [".gitignore"] = "bin/", [$@"{name}.A\{name}.A.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
+        });
+        string copyFolder = Path.Combine(_appFolder, name);
+        GitTestRepositories.RunGit("clone", remote, copyFolder);
+        GitTestRepositories.ConfigureRepository(copyFolder);
+
+        string otherComputerCopy = Path.Combine(_tempFolder, "OtherComputer", name);
+        GitTestRepositories.RunGit("clone", remote, otherComputerCopy);
+        GitTestRepositories.ConfigureRepository(otherComputerCopy);
+        Directory.CreateDirectory(Path.Combine(otherComputerCopy, $"{name}.B"));
+        File.WriteAllText(Path.Combine(otherComputerCopy, $"{name}.B", $"{name}.B.csproj"),
+            """<Project Sdk="Microsoft.NET.Sdk" />""");
+        GitTestRepositories.RunGit("-C", otherComputerCopy, "add", "--all");
+        GitTestRepositories.RunGit("-C", otherComputerCopy, "commit", "-m", $"{name}.B");
+        GitTestRepositories.RunGit("-C", otherComputerCopy, "push");
+
+        _parameters.Gits[name] = new GitDataModel
+        {
+            GitProjectAddress = remote, GitProjectFolderName = name, GitIgnorePatternName = "CSharp"
+        };
+        _parameters.Projects[name] = new ProjectModel
+        {
+            ProjectType = EProjectType.IsPackage, UseLocalPackages = true, GitProjectNames = [name]
+        };
+        _parameters.Projects["App"].GitProjectNames.Add(name);
+        return remote;
     }
 
     private static string Head(string repository)
@@ -223,6 +339,53 @@ public sealed class PackageDistributorTests : IDisposable
             {
                 RequestMessage = request, Content = new StringContent(body, Encoding.UTF8, "application/json")
             });
+        }
+    }
+
+    //records the csproj changes instead of running dotnet; at every restore it notes whether the copies are updated
+    private sealed class FakePackageReferenceCommands : IPackageReferenceCommands
+    {
+        private readonly Func<bool> _copiesAreUpdated;
+
+        // ReSharper disable once ConvertToPrimaryConstructor
+        public FakePackageReferenceCommands(Func<bool> copiesAreUpdated)
+        {
+            _copiesAreUpdated = copiesAreUpdated;
+        }
+
+        public List<string> Calls { get; } = [];
+        public List<bool> CopiesWereUpdatedAtRestore { get; } = [];
+
+        public Result RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
+        {
+            Calls.Add($"remove reference {projectFilePath} {referenceProjectFilePath}");
+            return Result.Success();
+        }
+
+        public Result AddPackageToProjectWithoutRestore(string projectFilePath, string packageName,
+            string packageVersion)
+        {
+            Calls.Add($"add package {projectFilePath} {packageName} {packageVersion}");
+            return Result.Success();
+        }
+
+        public Result RestoreWithoutHttpCache(string projectFilePath)
+        {
+            Calls.Add($"restore {projectFilePath}");
+            CopiesWereUpdatedAtRestore.Add(_copiesAreUpdated());
+            return Result.Success();
+        }
+
+        public Result RemovePackageFromProject(string projectFilePath, string packageName)
+        {
+            Calls.Add($"remove package {projectFilePath} {packageName}");
+            return Result.Success();
+        }
+
+        public Result AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
+        {
+            Calls.Add($"add reference {projectFilePath} {referenceProjectFilePath}");
+            return Result.Success();
         }
     }
 }

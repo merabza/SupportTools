@@ -100,10 +100,10 @@ public sealed class PackageDistributionStepsTests : IDisposable
     }
 
     [Fact]
-    public async Task DistributePackage_WhenProjectIsNotRegistered_Fails()
+    public async Task DistributePackagesToProject_WhenAPackageProjectIsNotRegistered_Fails()
     {
         // Act
-        bool result = await _sut.DistributePackage("Missing", CancellationToken.None);
+        bool result = await _sut.DistributePackagesToProject("App", ["Missing"], CancellationToken.None);
 
         // Assert
         Assert.False(result);

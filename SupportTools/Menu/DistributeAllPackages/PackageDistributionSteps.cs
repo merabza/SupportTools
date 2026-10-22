@@ -64,9 +64,10 @@ internal sealed class PackageDistributionSteps : IPackageDistributionSteps
         return packageBuilder.BuildAndUploadPackage();
     }
 
-    public Task<bool> DistributePackage(string projectName, CancellationToken cancellationToken)
+    public Task<bool> DistributePackagesToProject(string projectName, IReadOnlyList<string> packageProjectNames,
+        CancellationToken cancellationToken)
     {
-        var packageDistributor = new PackageDistributor(_logger, _httpClientFactory, _parametersManager, projectName);
-        return packageDistributor.DistributePackage(cancellationToken);
+        var packageDistributor = new PackageDistributor(_logger, _httpClientFactory, _parametersManager);
+        return packageDistributor.DistributePackagesToProject(projectName, packageProjectNames, cancellationToken);
     }
 }

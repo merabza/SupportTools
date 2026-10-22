@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using SupportToolsData.Models;
 
@@ -21,6 +22,8 @@ internal interface IPackageDistributionSteps
     //პაკეტის დაბილდვა და ატვირთვა package manager-ზე
     bool BuildAndUploadPackage(string projectName);
 
-    //პაკეტის გავრცელება ყველა მომხმარებელ პროექტში
-    Task<bool> DistributePackage(string projectName, CancellationToken cancellationToken);
+    //ამ გაშვების პაკეტების გავრცელება პროექტში: ჯერ ყველა მათგანის კლონი ახლდება, შემდეგ ვერსიები იწევა და
+    //რეფერენსები პაკეტებით იცვლება
+    Task<bool> DistributePackagesToProject(string projectName, IReadOnlyList<string> packageProjectNames,
+        CancellationToken cancellationToken);
 }

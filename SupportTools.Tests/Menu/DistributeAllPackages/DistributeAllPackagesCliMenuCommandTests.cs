@@ -119,7 +119,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Contains("Package projects processing order: RemotePackage", _consoleOutput.ToString(),
             StringComparison.Ordinal);
-        Assert.Contains("distribute RemotePackage", _steps.Calls);
+        Assert.Contains("package RemotePackage", _steps.Calls);
     }
 
     [Fact]
@@ -156,9 +156,8 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Equal(
         [
-            "sync Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "distribute Alpha",
-            "final sync Alpha", "sync Beta", "build Beta noIncremental=False", "solution Beta", "package Beta",
-            "distribute Beta", "final sync Beta"
+            "sync Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha",
+            "sync Beta", "build Beta noIncremental=False", "solution Beta", "package Beta", "final sync Beta"
         ], _steps.Calls);
         string output = _consoleOutput.ToString();
         Assert.Contains("Processing package project Alpha (1/2)", output, StringComparison.Ordinal);
@@ -203,8 +202,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
     [InlineData("build", "Build check failed for project Alpha with status BuildFailed, errors: 2", 2)]
     [InlineData("solution", "Package solution check failed for project Alpha", 3)]
     [InlineData("package", "Build package failed for project Alpha", 4)]
-    [InlineData("distribute", "Package distribution failed for project Alpha", 5)]
-    [InlineData("final sync", "Final sync gits failed for project Alpha", 6)]
+    [InlineData("final sync", "Final sync gits failed for project Alpha", 5)]
     public async Task RunBody_WhenAStepFails_ReportsItAndStopsTheRun(string failingStep, string expectedMessage,
         int expectedCallCount)
     {
@@ -303,6 +301,129 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         ], _steps.CommitMessages);
     }
 
+    //a package takes the packages of this run that it uses right before its first sync, in the processing order, when
+    //all of them are already pushed; a git that is not a package of this run is not distributed
+    [Fact]
+    public async Task RunBody_WhenAPackageUsesPackagesOfThisRun_DistributesThemToItBeforeItsFirstSync()
+    {
+        // Arrange
+        AddProject("Alpha", EProjectType.IsPackage, true, "Alpha", "Util", "Core", "Tool");
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("Util", EProjectType.IsPackage, true, "Util", "Core");
+        AddProject("Tool", EProjectType.Standard, true, "Tool");
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(
+        [
+            "sync Core", "build Core noIncremental=False", "solution Core", "package Core", "final sync Core",
+            "distribute Core to Util", "sync Util", "build Util noIncremental=False", "solution Util",
+            "package Util", "final sync Util", "distribute Core, Util to Alpha", "sync Alpha",
+            "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha"
+        ], _steps.Calls);
+    }
+
+    //the package is not synced, built or uploaded with the old versions of the packages it uses
+    [Fact]
+    public async Task RunBody_WhenDistributionToAPackageFails_StopsTheRunBeforeItsSync()
+    {
+        // Arrange
+        AddProject("Alpha", EProjectType.IsPackage, true, "Alpha", "Core");
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        _steps.FailingStep = "distribute";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("distribute Core to Alpha", _steps.Calls[^1]);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("Package distribution failed for project Alpha", output, StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages stopped on project Alpha. Successfully processed 1 of 2 package projects", output,
+            StringComparison.Ordinal);
+    }
+
+    //the projects that are not packages take the packages of this run that they use after the last package, in name
+    //order; the ones with UseLocalPackages off, the ones that use none of them and the package projects that were not
+    //processed take nothing
+    [Fact]
+    public async Task RunBody_WhenAllPackagesAreProcessed_DistributesThemToTheOtherProjectsAtTheEnd()
+    {
+        // Arrange
+        AddProject("Util", EProjectType.IsPackage, true, "Util", "Core");
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("Web", EProjectType.IsService, true, "Web", "Util");
+        AddProject("App", EProjectType.Standard, true, "App", "Util", "Core", "Tool");
+        AddProject("Tool", EProjectType.Standard, true, "Tool");
+        AddProject("Off", EProjectType.Standard, true, "Off", "Core");
+        _parameters.Projects["Off"].UseLocalPackages = false;
+        AddProject("OffPackage", EProjectType.IsPackage, true, "OffPackage", "Core");
+        _parameters.Projects["OffPackage"].UseLocalPackages = false;
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["distribute Core to Util", "distribute Core, Util to App", "distribute Util to Web"],
+            _steps.Calls.FindAll(x => x.StartsWith("distribute", StringComparison.Ordinal)));
+        Assert.Equal("distribute Util to Web", _steps.Calls[^1]);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("Distributing packages to project App (1/2)", output, StringComparison.Ordinal);
+        Assert.Contains("Distributing packages to project Web (2/2)", output, StringComparison.Ordinal);
+        Assert.Contains("Distribute all packages finished. Package projects processed: 2", output,
+            StringComparison.Ordinal);
+    }
+
+    //all the packages are already uploaded, so one failed project does not stop the others, but the run fails
+    [Fact]
+    public async Task RunBody_WhenDistributionToAnotherProjectFails_GoesOnWithTheOthersAndFails()
+    {
+        // Arrange
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("App", EProjectType.Standard, true, "App", "Core");
+        AddProject("Web", EProjectType.IsService, true, "Web", "Core");
+        _steps.FailingStep = "distribute";
+        _steps.FailingProject = "App";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(["distribute Core to App", "distribute Core to Web"], _steps.Calls[^2..]);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("Package distribution failed for project App", output, StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages finished with errors. Packages were not distributed to projects: App", output,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("Distribute all packages finished. Package projects processed", output,
+            StringComparison.Ordinal);
+    }
+
+    //a stopped run distributes nothing to the projects that are not packages
+    [Fact]
+    public async Task RunBody_WhenAPackageFails_DistributesNothingToTheOtherProjects()
+    {
+        // Arrange
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("App", EProjectType.Standard, true, "App", "Core");
+        _steps.FailingStep = "package";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.DoesNotContain(_steps.Calls, x => x.StartsWith("distribute", StringComparison.Ordinal));
+        Assert.DoesNotContain("Distributing packages to project", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
     //a repeated git counts once, so the package does not wait for a second, never coming, dependency
     [Fact]
     public async Task RunBody_WhenADependencyIsListedTwice_CountsItOnce()
@@ -391,7 +512,8 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
     }
 
     //records every step; a step named FailingStep fails for FailingProject (or for every project when it is null).
-    //The first sync of a project is "sync", the second one "final sync"
+    //The first sync of a project is "sync", the second one "final sync"; a distribution is "distribute" for the project
+    //that takes the packages
     private sealed class FakePackageDistributionSteps : IPackageDistributionSteps
     {
         private readonly HashSet<string> _syncedProjectNames = [];
@@ -429,9 +551,11 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
             return Run("package", projectName);
         }
 
-        public Task<bool> DistributePackage(string projectName, CancellationToken cancellationToken)
+        public Task<bool> DistributePackagesToProject(string projectName, IReadOnlyList<string> packageProjectNames,
+            CancellationToken cancellationToken)
         {
-            return Task.FromResult(Run("distribute", projectName));
+            Calls.Add($"distribute {string.Join(", ", packageProjectNames)} to {projectName}");
+            return Task.FromResult(!Fails("distribute", projectName));
         }
 
         private bool Run(string step, string projectName)

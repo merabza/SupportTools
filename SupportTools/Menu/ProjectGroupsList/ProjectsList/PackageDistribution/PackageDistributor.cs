@@ -23,8 +23,8 @@ using ToolsManagement.ApiClientsManagement;
 
 namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 
-//პაკეტის მომხმარებელ პროექტებში გავრცელების ლოგიკა. გამოიყენება როგორც ცალკე მენიუს ბრძანებიდან,
-//ისე ყველა პაკეტის გავრცელების პროცესიდან
+//პაკეტის მომხმარებელ პროექტებში გავრცელების ლოგიკა. გამოიყენება როგორც ცალკე მენიუს ბრძანებიდან (ერთი პაკეტი ყველა
+//მომხმარებელ პროექტში), ისე ყველა პაკეტის გავრცელების პროცესიდან (ერთი პროექტი ამ გაშვების რამდენიმე პაკეტს იღებს)
 public sealed class PackageDistributor
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -33,60 +33,35 @@ public sealed class PackageDistributor
     private readonly Dictionary<string, string> _latestVersionsCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
-    private readonly string _projectName;
+    private readonly ProjectReferenceReplacer _referenceReplacer;
 
     //flat container-ის საბაზისო მისამართი, რომელიც ერთხელ იკითხება სერვერის service index-იდან
     private string? _packageBaseAddress;
 
+    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager) : this(logger, httpClientFactory, parametersManager,
+        new DotnetPackageReferenceCommands(new DotnetProcessor(logger, true)))
+    {
+    }
+
+    //csproj ფაილების ცვლილებების ბრძანებები პარამეტრადაა გამოტანილი, რომ ტესტებმა dotnet არ გაუშვან
     // ReSharper disable once ConvertToPrimaryConstructor
-    public PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        string projectName)
+    internal PackageDistributor(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, IPackageReferenceCommands referenceCommands)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
-        _projectName = projectName;
+        _referenceReplacer = new ProjectReferenceReplacer(referenceCommands, logger);
     }
 
-    public async Task<bool> DistributePackage(CancellationToken cancellationToken = default)
+    //ერთი პაკეტის გავრცელება ყველა მომხმარებელ პროექტში
+    public async Task<bool> DistributePackage(string packageProjectName, CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
-        ProjectModel? project = parameters.GetProject(_projectName);
-        if (project is null)
+        string? server = GetPackageServer(parameters, [packageProjectName]);
+        if (server is null)
         {
-            StShared.WriteErrorLine($"Project {_projectName} does not found", true);
-            return false;
-        }
-
-        //პაკეტის გავრცელება მუშაობს მხოლოდ პაკეტის ტიპის პროექტებისთვის
-        if (project.ProjectType != EProjectType.IsPackage)
-        {
-            StShared.WriteErrorLine($"Project {_projectName} is not package type project", true);
-            return false;
-        }
-
-        //პაკეტის პროექტის შესაბამისი git რეპოზიტორია არის ის, რომლის სახელიც ემთხვევა პროექტის სახელს
-        if (!parameters.Gits.ContainsKey(_projectName))
-        {
-            StShared.WriteErrorLine($"Git repository with name {_projectName} does not exists in Gits list", true);
-            return false;
-        }
-
-        string? localPackageManagerWebApiClientName = parameters.LocalPackageManagerWebApiClientName;
-        if (string.IsNullOrWhiteSpace(localPackageManagerWebApiClientName))
-        {
-            StShared.WriteErrorLine("LocalPackageManagerWebApiClientName does not specified", true);
-            return false;
-        }
-
-        ApiClientSettingsDomain apiClientSettings;
-        try
-        {
-            apiClientSettings = parameters.GetApiClientSettingsRequired(localPackageManagerWebApiClientName);
-        }
-        catch (InvalidOperationException e)
-        {
-            StShared.WriteException(e, true, _logger);
             return false;
         }
 
@@ -99,12 +74,12 @@ public sealed class PackageDistributor
         foreach ((string consumerProjectName, ProjectModel consumerProject) in parameters.Projects.OrderBy(x => x.Key,
                      StringComparer.Ordinal))
         {
-            if (consumerProjectName == _projectName)
+            if (consumerProjectName == packageProjectName)
             {
                 continue;
             }
 
-            if (!consumerProject.GitProjectNames.Contains(_projectName))
+            if (!consumerProject.GitProjectNames.Contains(packageProjectName))
             {
                 continue;
             }
@@ -119,22 +94,97 @@ public sealed class PackageDistributor
 
             consumersCount++;
             hadErrors |= !await ProcessConsumerProject(parameters, gitProjects, consumerProjectName, consumerProject,
-                apiClientSettings.Server, cancellationToken);
+                [packageProjectName], server, cancellationToken);
         }
 
         if (_logger.IsEnabled(LogLevel.Information))
         {
             _logger.LogInformation(
                 "Package distribution for {ProjectName} finished. Consumer projects processed: {ConsumersCount}",
-                _projectName, consumersCount);
+                packageProjectName, consumersCount);
         }
 
         return !hadErrors;
     }
 
+    //ერთი პროექტი რამდენიმე პაკეტს ერთად იღებს. „Distribute all packages“ ამას მაშინ იძახებს, როცა ეს პაკეტები უკვე
+    //დაფუშულია. packageProjectNames დამოკიდებულებების რიგითაა, რომ ყოველი პაკეტი თავის დამოკიდებულებებზე გვიან
+    //გავრცელდეს
+    public async Task<bool> DistributePackagesToProject(string projectName, IReadOnlyList<string> packageProjectNames,
+        CancellationToken cancellationToken = default)
+    {
+        var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        string? server = GetPackageServer(parameters, packageProjectNames);
+        if (server is null)
+        {
+            return false;
+        }
+
+        ProjectModel? project = parameters.GetProject(projectName);
+        if (project is null)
+        {
+            StShared.WriteErrorLine($"Project {projectName} does not found", true);
+            return false;
+        }
+
+        var gitProjects = GitProjects.Create(_logger, parameters.GitProjects);
+        return await ProcessConsumerProject(parameters, gitProjects, projectName, project, packageProjectNames, server,
+            cancellationToken);
+    }
+
+    //პაკეტების პროექტების შემოწმება და ლოკალური პაკეტების სერვერის მისამართი; null - გავრცელება შეუძლებელია
+    private string? GetPackageServer(SupportToolsParameters parameters, IEnumerable<string> packageProjectNames)
+    {
+        foreach (string packageProjectName in packageProjectNames)
+        {
+            ProjectModel? project = parameters.GetProject(packageProjectName);
+            if (project is null)
+            {
+                StShared.WriteErrorLine($"Project {packageProjectName} does not found", true);
+                return null;
+            }
+
+            //პაკეტის გავრცელება მუშაობს მხოლოდ პაკეტის ტიპის პროექტებისთვის
+            if (project.ProjectType != EProjectType.IsPackage)
+            {
+                StShared.WriteErrorLine($"Project {packageProjectName} is not package type project", true);
+                return null;
+            }
+
+            //პაკეტის პროექტის შესაბამისი git რეპოზიტორია არის ის, რომლის სახელიც ემთხვევა პროექტის სახელს
+            if (!parameters.Gits.ContainsKey(packageProjectName))
+            {
+                StShared.WriteErrorLine($"Git repository with name {packageProjectName} does not exists in Gits list",
+                    true);
+                return null;
+            }
+        }
+
+        string? localPackageManagerWebApiClientName = parameters.LocalPackageManagerWebApiClientName;
+        if (string.IsNullOrWhiteSpace(localPackageManagerWebApiClientName))
+        {
+            StShared.WriteErrorLine("LocalPackageManagerWebApiClientName does not specified", true);
+            return null;
+        }
+
+        ApiClientSettingsDomain apiClientSettings;
+        try
+        {
+            apiClientSettings = parameters.GetApiClientSettingsRequired(localPackageManagerWebApiClientName);
+        }
+        catch (InvalidOperationException e)
+        {
+            StShared.WriteException(e, true, _logger);
+            return null;
+        }
+
+        return apiClientSettings.Server;
+    }
+
     //ერთი მომხმარებელი პროექტის დამუშავება. ცვლილებები შედის მხოლოდ მთავარ რეპოზიტორიაში
     private async Task<bool> ProcessConsumerProject(SupportToolsParameters parameters, GitProjects gitProjects,
-        string consumerProjectName, ProjectModel consumerProject, string server, CancellationToken cancellationToken)
+        string consumerProjectName, ProjectModel consumerProject, IReadOnlyList<string> packageProjectNames,
+        string server, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(consumerProject.ProjectFolderName))
         {
@@ -155,18 +205,8 @@ public sealed class PackageDistributor
             return true;
         }
 
-        if (!gitRepos.Gits.TryGetValue(_projectName, out GitData? packageGitData))
-        {
-            StShared.WriteWarningLine(
-                $"Git repository {_projectName} does not found in gits list for project {consumerProjectName}, skipped",
-                true, _logger);
-            return true;
-        }
-
         string mainRepoPath =
             Path.GetFullPath(Path.Combine(consumerProject.ProjectFolderName, mainGitData.GitProjectFolderName));
-        string packageRepoPath =
-            Path.GetFullPath(Path.Combine(consumerProject.ProjectFolderName, packageGitData.GitProjectFolderName));
 
         if (!Directory.Exists(mainRepoPath))
         {
@@ -176,23 +216,52 @@ public sealed class PackageDistributor
             return true;
         }
 
-        //პაკეტის git-ის ცვლილებები ამავე გაშვებაში ხშირად იგზავნება remote-ზე, მომხმარებელი პროექტის გვერდით მისი კლონი კი
-        //ძველი რჩება. ამ კლონის პროექტებზე დარჩენილი რეფერენსები მაშინ ძველ ვერსიებს ითხოვს და ახალ პაკეტთან კონფლიქტს
-        //იწვევს (NU1107, NU1605), ამიტომ კლონი ვერსიების აწევამდე და რეფერენსების ჩანაცვლებამდე ახლდება
-        if (!PullPackageRepoCopy(consumerProjectName, packageRepoPath))
+        //პაკეტების git-ების ცვლილებები ამავე გაშვებაში ხშირად იგზავნება remote-ზე, მომხმარებელი პროექტის გვერდით მათი
+        //კლონები კი ძველი რჩება. ამ კლონების პროექტებზე დარჩენილი რეფერენსები მაშინ ძველ ვერსიებს ითხოვს და ახალ
+        //პაკეტთან კონფლიქტს იწვევს (NU1107, NU1605). ამიტომ ვერსიების აწევამდე და რეფერენსების ჩანაცვლებამდე ყველა
+        //პაკეტის კლონი ახლდება: ერთის განახლების შემდეგ restore-მა მეორე, ჯერ ძველი კლონი რომ ნახოს, ისიც ასეთ
+        //კონფლიქტს იწვევს
+        List<(string PackageProjectName, string PackageRepoPath)> packageRepos = [];
+        foreach (string packageProjectName in packageProjectNames)
         {
-            return false;
+            if (!gitRepos.Gits.TryGetValue(packageProjectName, out GitData? packageGitData))
+            {
+                StShared.WriteWarningLine(
+                    $"Git repository {packageProjectName} does not found in gits list for project {consumerProjectName}, skipped",
+                    true, _logger);
+                continue;
+            }
+
+            string packageRepoPath = Path.GetFullPath(Path.Combine(consumerProject.ProjectFolderName,
+                packageGitData.GitProjectFolderName));
+            if (!PullPackageRepoCopy(consumerProjectName, packageRepoPath))
+            {
+                return false;
+            }
+
+            packageRepos.Add((packageProjectName, packageRepoPath));
         }
 
-        string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        bool hadErrors = false;
+        foreach ((string packageProjectName, string packageRepoPath) in packageRepos)
+        {
+            hadErrors |= !await DistributePackageToMainRepo(mainRepoPath, packageProjectName, packageRepoPath, server,
+                cancellationToken);
+        }
 
-        var referenceReplacer =
-            new ProjectReferenceReplacer(new DotnetPackageReferenceCommands(new DotnetProcessor(_logger, true)),
-                _logger);
+        return !hadErrors;
+    }
+
+    //ერთი პაკეტის გავრცელება მომხმარებელი პროექტის მთავარ რეპოზიტორიაში: ვერსიების აწევა და რეფერენსების ჩანაცვლება
+    private async Task<bool> DistributePackageToMainRepo(string mainRepoPath, string packageProjectName,
+        string packageRepoPath, string server, CancellationToken cancellationToken)
+    {
+        string packageRepoPrefix = packageRepoPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
         //მანამდე უკვე ჩასმული ამავე პაკეტის პროექტის პაკეტების ვერსიები უახლესზე აიწევა,
         //რომ ძველ ვერსიებზე მიბმის გამო ვერსიების კონფლიქტები (NU1107) არ წარმოიშვას
-        bool hadErrors = !await UpdateExistingPackageVersions(mainRepoPath, packageRepoPath, server, cancellationToken);
+        bool hadErrors = !await UpdateExistingPackageVersions(mainRepoPath, packageProjectName, packageRepoPath, server,
+            cancellationToken);
 
         foreach (string csprojFile in Directory.EnumerateFiles(mainRepoPath, "*.csproj", SearchOption.AllDirectories))
         {
@@ -232,7 +301,7 @@ public sealed class PackageDistributor
                     continue;
                 }
 
-                if (!referenceReplacer.Replace(csprojFile, refFullPath, packageId, latestVersion))
+                if (!_referenceReplacer.Replace(csprojFile, refFullPath, packageId, latestVersion))
                 {
                     hadErrors = true;
                     continue;
@@ -291,8 +360,8 @@ public sealed class PackageDistributor
 
     //მომხმარებელი პროექტის მთავარ რეპოზიტორიაში უკვე არსებული ამ პაკეტის პროექტის პაკეტების
     //ვერსიების აწევა უახლესზე Directory.Packages.props ფაილებში
-    private async Task<bool> UpdateExistingPackageVersions(string mainRepoPath, string packageRepoPath, string server,
-        CancellationToken cancellationToken)
+    private async Task<bool> UpdateExistingPackageVersions(string mainRepoPath, string packageProjectName,
+        string packageRepoPath, string server, CancellationToken cancellationToken)
     {
         //პაკეტის პროექტის პაკეტების სახელები ემთხვევა მისი რეპოზიტორიის csproj ფაილების სახელებს
         HashSet<string>? packageIds = null;
@@ -320,8 +389,9 @@ public sealed class PackageDistributor
 
                 //თუ პაკეტის რეპოზიტორიის კლონი ვერ მოიძებნა, გამოიყენება სახელების კონვენცია
                 bool isPackageProjectPackage = packageIds?.Contains(packageId) ??
-                                               packageId.Equals(_projectName, StringComparison.OrdinalIgnoreCase) ||
-                                               packageId.StartsWith(_projectName + ".",
+                                               packageId.Equals(packageProjectName,
+                                                   StringComparison.OrdinalIgnoreCase) ||
+                                               packageId.StartsWith(packageProjectName + ".",
                                                    StringComparison.OrdinalIgnoreCase);
                 if (!isPackageProjectPackage)
                 {

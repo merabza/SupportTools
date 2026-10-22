@@ -110,6 +110,11 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             distributedProjectNames.Add(projectName);
         }
 
+        if (!await DistributePackagesToOtherProjects(parameters, distributedProjectNames, cancellationToken))
+        {
+            return false;
+        }
+
         if (_logger.IsEnabled(LogLevel.Information))
         {
             _logger.LogInformation("Distribute all packages finished. Package projects processed: {ProcessedCount}",
@@ -120,14 +125,25 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         return true;
     }
 
-    //ერთი პაკეტის პროექტის სრული დამუშავება: სინქრონიზაცია, build-ის შემოწმება, სოლუშენის შემოწმება,
-    //პაკეტის დაბილდვა, გავრცელება და ხელახალი სინქრონიზაცია
+    //ერთი პაკეტის პროექტის სრული დამუშავება: ამ გაშვების პაკეტების მიღება, სინქრონიზაცია, build-ის შემოწმება,
+    //სოლუშენის შემოწმება, პაკეტის დაბილდვა და ატვირთვა, ხელახალი სინქრონიზაცია
     private async Task<bool> ProcessPackageProject(string projectName, ProjectModel project,
         IReadOnlyCollection<string> distributedProjectNames, CancellationToken cancellationToken)
     {
+        //ამ გაშვების პაკეტები, რომლებსაც პროექტი იყენებს, დამოკიდებულებების რიგით მის წინ დამუშავდა და უკვე დაფუშულია.
+        //ამიტომ მათი კლონები პროექტის გვერდით საბოლოო მდგომარეობამდე ახლდება და restore ძველ და ახალ კლონებს
+        //ერთად ვერ ნახავს
+        List<string> usedPackageNames = GetUsedPackageNames(project, distributedProjectNames);
+        if (usedPackageNames.Count > 0 &&
+            !await _steps.DistributePackagesToProject(projectName, usedPackageNames, cancellationToken))
+        {
+            StShared.WriteErrorLine($"Package distribution failed for project {projectName}", true, _logger);
+            return false;
+        }
+
         //გიტების სინქრონიზაცია
-        if (!await _steps.SyncProjectGits(projectName,
-                CreateSyncCommitMessage(projectName, project, distributedProjectNames), cancellationToken))
+        if (!await _steps.SyncProjectGits(projectName, CreateSyncCommitMessage(projectName, usedPackageNames),
+                cancellationToken))
         {
             StShared.WriteErrorLine($"Sync gits failed for project {projectName}", true, _logger);
             return false;
@@ -157,13 +173,6 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        //პაკეტის გავრცელება ყველა მომხმარებელ პროექტში
-        if (!await _steps.DistributePackage(projectName, cancellationToken))
-        {
-            StShared.WriteErrorLine($"Package distribution failed for project {projectName}", true, _logger);
-            return false;
-        }
-
         //გიტების ხელახალი სინქრონიზაცია
         if (!await _steps.SyncProjectGits(projectName, $"Distribute all packages: after {projectName} package",
                 cancellationToken))
@@ -175,13 +184,57 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         return true;
     }
 
-    //პირველი სინქრონიზაციის commit-ის მესიჯი. პროექტის git-ებში ცვლილებებს ძირითადად ამავე გაშვებაში უკვე
-    //გავრცელებული პაკეტები ტოვებს, რომლებსაც პროექტი იყენებს, ამიტომ მესიჯი მათ ასახელებს
-    internal static string CreateSyncCommitMessage(string projectName, ProjectModel project,
-        IEnumerable<string> distributedProjectNames)
+    //არაპაკეტური პროექტები ამ გაშვების პაკეტებს ბოლოს იღებენ, როცა ყველა პაკეტი უკვე დაფუშულია. მათი ცვლილებები
+    //დაუკომიტებელი რჩება. ერთი პროექტის ჩავარდნა დანარჩენებს არ აჩერებს
+    private async Task<bool> DistributePackagesToOtherProjects(SupportToolsParameters parameters,
+        IReadOnlyCollection<string> distributedProjectNames, CancellationToken cancellationToken)
     {
-        List<string> usedPackageNames =
-            [.. distributedProjectNames.Where(x => project.GitProjectNames.Contains(x))];
+        List<(string ProjectName, List<string> UsedPackageNames)> projects =
+        [
+            .. parameters.Projects
+                .Where(x => x.Value.ProjectType != EProjectType.IsPackage && x.Value.UseLocalPackages)
+                .OrderBy(x => x.Key, StringComparer.Ordinal)
+                .Select(x => (ProjectName: x.Key,
+                    UsedPackageNames: GetUsedPackageNames(x.Value, distributedProjectNames)))
+                .Where(x => x.UsedPackageNames.Count > 0)
+        ];
+
+        List<string> failedProjectNames = [];
+        for (int i = 0; i < projects.Count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            (string projectName, List<string> usedPackageNames) = projects[i];
+            StShared.ConsoleWriteInformationLine(_logger, true,
+                $"Distributing packages to project {projectName} ({i + 1}/{projects.Count})");
+
+            if (!await _steps.DistributePackagesToProject(projectName, usedPackageNames, cancellationToken))
+            {
+                StShared.WriteErrorLine($"Package distribution failed for project {projectName}", true, _logger);
+                failedProjectNames.Add(projectName);
+            }
+        }
+
+        if (failedProjectNames.Count == 0)
+        {
+            return true;
+        }
+
+        StShared.WriteErrorLine(
+            $"Distribute all packages finished with errors. Packages were not distributed to projects: {string.Join(", ", failedProjectNames)}",
+            true, _logger);
+        return false;
+    }
+
+    //ამ გაშვების ის პაკეტები, რომელთა რეპოზიტორიებიც პროექტის გიტების სიაშია, დამუშავების რიგით
+    private static List<string> GetUsedPackageNames(ProjectModel project, IEnumerable<string> distributedProjectNames)
+    {
+        return [.. distributedProjectNames.Where(x => project.GitProjectNames.Contains(x))];
+    }
+
+    //პირველი სინქრონიზაციის commit-ის მესიჯი. პროექტის git-ებში ცვლილებებს ძირითადად სინქრონიზაციის წინ მიღებული
+    //ამ გაშვების პაკეტები ტოვებს, ამიტომ მესიჯი მათ ასახელებს
+    internal static string CreateSyncCommitMessage(string projectName, IReadOnlyCollection<string> usedPackageNames)
+    {
         return usedPackageNames.Count == 0
             ? $"Distribute all packages: before {projectName} package"
             : $"Distribute all packages: use new {string.Join(", ", usedPackageNames)} packages in {projectName}";
