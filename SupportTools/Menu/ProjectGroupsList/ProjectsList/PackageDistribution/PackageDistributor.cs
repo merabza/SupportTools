@@ -431,20 +431,22 @@ public sealed class PackageDistributor
         return !hadErrors;
     }
 
+    private async Task<string?> GetPackageBaseAddress(string server, CancellationToken cancellationToken)
+    {
+        _packageBaseAddress ??= await FindPackageBaseAddress(_httpClientFactory, server, _logger, cancellationToken);
+        return _packageBaseAddress;
+    }
+
     //flat container-ის საბაზისო მისამართის დადგენა სერვერის service index-იდან.
     //სხვადასხვა სერვერს ეს მისამართი სხვადასხვა აქვს (მაგალითად BaGetter-ს /v3/package/, nuget.org-ს /v3-flatcontainer/),
     //ამიტომ მისი აღმოჩენა ხდება PackageBaseAddress რესურსით
-    private async Task<string?> GetPackageBaseAddress(string server, CancellationToken cancellationToken)
+    internal static async Task<string?> FindPackageBaseAddress(IHttpClientFactory httpClientFactory, string server,
+        ILogger logger, CancellationToken cancellationToken)
     {
-        if (_packageBaseAddress is not null)
-        {
-            return _packageBaseAddress;
-        }
-
         var serviceIndexUri = new Uri(NugetServerUrls.GetServiceIndexUrl(server));
 
         // ReSharper disable once using
-        using HttpClient client = _httpClientFactory.CreateClient();
+        using HttpClient client = httpClientFactory.CreateClient();
         // ReSharper disable once using
         using HttpResponseMessage response = await client.GetAsync(serviceIndexUri, cancellationToken);
 
@@ -452,7 +454,7 @@ public sealed class PackageDistributor
         {
             StShared.WriteErrorLine(
                 $"Cannot get nuget service index {serviceIndexUri}. Status code is {response.StatusCode}", true,
-                _logger);
+                logger);
             return null;
         }
 
@@ -463,12 +465,11 @@ public sealed class PackageDistributor
         if (string.IsNullOrWhiteSpace(packageBaseAddress))
         {
             StShared.WriteErrorLine(
-                $"PackageBaseAddress resource does not found in nuget service index {serviceIndexUri}", true, _logger);
+                $"PackageBaseAddress resource does not found in nuget service index {serviceIndexUri}", true, logger);
             return null;
         }
 
-        _packageBaseAddress = packageBaseAddress.TrimEnd('/');
-        return _packageBaseAddress;
+        return packageBaseAddress.TrimEnd('/');
     }
 
     //პაკეტის უახლესი ვერსიის მოძიება ლოკალურ პაკეტების სერვერზე flat container-ის საშუალებით
@@ -527,7 +528,7 @@ public sealed class PackageDistributor
 
     //ამ სისტემის მიერ შექმნილი ვერსიები 4-ნაწილიანი რიცხვითი ვერსიებია, ამიტომ მაქსიმალურის ასარჩევად გამოიყენება Version.
     //თუ რომელიმე ვერსია ამ ფორმატს არ ემთხვევა, გამოიყენება სიის ბოლო ელემენტი (სერვერი ვერსიებს ზრდადობით აბრუნებს)
-    private static string GetLatestVersion(List<string> versions)
+    internal static string GetLatestVersion(List<string> versions)
     {
         var parsedVersions = new List<(Version Parsed, string Original)>();
         foreach (string version in versions)

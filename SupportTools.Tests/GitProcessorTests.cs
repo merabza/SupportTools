@@ -361,6 +361,36 @@ public sealed class GitProcessorTests : IDisposable
         Assert.True(result.IsFailure);
     }
 
+    [Fact]
+    public void GetHeadCommitId_WhenRepositoryHasCommits_ReturnsTheFullIdWithoutTheLineBreak()
+    {
+        // Arrange
+        string clone = CloneRemote(CreateRemote(), "Mine");
+        CommitFile(clone, "Mine.txt");
+
+        // Act
+        Result<string> result = CreateSut(clone).GetHeadCommitId();
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(RunGit("-C", clone, "rev-parse", "HEAD"), result.Value);
+        Assert.Equal(40, result.Value.Length);
+        Assert.Equal(string.Empty, _consoleOutput.ToString());
+    }
+
+    [Fact]
+    public void GetHeadCommitId_WhenRepositoryHasNoCommit_ReturnsTheError()
+    {
+        // Arrange
+        string repository = InitRepository("Local");
+
+        // Act
+        Result<string> result = CreateSut(repository).GetHeadCommitId();
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
     //the message reaches git as one argument, whatever quotes and backslashes it holds
     [Fact]
     public void Commit_WhenChangesAreStaged_CommitsThemWithTheExactMessage()

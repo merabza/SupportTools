@@ -187,6 +187,19 @@ fi*/
         return result.Value.Item1.Trim(Environment.NewLine.ToCharArray());
     }
 
+    //მიმდინარე commit-ის სრული იდენტიფიკატორი
+    public Result<string> GetHeadCommitId()
+    {
+        Result<(string, int)> result =
+            StShared.RunProcessWithOutput(false, null, _git, $"{_switchToProjectPath} rev-parse HEAD");
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        return result.Value.Item1.Trim();
+    }
+
     public bool Commit(string commitMessage)
     {
         if (StShared.RunProcess(_useConsole, _logger, _git,

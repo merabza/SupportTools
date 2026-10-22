@@ -61,6 +61,18 @@ public sealed class PackageDistributionStepsTests : IDisposable
         Assert.Contains("Sync Multiple Projects Gits V3 Started", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
+    //a project that is not registered has nothing to compare: its packages are built, and the build steps report it
+    [Fact]
+    public async Task GetUnchangedUploadedPackageVersion_WhenProjectIsNotRegistered_ReturnsNullWithoutAWord()
+    {
+        // Act
+        string? result = await _sut.GetUnchangedUploadedPackageVersion("Missing", CancellationToken.None);
+
+        // Assert
+        Assert.Null(result);
+        Assert.Equal(string.Empty, _consoleOutput.ToString());
+    }
+
     //the result is the one the build check writes into the menu parameters
     [Theory]
     [InlineData(false)]

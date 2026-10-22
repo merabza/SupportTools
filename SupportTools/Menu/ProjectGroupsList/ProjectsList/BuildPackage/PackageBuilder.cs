@@ -152,9 +152,7 @@ public sealed class PackageBuilder
     private Dictionary<string, string> RemoveOtherRepositoriesPackages(string solutionFolder, string outputFolderPath,
         string packageVersion)
     {
-        HashSet<string> ownProjectNames = Directory
-            .EnumerateFiles(solutionFolder, "*.csproj", SearchOption.AllDirectories)
-            .Select(Path.GetFileNameWithoutExtension).OfType<string>().ToHashSet(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> ownProjectNames = GetOwnProjectNames(solutionFolder);
 
         string packageFileNameSuffix = $".{packageVersion}.nupkg";
         var ownPackageFiles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -182,6 +180,14 @@ public sealed class PackageBuilder
         }
 
         return ownPackageFiles;
+    }
+
+    //ამ რეპოზიტორიის პროექტების სახელები: solution-ის ფოლდერში მდებარე csproj ფაილების სახელები. მათი პაკეტების
+    //სახელები ამ სახელებს ემთხვევა
+    internal static HashSet<string> GetOwnProjectNames(string solutionFolder)
+    {
+        return Directory.EnumerateFiles(solutionFolder, "*.csproj", SearchOption.AllDirectories)
+            .Select(Path.GetFileNameWithoutExtension).OfType<string>().ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     //ProjectReference პაკეტის დამოკიდებულებად ამავე ვერსიით იწერება. თუ ის ამ რეპოზიტორიის შექმნილი პაკეტი არ არის,

@@ -45,7 +45,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
     protected override ValueTask<string?> GetActionDescription(CancellationToken cancellationToken = default)
     {
         return ValueTask.FromResult<string?>(
-            "This process will sync gits, check build, check solution, build and distribute packages for all package type projects, ordered by package dependencies");
+            "This process will sync gits, check build, check solution, build and distribute packages for all package type projects, ordered by package dependencies. Packages that have not changed since their last upload are not built and uploaded again");
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
@@ -90,6 +90,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
 
         int processedCount = 0;
         List<string> distributedProjectNames = [];
+        List<string> unchangedProjectNames = [];
         foreach (string projectName in orderedProjectNames)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -98,7 +99,7 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
 
             //ნებისმიერი ნაბიჯის ჩავარდნა აჩერებს პროექტების დამუშავების მთლიან ციკლს
             if (!await ProcessPackageProject(projectName, packageProjects[projectName], distributedProjectNames,
-                    cancellationToken))
+                    unchangedProjectNames, cancellationToken))
             {
                 StShared.WriteErrorLine(
                     $"Distribute all packages stopped on project {projectName}. Successfully processed {processedCount} of {orderedProjectNames.Count} package projects",
@@ -115,20 +116,25 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             return false;
         }
 
+        int unchangedCount = unchangedProjectNames.Count;
         if (_logger.IsEnabled(LogLevel.Information))
         {
-            _logger.LogInformation("Distribute all packages finished. Package projects processed: {ProcessedCount}",
-                processedCount);
+            _logger.LogInformation(
+                "Distribute all packages finished. Package projects processed: {ProcessedCount}, built and uploaded: {UploadedCount}, unchanged since the last upload: {UnchangedCount}",
+                processedCount, processedCount - unchangedCount, unchangedCount);
         }
 
-        Console.WriteLine($"Distribute all packages finished. Package projects processed: {processedCount}");
+        Console.WriteLine(
+            $"Distribute all packages finished. Package projects processed: {processedCount}, built and uploaded: {processedCount - unchangedCount}, unchanged since the last upload: {unchangedCount}");
         return true;
     }
 
     //ერთი პაკეტის პროექტის სრული დამუშავება: ამ გაშვების პაკეტების მიღება, სინქრონიზაცია, build-ის შემოწმება,
-    //სოლუშენის შემოწმება, პაკეტის დაბილდვა და ატვირთვა, ხელახალი სინქრონიზაცია
+    //სოლუშენის შემოწმება, პაკეტის დაბილდვა და ატვირთვა, ხელახალი სინქრონიზაცია. ბოლო ატვირთვის მერე შეუცვლელი პროექტი
+    //სინქრონიზაციის შემდეგ მხოლოდ სოლუშენის შემოწმებას გადის და unchangedProjectNames-ში ემატება
     private async Task<bool> ProcessPackageProject(string projectName, ProjectModel project,
-        IReadOnlyCollection<string> distributedProjectNames, CancellationToken cancellationToken)
+        IReadOnlyCollection<string> distributedProjectNames, List<string> unchangedProjectNames,
+        CancellationToken cancellationToken)
     {
         //ამ გაშვების პაკეტები, რომლებსაც პროექტი იყენებს, დამოკიდებულებების რიგით მის წინ დამუშავდა და უკვე დაფუშულია.
         //ამიტომ მათი კლონები პროექტის გვერდით საბოლოო მდგომარეობამდე ახლდება და restore ძველ და ახალ კლონებს
@@ -149,6 +155,23 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
             return false;
         }
 
+        //ბოლო ატვირთვის მერე შეუცვლელი პროექტის build აღარ მოწმდება, მისი პაკეტები აღარ იბილდება და აღარ იტვირთება:
+        //სერვერზე მათი უახლესი ვერსია რჩება, რომელსაც მომხმარებელი პროექტები იღებენ. სოლუშენის შემოწმება მაინც
+        //სრულდება, რადგან ის ამ კომპიუტერის NuGet-ის კონფიგურაციაში პაკეტების წყაროსაც ამოწმებს
+        string? unchangedVersion = await _steps.GetUnchangedUploadedPackageVersion(projectName, cancellationToken);
+        if (unchangedVersion is not null)
+        {
+            StShared.ConsoleWriteInformationLine(_logger, true,
+                $"Project {projectName} has not changed since its packages {unchangedVersion} were uploaded, build check, build and upload are skipped");
+            if (!CheckPackageSolution(projectName))
+            {
+                return false;
+            }
+
+            unchangedProjectNames.Add(projectName);
+            return true;
+        }
+
         //პროექტის build-ის შემოწმება (ინკრემენტული, კითხვის გარეშე). გაფრთხილებებით აგებული პროექტის გავრცელება არ ჩერდება
         ProjectBuildCheckResult? buildCheckResult = _steps.CheckBuild(projectName, project, false, cancellationToken);
         if (buildCheckResult is null || !buildCheckResult.IsBuildSucceeded)
@@ -160,9 +183,8 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         }
 
         //პაკეტის სოლუშენის შემოწმება
-        if (!_steps.CheckPackageSolution(projectName))
+        if (!CheckPackageSolution(projectName))
         {
-            StShared.WriteErrorLine($"Package solution check failed for project {projectName}", true, _logger);
             return false;
         }
 
@@ -182,6 +204,17 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         }
 
         return true;
+    }
+
+    private bool CheckPackageSolution(string projectName)
+    {
+        if (_steps.CheckPackageSolution(projectName))
+        {
+            return true;
+        }
+
+        StShared.WriteErrorLine($"Package solution check failed for project {projectName}", true, _logger);
+        return false;
     }
 
     //არაპაკეტური პროექტები ამ გაშვების პაკეტებს ბოლოს იღებენ, როცა ყველა პაკეტი უკვე დაფუშულია. მათი ცვლილებები

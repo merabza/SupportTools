@@ -12,8 +12,8 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu.DistributeAllPackages;
 
-//ნაბიჯები ნამდვილი ბრძანებებით: Sync ... Gits V3, ProjectBuildChecker, PackageSolutionChecker, PackageBuilder და
-//PackageDistributor, ისევე როგორც პროექტის მენიუს ცალკეული ბრძანებები
+//ნაბიჯები ნამდვილი ბრძანებებით: Sync ... Gits V3, UploadedPackageChecker, ProjectBuildChecker, PackageSolutionChecker,
+//PackageBuilder და PackageDistributor, ისევე როგორც პროექტის მენიუს ცალკეული ბრძანებები
 internal sealed class PackageDistributionSteps : IPackageDistributionSteps
 {
     private readonly string _appName;
@@ -40,6 +40,12 @@ internal sealed class PackageDistributionSteps : IPackageDistributionSteps
         var syncProjectGitsToolAction = SyncMultipleProjectsGitsToolActionV3.Create(_logger, _httpClientFactory,
             _parametersManager, null, projectName, true, commitMessage);
         return await syncProjectGitsToolAction.Run(cancellationToken);
+    }
+
+    public Task<string?> GetUnchangedUploadedPackageVersion(string projectName, CancellationToken cancellationToken)
+    {
+        var uploadedPackageChecker = new UploadedPackageChecker(_logger, _httpClientFactory, _parametersManager);
+        return uploadedPackageChecker.GetUnchangedUploadedVersion(projectName, cancellationToken);
     }
 
     //შედეგი ჩაიწერება მენიუს პარამეტრებში, ისევე როგორც Check ... build-ის ბრძანებებში. restore NuGet-ის HTTP

@@ -68,7 +68,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(
-            "This process will sync gits, check build, check solution, build and distribute packages for all package type projects, ordered by package dependencies",
+            "This process will sync gits, check build, check solution, build and distribute packages for all package type projects, ordered by package dependencies. Packages that have not changed since their last upload are not built and uploaded again",
             result);
     }
 
@@ -156,15 +156,99 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Equal(
         [
-            "sync Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha",
-            "sync Beta", "build Beta noIncremental=False", "solution Beta", "package Beta", "final sync Beta"
+            "sync Alpha", "check Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha",
+            "final sync Alpha", "sync Beta", "check Beta", "build Beta noIncremental=False", "solution Beta",
+            "package Beta", "final sync Beta"
         ], _steps.Calls);
         string output = _consoleOutput.ToString();
         Assert.Contains("Processing package project Alpha (1/2)", output, StringComparison.Ordinal);
         Assert.Contains("Processing package project Beta (2/2)", output, StringComparison.Ordinal);
-        Assert.Contains("Distribute all packages finished. Package projects processed: 2", output,
+        Assert.Contains(
+            "Distribute all packages finished. Package projects processed: 2, built and uploaded: 2, unchanged since the last upload: 0",
+            output, StringComparison.Ordinal);
+        VerifyFinishedLogged(Times.Once(),
+            "Distribute all packages finished. Package projects processed: 2, built and uploaded: 2, unchanged since the last upload: 0");
+    }
+
+    //a package that has not changed since its last upload gets only its solution check after the first sync: the
+    //packages on the server stay the newest ones
+    [Fact]
+    public async Task RunBody_WhenAPackageHasNotChangedSinceItsLastUpload_SkipsItsBuildCheckBuildAndUpload()
+    {
+        // Arrange
+        AddProject("Alpha", EProjectType.IsPackage, true);
+        AddProject("Beta", EProjectType.IsPackage, true);
+        _steps.UnchangedVersions["Alpha"] = "1.0.5";
+        _logger.Setup(x => x.IsEnabled(LogLevel.Information)).Returns(true);
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(
+        [
+            "sync Alpha", "check Alpha", "solution Alpha", "sync Beta", "check Beta",
+            "build Beta noIncremental=False", "solution Beta", "package Beta", "final sync Beta"
+        ], _steps.Calls);
+        string output = _consoleOutput.ToString();
+        Assert.Contains(
+            "Project Alpha has not changed since its packages 1.0.5 were uploaded, build check, build and upload are skipped",
+            output, StringComparison.Ordinal);
+        Assert.DoesNotContain("Project Beta has not changed", output, StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages finished. Package projects processed: 2, built and uploaded: 1, unchanged since the last upload: 1",
+            output, StringComparison.Ordinal);
+        VerifyFinishedLogged(Times.Once(),
+            "Distribute all packages finished. Package projects processed: 2, built and uploaded: 1, unchanged since the last upload: 1");
+    }
+
+    //the projects that use an unchanged package still take it: a run that stopped earlier may have uploaded it without
+    //distributing it, and a project that already has its newest version does not change
+    [Fact]
+    public async Task RunBody_WhenAPackageHasNotChanged_StillDistributesItToTheProjectsThatUseIt()
+    {
+        // Arrange
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("Alpha", EProjectType.IsPackage, true, "Alpha", "Core");
+        AddProject("App", EProjectType.Standard, true, "App", "Core");
+        _steps.UnchangedVersions["Core"] = "1.0.5";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(
+        [
+            "sync Core", "check Core", "solution Core", "distribute Core to Alpha", "sync Alpha", "check Alpha",
+            "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha",
+            "distribute Core to App"
+        ], _steps.Calls);
+        Assert.Equal("Distribute all packages: use new Core packages in Alpha", _steps.CommitMessages[1]);
+    }
+
+    //the solution check of an unchanged package fails like the one of a package that is built
+    [Fact]
+    public async Task RunBody_WhenTheSolutionCheckOfAnUnchangedPackageFails_StopsTheRun()
+    {
+        // Arrange
+        AddProject("Alpha", EProjectType.IsPackage, true);
+        AddProject("Beta", EProjectType.IsPackage, true);
+        _steps.UnchangedVersions["Alpha"] = "1.0.5";
+        _steps.FailingStep = "solution";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(["sync Alpha", "check Alpha", "solution Alpha"], _steps.Calls);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("Package solution check failed for project Alpha", output, StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages stopped on project Alpha. Successfully processed 0 of 2 package projects", output,
             StringComparison.Ordinal);
-        VerifyFinishedLogged(Times.Once());
     }
 
     [Fact]
@@ -177,7 +261,8 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         await CliMenuTestAccess.InvokeRunBody(CreateSut());
 
         // Assert
-        VerifyFinishedLogged(Times.Never());
+        VerifyFinishedLogged(Times.Never(),
+            "Distribute all packages finished. Package projects processed: 1, built and uploaded: 1, unchanged since the last upload: 0");
     }
 
     //a package built with warnings is still distributed
@@ -199,10 +284,10 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
     //the first step that fails stops the whole run, with its own message
     [Theory]
     [InlineData("sync", "Sync gits failed for project Alpha", 1)]
-    [InlineData("build", "Build check failed for project Alpha with status BuildFailed, errors: 2", 2)]
-    [InlineData("solution", "Package solution check failed for project Alpha", 3)]
-    [InlineData("package", "Build package failed for project Alpha", 4)]
-    [InlineData("final sync", "Final sync gits failed for project Alpha", 5)]
+    [InlineData("build", "Build check failed for project Alpha with status BuildFailed, errors: 2", 3)]
+    [InlineData("solution", "Package solution check failed for project Alpha", 4)]
+    [InlineData("package", "Build package failed for project Alpha", 5)]
+    [InlineData("final sync", "Final sync gits failed for project Alpha", 6)]
     public async Task RunBody_WhenAStepFails_ReportsItAndStopsTheRun(string failingStep, string expectedMessage,
         int expectedCallCount)
     {
@@ -319,10 +404,10 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Equal(
         [
-            "sync Core", "build Core noIncremental=False", "solution Core", "package Core", "final sync Core",
-            "distribute Core to Util", "sync Util", "build Util noIncremental=False", "solution Util",
-            "package Util", "final sync Util", "distribute Core, Util to Alpha", "sync Alpha",
-            "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha"
+            "sync Core", "check Core", "build Core noIncremental=False", "solution Core", "package Core",
+            "final sync Core", "distribute Core to Util", "sync Util", "check Util", "build Util noIncremental=False",
+            "solution Util", "package Util", "final sync Util", "distribute Core, Util to Alpha", "sync Alpha",
+            "check Alpha", "build Alpha noIncremental=False", "solution Alpha", "package Alpha", "final sync Alpha"
         ], _steps.Calls);
     }
 
@@ -376,8 +461,9 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         string output = _consoleOutput.ToString();
         Assert.Contains("Distributing packages to project App (1/2)", output, StringComparison.Ordinal);
         Assert.Contains("Distributing packages to project Web (2/2)", output, StringComparison.Ordinal);
-        Assert.Contains("Distribute all packages finished. Package projects processed: 2", output,
-            StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages finished. Package projects processed: 2, built and uploaded: 2, unchanged since the last upload: 0",
+            output, StringComparison.Ordinal);
     }
 
     //all the packages are already uploaded, so one failed project does not stop the others, but the run fails
@@ -499,21 +585,20 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         };
     }
 
-    private void VerifyFinishedLogged(Times times)
+    private void VerifyFinishedLogged(Times times, string message)
     {
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
         _logger.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
-            It.Is<It.IsAnyType>((value, _) =>
-                value.ToString() == "Distribute all packages finished. Package projects processed: 2" ||
-                value.ToString() == "Distribute all packages finished. Package projects processed: 1"),
-            It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+            It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
 
     //records every step; a step named FailingStep fails for FailingProject (or for every project when it is null).
     //The first sync of a project is "sync", the second one "final sync"; a distribution is "distribute" for the project
-    //that takes the packages
+    //that takes the packages; "check" asks whether a package has changed since its last upload, which only the projects
+    //in UnchangedVersions have not
     private sealed class FakePackageDistributionSteps : IPackageDistributionSteps
     {
         private readonly HashSet<string> _syncedProjectNames = [];
@@ -523,6 +608,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         public string? FailingStep { get; set; }
         public string? FailingProject { get; set; }
         public ProjectBuildCheckResult? BuildResult { get; set; } = new(EProjectBuildCheckStatus.Success);
+        public Dictionary<string, string> UnchangedVersions { get; } = [];
 
         public Task<bool> SyncProjectGits(string projectName, string commitMessage,
             CancellationToken cancellationToken)
@@ -530,6 +616,13 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
             CommitMessages.Add(commitMessage);
             string step = _syncedProjectNames.Add(projectName) ? "sync" : "final sync";
             return Task.FromResult(Run(step, projectName));
+        }
+
+        public Task<string?> GetUnchangedUploadedPackageVersion(string projectName,
+            CancellationToken cancellationToken)
+        {
+            Calls.Add($"check {projectName}");
+            return Task.FromResult(UnchangedVersions.GetValueOrDefault(projectName));
         }
 
         public ProjectBuildCheckResult? CheckBuild(string projectName, ProjectModel project, bool noIncremental,
