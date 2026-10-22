@@ -51,6 +51,9 @@ internal static class TableDataTransferrer
 
         bool hasIdentity = insertableFields.Any(f => identityColumns.Contains(f.DevFieldName));
 
+        //საკუთარ თავზე მიმართვები (მაგ. DataTypes → DataTypes) ჩაწერის შემდეგ ივსება
+        List<SeederSelfReference> selfReferences = [];
+
         string tableLabel = $"{pt.DevSchemaName}.{pt.DevTableName}";
         //შერწყმისა და დიაგნოსტიკის გასაღები: pairs ფაილში მითითებული ბუნებრივი გასაღები, თუ ცარიელია — Dev-ის პირველადი გასაღები
         IReadOnlyList<string> keyFieldNames = pt.KeyFieldNames.Count > 0 ? pt.KeyFieldNames : primaryKeyColumns;
@@ -80,8 +83,8 @@ internal static class TableDataTransferrer
             }
 
             List<Dictionary<string, object?>>? convertorData = await LoadConvertorRowsAsync(convertorProjectFilePath,
-                prodCopyConnectionString, devConnectionString, pt, insertableFields, commandTimeOut, logger,
-                cancellationToken);
+                prodCopyConnectionString, devConnectionString, pt, insertableFields, selfReferences, commandTimeOut,
+                logger, cancellationToken);
             if (convertorData is null)
             {
                 return 0;
@@ -89,8 +92,11 @@ internal static class TableDataTransferrer
 
             convertorData = UniqueIndexCollisionResolver.Resolve(convertorData, insertableFields, identityColumns,
                 uniqueIndexes, keyFieldNames, tableLabel, null, logger);
-            return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
+            long convertorCount = await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
                 identityColumns, hasIdentity, commandTimeOut, convertorData, logger, cancellationToken);
+            await SeederRulesReferenceResolver.ApplySelfReferencesAsync(devConnectionString, pt, selfReferences,
+                convertorData, commandTimeOut, logger, cancellationToken);
+            return convertorCount;
         }
 
         //დარჩენილი სამივე ვარიანტი მოითხოვს SeederRules-ის გაშვებას
@@ -111,7 +117,7 @@ internal static class TableDataTransferrer
 
         //SeederRules-ის JSON-ში FK მიმართვები გასაღების სტრიქონებითაა — ჩაწერამდე Dev ბაზის ID-ებით უნდა ჩანაცვლდეს
         if (!await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields, rulesData,
-                commandTimeOut, logger, cancellationToken))
+                selfReferences, commandTimeOut, logger, cancellationToken))
         {
             return 0;
         }
@@ -121,15 +127,18 @@ internal static class TableDataTransferrer
         {
             rulesData = UniqueIndexCollisionResolver.Resolve(rulesData, insertableFields, identityColumns,
                 uniqueIndexes, keyFieldNames, tableLabel, null, logger);
-            return await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
+            long rulesCount = await BulkInsertRowsAdjustingIdentityAsync(devConnectionString, pt, insertableFields,
                 identityColumns, hasIdentity, commandTimeOut, rulesData, logger, cancellationToken);
+            await SeederRulesReferenceResolver.ApplySelfReferencesAsync(devConnectionString, pt, selfReferences,
+                rulesData, commandTimeOut, logger, cancellationToken);
+            return rulesCount;
         }
 
         //SeederRulesHasMorePriority ან DatabaseDataHasMorePriority — ორივე წყაროდან ჩატვირთვა და Adjust;
         //კონვერტორის შემთხვევაში ბაზის მხარის მწკრივები ProdCopy-ის პირდაპირი წაკითხვის ნაცვლად კონვერტორისგან მოდის
         List<Dictionary<string, object?>>? dbData = convertorProjectFilePath is not null
             ? await LoadConvertorRowsAsync(convertorProjectFilePath, prodCopyConnectionString, devConnectionString, pt,
-                insertableFields, commandTimeOut, logger, cancellationToken)
+                insertableFields, selfReferences, commandTimeOut, logger, cancellationToken)
             : await ProdCopyTableReader.ReadAsync(prodCopyDataProvider, prodCopyConnectionString, pt, insertableFields,
                 logger, cancellationToken);
         if (dbData is null)
@@ -157,8 +166,11 @@ internal static class TableDataTransferrer
             FillMissingIdentityValues(insertableFields, identityColumns, dataToInsert);
         }
 
-        return await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut,
-            dataToInsert, cancellationToken);
+        long mergedCount = await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity,
+            commandTimeOut, dataToInsert, cancellationToken);
+        await SeederRulesReferenceResolver.ApplySelfReferencesAsync(devConnectionString, pt, selfReferences,
+            dataToInsert, commandTimeOut, logger, cancellationToken);
+        return mergedCount;
     }
 
     //ProdCopy → Dev streaming SqlBulkCopy-ით (არსებული ქცევა OnlyDatabase-სთვის)
@@ -249,8 +261,8 @@ internal static class TableDataTransferrer
     //(ასეთი ველების გარეშე ამომხსნელი უმოქმედოა)
     private static async Task<List<Dictionary<string, object?>>?> LoadConvertorRowsAsync(
         string convertorProjectFilePath, string prodCopyConnectionString, string devConnectionString, PairedTable pt,
-        IReadOnlyList<PairedField> insertableFields, int commandTimeOut, ILogger logger,
-        CancellationToken cancellationToken)
+        IReadOnlyList<PairedField> insertableFields, List<SeederSelfReference> selfReferences, int commandTimeOut,
+        ILogger logger, CancellationToken cancellationToken)
     {
         List<Dictionary<string, object?>>? rows = OldDataConvertorRunner.Run(convertorProjectFilePath, pt.DevTableName,
             prodCopyConnectionString, logger);
@@ -260,7 +272,7 @@ internal static class TableDataTransferrer
         }
 
         bool resolved = await SeederRulesReferenceResolver.ResolveAsync(devConnectionString, pt, insertableFields, rows,
-            commandTimeOut, logger, cancellationToken);
+            selfReferences, commandTimeOut, logger, cancellationToken);
         return resolved ? rows : null;
     }
 

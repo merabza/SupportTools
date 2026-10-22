@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -185,6 +186,7 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
         Dictionary<(string DevSchemaName, string DevTableName), PairedTable> pairsByDevKey =
             pairs.PairedTables.Values.ToDictionary(p => (p.DevSchemaName, p.DevTableName), p => p);
         long totalRows = 0;
+        List<string> failedTables = [];
         var stopwatch = Stopwatch.StartNew();
         foreach ((string Schema, string Table) node in sortResult.Ordered!)
         {
@@ -218,11 +220,25 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                     pt.DevSchemaName, pt.DevTableName, insertable.Count, hasIdentity);
             }
 
-            long rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyDataProvider,
-                Parameters.ProdCopyConnectionString, Parameters.DevConnectionString, pt, insertable,
-                meta.IdentityColumns, Parameters.CommandTimeOut, meta.PrimaryKeyColumns, meta.UniqueIndexes,
-                Parameters.DataSeederRulesByTableStartupProjectFilePath, Parameters.OldDataConvertorForDataSeeder,
-                _logger, cancellationToken);
+            long rows;
+            try
+            {
+                rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyDataProvider,
+                    Parameters.ProdCopyConnectionString, Parameters.DevConnectionString, pt, insertable,
+                    meta.IdentityColumns, Parameters.CommandTimeOut, meta.PrimaryKeyColumns, meta.UniqueIndexes,
+                    Parameters.DataSeederRulesByTableStartupProjectFilePath, Parameters.OldDataConvertorForDataSeeder,
+                    _logger, cancellationToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                //ერთი ცხრილის შეცდომა (მაგ. NOT NULL სვეტი, რომელსაც წყარო არ ავსებს) დანარჩენ ცხრილებს არ აჩერებს —
+                //ბოლოს ყველა ჩავარდნილი ცხრილი ერთად ჩამოითვლება
+                StShared.WriteException(ex, $"Failed to transfer {pt.DevSchemaName}.{pt.DevTableName}", true, _logger,
+                    false);
+                failedTables.Add($"{pt.DevSchemaName}.{pt.DevTableName}");
+                continue;
+            }
+
             totalRows += rows;
 
             if (_logger.IsEnabled(LogLevel.Information))
@@ -230,6 +246,17 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
                 _logger.LogInformation("Copied {Rows} rows to {Schema}.{Table}", rows, pt.DevSchemaName,
                     pt.DevTableName);
             }
+        }
+
+        if (failedTables.Count > 0)
+        {
+            //კავშირების შემოწმება აკლებული მშობელი ცხრილების გამო მხოლოდ შედეგად მიღებულ შეცდომებს გაიმეორებდა
+            StShared.WriteErrorLine(
+                $"Transfer failed for {failedTables.Count} of {pairs.PairedTables.Count} tables:\n" +
+                string.Join("\n", failedTables.Select(t => $"  - {t}")) +
+                "\nForeign keys were not revalidated. Fix the errors, run 'Recreate Dev Database', then try again.",
+                true, _logger, false);
+            return false;
         }
 
         //11. ბალკ-ჩატვირთვა კავშირებს (FK) შემოწმების გარეშე წერს და ისინი untrusted ხდება —
