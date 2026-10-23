@@ -7,7 +7,6 @@ using AppCliTools.CliParameters;
 using LibCodeGenerator.CodeCreators;
 using LibCodeGenerator.Helpers;
 using LibCodeGenerator.ToolCommands.GenerateApiRoutes;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
 using LibGitWork.Models;
@@ -80,7 +79,7 @@ public sealed class GenerateApiRoutesToolCommand : ToolCommand
         var gitRepos = GitRepos.Create(Logger, supportToolsParameters.Gits,
             project.SpaProjectFolderRelativePath(gitProjects), _useConsole, false);
 
-        foreach (string gitProjectName in _parameters.Project.GetGitProjectNamesByGitCollectionType(EGitCol.Main))
+        foreach (string gitProjectName in _parameters.Project.GitProjectNames)
         {
             string gitProjectFolder = Path.Combine(projectFolder, gitProjectName);
 

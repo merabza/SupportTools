@@ -137,8 +137,6 @@ public sealed class TemplateCruder : ParCruder<TemplateModel>
                 EnableFieldByName(nameof(TemplateModel.UseSignalR));
                 EnableFieldByName(nameof(TemplateModel.UseFluentValidation));
                 break;
-            case ESupportProjectType.ScaffoldSeeder:
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(supportProjectType), supportProjectType,
                     "Unsupported project type");

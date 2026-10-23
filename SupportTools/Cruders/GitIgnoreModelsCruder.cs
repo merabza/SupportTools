@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.Cruders;
-using LibGitData;
 using LibGitData.Models;
 using LibSupportToolsServerWork.Registry.Adapters;
 using Microsoft.Extensions.Logging;
@@ -76,27 +74,18 @@ public sealed class GitIgnoreModelsCruder : SimpleNamesListCruder
 
         foreach ((string _, ProjectModel project) in projects)
         {
-            foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())
+            Dictionary<string, GitDataModel> gits = supportToolsParameters.Gits;
+            //პარამეტრების ფაილში git-ების სიის ნაცვლად შეიძლება null იყოს
+            foreach (string gitProjectName in project.GitProjectNames ?? [])
             {
-                Dictionary<string, GitDataModel> gits = supportToolsParameters.Gits;
-                List<string> gitProjectNames = gitCol switch
+                if (!gits.TryGetValue(gitProjectName, out GitDataModel? git))
                 {
-                    EGitCol.Main => project.GitProjectNames,
-                    EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-                    _ => null
-                } ?? [];
+                    continue;
+                }
 
-                foreach (string gitProjectName in gitProjectNames)
+                if (git.GitIgnorePatternName == name)
                 {
-                    if (!gits.TryGetValue(gitProjectName, out GitDataModel? git))
-                    {
-                        continue;
-                    }
-
-                    if (git.GitIgnorePatternName == name)
-                    {
-                        usageCount++;
-                    }
+                    usageCount++;
                 }
             }
         }

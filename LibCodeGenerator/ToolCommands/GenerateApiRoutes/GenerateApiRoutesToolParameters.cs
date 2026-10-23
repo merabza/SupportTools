@@ -27,9 +27,9 @@ public sealed class GenerateApiRoutesToolParameters : IParameters
     {
         try
         {
-            var externalScaffoldSeedToolParameters = new GenerateApiRoutesToolParameters(projectName,
+            var generateApiRoutesToolParameters = new GenerateApiRoutesToolParameters(projectName,
                 supportToolsParameters.GetProjectRequired(projectName));
-            return externalScaffoldSeedToolParameters;
+            return generateApiRoutesToolParameters;
         }
         catch (Exception e)
         {

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using LibGitData;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibApiClientParameters;
@@ -22,8 +21,6 @@ public sealed class SupportToolsParametersTests : IDisposable
 {
     private const string ProjectName = "FakeProject";
     private const string GitName = "FakeGit";
-    private const string SeederGitName = "FakeSeederGit";
-    private const EGitCol UnknownGitCol = (EGitCol)99;
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
@@ -35,9 +32,7 @@ public sealed class SupportToolsParametersTests : IDisposable
         _project = new ProjectModel
         {
             ProjectFolderName = @"D:\Work\FakeProject",
-            ScaffoldSeederProjectName = "FakeSeeder",
             GitProjectNames = [GitName, "OtherGit"],
-            ScaffoldSeederGitProjectNames = [SeederGitName],
             FrontNpmPackageNames = ["react"],
             ServerInfos = { ["Server|Prod"] = new ServerInfoModel { ServerName = "Server" } }
         };
@@ -165,79 +160,44 @@ public sealed class SupportToolsParametersTests : IDisposable
     public void DeleteGitFromProjectByNames_WhenProjectDoesNotExist_ReturnsFalse()
     {
         // Act
-        bool result = _sut.DeleteGitFromProjectByNames("MissingProject", GitName, EGitCol.Main);
+        bool result = _sut.DeleteGitFromProjectByNames("MissingProject", GitName);
 
         // Assert
         Assert.False(result);
     }
 
     [Fact]
-    public void DeleteGitFromProjectByNames_WhenMainGit_RemovesItFromProjectGits()
+    public void DeleteGitFromProjectByNames_WhenProjectExists_RemovesItFromProjectGits()
     {
         // Arrange
         string[] expected = ["OtherGit"];
 
         // Act
-        bool result = _sut.DeleteGitFromProjectByNames(ProjectName, GitName, EGitCol.Main);
+        bool result = _sut.DeleteGitFromProjectByNames(ProjectName, GitName);
 
         // Assert
         Assert.True(result);
         Assert.Equal(expected, _project.GitProjectNames);
-        Assert.Single(_project.ScaffoldSeederGitProjectNames);
-    }
-
-    [Fact]
-    public void DeleteGitFromProjectByNames_WhenScaffoldSeederGit_RemovesItFromSeederGits()
-    {
-        // Act
-        bool result = _sut.DeleteGitFromProjectByNames(ProjectName, SeederGitName, EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.True(result);
-        Assert.Empty(_project.ScaffoldSeederGitProjectNames);
-        Assert.Equal(2, _project.GitProjectNames.Count);
-    }
-
-    [Fact]
-    public void DeleteGitFromProjectByNames_WhenGitCollectionIsUnknown_ReturnsFalseWithoutChanges()
-    {
-        // Act
-        bool result = _sut.DeleteGitFromProjectByNames(ProjectName, GitName, UnknownGitCol);
-
-        // Assert
-        Assert.False(result);
-        Assert.Equal(2, _project.GitProjectNames.Count);
-        Assert.Single(_project.ScaffoldSeederGitProjectNames);
     }
 
     [Fact]
     public void GetGitProjectNames_WhenProjectDoesNotExist_ReturnsEmptyList()
     {
         // Act
-        List<string> result = _sut.GetGitProjectNames("MissingProject", EGitCol.Main);
+        List<string> result = _sut.GetGitProjectNames("MissingProject");
 
         // Assert
         Assert.Empty(result);
     }
 
     [Fact]
-    public void GetGitProjectNames_WhenMainGits_ReturnsProjectGits()
+    public void GetGitProjectNames_WhenProjectExists_ReturnsProjectGits()
     {
         // Act
-        List<string> result = _sut.GetGitProjectNames(ProjectName, EGitCol.Main);
+        List<string> result = _sut.GetGitProjectNames(ProjectName);
 
         // Assert
         Assert.Same(_project.GitProjectNames, result);
-    }
-
-    [Fact]
-    public void GetGitProjectNames_WhenScaffoldSeederGits_ReturnsSeederGits()
-    {
-        // Act
-        List<string> result = _sut.GetGitProjectNames(ProjectName, EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.Same(_project.ScaffoldSeederGitProjectNames, result);
     }
 
     [Fact]
@@ -427,17 +387,17 @@ public sealed class SupportToolsParametersTests : IDisposable
     public void GetGitsFolder_WhenProjectDoesNotExist_ReturnsNull()
     {
         // Act
-        string? result = _sut.GetGitsFolder("MissingProject", EGitCol.Main);
+        string? result = _sut.GetGitsFolder("MissingProject");
 
         // Assert
         Assert.Null(result);
     }
 
     [Fact]
-    public void GetGitsFolder_WhenMainGits_ReturnsProjectFolder()
+    public void GetGitsFolder_WhenProjectFolderIsSet_ReturnsProjectFolder()
     {
         // Act
-        string? result = _sut.GetGitsFolder(ProjectName, EGitCol.Main);
+        string? result = _sut.GetGitsFolder(ProjectName);
 
         // Assert
         Assert.Equal(@"D:\Work\FakeProject", result);
@@ -448,73 +408,17 @@ public sealed class SupportToolsParametersTests : IDisposable
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void GetGitsFolder_WhenMainGitsAndProjectFolderIsNotSet_ReportsItAndReturnsNull(string? projectFolderName)
+    public void GetGitsFolder_WhenProjectFolderIsNotSet_ReportsItAndReturnsNull(string? projectFolderName)
     {
         // Arrange
         _sut.Projects[ProjectName] = new ProjectModel { ProjectFolderName = projectFolderName };
 
         // Act
-        string? result = _sut.GetGitsFolder(ProjectName, EGitCol.Main);
+        string? result = _sut.GetGitsFolder(ProjectName);
 
         // Assert
         Assert.Null(result);
         Assert.Contains("ProjectFolderName must be specified", ConsoleText(), StringComparison.Ordinal);
-    }
-
-    //scaffold seeder gits live in {ScaffoldSeedersWorkFolder}\{ScaffoldSeederProjectName}\{ScaffoldSeederProjectName}ScaffoldSeeder
-    [Fact]
-    public void GetGitsFolder_WhenScaffoldSeederGits_ReturnsSeederFolder()
-    {
-        // Arrange
-        _sut.ScaffoldSeedersWorkFolder = @"D:\Seeders";
-
-        // Act
-        string? result = _sut.GetGitsFolder(ProjectName, EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.Equal(Path.Combine(@"D:\Seeders", "FakeSeeder", "FakeSeederScaffoldSeeder"), result);
-        Assert.Empty(ConsoleText());
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void GetGitsFolder_WhenScaffoldSeedersWorkFolderIsNotSet_ReturnsNull(string? scaffoldSeedersWorkFolder)
-    {
-        // Arrange
-        _sut.ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
-
-        // Act
-        string? result = _sut.GetGitsFolder(ProjectName, EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void GetGitsFolder_WhenScaffoldSeederProjectNameIsNotSet_ReportsItAndReturnsNull()
-    {
-        // Arrange
-        _sut.ScaffoldSeedersWorkFolder = @"D:\Seeders";
-        _project.ScaffoldSeederProjectName = null;
-
-        // Act
-        string? result = _sut.GetGitsFolder(ProjectName, EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.Null(result);
-        Assert.Contains("ScaffoldSeederProjectName must be specified", ConsoleText(), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void GetGitsFolder_WhenGitCollectionIsUnknown_ReturnsNull()
-    {
-        // Act
-        string? result = _sut.GetGitsFolder(ProjectName, UnknownGitCol);
-
-        // Assert
-        Assert.Null(result);
     }
 
     [Theory]

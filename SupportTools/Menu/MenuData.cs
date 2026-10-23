@@ -19,7 +19,6 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequence;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
@@ -29,7 +28,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Menu.RemoveUnusedPackageVersions;
 using SupportTools.Menu.ReversePackageDistribution;
@@ -114,13 +113,11 @@ public static class MenuData
         //პროექტის ამ კომპიუტერზე ჩამოტანა (მხოლოდ remote პროექტებისთვის)
         nameof(CloneProjectToThisComputerCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია
-        nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
+        nameof(SyncOneProjectAllGitsCliMenuCommandV2FactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია V3
-        nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3FactoryStrategy),
+        nameof(SyncOneProjectAllGitsCliMenuCommandV3FactoryStrategy),
         //პროექტის გიტების ჩამონათვალი და მართვა
         nameof(GitSubMenuCliMenuCommandFactoryStrategy),
-        //პროექტის Scaffold Seeder-ის გიტების ჩამონათვალი და მართვა
-        nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy),
         //პროექტის .editorconfig ფაილის ახალ შაბლონად შენახვა
         nameof(SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy),
         //დასაშვები ინსტრუმენტების არჩევის საშუალება

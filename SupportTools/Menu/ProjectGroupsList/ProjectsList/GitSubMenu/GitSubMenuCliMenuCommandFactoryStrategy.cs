@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using AppCliTools.CliMenu;
-using LibGitData;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
@@ -15,7 +14,6 @@ public class GitSubMenuCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new GitSubMenuCliMenuCommand(logger, httpClientFactory, parametersManager, menuParameters.ProjectName,
-            EGitCol.Main);
+        return new GitSubMenuCliMenuCommand(logger, httpClientFactory, parametersManager, menuParameters.ProjectName);
     }
 }

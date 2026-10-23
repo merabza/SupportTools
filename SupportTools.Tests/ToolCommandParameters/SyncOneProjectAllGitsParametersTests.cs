@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
 using LibGitWork.ToolCommandParameters;
@@ -14,7 +13,7 @@ using Xunit;
 namespace SupportTools.Tests.ToolCommandParameters;
 
 //project Front (folder D:\Projects\Front): gits FrontBack and FrontSpa ({SpaProjectFolderRelativePath}\ClientApp,
-//SpaProjectName FrontApp); ScaffoldSeeder git FrontSeeder
+//SpaProjectName FrontApp)
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
 {
@@ -39,15 +38,11 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
         {
             ProjectFolderName = ProjectFolder,
             SpaProjectName = "FrontApp",
-            ScaffoldSeederProjectName = ProjectName,
-            GitProjectNames = ["FrontBack", "FrontSpa"],
-            ScaffoldSeederGitProjectNames = ["FrontSeeder"]
+            GitProjectNames = ["FrontBack", "FrontSpa"]
         };
-        _parameters.ScaffoldSeedersWorkFolder = @"D:\Seeders";
         _parameters.Gits["FrontBack"] = CreateGit("FrontBack", "FrontBack");
         _parameters.Gits["FrontSpa"] =
             CreateGit("FrontSpa", $@"{GitDataModel.SpaProjectFolderRelativePathName}\ClientApp");
-        _parameters.Gits["FrontSeeder"] = CreateGit("FrontSeeder", "FrontSeeder");
         _parameters.Gits["Other"] = CreateGit("Other", "Other");
         _parameters.GitProjects["FrontApp"] = new GitProjectDataModel
         {
@@ -62,10 +57,10 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
     }
 
     [Fact]
-    public void Create_WhenMainGits_ReturnsTheProjectGitsAndTheGivenValues()
+    public void Create_WhenProjectExists_ReturnsTheProjectGitsAndTheGivenValues()
     {
         // Act
-        SyncOneProjectAllGitsParameters? result = Create(EGitCol.Main);
+        SyncOneProjectAllGitsParameters? result = Create();
 
         // Assert
         Assert.NotNull(result);
@@ -82,23 +77,10 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
     }
 
     [Fact]
-    public void Create_WhenScaffoldSeederGits_ReturnsTheSeederGitsAndFolder()
-    {
-        // Act
-        SyncOneProjectAllGitsParameters? result = Create(EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(Path.Combine(@"D:\Seeders", ProjectName, "FrontScaffoldSeeder"), result.GitsFolder);
-        Assert.Equal(["FrontSeeder"], result.GitData.Select(x => x.GitProjectFolderName));
-    }
-
-    [Fact]
     public void Create_WhenProjectDoesNotExist_ReportsItAndReturnsNull()
     {
         // Act
-        var result = SyncOneProjectAllGitsParameters.Create(null, _parameters,
-            "Missing", EGitCol.Main, null, false, true);
+        var result = SyncOneProjectAllGitsParameters.Create(null, _parameters, "Missing", null, false, true);
 
         // Assert
         Assert.Null(result);
@@ -109,10 +91,10 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
     public void Create_WhenGitsFolderIsUnknown_ReportsItAndReturnsNull()
     {
         // Arrange
-        _parameters.ScaffoldSeedersWorkFolder = null;
+        _parameters.Projects[ProjectName] = new ProjectModel { GitProjectNames = ["FrontBack"] };
 
         // Act
-        SyncOneProjectAllGitsParameters? result = Create(EGitCol.ScaffoldSeed);
+        SyncOneProjectAllGitsParameters? result = Create();
 
         // Assert
         Assert.Null(result);
@@ -126,7 +108,7 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
         _parameters.Gits.Remove("FrontBack");
 
         // Act
-        SyncOneProjectAllGitsParameters? result = Create(EGitCol.Main);
+        SyncOneProjectAllGitsParameters? result = Create();
 
         // Assert
         Assert.NotNull(result);
@@ -143,17 +125,16 @@ public sealed class SyncOneProjectAllGitsParametersTests : IDisposable
         _parameters.GitProjects.Clear();
 
         // Act
-        SyncOneProjectAllGitsParameters? result = Create(EGitCol.Main);
+        SyncOneProjectAllGitsParameters? result = Create();
 
         // Assert
         Assert.Null(result);
         AssertErrorLine(SpaProjectFolderHelperTests.MissingMessage);
     }
 
-    private SyncOneProjectAllGitsParameters? Create(EGitCol gitCol)
+    private SyncOneProjectAllGitsParameters? Create()
     {
-        return SyncOneProjectAllGitsParameters.Create(null, _parameters, ProjectName, gitCol, _changedGitProjects, true,
-            true);
+        return SyncOneProjectAllGitsParameters.Create(null, _parameters, ProjectName, _changedGitProjects, true, true);
     }
 
     private void AssertErrorLine(string expected)

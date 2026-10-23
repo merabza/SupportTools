@@ -23,7 +23,7 @@ public sealed class GitClearParameters : IParameters
     }
 
     //public static GitClearParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters,
-    //    string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
+    //    string projectName, string gitProjectName, bool useConsole)
     //{
     //    var project = supportToolsParameters.GetProject(projectName);
     //    if (project is null)
@@ -32,7 +32,7 @@ public sealed class GitClearParameters : IParameters
     //        return null;
     //    }
 
-    //    var gitProjectNames = project.GetGitProjectNames(gitCol);
+    //    var gitProjectNames = project.GitProjectNames;
 
     //    if (!gitProjectNames.Contains(gitProjectName))
     //    {
@@ -60,7 +60,7 @@ public sealed class GitClearParameters : IParameters
     //        return null;
     //    }
 
-    //    var gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+    //    var gitsFolder = supportToolsParameters.GetGitsFolder(projectName);
 
     //    if (gitsFolder != null)
     //        return new GitClearParameters(value, gitsFolder);

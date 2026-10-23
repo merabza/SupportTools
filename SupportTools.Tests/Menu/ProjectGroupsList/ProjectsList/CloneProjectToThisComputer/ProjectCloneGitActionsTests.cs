@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using LibGitData;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,7 +13,7 @@ using Xunit;
 namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 
 //runs the real git over a throwaway bare remote RepoA (a local path, no network) that holds the projects Lib and Core;
-//Lib references Core. Project App (folder {temp}\Projects\App) has the git RepoA and the ScaffoldSeeder git RepoA too
+//Lib references Core. Project App (folder {temp}\Projects\App) has the git RepoA
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class ProjectCloneGitActionsTests : IDisposable
 {
@@ -46,20 +45,13 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
             [@"Core\Core.csproj"] = """<Project Sdk="Microsoft.NET.Sdk" />"""
         });
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         _parameters.Gits["RepoA"] = new GitDataModel
         {
             GitProjectAddress = remote, GitProjectFolderName = "RepoA", GitIgnorePatternName = "CSharp"
         };
         _projectFolder = Path.Combine(_tempFolder, "Projects", "App");
         Directory.CreateDirectory(_projectFolder);
-        _parameters.Projects["App"] = new ProjectModel
-        {
-            ProjectFolderName = _projectFolder,
-            ScaffoldSeederProjectName = "App",
-            GitProjectNames = ["RepoA"],
-            ScaffoldSeederGitProjectNames = ["RepoA"]
-        };
+        _parameters.Projects["App"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["RepoA"] };
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
     }
 
@@ -109,7 +101,7 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
         AddGitWithoutAddress();
 
         // Act
-        CreateSut().SyncGit("App", EGitCol.Main, "RepoA");
+        CreateSut().SyncGit("App", "RepoA");
 
         // Assert
         Assert.Equal(2, CountOccurrences(_consoleOutput.ToString(), NoAddressMessage));
@@ -164,25 +156,13 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
     }
 
     [Fact]
-    public void SyncGit_WhenGitIsAMainGitOfTheProject_ClonesItIntoTheProjectFolder()
+    public void SyncGit_WhenGitIsAGitOfTheProject_ClonesItIntoTheProjectFolder()
     {
         // Act
-        CreateSut().SyncGit("App", EGitCol.Main, "RepoA");
+        CreateSut().SyncGit("App", "RepoA");
 
         // Assert
         Assert.True(File.Exists(Path.Combine(_projectFolder, "RepoA", "Lib", "Lib.csproj")));
-    }
-
-    [Fact]
-    public void SyncGit_WhenGitIsAScaffoldSeederGit_ClonesItIntoTheSeederFolder()
-    {
-        // Act
-        CreateSut().SyncGit("App", EGitCol.ScaffoldSeed, "RepoA");
-
-        // Assert
-        Assert.True(File.Exists(Path.Combine(_tempFolder, "Seeders", "App", "AppScaffoldSeeder", "RepoA", "Lib",
-            "Lib.csproj")));
-        Assert.False(Directory.Exists(Path.Combine(_projectFolder, "RepoA")));
     }
 
     //a git that the project does not have gives no sync, so not even the work folder is touched
@@ -193,7 +173,7 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
         _parameters.Projects["App"].GitProjectNames.Clear();
 
         // Act
-        CreateSut().SyncGit("App", EGitCol.Main, "RepoA");
+        CreateSut().SyncGit("App", "RepoA");
 
         // Assert
         Assert.False(Directory.Exists(Path.Combine(_projectFolder, "RepoA")));

@@ -60,8 +60,6 @@ public sealed class StoredFilesRegistrySyncAdapterTests : IDisposable
     public void GetLocalRecords_WhenRegistryPointsToFiles_GivesEveryExistingFileByItsCanonicalPath()
     {
         // Arrange
-        _project.SeedProjectParametersFilePath = WriteLocal(@"AppFake\Seed.json", "{}");
-        _project.PrepareProdCopyDatabaseProjectParametersFilePath = WriteLocal(@"AppFake\Prepare.json", "{}");
         _project.PairedDbObjectsResultFileName = WriteLocal(@"AppFake\Paired.json", "{}");
         _project.ServerInfos["one"] = new ServerInfoModel
         {
@@ -74,7 +72,8 @@ public sealed class StoredFilesRegistrySyncAdapterTests : IDisposable
         };
         _context.Parameters.Projects["AppEmpty"] = new ProjectModel
         {
-            SeedProjectParametersFilePath = " ", PairedDbObjectsResultFileName = string.Empty
+            PairedDbObjectsResultFileName = " ",
+            ServerInfos = { ["empty"] = new ServerInfoModel { AppSettingsJsonSourceFileName = string.Empty } }
         };
 
         // Act
@@ -83,8 +82,7 @@ public sealed class StoredFilesRegistrySyncAdapterTests : IDisposable
         // Assert
         string[] expected =
         [
-            KeyOf(@"AppFake\Merinson\appsettings.json"), KeyOf(AppSettings), KeyOf(@"AppFake\Paired.json"),
-            KeyOf(@"AppFake\Prepare.json"), KeyOf(@"AppFake\Seed.json")
+            KeyOf(@"AppFake\Merinson\appsettings.json"), KeyOf(AppSettings), KeyOf(@"AppFake\Paired.json")
         ];
         Assert.Equal(expected, result.Keys.Order(StringComparer.Ordinal));
         var contract = Assert.IsType<StoredFileContract>(result[KeyOf(AppSettings)]);

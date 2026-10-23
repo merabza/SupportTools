@@ -16,14 +16,13 @@ configurations, and keep dependencies up to date.
 
 ## Templates
 
-The template factory (`AppCreatorFactory`) currently produces four kinds:
+The template factory (`AppCreatorFactory`) currently produces three kinds:
 
 |Template|Output|
 |-|-|
 |`Console`|CLI application, optionally with database/repositories/migrations|
 |`Api`|REST API, optionally with database, carcass framework, identity, SignalR|
 |`Razor`|Server-rendered web app (minimal extra projects)|
-|`ScaffoldSeeder`|Listed but currently returns no creator — not functional|
 
 A `TemplateModel` controls the features each generated solution gets:
 database, menu support, HTTPS, React frontend, carcass, Identity,
@@ -154,8 +153,7 @@ project working directories.
 **What it does**
 
 * Iterates all projects (or a filtered subset)
-* Calls `Clear One Solution` for each Git collection, including
-scaffold seeder collections
+* Calls `Clear One Solution` for each project
 * Deletes the project working folders
 * Excludes the tool's own `bin/Debug` directory from deletion
 

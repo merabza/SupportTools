@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using AppCliTools.CliMenu;
-using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -13,7 +12,6 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 
 public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 {
-    private readonly EGitCol _gitCol;
     private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger _logger;
@@ -23,14 +21,12 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public GitSubMenuCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string projectName, EGitCol gitCol) : base(
-        gitCol == EGitCol.ScaffoldSeed ? "Git ScaffoldSeeder projects" : "Git", EMenuAction.LoadSubMenu)
+        IParametersManager parametersManager, string projectName) : base("Git", EMenuAction.LoadSubMenu)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
-        _gitCol = gitCol;
     }
 
     public override CliMenuSet GetSubMenu()
@@ -43,35 +39,30 @@ public sealed class GitSubMenuCliMenuCommand : CliMenuCommand
         //თითოული git ნაწილისათვის შემოწმდეს არის თუ არა რამე დასაკომიტებელი, თუ არის, დაკომიტდეს ავტომატური მესიჯის შემოთავაზებით და ახალი მესიჯის შეყვანის საშუალებით
         //მესიჯის შეყვანის შემდეგ გამოვიდეს შეკითხვა გავრცელდეს თუ არა იგივე მესიჯი სხვა დანარჩენ ცვლილებებზე თუ იქნება.
         //გიტის დაკომიტების მერე გაეშვას პული და ბოლოს პუში
-        gitSubMenuSet.AddMenuItem(
-            new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, _projectName, _gitCol));
+        gitSubMenuSet.AddMenuItem(new SyncOneProjectAllGitsCliMenuCommand(_logger, _parametersManager, _projectName));
 
-        if (_gitCol == EGitCol.Main) //მხოლოდ მთავარი ვარიანტისთვის არის შესაძლებელი ახალი გიტის დამატება ამოკლება
-        {
-            //გიტების ინფორმაციის ჩატვირთვა კლონირების ფაილიდან
-            gitSubMenuSet.AddMenuItem(new LoadGitsFromCloneFileCommand(_parametersManager, _projectName));
+        //გიტების ინფორმაციის ჩატვირთვა კლონირების ფაილიდან
+        gitSubMenuSet.AddMenuItem(new LoadGitsFromCloneFileCommand(_parametersManager, _projectName));
 
-            //გიტების ინფორმაციაზე დაყრდნობით კლონირების ფაილის შექმნა
-            gitSubMenuSet.AddMenuItem(new SaveGitsCloneFileCliMenuCommand(_parametersManager, _projectName));
-            //მომავალში სასურველი იქნება ბრენჩების შექმნის ათვისება და pull Request-ების ათვისება.
-        }
+        //გიტების ინფორმაციაზე დაყრდნობით კლონირების ფაილის შექმნა
+        gitSubMenuSet.AddMenuItem(new SaveGitsCloneFileCliMenuCommand(_parametersManager, _projectName));
+        //მომავალში სასურველი იქნება ბრენჩების შექმნის ათვისება და pull Request-ების ათვისება.
 
         //მენიუს ელემენტი, რომლის საშუალებითაც შესაძლებელია პროექტში გიტის ჩაგდება
-        var newGitCommand =
-            new NewGitCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName, _gitCol);
+        var newGitCommand = new NewGitCliMenuCommand(_logger, _httpClientFactory, _parametersManager, _projectName);
         gitSubMenuSet.AddMenuItem(newGitCommand);
 
         //იმ გიტების ჩამონათვალი, რომლებიც ამ პროექტში შედიან
         //თითოეულზე უნდა შეიძლებოდეს ქვემენიუში შესვლა, რომელიც საშუალებას მოგვცემს გიტის ეს კონკრეტული ნაწილი ამოვშალოთ პროექტიდან
         //ასევე შესაძელებელი უნდა იყოს გიტის დასინქრონიზება და ძირითადი ბრძანებების გაშვება
-        //string gitsFolder = parameters.GetGitsFolder(_projectName, _gitCol);
+        //string gitsFolder = parameters.GetGitsFolder(_projectName);
 
-        List<string> gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
+        List<string> gitProjectNames = parameters.GetGitProjectNames(_projectName);
 
         foreach (string gitProjectName in gitProjectNames.OrderBy(o => o))
         {
             gitSubMenuSet.AddMenuItem(new GitProjectSubMenuCliMenuCommand(_logger, _parametersManager, _projectName,
-                gitProjectName, _gitCol));
+                gitProjectName));
         }
 
         //მთავარ მენიუში გასვლა

@@ -274,16 +274,13 @@ public sealed class ProjectCloneChecksTests : IDisposable
         File.WriteAllText(existing, "{}");
         string appSettings = Path.Combine(_tempFolder, "appsettings.json");
         string paired = Path.Combine(_tempFolder, "paired.json");
-        var project = new ProjectModel
-        {
-            SeedProjectParametersFilePath = existing,
-            PrepareProdCopyDatabaseProjectParametersFilePath = " ",
-            PairedDbObjectsResultFileName = paired
-        };
-        project.ServerInfos["A"] = new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings };
-        project.ServerInfos["B"] =
+        var project = new ProjectModel { PairedDbObjectsResultFileName = paired };
+        project.ServerInfos["A"] = new ServerInfoModel { AppSettingsJsonSourceFileName = existing };
+        project.ServerInfos["B"] = new ServerInfoModel { AppSettingsJsonSourceFileName = " " };
+        project.ServerInfos["C"] = new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings };
+        project.ServerInfos["D"] =
             new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings.ToUpperInvariant() };
-        project.ServerInfos["C"] = new ServerInfoModel();
+        project.ServerInfos["E"] = new ServerInfoModel();
 
         // Act
         List<string> result = ProjectCloneChecks.GetMissingStoredFiles(project);

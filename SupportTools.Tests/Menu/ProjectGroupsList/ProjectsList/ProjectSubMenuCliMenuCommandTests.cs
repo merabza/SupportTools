@@ -13,8 +13,6 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
@@ -49,7 +47,6 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             .AddTransient<IMenuCommandFactoryStrategy, CheckPackageSolutionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, BuildPackageCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
-            .AddTransient<IMenuCommandFactoryStrategy, GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
             .BuildServiceProvider();
@@ -135,36 +132,6 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
     }
 
     [Fact]
-    public void GetSubMenu_WhenProjectHasScaffoldSeederProjectName_ShowsScaffoldSeederGits()
-    {
-        // Arrange
-        RegisterProject(new ProjectModel { ScaffoldSeederProjectName = "Seeder" });
-
-        // Act
-        List<CliMenuCommand> commands = GetSubMenuCommands();
-
-        // Assert
-        Assert.Single(commands.OfType<GitSubMenuCliMenuCommand>());
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void GetSubMenu_WhenProjectHasNoScaffoldSeederProjectName_HidesScaffoldSeederGits(
-        string? scaffoldSeederProjectName)
-    {
-        // Arrange
-        RegisterProject(new ProjectModel { ScaffoldSeederProjectName = scaffoldSeederProjectName });
-
-        // Act
-        List<CliMenuCommand> commands = GetSubMenuCommands();
-
-        // Assert
-        Assert.Empty(commands.OfType<GitSubMenuCliMenuCommand>());
-    }
-
-    [Fact]
     public void GetSubMenu_WhenProjectHasSolutionFile_ShowsOpenByVisualStudioOnWindowsOnly()
     {
         // Arrange
@@ -223,12 +190,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
     public void GetSubMenu_WhenAllConditionsAreMet_ListsCommandsInMenuDataOrder()
     {
         // Arrange
-        RegisterProject(new ProjectModel
-        {
-            ProjectType = EProjectType.IsPackage,
-            SolutionFileName = SolutionFileName,
-            ScaffoldSeederProjectName = "Seeder"
-        });
+        RegisterProject(new ProjectModel { ProjectType = EProjectType.IsPackage, SolutionFileName = SolutionFileName });
         List<Type> expected =
         [
             typeof(DeleteProjectCliMenuCommand),
@@ -237,7 +199,6 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             typeof(BuildPackageCliMenuCommand),
             typeof(PackageDistributionCliMenuCommand),
             typeof(CloneProjectToThisComputerCliMenuCommand),
-            typeof(GitSubMenuCliMenuCommand),
             typeof(SaveEditorConfigAsNewTemplateCliMenuCommand)
         ];
         if (!OperatingSystem.IsWindows())

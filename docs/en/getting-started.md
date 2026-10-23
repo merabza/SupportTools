@@ -13,15 +13,13 @@ the `JetBrainsCleanupCode` command
 
 ## Clone all required repositories
 
-SupportTools depends on ten sibling repositories. Create a parent
+SupportTools depends on eight sibling repositories. Create a parent
 folder and clone them next to each other.
 
 ```bash
 mkdir SupportTools
 cd SupportTools
 git clone git@github.com:merabza/AppCliTools.git              AppCliTools
-git clone git@github.com:merabza/BackendCarcass.git           BackendCarcass
-git clone git@github.com:merabza/BackendCarcassShared.git     BackendCarcassShared
 git clone git@github.com:merabza/ConnectionTools.git          ConnectionTools
 git clone git@github.com:merabza/DatabaseTools.git            DatabaseTools
 git clone git@github.com:merabza/ParametersManagement.git     ParametersManagement
@@ -38,8 +36,6 @@ After this you should have a layout like:
 ```
 SupportTools/
   ├── AppCliTools/
-  ├── BackendCarcass/
-  ├── BackendCarcassShared/
   ├── ConnectionTools/
   ├── DatabaseTools/
   ├── ParametersManagement/

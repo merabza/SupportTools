@@ -133,12 +133,6 @@ public sealed class DotnetProcessor
             $"restore {solutionFileFullName} -p:NoWarn=NU1605 -p:TreatWarningsAsErrors=false", null, false);
     }
 
-    public Result RunToolUsingParametersFile(string projectFilePath, string projectParametersFilePath)
-    {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"run --project {projectFilePath} --use {projectParametersFilePath}");
-    }
-
     public Result Restore(string projectFileFullName)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
@@ -221,15 +215,6 @@ public sealed class DotnetProcessor
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"nuget push {nupkgPath} --source {source} --skip-duplicate{(string.IsNullOrWhiteSpace(apiKey) ? string.Empty : $" --api-key {apiKey}")}");
-    }
-
-    public Result EfDatabaseScaffold(string databaseScaffoldClassLibProjectFileFullName,
-        string prodCopyDatabaseConnectionString, string providerPackageName,
-        string createProjectSeederCodeProjectFileFullName, string dbScContextName,
-        string databaseScaffoldClassLibProjectFullPath)
-    {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"ef dbcontext scaffold --project {databaseScaffoldClassLibProjectFileFullName} \"{prodCopyDatabaseConnectionString}\" {providerPackageName} --startup-project {createProjectSeederCodeProjectFileFullName} --context {dbScContextName} --context-dir . --output-dir {Path.Combine(databaseScaffoldClassLibProjectFullPath, "Models")} --force --no-pluralize --no-onconfiguring");
     }
 
     public Result<(string, int)> SearchTool(string toolName)

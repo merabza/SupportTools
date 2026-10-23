@@ -9,14 +9,20 @@ using SupportToolsServerApiContracts.Models;
 namespace LibSupportToolsServerWork.Registry.Mappers;
 
 //პროექტი (B6), ServerInfo-ებით (B7) ერთ აგრეგატად (G7): ProjectModel ↔ StsProjectDataModel. dictionary-ის key
-//კონტრაქტის Name-ია. 15 გზის ველი PathMapper-ით გარდაიქმნება (README §4.4). KeyGuidPart საიდუმლოა (G2): გადაიცემა,
+//კონტრაქტის Name-ია. 9 გზის ველი PathMapper-ით გარდაიქმნება (README §4.4). KeyGuidPart საიდუმლოა (G2): გადაიცემა,
 //მაგრამ არსად იბეჭდება. ProjectType, AllowToolsList და endpoint-ების HttpMethod/EndpointType enum-ების სახელებია.
-//RouteClassModel.Version კონტრაქტის ApiVersion-ია. ScaffoldSeederGitProjectNames ისე გადადის, როგორც არის.
+//RouteClassModel.Version კონტრაქტის ApiVersion-ია.
 //ProjectModel-ის ყველა ველი კონტრაქტშია; მომავალში დამატებული, ჯერ ლოკალური ველი (README §4.6) ApplyToLocal-მა
 //უცვლელად უნდა დატოვოს: ადგილზე განახლებისას ის ისედაც რჩება, ახალი ობიექტისას CreateWithInitOnlyValues-მა უნდა
 //გადაიტანოს
 public static class ProjectMapper
 {
+    //ScaffoldSeeder-ის მექანიზმთან ერთად წაშლილი ხელსაწყოები, რომელთა სახელები სერვერზე შეიძლება ჯერ კიდევ იყოს
+    private static readonly HashSet<string> RemovedProjectToolNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "JsonFromProjectDbProjectGetter", "ScaffoldSeederCreator", "SeedData", "PrepareProdCopyDatabase"
+    };
+
     public static StsProjectDataModel ToContract(string name, ProjectModel project, PathMapper pathMapper)
     {
         return new StsProjectDataModel
@@ -34,10 +40,6 @@ public static class ProjectMapper
             ApiContractsProjectName = project.ApiContractsProjectName,
             SpaProjectName = project.SpaProjectName,
             DbContextName = project.DbContextName,
-            ProjectShortPrefix = project.ProjectShortPrefix,
-            ScaffoldSeederProjectName = project.ScaffoldSeederProjectName,
-            DbContextProjectName = project.DbContextProjectName,
-            NewDataSeedingClassLibProjectName = project.NewDataSeedingClassLibProjectName,
             ProgramArchiveDateMask = project.ProgramArchiveDateMask,
             ProgramArchiveExtension = project.ProgramArchiveExtension,
             ParametersFileDateMask = project.ParametersFileDateMask,
@@ -50,21 +52,12 @@ public static class ProjectMapper
             DataSeederRulesByTableStartupProjectFilePath =
                 pathMapper.ToCanonical(project.DataSeederRulesByTableStartupProjectFilePath),
             OldDataConvertorForDataSeeder = pathMapper.ToCanonical(project.OldDataConvertorForDataSeeder),
-            SeedProjectFilePath = pathMapper.ToCanonical(project.SeedProjectFilePath),
-            SeedProjectParametersFilePath = pathMapper.ToCanonical(project.SeedProjectParametersFilePath),
-            ExcludesRulesParametersFilePath = pathMapper.ToCanonical(project.ExcludesRulesParametersFilePath),
             AppSetEnKeysJsonFileName = pathMapper.ToCanonical(project.AppSetEnKeysJsonFileName),
-            MigrationSqlFilesFolder = pathMapper.ToCanonical(project.MigrationSqlFilesFolder),
-            PrepareProdCopyDatabaseProjectFilePath =
-                pathMapper.ToCanonical(project.PrepareProdCopyDatabaseProjectFilePath),
-            PrepareProdCopyDatabaseProjectParametersFilePath =
-                pathMapper.ToCanonical(project.PrepareProdCopyDatabaseProjectParametersFilePath),
             PairedDbObjectsResultFileName = pathMapper.ToCanonical(project.PairedDbObjectsResultFileName),
             KeyGuidPart = project.KeyGuidPart,
             DevDatabaseParameters = DatabaseParametersMapper.ToContract(project.DevDatabaseParameters),
             ProdCopyDatabaseParameters = DatabaseParametersMapper.ToContract(project.ProdCopyDatabaseParameters),
             GitProjectNames = [.. project.GitProjectNames],
-            ScaffoldSeederGitProjectNames = [.. project.ScaffoldSeederGitProjectNames],
             FrontNpmPackageNames = [.. project.FrontNpmPackageNames],
             RedundantFileNames = [.. project.RedundantFileNames],
             AllowToolsList = [.. project.AllowToolsList.Select(x => x.ToString())],
@@ -110,7 +103,6 @@ public static class ProjectMapper
         project.UseLocalPackages = contract.UseLocalPackages;
         project.EditorConfigPatternName = contract.EditorConfigPatternName;
         project.SpaProjectName = contract.SpaProjectName;
-        project.ScaffoldSeederProjectName = contract.ScaffoldSeederProjectName;
         project.ProgramArchiveDateMask = contract.ProgramArchiveDateMask;
         project.ProgramArchiveExtension = contract.ProgramArchiveExtension;
         project.ParametersFileDateMask = contract.ParametersFileDateMask;
@@ -120,17 +112,9 @@ public static class ProjectMapper
         project.DataSeederRulesByTableStartupProjectFilePath =
             pathMapper.ToLocal(contract.DataSeederRulesByTableStartupProjectFilePath);
         project.OldDataConvertorForDataSeeder = pathMapper.ToLocal(contract.OldDataConvertorForDataSeeder);
-        project.SeedProjectFilePath = pathMapper.ToLocal(contract.SeedProjectFilePath);
-        project.SeedProjectParametersFilePath = pathMapper.ToLocal(contract.SeedProjectParametersFilePath);
-        project.MigrationSqlFilesFolder = pathMapper.ToLocal(contract.MigrationSqlFilesFolder);
-        project.PrepareProdCopyDatabaseProjectFilePath =
-            pathMapper.ToLocal(contract.PrepareProdCopyDatabaseProjectFilePath);
-        project.PrepareProdCopyDatabaseProjectParametersFilePath =
-            pathMapper.ToLocal(contract.PrepareProdCopyDatabaseProjectParametersFilePath);
         project.PairedDbObjectsResultFileName = pathMapper.ToLocal(contract.PairedDbObjectsResultFileName);
 
         Refill(project.GitProjectNames, contract.GitProjectNames);
-        Refill(project.ScaffoldSeederGitProjectNames, contract.ScaffoldSeederGitProjectNames);
         Refill(project.FrontNpmPackageNames, contract.FrontNpmPackageNames);
         Refill(project.RedundantFileNames, contract.RedundantFileNames);
         Refill(project.AllowToolsList, contract.AllowToolsList.Select(x => Enum.Parse<EProjectTools>(x, true)));
@@ -150,11 +134,6 @@ public static class ProjectMapper
         contract.ApiContractsProjectName = ContractNormalization.EmptyToNull(contract.ApiContractsProjectName);
         contract.SpaProjectName = ContractNormalization.EmptyToNull(contract.SpaProjectName);
         contract.DbContextName = ContractNormalization.EmptyToNull(contract.DbContextName);
-        contract.ProjectShortPrefix = ContractNormalization.EmptyToNull(contract.ProjectShortPrefix);
-        contract.ScaffoldSeederProjectName = ContractNormalization.EmptyToNull(contract.ScaffoldSeederProjectName);
-        contract.DbContextProjectName = ContractNormalization.EmptyToNull(contract.DbContextProjectName);
-        contract.NewDataSeedingClassLibProjectName =
-            ContractNormalization.EmptyToNull(contract.NewDataSeedingClassLibProjectName);
         contract.ProgramArchiveDateMask = ContractNormalization.EmptyToNull(contract.ProgramArchiveDateMask);
         contract.ProgramArchiveExtension = ContractNormalization.EmptyToNull(contract.ProgramArchiveExtension);
         contract.ParametersFileDateMask = ContractNormalization.EmptyToNull(contract.ParametersFileDateMask);
@@ -167,26 +146,17 @@ public static class ProjectMapper
         contract.DataSeederRulesByTableStartupProjectFilePath =
             NormalizePath(contract.DataSeederRulesByTableStartupProjectFilePath);
         contract.OldDataConvertorForDataSeeder = NormalizePath(contract.OldDataConvertorForDataSeeder);
-        contract.SeedProjectFilePath = NormalizePath(contract.SeedProjectFilePath);
-        contract.SeedProjectParametersFilePath = NormalizePath(contract.SeedProjectParametersFilePath);
-        contract.ExcludesRulesParametersFilePath = NormalizePath(contract.ExcludesRulesParametersFilePath);
         contract.AppSetEnKeysJsonFileName = NormalizePath(contract.AppSetEnKeysJsonFileName);
-        contract.MigrationSqlFilesFolder = NormalizePath(contract.MigrationSqlFilesFolder);
-        contract.PrepareProdCopyDatabaseProjectFilePath =
-            NormalizePath(contract.PrepareProdCopyDatabaseProjectFilePath);
-        contract.PrepareProdCopyDatabaseProjectParametersFilePath =
-            NormalizePath(contract.PrepareProdCopyDatabaseProjectParametersFilePath);
         contract.PairedDbObjectsResultFileName = NormalizePath(contract.PairedDbObjectsResultFileName);
         contract.KeyGuidPart = ContractNormalization.EmptyToNull(contract.KeyGuidPart);
         contract.DevDatabaseParameters = DatabaseParametersMapper.Normalize(contract.DevDatabaseParameters);
         contract.ProdCopyDatabaseParameters = DatabaseParametersMapper.Normalize(contract.ProdCopyDatabaseParameters);
         contract.GitProjectNames = ContractNormalization.OrderByName(contract.GitProjectNames, x => x);
-        contract.ScaffoldSeederGitProjectNames =
-            ContractNormalization.OrderByName(contract.ScaffoldSeederGitProjectNames, x => x);
         contract.FrontNpmPackageNames = ContractNormalization.OrderByName(contract.FrontNpmPackageNames, x => x);
         contract.RedundantFileNames = ContractNormalization.OrderByName(contract.RedundantFileNames, x => x);
         contract.AllowToolsList = ContractNormalization.OrderByName(
-            contract.AllowToolsList.Select(ContractNormalization.EnumName<EProjectTools>), x => x);
+            contract.AllowToolsList.Where(x => !IsRemovedProjectTool(x))
+                .Select(ContractNormalization.EnumName<EProjectTools>), x => x);
 
         foreach (StsProjectEndpointDataModel endpoint in contract.Endpoints)
         {
@@ -228,7 +198,8 @@ public static class ProjectMapper
             return nameof(StsProjectDataModel.ProjectType);
         }
 
-        if (!contract.AllowToolsList.All(ContractNormalization.IsEnumName<EProjectTools>))
+        if (!contract.AllowToolsList.All(x =>
+                IsRemovedProjectTool(x) || ContractNormalization.IsEnumName<EProjectTools>(x)))
         {
             return nameof(StsProjectDataModel.AllowToolsList);
         }
@@ -264,8 +235,6 @@ public static class ProjectMapper
     {
         List<string> problems = [];
         AddRepeated(problems, nameof(StsProjectDataModel.GitProjectNames), contract.GitProjectNames);
-        AddRepeated(problems, nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames),
-            contract.ScaffoldSeederGitProjectNames);
         AddRepeated(problems, nameof(StsProjectDataModel.FrontNpmPackageNames), contract.FrontNpmPackageNames);
         AddRepeated(problems, nameof(StsProjectDataModel.RedundantFileNames), contract.RedundantFileNames);
         AddRepeated(problems, nameof(StsProjectDataModel.AllowToolsList), contract.AllowToolsList);
@@ -302,6 +271,15 @@ public static class ProjectMapper
         return ContractNormalization.UpperDriveLetter(ContractNormalization.EmptyToNull(path));
     }
 
+    //წაშლილი ხელსაწყოს სახელი (სერვერიდან) ან ნომერი, რომელიც EProjectTools-ში აღარ არის (ლოკალური ფაილი AllowToolsList-ს
+    //ნომრებით ინახავს). ნორმალიზაცია მათ ორივე მხარეს შლის, ამიტომ ასეთი პროექტი სინქრონიზაციიდან არ გამოირიცხება და
+    //ნომერი სერვერზე არ მიდის
+    private static bool IsRemovedProjectTool(string toolName)
+    {
+        return RemovedProjectToolNames.Contains(toolName) ||
+               Enum.TryParse(toolName, true, out EProjectTools tool) && !Enum.IsDefined(tool);
+    }
+
     //init-only ველები კონტრაქტიდან; სიები, dictionary-ები და ბაზის პარამეტრების ეგზემპლარები არსებულისაა, თუ ის არის.
     //DatabaseParametersMapper.ToLocal არსებულ ბაზის პარამეტრებს აქვე, ადგილზე ანახლებს, ამიტომ ისინი განახლებულია
     //როგორც არსებულ პროექტში, ისე ახალ ობიექტში
@@ -319,10 +297,6 @@ public static class ProjectMapper
             MainProjectName = contract.MainProjectName,
             ApiContractsProjectName = contract.ApiContractsProjectName,
             DbContextName = contract.DbContextName,
-            ProjectShortPrefix = contract.ProjectShortPrefix,
-            DbContextProjectName = contract.DbContextProjectName,
-            NewDataSeedingClassLibProjectName = contract.NewDataSeedingClassLibProjectName,
-            ExcludesRulesParametersFilePath = pathMapper.ToLocal(contract.ExcludesRulesParametersFilePath),
             AppSetEnKeysJsonFileName = pathMapper.ToLocal(contract.AppSetEnKeysJsonFileName),
             KeyGuidPart = contract.KeyGuidPart,
             DevDatabaseParameters =
@@ -335,7 +309,6 @@ public static class ProjectMapper
             Endpoints = existing?.Endpoints ?? [],
             RouteClasses = existing?.RouteClasses ?? [],
             GitProjectNames = existing?.GitProjectNames ?? [],
-            ScaffoldSeederGitProjectNames = existing?.ScaffoldSeederGitProjectNames ?? [],
             ServerInfos = existing?.ServerInfos ?? [],
             AllowToolsList = existing?.AllowToolsList ?? []
         };
@@ -357,10 +330,6 @@ public static class ProjectMapper
                    (existing.MainProjectName, candidate.MainProjectName),
                    (existing.ApiContractsProjectName, candidate.ApiContractsProjectName),
                    (existing.DbContextName, candidate.DbContextName),
-                   (existing.ProjectShortPrefix, candidate.ProjectShortPrefix),
-                   (existing.DbContextProjectName, candidate.DbContextProjectName),
-                   (existing.NewDataSeedingClassLibProjectName, candidate.NewDataSeedingClassLibProjectName),
-                   (existing.ExcludesRulesParametersFilePath, candidate.ExcludesRulesParametersFilePath),
                    (existing.AppSetEnKeysJsonFileName, candidate.AppSetEnKeysJsonFileName),
                    (existing.KeyGuidPart, candidate.KeyGuidPart)
                }.All(x => string.Equals(x.Item1, x.Item2, StringComparison.Ordinal));

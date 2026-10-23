@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using LibGitData;
 using LibGitData.Domain;
 using LibGitData.Models;
 using ParametersManagement.LibDatabaseParameters;
@@ -41,17 +40,9 @@ public sealed class ProjectModel : ItemData
     public string? MigrationProjectFilePath { get; set; }
 
     //public string? SolutionFileNameWithMigrationProject { get; set; }
-    public string? SeedProjectFilePath { get; set; }
-    public string? SeedProjectParametersFilePath { get; set; }
     public string? DbContextName { get; init; }
-    public string? ProjectShortPrefix { get; init; }
-    public string? ScaffoldSeederProjectName { get; set; }
-    public string? DbContextProjectName { get; init; }
-    public string? NewDataSeedingClassLibProjectName { get; init; }
-    public string? ExcludesRulesParametersFilePath { get; init; }
     public string? AppSetEnKeysJsonFileName { get; init; }
     public string? KeyGuidPart { get; init; }
-    public string? MigrationSqlFilesFolder { get; set; }
     public DatabaseParameters? DevDatabaseParameters { get; init; }
     public DatabaseParameters? ProdCopyDatabaseParameters { get; init; }
     public List<string> RedundantFileNames { get; init; } = [];
@@ -59,11 +50,8 @@ public sealed class ProjectModel : ItemData
     public Dictionary<string, EndpointModel> Endpoints { get; init; } = [];
     public Dictionary<string, RouteClassModel> RouteClasses { get; init; } = [];
     public List<string> GitProjectNames { get; init; } = [];
-    public List<string> ScaffoldSeederGitProjectNames { get; set; } = [];
     public Dictionary<string, ServerInfoModel> ServerInfos { get; init; } = [];
     public List<EProjectTools> AllowToolsList { get; init; } = [];
-    public string? PrepareProdCopyDatabaseProjectFilePath { get; set; }
-    public string? PrepareProdCopyDatabaseProjectParametersFilePath { get; set; }
     public string? PairedDbObjectsResultFileName { get; set; }
 
     public ServerInfoModel GetServerInfoRequired(string serverName)
@@ -126,15 +114,5 @@ public sealed class ProjectModel : ItemData
         GitProjectDataDomain gitProject = gitProjects.GetGitProjectByKey(projectName);
         string projectRelativePath = gitProject.ProjectRelativePath;
         return string.IsNullOrWhiteSpace(projectRelativePath) ? null : projectRelativePath;
-    }
-
-    public List<string> GetGitProjectNamesByGitCollectionType(EGitCol gitCol)
-    {
-        return gitCol switch
-        {
-            EGitCol.Main => GitProjectNames,
-            EGitCol.ScaffoldSeed => ScaffoldSeederGitProjectNames,
-            _ => []
-        };
     }
 }

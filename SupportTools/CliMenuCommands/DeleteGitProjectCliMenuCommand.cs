@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
@@ -12,27 +11,24 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class DeleteGitProjectCliMenuCommand : CliMenuCommand
 {
-    private readonly EGitCol _gitCol;
     private readonly string _gitProjectName;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public DeleteGitProjectCliMenuCommand(IParametersManager parametersManager, string projectName,
-        string gitProjectName, EGitCol gitCol) : base("Delete Git Project", EMenuAction.LevelUp, EMenuAction.Reload,
-        gitProjectName)
+        string gitProjectName) : base("Delete Git Project", EMenuAction.LevelUp, EMenuAction.Reload, gitProjectName)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitProjectName = gitProjectName;
-        _gitCol = gitCol;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
 
-        List<string> gitProjectNames = parameters.GetGitProjectNames(_projectName, _gitCol);
+        List<string> gitProjectNames = parameters.GetGitProjectNames(_projectName);
 
         if (!gitProjectNames.Contains(_gitProjectName))
         {

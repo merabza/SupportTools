@@ -172,8 +172,7 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         var parameters = (SupportToolsParameters)ParametersManager.Parameters;
         Dictionary<string, ProjectModel> projects = parameters.Projects;
 
-        int usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
-                         projects.Values.Count(project => project.ScaffoldSeederGitProjectNames.Contains(name));
+        int usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name));
 
         StsGitDataModel? remGitRepo =
             _remoteGitRepos.SingleOrDefault(x => x.GitProjectAddress == git.GitProjectAddress);

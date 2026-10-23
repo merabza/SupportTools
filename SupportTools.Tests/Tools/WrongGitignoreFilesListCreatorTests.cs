@@ -89,8 +89,6 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
 
         // Assert
         Assert.Empty(result);
-        //a project without ScaffoldSeeder gits is skipped for them silently
-        Assert.DoesNotContain("ScaffoldSeederProjectName", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
     //two projects in one folder whose gits share a folder: the project that comes first by name gives the template
@@ -194,7 +192,7 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
     }
 
     [Fact]
-    public void Create_WhenProjectHasNoFolder_SkipsItsMainGits()
+    public void Create_WhenProjectHasNoFolder_SkipsItsGits()
     {
         // Arrange
         _parameters.Projects["App"] = new ProjectModel { GitProjectNames = ["AppMain"] };
@@ -207,49 +205,6 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
         string output = _consoleOutput.ToString();
         Assert.Contains("ProjectFolderName is not specified for project App", output, StringComparison.Ordinal);
         Assert.DoesNotContain("ProjectFolderName must be specified", output, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void Create_WhenProjectHasScaffoldSeederGits_ChecksThemInTheSeederFolder()
-    {
-        // Arrange
-        string seedersFolder = Path.Combine(_tempFolder, "Seeders");
-        _parameters.ScaffoldSeedersWorkFolder = seedersFolder;
-        _parameters.Gits["AppSeeder"] = CreateGit("AppSeeder", "CSharp");
-        _parameters.Projects["App"] = new ProjectModel
-        {
-            ProjectFolderName = _projectFolder,
-            ScaffoldSeederProjectName = "App",
-            ScaffoldSeederGitProjectNames = ["AppSeeder"]
-        };
-        string seederGitignore =
-            WriteGitignore(Path.Combine(seedersFolder, "App", "AppScaffoldSeeder"), "AppSeeder", "obj/");
-
-        // Act
-        Dictionary<string, (string, string)> result = CreateSut().Create();
-
-        // Assert
-        Assert.Equal([seederGitignore], result.Keys);
-    }
-
-    //without a seeders work folder the seeder gits have no folder to check
-    [Fact]
-    public void Create_WhenSeedersWorkFolderIsNotSpecified_SkipsTheSeederGits()
-    {
-        // Arrange
-        _parameters.Gits["AppSeeder"] = CreateGit("AppSeeder", "CSharp");
-        _parameters.Projects["App"] = new ProjectModel
-        {
-            ProjectFolderName = _projectFolder,
-            ScaffoldSeederProjectName = "App",
-            ScaffoldSeederGitProjectNames = ["AppSeeder"]
-        };
-
-        // Act
-        Dictionary<string, (string, string)> result = CreateSut().Create();
-
-        // Assert
-        Assert.Empty(result);
     }
 
     [Fact]

@@ -42,7 +42,6 @@ public sealed class SupportToolsParametersEditorTests
         nameof(SupportToolsParameters.TempFolder),
         nameof(SupportToolsParameters.CodeGenerateTestFolder),
         nameof(SupportToolsParameters.SecurityFolder),
-        nameof(SupportToolsParameters.ScaffoldSeedersWorkFolder),
         nameof(SupportToolsParameters.PublisherWorkFolder),
         nameof(SupportToolsParameters.ServiceDescriptionSignature),
         nameof(SupportToolsParameters.UploadTempExtension),

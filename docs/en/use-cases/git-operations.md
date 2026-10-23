@@ -13,13 +13,12 @@ via the project's `Git` submenu (see [Configuration](../configuration.md)).
 |-|-|
 |`Sync All Projects All Gits V2`|Every repository across every project|
 |`Sync One Group All Projects Gits V2`|Every repository across every project in one group|
-|`Sync One Project All Gits With Scaffold Seeders V2`|All repositories of one project, including scaffold seeders|
-|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits With Scaffold Seeders V3`|The same scopes as V2, faster (see [below](#if-you-want-the-faster-sync-v3))|
+|`Sync One Project All Gits V2`|All repositories of one project|
+|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits V3`|The same scopes as V2, faster (see [below](#if-you-want-the-faster-sync-v3))|
 |`Clone Project To This Computer`|A `remote` project: create its folder and clone its repositories here|
 |`Update Git Projects` / `Update Git Projects From SupportToolsServer`|`GitProjects` of every repository, from the local clones or from the server's|
 |`Sync Gits With SupportToolsServer...`|The list of git repositories, shared with the other computers|
 |`Git` submenu (per-project)|Manage individual repositories: list, add, remove, sync|
-|`Git ScaffoldSeeder projects` submenu|Same, but for the project's scaffold seeder repos|
 
 \---
 
@@ -112,7 +111,7 @@ you with stale shared code. Sync All is safer when in doubt.
 
 \---
 
-## If you need to sync one project (with its scaffold seeders)
+## If you need to sync one project
 
 Use when working on a single project and you want a tighter loop than
 group-level sync.
@@ -120,27 +119,19 @@ group-level sync.
 **Steps**
 
 1. `Main Menu` → `Project Groups List` → (group) → `Projects List` →
-(project) → `Sync One Project All Gits With Scaffold Seeders V2`
+(project) → `Sync One Project All Gits V2`
 
 **Expected output**
 
-* All repos belonging to that project sync, plus any scaffold seeder
-repos linked to it
-
-**Common pitfalls**
-
-* **Missing scaffold seeder folder.** If the configured scaffold
-seeder work folder doesn't exist, it's logged as a warning, not an
-error. The main repos still sync. Check the log if you expected
-scaffold work.
+* All repos belonging to that project sync
 
 \---
 
 ## If you want the faster sync (V3)
 
 `Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3` and
-`Sync One Project All Gits With Scaffold Seeders V3` sit right below their V2
-commands and do the same work (clone, remove the ignored files from the
+`Sync One Project All Gits V3` sit right below their V2 commands and do the
+same work (clone, remove the ignored files from the
 index, commit, pull, push), faster:
 
 * SupportTools' own clone of every repository in `WorkFolder\Gits` is synced
@@ -224,9 +215,7 @@ that the folders do not exist.
 1. `Main Menu` → `Project Groups List` → (group) → `Projects List` →
 (a `remote` project) → `Clone Project To This Computer` (shown only for
 remote projects)
-2. If the project has scaffold seeder repositories, answer whether to clone
-them too (default `n`)
-3. Confirm `Clone N gits of project ... to <folder>?`
+2. Confirm `Clone N gits of project ... to <folder>?`
 
 **What it does**
 
@@ -241,9 +230,8 @@ record of the project's `SpaProjectName` to know its folder.
 and the project's `.editorconfig` template exist, and the cloned files
 match them.
 5. Checks the project's secret files (`AppSettingsJsonSourceFileName` of
-its server infos, `SeedProjectParametersFilePath`,
-`PrepareProdCopyDatabaseProjectParametersFilePath`,
-`PairedDbObjectsResultFileName`). When some are missing it lists them and
+its server infos, `PairedDbObjectsResultFileName`). When some are missing
+it lists them and
 offers to run `Sync Registry With SupportToolsServer...`, which brings
 them, then checks again.
 6. Prints a report: the folder, the updated `GitProjects`, how many
@@ -254,7 +242,7 @@ missing files.
 
 * **Partial clone.** The folder is created first, so after a failed clone
 the project already counts as `local`. Fix the cause (see the report) and
-run `Sync One Project All Gits With Scaffold Seeders V2` on the project.
+run `Sync One Project All Gits V2` on the project.
 * **`GitProjects has no X (SpaProjectName of project Y)`.** The scan found
 no project named like `SpaProjectName`. Check the name, or run
 `Update Git Projects` (or `Update Git Projects From SupportToolsServer`)

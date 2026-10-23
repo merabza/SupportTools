@@ -18,9 +18,9 @@ namespace LibSupportToolsServerWork.Registry.Adapters;
 //ისინი ღიად ინახება. ჩანაწერის გასაღები კანონიკური გზაა (ToCanonical, დისკის დიდი ასოთი), ფაილი კი ამ კომპიუტერზე
 //ToLocal(გასაღები)-ზეა; ჩამოტანა საჭირო ფოლდერებს ქმნის.
 //- რეესტრის ფაილის ველები (მომხმარებლის გადაწყვეტილება): ServerInfo-ების AppSettingsJsonSourceFileName და პროექტის
-//  SeedProjectParametersFilePath, PrepareProdCopyDatabaseProjectParametersFilePath, PairedDbObjectsResultFileName.
-//  AppSettingsEncoder-ის გენერირებული AppSettingsEncodedJsonFileName არ შედის. რეესტრის მითითებული, მაგრამ ლოკალურად
-//  დაკარგული ფაილი სერვერიდან ჩამოდის (GetMissingLocalKeys) და სერვერიდან არ იშლება.
+//  PairedDbObjectsResultFileName. AppSettingsEncoder-ის გენერირებული AppSettingsEncodedJsonFileName არ შედის.
+//  რეესტრის მითითებული, მაგრამ ლოკალურად დაკარგული ფაილი სერვერიდან ჩამოდის (GetMissingLocalKeys) და სერვერიდან არ
+//  იშლება.
 //- ლოკალური ჩანაწერია არსებული ფაილი, რომელზეც რეესტრი მიუთითებს, რომელიც სერვერზეა ან რომელიც უკვე სინქრონიზდა
 //  (მდგომარეობაშია). ამიტომ ფაილი სინქრონიზაციაში რჩება, სანამ არსებობს, მაშინაც, როცა რეესტრი მასზე აღარ მიუთითებს
 //  (ფაილზე დაფუძნებული წაშლა, მომხმარებლის გადაწყვეტილება): სერვერიდან წაშლა მხოლოდ მაშინ შემოთავაზდება, როცა ლოკალური
@@ -244,8 +244,6 @@ public sealed class StoredFilesRegistrySyncAdapter : RegistrySyncAdapter<StoredF
     {
         foreach (ProjectModel project in _parameters.Projects.Values)
         {
-            yield return project.SeedProjectParametersFilePath;
-            yield return project.PrepareProdCopyDatabaseProjectParametersFilePath;
             yield return project.PairedDbObjectsResultFileName;
             foreach (ServerInfoModel serverInfo in project.ServerInfos.Values)
             {

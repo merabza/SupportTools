@@ -31,7 +31,6 @@ public sealed class GitIgnoreModelsCruderTests
     {
         _parameters.GitIgnorePatterns.Add(PatternName);
         _parameters.Gits["MainGit"] = new GitDataModel { GitIgnorePatternName = PatternName };
-        _parameters.Gits["SeederGit"] = new GitDataModel { GitIgnorePatternName = PatternName };
         _parameters.Gits["OtherGit"] = new GitDataModel { GitIgnorePatternName = "OtherPattern" };
         _parameters.Gits["NoPatternGit"] = new GitDataModel();
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
@@ -114,35 +113,27 @@ public sealed class GitIgnoreModelsCruderTests
         Assert.Equal("Usage count is: 0", status);
     }
 
-    //every listed git of both git collections of every project counts; the same git listed twice counts twice
+    //every listed git of every project counts; a git listed by two projects counts twice
     [Fact]
-    public void GetStatusFor_WhenGitsOfBothCollectionsUseThePattern_CountsEveryListing()
+    public void GetStatusFor_WhenGitsUseThePattern_CountsEveryListing()
     {
         // Arrange
-        _parameters.Projects["FirstProject"] = new ProjectModel
-        {
-            GitProjectNames = ["MainGit", "OtherGit", "NoPatternGit"], ScaffoldSeederGitProjectNames = ["SeederGit"]
-        };
-        _parameters.Projects["SecondProject"] = new ProjectModel
-        {
-            GitProjectNames = ["MainGit"], ScaffoldSeederGitProjectNames = ["MainGit"]
-        };
+        _parameters.Projects["FirstProject"] =
+            new ProjectModel { GitProjectNames = ["MainGit", "OtherGit", "NoPatternGit"] };
+        _parameters.Projects["SecondProject"] = new ProjectModel { GitProjectNames = ["MainGit"] };
 
         // Act
         string status = CreateSut().GetStatusFor(PatternName);
 
         // Assert
-        Assert.Equal("Usage count is: 4", status);
+        Assert.Equal("Usage count is: 2", status);
     }
 
     [Fact]
     public void GetStatusFor_WhenListedGitIsNotRegistered_SkipsIt()
     {
         // Arrange
-        _parameters.Projects["FirstProject"] = new ProjectModel
-        {
-            GitProjectNames = ["MissingGit", "MainGit"], ScaffoldSeederGitProjectNames = ["MissingGit"]
-        };
+        _parameters.Projects["FirstProject"] = new ProjectModel { GitProjectNames = ["MissingGit", "MainGit"] };
 
         // Act
         string status = CreateSut().GetStatusFor(PatternName);
@@ -166,23 +157,17 @@ public sealed class GitIgnoreModelsCruderTests
 
     //a parameters file may hold null instead of a git list
     [Fact]
-    public void GetStatusFor_WhenGitListIsNull_CountsTheOtherList()
+    public void GetStatusFor_WhenGitListIsNull_CountsTheOtherProjects()
     {
         // Arrange
-        _parameters.Projects["FirstProject"] = new ProjectModel
-        {
-            GitProjectNames = null!, ScaffoldSeederGitProjectNames = ["SeederGit"]
-        };
-        _parameters.Projects["SecondProject"] = new ProjectModel
-        {
-            GitProjectNames = ["MainGit"], ScaffoldSeederGitProjectNames = null!
-        };
+        _parameters.Projects["FirstProject"] = new ProjectModel { GitProjectNames = null! };
+        _parameters.Projects["SecondProject"] = new ProjectModel { GitProjectNames = ["MainGit"] };
 
         // Act
         string status = CreateSut().GetStatusFor(PatternName);
 
         // Assert
-        Assert.Equal("Usage count is: 2", status);
+        Assert.Equal("Usage count is: 1", status);
     }
 
     private GitIgnoreModelsCruder CreateSut()

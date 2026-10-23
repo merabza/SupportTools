@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork.Helpers;
 using Microsoft.Extensions.Logging;
@@ -22,9 +21,9 @@ namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisCom
 //„ჩამოიტანე პროექტი აქ“ (D3): remote პროექტის (ProjectFolderName ამ კომპიუტერზე არ არის) ამ კომპიუტერზე ჩამოტანა.
 //ნაბიჯები: (ა) ProjectFolderName-ის შექმნა; (გ) GitProjects-ის ჩანაწერები იმ git-ებისთვის, რომლებსაც ისინი აკლია
 //(Update Git Projects-ის სკანირება, მომხმარებლის არჩევანი). ეს ნაბიჯი კლონამდე სრულდება, რომ SpaProjectName-ის
-//ჩანაწერით {SpaProjectFolderRelativePath}-იანი git-ების ფოლდერიც დადგინდეს; (ბ) git-ების კლონი V2 მექანიზმით
-//(ScaffoldSeeder-ის git-ები ცალკე კითხვით); (დ) შაბლონების ფაილების შემოწმება; (ე) საიდუმლო ფაილების (C6)
-//შემოწმება და, თუ აკლია, „Sync Registry“-ის შეთავაზება. ბოლოს შედეგის ანგარიში
+//ჩანაწერით {SpaProjectFolderRelativePath}-იანი git-ების ფოლდერიც დადგინდეს; (ბ) git-ების კლონი V2 მექანიზმით;
+//(დ) შაბლონების ფაილების შემოწმება; (ე) საიდუმლო ფაილების (C6) შემოწმება და, თუ აკლია, „Sync Registry“-ის
+//შეთავაზება. ბოლოს შედეგის ანგარიში
 public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
 {
     public const string MenuCommandName = "Clone Project To This Computer";
@@ -82,7 +81,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
             return true;
         }
 
-        List<(EGitCol GitCol, string GitName)> gits = ChooseGits(project);
+        List<string> gits = [.. project.GitProjectNames];
         if (!_inputBool($"Clone {Count(gits.Count)} gits of project {_projectName} to {projectFolderName}?", true))
         {
             return true;
@@ -110,21 +109,6 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
         return success;
     }
 
-    private List<(EGitCol GitCol, string GitName)> ChooseGits(ProjectModel project)
-    {
-        List<(EGitCol GitCol, string GitName)> gits = [.. project.GitProjectNames.Select(x => (EGitCol.Main, x))];
-
-        int scaffoldSeederGitsCount = project.ScaffoldSeederGitProjectNames.Count;
-        if (scaffoldSeederGitsCount > 0 &&
-            _inputBool($"Clone also {Count(scaffoldSeederGitsCount)} ScaffoldSeeder gits of project {_projectName}?",
-                false))
-        {
-            gits.AddRange(project.ScaffoldSeederGitProjectNames.Select(x => (EGitCol.ScaffoldSeed, x)));
-        }
-
-        return gits;
-    }
-
     private bool CreateFolder(string projectFolderName)
     {
         try
@@ -142,11 +126,10 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
 
     //(გ) git-ები, რომელთა csproj/esproj ჩანაწერები GitProjects-ში აკლია, სკანირდება და პარამეტრები ინახება
     private async ValueTask<bool> PrepareGitProjects(SupportToolsParameters parameters, ProjectModel project,
-        List<(EGitCol GitCol, string GitName)> gits, List<string> report, CancellationToken cancellationToken)
+        List<string> gits, List<string> report, CancellationToken cancellationToken)
     {
         bool success = true;
-        List<string> gitNamesToScan = ProjectCloneChecks.GetGitsWithoutGitProjects(parameters,
-            gits.Select(x => x.GitName));
+        List<string> gitNamesToScan = ProjectCloneChecks.GetGitsWithoutGitProjects(parameters, gits);
         if (gitNamesToScan.Count > 0)
         {
             List<string> scannedGitNames = [];
@@ -181,37 +164,30 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
 
     //(ბ) git-ების კლონი. ბრუნდება git-ების ფოლდერები (null - ფოლდერი ვერ დგინდება)
     private Dictionary<string, string?> CloneGits(SupportToolsParameters parameters, ProjectModel project,
-        List<(EGitCol GitCol, string GitName)> gits)
+        List<string> gits)
     {
-        foreach ((EGitCol gitCol, string gitName) in gits)
+        foreach (string gitName in gits)
         {
-            _gitActions.SyncGit(_projectName, gitCol, gitName);
+            _gitActions.SyncGit(_projectName, gitName);
         }
 
         Dictionary<string, string?> gitFolders = new(StringComparer.OrdinalIgnoreCase);
-        foreach (IGrouping<EGitCol, (EGitCol GitCol, string GitName)> gitColGits in gits.GroupBy(x => x.GitCol))
+        foreach ((string gitName, string? gitFolder) in ProjectCloneChecks.GetGitFolders(parameters, _projectName,
+                     project, project.ProjectFolderName, gits))
         {
-            string? gitsFolder = gitColGits.Key == EGitCol.Main
-                ? project.ProjectFolderName
-                : parameters.GetGitsFolder(_projectName, gitColGits.Key);
-            foreach ((string gitName, string? gitFolder) in ProjectCloneChecks.GetGitFolders(parameters, _projectName,
-                         project, gitsFolder, gitColGits.Select(x => x.GitName)))
-            {
-                gitFolders[gitName] = gitFolder;
-            }
+            gitFolders[gitName] = gitFolder;
         }
 
         return gitFolders;
     }
 
     //დაკლონილად ითვლება git, რომლის ფოლდერიც სინქრონიზაციის შემდეგ არსებობს
-    private static bool ReportClonedGits(List<(EGitCol GitCol, string GitName)> gits,
-        Dictionary<string, string?> gitFolders, List<string> report)
+    private static bool ReportClonedGits(List<string> gits, Dictionary<string, string?> gitFolders,
+        List<string> report)
     {
         List<string> notClonedGitNames =
         [
-            .. gits.Select(x => x.GitName).Where(x =>
-                gitFolders.GetValueOrDefault(x) is not { } gitFolder || !Directory.Exists(gitFolder))
+            .. gits.Where(x => gitFolders.GetValueOrDefault(x) is not { } gitFolder || !Directory.Exists(gitFolder))
         ];
         report.Add($"Gits cloned: {Count(gits.Count - notClonedGitNames.Count)} of {Count(gits.Count)}");
         if (notClonedGitNames.Count == 0)

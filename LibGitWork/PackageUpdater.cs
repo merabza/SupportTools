@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using LibGitData;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -25,9 +24,9 @@ public sealed class PackageUpdater
 
     public int Count => _packageUpdaterToolActionList.Count;
 
-    public void Add(string projectName, EGitCol gitCol)
+    public void Add(string projectName)
     {
-        var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName, gitCol,
+        var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
             _gitProjectName, _useConsole);
         if (packageUpdaterToolAction is null)
         {

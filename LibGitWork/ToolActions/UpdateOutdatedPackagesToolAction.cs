@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -65,12 +64,11 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         //var packageUpdaters = new Dictionary<string, PackageUpdater>();
         var projectGitProjectNames = new Dictionary<string, List<string>>();
         //var updatedGitProjectNames = new List<string>();
-        const EGitCol gitCol = EGitCol.Main;
         var failedGitProjectNames = new List<string>();
 
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            projectGitProjectNames.Add(projectName, [.. project.GetGitProjectNamesByGitCollectionType(gitCol)]);
+            projectGitProjectNames.Add(projectName, [.. project.GitProjectNames]);
         }
 
         int lastProjectsCount = projectGitProjectNames.Count + 1;
@@ -94,7 +92,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 string gitProjectName = kvp.Value[0];
 
                 var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
-                    gitCol, gitProjectName, true);
+                    gitProjectName, true);
                 if (packageUpdaterToolAction is null || !packageUpdaterToolAction.RunPackageUpdate())
                 {
                     failedGitProjectNames.Add(gitProjectName);
@@ -117,7 +115,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
         //foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         //{
-        //    foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+        //    foreach (string gitProjectName in project.GitProjectNames)
         //    {
         //        if (!packageUpdaters.TryGetValue(gitProjectName, out PackageUpdater? value))
         //        {
@@ -125,7 +123,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         //            packageUpdaters.Add(gitProjectName, value);
         //        }
 
-        //        value.Add(projectName, gitCol);
+        //        value.Add(projectName);
         //    }
         //}
 

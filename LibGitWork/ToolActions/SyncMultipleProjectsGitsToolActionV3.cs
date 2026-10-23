@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitWork.Helpers;
 using LibGitWork.Models;
 using LibGitWork.SyncV3;
@@ -111,8 +110,8 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
         return outcomes.TrueForAll(x => x.Error is null);
     }
 
-    //V2-ის წესით: პროექტები სახელით, თითოეულში ჯერ მთავარი, მერე ScaffoldSeeder-ის git-ები. ფოლდერი ერთხელ ითვლება.
-    //ბოლოს ყოველი git-ის სამუშაო ფოლდერის კლონი, რომ მას git-ის push-ები უკვე დახვდეს
+    //V2-ის წესით: პროექტები სახელით, თითოეულში მისი git-ები. ფოლდერი ერთხელ ითვლება. ბოლოს ყოველი git-ის სამუშაო
+    //ფოლდერის კლონი, რომ მას git-ის push-ები უკვე დახვდეს
     private List<GitSyncFolder> CollectFolders()
     {
         List<GitSyncFolder> folders = [];
@@ -123,27 +122,23 @@ public sealed class SyncMultipleProjectsGitsToolActionV3 : ToolAction
             _syncParameters.IncludeRemoteProjects);
         foreach ((string projectName, ProjectModel project) in projects.OrderBy(x => x.Key))
         {
-            foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())
+            foreach (string gitName in project.GitProjectNames)
             {
-                foreach (string gitName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+                var gitSyncParameters = GitSyncParameters.Create(_logger, _parameters, projectName, gitName, true);
+                if (gitSyncParameters is null)
                 {
-                    var gitSyncParameters =
-                        GitSyncParameters.Create(_logger, _parameters, projectName, gitCol, gitName, true);
-                    if (gitSyncParameters is null)
-                    {
-                        continue;
-                    }
-
-                    string folderPath = Path.Combine(gitSyncParameters.GitsFolder,
-                        gitSyncParameters.GitData.GitProjectFolderName);
-                    if (folderPaths.Add(folderPath))
-                    {
-                        folders.Add(new GitSyncFolder(gitName, gitSyncParameters.GitData.GitProjectAddress, projectName,
-                            folderPath));
-                    }
-
-                    gits.TryAdd(gitName, gitSyncParameters.GitData);
+                    continue;
                 }
+
+                string folderPath = Path.Combine(gitSyncParameters.GitsFolder,
+                    gitSyncParameters.GitData.GitProjectFolderName);
+                if (folderPaths.Add(folderPath))
+                {
+                    folders.Add(new GitSyncFolder(gitName, gitSyncParameters.GitData.GitProjectAddress, projectName,
+                        folderPath));
+                }
+
+                gits.TryAdd(gitName, gitSyncParameters.GitData);
             }
         }
 

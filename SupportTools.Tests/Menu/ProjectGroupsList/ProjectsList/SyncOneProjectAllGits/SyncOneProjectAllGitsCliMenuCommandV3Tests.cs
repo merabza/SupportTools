@@ -10,18 +10,17 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 using SupportToolsData.Models;
 using Xunit;
 
-namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
+namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 
 //the gits point to missing local repositories, so the clone of every folder fails at once (no network, nothing is
-//cloned) and the output names the synced gits. Remote1 (folder missing) has the main git RepoA and the ScaffoldSeeder
-//git RepoS; Local1 has RepoB
+//cloned) and the output names the synced gits. Remote1 (folder missing) has the gits RepoA and RepoS; Local1 has RepoB
 //Every git also has its work folder clone, so the summary counts two folders per git
 [Collection(ConsoleCaptureCollection.Name)]
-public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Tests : IDisposable
+public sealed class SyncOneProjectAllGitsCliMenuCommandV3Tests : IDisposable
 {
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
@@ -29,22 +28,18 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
     private readonly Mock<IParametersManager> _parametersManager = new();
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
 
-    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Tests()
+    public SyncOneProjectAllGitsCliMenuCommandV3Tests()
     {
         _originalConsoleOutput = Console.Out;
         Console.SetOut(_consoleOutput);
 
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         AddGit("RepoA");
         AddGit("RepoB");
         AddGit("RepoS");
         _parameters.Projects["Remote1"] = new ProjectModel
         {
-            ProjectFolderName = Path.Combine(_tempFolder, "Projects", "Remote1"),
-            GitProjectNames = ["RepoA"],
-            ScaffoldSeederProjectName = "Remote1",
-            ScaffoldSeederGitProjectNames = ["RepoS"]
+            ProjectFolderName = Path.Combine(_tempFolder, "Projects", "Remote1"), GitProjectNames = ["RepoA", "RepoS"]
         };
         _parameters.Projects["Local1"] = new ProjectModel
         {
@@ -68,13 +63,13 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
         var sut = CreateSut("Remote1");
 
         // Assert
-        Assert.Equal("Sync One Project All Gits With Scaffold Seeders V3", sut.Name);
+        Assert.Equal("Sync One Project All Gits V3", sut.Name);
         Assert.Equal(EMenuAction.Reload, sut.MenuActionOnBodySuccess);
         Assert.Equal(EMenuAction.Reload, sut.MenuActionOnBodyFail);
         Assert.True(CliMenuTestAccess.GetAskRunAction(sut));
     }
 
-    //like V2, the command of one project syncs its main and ScaffoldSeeder gits, also when the project is remote
+    //like V2, the command of one project syncs its gits, also when the project is remote
     [Fact]
     public async Task RunBody_WhenTheProjectIsRemote_SyncsItsGitsWithoutAsking()
     {
@@ -94,8 +89,8 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
     public void CreateMenuCommand_WhenCalled_CreatesTheV3CommandOfTheProject()
     {
         // Arrange
-        var sut = new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3FactoryStrategy(
-            new Mock<ILogger<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3FactoryStrategy>>().Object,
+        var sut = new SyncOneProjectAllGitsCliMenuCommandV3FactoryStrategy(
+            new Mock<ILogger<SyncOneProjectAllGitsCliMenuCommandV3FactoryStrategy>>().Object,
             new Mock<IHttpClientFactory>().Object, new SupportToolsMenuParameters { ProjectName = "Remote1" },
             _parametersManager.Object);
 
@@ -103,7 +98,7 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
         CliMenuCommand command = sut.CreateMenuCommand();
 
         // Assert
-        Assert.IsType<SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3>(command);
+        Assert.IsType<SyncOneProjectAllGitsCliMenuCommandV3>(command);
     }
 
     //strategies are looked up by type name, so the project submenu shows the command only if its name is listed
@@ -114,16 +109,14 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3Test
         List<string> strategyNames = MenuData.ProjectSubMenuCommandFactoryStrategyNames;
 
         // Assert
-        int index = strategyNames.IndexOf(
-            nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3FactoryStrategy));
+        int index = strategyNames.IndexOf(nameof(SyncOneProjectAllGitsCliMenuCommandV3FactoryStrategy));
         Assert.True(index > 0);
-        Assert.Equal(nameof(SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2FactoryStrategy),
-            strategyNames[index - 1]);
+        Assert.Equal(nameof(SyncOneProjectAllGitsCliMenuCommandV2FactoryStrategy), strategyNames[index - 1]);
     }
 
-    private SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3 CreateSut(string projectName)
+    private SyncOneProjectAllGitsCliMenuCommandV3 CreateSut(string projectName)
     {
-        return new SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3(new Mock<ILogger>().Object,
+        return new SyncOneProjectAllGitsCliMenuCommandV3(new Mock<ILogger>().Object,
             new Mock<IHttpClientFactory>().Object, _parametersManager.Object, projectName);
     }
 

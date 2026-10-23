@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork;
 using LibGitWork.Models;
@@ -33,7 +32,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
     }
 
     public static ClearOneProjectAllGitsParameters? Create(ILogger? logger,
-        SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol)
+        SupportToolsParameters supportToolsParameters, string projectName)
     {
         ProjectModel? project = supportToolsParameters.GetProject(projectName);
 
@@ -43,7 +42,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName);
 
         if (gitsFolder == null)
         {
@@ -51,12 +50,7 @@ public sealed class ClearOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        List<string> gitProjectNames = gitCol switch
-        {
-            EGitCol.Main => project.GitProjectNames,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => null
-        } ?? [];
+        List<string> gitProjectNames = project.GitProjectNames ?? [];
 
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 

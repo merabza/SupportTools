@@ -15,13 +15,12 @@ URL-ები კონფიგურირებული პროექტ�
 |-|-|
 |`Sync All Projects All Gits V2`|ყველა რეპოზიტორია ყველა პროექტში|
 |`Sync One Group All Projects Gits V2`|ერთი ჯგუფის ყველა პროექტის ყველა რეპო|
-|`Sync One Project All Gits With Scaffold Seeders V2`|ერთი პროექტის ყველა რეპო, scaffold seeder-ების ჩათვლით|
-|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits With Scaffold Seeders V3`|იგივე არეალი, რაც V2-ს, უფრო სწრაფად (იხ. [ქვემოთ](#თუ-გინდა-უფრო-სწრაფი-სინქი-v3))|
+|`Sync One Project All Gits V2`|ერთი პროექტის ყველა რეპო|
+|`Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3`, `Sync One Project All Gits V3`|იგივე არეალი, რაც V2-ს, უფრო სწრაფად (იხ. [ქვემოთ](#თუ-გინდა-უფრო-სწრაფი-სინქი-v3))|
 |`Clone Project To This Computer`|`remote` პროექტი: მისი ფოლდერის შექმნა და რეპოების აქ დაკლონვა|
 |`Update Git Projects` / `Update Git Projects From SupportToolsServer`|ყველა რეპოს `GitProjects`, ლოკალური ან სერვერის კლონებიდან|
 |`Sync Gits With SupportToolsServer...`|git რეპოების სია, სხვა კომპიუტერებთან გაზიარებული|
 |`Git` ქვემენიუ (პერ-პროექტი)|ცალკეული რეპოების მართვა: სია, დამატება, წაშლა, სინქი|
-|`Git ScaffoldSeeder projects` ქვემენიუ|იგივე, მაგრამ პროექტის scaffold seeder რეპოებისთვის|
 
 \---
 
@@ -117,7 +116,7 @@ commit-ები ერთდროულად, ხელსაწყო უშ
 
 \---
 
-## თუ გჭირდება ერთი პროექტის სინქი (scaffold seeders-ით)
+## თუ გჭირდება ერთი პროექტის სინქი
 
 გამოიყენე როცა ერთ პროექტზე მუშაობ და გინდა უფრო მკაცრი ციკლი, ვიდრე
 ჯგუფის დონის სინქი.
@@ -125,27 +124,19 @@ commit-ები ერთდროულად, ხელსაწყო უშ
 **ნაბიჯები**
 
 1. `Main Menu` → `Project Groups List` → (ჯგუფი) → `Projects List` →
-(პროექტი) → `Sync One Project All Gits With Scaffold Seeders V2`
+(პროექტი) → `Sync One Project All Gits V2`
 
 **მოსალოდნელი შედეგი**
 
-* პროექტის ყველა რეპო სინქდება, პლუს მასთან დაკავშირებული scaffold
-seeder რეპოები
-
-**ხშირი შეცდომები**
-
-* **გამოტოვებული scaffold seeder ფოლდერი.** თუ კონფიგურირებული
-scaffold seeder სამუშაო ფოლდერი არ არსებობს, ეს ლოგდება როგორც
-warning, არა შეცდომა. ძირითადი რეპოები მაინც სინქდება. შეამოწმე ლოგი
-თუ scaffold-ის შედეგი გელოდა.
+* პროექტის ყველა რეპო სინქდება
 
 \---
 
 ## თუ გინდა უფრო სწრაფი სინქი (V3)
 
 `Sync All Projects All Gits V3`, `Sync One Group All Projects Gits V3` და
-`Sync One Project All Gits With Scaffold Seeders V3` მენიუში თავიანთი V2
-ბრძანებების ქვემოთ დგას და იგივე სამუშაოს აკეთებს (კლონირება,
+`Sync One Project All Gits V3` მენიუში თავიანთი V2 ბრძანებების ქვემოთ
+დგას და იგივე სამუშაოს აკეთებს (კლონირება,
 დაიგნორებული ფაილების ინდექსიდან ამოღება, commit, pull, push), ოღონდ
 უფრო სწრაფად:
 
@@ -232,9 +223,7 @@ V3 ვერსიები, `Update Outdated Packages` და `Distribute all p
 1. `Main Menu` → `Project Groups List` → (ჯგუფი) → `Projects List` →
 (`remote` პროექტი) → `Clone Project To This Computer` (ჩანს მხოლოდ
 remote პროექტებისთვის)
-2. თუ პროექტს scaffold seeder რეპოები აქვს, უპასუხე, დაიკლონოს თუ არა
-ისინიც (ნაგულისხმევად `n`)
-3. დაადასტურე `Clone N gits of project ... to <folder>?`
+2. დაადასტურე `Clone N gits of project ... to <folder>?`
 
 **რას აკეთებს**
 
@@ -249,9 +238,8 @@ remote პროექტებისთვის)
 პროექტის `.editorconfig` შაბლონი არსებობს და დაკლონილი ფაილები მათ
 ემთხვევა.
 5. ამოწმებს პროექტის საიდუმლო ფაილებს (მისი server info-ების
-`AppSettingsJsonSourceFileName`, `SeedProjectParametersFilePath`,
-`PrepareProdCopyDatabaseProjectParametersFilePath`,
-`PairedDbObjectsResultFileName`). თუ რომელიმე აკლია, ჩამოთვლის მათ და
+`AppSettingsJsonSourceFileName`, `PairedDbObjectsResultFileName`). თუ
+რომელიმე აკლია, ჩამოთვლის მათ და
 გთავაზობს `Sync Registry With SupportToolsServer...`-ის გაშვებას,
 რომელიც მათ ჩამოიტანს, შემდეგ კი ისევ ამოწმებს.
 6. წერს ანგარიშს: ფოლდერი, განახლებული `GitProjects`, რამდენი რეპო
@@ -261,8 +249,7 @@ remote პროექტებისთვის)
 
 * **ნაწილობრივი კლონი.** ფოლდერი პირველ რიგში იქმნება, ამიტომ
 ჩავარდნილი კლონის შემდეგაც პროექტი უკვე `local`-ად ითვლება. გაასწორე
-მიზეზი (იხ. ანგარიში) და პროექტზე გაუშვი
-`Sync One Project All Gits With Scaffold Seeders V2`.
+მიზეზი (იხ. ანგარიში) და პროექტზე გაუშვი `Sync One Project All Gits V2`.
 * **`GitProjects has no X (SpaProjectName of project Y)`.** სკანირებამ
 `SpaProjectName`-ის სახელის პროექტი ვერ იპოვა. შეამოწმე სახელი, ან Gits
 სიიდან გაუშვი `Update Git Projects` (ან

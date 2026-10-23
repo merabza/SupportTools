@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitData;
 using LibGitWork.Helpers;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -67,18 +66,15 @@ public sealed class SyncMultipleProjectsGitsToolActionV2 : ToolAction
 
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            foreach (EGitCol gitCol in Enum.GetValues<EGitCol>())
+            foreach (string gitProjectName in project.GitProjectNames)
             {
-                foreach (string gitProjectName in project.GetGitProjectNamesByGitCollectionType(gitCol))
+                if (!gitSyncToolsByGitProjectNames.TryGetValue(gitProjectName, out GitProjectSyncronizer? value))
                 {
-                    if (!gitSyncToolsByGitProjectNames.TryGetValue(gitProjectName, out GitProjectSyncronizer? value))
-                    {
-                        value = new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true);
-                        gitSyncToolsByGitProjectNames.Add(gitProjectName, value);
-                    }
-
-                    value.Add(projectName, gitCol);
+                    value = new GitProjectSyncronizer(_logger, _parametersManager, gitProjectName, true);
+                    gitSyncToolsByGitProjectNames.Add(gitProjectName, value);
                 }
+
+                value.Add(projectName);
             }
         }
 

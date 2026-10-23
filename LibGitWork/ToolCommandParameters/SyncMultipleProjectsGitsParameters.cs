@@ -1,22 +1,19 @@
 ﻿using System.Collections.Generic;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
-using SystemTools.SystemToolsShared;
 
 namespace LibGitWork.ToolCommandParameters;
 
 public sealed class SyncMultipleProjectsGitsParameters : IParameters
 {
-    private SyncMultipleProjectsGitsParameters(string? scaffoldSeedersWorkFolder,
-        Dictionary<string, ProjectModel> projects, string? projectGroupName, string? projectName)
+    private SyncMultipleProjectsGitsParameters(Dictionary<string, ProjectModel> projects, string? projectGroupName,
+        string? projectName)
     {
-        ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
         Projects = projects;
         ProjectGroupName = projectGroupName;
         ProjectName = projectName;
     }
 
-    public string? ScaffoldSeedersWorkFolder { get; }
     public Dictionary<string, ProjectModel> Projects { get; }
     public string? ProjectGroupName { get; }
     public string? ProjectName { get; }
@@ -29,12 +26,6 @@ public sealed class SyncMultipleProjectsGitsParameters : IParameters
     public static SyncMultipleProjectsGitsParameters Create(SupportToolsParameters supportToolsParameters,
         string? projectGroupName, string? projectName)
     {
-        if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
-        {
-            StShared.WriteWarningLine("ScaffoldSeedersWorkFolder is not specified", true);
-        }
-
-        return new SyncMultipleProjectsGitsParameters(supportToolsParameters.ScaffoldSeedersWorkFolder,
-            supportToolsParameters.Projects, projectGroupName, projectName);
+        return new SyncMultipleProjectsGitsParameters(supportToolsParameters.Projects, projectGroupName, projectName);
     }
 }

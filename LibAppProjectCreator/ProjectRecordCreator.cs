@@ -18,20 +18,18 @@ internal sealed class ProjectRecordCreator
     private readonly string _newDbPartProjectName;
     private readonly string _newProjectKeyGuidPart;
     private readonly string _newProjectName;
-    private readonly string? _newProjectShortName;
 
     private readonly IParametersManager _parametersManager;
     private readonly TemplateModel _templateModel;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectRecordCreator(ILogger logger, IParametersManager parametersManager, TemplateModel templateModel,
-        string newProjectName, string? newProjectShortName, string? newDbPartProjectName, string newProjectKeyGuidPart)
+        string newProjectName, string? newDbPartProjectName, string newProjectKeyGuidPart)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _templateModel = templateModel;
         _newProjectName = newProjectName;
-        _newProjectShortName = newProjectShortName;
         _newDbPartProjectName =
             _templateModel.UseDbPartFolderForDatabaseProjects && !string.IsNullOrWhiteSpace(newDbPartProjectName)
                 ? newDbPartProjectName
@@ -69,19 +67,6 @@ internal sealed class ProjectRecordCreator
         {
             StShared.WriteErrorLine(
                 "supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal is empty", true, _logger);
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName))
-        {
-            StShared.WriteErrorLine(
-                "supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName is empty", true, _logger);
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(supportToolsParameters.ScaffoldSeedersWorkFolder))
-        {
-            StShared.WriteErrorLine("supportToolsParameters.ScaffoldSeedersWorkFolder is empty", true, _logger);
             return false;
         }
 
@@ -191,16 +176,9 @@ internal sealed class ProjectRecordCreator
             return false;
         }
 
-        string scaffoldSeederProjectName = $"{_newDbPartProjectName}ScaffoldSeeder";
-        string? fakeHostProjectName = supportToolsParameters.AppProjectCreatorAllParameters.FakeHostProjectName;
         string? projectsFolderPathReal = supportToolsParameters.AppProjectCreatorAllParameters.ProjectsFolderPathReal;
-        string? scaffoldSeedersWorkFolder = supportToolsParameters.ScaffoldSeedersWorkFolder;
-        string dbMigrationProjectName = $"{_newDbPartProjectName}DbMigration";
         const string solutionFileExtension = ".sln";
         const string jsonExtension = ".json";
-        //var seedProjectName = $"Seed{_newDbPartProjectName}Db";
-        //var getJsonProjectName = $"GetJsonFromScaffold{_newDbPartProjectName}Db";
-        //var scaffoldSeedSecFolderName = $"{_newDbPartProjectName}ScaffoldSeeder.sec";
         string dbPartProjectsFolderName = $"{_newDbPartProjectName}DbPart";
         string? securityFolder = supportToolsParameters.SecurityFolder;
         const string appSettingsFileName = $"appsettings{jsonExtension}";
@@ -265,48 +243,7 @@ internal sealed class ProjectRecordCreator
                 Path.Combine(supportToolsParameters.AppProjectCreatorAllParameters.SecretsFolderPathReal,
                     _newProjectName),
             MainProjectName = _newProjectName,
-            MigrationStartupProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, fakeHostProjectName,
-                $"{fakeHostProjectName}{NamingStats.CsProjectExtension}"),
-            //SolutionFileNameWithMigrationProject =
-            //    Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-            //        scaffoldSeederProjectName, $"{scaffoldSeederProjectName}{solutionFileExtension}"),
-            MigrationProjectFilePath = Path.Combine(scaffoldSeedersWorkFolder, _newProjectName,
-                scaffoldSeederProjectName, scaffoldSeederProjectName, dbMigrationProjectName,
-                $"{dbMigrationProjectName}{NamingStats.CsProjectExtension}"),
-            //SeedProjectFilePath =
-            //    _templateModel is { UseDatabase: true, UseCarcass: true }
-            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-            //            scaffoldSeederProjectName, seedProjectName, $"{seedProjectName}{csProjectExtension}")
-            //        : null,
-            //SeedProjectParametersFilePath =
-            //    _templateModel is { UseDatabase: true, UseCarcass: true }
-            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
-            //            $"{seedProjectName}{csProjectExtension}")
-            //        : null,
-            //GetJsonFromScaffoldDbProjectFileFullName =
-            //    _templateModel is { UseDatabase: true, UseCarcass: true }
-            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeederProjectName,
-            //            scaffoldSeederProjectName, getJsonProjectName, $"{getJsonProjectName}{NamingStats.CsProjectExtension}")
-            //        : null,
-            //GetJsonFromScaffoldDbProjectParametersFileFullName =
-            //    _templateModel is { UseDatabase: true, UseCarcass: true }
-            //        ? Path.Combine(scaffoldSeedersWorkFolder, _newProjectName, scaffoldSeedSecFolderName,
-            //            $"{getJsonProjectName}{NamingStats.CsProjectExtension}")
-            //        : null,
             DbContextName = $"{_newDbPartProjectName}DbContext",
-            ProjectShortPrefix = _newProjectShortName,
-            DbContextProjectName =
-                _templateModel is { UseDatabase: true, UseCarcass: true } ? $"{_newDbPartProjectName}Db" : null,
-            NewDataSeedingClassLibProjectName =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? $"{_newDbPartProjectName}DbNewDataSeeding"
-                    : null,
-            ExcludesRulesParametersFilePath =
-                _templateModel is { UseDatabase: true, UseCarcass: true }
-                    ? Path.Combine(projectsFolderPathReal, _newProjectName, dbPartProjectsFolderName,
-                        $"ExcludesRules{jsonExtension}")
-                    : null,
             AppSetEnKeysJsonFileName =
                 _templateModel.SupportProjectType == ESupportProjectType.Api
                     ? Path.Combine(projectsFolderPathReal, _newProjectName, _newProjectName, _newProjectName,
@@ -322,20 +259,8 @@ internal sealed class ProjectRecordCreator
             },
             RedundantFileNames = redundantFileNames,
             GitProjectNames = gitProjectNames,
-            ScaffoldSeederGitProjectNames = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ?
-                [
-                    "AppCliTools", "BackendCarcass", "DatabaseTools", "ParametersManagement", "SystemTools",
-                    "ToolsManagement", "WebSystemTools",
-                    dbPartProjectsFolderName
-                ]
-                : [],
             AllowToolsList = _templateModel is { UseDatabase: true, UseCarcass: true }
-                ?
-                [
-                    EProjectTools.ScaffoldSeederCreator, EProjectTools.RecreateDevDatabase,
-                    EProjectTools.SeedData, EProjectTools.PrepareProdCopyDatabase
-                ]
+                ? [EProjectTools.RecreateDevDatabase]
                 :
                 [
                     EProjectTools.CreateDevDatabaseByMigration, EProjectTools.RecreateDevDatabase,

@@ -17,10 +17,6 @@ parameters configured (see [Configuration](../configuration.md)).
 |`DropDevDatabase`|Drop the dev DB|
 |`AnaliseDevDatabase`|Analyze schema of the dev DB|
 |`AnaliseProdCopyDatabase`|Analyze schema of the prod copy DB|
-|`PrepareProdCopyDatabase`|Prepare a prod copy for scaffold processing|
-|`ScaffoldSeederCreator`|Generate scaffold + seed code/JSON from prod copy|
-|`JsonFromProjectDbProjectGetter`|Extract DB rows into JSON files|
-|`SeedData`|Load JSON files into the dev DB|
 
 \---
 
@@ -86,48 +82,9 @@ drop succeeds.
 
 \---
 
-## If you need to copy production data into dev
-
-A multi-step pipeline. Intermediate JSON files are the contract between
-extraction and loading.
-
-**Steps**
-
-1. Obtain a prod copy (out of scope of this tool — use your DBA's process
-or a backup restore)
-2. `Project Tools List` → `PrepareProdCopyDatabase`
-— cleans up the prod copy so it can be scaffolded
-3. `Project Tools List` → `JsonFromProjectDbProjectGetter`
-— reads rows from each table, writes one JSON file per table
-4. `Project Tools List` → `SeedData`
-— reads the JSON files, inserts rows into the dev DB
-
-**Expected output**
-
-* A folder of `<TableName>.json` files (location from project parameters)
-* Dev DB populated with the same data as the prod copy
-
-**Common pitfalls**
-
-* **Order dependency.** `SeedData` relies on the dependency graph
-produced by `ScaffoldSeederCreator`. Run the scaffold step at least
-once for this project before seeding.
-* **Identity columns.** If prod rows carry explicit IDs, the dev schema
-must permit `IDENTITY\\\_INSERT`. The seeder toggles it per table, but
-the schema shape must match.
-* **Plaintext on disk.** JSON files contain raw row data, including any
-sensitive fields. Keep the output folder outside the repo and out of
-git.
-* **Large tables.** The extractor loads tables fully into memory. For
-tables larger than a few hundred MB, filter at the SQL level before
-running.
-
-\---
-
 ## If you need to analyze a database schema
 
-Use when investigating drift between dev and prod, or auditing what the
-scaffold tool sees.
+Use when investigating drift between dev and prod.
 
 **Steps**
 
@@ -146,50 +103,14 @@ scaffold tool sees.
 **Common pitfalls**
 
 * **Connection-only.** These commands read directly from the live DB.
-They do not depend on migrations or scaffold output. An empty report
-means the connection failed — check the connection string, not the
-project state.
-
-\---
-
-## If you need to generate scaffold + seed code from prod
-
-Use when bootstrapping a new project, or refreshing the scaffold model
-after a schema change in prod.
-
-**Steps**
-
-1. `Project Tools List` → `ScaffoldSeederCreator`
-
-**What it does**
-
-* Scaffolds against the prod copy
-* Generates EF model classes
-* Generates seed JSON files
-* Generates the seeder code that consumes those JSON files
-
-**Expected output**
-
-* A scaffold project at the configured path
-* JSON files alongside it, ready for `SeedData`
-
-**Common pitfalls**
-
-* **Idempotency.** Re-running overwrites generated code. Manual edits in
-the scaffold project are lost. Keep customizations in partial-class
-files outside the generated path.
-* **Reserved-word column names.** If prod columns share names with C#
-keywords, generated code may not compile. Adjust the column or use
-EF customization hooks.
-* **Run order.** `SeedData` will fail if `ScaffoldSeederCreator` has not
-been run for this project at least once — the dependency graph the
-seeder needs comes from the scaffold step.
+They do not depend on migrations. An empty report means the connection
+failed — check the connection string, not the project state.
 
 \---
 
 ## Related
 
 * [Configuration](../configuration.md) — where DB connection strings live
-* [Architecture](../architecture.md) — `LibDatabaseWork`, `LibScaffoldSeeder`
+* [Architecture](../architecture.md) — `LibDatabaseWork`
 * [Project Creation](project-creation.md) — initial DB setup for new projects
 

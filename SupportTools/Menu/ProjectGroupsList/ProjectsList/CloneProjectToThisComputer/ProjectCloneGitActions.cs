@@ -1,5 +1,4 @@
-﻿using LibGitData;
-using LibGitWork;
+﻿using LibGitWork;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportToolsData.Models;
@@ -27,10 +26,10 @@ internal sealed class ProjectCloneGitActions : IProjectCloneGitActions
         return gitProjectsUpdater?.ProcessOneGitProject() is not null;
     }
 
-    public void SyncGit(string projectName, EGitCol gitCol, string gitName)
+    public void SyncGit(string projectName, string gitName)
     {
         var gitProjectSyncronizer = new GitProjectSyncronizer(_logger, _parametersManager, gitName, true);
-        gitProjectSyncronizer.Add(projectName, gitCol);
+        gitProjectSyncronizer.Add(projectName);
         if (gitProjectSyncronizer.Count > 0)
         {
             gitProjectSyncronizer.RunSync();

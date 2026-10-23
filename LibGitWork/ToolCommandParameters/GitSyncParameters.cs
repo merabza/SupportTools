@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using LibGitData;
-using LibGitData.Models;
+﻿using LibGitData.Models;
 using LibGitWork.Helpers;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
@@ -30,7 +28,7 @@ public sealed class GitSyncParameters : IParameters
     }
 
     public static GitSyncParameters? Create(ILogger? logger, SupportToolsParameters supportToolsParameters,
-        string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
+        string projectName, string gitProjectName, bool useConsole)
     {
         ProjectModel? project = supportToolsParameters.GetProject(projectName);
         if (project is null)
@@ -39,9 +37,7 @@ public sealed class GitSyncParameters : IParameters
             return null;
         }
 
-        List<string> gitProjectNames = project.GetGitProjectNamesByGitCollectionType(gitCol);
-
-        if (!gitProjectNames.Contains(gitProjectName))
+        if (!project.GitProjectNames.Contains(gitProjectName))
         {
             StShared.WriteErrorLine($"Git Project with name {gitProjectName} does not exists", true, logger);
             return null;
@@ -75,7 +71,7 @@ public sealed class GitSyncParameters : IParameters
             return null;
         }
 
-        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName);
 
         if (gitsFolder != null)
         {

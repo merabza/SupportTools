@@ -173,7 +173,7 @@ public sealed class ProjectCreatorSettingsRegistrySyncAdapterTests : IDisposable
         // Arrange
         _context.Parameters.AppProjectCreatorAllParameters = new AppProjectCreatorAllParameters
         {
-            IndentSize = 4, FakeHostProjectName = "FakeHost", Templates = { ["Console"] = new TemplateModel() }
+            IndentSize = 4, Templates = { ["Console"] = new TemplateModel() }
         };
 
         // Act

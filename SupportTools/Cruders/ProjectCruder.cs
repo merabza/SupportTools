@@ -24,10 +24,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         IParametersManager parametersManager, Dictionary<string, ProjectModel> currentValuesDictionary) : base(
         parametersManager, currentValuesDictionary, "Project", "Projects")
     {
-        string[] gitProjectNamesParameterNames =
-        [
-            nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)
-        ];
+        string[] gitProjectNamesParameterNames = [nameof(ProjectModel.GitProjectNames)];
         FieldEditors.Add(new EnumFieldEditor<EProjectType>(nameof(ProjectModel.ProjectType), EProjectType.Standard));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectGroupName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectDescription)));
@@ -57,28 +54,12 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
         FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
             nameof(ProjectModel.ProdCopyDatabaseParameters), parametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.DbContextName)));
-        FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ProjectShortPrefix)));
-        FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.ScaffoldSeederProjectName)));
-        FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.DbContextProjectName),
-            gitProjectNamesParameterNames, CsProjExtension, parametersManager, true));
-        FieldEditors.Add(new GitProjectNameFieldEditor(nameof(ProjectModel.NewDataSeedingClassLibProjectName),
-            gitProjectNamesParameterNames, CsProjExtension, parametersManager, true));
         //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SolutionFileNameWithMigrationProject)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.DataSeederRulesByTableStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.OldDataConvertorForDataSeeder)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationStartupProjectFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.MigrationProjectFilePath)));
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectFilePath)));
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.SeedProjectParametersFilePath)));
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.PrepareProdCopyDatabaseProjectFilePath)));
-        FieldEditors.Add(
-            new FilePathFieldEditor(nameof(ProjectModel.PrepareProdCopyDatabaseProjectParametersFilePath)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.PairedDbObjectsResultFileName)));
-        //FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectFileFullName)));
-        //FieldEditors.Add(
-        //    new FilePathFieldEditor(nameof(ProjectModel.GetJsonFromScaffoldDbProjectParametersFileFullName)));
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.ExcludesRulesParametersFilePath)));
-        FieldEditors.Add(new FolderPathFieldEditor(nameof(ProjectModel.MigrationSqlFilesFolder)));
 
         //FieldEditors.Add(new EndpointsFieldEditor(nameof(ProjectModel.Endpoints), parametersManager));
         FieldEditors.Add(new DictionaryFieldEditor<EndpointCruder, EndpointModel>(nameof(ProjectModel.Endpoints),

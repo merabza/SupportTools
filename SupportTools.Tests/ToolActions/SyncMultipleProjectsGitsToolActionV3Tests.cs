@@ -53,7 +53,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
 
         _projectsFolder = Path.Combine(_tempFolder, "Projects");
         //without WorkFolder the work folder clones are left out; the tests of the work folder clones set it
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         foreach (string gitName in (string[])["RepoA", "RepoB", "RepoC"])
         {
             AddGit(gitName);
@@ -652,23 +651,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Contains("Message", _consoleOutput.ToString(), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Run_WhenProjectHasScaffoldSeederGits_ClonesThemIntoTheSeederFolder()
-    {
-        // Arrange
-        AddGit("RepoS");
-        ProjectModel project = _parameters.Projects["Local1"];
-        project.ScaffoldSeederProjectName = "Local1";
-        project.ScaffoldSeederGitProjectNames.Add("RepoS");
-
-        // Act
-        await Create(null, "Local1", false).Run();
-
-        // Assert
-        Assert.True(Directory.Exists(Path.Combine(_tempFolder, "Seeders", "Local1", "Local1ScaffoldSeeder", "RepoS",
-            ".git")));
     }
 
     [Fact]

@@ -29,7 +29,7 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
 
-    //the project files of the project's gits (main and ScaffoldSeeder), of another git and of no git
+    //the project files of the project's git, of another git and of no git
     private readonly SupportToolsParameters _parameters = new()
     {
         GitProjects =
@@ -41,10 +41,7 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
             ["WebAgentFront"] =
                 new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgentFront.esproj" },
             ["LibWebAgentRepositories"] =
-                new GitProjectDataModel
-                {
-                    GitName = "WebAgentScaffoldSeeder", ProjectFileName = "LibWebAgentRepositories.csproj"
-                },
+                new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "LibWebAgentRepositories.csproj" },
             ["OtherApp"] =
                 new GitProjectDataModel { GitName = "OtherApp", ProjectFileName = "OtherApp.csproj" },
             ["NoGitApp"] = new GitProjectDataModel { ProjectFileName = "NoGitApp.csproj" }
@@ -56,7 +53,6 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     private readonly ProjectModel _project = new()
     {
         GitProjectNames = ["WebAgent"],
-        ScaffoldSeederGitProjectNames = ["WebAgentScaffoldSeeder"],
         MainProjectName = "WebAgent",
         ApiContractsProjectName = "WebAgentContracts",
         SpaProjectName = "WebAgentFront"
@@ -96,7 +92,7 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
         Assert.Equal("WebAgent", _project.MainProjectName);
     }
 
-    //only the projects of the record's gits (main and ScaffoldSeeder) with the editor's extension, in name order
+    //only the projects of the record's gits with the editor's extension, in name order
     [Theory]
     [InlineData(nameof(ProjectModel.ApiContractsProjectName), CsProjExtension, "Api Contracts Project Name",
         "WebAgentContracts", new[] { "LibWebAgentRepositories", "WebAgent", "WebAgentContracts" })]
@@ -209,7 +205,7 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
     //as ProjectCruder creates the editors
     private static string[] GitProjectNamesParameterNames()
     {
-        return [nameof(ProjectModel.GitProjectNames), nameof(ProjectModel.ScaffoldSeederGitProjectNames)];
+        return [nameof(ProjectModel.GitProjectNames)];
     }
 
     private string? GetProjectName(string propertyName)

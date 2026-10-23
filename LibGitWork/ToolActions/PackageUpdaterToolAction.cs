@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LibDotnetWork;
-using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -34,11 +33,11 @@ public sealed class PackageUpdaterToolAction : ToolAction
     }
 
     public static PackageUpdaterToolAction? Create(ILogger? logger, IParametersManager parametersManager,
-        string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
+        string projectName, string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
+        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName,
             gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)

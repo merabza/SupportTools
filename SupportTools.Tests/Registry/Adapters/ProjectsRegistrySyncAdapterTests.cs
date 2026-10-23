@@ -31,7 +31,6 @@ public sealed class ProjectsRegistrySyncAdapterTests : IDisposable
         _context.Parameters.Projects[ProjectTestData.Name] = ProjectTestData.NewProject();
         _context.Parameters.Gits["AppFake"] = new GitDataModel();
         _context.Parameters.Gits["SystemTools"] = new GitDataModel();
-        _context.Parameters.Gits["AppFakeScaffoldSeeder"] = new GitDataModel();
         _context.Parameters.NpmPackages["react"] = "React";
         _context.Parameters.EditorConfigPatterns.Add("default");
         _context.Parameters.DatabaseServerConnections["Dev"] = new DatabaseServerConnectionData();
@@ -218,17 +217,16 @@ public sealed class ProjectsRegistrySyncAdapterTests : IDisposable
     }
 
     [Fact]
-    public void GetLocalRecords_WhenTemplateAndScaffoldSeederGitAreMissing_WarnsAboutThem()
+    public void GetLocalRecords_WhenTemplateIsMissing_WarnsAboutIt()
     {
         // Arrange
-        _context.Parameters.Gits.Remove("AppFakeScaffoldSeeder");
         _context.Parameters.EditorConfigPatterns.Clear();
 
         // Act
         _sut.GetLocalRecords();
 
         // Assert
-        Assert.Equal(["ScaffoldSeederGitProjectNames AppFakeScaffoldSeeder", "EditorConfigPatternName default"],
+        Assert.Equal(["EditorConfigPatternName default"],
             _context.Warnings.Items.Select(x => x.Message.Split(" is neither")[0]));
     }
 
@@ -241,7 +239,7 @@ public sealed class ProjectsRegistrySyncAdapterTests : IDisposable
         _context.Parameters.NpmPackages.Clear();
         _context.Parameters.EditorConfigPatterns.Clear();
         _context.Parameters.DatabaseServerConnections.Clear();
-        foreach (string git in new[] { "AppFake", "SystemTools", "AppFakeScaffoldSeeder" })
+        foreach (string git in new[] { "AppFake", "SystemTools" })
         {
             _context.Server.Store(FakeSupportToolsServer.GitRepos, git,
                 new StsGitDataModel

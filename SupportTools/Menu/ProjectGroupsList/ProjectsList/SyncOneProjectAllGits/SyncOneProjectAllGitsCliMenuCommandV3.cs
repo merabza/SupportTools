@@ -6,11 +6,11 @@ using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 
-public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3 : CliMenuCommand
+public sealed class SyncOneProjectAllGitsCliMenuCommandV3 : CliMenuCommand
 {
-    public const string MenuCommandName = "Sync One Project All Gits With Scaffold Seeders V3";
+    public const string MenuCommandName = "Sync One Project All Gits V3";
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -18,9 +18,9 @@ public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3 : C
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV3(ILogger logger,
-        IHttpClientFactory httpClientFactory, IParametersManager parametersManager, string projectName,
-        bool askRunAction = true) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
+    public SyncOneProjectAllGitsCliMenuCommandV3(ILogger logger, IHttpClientFactory httpClientFactory,
+        IParametersManager parametersManager, string projectName, bool askRunAction = true) : base(MenuCommandName,
+        EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;

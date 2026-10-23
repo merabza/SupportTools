@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using AppCliTools.CliTools;
-using LibGitData;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibApiClientParameters;
@@ -60,7 +59,6 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public string? TempFolder { get; set; }
     public string? CodeGenerateTestFolder { get; set; }
     public string? SecurityFolder { get; set; }
-    public string? ScaffoldSeedersWorkFolder { get; set; }
     public string? PublisherWorkFolder { get; set; }
     public string? ServiceDescriptionSignature { get; set; }
     public string? UploadTempExtension { get; set; }
@@ -133,7 +131,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return string.IsNullOrWhiteSpace(MachineName) ? Environment.MachineName : MachineName;
     }
 
-    public bool DeleteGitFromProjectByNames(string projectName, string gitName, EGitCol gitCol)
+    public bool DeleteGitFromProjectByNames(string projectName, string gitName)
     {
         ProjectModel? project = GetProject(projectName);
         if (project is null)
@@ -141,23 +139,14 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
             return false;
         }
 
-        switch (gitCol)
-        {
-            case EGitCol.Main:
-                project.GitProjectNames.Remove(gitName);
-                return true;
-            case EGitCol.ScaffoldSeed:
-                project.ScaffoldSeederGitProjectNames.Remove(gitName);
-                return true;
-            default:
-                return false;
-        }
+        project.GitProjectNames.Remove(gitName);
+        return true;
     }
 
-    public List<string> GetGitProjectNames(string projectName, EGitCol gitCol)
+    public List<string> GetGitProjectNames(string projectName)
     {
         ProjectModel? project = GetProject(projectName);
-        return project is null ? [] : project.GetGitProjectNamesByGitCollectionType(gitCol);
+        return project is null ? [] : project.GitProjectNames;
     }
 
     public ApiClientSettingsDomain GetApiClientSettingsRequired(string apiClientName)
@@ -235,15 +224,7 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
         return Projects.GetValueOrDefault(projectName);
     }
 
-    private string? GetProjectScaffoldSeederPath(string scaffoldSeederProjectName)
-    {
-        return string.IsNullOrWhiteSpace(ScaffoldSeedersWorkFolder)
-            ? null
-            : Path.Combine(ScaffoldSeedersWorkFolder, scaffoldSeederProjectName,
-                $"{scaffoldSeederProjectName}ScaffoldSeeder");
-    }
-
-    public string? GetGitsFolder(string projectName, EGitCol gitCol)
+    public string? GetGitsFolder(string projectName)
     {
         ProjectModel? project = GetProject(projectName);
         if (project is null)
@@ -251,29 +232,13 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
             return null;
         }
 
-        switch (gitCol)
+        if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
         {
-            case EGitCol.Main:
-                if (!string.IsNullOrWhiteSpace(project.ProjectFolderName))
-                {
-                    return project.ProjectFolderName;
-                }
-
-                StShared.WriteErrorLine("ProjectFolderName must be specified", true);
-                return null;
-
-            case EGitCol.ScaffoldSeed:
-                if (project.ScaffoldSeederProjectName != null)
-                {
-                    return GetProjectScaffoldSeederPath(project.ScaffoldSeederProjectName);
-                }
-
-                StShared.WriteErrorLine("ScaffoldSeederProjectName must be specified", true);
-                return null;
-
-            default:
-                return null;
+            return project.ProjectFolderName;
         }
+
+        StShared.WriteErrorLine("ProjectFolderName must be specified", true);
+        return null;
     }
 
     public static string FixProjectGroupName(string? projectGroupName)

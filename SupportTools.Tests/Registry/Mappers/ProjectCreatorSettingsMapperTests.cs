@@ -104,7 +104,6 @@ public sealed class ProjectCreatorSettingsMapperTests
         var empty = new StsProjectCreatorSettingsDataModel
         {
             IndentSize = 4,
-            FakeHostProjectName = "",
             ProjectsFolderPathReal = "",
             SecretsFolderPathReal = "",
             ProductionServerName = "",
@@ -128,7 +127,6 @@ public sealed class ProjectCreatorSettingsMapperTests
         return new AppProjectCreatorAllParameters
         {
             IndentSize = 4,
-            FakeHostProjectName = "FakeHost",
             ProjectsFolderPathReal = projectsFolder,
             ProductionServerName = "dl360",
             ProductionEnvironmentName = "Production",

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork.ToolCommandParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
@@ -45,15 +44,15 @@ internal sealed class FakeProjectCloneGitActions : IProjectCloneGitActions
         return true;
     }
 
-    public void SyncGit(string projectName, EGitCol gitCol, string gitName)
+    public void SyncGit(string projectName, string gitName)
     {
-        Calls.Add($"sync {gitCol} {gitName}");
+        Calls.Add($"sync {gitName}");
         if (FailingClones.Contains(gitName))
         {
             return;
         }
 
-        var gitSyncParameters = GitSyncParameters.Create(null, _parameters, projectName, gitCol, gitName, false);
+        var gitSyncParameters = GitSyncParameters.Create(null, _parameters, projectName, gitName, false);
         if (gitSyncParameters is null)
         {
             return;

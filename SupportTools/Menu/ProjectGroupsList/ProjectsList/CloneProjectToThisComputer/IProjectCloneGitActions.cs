@@ -1,6 +1,4 @@
-﻿using LibGitData;
-
-namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
+﻿namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 
 //„Clone Project To This Computer“-ის git-ის ნაბიჯები. ტესტები git-ის გაშვების გარეშე fake-ს აწვდიან
 internal interface IProjectCloneGitActions
@@ -9,5 +7,5 @@ internal interface IProjectCloneGitActions
     bool ScanGitProjects(string gitName);
 
     //ერთი git-ის კლონი (ან სინქრონიზაცია) პროექტის ფოლდერში არსებული V2 მექანიზმით
-    void SyncGit(string projectName, EGitCol gitCol, string gitName);
+    void SyncGit(string projectName, string gitName);
 }

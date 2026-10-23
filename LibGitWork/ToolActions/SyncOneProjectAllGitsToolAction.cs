@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitData;
 using LibGitWork.Models;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -30,14 +29,13 @@ public sealed class SyncOneProjectAllGitsToolAction : ToolAction
     }
 
     public static SyncOneProjectAllGitsToolAction? Create(ILogger? logger, IParametersManager parametersManager,
-        string projectName, EGitCol gitCol,
-        Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
-        bool useConsole)
+        string projectName, Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects,
+        bool isFirstSync, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var syncOneProjectAllGitsParameters = SyncOneProjectAllGitsParameters.Create(loggerOrNull,
-            supportToolsParameters, projectName, gitCol, changedGitProjects, isFirstSync, useConsole);
+            supportToolsParameters, projectName, changedGitProjects, isFirstSync, useConsole);
 
         if (syncOneProjectAllGitsParameters is not null)
         {

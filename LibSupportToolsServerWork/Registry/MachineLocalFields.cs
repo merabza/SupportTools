@@ -34,7 +34,6 @@ public static class MachineLocalFields
         nameof(SupportToolsParameters.TempFolder),
         nameof(SupportToolsParameters.CodeGenerateTestFolder),
         nameof(SupportToolsParameters.SecurityFolder),
-        nameof(SupportToolsParameters.ScaffoldSeedersWorkFolder),
         nameof(SupportToolsParameters.PublisherWorkFolder),
         nameof(SupportToolsParameters.LocalInstallerSettings),
         nameof(SupportToolsParameters.RecentCommandsFileName),

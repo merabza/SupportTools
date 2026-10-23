@@ -27,7 +27,6 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 |`LibAppInstallWork`|Install/uninstall pipeline-ები (ლოკალური და მოშორებული)|LibDotnetWork, SupportToolsData|
 |`LibSupportToolsServerWork`|ცენტრალური რეესტრი: საერთო კოლექციების სინქრონიზაცია SupportToolsServer-თან (იხ. [რეესტრის ფენა](#რეესტრის-ფენა)); SupportToolsServer-ის რედაქტორები (`Support Tools Server Editor`); ყველაფერი სერვერის კლიენტით, `SupportToolsServerApiClient`|LibGitWork, SupportToolsData|
 |`LibAppProjectCreator`|პროექტის scaffolding შაბლონებიდან|LibAppInstallWork, LibGitWork, LibNpmWork|
-|`LibScaffoldSeeder`|Scaffold + seed კოდი არსებული ბაზებიდან|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, კონფიგურაცია, პარამეტრების მართვა|გარე: AppCliTools.CliTools, ParametersManagement.\*|
 |`SupportTools`|კონსოლის entry point, მენიუს wiring, CLI ბრძანებების factory-ები|ყველა Lib\* პროექტი|
 
@@ -44,7 +43,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
                                   │
 შრე 4    მაღალი დონის workflow-ები ▼
          ┌──────────────────────────────────────────────────────────┐
-         │ LibAppProjectCreator      LibScaffoldSeeder              │
+         │ LibAppProjectCreator                                     │
          └──────────────────────────────────────────────────────────┘
                                   │
 შრე 3    დომენის ლოგიკა            ▼
@@ -65,7 +64,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 ```
 
 წაიკითხეთ ზემოდან: `SupportTools/Menu/`-ში executable ბრძანება იყენებს
-ორკესტრატორს `LibAppInstallWork`-ში ან `LibScaffoldSeeder`-ში,
+ორკესტრატორს `LibAppInstallWork`-ში ან `LibAppProjectCreator`-ში,
 რომელიც გადასცემს `LibDotnetWork`/`LibGitWork`/`LibNpmWork`-ს
 პროცესის სამუშაოს, რომელიც იყენებს `LibGitData`/`SupportToolsData`-ს
 ტიპიზებული state-ისთვის.
@@ -80,9 +79,7 @@ Solution ასევე იცავს ცხრა გარე რეპო�
 
 |რეპო|გამოყენება|
 |-|-|
-|`AppCliTools`|CLI მენიუ, პარამეტრების რედაქტირება, მონაცემთა შეტანა, seed-კოდის შექმნა|
-|`BackendCarcass`|გაზიარებული backend framework პროექტები|
-|`BackendCarcassShared`|Carcass კონტრაქტები|
+|`AppCliTools`|CLI მენიუ, პარამეტრების რედაქტირება, მონაცემთა შეტანა|
 |`ConnectionTools`|FTP/connection-pool utility-ები|
 |`DatabaseTools`|SQL Server, SQLite, OleDb, MariaDB ადაპტერები|
 |`ParametersManagement`|API client, file, database პარამეტრების მართვა|

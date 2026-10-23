@@ -41,19 +41,9 @@ internal static class ProjectTestData
             DataSeederRulesByTableStartupProjectFilePath = $@"{Folder}\Rules\Rules.csproj",
             OldDataConvertorForDataSeeder = $@"{Folder}\Convertor\Convertor.csproj",
             MigrationProjectFilePath = $@"{Folder}\Migration\Migration.csproj",
-            SeedProjectFilePath = $@"{Folder}\Seeder\Seeder.csproj",
-            SeedProjectParametersFilePath = @"D:\1WorkDotnet\Security\AppFake\Seeder.json",
             DbContextName = "AppFakeDbContext",
-            ProjectShortPrefix = "af",
-            ScaffoldSeederProjectName = "AppFakeScaffoldSeeder",
-            DbContextProjectName = "AppFakeDb",
-            NewDataSeedingClassLibProjectName = "AppFakeNewDataSeeding",
-            ExcludesRulesParametersFilePath = @"D:\1WorkDotnet\Security\AppFake\Excludes.json",
             AppSetEnKeysJsonFileName = @"D:\1WorkDotnet\Security\AppFake\AppSetEnKeys.json",
             KeyGuidPart = "00000000-fake-key-guid-part",
-            MigrationSqlFilesFolder = $@"{Folder}\Sql",
-            PrepareProdCopyDatabaseProjectFilePath = $@"{Folder}\Prepare\Prepare.csproj",
-            PrepareProdCopyDatabaseProjectParametersFilePath = @"D:\1WorkDotnet\Security\AppFake\Prepare.json",
             PairedDbObjectsResultFileName = @"D:\1WorkDotnet\Security\AppFake\Paired.json",
             DevDatabaseParameters = NewDatabaseParameters("AppFakeDev"),
             ProdCopyDatabaseParameters = NewDatabaseParameters("AppFakeProdCopy"),
@@ -84,7 +74,6 @@ internal static class ProjectTestData
             },
             RouteClasses = { ["Items"] = new RouteClassModel { Root = "api", Version = "v2", Base = "items" } },
             GitProjectNames = ["AppFake", "SystemTools"],
-            ScaffoldSeederGitProjectNames = ["AppFakeScaffoldSeeder"],
             ServerInfos =
             {
                 [ProdKey] = new ServerInfoModel
@@ -116,7 +105,7 @@ internal static class ProjectTestData
                     AllowToolsList = [EProjectServerTools.VersionChecker]
                 }
             },
-            AllowToolsList = [EProjectTools.SeedData, EProjectTools.GenerateApiRoutes]
+            AllowToolsList = [EProjectTools.RecreateDevDatabase, EProjectTools.GenerateApiRoutes]
         };
     }
 

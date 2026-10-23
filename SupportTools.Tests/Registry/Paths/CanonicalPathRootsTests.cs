@@ -69,23 +69,16 @@ public sealed class CanonicalPathRootsTests
                     ProjectSecurityFolderPath = @"C:\R03\x",
                     MigrationStartupProjectFilePath = @"C:\R04\x.csproj",
                     MigrationProjectFilePath = @"C:\R05\x.csproj",
-                    SeedProjectFilePath = @"C:\R06\x.csproj",
-                    SeedProjectParametersFilePath = @"C:\R07\x.json",
-                    DataSeederRulesByTableStartupProjectFilePath = @"C:\R08\x.csproj",
-                    OldDataConvertorForDataSeeder = @"C:\R09\x.csproj",
-                    ExcludesRulesParametersFilePath = @"C:\R10\x.json",
-                    AppSetEnKeysJsonFileName = @"C:\R11\x.json",
-                    MigrationSqlFilesFolder = @"C:\R12\x",
-                    PrepareProdCopyDatabaseProjectFilePath = @"C:\R13\x.csproj",
-                    PrepareProdCopyDatabaseProjectParametersFilePath = @"C:\R14\x.json",
-                    PairedDbObjectsResultFileName = @"C:\R15\x.json"
+                    DataSeederRulesByTableStartupProjectFilePath = @"C:\R06\x.csproj",
+                    OldDataConvertorForDataSeeder = @"C:\R07\x.csproj",
+                    AppSetEnKeysJsonFileName = @"C:\R08\x.json",
+                    PairedDbObjectsResultFileName = @"C:\R09\x.json"
                 }
             }
         };
         string[] expected =
         [
-            @"C:\R01", @"C:\R02", @"C:\R03", @"C:\R04", @"C:\R05", @"C:\R06", @"C:\R07", @"C:\R08", @"C:\R09",
-            @"C:\R10", @"C:\R11", @"C:\R12", @"C:\R13", @"C:\R14", @"C:\R15"
+            @"C:\R01", @"C:\R02", @"C:\R03", @"C:\R04", @"C:\R05", @"C:\R06", @"C:\R07", @"C:\R08", @"C:\R09"
         ];
 
         // Act
@@ -153,7 +146,7 @@ public sealed class CanonicalPathRootsTests
                 ["A"] = new ProjectModel
                 {
                     ProjectFolderName = @"D:\1WorkDotnet\SupportTools",
-                    MigrationSqlFilesFolder = @"Sql\Migrations"
+                    MigrationProjectFilePath = @"Migrations\Migrations.csproj"
                 }
             }
         };

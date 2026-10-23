@@ -28,12 +28,12 @@ public sealed class GitClearToolAction : ToolAction
     }
 
     //public static GitClearToolAction? Create(ILogger logger, ParametersManager parametersManager,
-    //    string projectName, EGitCol gitCol, string gitProjectName, bool useConsole)
+    //    string projectName, string gitProjectName, bool useConsole)
     //{
     //    var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
     //    var loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
     //    var gitClearParameters = GitClearParameters.Create(loggerOrNull,
-    //        supportToolsParameters, projectName, gitCol, gitProjectName, useConsole);
+    //        supportToolsParameters, projectName, gitProjectName, useConsole);
 
     //    if (gitClearParameters is not null)
     //        return new GitClearToolAction(loggerOrNull, gitClearParameters);

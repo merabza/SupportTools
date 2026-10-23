@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -38,10 +37,10 @@ public sealed class GitProjectSyncronizer
 
     public int Count => _gitSyncToolActionList.Count;
 
-    public void Add(string projectName, EGitCol gitCol)
+    public void Add(string projectName)
     {
-        var gitSyncToolAction = GitSyncToolAction.Create(_logger, _parametersManager, projectName, gitCol,
-            _gitProjectName, true);
+        var gitSyncToolAction =
+            GitSyncToolAction.Create(_logger, _parametersManager, projectName, _gitProjectName, true);
         if (gitSyncToolAction is null)
         {
             return;

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -19,7 +18,6 @@ namespace SupportTools.CliMenuCommands;
 //ფაილი კი კოპირდება შაბლონების ფოლდერში. თვითონ გიტის GitIgnorePatternName არ იცვლება
 public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
 {
-    private readonly EGitCol _gitCol;
     private readonly string _gitProjectName;
     private readonly Func<string, bool, bool> _inputBool;
     private readonly Func<string, string?, string?> _inputText;
@@ -28,8 +26,8 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
     private readonly string _projectName;
 
     public SaveGitIgnoreAsNewTemplateCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        string projectName, string gitProjectName, EGitCol gitCol) : this(logger, parametersManager, projectName,
-        gitProjectName, gitCol, (fieldName, defaultValue) => Inputer.InputText(fieldName, defaultValue),
+        string projectName, string gitProjectName) : this(logger, parametersManager, projectName, gitProjectName,
+        (fieldName, defaultValue) => Inputer.InputText(fieldName, defaultValue),
         (fieldName, defaultValue) => Inputer.InputBool(fieldName, defaultValue, false))
     {
     }
@@ -37,14 +35,13 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
     //კონსოლიდან შეყვანა პარამეტრებადაა გამოტანილი, რომ ტესტებმა პასუხები თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
     internal SaveGitIgnoreAsNewTemplateCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        string projectName, string gitProjectName, EGitCol gitCol, Func<string, string?, string?> inputText,
+        string projectName, string gitProjectName, Func<string, string?, string?> inputText,
         Func<string, bool, bool> inputBool) : base("Save .gitignore as New Template", EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;
         _projectName = projectName;
         _gitProjectName = gitProjectName;
-        _gitCol = gitCol;
         _inputText = inputText;
         _inputBool = inputBool;
     }
@@ -61,8 +58,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommand : CliMenuCommand
         }
 
         //გიტის ლოკალური ფოლდერი დგინდება ისევე, როგორც სინქრონიზაციისას
-        var gitSyncParameters =
-            GitSyncParameters.Create(_logger, parameters, _projectName, _gitCol, _gitProjectName, true);
+        var gitSyncParameters = GitSyncParameters.Create(_logger, parameters, _projectName, _gitProjectName, true);
         if (gitSyncParameters is null)
         {
             return false;

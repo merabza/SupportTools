@@ -26,7 +26,6 @@ the build expects all sibling repos to live alongside `SupportTools/`.
 |`LibAppInstallWork`|Install/uninstall pipelines (local \& remote)|LibDotnetWork, SupportToolsData|
 |`LibSupportToolsServerWork`|The central registry: sync of the shared collections with SupportToolsServer (see [Registry layer](#registry-layer)); the SupportToolsServer editors (`Support Tools Server Editor`); all through the server client `SupportToolsServerApiClient`|LibGitWork, SupportToolsData|
 |`LibAppProjectCreator`|Project scaffolding from templates|LibAppInstallWork, LibGitWork, LibNpmWork|
-|`LibScaffoldSeeder`|Scaffold + seed code from existing databases|LibAppProjectCreator, LibGitWork|
 |`SupportTools.Application`|DI host, configuration, parameter management|External: AppCliTools.CliTools, ParametersManagement.\*|
 |`SupportTools`|Console entry point, menu wiring, CLI command factories|All Lib\* projects|
 
@@ -43,7 +42,7 @@ Layer 5  Entry
                                   │
 Layer 4  High-level workflows     ▼
          ┌──────────────────────────────────────────────────────────┐
-         │ LibAppProjectCreator      LibScaffoldSeeder              │
+         │ LibAppProjectCreator                                     │
          └──────────────────────────────────────────────────────────┘
                                   │
 Layer 3  Domain logic             ▼
@@ -64,7 +63,7 @@ Layer 1  Foundation               ▼
 ```
 
 Reads from top: an executable command in `SupportTools/Menu/` uses an
-orchestrator in `LibAppInstallWork` or `LibScaffoldSeeder`, which
+orchestrator in `LibAppInstallWork` or `LibAppProjectCreator`, which
 delegates to `LibDotnetWork`/`LibGitWork`/`LibNpmWork` for process work,
 which uses `LibGitData`/`SupportToolsData` for typed state.
 
@@ -77,9 +76,7 @@ These are sibling Git checkouts referenced via relative paths in
 
 |Repo|Used for|
 |-|-|
-|`AppCliTools`|CLI menu, parameter editing, data input, seed-code creation|
-|`BackendCarcass`|Shared backend framework projects|
-|`BackendCarcassShared`|Carcass contracts|
+|`AppCliTools`|CLI menu, parameter editing, data input|
 |`ConnectionTools`|FTP/connection-pool utilities|
 |`DatabaseTools`|SQL Server, SQLite, OleDb, MariaDB adapters|
 |`ParametersManagement`|API client, file, and database parameter management|

@@ -44,7 +44,7 @@ of properties:
 
 |Group|Properties|Used for|
 |-|-|-|
-|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
+|Paths|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|Where the tool reads/writes on disk; `FolderForGitignoreFiles` is the folder holding the `.gitignore` template files; `FolderForEditorConfigFiles` is the folder holding the `.editorconfig` template files; `GitExecutablePath` is the full path to the git executable (when empty, plain `git` from `PATH` is used; the editor auto-detects it via `Get-Command git` on Windows / `which git` on Linux)|
 |Machine profile|`MachineName`, `CurrentMachineServerName`, `PathMappings`, `HideRemoteOnlyProjects`|Settings of this computer, never shared with other computers (see [Machine profile and path mapping](#machine-profile-and-path-mapping))|
 |Registry sync|`SupportToolsServerWebApiClientName`, `AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`, `RegistrySyncState`|The connection to SupportToolsServer and the sync state of this computer, never shared (see [Central registry](#central-registry-supporttoolsserver))|
 |Exchange|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|Required for AppSettings encode/install (see [Deployment](use-cases/deployment.md))|
@@ -201,8 +201,6 @@ records as they are, secrets included: API keys, database and file
 storage user names and passwords, `KeyGuidPart`, `MediatRLicenseKey` and
 the secret files that the registry points to
 (`AppSettingsJsonSourceFileName` of the server infos,
-`SeedProjectParametersFilePath`,
-`PrepareProdCopyDatabaseProjectParametersFilePath`,
 `PairedDbObjectsResultFileName`; a file inside a git working tree is left
 out, git carries it). Protect the server, its database and its backups
 like the parameters file. SupportTools never prints these values: a diff
@@ -220,12 +218,11 @@ The core of each registered project. Located at
 |-|-|
 |Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (see [templates](#gitignore-and-editorconfig-templates))|
 |Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (own packages: off = `Distribute all packages` and `Reverse Package Distribution` skip the project)|
-|Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
-|Migration \& seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
-|Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|
+|Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextName`|
+|Migration|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`|
 |Encryption|`AppSetEnKeysJsonFileName`, `KeyGuidPart`|
 |Database|`DevDatabaseParameters`, `ProdCopyDatabaseParameters`|
-|Collections|`Endpoints`, `RouteClasses`, `ServerInfos`, `GitProjectNames`, `ScaffoldSeederGitProjectNames`, `FrontNpmPackageNames`, `RedundantFileNames`|
+|Collections|`Endpoints`, `RouteClasses`, `ServerInfos`, `GitProjectNames`, `FrontNpmPackageNames`, `RedundantFileNames`|
 
 \---
 
@@ -365,9 +362,8 @@ parameters with the next registry sync.
 Deleting or renaming a git in `Gits from SupportToolsServer` also changes
 the local `Gits` record once the server accepts the change. A deleted git
 stays locally while a project still uses it. A rename also renames the
-references in the projects (`GitProjectNames`,
-`ScaffoldSeederGitProjectNames`) and in `GitProjects`, unless the new
-name is already taken locally.
+references in the projects (`GitProjectNames`) and in `GitProjects`,
+unless the new name is already taken locally.
 
 Editing the JSON file directly works for one-off fixes, but the menu
 editors run validation that the file does not.

@@ -54,7 +54,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
     [Theory]
     [InlineData("RecreateDevDatabase", EProjectTools.RecreateDevDatabase)]
     [InlineData("recreatedevdatabase", EProjectTools.RecreateDevDatabase)]
-    [InlineData("SEEDDATA", EProjectTools.SeedData)]
+    [InlineData("GENERATEAPIROUTES", EProjectTools.GenerateApiRoutes)]
     public void FindProjectTool_WhenNameIsKnown_ReturnsToolIgnoringCase(string toolName, EProjectTools expected)
     {
         Assert.Equal(expected, ProjectToolRunner.FindProjectTool(toolName));
@@ -65,6 +65,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
     [InlineData("2")]
     [InlineData("")]
     [InlineData("ServiceStarter")]
+    [InlineData("SeedData")]
     public void FindProjectTool_WhenNameIsNotAProjectToolName_ReturnsNull(string toolName)
     {
         Assert.Null(ProjectToolRunner.FindProjectTool(toolName));
@@ -103,7 +104,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
     public async Task Run_WhenToolIsNotInAllowToolsList_ReturnsFalseAndListsAllowedTools()
     {
         // Arrange
-        AddProject(EProjectTools.SeedData, EProjectTools.RecreateDevDatabase);
+        AddProject(EProjectTools.GenerateApiRoutes, EProjectTools.RecreateDevDatabase);
 
         // Act
         bool result = await ProjectToolRunner.Run(CreateServiceProvider(), _parametersManager.Object, ProjectName,
@@ -113,14 +114,15 @@ public sealed class ProjectToolRunnerTests : IDisposable
         Assert.False(result);
         Assert.Contains($"Tool {EProjectTools.DropDevDatabase} is not allowed for project {ProjectName}", ConsoleText(),
             StringComparison.Ordinal);
-        Assert.Contains("Allowed tools are: RecreateDevDatabase, SeedData", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("Allowed tools are: GenerateApiRoutes, RecreateDevDatabase", ConsoleText(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
     public async Task Run_WhenAllowToolsListHasUndefinedValue_DoesNotOfferItAsAllowed()
     {
         // Arrange
-        AddProject(EProjectTools.SeedData, (EProjectTools)99);
+        AddProject(EProjectTools.GenerateApiRoutes, (EProjectTools)99);
 
         // Act
         bool result = await ProjectToolRunner.Run(CreateServiceProvider(), _parametersManager.Object, ProjectName,
@@ -128,7 +130,7 @@ public sealed class ProjectToolRunnerTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Contains("Allowed tools are: SeedData", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("Allowed tools are: GenerateApiRoutes", ConsoleText(), StringComparison.Ordinal);
         Assert.DoesNotContain("99", ConsoleText(), StringComparison.Ordinal);
     }
 

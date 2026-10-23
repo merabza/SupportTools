@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
-using LibGitData;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
@@ -15,7 +14,6 @@ namespace SupportTools.CliMenuCommands;
 
 public sealed class NewGitCliMenuCommand : CliMenuCommand
 {
-    private readonly EGitCol _gitCol;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
@@ -24,14 +22,12 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
     //ახალი პროექტის შექმნის ამოცანა
     // ReSharper disable once ConvertToPrimaryConstructor
     public NewGitCliMenuCommand(ILogger logger, IHttpClientFactory httpClientFactory,
-        IParametersManager parametersManager, string projectName, EGitCol gitCol) : base("Add Git Project",
-        EMenuAction.Reload)
+        IParametersManager parametersManager, string projectName) : base("Add Git Project", EMenuAction.Reload)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _parametersManager = parametersManager;
         _projectName = projectName;
-        _gitCol = gitCol;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
@@ -58,7 +54,7 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        List<string> gitProjectNames = GitProjectNames(project, _gitCol);
+        List<string> gitProjectNames = project.GitProjectNames;
 
         //გადავამოწმოთ ხომ არ არსებობს იგივე სახელით სხვა პროექტი.
         if (gitProjectNames.Contains(newGitName))
@@ -75,17 +71,5 @@ public sealed class NewGitCliMenuCommand : CliMenuCommand
         await _parametersManager.Save(parameters, "Add Git Project Finished", null, cancellationToken);
 
         return true;
-    }
-
-    private static List<string> GitProjectNames(ProjectModel project, EGitCol gitCol)
-    {
-        List<string> gitProjectNames = gitCol switch
-        {
-            EGitCol.Main => project.GitProjectNames,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => throw new ArgumentOutOfRangeException(nameof(gitCol), gitCol,
-                $"Unsupported git collection type: {gitCol}")
-        };
-        return gitProjectNames;
     }
 }

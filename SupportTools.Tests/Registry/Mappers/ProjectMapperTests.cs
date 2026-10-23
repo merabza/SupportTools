@@ -40,7 +40,7 @@ public sealed class ProjectMapperTests
         // Assert
         Assert.Equal(ProjectTestData.Name, result.Name);
         Assert.Equal("IsService", result.ProjectType);
-        Assert.Equal(["SeedData", "GenerateApiRoutes"], result.AllowToolsList);
+        Assert.Equal(["RecreateDevDatabase", "GenerateApiRoutes"], result.AllowToolsList);
         Assert.Equal("v2", Assert.Single(result.RouteClasses).ApiVersion);
         Assert.Equal(["GetItems", "SaveItem"], result.Endpoints.Select(x => x.Name));
         Assert.Equal(("Get", "Query"), (result.Endpoints[0].HttpMethod, result.Endpoints[0].EndpointType));
@@ -261,7 +261,7 @@ public sealed class ProjectMapperTests
         // Arrange
         StsProjectDataModel contract = ContractOf(ProjectTestData.NewProject());
         contract.ProjectType = "ispackage";
-        contract.AllowToolsList = ["seeddata"];
+        contract.AllowToolsList = ["generateapiroutes"];
         contract.Endpoints[0].HttpMethod = "patch";
         contract.Endpoints[0].EndpointType = "command";
 
@@ -270,7 +270,7 @@ public sealed class ProjectMapperTests
 
         // Assert
         Assert.Equal(EProjectType.IsPackage, result.ProjectType);
-        Assert.Equal([EProjectTools.SeedData], result.AllowToolsList);
+        Assert.Equal([EProjectTools.GenerateApiRoutes], result.AllowToolsList);
         Assert.Equal((EHttpMethod.Patch, EEndpointType.Command),
             (result.Endpoints["GetItems"].HttpMethod, result.Endpoints["GetItems"].EndpointType));
     }
@@ -297,7 +297,6 @@ public sealed class ProjectMapperTests
         Assert.Same(existing.Endpoints, result.Endpoints);
         Assert.Same(existing.RouteClasses, result.RouteClasses);
         Assert.Same(existing.GitProjectNames, result.GitProjectNames);
-        Assert.Same(existing.ScaffoldSeederGitProjectNames, result.ScaffoldSeederGitProjectNames);
         Assert.Same(existing.ServerInfos, result.ServerInfos);
         Assert.Same(existing.AllowToolsList, result.AllowToolsList);
         Assert.Same(existing.DevDatabaseParameters, result.DevDatabaseParameters);
@@ -384,7 +383,7 @@ public sealed class ProjectMapperTests
         // Arrange
         StsProjectDataModel contract = ContractOf(ProjectTestData.NewProject());
         contract.ProjectType = "isservice";
-        contract.AllowToolsList = ["seeddata"];
+        contract.AllowToolsList = ["generateapiroutes"];
         contract.Endpoints[0].HttpMethod = "GET";
         contract.ServerInfos[0].AllowToolsList = ["versionchecker"];
         contract.DevDatabaseParameters!.BackupType = "trlog";
@@ -394,7 +393,7 @@ public sealed class ProjectMapperTests
 
         // Assert
         Assert.Equal("IsService", result.ProjectType);
-        Assert.Equal(["SeedData"], result.AllowToolsList);
+        Assert.Equal(["GenerateApiRoutes"], result.AllowToolsList);
         Assert.Equal("Get", result.Endpoints[0].HttpMethod);
         Assert.Equal(["VersionChecker"], result.ServerInfos[0].AllowToolsList);
         Assert.Equal("TrLog", result.DevDatabaseParameters?.BackupType);
@@ -500,13 +499,12 @@ public sealed class ProjectMapperTests
     //every set of the contract is checked, also an exact repetition
     [Theory]
     [InlineData(0, "GitProjectNames: SystemTools/SystemTools")]
-    [InlineData(1, "ScaffoldSeederGitProjectNames: AppFakeScaffoldSeeder/appfakescaffoldseeder")]
-    [InlineData(2, "FrontNpmPackageNames: react/REACT")]
-    [InlineData(3, "RedundantFileNames: Class1.cs/class1.cs")]
-    [InlineData(4, "AllowToolsList: SeedData/SeedData")]
-    [InlineData(5, "RouteClasses: Items/items")]
-    [InlineData(6, "ServerInfos.Merinson|Test.AllowToolsList: VersionChecker/VersionChecker")]
-    [InlineData(7, "GitProjectNames: AppFake/APPFAKE, SystemTools/systemtools")]
+    [InlineData(1, "FrontNpmPackageNames: react/REACT")]
+    [InlineData(2, "RedundantFileNames: Class1.cs/class1.cs")]
+    [InlineData(3, "AllowToolsList: GenerateApiRoutes/GenerateApiRoutes")]
+    [InlineData(4, "RouteClasses: Items/items")]
+    [InlineData(5, "ServerInfos.Merinson|Test.AllowToolsList: VersionChecker/VersionChecker")]
+    [InlineData(6, "GitProjectNames: AppFake/APPFAKE, SystemTools/systemtools")]
     public void FindRepeatedValues_WhenASetRepeatsAValue_NamesTheSet(int caseNumber, string expected)
     {
         // Arrange
@@ -517,21 +515,18 @@ public sealed class ProjectMapperTests
                 contract.GitProjectNames.Add("SystemTools");
                 break;
             case 1:
-                contract.ScaffoldSeederGitProjectNames.Add("appfakescaffoldseeder");
-                break;
-            case 2:
                 contract.FrontNpmPackageNames.Add("REACT");
                 break;
-            case 3:
+            case 2:
                 contract.RedundantFileNames.Add("class1.cs");
                 break;
-            case 4:
-                contract.AllowToolsList.Add("SeedData");
+            case 3:
+                contract.AllowToolsList.Add("GenerateApiRoutes");
                 break;
-            case 5:
+            case 4:
                 contract.RouteClasses.Add(new StsProjectRouteClassDataModel { Name = "items" });
                 break;
-            case 6:
+            case 5:
                 contract.ServerInfos[1].AllowToolsList.Add("VersionChecker");
                 break;
             default:
@@ -599,7 +594,7 @@ public sealed class ProjectMapperTests
         var project = new ProjectModel
         {
             ProjectFolderName = @"d:\1WorkDotnet\AppFake",
-            MigrationSqlFilesFolder = @"d:\1WorkDotnet\AppFake\Sql",
+            MigrationProjectFilePath = @"d:\1WorkDotnet\AppFake\Migration\Migration.csproj",
             PairedDbObjectsResultFileName = @"d:\1WorkDotnet\Security\Paired.json"
         };
 
@@ -608,7 +603,7 @@ public sealed class ProjectMapperTests
 
         // Assert
         Assert.Equal(@"D:\1WorkDotnet\AppFake", result.ProjectFolderName);
-        Assert.Equal(@"D:\1WorkDotnet\AppFake\Sql", result.MigrationSqlFilesFolder);
+        Assert.Equal(@"D:\1WorkDotnet\AppFake\Migration\Migration.csproj", result.MigrationProjectFilePath);
         Assert.Equal(@"D:\1WorkDotnet\Security\Paired.json", result.PairedDbObjectsResultFileName);
     }
 
@@ -617,7 +612,6 @@ public sealed class ProjectMapperTests
     {
         // Arrange
         StsProjectDataModel contract = ContractOf(ProjectTestData.NewProject());
-        contract.ScaffoldSeederGitProjectNames = ["b", "A"];
         contract.FrontNpmPackageNames = ["vite", "React"];
         contract.RedundantFileNames = ["z.cs", "a.cs"];
         contract.RouteClasses.Insert(0, new StsProjectRouteClassDataModel { Name = "Users" });
@@ -627,12 +621,51 @@ public sealed class ProjectMapperTests
 
         // Assert
         Assert.Equal(["AppFake", "SystemTools"], result.GitProjectNames);
-        Assert.Equal(["A", "b"], result.ScaffoldSeederGitProjectNames);
         Assert.Equal(["React", "vite"], result.FrontNpmPackageNames);
         Assert.Equal(["a.cs", "z.cs"], result.RedundantFileNames);
-        Assert.Equal(["GenerateApiRoutes", "SeedData"], result.AllowToolsList);
+        Assert.Equal(["GenerateApiRoutes", "RecreateDevDatabase"], result.AllowToolsList);
         Assert.Equal(["GetItems", "SaveItem"], result.Endpoints.Select(x => x.Name));
         Assert.Equal(["Items", "Users"], result.RouteClasses.Select(x => x.Name));
+    }
+
+    //the tools removed with the ScaffoldSeeder mechanism: the server may still have their names, the local file their
+    //numbers, which EProjectTools no longer has; both sides drop them, so a removed tool changes no hash
+    [Fact]
+    public void Normalize_WhenAllowToolsListHasRemovedTools_DropsThem()
+    {
+        // Arrange
+        StsProjectDataModel serverContract = ContractOf(new ProjectModel());
+        serverContract.AllowToolsList =
+        [
+            "SeedData", "scaffoldseedercreator", "JsonFromProjectDbProjectGetter", "PrepareProdCopyDatabase",
+            "GenerateApiRoutes"
+        ];
+        StsProjectDataModel localContract =
+            ContractOf(new ProjectModel { AllowToolsList = [(EProjectTools)8, EProjectTools.GenerateApiRoutes] });
+
+        // Act
+        StsProjectDataModel serverResult = ProjectMapper.Normalize(serverContract);
+        StsProjectDataModel localResult = ProjectMapper.Normalize(localContract);
+
+        // Assert
+        Assert.Equal(["GenerateApiRoutes"], serverResult.AllowToolsList);
+        Assert.Equal(["GenerateApiRoutes"], localResult.AllowToolsList);
+        Assert.Equal(MapperTestHelpers.HashOf(serverResult), MapperTestHelpers.HashOf(localResult));
+    }
+
+    //a removed tool on the server must not keep the project out of the sync
+    [Fact]
+    public void FindUnknownEnumField_WhenAllowToolsListHasRemovedTools_ReturnsNull()
+    {
+        // Arrange
+        StsProjectDataModel contract = ContractOf(ProjectTestData.NewProject());
+        contract.AllowToolsList.AddRange(["SeedData", "PrepareProdCopyDatabase"]);
+
+        // Act
+        string? result = ProjectMapper.FindUnknownEnumField(contract);
+
+        // Assert
+        Assert.Null(result);
     }
 
     //a contract with every optional text of the aggregate set to the given value
@@ -649,10 +682,6 @@ public sealed class ProjectMapperTests
             ApiContractsProjectName = text,
             SpaProjectName = text,
             DbContextName = text,
-            ProjectShortPrefix = text,
-            ScaffoldSeederProjectName = text,
-            DbContextProjectName = text,
-            NewDataSeedingClassLibProjectName = text,
             ProgramArchiveDateMask = text,
             ProgramArchiveExtension = text,
             ParametersFileDateMask = text,
@@ -664,13 +693,7 @@ public sealed class ProjectMapperTests
             MigrationProjectFilePath = text,
             DataSeederRulesByTableStartupProjectFilePath = text,
             OldDataConvertorForDataSeeder = text,
-            SeedProjectFilePath = text,
-            SeedProjectParametersFilePath = text,
-            ExcludesRulesParametersFilePath = text,
             AppSetEnKeysJsonFileName = text,
-            MigrationSqlFilesFolder = text,
-            PrepareProdCopyDatabaseProjectFilePath = text,
-            PrepareProdCopyDatabaseProjectParametersFilePath = text,
             PairedDbObjectsResultFileName = text,
             KeyGuidPart = text,
             DevDatabaseParameters = new StsDatabaseParametersDataModel { DatabaseName = text },

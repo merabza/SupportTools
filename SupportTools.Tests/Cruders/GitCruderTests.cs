@@ -378,27 +378,20 @@ public sealed class GitCruderTests : IDisposable
         Assert.Equal("ERROR: Git address Not found", status);
     }
 
-    //a project counts once per list that holds the git; other gits and other spellings do not count
+    //a project counts when its gits hold the git; other gits and other spellings do not count
     [Fact]
-    public void GetStatusFor_WhenProjectsUseTheGit_CountsBothKindsOfUsage()
+    public void GetStatusFor_WhenProjectsUseTheGit_CountsThem()
     {
         // Arrange
-        _parameters.Projects["Main"] = new ProjectModel { GitProjectNames = ["RepoA"] };
-        _parameters.Projects["Seeder"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["RepoA"] };
-        _parameters.Projects["Both"] = new ProjectModel
-        {
-            GitProjectNames = ["RepoA"], ScaffoldSeederGitProjectNames = ["RepoA"]
-        };
-        _parameters.Projects["Other"] = new ProjectModel
-        {
-            GitProjectNames = ["RepoB", "REPOA"], ScaffoldSeederGitProjectNames = ["RepoB"]
-        };
+        _parameters.Projects["First"] = new ProjectModel { GitProjectNames = ["RepoA"] };
+        _parameters.Projects["Second"] = new ProjectModel { GitProjectNames = ["RepoB", "RepoA"] };
+        _parameters.Projects["Other"] = new ProjectModel { GitProjectNames = ["RepoB", "REPOA"] };
 
         // Act
         string status = CreateLocalSut().GetStatusFor("RepoA");
 
         // Assert
-        Assert.Equal($"{RepoAAddress} Usage count is: 4", status);
+        Assert.Equal($"{RepoAAddress} Usage count is: 2", status);
     }
 
     [Fact]
@@ -414,8 +407,8 @@ public sealed class GitCruderTests : IDisposable
         Assert.Null(git.GitIgnorePatternName);
     }
 
-    //after the editors of the record: the update of its git projects and a link to every project that uses the git as
-    //a main git, in name order
+    //after the editors of the record: the update of its git projects and a link to every project that uses the git, in
+    //name order
     [Fact]
     public void FillDetailsSubMenu_WhenProjectsUseTheGit_AddsTheUpdateCommandAndLinksToTheProjects()
     {
@@ -424,7 +417,6 @@ public sealed class GitCruderTests : IDisposable
             new ProjectModel { ProjectGroupName = "Group1", GitProjectNames = ["RepoA"] };
         _parameters.Projects["ProjectA"] =
             new ProjectModel { ProjectGroupName = "Group2", GitProjectNames = ["RepoA"] };
-        _parameters.Projects["SeederOnly"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["RepoA"] };
         _parameters.Projects["Other"] = new ProjectModel { GitProjectNames = ["RepoB"] };
         var detailsMenu = new CliMenuSet("Details");
 

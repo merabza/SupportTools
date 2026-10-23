@@ -47,21 +47,11 @@ public sealed class ProjectCruderTests
         nameof(ProjectModel.DevDatabaseParameters),
         nameof(ProjectModel.ProdCopyDatabaseParameters),
         nameof(ProjectModel.DbContextName),
-        nameof(ProjectModel.ProjectShortPrefix),
-        nameof(ProjectModel.ScaffoldSeederProjectName),
-        nameof(ProjectModel.DbContextProjectName),
-        nameof(ProjectModel.NewDataSeedingClassLibProjectName),
         nameof(ProjectModel.DataSeederRulesByTableStartupProjectFilePath),
         nameof(ProjectModel.OldDataConvertorForDataSeeder),
         nameof(ProjectModel.MigrationStartupProjectFilePath),
         nameof(ProjectModel.MigrationProjectFilePath),
-        nameof(ProjectModel.SeedProjectFilePath),
-        nameof(ProjectModel.SeedProjectParametersFilePath),
-        nameof(ProjectModel.PrepareProdCopyDatabaseProjectFilePath),
-        nameof(ProjectModel.PrepareProdCopyDatabaseProjectParametersFilePath),
         nameof(ProjectModel.PairedDbObjectsResultFileName),
-        nameof(ProjectModel.ExcludesRulesParametersFilePath),
-        nameof(ProjectModel.MigrationSqlFilesFolder),
         nameof(ProjectModel.Endpoints),
         nameof(ProjectModel.RouteClasses),
         nameof(ProjectModel.FrontNpmPackageNames)
@@ -89,16 +79,12 @@ public sealed class ProjectCruderTests
         Assert.Equal(ExpectedPropertyNames, fieldEditors.Select(x => x.PropertyName));
     }
 
-    //a project must not be forced to have these projects, so their editors offer the (None) choice
+    //a project must not be forced to have a main project, so its editor offers the (None) choice
     [Fact]
-    public void Constructor_WhenCreated_OffersNoneOnlyForMainAndDatabaseProjectNames()
+    public void Constructor_WhenCreated_OffersNoneOnlyForMainProjectName()
     {
         // Arrange
-        string[] expected =
-        [
-            nameof(ProjectModel.MainProjectName), nameof(ProjectModel.DbContextProjectName),
-            nameof(ProjectModel.NewDataSeedingClassLibProjectName)
-        ];
+        string[] expected = [nameof(ProjectModel.MainProjectName)];
         FieldInfo useNoneField =
             typeof(GitProjectNameFieldEditor).GetField("_useNone", BindingFlags.Instance | BindingFlags.NonPublic)!;
 

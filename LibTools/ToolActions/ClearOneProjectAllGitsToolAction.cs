@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitData;
 using LibGitWork.Models;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -30,12 +29,12 @@ public sealed class ClearOneProjectAllGitsToolAction : ToolAction
     }
 
     public static ClearOneProjectAllGitsToolAction? Create(ILogger? logger, IParametersManager parametersManager,
-        string projectName, EGitCol gitCol, string? excludeFolder)
+        string projectName, string? excludeFolder)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
         var clearOneProjectAllGitsParameters =
-            ClearOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol);
+            ClearOneProjectAllGitsParameters.Create(loggerOrNull, supportToolsParameters, projectName);
 
         if (clearOneProjectAllGitsParameters is not null)
         {

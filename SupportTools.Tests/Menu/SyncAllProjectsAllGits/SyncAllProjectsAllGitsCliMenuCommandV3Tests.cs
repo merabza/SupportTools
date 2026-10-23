@@ -37,7 +37,6 @@ public sealed class SyncAllProjectsAllGitsCliMenuCommandV3Tests : IDisposable
         Console.SetOut(_consoleOutput);
 
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         AddProject("Local1", true, "RepoA");
         AddProject("Remote1", false, "RepoB");
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);

@@ -21,7 +21,6 @@ public static class ProjectCreatorSettingsMapper
         return new StsProjectCreatorSettingsDataModel
         {
             IndentSize = parameters.IndentSize,
-            FakeHostProjectName = parameters.FakeHostProjectName,
             ProjectsFolderPathReal = pathMapper.ToCanonical(parameters.ProjectsFolderPathReal),
             SecretsFolderPathReal = pathMapper.ToCanonical(parameters.SecretsFolderPathReal),
             ProductionServerName = parameters.ProductionServerName,
@@ -37,7 +36,6 @@ public static class ProjectCreatorSettingsMapper
         AppProjectCreatorAllParameters parameters, PathMapper pathMapper)
     {
         parameters.IndentSize = contract.IndentSize;
-        parameters.FakeHostProjectName = contract.FakeHostProjectName;
         parameters.ProjectsFolderPathReal = pathMapper.ToLocal(contract.ProjectsFolderPathReal);
         parameters.SecretsFolderPathReal = pathMapper.ToLocal(contract.SecretsFolderPathReal);
         parameters.ProductionServerName = contract.ProductionServerName;
@@ -49,7 +47,6 @@ public static class ProjectCreatorSettingsMapper
 
     public static StsProjectCreatorSettingsDataModel Normalize(StsProjectCreatorSettingsDataModel contract)
     {
-        contract.FakeHostProjectName = ContractNormalization.EmptyToNull(contract.FakeHostProjectName);
         contract.ProjectsFolderPathReal =
             ContractNormalization.UpperDriveLetter(ContractNormalization.EmptyToNull(contract.ProjectsFolderPathReal));
         contract.SecretsFolderPathReal =

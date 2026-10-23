@@ -42,7 +42,7 @@
 
 |ჯგუფი|თვისებები|გამოყენება|
 |-|-|-|
-|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `ScaffoldSeedersWorkFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `FolderForEditorConfigFiles` — `.editorconfig` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
+|ბილიკები|`LogFolder`, `WorkFolder`, `TempFolder`, `SecurityFolder`, `PublisherWorkFolder`, `CodeGenerateTestFolder`, `FolderForGitignoreFiles`, `FolderForEditorConfigFiles`, `GitExecutablePath`|სად კითხულობს/წერს ხელსაწყო დისკზე; `FolderForGitignoreFiles` — `.gitignore` შაბლონების ფაილების ფოლდერი; `FolderForEditorConfigFiles` — `.editorconfig` შაბლონების ფაილების ფოლდერი; `GitExecutablePath` — git-ის გამშვები ფაილის სრული გზა (თუ ცარიელია, გამოიყენება უბრალოდ `git` `PATH`-იდან; რედაქტორი ავტომატურად ადგენს Windows-ზე `Get-Command git`-ით / Linux-ზე `which git`-ით)|
 |კომპიუტერის პროფილი|`MachineName`, `CurrentMachineServerName`, `PathMappings`, `HideRemoteOnlyProjects`|ამ კომპიუტერის პარამეტრები, სხვა კომპიუტერებს არ ეზიარება (იხ. [კომპიუტერის პროფილი და გზების გარდაქმნა](#კომპიუტერის-პროფილი-და-გზების-გარდაქმნა))|
 |რეესტრის სინქრონიზაცია|`SupportToolsServerWebApiClientName`, `AutoSyncWithSupportToolsServer`, `SupportToolsServerSyncTimeoutSeconds`, `RegistrySyncState`|SupportToolsServer-თან კავშირი და ამ კომპიუტერის სინქრონიზაციის მდგომარეობა, არ ეზიარება (იხ. [ცენტრალური რეესტრი](#ცენტრალური-რეესტრი-supporttoolsserver))|
 |გაცვლა|`FileStorageNameForExchange`, `SmartSchemaNameForExchange`, `UploadTempExtension`|საჭიროა AppSettings encode/install-ისთვის (იხ. [განთავსება](use-cases/deployment.md))|
@@ -206,8 +206,6 @@ bootstrap API client-ი არასოდეს სინქრონიზდ
 ფაილსაცავების მომხმარებლები და პაროლები, `KeyGuidPart`,
 `MediatRLicenseKey` და საიდუმლო ფაილები, რომლებზეც რეესტრი მიუთითებს
 (server info-ების `AppSettingsJsonSourceFileName`,
-`SeedProjectParametersFilePath`,
-`PrepareProdCopyDatabaseProjectParametersFilePath`,
 `PairedDbObjectsResultFileName`; git-ის სამუშაო ხეში მყოფი ფაილი არ
 ითვლება, მას git ატარებს). სერვერი, მისი ბაზა და მისი backup-ები ისევე
 დაიცავი, როგორც პარამეტრების ფაილი. SupportTools ამ მნიშვნელობებს
@@ -225,12 +223,11 @@ bootstrap API client-ი არასოდეს სინქრონიზდ
 |-|-|
 |იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
 |პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (საკუთარი პაკეტები: გამორთულ პროექტს `Distribute all packages` და `Reverse Package Distribution` გამოტოვებს)|
-|ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextProjectName`, `DbContextName`, `ProjectShortPrefix`|
-|მიგრაცია და seeding|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`, `SeedProjectFilePath`, `SeedProjectParametersFilePath`, `MigrationSqlFilesFolder`|
-|Scaffold|`ScaffoldSeederProjectName`, `NewDataSeedingClassLibProjectName`, `ExcludesRulesParametersFilePath`|
+|ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextName`|
+|მიგრაცია|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`|
 |შიფვრა|`AppSetEnKeysJsonFileName`, `KeyGuidPart`|
 |ბაზა|`DevDatabaseParameters`, `ProdCopyDatabaseParameters`|
-|კოლექციები|`Endpoints`, `RouteClasses`, `ServerInfos`, `GitProjectNames`, `ScaffoldSeederGitProjectNames`, `FrontNpmPackageNames`, `RedundantFileNames`|
+|კოლექციები|`Endpoints`, `RouteClasses`, `ServerInfos`, `GitProjectNames`, `FrontNpmPackageNames`, `RedundantFileNames`|
 
 \---
 
@@ -375,9 +372,9 @@ git სიები
 `Gits from SupportToolsServer`-ში git-ის წაშლა ან გადარქმევა ლოკალურ
 `Gits`-ის ჩანაწერსაც ცვლის, როცა სერვერი ცვლილებას მიიღებს. წაშლილი git
 ლოკალურად რჩება, სანამ მას რომელიმე პროექტი იყენებს. გადარქმევისას ახალ
-სახელზე გადადის პროექტების მიმართვებიც (`GitProjectNames`,
-`ScaffoldSeederGitProjectNames`) და `GitProjects`-ის ჩანაწერებიც, თუ ახალი
-სახელი ლოკალურად უკვე დაკავებული არ არის.
+სახელზე გადადის პროექტების მიმართვებიც (`GitProjectNames`) და
+`GitProjects`-ის ჩანაწერებიც, თუ ახალი სახელი ლოკალურად უკვე დაკავებული
+არ არის.
 
 JSON ფაილის პირდაპირი რედაქტირება მუშაობს ერთჯერადი fix-ებისთვის,
 მაგრამ მენიუს editor-ები ვალიდირებენ, ფაილი კი არა.

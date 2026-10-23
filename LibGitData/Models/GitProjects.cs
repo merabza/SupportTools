@@ -13,11 +13,9 @@ public sealed class GitProjects
     private const string CliParametersDataEdit = nameof(CliParametersDataEdit);
     private const string CliTools = nameof(CliTools);
     private const string CliToolsData = nameof(CliToolsData);
-    private const string DbContextAnalyzer = nameof(DbContextAnalyzer);
 
     //BackendCarcass
     private const string BackendCarcass = nameof(BackendCarcass);
-    private const string DataSeeding = nameof(DataSeeding);
     private const string Db = nameof(Db);
 
     //DatabaseTools
@@ -26,8 +24,6 @@ public sealed class GitProjects
 
     //ParametersManagement
     private const string Api = nameof(Api);
-    private const string ParametersManagement = nameof(ParametersManagement);
-    private const string LibDatabaseParameters = nameof(LibDatabaseParameters);
     private const string Identity = nameof(Identity);
     private const string Repositories = nameof(Repositories);
 
@@ -64,13 +60,9 @@ public sealed class GitProjects
 
     public GitProjectDataDomain AppCliToolsCliToolsData => GetGitProjectByKey($"{AppCliTools}.{nameof(CliToolsData)}");
 
-    public GitProjectDataDomain AppCliToolsDbContextAnalyzer =>
-        GetGitProjectByKey($"{AppCliTools}.{nameof(DbContextAnalyzer)}");
-
     //BackendCarcass
     public GitProjectDataDomain BackendCarcassApi => GetGitProjectByKey($"{BackendCarcass}.{nameof(Api)}");
     public GitProjectDataDomain BackendCarcassDb => GetGitProjectByKey($"{BackendCarcass}.{Db}");
-    public GitProjectDataDomain BackendCarcassDataSeeding => GetGitProjectByKey($"{BackendCarcass}.{DataSeeding}");
     public GitProjectDataDomain BackendCarcassIdentity => GetGitProjectByKey($"{BackendCarcass}.{nameof(Identity)}");
 
     public GitProjectDataDomain BackendCarcassRepositories =>
@@ -78,10 +70,6 @@ public sealed class GitProjects
 
     //DatabaseTools
     public GitProjectDataDomain DatabaseToolsDbTools => GetGitProjectByKey($"{DatabaseTools}.{nameof(DbTools)}");
-
-    //ParametersManagement
-    public GitProjectDataDomain ParametersManagementLibDatabaseParameters =>
-        GetGitProjectByKey($"{ParametersManagement}.{LibDatabaseParameters}");
 
     //SystemTools
     public GitProjectDataDomain SystemToolsSystemToolsShared =>

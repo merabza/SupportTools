@@ -368,13 +368,13 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.Contains("Server list is broken", console, StringComparison.Ordinal);
     }
 
-    //a git is used by projects directly and as a scaffold seeder git
+    //a git is used by two projects
     [Fact]
-    public void GetStatusFor_WhenProjectsUseTheGit_CountsBothKindsOfUsage()
+    public void GetStatusFor_WhenProjectsUseTheGit_CountsThem()
     {
         // Arrange
-        _parameters.Projects["Direct"] = new ProjectModel { GitProjectNames = ["RepoA"] };
-        _parameters.Projects["Seeder"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["RepoA", "RepoB"] };
+        _parameters.Projects["First"] = new ProjectModel { GitProjectNames = ["RepoA"] };
+        _parameters.Projects["Second"] = new ProjectModel { GitProjectNames = ["RepoA", "RepoB"] };
         _parameters.Projects["Other"] = new ProjectModel { GitProjectNames = ["RepoB"] };
 
         // Act
@@ -517,17 +517,15 @@ public sealed class GitStsCruderTests : IDisposable
         VerifyParametersSavedOnce("Local git repoa removed");
     }
 
-    //projects would refer to a missing git: such a local git stays
+    //projects would refer to a missing git: such a local git stays, whatever the spelling of the reference
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task RemoveThenSave_WhenAProjectUsesTheLocalGit_KeepsItAndSavesNothing(bool asScaffoldSeederGit)
+    [InlineData("RepoA")]
+    [InlineData("repoa")]
+    public async Task RemoveThenSave_WhenAProjectUsesTheLocalGit_KeepsItAndSavesNothing(string referenceName)
     {
         // Arrange
         _parameters.Gits["RepoA"] = new GitDataModel { GitProjectAddress = RepoAAddress };
-        _parameters.Projects["Project"] = asScaffoldSeederGit
-            ? new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] }
-            : new ProjectModel { GitProjectNames = ["RepoA"] };
+        _parameters.Projects["Project"] = new ProjectModel { GitProjectNames = [referenceName] };
         GitStsCruder sut = CreateSut();
 
         // Act
@@ -550,7 +548,7 @@ public sealed class GitStsCruderTests : IDisposable
         _parameters.Gits["RepoA"] = new GitDataModel();
         _parameters.Projects["Zeta"] = new ProjectModel { GitProjectNames = ["RepoA"] };
         _parameters.Projects["Middle"] = new ProjectModel { GitProjectNames = ["Other"] };
-        _parameters.Projects["Alpha"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] };
+        _parameters.Projects["Alpha"] = new ProjectModel { GitProjectNames = ["repoa"] };
         GitStsCruder sut = CreateSut();
 
         // Act
@@ -625,7 +623,7 @@ public sealed class GitStsCruderTests : IDisposable
         _parameters.Gits["RepoA"] = localGit;
         _parameters.Gits["Other"] = new GitDataModel();
         _parameters.Projects["Direct"] = new ProjectModel { GitProjectNames = ["Other", "RepoA"] };
-        _parameters.Projects["Seeder"] = new ProjectModel { ScaffoldSeederGitProjectNames = ["repoa"] };
+        _parameters.Projects["OtherSpelling"] = new ProjectModel { GitProjectNames = ["repoa"] };
         _parameters.GitProjects["App"] = new GitProjectDataModel { GitName = "RepoA" };
         _parameters.GitProjects["OtherApp"] = new GitProjectDataModel { GitName = "Other" };
 
@@ -637,7 +635,7 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.Equal(["Other", "RepoB"], _parameters.Gits.Keys.Order());
         Assert.Same(localGit, _parameters.Gits["RepoB"]);
         Assert.Equal(["Other", "RepoB"], _parameters.Projects["Direct"].GitProjectNames);
-        Assert.Equal(["RepoB"], _parameters.Projects["Seeder"].ScaffoldSeederGitProjectNames);
+        Assert.Equal(["RepoB"], _parameters.Projects["OtherSpelling"].GitProjectNames);
         Assert.Equal("RepoB", _parameters.GitProjects["App"].GitName);
         Assert.Equal("Other", _parameters.GitProjects["OtherApp"].GitName);
         VerifyParametersSavedOnce("Local git RepoA renamed to RepoB");

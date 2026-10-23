@@ -37,7 +37,6 @@ public sealed class SyncOneGroupAllProjectsGitsCliMenuCommandV3Tests : IDisposab
         Console.SetOut(_consoleOutput);
 
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         AddProject("Local1", "G1", true, "RepoA");
         AddProject("Remote1", "G1", false, "RepoB");
         AddProject("Local2", "G2", true, "RepoC");

@@ -159,8 +159,6 @@ public sealed class ProjectsRegistrySyncAdapter : DictionaryRegistrySyncAdapter<
         List<(string Field, string? Name, HashSet<string> KnownNames)> references =
         [
             .. contract.GitProjectNames.Select(x => (nameof(StsProjectDataModel.GitProjectNames), (string?)x, gits)),
-            .. contract.ScaffoldSeederGitProjectNames.Select(x =>
-                (nameof(StsProjectDataModel.ScaffoldSeederGitProjectNames), (string?)x, gits)),
             .. contract.FrontNpmPackageNames.Select(x =>
                 (nameof(StsProjectDataModel.FrontNpmPackageNames), (string?)x, npmPackages)),
             (nameof(StsProjectDataModel.EditorConfigPatternName), contract.EditorConfigPatternName,

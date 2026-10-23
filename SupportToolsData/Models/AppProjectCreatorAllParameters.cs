@@ -6,7 +6,6 @@ namespace SupportToolsData.Models;
 public sealed class AppProjectCreatorAllParameters : IParameters
 {
     public int IndentSize { get; set; }
-    public string? FakeHostProjectName { get; set; }
     public string? ProjectsFolderPathReal { get; set; }
     public string? ProductionServerName { get; set; }
     public string? ProductionEnvironmentName { get; set; }

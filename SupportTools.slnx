@@ -7,18 +7,8 @@
     <Project Path="../AppCliTools/AppCliTools.CliParametersEdit/AppCliTools.CliParametersEdit.csproj" />
     <Project Path="../AppCliTools/AppCliTools.CliTools/AppCliTools.CliTools.csproj" />
     <Project Path="../AppCliTools/AppCliTools.CodeTools/AppCliTools.CodeTools.csproj" />
-    <Project Path="../AppCliTools/AppCliTools.DbContextAnalyzer/AppCliTools.DbContextAnalyzer.csproj" />
     <Project Path="../AppCliTools/AppCliTools.LibDataInput/AppCliTools.LibDataInput.csproj" />
     <Project Path="../AppCliTools/AppCliTools.LibMenuInput/AppCliTools.LibMenuInput.csproj" />
-    <Project Path="../AppCliTools/AppCliTools.LibSeedCodeCreator/AppCliTools.LibSeedCodeCreator.csproj" />
-  </Folder>
-  <Folder Name="/BackendCarcass/">
-    <Project Path="../BackendCarcass/BackendCarcass.Application/BackendCarcass.Application.csproj" />
-    <Project Path="../BackendCarcass/BackendCarcass.Database/BackendCarcass.Database.csproj" />
-    <Project Path="../BackendCarcass/BackendCarcass.Domain/BackendCarcass.Domain.csproj" />
-  </Folder>
-  <Folder Name="/BackendCarcassShared/">
-    <Project Path="../BackendCarcassShared/BackendCarcassShared.Contracts/BackendCarcassShared.Contracts.csproj" />
   </Folder>
   <Folder Name="/ConnectionTools/">
     <Project Path="../ConnectionTools/ConnectionTools.ConnectTools/ConnectionTools.ConnectTools.csproj" />
@@ -49,13 +39,9 @@
   </Folder>
   <Folder Name="/SystemTools/">
     <Project Path="../SystemTools/SystemTools.ApiContracts/SystemTools.ApiContracts.csproj" />
-    <Project Path="../SystemTools/SystemTools.Application.Abstractions/SystemTools.Application.Abstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.BackgroundTasks/SystemTools.BackgroundTasks.csproj" />
     <Project Path="../SystemTools/SystemTools.DatabaseToolsShared/SystemTools.DatabaseToolsShared.csproj" />
-    <Project Path="../SystemTools/SystemTools.Domain.Abstractions/SystemTools.Domain.Abstractions.csproj" />
     <Project Path="../SystemTools/SystemTools.JetBrainsResharperGlobalToolsWork/SystemTools.JetBrainsResharperGlobalToolsWork.csproj" />
-    <Project Path="../SystemTools/SystemTools.ReCounterContracts/SystemTools.ReCounterContracts.csproj" />
-    <Project Path="../SystemTools/SystemTools.RepositoriesShared/SystemTools.RepositoriesShared.csproj" />
     <Project Path="../SystemTools/SystemTools.SerilogStuff/SystemTools.SerilogStuff.csproj" Id="c78f030b-aaef-4d9b-81a7-822edd393117" />
     <Project Path="../SystemTools/SystemTools.SharedKernel/SystemTools.SharedKernel.csproj" />
     <Project Path="../SystemTools/SystemTools.StringMessagesApiContracts/SystemTools.StringMessagesApiContracts.csproj" />
@@ -81,7 +67,6 @@
   <Project Path="LibGitData/LibGitData.csproj" />
   <Project Path="LibGitWork/LibGitWork.csproj" />
   <Project Path="LibNpmWork/LibNpmWork.csproj" />
-  <Project Path="LibScaffoldSeeder/LibScaffoldSeeder.csproj" />
   <Project Path="LibSupportToolsServerWork/LibSupportToolsServerWork.csproj" />
   <Project Path="LibTools/LibTools.csproj" />
   <Project Path="SupportTools.Tests/SupportTools.Tests.csproj" />

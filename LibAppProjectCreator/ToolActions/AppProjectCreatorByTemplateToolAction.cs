@@ -166,7 +166,7 @@ public sealed class AppProjectCreatorByTemplateToolAction : ToolAction
         }
 
         var projectRecordCreator = new ProjectRecordCreator(_logger, _parametersManager, templateModel, projectName,
-            projectShortName, dbPartProjectName, string.Empty);
+            dbPartProjectName, string.Empty);
 
         if (await projectRecordCreator.Create(cancellationToken))
         {

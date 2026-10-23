@@ -62,7 +62,8 @@ public sealed class ProjectTemplateMapperTests
     }
 
     [Theory]
-    [InlineData("ScaffoldSeeder", false)]
+    [InlineData("Api", false)]
+    [InlineData("ScaffoldSeeder", true)]
     [InlineData("Worker", true)]
     public void HasUnknownSupportProjectType_WhenCalled_FindsTypesUnknownToThisClient(string type, bool expected)
     {

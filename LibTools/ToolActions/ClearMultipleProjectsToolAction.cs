@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibGitData;
 using LibGitWork;
 using LibTools.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -78,11 +77,7 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         //პროექტების ჩამონათვალი
         foreach ((string projectName, ProjectModel project) in projectsListOrdered)
         {
-            ClearOneSolution(projectName, project, EGitCol.Main);
-            if (_clearAllProjectsParameters.ScaffoldSeedersWorkFolder is not null)
-            {
-                ClearOneSolution(projectName, project, EGitCol.ScaffoldSeed);
-            }
+            ClearOneSolution(projectName, project);
         }
 
         //Console.WriteLine("---===---------===---");
@@ -112,15 +107,15 @@ public sealed class ClearMultipleProjectsToolAction : ToolAction
         return _clearAllProjectsParameters.Projects.Where(x => x.Key == _clearAllProjectsParameters.ProjectName);
     }
 
-    private void ClearOneSolution(string projectName, ProjectModel project, EGitCol gitCol)
+    private void ClearOneSolution(string projectName, ProjectModel project)
     {
-        if (!GitStat.CheckGitProject(projectName, project, gitCol, false))
+        if (!GitStat.CheckGitProject(projectName, project))
         {
             return;
         }
 
         var clearOneProjectAllGitsToolAction =
-            ClearOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, gitCol, _excludeFolder);
+            ClearOneProjectAllGitsToolAction.Create(_logger, _parametersManager, projectName, _excludeFolder);
         clearOneProjectAllGitsToolAction?.Run(CancellationToken.None).Wait();
     }
 }

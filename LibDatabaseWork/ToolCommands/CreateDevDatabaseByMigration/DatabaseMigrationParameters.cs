@@ -46,7 +46,6 @@ public sealed class DatabaseMigrationParameters : IParameters
         //პროექტების მიხედვით სწორი პროექტის ფაილის დადგენა მომავლისთვის გადავდე
         //GitProjects gitProjects = new GitProjects(supportToolsParameters.GitProjects);
         //GitProjectDataModel gitProject = gitProjects.GetGitProjectByKey(projectName);
-        //StartupProjectFileName = Path.Combine(supportToolsParameters.ScaffoldSeedersWorkFolder, projectName, project.MigrationStartupProjectFilePath),//gitProject.ProjectRelativePath
 
         if (project is null)
         {

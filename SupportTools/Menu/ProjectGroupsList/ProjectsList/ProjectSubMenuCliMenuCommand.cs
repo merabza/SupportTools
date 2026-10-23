@@ -6,7 +6,6 @@ using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitScaffoldSeederProjects;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
@@ -45,11 +44,6 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(CheckPackageSolutionCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(BuildPackageCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
-        }
-
-        if (project is null || string.IsNullOrWhiteSpace(project.ScaffoldSeederProjectName))
-        {
-            excludeList.Add(nameof(GitScaffoldSeederProjectsCliMenuCommandFactoryStrategy));
         }
 
         if (!SystemStat.IsWindows() || string.IsNullOrWhiteSpace(project?.SolutionFileName))

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using LibGitData;
 using LibGitData.Domain;
 using LibGitData.Models;
 using SupportToolsData.Models;
@@ -68,7 +67,6 @@ public sealed class ProjectModelTests
         Assert.Empty(sut.Endpoints);
         Assert.Empty(sut.RouteClasses);
         Assert.Empty(sut.GitProjectNames);
-        Assert.Empty(sut.ScaffoldSeederGitProjectNames);
         Assert.Empty(sut.ServerInfos);
         Assert.Empty(sut.AllowToolsList);
     }
@@ -238,45 +236,6 @@ public sealed class ProjectModelTests
 
         // Assert
         Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public void GetGitProjectNamesByGitCollectionType_WhenMain_ReturnsProjectGits()
-    {
-        // Arrange
-        var sut = new ProjectModel { GitProjectNames = ["App"], ScaffoldSeederGitProjectNames = ["AppSeeder"] };
-
-        // Act
-        List<string> result = sut.GetGitProjectNamesByGitCollectionType(EGitCol.Main);
-
-        // Assert
-        Assert.Same(sut.GitProjectNames, result);
-    }
-
-    [Fact]
-    public void GetGitProjectNamesByGitCollectionType_WhenScaffoldSeed_ReturnsSeederGits()
-    {
-        // Arrange
-        var sut = new ProjectModel { GitProjectNames = ["App"], ScaffoldSeederGitProjectNames = ["AppSeeder"] };
-
-        // Act
-        List<string> result = sut.GetGitProjectNamesByGitCollectionType(EGitCol.ScaffoldSeed);
-
-        // Assert
-        Assert.Same(sut.ScaffoldSeederGitProjectNames, result);
-    }
-
-    [Fact]
-    public void GetGitProjectNamesByGitCollectionType_WhenCollectionIsUnknown_ReturnsEmptyList()
-    {
-        // Arrange
-        var sut = new ProjectModel { GitProjectNames = ["App"], ScaffoldSeederGitProjectNames = ["AppSeeder"] };
-
-        // Act
-        List<string> result = sut.GetGitProjectNamesByGitCollectionType((EGitCol)99);
-
-        // Assert
-        Assert.Empty(result);
     }
 
     private static LibGitData.Models.GitProjects CreateGitProjects()

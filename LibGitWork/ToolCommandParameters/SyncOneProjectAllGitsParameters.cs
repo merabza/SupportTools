@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using LibGitData;
 using LibGitData.Models;
 using LibGitWork.Helpers;
 using LibGitWork.Models;
@@ -41,7 +40,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
     }
 
     public static SyncOneProjectAllGitsParameters? Create(ILogger? logger,
-        SupportToolsParameters supportToolsParameters, string projectName, EGitCol gitCol,
+        SupportToolsParameters supportToolsParameters, string projectName,
         Dictionary<EGitCollect, Dictionary<string, List<string>>>? changedGitProjects, bool isFirstSync,
         bool useConsole)
     {
@@ -53,7 +52,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName, gitCol);
+        string? gitsFolder = supportToolsParameters.GetGitsFolder(projectName);
 
         if (gitsFolder == null)
         {
@@ -61,12 +60,7 @@ public sealed class SyncOneProjectAllGitsParameters : IParameters
             return null;
         }
 
-        List<string> gitProjectNames = gitCol switch
-        {
-            EGitCol.Main => project.GitProjectNames,
-            EGitCol.ScaffoldSeed => project.ScaffoldSeederGitProjectNames,
-            _ => null
-        } ?? [];
+        List<string> gitProjectNames = project.GitProjectNames ?? [];
 
         var gitProjects = GitProjects.Create(logger, supportToolsParameters.GitProjects);
 

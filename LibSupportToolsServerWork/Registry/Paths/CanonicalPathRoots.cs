@@ -45,15 +45,9 @@ public static class CanonicalPathRoots
             yield return project.ProjectSecurityFolderPath;
             yield return project.MigrationStartupProjectFilePath;
             yield return project.MigrationProjectFilePath;
-            yield return project.SeedProjectFilePath;
-            yield return project.SeedProjectParametersFilePath;
             yield return project.DataSeederRulesByTableStartupProjectFilePath;
             yield return project.OldDataConvertorForDataSeeder;
-            yield return project.ExcludesRulesParametersFilePath;
             yield return project.AppSetEnKeysJsonFileName;
-            yield return project.MigrationSqlFilesFolder;
-            yield return project.PrepareProdCopyDatabaseProjectFilePath;
-            yield return project.PrepareProdCopyDatabaseProjectParametersFilePath;
             yield return project.PairedDbObjectsResultFileName;
 
             foreach (ServerInfoModel serverInfo in project.ServerInfos.Values)

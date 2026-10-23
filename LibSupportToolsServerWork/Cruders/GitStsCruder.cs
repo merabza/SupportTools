@@ -322,7 +322,6 @@ public sealed class GitStsCruder : Cruder
         foreach (ProjectModel project in parameters.Projects.Values)
         {
             RenameGitName(project.GitProjectNames, localGitKey, newGitKey);
-            RenameGitName(project.ScaffoldSeederGitProjectNames, localGitKey, newGitKey);
         }
 
         foreach (GitProjectDataModel gitProject in parameters.GitProjects.Values.Where(x =>
@@ -346,8 +345,8 @@ public sealed class GitStsCruder : Cruder
         return
         [
             .. parameters.Projects
-                .Where(p => p.Value.GitProjectNames.Concat(p.Value.ScaffoldSeederGitProjectNames)
-                    .Contains(gitKey, StringComparer.OrdinalIgnoreCase)).Select(p => p.Key).Order()
+                .Where(p => p.Value.GitProjectNames.Contains(gitKey, StringComparer.OrdinalIgnoreCase))
+                .Select(p => p.Key).Order()
         ];
     }
 
@@ -401,8 +400,7 @@ public sealed class GitStsCruder : Cruder
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         Dictionary<string, ProjectModel> projects = parameters.Projects;
 
-        int usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name)) +
-                         projects.Values.Count(project => project.ScaffoldSeederGitProjectNames.Contains(name));
+        int usageCount = projects.Values.Count(project => project.GitProjectNames.Contains(name));
 
         return $"{git.GitProjectAddress} Usage count is: {usageCount}";
     }

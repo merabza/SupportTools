@@ -64,8 +64,6 @@ internal static class ProjectCloneChecks
     {
         IEnumerable<string?> paths =
         [
-            project.SeedProjectParametersFilePath,
-            project.PrepareProdCopyDatabaseProjectParametersFilePath,
             project.PairedDbObjectsResultFileName,
             .. project.ServerInfos.Values.Select(x => x.AppSettingsJsonSourceFileName)
         ];

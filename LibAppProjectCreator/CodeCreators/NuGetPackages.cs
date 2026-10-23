@@ -7,7 +7,6 @@ public static class NuGetPackages
     public const string MicrosoftEntityFrameworkCore = "Microsoft.EntityFrameworkCore";
     public const string MicrosoftEntityFrameworkCoreRelational = "Microsoft.EntityFrameworkCore.Relational";
     public const string MicrosoftEntityFrameworkCoreSqlServer = "Microsoft.EntityFrameworkCore.SqlServer";
-    public const string MicrosoftExtensionsConfigurationUserSecrets = "Microsoft.Extensions.Configuration.UserSecrets";
     public const string MicrosoftAspNetCoreAuthenticationJwtBearer = "Microsoft.AspNetCore.Authentication.JwtBearer";
     public const string MicrosoftAspNetCoreSpaServicesExtensions = "Microsoft.AspNetCore.SpaServices.Extensions";
     public const string MicrosoftExtensionsHostingWindowsServices = "Microsoft.Extensions.Hosting.WindowsServices";

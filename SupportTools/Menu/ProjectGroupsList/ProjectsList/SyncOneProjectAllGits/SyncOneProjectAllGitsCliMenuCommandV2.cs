@@ -5,19 +5,19 @@ using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 
-namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGitsWithScaffoldSeeders;
+namespace SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 
-public sealed class SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2 : CliMenuCommand
+public sealed class SyncOneProjectAllGitsCliMenuCommandV2 : CliMenuCommand
 {
-    public const string MenuCommandName = "Sync One Project All Gits With Scaffold Seeders V2";
+    public const string MenuCommandName = "Sync One Project All Gits V2";
     private readonly ILogger _logger;
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SyncOneProjectAllGitsWithScaffoldSeedersCliMenuCommandV2(ILogger logger,
-        IParametersManager parametersManager, string projectName, bool askRunAction = true) : base(MenuCommandName,
-        EMenuAction.Reload, EMenuAction.Reload, null, askRunAction)
+    public SyncOneProjectAllGitsCliMenuCommandV2(ILogger logger, IParametersManager parametersManager,
+        string projectName, bool askRunAction = true) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload,
+        null, askRunAction)
     {
         _logger = logger;
         _parametersManager = parametersManager;

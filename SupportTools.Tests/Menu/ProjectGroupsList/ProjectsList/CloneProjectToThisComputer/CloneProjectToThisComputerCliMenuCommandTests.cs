@@ -16,14 +16,13 @@ namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList.CloneProjectToT
 
 //D3: "Clone Project To This Computer" over fake git steps. Project App (folder {temp}\Projects\App, missing):
 //gits AppMain (plain folder) and AppSpa ({SpaProjectFolderRelativePath}\ClientApp, SpaProjectName AppFront is a project
-//of AppMain), ScaffoldSeeder git AppSeeder; the .gitignore template CSharp is "bin/"
+//of AppMain); the .gitignore template CSharp is "bin/"
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 {
     private const string ProjectName = "App";
     private const string MainGitName = "AppMain";
     private const string SpaGitName = "AppSpa";
-    private const string SeederGitName = "AppSeeder";
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly FakeProjectCloneGitActions _gitActions;
@@ -35,7 +34,6 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
     private readonly List<string> _questions = [];
     private readonly string _tempFolder = Path.Combine(Path.GetTempPath(), $"CloneProjectTests_{Guid.NewGuid():N}");
     private bool _confirmAnswer = true;
-    private bool _scaffoldSeederAnswer;
     private Func<CancellationToken, ValueTask> _syncRegistry = _ => ValueTask.CompletedTask;
     private bool _syncRegistryAnswer = true;
     private int _syncRegistryRuns;
@@ -51,19 +49,15 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         {
             ProjectFolderName = _projectFolder,
             SpaProjectName = "AppFront",
-            ScaffoldSeederProjectName = ProjectName,
-            GitProjectNames = [MainGitName, SpaGitName],
-            ScaffoldSeederGitProjectNames = [SeederGitName]
+            GitProjectNames = [MainGitName, SpaGitName]
         };
         _parameters.Projects[ProjectName] = _project;
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         _parameters.FolderForGitignoreFiles = Path.Combine(_tempFolder, "Templates");
         Directory.CreateDirectory(_parameters.FolderForGitignoreFiles);
         File.WriteAllText(Path.Combine(_parameters.FolderForGitignoreFiles, "CSharp.gitignore"), "bin/");
         _parameters.Gits[MainGitName] = CreateGit(MainGitName, MainGitName);
         _parameters.Gits[SpaGitName] =
             CreateGit(SpaGitName, $@"{GitDataModel.SpaProjectFolderRelativePathName}\ClientApp");
-        _parameters.Gits[SeederGitName] = CreateGit(SeederGitName, SeederGitName);
 
         _gitActions = new FakeProjectCloneGitActions(_parameters);
         _gitActions.ScanResults[MainGitName] = new Dictionary<string, GitProjectDataModel>
@@ -95,7 +89,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         Assert.True(Directory.Exists(_projectFolder));
         Assert.DoesNotContain(_questions,
             x => x.Contains("files of the project are missing", StringComparison.Ordinal));
-        Assert.Equal(["scan AppMain", "scan AppSpa", "sync Main AppMain", "sync Main AppSpa"], _gitActions.Calls);
+        Assert.Equal(["scan AppMain", "scan AppSpa", "sync AppMain", "sync AppSpa"], _gitActions.Calls);
         Assert.True(Directory.Exists(Path.Combine(_projectFolder, MainGitName)));
         Assert.True(Directory.Exists(Path.Combine(_projectFolder, @"AppMain\AppFront\ClientApp")));
         _parametersManager.Verify(x => x.Save(_parameters, "Git Projects Updated", null, It.IsAny<CancellationToken>()),
@@ -124,7 +118,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         await CreateSut().Run();
 
         // Assert
-        Assert.Equal(["sync Main AppMain", "sync Main AppSpa"], _gitActions.Calls);
+        Assert.Equal(["sync AppMain", "sync AppSpa"], _gitActions.Calls);
         _parametersManager.Verify(
             x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
                 It.IsAny<CancellationToken>()), Times.Never);
@@ -202,48 +196,6 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
         Assert.Contains("Update Git Projects failed for git AppSpa", output, StringComparison.Ordinal);
         Assert.Contains("GitProjects updated for gits: AppMain", output, StringComparison.Ordinal);
         Assert.Contains("finished with errors", output, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Run_WhenScaffoldSeederGitsAreChosen_ClonesThemIntoTheSeederFolder()
-    {
-        // Arrange
-        _scaffoldSeederAnswer = true;
-
-        // Act
-        await CreateSut().Run();
-
-        // Assert
-        Assert.Equal([
-            "scan AppMain", "scan AppSpa", "scan AppSeeder", "sync Main AppMain", "sync Main AppSpa",
-            "sync ScaffoldSeed AppSeeder"
-        ], _gitActions.Calls);
-        Assert.True(Directory.Exists(Path.Combine(_tempFolder, "Seeders", "App", "AppScaffoldSeeder", SeederGitName)));
-        Assert.Contains("Gits cloned: 3 of 3", _consoleOutput.ToString(), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Run_WhenScaffoldSeederGitsAreNotChosen_AsksWithDefaultNoAndSkipsThem()
-    {
-        // Act
-        await CreateSut().Run();
-
-        // Assert
-        Assert.Contains("Clone also 1 ScaffoldSeeder gits of project App?|False", _questions);
-        Assert.DoesNotContain("sync ScaffoldSeed AppSeeder", _gitActions.Calls);
-    }
-
-    [Fact]
-    public async Task Run_WhenProjectHasNoScaffoldSeederGits_DoesNotAskAboutThem()
-    {
-        // Arrange
-        _project.ScaffoldSeederGitProjectNames = [];
-
-        // Act
-        await CreateSut().Run();
-
-        // Assert
-        Assert.DoesNotContain(_questions, x => x.StartsWith("Clone also", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -352,10 +304,10 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
     public async Task Run_WhenSeveralStoredFilesStayMissing_ListsThemAll()
     {
         // Arrange
-        string seedParameters = Path.Combine(_tempFolder, "Security", "seed.json");
         string pairedObjects = Path.Combine(_tempFolder, "Security", "paired.json");
-        _project.SeedProjectParametersFilePath = seedParameters;
+        string appSettings = Path.Combine(_tempFolder, "Security", "appsettings.json");
         _project.PairedDbObjectsResultFileName = pairedObjects;
+        _project.ServerInfos["Server|Prod"] = new ServerInfoModel { AppSettingsJsonSourceFileName = appSettings };
         _syncRegistryAnswer = false;
 
         // Act
@@ -366,7 +318,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
             "2 files of the project are missing. Run \"Sync Registry With SupportToolsServer...\" now?|True",
             _questions);
         Assert.Contains(
-            $"Project files missing (run \"Sync Registry With SupportToolsServer...\"): {seedParameters}, {pairedObjects}",
+            $"Project files missing (run \"Sync Registry With SupportToolsServer...\"): {pairedObjects}, {appSettings}",
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -416,8 +368,8 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
     public async Task Run_WhenStoredFileIsMissingAndSyncRegistryIsDeclined_ReportsTheMissingFile()
     {
         // Arrange
-        string seedParameters = Path.Combine(_tempFolder, "Security", "seed.json");
-        _project.SeedProjectParametersFilePath = seedParameters;
+        string pairedObjects = Path.Combine(_tempFolder, "Security", "paired.json");
+        _project.PairedDbObjectsResultFileName = pairedObjects;
         _syncRegistryAnswer = false;
 
         // Act
@@ -425,7 +377,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(0, _syncRegistryRuns);
-        Assert.Contains($"Project files missing (run \"Sync Registry With SupportToolsServer...\"): {seedParameters}",
+        Assert.Contains($"Project files missing (run \"Sync Registry With SupportToolsServer...\"): {pairedObjects}",
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -506,11 +458,6 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
     private bool InputBool(string question, bool defaultValue)
     {
         _questions.Add($"{question}|{defaultValue}");
-        if (question.StartsWith("Clone also", StringComparison.Ordinal))
-        {
-            return _scaffoldSeederAnswer;
-        }
-
         return question.StartsWith("Clone ", StringComparison.Ordinal) ? _confirmAnswer : _syncRegistryAnswer;
     }
 

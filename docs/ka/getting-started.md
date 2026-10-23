@@ -13,15 +13,13 @@
 
 ## ყველა საჭირო რეპოზიტორიის კლონირება
 
-SupportTools-ი დამოკიდებულია ათ დის რეპოზიტორიაზე. შექმენი მთავარი
+SupportTools-ი დამოკიდებულია რვა დის რეპოზიტორიაზე. შექმენი მთავარი
 ფოლდერი და დააკლონირე ისინი ერთმანეთის გვერდით.
 
 ```bash
 mkdir SupportTools
 cd SupportTools
 git clone git@github.com:merabza/AppCliTools.git              AppCliTools
-git clone git@github.com:merabza/BackendCarcass.git           BackendCarcass
-git clone git@github.com:merabza/BackendCarcassShared.git     BackendCarcassShared
 git clone git@github.com:merabza/ConnectionTools.git          ConnectionTools
 git clone git@github.com:merabza/DatabaseTools.git            DatabaseTools
 git clone git@github.com:merabza/ParametersManagement.git     ParametersManagement
@@ -38,8 +36,6 @@ cd ..
 ```
 SupportTools/
   ├── AppCliTools/
-  ├── BackendCarcass/
-  ├── BackendCarcassShared/
   ├── ConnectionTools/
   ├── DatabaseTools/
   ├── ParametersManagement/

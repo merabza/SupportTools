@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitWork.Errors;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
@@ -51,11 +50,11 @@ public sealed class GitSyncToolAction : ToolAction
     public bool? UseSameMessageForNextCommits { get; private set; }
 
     public static GitSyncToolAction? Create(ILogger? logger, IParametersManager parametersManager, string projectName,
-        EGitCol gitCol, string gitProjectName, bool useConsole)
+        string gitProjectName, bool useConsole)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName, gitCol,
+        var gitSyncParameters = GitSyncParameters.Create(loggerOrNull, supportToolsParameters, projectName,
             gitProjectName, useConsole);
 
         if (gitSyncParameters is not null)

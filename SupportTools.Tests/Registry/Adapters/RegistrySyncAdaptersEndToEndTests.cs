@@ -327,7 +327,7 @@ public sealed class RegistrySyncAdaptersEndToEndTests : IDisposable
                         new DatabaseParameters { DbConnectionName = "Dev", DatabaseName = "AppFake" },
                     GitProjectNames = ["AppFront"],
                     FrontNpmPackageNames = ["react"],
-                    AllowToolsList = [EProjectTools.SeedData],
+                    AllowToolsList = [EProjectTools.GenerateApiRoutes],
                     ServerInfos =
                     {
                         [ProjectServerInfoKey] = new ServerInfoModel

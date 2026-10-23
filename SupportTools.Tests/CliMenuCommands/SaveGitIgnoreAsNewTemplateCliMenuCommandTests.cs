@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.LibDataInput;
-using LibGitData;
 using LibGitData.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -105,7 +104,7 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
     {
         // Act
         var sut = new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object, ProjectName,
-            GitProjectName, EGitCol.Main);
+            GitProjectName);
 
         // Assert
         Assert.Equal(MenuName, sut.Name);
@@ -483,31 +482,6 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         Assert.Contains("[ERROR]", ConsoleText(), StringComparison.Ordinal);
     }
 
-    [Fact]
-    public async Task RunBody_WhenGitIsScaffoldSeederGit_CopiesGitIgnoreFromScaffoldSeederFolder()
-    {
-        // Arrange
-        //ScaffoldSeeder gits live in {ScaffoldSeedersWorkFolder}\{ScaffoldSeederProjectName}\{ScaffoldSeederProjectName}ScaffoldSeeder
-        byte[] seederGitIgnoreContent = [.. "seeder-only/"u8];
-        string scaffoldSeedersWorkFolder = Path.Combine(_rootFolder, "seeders");
-        string seederGitFolder =
-            Path.Combine(scaffoldSeedersWorkFolder, "Seeder", "SeederScaffoldSeeder", GitProjectName);
-        Directory.CreateDirectory(seederGitFolder);
-        await File.WriteAllBytesAsync(Path.Combine(seederGitFolder, ".gitignore"), seederGitIgnoreContent);
-        _parameters.ScaffoldSeedersWorkFolder = scaffoldSeedersWorkFolder;
-        ProjectModel project = _parameters.Projects[ProjectName];
-        project.ScaffoldSeederProjectName = "Seeder";
-        project.ScaffoldSeederGitProjectNames = [GitProjectName];
-        AnswerWithDefault();
-
-        // Act
-        bool result = await InvokeRunBody(CreateSut(EGitCol.ScaffoldSeed));
-
-        // Assert
-        Assert.True(result);
-        Assert.Equal(seederGitIgnoreContent, await File.ReadAllBytesAsync(TemplateFileName(GitProjectName)));
-    }
-
     //RunBody is protected, and its result is not observable through Run(): success and failure both reload the menu
     private static async Task<bool> InvokeRunBody(SaveGitIgnoreAsNewTemplateCliMenuCommand sut)
     {
@@ -516,10 +490,10 @@ public sealed class SaveGitIgnoreAsNewTemplateCliMenuCommandTests : IDisposable
         return await (ValueTask<bool>)runBody.Invoke(sut, [CancellationToken.None])!;
     }
 
-    private SaveGitIgnoreAsNewTemplateCliMenuCommand CreateSut(EGitCol gitCol = EGitCol.Main)
+    private SaveGitIgnoreAsNewTemplateCliMenuCommand CreateSut()
     {
         return new SaveGitIgnoreAsNewTemplateCliMenuCommand(_logger.Object, _parametersManager.Object, ProjectName,
-            GitProjectName, gitCol, InputText, InputBool);
+            GitProjectName, InputText, InputBool);
     }
 
     private string? InputText(string fieldName, string? defaultValue)

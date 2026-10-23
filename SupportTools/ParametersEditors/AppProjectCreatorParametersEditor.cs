@@ -19,7 +19,6 @@ public sealed class AppProjectCreatorParametersEditor : ParametersEditor
         parametersManager)
     {
         FieldEditors.Add(new IntFieldEditor(nameof(AppProjectCreatorAllParameters.IndentSize)));
-        FieldEditors.Add(new TextFieldEditor(nameof(AppProjectCreatorAllParameters.FakeHostProjectName)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.ProjectsFolderPathReal)));
         FieldEditors.Add(new FolderPathFieldEditor(nameof(AppProjectCreatorAllParameters.SecretsFolderPathReal)));
         FieldEditors.Add(new DatabaseServerConnectionNameFieldEditor(application, logger, httpClientFactory,

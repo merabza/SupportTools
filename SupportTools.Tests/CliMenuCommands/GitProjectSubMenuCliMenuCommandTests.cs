@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using AppCliTools.CliMenu;
-using LibGitData;
 using LibGitWork.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,7 +16,7 @@ public sealed class GitProjectSubMenuCliMenuCommandTests
     private const string GitProjectName = "MyGit";
 
     private readonly GitProjectSubMenuCliMenuCommand _sut = new(new Mock<ILogger>().Object,
-        new Mock<IParametersManager>().Object, "TestProject", GitProjectName, EGitCol.Main);
+        new Mock<IParametersManager>().Object, "TestProject", GitProjectName);
 
     [Fact]
     public void Constructor_WhenCreated_NamesMenuItemAfterGitProject()

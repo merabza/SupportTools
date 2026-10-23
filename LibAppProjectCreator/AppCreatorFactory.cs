@@ -58,8 +58,6 @@ public static class AppCreatorFactory
                     par.DbPartProjectName, mediatRLicenseKey, template);
                 return new RazorAppCreator(logger, httpClientFactory, par.ProjectName, par.IndentSize, gitProjects,
                     gitRepos, razorAppCreatorData);
-            case ESupportProjectType.ScaffoldSeeder:
-                return null;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(par), par.ProjectType, "Unsupported project type");

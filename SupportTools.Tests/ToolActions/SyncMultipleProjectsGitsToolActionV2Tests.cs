@@ -34,7 +34,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV2Tests : IDisposable
 
         _projectsFolder = Path.Combine(_tempFolder, "Projects");
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
         foreach (string gitName in (string[])["RepoA", "RepoB", "RepoC"])
         {
             AddGit(gitName);
@@ -161,23 +160,6 @@ public sealed class SyncMultipleProjectsGitsToolActionV2Tests : IDisposable
         //the projects of a git go in name order
         Assert.True(output.IndexOf($"Checking {GitFolder("Local1", "RepoA")}...", StringComparison.Ordinal) <
                     output.IndexOf($"Checking {GitFolder("Local2", "RepoA")}...", StringComparison.Ordinal));
-    }
-
-    [Fact]
-    public async Task Run_WhenProjectHasScaffoldSeederGits_ClonesThemIntoTheSeederFolder()
-    {
-        // Arrange
-        AddGit("RepoS");
-        ProjectModel project = _parameters.Projects["Local1"];
-        project.ScaffoldSeederProjectName = "Local1";
-        project.ScaffoldSeederGitProjectNames.Add("RepoS");
-
-        // Act
-        await Create(null, "Local1", false).Run();
-
-        // Assert
-        Assert.True(Directory.Exists(Path.Combine(_tempFolder, "Seeders", "Local1", "Local1ScaffoldSeeder", "RepoS",
-            ".git")));
     }
 
     //a git with local changes goes first; the given message is used for its commit without asking

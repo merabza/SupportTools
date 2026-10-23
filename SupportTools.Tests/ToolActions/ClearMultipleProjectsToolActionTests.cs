@@ -67,23 +67,6 @@ public sealed class ClearMultipleProjectsToolActionTests : IDisposable
                     output.IndexOf($"Process Folder {GitFolder("Local2", "RepoC")}", StringComparison.Ordinal));
     }
 
-    //with a seeders work folder, a project without a seeder project is skipped silently
-    [Fact]
-    public async Task Run_WhenProjectHasNoScaffoldSeederProject_SkipsItsSeederGitsWithoutMessages()
-    {
-        // Arrange
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
-
-        // Act
-        await Create(null, "Local1").Run();
-
-        // Assert
-        AssertCleared(GitFolder("Local1", "RepoA"));
-        string output = _consoleOutput.ToString();
-        Assert.DoesNotContain("ScaffoldSeederProjectName", output, StringComparison.Ordinal);
-        Assert.DoesNotContain("Gits folder is not found", output, StringComparison.Ordinal);
-    }
-
     //SupportTools started from {folder}\bin\Debug\{framework} does not clear the folder of its own sources
     [Fact]
     public async Task Run_WhenStartedFromABinDebugFolder_KeepsTheProgramSourcesUncleared()
@@ -137,35 +120,6 @@ public sealed class ClearMultipleProjectsToolActionTests : IDisposable
         AssertNotCleared(GitFolder("Local2", "RepoC"));
     }
 
-    [Fact]
-    public async Task Run_WhenSeedersWorkFolderIsSet_ClearsTheScaffoldSeederGitsToo()
-    {
-        // Arrange
-        string seederRepository = AddScaffoldSeederGit();
-
-        // Act
-        await Create(null, "Local1").Run();
-
-        // Assert
-        AssertCleared(seederRepository);
-    }
-
-    [Fact]
-    public async Task Run_WhenSeedersWorkFolderIsNotSet_WarnsAndSkipsTheScaffoldSeederGits()
-    {
-        // Arrange
-        AddScaffoldSeederGit();
-        _parameters.ScaffoldSeedersWorkFolder = null;
-
-        // Act
-        await Create(null, "Local1").Run();
-
-        // Assert
-        string output = _consoleOutput.ToString();
-        Assert.Contains("ScaffoldSeedersWorkFolder is not specified", output, StringComparison.Ordinal);
-        Assert.DoesNotContain("Gits folder is not found", output, StringComparison.Ordinal);
-    }
-
     private ClearMultipleProjectsToolAction Create(string? projectGroupName, string? projectName)
     {
         return ClearMultipleProjectsToolAction.Create(new Mock<ILogger>().Object, _parametersManager.Object,
@@ -185,24 +139,6 @@ public sealed class ClearMultipleProjectsToolActionTests : IDisposable
         string programRepository = GitFolder("Tool", "ToolSources");
         CreateRepositoryWithBuildOutput(programRepository);
         return programRepository;
-    }
-
-    private string AddScaffoldSeederGit()
-    {
-        _parameters.ScaffoldSeedersWorkFolder = Path.Combine(_tempFolder, "Seeders");
-        _parameters.Gits["RepoS"] = new GitDataModel
-        {
-            GitProjectAddress = "git@github.com:x/RepoS.git",
-            GitProjectFolderName = "RepoS",
-            GitIgnorePatternName = "CSharp"
-        };
-        ProjectModel project = _parameters.Projects["Local1"];
-        project.ScaffoldSeederProjectName = "Local1";
-        project.ScaffoldSeederGitProjectNames.Add("RepoS");
-        string seederRepository =
-            Path.Combine(_parameters.ScaffoldSeedersWorkFolder, "Local1", "Local1ScaffoldSeeder", "RepoS");
-        CreateRepositoryWithBuildOutput(seederRepository);
-        return seederRepository;
     }
 
     private void AddProject(string projectName, string groupName, string gitName)
