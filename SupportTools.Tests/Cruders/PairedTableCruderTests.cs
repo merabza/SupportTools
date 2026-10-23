@@ -58,8 +58,8 @@ public sealed class PairedTableCruderTests
         Assert.Equal([
             nameof(PairedTable.ProdCopySchemaName), nameof(PairedTable.ProdCopyTableName),
             nameof(PairedTable.DevSchemaName), nameof(PairedTable.DevTableName), nameof(PairedTable.SeedDataType),
-            nameof(PairedTable.UseOldDataConvertor), nameof(PairedTable.KeyFieldNames),
-            nameof(PairedTable.PairedFields)
+            nameof(PairedTable.UseOldDataConvertor), nameof(PairedTable.ProdCopyRowFilter),
+            nameof(PairedTable.KeyFieldNames), nameof(PairedTable.PairedFields)
         ], fieldEditors.Select(x => x.PropertyName));
         Assert.IsType<SchemaNameFieldEditor>(fieldEditors[0]);
         Assert.IsType<TableNameFieldEditor>(fieldEditors[1]);
@@ -67,8 +67,9 @@ public sealed class PairedTableCruderTests
         Assert.IsType<TableNameFieldEditor>(fieldEditors[3]);
         Assert.IsType<EnumFieldEditor<ESeedDataType>>(fieldEditors[4]);
         Assert.IsType<BoolFieldEditor>(fieldEditors[5]);
-        Assert.IsType<SimpleNamesListFieldEditor<KeyFieldNamesLisCruder>>(fieldEditors[6]);
-        Assert.IsType<PairedFieldsListFieldEditor>(fieldEditors[7]);
+        Assert.IsType<OptionalTextFieldEditor>(fieldEditors[6]);
+        Assert.IsType<SimpleNamesListFieldEditor<KeyFieldNamesLisCruder>>(fieldEditors[7]);
+        Assert.IsType<PairedFieldsListFieldEditor>(fieldEditors[8]);
     }
 
     //the schema and table names of each side are read from the database of that side
@@ -100,7 +101,7 @@ public sealed class PairedTableCruderTests
     {
         // Arrange
         var pairedTable = new PairedTable { KeyFieldNames = ["Code"] };
-        FieldEditor keyFieldNamesEditor = CliMenuTestAccess.GetFieldEditors(CreateSut())[6];
+        FieldEditor keyFieldNamesEditor = CliMenuTestAccess.GetFieldEditors(CreateSut())[7];
 
         // Act
         CliMenuSet? listMenu = keyFieldNamesEditor.GetSubMenu(pairedTable);

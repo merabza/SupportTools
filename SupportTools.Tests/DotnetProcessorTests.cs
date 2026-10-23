@@ -40,6 +40,21 @@ public sealed class DotnetProcessorTests
         Assert.Equal(expected, result);
     }
 
+    //Version, not AssemblyVersion: it also reaches the restore, so a project built from source wins over an older package
+    //of the same name (WebSystemTools refers to SystemTools by packages) and the publish holds the DLLs the app references
+    [Fact]
+    public void CreatePublishArguments_SetsTheVersionOfEveryProject()
+    {
+        // Act
+        string result =
+            DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj", "1.0.9792.31628");
+
+        // Assert
+        Assert.Equal(
+            @"publish --configuration Release --runtime linux-x64 --self-contained --output C:\Publish\App App.csproj /p:Version=1.0.9792.31628",
+            result);
+    }
+
     [Fact]
     public void CreateRestoreWithoutHttpCacheArguments_SkipsTheHttpCache()
     {

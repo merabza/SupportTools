@@ -28,7 +28,18 @@ public sealed class DotnetProcessor
         string assemblyVersion)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:AssemblyVersion={assemblyVersion}");
+            CreatePublishArguments(runtime, outputFolderPath, mainProjectFileName, assemblyVersion));
+    }
+
+    //ვერსია Version-ით გადაეცემა: AssemblyVersion მისგან იგივე გამოდის, Version კი restore-საც სწვდება. ამიტომ
+    //ProjectReference-ით აგებული პროექტის ვერსია იგივე სახელის ძველ პაკეტისაზე (მაგალითად, WebSystemTools-ის
+    //PackageReference-ით მოსული SystemTools-ისაზე) მაღალია და NuGet პროექტს ირჩევს. მხოლოდ AssemblyVersion-ით publish-ში
+    //პაკეტის 1.0.0.0 DLL ხვდებოდა, აპის DLL-ები კი პროექტის ახალ ვერსიას ითხოვდნენ (FileNotFoundException გაშვებისას)
+    internal static string CreatePublishArguments(string runtime, string outputFolderPath, string mainProjectFileName,
+        string assemblyVersion)
+    {
+        return
+            $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:Version={assemblyVersion}";
     }
 
     public Result CreateNewSolution(string solutionPath, string solutionName)

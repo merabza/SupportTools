@@ -35,6 +35,7 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
         FieldEditors.Add(new EnumFieldEditor<ESeedDataType>(nameof(PairedTable.SeedDataType),
             ESeedDataType.OnlyDatabase));
         FieldEditors.Add(new BoolFieldEditor(nameof(PairedTable.UseOldDataConvertor)));
+        FieldEditors.Add(new OptionalTextFieldEditor(nameof(PairedTable.ProdCopyRowFilter)));
         FieldEditors.Add(new SimpleNamesListFieldEditor<KeyFieldNamesLisCruder>(nameof(PairedTable.KeyFieldNames),
             x => new KeyFieldNamesLisCruder(parametersManager, x)));
         FieldEditors.Add(new PairedFieldsListFieldEditor(nameof(PairedTable.PairedFields), logger, parametersManager,
