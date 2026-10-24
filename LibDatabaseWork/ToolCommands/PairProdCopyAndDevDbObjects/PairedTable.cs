@@ -36,6 +36,11 @@ public sealed class PairedTable : ItemData
     public ESeedDataType SeedDataType { get; set; }
     public bool UseOldDataConvertor { get; set; }
 
+    //ProdCopy-დან წასაკითხი მწკრივების ფილტრი: SQL პირობა WHERE-ის გარეშე, ProdCopy ბაზის დიალექტზე
+    //(მაგ. [Kind] <> N'ScaffoldSeed'); ცარიელი — ყველა მწკრივი. მოქმედებს მხოლოდ ProdCopy-ის პირდაპირ წაკითხვაზე:
+    //კონვერტორი და OnlySeederRules მას არ იყენებენ
+    public string? ProdCopyRowFilter { get; set; }
+
     //ბუნებრივი გასაღების ველები Adjust შერწყმისთვის (SeederRulesHasMorePriority/DatabaseDataHasMorePriority);
     //ცარიელი სიის შემთხვევაში გამოიყენება Dev ცხრილის პირველადი გასაღების სვეტები
     public List<string> KeyFieldNames { get; set; } = [];
