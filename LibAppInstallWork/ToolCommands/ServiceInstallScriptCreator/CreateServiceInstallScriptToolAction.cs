@@ -14,8 +14,6 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     private readonly string _environmentName;
     private readonly string _ftpSiteAddress;
     private readonly string _ftpSiteDirectory;
-    private readonly int _ftpSiteLsFileOffset;
-    private readonly string _ftpSitePassword;
     private readonly string _ftpSiteUserName;
     private readonly ILogger _logger;
     private readonly int _portNumber;
@@ -30,10 +28,10 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     private readonly string _settingsFileName;
 
     public CreateServiceInstallScriptToolAction(ILogger logger, string scriptFileName, int portNumber,
-        string ftpSiteAddress, string ftpSiteUserName, string ftpSitePassword, string ftpSiteDirectory,
-        string projectName, string? serviceDescriptionSignature, string? projectDescription, string runTime,
-        string environmentName, string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
-        string serverSideServiceUserName, int ftpSiteLsFileOffset) : base(logger,
+        string ftpSiteAddress, string ftpSiteUserName, string ftpSiteDirectory, string projectName,
+        string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
+        string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
+        string serverSideServiceUserName) : base(logger,
         nameof(ServiceInstallScriptCreatorToolCommand), null, null)
     {
         _logger = logger;
@@ -41,7 +39,6 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
         _portNumber = portNumber;
         _ftpSiteAddress = ftpSiteAddress;
         _ftpSiteUserName = ftpSiteUserName;
-        _ftpSitePassword = ftpSitePassword;
         _ftpSiteDirectory = ftpSiteDirectory;
         _projectName = projectName;
         _serviceDescriptionSignature = serviceDescriptionSignature;
@@ -52,7 +49,6 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
         _serverSideDeployFolder = serverSideDeployFolder;
         _settingsFileName = settingsFileName;
         _serverSideServiceUserName = serverSideServiceUserName;
-        _ftpSiteLsFileOffset = ftpSiteLsFileOffset;
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -64,19 +60,51 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
 
                         # {{sf.Name}}
 
+                        #This script installs with apt-get the programs it needs, when they are missing:
+                        #curl, unzip and the .NET runtime of the project (from its runtimeconfig.json)
                         #The following steps are required for this script to work on the server
-                        #1. Unzip must be installed
-                        #sudo apt install unzip
-                        #2. dotnet must be installed
-                        #sudo snap install dotnet-sdk --classic
-                        #3. run which dotnet command to understand where dotnet is
-                        #which dotnet
-                        #4. Open {{_portNumber}} Port for WebAgent
+                        #1. Open {{_portNumber}} Port for WebAgent
                         #sudo iptables -A INPUT -p tcp --dport {{_portNumber}} -j ACCEPT
-                        #5. Open 5032 Port for WebAgentInstaller
+                        #2. Open 5032 Port for WebAgentInstaller
                         #sudo iptables -A INPUT -p tcp --dport 5032 -j ACCEPT
 
-                        dotnetRunner=$(which dotnet 2>&1)
+                        aptUpdated=0
+
+                        # install an apt package; apt-get update runs once, before the first install
+                        install_package() {
+                          if ! command -v apt-get > /dev/null 2>&1; then
+                            echo "apt-get not found, install $1 manually. process finished!"
+                            exit 1
+                          fi
+                          if [ $aptUpdated -eq 0 ]; then
+                            echo apt-get update...
+                            if ! sudo apt-get update; then
+                              echo "apt-get update failed. process finished!"
+                              exit 1
+                            fi
+                            aptUpdated=1
+                          fi
+                          echo install $1...
+                          if ! sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "$1"; then
+                            echo "$1 install failed. process finished!"
+                            exit 1
+                          fi
+                        }
+
+                        # install the package when the command is missing
+                        require_command() {
+                          if ! command -v "$1" > /dev/null 2>&1; then
+                            echo "$1 is not installed"
+                            install_package "$2"
+                            if ! command -v "$1" > /dev/null 2>&1; then
+                              echo "$1 is not found after the install of $2. process finished!"
+                              exit 1
+                            fi
+                          fi
+                        }
+
+                        require_command curl curl
+                        require_command unzip unzip
 
                         result=$(hostname)
                         echo result is $result
@@ -85,7 +113,6 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
 
                         ftpSite={{_ftpSiteAddress}}
                         user={{_ftpSiteUserName}}
-                        pass={{_ftpSitePassword}}
                         directory={{_ftpSiteDirectory}}
                         projectName={{_projectName}}
                         ServiceDescriptionSignature={{_serviceDescriptionSignature}}
@@ -103,24 +130,8 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
                         mainDllFileName=$projectInstallFullPath/$projectName.dll
                         serviceEnvName=$projectName$environmentName
 
-                        LS_FILE_OFFSET={{_ftpSiteLsFileOffset}} # Check directory_listing to see where filename begins
-
                         echo download File Prefix is $downloadFilePrefix
                         echo download Settings File Prefix is $downloadSettingsFilePrefix
-
-                        if [ -z "$dotnetRunner" ]; then
-                          echo "dotnet runner is not installed!"
-                          exit 1
-                        fi
-
-                        if [ ! -e $dotnetRunner ]
-                        then
-                          echo "dotnet runner $dotnetRunner does not exists"
-                          dotnetRunner=$(which dotnet 2>&1)
-                          echo "dotnet runner will use $dotnetRunner"
-                        fi
-
-
 
                         echo The Argument ftpSite is $ftpSite
                         if [ -z "$ftpSite" ]; then
@@ -132,7 +143,27 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
                           echo "user not specified, process finished!"
                           exit 1
                         fi
-                        echo The Argument pass is $pass
+                        # ask the ftp password, show * for every typed character
+                        pass=""
+                        prompt="Enter ftp password for $user: "
+                        while IFS= read -r -s -n 1 -p "$prompt" char; do
+                          if [ -z "$char" ]; then
+                            break
+                          fi
+                          if [[ $char == $'\177' || $char == $'\b' ]]; then
+                            if [ -n "$pass" ]; then
+                              pass="${pass%?}"
+                              prompt=$'\b \b'
+                            else
+                              prompt=""
+                            fi
+                          else
+                            pass+="$char"
+                            prompt="*"
+                          fi
+                        done
+                        echo
+
                         if [ -z "$pass" ]; then
                           echo "pass not specified, process finished!"
                           exit 1
@@ -185,25 +216,15 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
                         mkdir -p $projectInstallFullPath
                         #rm $downloadFolder
 
-                        echo remove old directory_listing if it exists
-                        rm -f directory_listing
+                        echo Try to get ftp files list
+                        # get the file names only; the newest file is chosen by the date in its name
+                        if ! directory_listing=$(curl -sS --fail --list-only -u "$user:$pass" "ftp://$ftpSite$directory"); then
+                          echo "ftp files list download failed. process finished!"
+                          exit 1
+                        fi
 
-                        echo Try to get ftp files list to directory_listing
-                        # get listing from directory sorted by modification date
-                        ftp -n $ftpSite > directory_listing <<fin
-                        quote USER $user
-                        quote PASS $pass
-                        passive on
-                        cd $directory
-                        ls -lt
-                        quit
-                        fin
-
-                        echo parse the file names from the directory listing
-                        files_to_get=`cut -c $LS_FILE_OFFSET- < directory_listing`
-
-                        echo remove directory_listing
-                        #rm -f directory_listing
+                        # some ftp servers end the lines with CRLF
+                        files_to_get=$(printf '%s\n' "$directory_listing" | tr -d '\r')
 
                         #echo files_to_get is $files_to_get
 
@@ -233,35 +254,67 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
 
                         downloadzipfilename=$downloadFolder/$zipfilename
 
+                        echo download $zipfilename to $downloadzipfilename
 
-                        cmd="get $zipfilename $downloadzipfilename
-                        "
+                        rm -f $downloadzipfilename
 
-                        echo cmd is $cmd
+                        # go back and get the file
+                        if ! curl -sS --fail -u "$user:$pass" "ftp://$ftpSite$directory$zipfilename" -o "$downloadzipfilename"; then
+                          echo "zip file $zipfilename download failed. process finished!"
+                          exit 1
+                        fi
 
-
-
-
-                        rm $downloadzipfilename
-
-
-                        # go back and get the file(s)
-                        ftp -n $ftpSite <<fin
-                        quote USER $user
-                        quote PASS $pass
-                        passive on
-                        cd $directory
-                        binary
-                        $cmd
-                        quit
-                        fin
+                        if [ ! -s "$downloadzipfilename" ]; then
+                          echo "downloaded zip file $downloadzipfilename is missing or empty. process finished!"
+                          exit 1
+                        fi
 
                         expandedFolderName=${downloadzipfilename%.*}
                         echo expandedFolderName is $expandedFolderName
 
                         rm -rf $expandedFolderName
 
-                        unzip -q $downloadzipfilename -d $expandedFolderName
+                        if ! unzip -q $downloadzipfilename -d $expandedFolderName; then
+                          echo "unzip of $downloadzipfilename failed. process finished!"
+                          exit 1
+                        fi
+
+                        if [ ! -e "$expandedFolderName/$projectName.dll" ]; then
+                          echo "$projectName.dll not found in $expandedFolderName. process finished!"
+                          exit 1
+                        fi
+
+                        # the .NET runtime that the project needs, from its runtimeconfig.json
+                        # a self-contained project (includedFrameworks) brings its own runtime
+                        runtimeConfigFileName=$expandedFolderName/$projectName.runtimeconfig.json
+                        if [ -e "$runtimeConfigFileName" ] && ! grep -q '"includedFrameworks"' "$runtimeConfigFileName"; then
+                          if grep -q '"Microsoft.AspNetCore.App"' "$runtimeConfigFileName"; then
+                            frameworkName=Microsoft.AspNetCore.App
+                            runtimePackagePrefix=aspnetcore-runtime
+                          else
+                            frameworkName=Microsoft.NETCore.App
+                            runtimePackagePrefix=dotnet-runtime
+                          fi
+                          frameworkVersion=$(grep -A1 "\"$frameworkName\"" "$runtimeConfigFileName" | grep -o '"version": *"[0-9]*\.[0-9]*' | grep -o '[0-9]*\.[0-9]*$')
+                          if [ -n "$frameworkVersion" ]; then
+                            echo "the project needs $frameworkName $frameworkVersion"
+                            if ! dotnet --list-runtimes 2>/dev/null | grep -q "^$frameworkName $frameworkVersion\."; then
+                              echo "$frameworkName $frameworkVersion is not installed"
+                              install_package "$runtimePackagePrefix-$frameworkVersion"
+                              if ! dotnet --list-runtimes 2>/dev/null | grep -q "^$frameworkName $frameworkVersion\."; then
+                                echo "$frameworkName $frameworkVersion is not found after the install. process finished!"
+                                exit 1
+                              fi
+                            fi
+                          fi
+                        fi
+
+                        dotnetRunner=$(command -v dotnet)
+                        if [ -z "$dotnetRunner" ]; then
+                          echo "dotnet runner is not installed! process finished!"
+                          exit 1
+                        fi
+                        echo "dotnet runner is $dotnetRunner"
 
 
                         #Get latest settings json file
@@ -286,25 +339,20 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
 
                         downloadSettingsJsonFileName=$expandedFolderName/$SettingsFileName
 
-                        cmd="get $latestSettingsJsonFileName $downloadSettingsJsonFileName
-                        "
-
-                        echo cmd is $cmd
-
+                        echo download $latestSettingsJsonFileName to $downloadSettingsJsonFileName
 
                         #rm $downloadSettingsJsonFileName
 
+                        # go back and get the file
+                        if ! curl -sS --fail -u "$user:$pass" "ftp://$ftpSite$directory$latestSettingsJsonFileName" -o "$downloadSettingsJsonFileName"; then
+                          echo "Settings json file $latestSettingsJsonFileName download failed. process finished!"
+                          exit 2
+                        fi
 
-                        # go back and get the file(s)
-                        ftp -n $ftpSite <<fin
-                        quote USER $user
-                        quote PASS $pass
-                        passive on
-                        cd $directory
-                        binary
-                        $cmd
-                        quit
-                        fin
+                        if [ ! -s "$downloadSettingsJsonFileName" ]; then
+                          echo "downloaded settings file $downloadSettingsJsonFileName is missing or empty. process finished!"
+                          exit 2
+                        fi
 
                         if (( $(ps -ef | grep -v grep | grep $serviceEnvName | wc -l) > 0 ))
                         then

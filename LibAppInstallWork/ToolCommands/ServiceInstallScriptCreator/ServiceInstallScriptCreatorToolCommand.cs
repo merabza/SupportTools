@@ -62,26 +62,19 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
         string startPath = uri.AbsolutePath;
         int port = uri.Port;
 
-        string ftpSiteAddress = port == 21 ? hostName : $"\"{hostName} {port}\"";
+        // curl-ის მისამართის ფორმატი: host ან host:port
+        string ftpSiteAddress = port == 21 ? hostName : $"{hostName}:{port}";
+
+        // curl-ს საქაღალდის სიისთვის და ფაილის მისამართის ასაწყობად ბოლოში / სჭირდება
+        if (!startPath.EndsWith('/'))
+        {
+            startPath += "/";
+        }
 
         string? userName = _par.FileStorageForExchange.UserName;
         if (string.IsNullOrWhiteSpace(userName))
         {
             _logger.LogError("User Name is not specified for File Storage {FileStoragePath}", fileStoragePath);
-            return false;
-        }
-
-        string? password = _par.FileStorageForExchange.Password;
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            _logger.LogError("Password is not specified for File Storage {FileStoragePath}", fileStoragePath);
-            return false;
-        }
-
-        if (_par.FileStorageForExchange.FtpSiteLsFileOffset == 0)
-        {
-            _logger.LogError("FtpSiteLsFileOffset is not specified for File Storage {FileStoragePath}",
-                fileStoragePath);
             return false;
         }
 
@@ -182,10 +175,10 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
         var sf = new FileInfo(settingsFileFullName);
 
         var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave,
-            _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, password, startPath, _par.ProjectName,
+            _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,
-            sf.Name, _par.ServerInfo.ServiceUserName, _par.FileStorageForExchange.FtpSiteLsFileOffset);
+            sf.Name, _par.ServerInfo.ServiceUserName);
         return await createInstallScript.Run(cancellationToken);
     }
 }
