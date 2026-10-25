@@ -92,7 +92,8 @@ public sealed class ServerInstallationCruderTests : IDisposable
             nameof(ServerInstallationModel.InstallMariaDb), nameof(ServerInstallationModel.MariaDbRootPasswordHash),
             nameof(ServerInstallationModel.InstallPostgreSql), nameof(ServerInstallationModel.InstallMsSqlServer),
             nameof(ServerInstallationModel.SqlServerEdition), nameof(ServerInstallationModel.SqlServerSaPasswordHash),
-            nameof(ServerInstallationModel.SqlServerPort), nameof(ServerInstallationModel.InstallSqlServerClient)
+            nameof(ServerInstallationModel.SqlServerPort), nameof(ServerInstallationModel.OpenSqlServerPort),
+            nameof(ServerInstallationModel.InstallSqlServerClient)
         ], fieldEditors.Select(x => x.PropertyName));
     }
 
@@ -274,6 +275,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Assert.False(enabled[nameof(ServerInstallationModel.SqlServerEdition)]);
         Assert.False(enabled[nameof(ServerInstallationModel.SqlServerSaPasswordHash)]);
         Assert.False(enabled[nameof(ServerInstallationModel.SqlServerPort)]);
+        Assert.False(enabled[nameof(ServerInstallationModel.OpenSqlServerPort)]);
     }
 
     //Virtualmin brings Webmin, and SQL Server always gets sqlcmd, which sets the sa hash
@@ -299,6 +301,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Assert.True(enabled[nameof(ServerInstallationModel.SqlServerEdition)]);
         Assert.True(enabled[nameof(ServerInstallationModel.SqlServerSaPasswordHash)]);
         Assert.True(enabled[nameof(ServerInstallationModel.SqlServerPort)]);
+        Assert.True(enabled[nameof(ServerInstallationModel.OpenSqlServerPort)]);
     }
 
     //"New Server Installation" gives the new record the default of every field editor before the input: the lists

@@ -12,6 +12,7 @@ public sealed class ServerInstallationModel : ItemData
     public const string DefaultLocale = "en_US.UTF-8";
     public const string DefaultKeyboardLayout = "us";
     public const string DefaultSqlServerEdition = "EnterpriseDeveloper";
+    public const int DefaultSqlServerPort = 1433;
 
     //იდენტიფიკაცია
     public string? Hostname { get; set; }
@@ -75,6 +76,9 @@ public sealed class ServerInstallationModel : ItemData
 
     public bool InstallSqlServerClient { get; set; }
 
-    //SQL Server ამ პორტზე უსმენს და პორტი firewall-ში იხსნება. 0 ნიშნავს, რომ არაფერი იცვლება
+    //SQL Server ამ პორტზე უსმენს. 0 ან 1433 (ნაგულისხმევი) ნიშნავს, რომ პორტი არ იცვლება
     public int SqlServerPort { get; set; }
+
+    //SQL Server-ის პორტი firewall-ში იხსნება
+    public bool OpenSqlServerPort { get; set; }
 }

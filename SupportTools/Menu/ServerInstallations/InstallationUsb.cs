@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,14 +16,29 @@ public static class InstallationUsb
 {
     private const string OriginalGrubCfgFileName = "grub.cfg.original";
 
-    //დისკები, რომლებიც Ubuntu-ს საინსტალაციო მედიას ჰგავს: აქვს boot\grub\grub.cfg და casper ფოლდერი
+    //დისკები, რომლებიც Ubuntu-ს საინსტალაციო მედიას ჰგავს: აქვს boot\grub\grub.cfg და casper ფოლდერი.
+    //RDP სესიაში კლიენტის კომპიუტერის გადამისამართებული დისკებიც მოწმდება (\\tsclient\E\)
     public static List<InstallationUsbDrive> FindDrives()
     {
         return
         [
             .. DriveInfo.GetDrives().Where(x => x.IsReady && IsInstallationMedia(x.RootDirectory.FullName))
-                .Select(x => new InstallationUsbDrive(x.RootDirectory.FullName, GetDescription(x)))
+                .Select(x => new InstallationUsbDrive(x.RootDirectory.FullName, GetDescription(x))),
+            .. GetRdpDriveRoots(Environment.GetEnvironmentVariable("SESSIONNAME")).Where(IsInstallationMedia)
+                .Select(x => new InstallationUsbDrive(x, $"{x} (RDP redirected drive)"))
         ];
+    }
+
+    //RDP-ით გადამისამართებული დისკები DriveInfo.GetDrives-ში არ ჩანს, მხოლოდ \\tsclient\<ასო>-ით მიიწვდომება.
+    //RDP სესიის გარეთ \\tsclient-ის ძებნა ქსელის ტაიმაუტს ელოდება, ამიტომ მოწმდება მხოლოდ RDP სესიაში (SESSIONNAME = RDP-Tcp#N)
+    internal static List<string> GetRdpDriveRoots(string? sessionName)
+    {
+        if (sessionName is null || !sessionName.StartsWith("RDP-", StringComparison.OrdinalIgnoreCase))
+        {
+            return [];
+        }
+
+        return [.. Enumerable.Range('A', 26).Select(x => $@"\\tsclient\{(char)x}\")];
     }
 
     internal static string GetDescription(DriveInfo drive)

@@ -54,7 +54,8 @@ public sealed class WriteServerInstallationToUsbCliMenuCommand : CliMenuCommand
         if (drives.Count == 0)
         {
             StShared.WriteErrorLine(
-                "No Ubuntu installation USB found (a drive with boot\\grub\\grub.cfg and a casper folder)", true);
+                "No Ubuntu installation USB found (a local or RDP redirected drive with boot\\grub\\grub.cfg and a casper folder)",
+                true);
             return ValueTask.FromResult(false);
         }
 

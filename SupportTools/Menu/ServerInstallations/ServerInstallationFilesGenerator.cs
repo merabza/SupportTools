@@ -470,14 +470,28 @@ public static partial class ServerInstallationFilesGenerator
 
                         """);
 
-            if (installation.SqlServerPort > 0)
+            //0 და ნაგულისხმევი პორტი არაფერს ცვლის: mssql-conf გამოყენებულ პორტს არ იღებს
+            int sqlServerPort = installation.SqlServerPort == 0
+                ? ServerInstallationModel.DefaultSqlServerPort
+                : installation.SqlServerPort;
+            string port = sqlServerPort.ToString(CultureInfo.InvariantCulture);
+            if (sqlServerPort != ServerInstallationModel.DefaultSqlServerPort)
             {
-                string port = installation.SqlServerPort.ToString(CultureInfo.InvariantCulture);
                 sb.Append(CultureInfo.InvariantCulture, $$"""
-                            # SQL Server listens on port {{port}}
-                            /opt/mssql/bin/mssql-conf set network.tcpport {{port}}
-                            systemctl restart mssql-server
-                            # Open the port: in firewalld if it runs (Virtualmin sets it up), in nftables otherwise
+                            # SQL Server listens on port {{port}} (mssql-conf refuses a port in use, so not again)
+                            if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*{{port}}[[:space:]]*$' \
+                              /var/opt/mssql/mssql.conf 2>/dev/null; then
+                              /opt/mssql/bin/mssql-conf set network.tcpport {{port}}
+                              systemctl restart mssql-server
+                            fi
+
+                            """);
+            }
+
+            if (installation.OpenSqlServerPort)
+            {
+                sb.Append(CultureInfo.InvariantCulture, $$"""
+                            # Open SQL Server's port {{port}}: in firewalld if it runs (Virtualmin sets it up), in nftables otherwise
                             if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
                               firewall-cmd --permanent --add-port={{port}}/tcp
                               firewall-cmd --reload

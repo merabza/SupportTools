@@ -133,6 +133,34 @@ public sealed class InstallationUsbTests : IDisposable
         Assert.All(result, x => Assert.StartsWith(x.RootPath, x.Description, StringComparison.Ordinal));
     }
 
+    [Theory]
+    [InlineData("RDP-Tcp#3")]
+    [InlineData("rdp-tcp#0")]
+    public void GetRdpDriveRoots_InAnRdpSession_ReturnsEveryTsclientDriveLetter(string sessionName)
+    {
+        // Act
+        List<string> result = InstallationUsb.GetRdpDriveRoots(sessionName);
+
+        // Assert
+        Assert.Equal(26, result.Count);
+        Assert.Equal(@"\\tsclient\A\", result[0]);
+        Assert.Equal(@"\\tsclient\Z\", result[25]);
+    }
+
+    //outside an RDP session \\tsclient does not exist, and looking it up waits for a network timeout
+    [Theory]
+    [InlineData("Console")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void GetRdpDriveRoots_OutsideAnRdpSession_ReturnsNothing(string? sessionName)
+    {
+        // Act
+        List<string> result = InstallationUsb.GetRdpDriveRoots(sessionName);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
     [Fact]
     public void GetDescription_ForADrive_ShowsItsRootTypeAndSize()
     {

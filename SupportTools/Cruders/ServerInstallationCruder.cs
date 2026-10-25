@@ -63,6 +63,7 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
         FieldEditors.Add(new PasswordHashFieldEditor(nameof(ServerInstallationModel.SqlServerSaPasswordHash),
             PasswordHashers.SqlServerPassword));
         FieldEditors.Add(new IntFieldEditor(nameof(ServerInstallationModel.SqlServerPort), 0, true));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.OpenSqlServerPort)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallSqlServerClient)));
     }
 
@@ -77,6 +78,7 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerEdition), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerSaPasswordHash), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerPort), installation.InstallMsSqlServer);
+        EnableFieldByName(nameof(ServerInstallationModel.OpenSqlServerPort), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.InstallSqlServerClient), !installation.InstallMsSqlServer);
     }
 

@@ -139,7 +139,7 @@ public sealed class WriteServerInstallationToUsbCliMenuCommandTests : IDisposabl
         Assert.False(result);
         Assert.Null(_menuItemNames);
         Assert.Contains(
-            @"[ERROR] No Ubuntu installation USB found (a drive with boot\grub\grub.cfg and a casper folder)",
+            @"[ERROR] No Ubuntu installation USB found (a local or RDP redirected drive with boot\grub\grub.cfg and a casper folder)",
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 

@@ -652,8 +652,9 @@ public sealed class ServerInstallationFilesGeneratorTests
                      """.ReplaceLineEndings("\n"), Scalar(writeFile, "content"));
     }
 
+    //a re-run must not set the port again: mssql-conf refuses a port in use, also by SQL Server itself
     [Fact]
-    public void CreateAutoinstallYaml_WithSqlServerPort_MovesSqlServerAndOpensThePort()
+    public void CreateAutoinstallYaml_WithSqlServerPort_MovesSqlServerOnceWithoutOpeningThePort()
     {
         // Arrange
         ServerInstallationModel installation = CreateOslo();
@@ -663,9 +664,49 @@ public sealed class ServerInstallationFilesGeneratorTests
         string script = GetInstallAppsLateCommand(installation);
 
         // Assert
-        Assert.Contains("/opt/mssql/bin/mssql-conf set network.tcpport 2433\nsystemctl restart mssql-server\n", script);
-        Assert.Contains("firewall-cmd --permanent --add-port=2433/tcp\n", script);
-        Assert.Contains("echo 'add rule inet filter input tcp dport 2433 accept' >> /etc/nftables.conf\n", script);
+        Assert.Contains("if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*2433[[:space:]]*$' \\\n" +
+                        "  /var/opt/mssql/mssql.conf 2>/dev/null; then\n" +
+                        "  /opt/mssql/bin/mssql-conf set network.tcpport 2433\n  systemctl restart mssql-server\nfi\n",
+            script);
+        Assert.DoesNotContain("firewall-cmd", script);
+        Assert.DoesNotContain("nftables", script);
+    }
+
+    //0 and 1433 are SQL Server's default port: mssql-conf would fail with "Port '1433' is already in use"
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1433)]
+    public void CreateAutoinstallYaml_WithDefaultSqlServerPort_KeepsThePort(int sqlServerPort)
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateOslo();
+        installation.SqlServerPort = sqlServerPort;
+
+        // Act
+        string script = GetInstallAppsLateCommand(installation);
+
+        // Assert
+        Assert.DoesNotContain("network.tcpport", script);
+    }
+
+    [Theory]
+    [InlineData(2433, "2433")]
+    [InlineData(1433, "1433")]
+    [InlineData(0, "1433")]
+    public void CreateAutoinstallYaml_WithOpenSqlServerPort_OpensTheListenedPort(int sqlServerPort, string opened)
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateOslo();
+        installation.SqlServerPort = sqlServerPort;
+        installation.OpenSqlServerPort = true;
+
+        // Act
+        string script = GetInstallAppsLateCommand(installation);
+
+        // Assert
+        Assert.Contains($"firewall-cmd --permanent --add-port={opened}/tcp\n", script);
+        Assert.Contains($"echo 'add rule inet filter input tcp dport {opened} accept' >> /etc/nftables.conf\n",
+            script);
     }
 
     [Fact]
