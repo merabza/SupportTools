@@ -17,4 +17,15 @@ public sealed class MachineLocalFieldsTests
         // Assert
         Assert.True(result);
     }
+
+    //the registry has no collection of server installations, and they hold password hashes
+    [Fact]
+    public void TopLevel_WhenRead_ContainsServerInstallations()
+    {
+        // Act
+        bool result = MachineLocalFields.TopLevel.Contains(nameof(SupportToolsParameters.ServerInstallations));
+
+        // Assert
+        Assert.True(result);
+    }
 }

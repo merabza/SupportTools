@@ -41,7 +41,9 @@ public static class MachineLocalFields
         //გამოთვლადია და ყოველ კომპიუტერზე თავიდან ითვლება (G9)
         nameof(SupportToolsParameters.GitProjects),
         //ამ კომპიუტერის exe ფაილების გზებია
-        nameof(SupportToolsParameters.Archivers)
+        nameof(SupportToolsParameters.Archivers),
+        //რეესტრში ასეთი კოლექცია არ არის, თან პაროლების ჰეშებს შეიცავს
+        nameof(SupportToolsParameters.ServerInstallations)
     ];
 
     //IsLocal = (სერვერის სახელი == CurrentMachineServerName), იხ. ServersIsLocalCalculator

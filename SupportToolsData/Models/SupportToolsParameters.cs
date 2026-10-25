@@ -89,6 +89,9 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
 
+    //Ubuntu Server-ის ავტომატური ინსტალაციები (grub.cfg და autoinstall.yaml საინსტალაციო ფლეშკისთვის)
+    public Dictionary<string, ServerInstallationModel> ServerInstallations { get; init; } = [];
+
     public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];

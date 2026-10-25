@@ -32,6 +32,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Menu.RemoveUnusedPackageVersions;
 using SupportTools.Menu.ReversePackageDistribution;
+using SupportTools.Menu.ServerInstallations;
 using SupportTools.Menu.SupportToolsParametersEdit;
 using SupportTools.Menu.SupportToolsServerEdit;
 using SupportTools.Menu.SyncAllProjectsAllGits;
@@ -74,6 +75,8 @@ public static class MenuData
         nameof(CheckAllProjectsBuildCliMenuCommandFactoryStrategy),
         //BaGetter პაკეტების სერვერზე პაკეტების ჩამონათვალი და მართვა
         nameof(BaGetterSubMenuCliMenuCommandFactoryStrategy),
+        //Ubuntu Server-ის ავტომატური ინსტალაციები: grub.cfg და autoinstall.yaml საინსტალაციო ფლეშკისთვის
+        nameof(ServerInstallationsCliMenuCommandFactoryStrategy),
         //პროექტების ჯგუფების ჩამონათვალი
         nameof(ProjectGroupsListFactoryStrategy),
         //ბოლოს გამოყენებული ბრძანებების ჩამონათვალი
