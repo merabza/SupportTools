@@ -58,13 +58,14 @@ public sealed class ServerInstallationModel : ItemData
     public bool InstallWebmin { get; set; }
     public bool InstallVirtualmin { get; set; }
 
+    //Virtualmin-ის ვებსერვერი: LAMP (Apache) ან LEMP (Nginx). MariaDB ორივე შემთხვევაში დგება
+    public EVirtualminBundle Bundle { get; set; } = EVirtualminBundle.LempNginx;
+
     //Virtualmin-ის Post-Installation Wizard-ის პასუხები. თუ DnsPrimaryNameServer ცარიელია, FQDN გამოიყენება
     public string? DnsPrimaryNameServer { get; set; }
     public string? EmailToAddress { get; set; }
 
-    public bool InstallMariaDb { get; set; }
-
-    //MariaDB-ის root-ის mysql_native_password ჰეში (*SHA1(SHA1))
+    //Virtualmin-ის მიერ დადგმული MariaDB-ის root-ის mysql_native_password ჰეში (*SHA1(SHA1))
     public string? MariaDbRootPasswordHash { get; set; }
 
     public bool InstallPostgreSql { get; set; }

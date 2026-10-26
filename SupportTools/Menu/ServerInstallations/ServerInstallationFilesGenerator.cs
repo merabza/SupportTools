@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using SupportToolsData;
 using SupportToolsData.Models;
 
 namespace SupportTools.Menu.ServerInstallations;
@@ -79,10 +80,6 @@ public static partial class ServerInstallationFilesGenerator
             CheckOptional(errors, nameof(installation.DnsPrimaryNameServer), installation.DnsPrimaryNameServer,
                 DomainRegex());
             CheckOptional(errors, nameof(installation.EmailToAddress), installation.EmailToAddress, EmailRegex());
-        }
-
-        if (installation.InstallMariaDb)
-        {
             CheckOptional(errors, nameof(installation.MariaDbRootPasswordHash),
                 installation.MariaDbRootPasswordHash, MariaDbHashRegex());
         }
@@ -279,16 +276,12 @@ public static partial class ServerInstallationFilesGenerator
         List<string> apps = [];
         if (installation.InstallVirtualmin)
         {
-            apps.Add("Virtualmin (with wizard answers)");
+            apps.Add($"Virtualmin {GetBundleName(installation.Bundle)} (with wizard answers)");
+            apps.Add("MariaDB");
         }
         else if (installation.InstallWebmin)
         {
             apps.Add("Webmin");
-        }
-
-        if (installation.InstallMariaDb)
-        {
-            apps.Add("MariaDB");
         }
 
         if (installation.InstallPostgreSql)
@@ -391,7 +384,7 @@ public static partial class ServerInstallationFilesGenerator
                         if [ ! -e /etc/webmin/virtual-server/installed-auto ]; then
                           script=$(curl -fsSL --retry 10 --retry-connrefused https://download.virtualmin.com/virtualmin-install)
                           sh -c "$script" -- --force --hostname {{GetFqdn(installation)}} \
-                            --bundle LEMP{{postgreSql}}
+                            --bundle {{GetBundleName(installation.Bundle)}}{{postgreSql}}
                         fi
                         if [ -e /usr/local/sbin/virtualmin-wizard.pl ]; then
                           perl /usr/local/sbin/virtualmin-wizard.pl
@@ -399,6 +392,15 @@ public static partial class ServerInstallationFilesGenerator
                         fi
 
                         """);
+            if (!string.IsNullOrWhiteSpace(installation.MariaDbRootPasswordHash))
+            {
+                sb.Append(CultureInfo.InvariantCulture, $$"""
+                            # root keeps socket login (used by Webmin) and also gets a password,
+                            # given here only as its mysql_native_password hash
+                            mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '{{installation.MariaDbRootPasswordHash}}'"
+
+                            """);
+            }
         }
         else
         {
@@ -415,25 +417,10 @@ public static partial class ServerInstallationFilesGenerator
                           """);
             }
 
-            if (installation.InstallMariaDb)
-            {
-                sb.Append(AptInstall("mariadb-server", "mariadb-server"));
-            }
-
             if (installation.InstallPostgreSql)
             {
                 sb.Append(AptInstall("postgresql", "postgresql postgresql-client"));
             }
-        }
-
-        if (installation.InstallMariaDb && !string.IsNullOrWhiteSpace(installation.MariaDbRootPasswordHash))
-        {
-            sb.Append(CultureInfo.InvariantCulture, $$"""
-                        # root keeps socket login (used by Webmin) and also gets a password,
-                        # given here only as its mysql_native_password hash
-                        mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '{{installation.MariaDbRootPasswordHash}}'"
-
-                        """);
         }
 
         if (installation.InstallMsSqlServer || installation.InstallSqlServerClient)
@@ -560,7 +547,6 @@ public static partial class ServerInstallationFilesGenerator
         string prins = string.IsNullOrWhiteSpace(installation.DnsPrimaryNameServer)
             ? GetFqdn(installation)
             : installation.DnsPrimaryNameServer;
-        string mysql = installation.InstallMariaDb ? "1" : "0";
         string postgres = installation.InstallPostgreSql ? "1" : "0";
         string email = string.IsNullOrWhiteSpace(installation.EmailToAddress)
             ? "'to_addr_def' => 1"
@@ -580,7 +566,7 @@ public static partial class ServerInstallationFilesGenerator
                      'memory' => { 'lookup' => 1 },
                      'spam'   => { 'spamd' => 0 },
                      'virus'  => { 'clamd' => 0 },
-                     'db'     => { 'mysql' => {{mysql}}, 'postgres' => {{postgres}} },
+                     'db'     => { 'mysql' => 1, 'postgres' => {{postgres}} },
                      'mysql'  => { 'socket' => 1, 'mypass' => '' },
                      'dns'    => { 'prins' => '{{prins}}', 'prins_skip' => 1,
                                    'secns' => &get_template(0)->{'dns_ns'} },
@@ -603,6 +589,12 @@ public static partial class ServerInstallationFilesGenerator
                  &save_module_config_keys({ 'wizard_run' => 1 });
 
                  """;
+    }
+
+    //virtualmin-install-ის --bundle-ის მნიშვნელობა
+    private static string GetBundleName(EVirtualminBundle bundle)
+    {
+        return bundle == EVirtualminBundle.LampApache ? "LAMP" : "LEMP";
     }
 
     private static string Indent(string text, int spaces)

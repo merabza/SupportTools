@@ -5,6 +5,7 @@ using AppCliTools.CliParameters.FieldEditors;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
 using SupportTools.Menu.ServerInstallations;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -51,9 +52,10 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
 
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallVirtualmin)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallWebmin)));
+        FieldEditors.Add(new EnumFieldEditor<EVirtualminBundle>(nameof(ServerInstallationModel.Bundle),
+            EVirtualminBundle.LempNginx));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInstallationModel.DnsPrimaryNameServer)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInstallationModel.EmailToAddress)));
-        FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallMariaDb)));
         FieldEditors.Add(new PasswordHashFieldEditor(nameof(ServerInstallationModel.MariaDbRootPasswordHash),
             PasswordHashers.MariaDbNativePassword));
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallPostgreSql)));
@@ -69,15 +71,16 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallDotnetRuntime)));
     }
 
-    //ველი ჩანს მხოლოდ მაშინ, როცა მას რამე იყენებს: Virtualmin-ს Webmin თვითონ მოაქვს, SQL Server-ს sqlcmd,
-    //.NET SDK-ს კი Runtime
+    //ველი ჩანს მხოლოდ მაშინ, როცა მას რამე იყენებს: Virtualmin-ს Webmin და MariaDB თვითონ მოაქვს,
+    //SQL Server-ს sqlcmd, .NET SDK-ს კი Runtime
     protected override void CheckFieldsEnables(ItemData itemData, string? lastEditedFieldName = null)
     {
         var installation = (ServerInstallationModel)itemData;
         EnableFieldByName(nameof(ServerInstallationModel.InstallWebmin), !installation.InstallVirtualmin);
+        EnableFieldByName(nameof(ServerInstallationModel.Bundle), installation.InstallVirtualmin);
         EnableFieldByName(nameof(ServerInstallationModel.DnsPrimaryNameServer), installation.InstallVirtualmin);
         EnableFieldByName(nameof(ServerInstallationModel.EmailToAddress), installation.InstallVirtualmin);
-        EnableFieldByName(nameof(ServerInstallationModel.MariaDbRootPasswordHash), installation.InstallMariaDb);
+        EnableFieldByName(nameof(ServerInstallationModel.MariaDbRootPasswordHash), installation.InstallVirtualmin);
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerEdition), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerSaPasswordHash), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerPort), installation.InstallMsSqlServer);

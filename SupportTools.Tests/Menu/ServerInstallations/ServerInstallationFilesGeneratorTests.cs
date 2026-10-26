@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SupportTools.Menu.ServerInstallations;
+using SupportToolsData;
 using SupportToolsData.Models;
 using Xunit;
 using YamlDotNet.RepresentationModel;
@@ -36,7 +37,6 @@ public sealed class ServerInstallationFilesGeneratorTests
             InstallDiskSerial = "CT500P3PSSD8_2331E865DB19_1",
             InstallVirtualmin = true,
             EmailToAddress = "admin@example.com",
-            InstallMariaDb = true,
             MariaDbRootPasswordHash = MariaDbHash,
             InstallPostgreSql = true,
             InstallMsSqlServer = true,
@@ -381,11 +381,12 @@ public sealed class ServerInstallationFilesGeneratorTests
     }
 
     [Fact]
-    public void Validate_WithoutMariaDb_IgnoresItsHash()
+    public void Validate_WithoutVirtualmin_IgnoresTheMariaDbHash()
     {
         // Arrange
         ServerInstallationModel installation = CreateOslo();
-        installation.InstallMariaDb = false;
+        installation.InstallVirtualmin = false;
+        installation.DomainName = null;
         installation.MariaDbRootPasswordHash = "*ABC";
 
         // Act
@@ -651,7 +652,7 @@ public sealed class ServerInstallationFilesGeneratorTests
         Assert.Equal("0755", Scalar(writeFile, "permissions"));
         Assert.Equal("""
                      #!/bin/sh
-                     # Installs Virtualmin (with wizard answers), MariaDB, PostgreSQL, SQL Server, sqlcmd
+                     # Installs Virtualmin LEMP (with wizard answers), MariaDB, PostgreSQL, SQL Server, sqlcmd
                      exec sudo /usr/local/sbin/install-apps "$@"
 
                      """.ReplaceLineEndings("\n"), Scalar(writeFile, "content"));
@@ -715,12 +716,12 @@ public sealed class ServerInstallationFilesGeneratorTests
     }
 
     [Fact]
-    public void CreateAutoinstallYaml_WithVirtualminOnly_AnswersTheWizardWithoutDatabasesAndEmail()
+    public void CreateAutoinstallYaml_WithVirtualminOnly_AnswersTheWizardWithMariaDbOnlyAndWithoutEmail()
     {
         // Arrange
         ServerInstallationModel installation = CreateOslo();
         installation.InstallWebmin = true;
-        installation.InstallMariaDb = false;
+        installation.MariaDbRootPasswordHash = null;
         installation.InstallPostgreSql = false;
         installation.InstallMsSqlServer = false;
         installation.EmailToAddress = null;
@@ -731,13 +732,13 @@ public sealed class ServerInstallationFilesGeneratorTests
 
         // Assert
         Assert.Contains("--hostname oslo.cyberia.ge \\\n    --bundle LEMP\n", script);
-        Assert.Contains("'db'     => { 'mysql' => 0, 'postgres' => 0 },", script);
+        Assert.Contains("'db'     => { 'mysql' => 1, 'postgres' => 0 },", script);
         Assert.Contains("'prins' => 'ns1.cyberia.ge',", script);
         Assert.Contains("'email'  => { 'from_addr_def' => 1, 'to_addr_def' => 1 },", script);
         Assert.DoesNotContain("webmin-setup-repo", script);
         Assert.DoesNotContain("ALTER USER", script);
         Assert.DoesNotContain("mssql", script);
-        Assert.Equal("# Installs Virtualmin (with wizard answers)", GetInstallAppsComment(installation));
+        Assert.Equal("# Installs Virtualmin LEMP (with wizard answers), MariaDB", GetInstallAppsComment(installation));
     }
 
     [Fact]
@@ -755,33 +756,51 @@ public sealed class ServerInstallationFilesGeneratorTests
 
         // Assert
         Assert.Contains("  sh /tmp/webmin-setup-repo.sh --force\n", script);
-        Assert.Contains("if ! dpkg -s mariadb-server >/dev/null 2>&1; then\n  apt-get update\n" +
-                        "  DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server\nfi\n", script);
         Assert.Contains("if ! dpkg -s postgresql >/dev/null 2>&1; then\n  apt-get update\n" +
                         "  DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-client\nfi\n",
             script);
         Assert.Contains("apt-get install -y mssql-tools18 unixodbc-dev\n", script);
         Assert.DoesNotContain("virtualmin", script);
+        Assert.DoesNotContain("mariadb", script);
         Assert.DoesNotContain("mssql-server", script);
-        Assert.Equal("# Installs Webmin, MariaDB, PostgreSQL, sqlcmd", GetInstallAppsComment(installation));
+        Assert.Equal("# Installs Webmin, PostgreSQL, sqlcmd", GetInstallAppsComment(installation));
     }
 
     [Fact]
-    public void CreateAutoinstallYaml_WithMariaDbOnly_InstallsNoWebminAndNoSqlTools()
+    public void CreateAutoinstallYaml_WithLampBundle_InstallsVirtualminWithApache()
     {
         // Arrange
-        ServerInstallationModel installation = CreateMinimal();
-        installation.InstallMariaDb = true;
+        ServerInstallationModel installation = CreateOslo();
+        installation.Bundle = EVirtualminBundle.LampApache;
+        installation.InstallPostgreSql = false;
 
         // Act
         string script = GetInstallAppsLateCommand(installation);
 
         // Assert
-        Assert.Contains("apt-get install -y mariadb-server\n", script);
+        Assert.Contains("--hostname oslo.cyberia.ge \\\n    --bundle LAMP\n", script);
+        Assert.DoesNotContain("LEMP", script);
+        Assert.Equal("# Installs Virtualmin LAMP (with wizard answers), MariaDB, SQL Server, sqlcmd",
+            GetInstallAppsComment(installation));
+    }
+
+    //without Virtualmin nothing installs MariaDB
+    [Fact]
+    public void CreateAutoinstallYaml_WithoutApps_InstallsNoMariaDbAndNoSqlTools()
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateMinimal();
+        installation.InstallDotnetRuntime = true;
+        installation.MariaDbRootPasswordHash = MariaDbHash;
+
+        // Act
+        string script = GetInstallAppsLateCommand(installation);
+
+        // Assert
+        Assert.DoesNotContain("mariadb", script);
         Assert.DoesNotContain("webmin", script);
         Assert.DoesNotContain("postgresql", script);
         Assert.DoesNotContain("mssql-tools18", script);
-        Assert.Equal("# Installs MariaDB", GetInstallAppsComment(installation));
     }
 
     //the SDK contains the runtime, and the Microsoft repository of sqlcmd must not supply .NET
@@ -811,15 +830,16 @@ public sealed class ServerInstallationFilesGeneratorTests
         Assert.Equal($"# Installs {appName}", GetInstallAppsComment(installation));
     }
 
-    //the root hash is set only for an installed MariaDB and only when there is a hash
+    //the root hash is set only for the MariaDB of Virtualmin and only when there is a hash
     [Theory]
     [InlineData(true, null)]
     [InlineData(false, MariaDbHash)]
-    public void CreateAutoinstallYaml_WithoutMariaDbOrHash_SetsNoRootPassword(bool installMariaDb, string? hash)
+    public void CreateAutoinstallYaml_WithoutVirtualminOrHash_SetsNoRootPassword(bool installVirtualmin,
+        string? hash)
     {
         // Arrange
         ServerInstallationModel installation = CreateOslo();
-        installation.InstallMariaDb = installMariaDb;
+        installation.InstallVirtualmin = installVirtualmin;
         installation.MariaDbRootPasswordHash = hash;
 
         // Act

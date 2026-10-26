@@ -88,8 +88,8 @@ public sealed class ServerInstallationCruderTests : IDisposable
             nameof(ServerInstallationModel.AutoinstallUserDataFilePath),
             nameof(ServerInstallationModel.InstallDiskSerial), nameof(ServerInstallationModel.FilesFolder),
             nameof(ServerInstallationModel.InstallVirtualmin), nameof(ServerInstallationModel.InstallWebmin),
-            nameof(ServerInstallationModel.DnsPrimaryNameServer), nameof(ServerInstallationModel.EmailToAddress),
-            nameof(ServerInstallationModel.InstallMariaDb), nameof(ServerInstallationModel.MariaDbRootPasswordHash),
+            nameof(ServerInstallationModel.Bundle), nameof(ServerInstallationModel.DnsPrimaryNameServer),
+            nameof(ServerInstallationModel.EmailToAddress), nameof(ServerInstallationModel.MariaDbRootPasswordHash),
             nameof(ServerInstallationModel.InstallPostgreSql), nameof(ServerInstallationModel.InstallMsSqlServer),
             nameof(ServerInstallationModel.SqlServerEdition), nameof(ServerInstallationModel.SqlServerSaPasswordHash),
             nameof(ServerInstallationModel.SqlServerPort), nameof(ServerInstallationModel.OpenSqlServerPort),
@@ -271,6 +271,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Assert.True(enabled[nameof(ServerInstallationModel.InstallWebmin)]);
         Assert.True(enabled[nameof(ServerInstallationModel.InstallSqlServerClient)]);
         Assert.True(enabled[nameof(ServerInstallationModel.InstallDotnetRuntime)]);
+        Assert.False(enabled[nameof(ServerInstallationModel.Bundle)]);
         Assert.False(enabled[nameof(ServerInstallationModel.DnsPrimaryNameServer)]);
         Assert.False(enabled[nameof(ServerInstallationModel.EmailToAddress)]);
         Assert.False(enabled[nameof(ServerInstallationModel.MariaDbRootPasswordHash)]);
@@ -280,13 +281,12 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Assert.False(enabled[nameof(ServerInstallationModel.OpenSqlServerPort)]);
     }
 
-    //Virtualmin brings Webmin, and SQL Server always gets sqlcmd, which sets the sa hash
+    //Virtualmin brings Webmin and MariaDB, and SQL Server always gets sqlcmd, which sets the sa hash
     [Fact]
-    public void GetItemMenu_WithVirtualminMariaDbAndSqlServer_ShowsTheirFields()
+    public void GetItemMenu_WithVirtualminAndSqlServer_ShowsTheirFields()
     {
         // Arrange
         _installation.InstallVirtualmin = true;
-        _installation.InstallMariaDb = true;
         _installation.InstallMsSqlServer = true;
         ServerInstallationCruder sut = CreateSut();
 
@@ -297,6 +297,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Dictionary<string, bool> enabled = GetEnabledFields(sut);
         Assert.False(enabled[nameof(ServerInstallationModel.InstallWebmin)]);
         Assert.False(enabled[nameof(ServerInstallationModel.InstallSqlServerClient)]);
+        Assert.True(enabled[nameof(ServerInstallationModel.Bundle)]);
         Assert.True(enabled[nameof(ServerInstallationModel.DnsPrimaryNameServer)]);
         Assert.True(enabled[nameof(ServerInstallationModel.EmailToAddress)]);
         Assert.True(enabled[nameof(ServerInstallationModel.MariaDbRootPasswordHash)]);
