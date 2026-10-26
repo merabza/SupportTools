@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using LibDotnetWork;
 using LibGitData.Models;
 using LibGitWork;
+using LibGitWork.Helpers;
 using LibGitWork.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -193,8 +194,17 @@ public sealed class PackageDistributor
             return true;
         }
 
-        var gitRepos = GitRepos.Create(_logger, parameters.Gits,
-            consumerProject.SpaProjectFolderRelativePath(gitProjects), true, false);
+        //SpaProjectName-ის GitProjects ჩანაწერის გარეშე მხოლოდ ის შემთხვევა ჩერდება, როცა მთავარ ან პაკეტის
+        //რეპოზიტორიას SPA-ს ფოლდერი სჭირდება
+        (string? spaProjectFolderRelativePath, bool spaProjectIsMissing) =
+            SpaProjectFolderHelper.GetSpaProjectFolderRelativePath(_logger, consumerProjectName, consumerProject,
+                gitProjects, parameters.Gits, [consumerProjectName, .. packageProjectNames], true);
+        if (spaProjectIsMissing)
+        {
+            return false;
+        }
+
+        var gitRepos = GitRepos.Create(_logger, parameters.Gits, spaProjectFolderRelativePath, true, false);
 
         //მომხმარებელი პროექტის მთავარი რეპოზიტორია არის ის, რომლის სახელიც ემთხვევა პროექტის სახელს
         if (!consumerProject.GitProjectNames.Contains(consumerProjectName) ||

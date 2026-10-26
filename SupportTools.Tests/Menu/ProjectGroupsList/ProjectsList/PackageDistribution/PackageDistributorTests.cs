@@ -241,6 +241,46 @@ public sealed class PackageDistributorTests : IDisposable
         Assert.Equal(PackagesProps, ReadPackagesProps());
     }
 
+    //GitProjects has no record of the project's SpaProjectName (Update Git Projects has not run): only the front git
+    //needs its folder, and the distribution touches only the main and the package gits
+    [Fact]
+    public async Task DistributePackagesToProject_WhenTheSpaProjectRecordIsMissing_DistributesToTheMainRepository()
+    {
+        // Arrange
+        AddFrontGitWithMissingSpaProject();
+
+        // Act
+        bool result = await CreateSut().DistributePackagesToProject("App", ["Lib"]);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(Head(_remote), Head(_copyFolder));
+        Assert.Contains("""<PackageVersion Include="Lib.B" Version="1.0.2" />""", ReadPackagesProps(),
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("[ERROR]", ConsoleText(), StringComparison.Ordinal);
+    }
+
+    //a git that the distribution needs lies in the SPA project's folder, which cannot be found: the project fails with
+    //a message that names the missing record, and nothing changes
+    [Fact]
+    public async Task DistributePackagesToProject_WhenAUsedGitNeedsTheMissingSpaProject_FailsAndChangesNothing()
+    {
+        // Arrange
+        AddFrontGitWithMissingSpaProject();
+        _parameters.Gits["Lib"].GitProjectFolderName = $@"{GitDataModel.SpaProjectFolderRelativePathName}\Lib";
+
+        // Act
+        bool result = await CreateSut().DistributePackagesToProject("App", ["Lib"]);
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains(
+            "GitProjects has no AppFront (SpaProjectName of project App): run \"Update Git Projects\" or \"Update Git Projects From SupportToolsServer\"",
+            ConsoleText(), StringComparison.Ordinal);
+        Assert.Equal(_initialCommit, Head(_copyFolder));
+        Assert.Equal(PackagesProps, ReadPackagesProps());
+    }
+
     [Fact]
     public async Task DistributePackagesToProject_WhenTheProjectIsNotRegistered_FailsAndPullsNothing()
     {
@@ -297,6 +337,19 @@ public sealed class PackageDistributorTests : IDisposable
         };
         _parameters.Projects["App"].GitProjectNames.Add(name);
         return remote;
+    }
+
+    //App gets SpaProjectName AppFront without a GitProjects record and a front git in the SPA project's folder
+    private void AddFrontGitWithMissingSpaProject()
+    {
+        _parameters.Projects["App"].SpaProjectName = "AppFront";
+        _parameters.Gits["AppFront"] = new GitDataModel
+        {
+            GitProjectAddress = "git@github.com:x/AppFront.git",
+            GitProjectFolderName = $@"{GitDataModel.SpaProjectFolderRelativePathName}\AppFront",
+            GitIgnorePatternName = "Node"
+        };
+        _parameters.Projects["App"].GitProjectNames.Add("AppFront");
     }
 
     private static string Head(string repository)
