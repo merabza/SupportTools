@@ -58,11 +58,13 @@ public static class ProdCopyTableReader
 
     //ProdCopy-ის ცხრილის წამკითხავი SELECT: MariaDB სახელებს `...`-ში სვამს, დანარჩენი ბაზები [...]-ში;
     //Access-სა და MariaDB-ს სქემები არ აქვს — ცარიელი სქემის დროს პრეფიქსი გამოტოვდება;
-    //pairs ფაილის მწკრივების ფილტრი WHERE-ად ემატება
+    //pairs ფაილის მწკრივების ფილტრი WHERE-ად ემატება; ProdCopy-ში არარსებული სვეტები 0-ით ბრუნდება
     internal static string BuildSelectSql(EDatabaseProvider prodCopyDataProvider, PairedTable pt,
-        IEnumerable<PairedField> fields)
+        IEnumerable<PairedField> fields, IEnumerable<string>? zeroFilledColumns = null)
     {
-        string selectList = string.Join(", ", fields.Select(f => Quote(f.ProdCopyFieldName)));
+        string selectList = string.Join(", ",
+            fields.Select(f => Quote(f.ProdCopyFieldName))
+                .Concat((zeroFilledColumns ?? []).Select(c => $"0 AS {Quote(c)}")));
         string fromPart = string.IsNullOrEmpty(pt.ProdCopySchemaName)
             ? Quote(pt.ProdCopyTableName)
             : $"{Quote(pt.ProdCopySchemaName)}.{Quote(pt.ProdCopyTableName)}";

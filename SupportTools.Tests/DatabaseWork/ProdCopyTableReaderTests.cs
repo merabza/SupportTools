@@ -70,6 +70,18 @@ public sealed class ProdCopyTableReaderTests
         Assert.Equal("SELECT [id], [IncorrectPhrase] FROM [dbo].[Errata]", sql);
     }
 
+    //a NOT NULL column of Dev that ProdCopy does not have yet (e.g. ServerInfos.OpenPort)
+    [Fact]
+    public void BuildSelectSql_WithZeroFilledColumns_SelectsZeroUnderTheDevName()
+    {
+        // Act
+        string sql = ProdCopyTableReader.BuildSelectSql(EDatabaseProvider.SqlServer, CreatePairedTable("dbo", "Errata"),
+            Fields, ["OpenPort"]);
+
+        // Assert
+        Assert.Equal("SELECT [id], [IncorrectPhrase], 0 AS [OpenPort] FROM [dbo].[Errata]", sql);
+    }
+
     private static PairedTable CreatePairedTable(string prodCopySchemaName, string prodCopyTableName,
         string? prodCopyRowFilter = null)
     {

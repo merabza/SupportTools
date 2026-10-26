@@ -21,8 +21,8 @@ internal static class TableDataTransferrer
 {
     public static async Task<long> TransferAsync(EDatabaseProvider prodCopyDataProvider,
         string prodCopyConnectionString, string devConnectionString, PairedTable pt,
-        IReadOnlyList<PairedField> insertableFields, IReadOnlySet<string> identityColumns, int commandTimeOut,
-        IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
+        IReadOnlyList<PairedField> insertableFields, IReadOnlyList<string> zeroFilledColumns,
+        IReadOnlySet<string> identityColumns, int commandTimeOut, IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
         string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
         CancellationToken cancellationToken)
     {
@@ -79,7 +79,8 @@ internal static class TableDataTransferrer
             if (convertorProjectFilePath is null)
             {
                 return await TransferStreamingFromProdCopyAsync(prodCopyDataProvider, prodCopyConnectionString,
-                    devConnectionString, pt, insertableFields, hasIdentity, commandTimeOut, logger, cancellationToken);
+                    devConnectionString, pt, insertableFields, zeroFilledColumns, hasIdentity, commandTimeOut, logger,
+                    cancellationToken);
             }
 
             List<Dictionary<string, object?>>? convertorData = await LoadConvertorRowsAsync(convertorProjectFilePath,
@@ -166,7 +167,18 @@ internal static class TableDataTransferrer
             FillMissingIdentityValues(insertableFields, identityColumns, dataToInsert);
         }
 
-        long mergedCount = await BulkInsertRowsAsync(devConnectionString, pt, insertableFields, hasIdentity,
+        //ProdCopy-ში არარსებული NOT NULL სვეტები: წესებს თუ მნიშვნელობა არ მოაქვთ, 0
+        foreach (string column in zeroFilledColumns)
+        {
+            foreach (Dictionary<string, object?> row in dataToInsert.Where(r => r.GetValueOrDefault(column) is null))
+            {
+                row[column] = 0;
+            }
+        }
+
+        List<PairedField> mergedFields =
+            [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
+        long mergedCount = await BulkInsertRowsAsync(devConnectionString, pt, mergedFields, hasIdentity,
             commandTimeOut, dataToInsert, cancellationToken);
         await SeederRulesReferenceResolver.ApplySelfReferencesAsync(devConnectionString, pt, selfReferences,
             dataToInsert, commandTimeOut, logger, cancellationToken);
@@ -176,8 +188,8 @@ internal static class TableDataTransferrer
     //ProdCopy → Dev streaming SqlBulkCopy-ით (არსებული ქცევა OnlyDatabase-სთვის)
     private static async Task<long> TransferStreamingFromProdCopyAsync(EDatabaseProvider prodCopyDataProvider,
         string prodCopyConnectionString, string devConnectionString, PairedTable pt,
-        IReadOnlyList<PairedField> insertableFields, bool hasIdentity, int commandTimeOut, ILogger logger,
-        CancellationToken cancellationToken)
+        IReadOnlyList<PairedField> insertableFields, IReadOnlyList<string> zeroFilledColumns, bool hasIdentity,
+        int commandTimeOut, ILogger logger, CancellationToken cancellationToken)
     {
         DbKit dbKit = DbKitFactory.GetKit(prodCopyDataProvider);
         // ReSharper disable once using
@@ -193,11 +205,15 @@ internal static class TableDataTransferrer
         await using var devConn = new SqlConnection(devConnectionString);
         await devConn.OpenAsync(cancellationToken);
 
+        //SELECT-ი ProdCopy-ში არარსებულ სვეტებს 0-ით აბრუნებს Dev-ის სახელით
+        List<PairedField> mappedFields =
+            [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
         // ReSharper disable once using
-        using var bulkCopy = CreateBulkCopy(devConn, pt, insertableFields, hasIdentity, commandTimeOut,
+        using var bulkCopy = CreateBulkCopy(devConn, pt, mappedFields, hasIdentity, commandTimeOut,
             f => f.ProdCopyFieldName);
 
-        string selectSql = ProdCopyTableReader.BuildSelectSql(prodCopyDataProvider, pt, insertableFields);
+        string selectSql =
+            ProdCopyTableReader.BuildSelectSql(prodCopyDataProvider, pt, insertableFields, zeroFilledColumns);
 
         prodDbm.Open();
         try

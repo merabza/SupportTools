@@ -30,7 +30,9 @@ internal static class DevTableMetaReader
         {
             const string query = """
                                  SELECT s.name AS SchemaName, t.name AS TableName, c.name AS ColumnName,
-                                        c.is_identity AS IsIdentity, c.is_computed AS IsComputed
+                                        c.is_identity AS IsIdentity, c.is_computed AS IsComputed,
+                                        c.is_nullable AS IsNullable, c.default_object_id AS DefaultObjectId,
+                                        TYPE_NAME(c.system_type_id) AS TypeName
                                  FROM sys.columns c
                                  INNER JOIN sys.tables t ON c.object_id = t.object_id
                                  INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
@@ -76,6 +78,14 @@ internal static class DevTableMetaReader
                     if (isComputed)
                     {
                         meta.ComputedColumns.Add(column);
+                    }
+
+                    //rowversion-ს (timestamp) სერვერი თვითონ ავსებს
+                    string typeName = (string)reader["TypeName"];
+                    if (!isIdentity && !isComputed && !(bool)reader["IsNullable"] &&
+                        (int)reader["DefaultObjectId"] == 0 && typeName != "timestamp")
+                    {
+                        meta.NotNullWithoutDefaultColumns[column] = typeName;
                     }
                 }
             }

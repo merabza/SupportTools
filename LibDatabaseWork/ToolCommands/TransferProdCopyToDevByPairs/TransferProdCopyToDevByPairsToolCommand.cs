@@ -153,6 +153,40 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             return false;
         }
 
+        //7a. Dev-ის NOT NULL სვეტები, რომლებიც pairs-ში არ არის: რიცხვითი 0-ით ივსება, დანარჩენი ტიპები გადატანას აჩერებს;
+        //    OnlySeederRules და კონვერტორის ცხრილები Dev-ის ყველა სვეტს თვითონ ავსებენ
+        var zeroFilledColumns = new Dictionary<(string Schema, string Table), List<string>>();
+        List<string> unfillableColumns = [];
+        foreach (PairedTable pt in pairs.PairedTables.Values.Where(p =>
+                     p.SeedDataType is not (ESeedDataType.None or ESeedDataType.OnlySeederRules) &&
+                     !p.UseOldDataConvertor))
+        {
+            (List<string> zeroFilled, List<string> unfillable) =
+                UnpairedRequiredColumnsFinder.Find(pt, devMeta[(pt.DevSchemaName, pt.DevTableName)]);
+            unfillableColumns.AddRange(unfillable.Select(c => $"{pt.DevSchemaName}.{pt.DevTableName}.{c}"));
+            if (zeroFilled.Count > 0)
+            {
+                zeroFilledColumns[(pt.DevSchemaName, pt.DevTableName)] = zeroFilled;
+            }
+        }
+
+        if (unfillableColumns.Count > 0)
+        {
+            StShared.WriteErrorLine(
+                "Dev columns that are NOT NULL, have no default and are not in the pairs file (ProdCopy has no such column):\n" +
+                string.Join("\n", unfillableColumns.Select(c => $"  - {c}")) +
+                "\nGive them a default value in Dev or fill them through seeder rules, then try again.", true, _logger);
+            return false;
+        }
+
+        if (zeroFilledColumns.Count > 0)
+        {
+            StShared.WriteWarningLine(
+                "Dev columns that ProdCopy does not have will be filled with 0:\n" + string.Join("\n",
+                    zeroFilledColumns.SelectMany(x => x.Value.Select(c => $"  - {x.Key.Schema}.{x.Key.Table}.{c}"))),
+                true, _logger);
+        }
+
         //8. FK graph + topological sort
         List<FkEdge>? fkEdges = DevFkGraphReader.Read(Parameters.DevConnectionString, _logger);
         if (fkEdges is null)
@@ -225,7 +259,7 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             {
                 rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyDataProvider,
                     Parameters.ProdCopyConnectionString, Parameters.DevConnectionString, pt, insertable,
-                    meta.IdentityColumns, Parameters.CommandTimeOut, meta.PrimaryKeyColumns, meta.UniqueIndexes,
+                    zeroFilledColumns.GetValueOrDefault(node, []), meta.IdentityColumns, Parameters.CommandTimeOut, meta.PrimaryKeyColumns, meta.UniqueIndexes,
                     Parameters.DataSeederRulesByTableStartupProjectFilePath, Parameters.OldDataConvertorForDataSeeder,
                     _logger, cancellationToken);
             }
