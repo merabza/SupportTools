@@ -227,25 +227,27 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
     //the solution check of an unchanged package fails like the one of a package that is built
     [Fact]
-    public async Task RunBody_WhenTheSolutionCheckOfAnUnchangedPackageFails_StopsTheRun()
+    public async Task RunBody_WhenTheSolutionCheckOfAnUnchangedPackageFails_SkipsItAndFails()
     {
         // Arrange
         AddProject("Alpha", EProjectType.IsPackage, true);
         AddProject("Beta", EProjectType.IsPackage, true);
         _steps.UnchangedVersions["Alpha"] = "1.0.5";
         _steps.FailingStep = "solution";
+        _steps.FailingProject = "Alpha";
 
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
 
         // Assert
         Assert.False(result);
-        Assert.Equal(["sync Alpha", "check Alpha", "solution Alpha"], _steps.Calls);
+        Assert.Equal(["sync Alpha", "check Alpha", "solution Alpha"], _steps.Calls[..3]);
+        Assert.Equal("final sync Beta", _steps.Calls[^1]);
         string output = _consoleOutput.ToString();
         Assert.Contains("Package solution check failed for project Alpha", output, StringComparison.Ordinal);
         Assert.Contains(
-            "Distribute all packages stopped on project Alpha. Successfully processed 0 of 2 package projects", output,
-            StringComparison.Ordinal);
+            "Distribute all packages finished with errors. Successfully processed 1 of 2 package projects. Failed: Alpha",
+            output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -278,34 +280,78 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         Assert.Contains("final sync Alpha", _steps.Calls);
     }
 
-    //the first step that fails stops the whole run, with its own message
+    //the first step that fails stops that package, with its own message; the other packages are processed and the run
+    //fails at the end
     [Theory]
     [InlineData("sync", "Sync gits failed for project Alpha", 1)]
     [InlineData("build", "Build check failed for project Alpha with status BuildFailed, errors: 2", 3)]
     [InlineData("solution", "Package solution check failed for project Alpha", 4)]
     [InlineData("package", "Build package failed for project Alpha", 5)]
     [InlineData("final sync", "Final sync gits failed for project Alpha", 6)]
-    public async Task RunBody_WhenAStepFails_ReportsItAndStopsTheRun(string failingStep, string expectedMessage,
-        int expectedCallCount)
+    public async Task RunBody_WhenAStepFails_ReportsItSkipsThePackageAndGoesOn(string failingStep,
+        string expectedMessage, int expectedCallCount)
     {
         // Arrange
         AddProject("Alpha", EProjectType.IsPackage, true);
         AddProject("Beta", EProjectType.IsPackage, true);
         _steps.FailingStep = failingStep;
+        _steps.FailingProject = "Alpha";
 
         // Act
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
 
         // Assert
         Assert.False(result);
-        Assert.Equal(expectedCallCount, _steps.Calls.Count);
+        Assert.Equal(expectedCallCount,
+            _steps.Calls.FindAll(x => x.Contains(" Alpha", StringComparison.Ordinal)).Count);
+        Assert.Equal("final sync Beta", _steps.Calls[^1]);
         string output = _consoleOutput.ToString();
         Assert.Contains(expectedMessage, output, StringComparison.Ordinal);
         Assert.Contains(
-            "Distribute all packages stopped on project Alpha. Successfully processed 0 of 2 package projects", output,
+            "Package project Alpha failed and is skipped, distribution goes on with the other package projects", output,
             StringComparison.Ordinal);
-        Assert.DoesNotContain("Processing package project Beta", output, StringComparison.Ordinal);
-        Assert.DoesNotContain("Distribute all packages finished", output, StringComparison.Ordinal);
+        Assert.Contains("Processing package project Beta (2/2)", output, StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages finished with errors. Successfully processed 1 of 2 package projects. Failed: Alpha" +
+            Environment.NewLine, output, StringComparison.Ordinal);
+        Assert.DoesNotContain("Distribute all packages finished. Package projects processed", output,
+            StringComparison.Ordinal);
+    }
+
+    //a package that uses a failed package, directly or through a skipped one, is skipped and is not built with its old
+    //version; the other packages and the projects that use them go on
+    [Fact]
+    public async Task RunBody_WhenAPackageFails_SkipsThePackagesThatUseItAndGoesOnWithTheOthers()
+    {
+        // Arrange
+        AddProject("Core", EProjectType.IsPackage, true, "Core");
+        AddProject("Util", EProjectType.IsPackage, true, "Util", "Core");
+        AddProject("Web", EProjectType.IsPackage, true, "Web", "Util");
+        AddProject("Other", EProjectType.IsPackage, true, "Other");
+        AddProject("App", EProjectType.Standard, true, "App", "Core", "Other");
+        _steps.FailingStep = "build";
+        _steps.FailingProject = "Core";
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal([
+            "sync Core", "check Core", "build Core noIncremental=False", "sync Other", "check Other",
+            "build Other noIncremental=False", "solution Other", "package Other", "final sync Other",
+            "distribute Other to App"
+        ], _steps.Calls);
+        string output = _consoleOutput.ToString();
+        Assert.Contains(
+            "Package project Util is skipped, because it uses package projects that were not distributed: Core", output,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "Package project Web is skipped, because it uses package projects that were not distributed: Util", output,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "Distribute all packages finished with errors. Successfully processed 1 of 4 package projects. Failed: Core. Skipped because they use failed packages: Util, Web",
+            output, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -339,7 +385,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         // Assert
         Assert.False(result);
         Assert.Contains(
-            "Distribute all packages stopped on project Beta. Successfully processed 1 of 2 package projects",
+            "Distribute all packages finished with errors. Successfully processed 1 of 2 package projects. Failed: Beta",
             _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -408,7 +454,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 
     //the package is not synced, built or uploaded with the old versions of the packages it uses
     [Fact]
-    public async Task RunBody_WhenDistributionToAPackageFails_StopsTheRunBeforeItsSync()
+    public async Task RunBody_WhenDistributionToAPackageFails_SkipsItBeforeItsSync()
     {
         // Arrange
         AddProject("Alpha", EProjectType.IsPackage, true, "Alpha", "Core");
@@ -424,8 +470,8 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
         string output = _consoleOutput.ToString();
         Assert.Contains("Package distribution failed for project Alpha", output, StringComparison.Ordinal);
         Assert.Contains(
-            "Distribute all packages stopped on project Alpha. Successfully processed 1 of 2 package projects", output,
-            StringComparison.Ordinal);
+            "Distribute all packages finished with errors. Successfully processed 1 of 2 package projects. Failed: Alpha",
+            output, StringComparison.Ordinal);
     }
 
     //the projects that are not packages take the packages of this run that they use after the last package, in name
@@ -486,7 +532,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
             StringComparison.Ordinal);
     }
 
-    //a stopped run distributes nothing to the projects that are not packages
+    //a failed package is distributed to none of the projects that are not packages
     [Fact]
     public async Task RunBody_WhenAPackageFails_DistributesNothingToTheOtherProjects()
     {

@@ -90,27 +90,61 @@ public sealed class DistributeAllPackagesCliMenuCommand : CliMenuCommand
         int processedCount = 0;
         List<string> distributedProjectNames = [];
         List<string> unchangedProjectNames = [];
-        foreach (string projectName in orderedProjectNames)
+        List<string> failedProjectNames = [];
+        List<string> skippedProjectNames = [];
+        for (int i = 0; i < orderedProjectNames.Count; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            StShared.ConsoleWriteInformationLine(_logger, true,
-                $"Processing package project {projectName} ({processedCount + 1}/{orderedProjectNames.Count})");
+            string projectName = orderedProjectNames[i];
+            ProjectModel project = packageProjects[projectName];
 
-            //ნებისმიერი ნაბიჯის ჩავარდნა აჩერებს პროექტების დამუშავების მთლიან ციკლს
-            if (!await ProcessPackageProject(projectName, packageProjects[projectName], distributedProjectNames,
-                    unchangedProjectNames, cancellationToken))
+            //ჩავარდნილ ან გამოტოვებულ პაკეტზე დამოკიდებული პაკეტი გამოიტოვება: ის მისი ძველი ვერსიით არ უნდა აიგოს
+            List<string> notDistributedDependencies =
+            [
+                .. failedProjectNames.Concat(skippedProjectNames).Where(x => project.GitProjectNames.Contains(x))
+            ];
+            if (notDistributedDependencies.Count > 0)
             {
-                StShared.WriteErrorLine(
-                    $"Distribute all packages stopped on project {projectName}. Successfully processed {processedCount} of {orderedProjectNames.Count} package projects",
+                StShared.WriteWarningLine(
+                    $"Package project {projectName} is skipped, because it uses package projects that were not distributed: {string.Join(", ", notDistributedDependencies)}",
                     true, _logger);
-                return false;
+                skippedProjectNames.Add(projectName);
+                continue;
+            }
+
+            StShared.ConsoleWriteInformationLine(_logger, true,
+                $"Processing package project {projectName} ({i + 1}/{orderedProjectNames.Count})");
+
+            //ნაბიჯის ჩავარდნისას ეს პაკეტი გამოიტოვება და დამუშავება დანარჩენი პაკეტებით გრძელდება
+            if (!await ProcessPackageProject(projectName, project, distributedProjectNames, unchangedProjectNames,
+                    cancellationToken))
+            {
+                StShared.WriteWarningLine(
+                    $"Package project {projectName} failed and is skipped, distribution goes on with the other package projects",
+                    true, _logger);
+                failedProjectNames.Add(projectName);
+                continue;
             }
 
             processedCount++;
             distributedProjectNames.Add(projectName);
         }
 
-        if (!await DistributePackagesToOtherProjects(parameters, distributedProjectNames, cancellationToken))
+        bool distributedToOtherProjects =
+            await DistributePackagesToOtherProjects(parameters, distributedProjectNames, cancellationToken);
+
+        if (failedProjectNames.Count > 0)
+        {
+            string skippedText = skippedProjectNames.Count == 0
+                ? string.Empty
+                : $". Skipped because they use failed packages: {string.Join(", ", skippedProjectNames)}";
+            StShared.WriteErrorLine(
+                $"Distribute all packages finished with errors. Successfully processed {processedCount} of {orderedProjectNames.Count} package projects. Failed: {string.Join(", ", failedProjectNames)}{skippedText}",
+                true, _logger);
+            return false;
+        }
+
+        if (!distributedToOtherProjects)
         {
             return false;
         }
