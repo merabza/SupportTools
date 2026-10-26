@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,8 +175,15 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
 
         var sf = new FileInfo(settingsFileFullName);
 
+        //OpenPort-ის ჩართვისას App Settings Json Source File-ის Kestrel-ის პორტები
+        List<int>? ports = KestrelPortsReader.GetPortsToOpen(_par.ServerInfo, _par.ProjectName);
+        if (ports is null)
+        {
+            return false;
+        }
+
         var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave,
-            _par.ServerInfo.ServerSidePort, ftpSiteAddress, userName, startPath, _par.ProjectName,
+            ports, ftpSiteAddress, userName, startPath, _par.ProjectName,
             _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
             _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,
             sf.Name, _par.ServerInfo.ServiceUserName);

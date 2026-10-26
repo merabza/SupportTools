@@ -87,6 +87,7 @@ internal static class ProjectTestData
                         @"D:\1WorkDotnet\Security\AppFake\appsettings.Production.json",
                     AppSettingsEncodedJsonFileName = $@"{Folder}\Encoded\appsettings.Production.json",
                     ServiceUserName = "appfake",
+                    OpenPort = true,
                     AllowToolsList =
                         [EProjectServerTools.ProgramUpdater, EProjectServerTools.AppSettingsUpdater],
                     CurrentDatabaseParameters = NewDatabaseParameters("AppFake"),

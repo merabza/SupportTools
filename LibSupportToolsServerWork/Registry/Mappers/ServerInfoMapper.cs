@@ -27,6 +27,7 @@ public static class ServerInfoMapper
             AppSettingsJsonSourceFileName = pathMapper.ToCanonical(serverInfo.AppSettingsJsonSourceFileName),
             AppSettingsEncodedJsonFileName = pathMapper.ToCanonical(serverInfo.AppSettingsEncodedJsonFileName),
             ServiceUserName = serverInfo.ServiceUserName,
+            OpenPort = serverInfo.OpenPort,
             AllowToolsList = [.. (serverInfo.AllowToolsList ?? []).Select(x => x.ToString())],
             CurrentDatabaseParameters = DatabaseParametersMapper.ToContract(serverInfo.CurrentDatabaseParameters),
             NewDatabaseParameters = DatabaseParametersMapper.ToContract(serverInfo.NewDatabaseParameters)
@@ -150,6 +151,7 @@ public static class ServerInfoMapper
         serverInfo.AppSettingsJsonSourceFileName = pathMapper.ToLocal(contract.AppSettingsJsonSourceFileName);
         serverInfo.AppSettingsEncodedJsonFileName = pathMapper.ToLocal(contract.AppSettingsEncodedJsonFileName);
         serverInfo.ServiceUserName = contract.ServiceUserName;
+        serverInfo.OpenPort = contract.OpenPort;
 
         //ცარიელი სია და სიის უქონლობა ერთია: ლოკალური null ცარიელი კონტრაქტით არ იცვლება
         if (serverInfo.AllowToolsList is null && contract.AllowToolsList.Count == 0)

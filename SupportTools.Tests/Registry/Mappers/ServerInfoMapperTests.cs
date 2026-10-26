@@ -28,6 +28,7 @@ public sealed class ServerInfoMapperTests
         Assert.Equal(("PAZISI", "Production", "Pc1.WebAgent", 5050),
             (result.ServerName, result.EnvironmentName, result.WebAgentNameForCheck, result.ServerSidePort));
         Assert.Equal(("v1", "appfake"), (result.ApiVersionId, result.ServiceUserName));
+        Assert.True(result.OpenPort);
         Assert.Equal(@"D:\1WorkDotnet\Security\AppFake\appsettings.Production.json",
             result.AppSettingsJsonSourceFileName);
         Assert.Equal(@"D:\1WorkDotnet\AppFake\Encoded\appsettings.Production.json",

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -16,7 +18,7 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     private readonly string _ftpSiteDirectory;
     private readonly string _ftpSiteUserName;
     private readonly ILogger _logger;
-    private readonly int _portNumber;
+    private readonly IReadOnlyCollection<int> _ports;
     private readonly string? _projectDescription;
     private readonly string _projectName;
     private readonly string _runTime;
@@ -27,7 +29,7 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     private readonly string? _serviceDescriptionSignature;
     private readonly string _settingsFileName;
 
-    public CreateServiceInstallScriptToolAction(ILogger logger, string scriptFileName, int portNumber,
+    public CreateServiceInstallScriptToolAction(ILogger logger, string scriptFileName, IReadOnlyCollection<int> ports,
         string ftpSiteAddress, string ftpSiteUserName, string ftpSiteDirectory, string projectName,
         string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
         string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
@@ -36,7 +38,7 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     {
         _logger = logger;
         _scriptFileName = scriptFileName;
-        _portNumber = portNumber;
+        _ports = ports;
         _ftpSiteAddress = ftpSiteAddress;
         _ftpSiteUserName = ftpSiteUserName;
         _ftpSiteDirectory = ftpSiteDirectory;
@@ -55,17 +57,22 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
     {
         var sf = new FileInfo(_scriptFileName);
 
+        //პროექტის თითოეული პორტის გახსნის ბრძანება
+        string openPortsCode = string.Join("\n", _ports.Select(port => $"open_port {port}"));
+        string portsList = _ports.Count == 0 ? "none, Open Port is off" : string.Join(", ", _ports);
+
         string code = $$"""
                         #!/bin/bash
 
                         # {{sf.Name}}
 
                         #This script installs with apt-get the programs it needs, when they are missing:
-                        #curl, unzip and the .NET runtime of the project (from its runtimeconfig.json)
-                        #The following steps are required for this script to work on the server
-                        #1. Open {{_portNumber}} Port for WebAgent
-                        #sudo iptables -A INPUT -p tcp --dport {{_portNumber}} -j ACCEPT
-                        #2. Open 5032 Port for WebAgentInstaller
+                        #curl, unzip, the .NET runtime of the project (from its runtimeconfig.json)
+                        #and nftables (when firewalld does not run)
+                        #It opens the port of the project (from its appsettings Kestrel endpoints: {{portsList}}):
+                        #in firewalld if it runs, else in the tcp ports set of Webmin's nftables table, in nftables otherwise
+                        #The following step is required for this script to work on the server
+                        #Open 5032 Port for WebAgentInstaller
                         #sudo iptables -A INPUT -p tcp --dport 5032 -j ACCEPT
 
                         aptUpdated=0
@@ -98,6 +105,56 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
                             install_package "$2"
                             if ! command -v "$1" > /dev/null 2>&1; then
                               echo "$1 is not found after the install of $2. process finished!"
+                              exit 1
+                            fi
+                          fi
+                        }
+
+                        # open a tcp port: in firewalld if it runs, in nftables otherwise
+                        # Webmin's (Virtualmin's) nftables table drops every port that is not in its tcp ports set,
+                        # so there the port goes into that set; a rule in another table would not help
+                        webminTable=webmin_profile_hosting
+                        webminTcpPorts=profile_hosting_tcp_ports
+
+                        # is the port among the elements of Webmin's tcp ports set in /etc/nftables.conf
+                        port_in_nftables_conf() {
+                          sudo perl -0777 -ne 'BEGIN { ($port, $set) = splice(@ARGV, 0, 2) } exit(/set \Q$set\E \{[^}]*?elements = \{[^}]*?(?<![0-9-])\Q$port\E(?![0-9-])/ ? 0 : 1)' "$1" "$webminTcpPorts" /etc/nftables.conf
+                        }
+
+                        open_port() {
+                          echo open port $1...
+                          if command -v firewall-cmd > /dev/null 2>&1 && sudo firewall-cmd --state > /dev/null 2>&1; then
+                            if ! sudo firewall-cmd --permanent --add-port=$1/tcp || ! sudo firewall-cmd --reload; then
+                              echo "port $1 open in firewalld failed. process finished!"
+                              exit 1
+                            fi
+                          elif command -v nft > /dev/null 2>&1 && sudo nft list set inet $webminTable $webminTcpPorts > /dev/null 2>&1; then
+                            if ! sudo nft get element inet $webminTable $webminTcpPorts "{ $1 }" > /dev/null 2>&1; then
+                              if ! sudo nft add element inet $webminTable $webminTcpPorts "{ $1 }"; then
+                                echo "port $1 add to the nftables set $webminTcpPorts failed. process finished!"
+                                exit 1
+                              fi
+                              # keep it after a restart: add it to the elements of the set in /etc/nftables.conf
+                              # (only here: a port that the set already holds may be inside a range of the file)
+                              if ! port_in_nftables_conf $1; then
+                                sudo perl -0777 -pi -e 'BEGIN { ($port, $set) = splice(@ARGV, 0, 2) } s/(set \Q$set\E \{[^}]*?elements = \{[^}]*?)\s*\}/$1, $port }/' "$1" "$webminTcpPorts" /etc/nftables.conf
+                                if ! port_in_nftables_conf $1; then
+                                  echo "port $1 is open now, but it could not be added to $webminTcpPorts in /etc/nftables.conf: add it there by hand"
+                                fi
+                              fi
+                            else
+                              echo "port $1 is already open in the nftables set $webminTcpPorts"
+                            fi
+                          else
+                            if ! dpkg -s nftables > /dev/null 2>&1; then
+                              install_package nftables
+                            fi
+                            if ! sudo grep -q "tcp dport $1 accept" /etc/nftables.conf 2>/dev/null; then
+                              echo "add rule inet filter input tcp dport $1 accept" | sudo tee -a /etc/nftables.conf > /dev/null
+                            fi
+                            sudo systemctl enable nftables
+                            if ! sudo systemctl restart nftables; then
+                              echo "nftables restart failed, check /etc/nftables.conf. process finished!"
                               exit 1
                             fi
                           fi
@@ -395,6 +452,8 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
 
                         echo move files
                         sudo mv -v $expandedFolderName/* $projectInstallFullPath/ > /dev/null 2>&1
+
+                        {{openPortsCode}}
 
                         sudo systemctl enable $serviceEnvName.service
 

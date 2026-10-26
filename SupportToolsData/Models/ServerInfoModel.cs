@@ -18,6 +18,10 @@ public sealed class ServerInfoModel : ItemData
     //public string? InstallScriptFileName { get; set; }
     public string? ServiceUserName { get; set; }
 
+    //სერვისის პორტების (App Settings Json Source File-ის Kestrel-ის Endpoints) გახსნა სერვერის firewall-ში
+    //ინსტალაციისა და საინსტალაციო სკრიპტის მიერ
+    public bool OpenPort { get; set; }
+
     public List<EProjectServerTools>? AllowToolsList { get; set; }
 
     //public DatabasesExchangeParameters? DatabasesExchangeParameters { get; set; }

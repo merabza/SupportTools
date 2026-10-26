@@ -711,6 +711,9 @@ public sealed class ServerInstallationFilesGeneratorTests
 
         // Assert
         Assert.Contains($"firewall-cmd --permanent --add-port={opened}/tcp\n", script);
+        Assert.Contains(
+            $"  nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{{ {opened} }}'\n", script);
+        Assert.Contains($"elements = \\{{[^}}]*?)\\s*\\}}/$1, {opened} }}/' \\\n", script);
         Assert.Contains($"echo 'add rule inet filter input tcp dport {opened} accept' >> /etc/nftables.conf\n",
             script);
     }

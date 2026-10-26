@@ -492,10 +492,21 @@ public static partial class ServerInstallationFilesGenerator
             if (installation.OpenSqlServerPort)
             {
                 sb.Append(CultureInfo.InvariantCulture, $$"""
-                            # Open SQL Server's port {{port}}: in firewalld if it runs (Virtualmin sets it up), in nftables otherwise
+                            # Open SQL Server's port {{port}}: in firewalld if it runs (Virtualmin sets it up), else in the tcp ports
+                            # set of Webmin's nftables table (it drops every port that is not in the set, so a rule in
+                            # another table would not help), in nftables otherwise
                             if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
                               firewall-cmd --permanent --add-port={{port}}/tcp
                               firewall-cmd --reload
+                            elif command -v nft >/dev/null 2>&1 &&
+                              nft list set inet webmin_profile_hosting profile_hosting_tcp_ports >/dev/null 2>&1; then
+                              # a port that the set already holds may be inside a range of the file, so the file only when it is new
+                              if ! nft get element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }' >/dev/null 2>&1; then
+                                nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }'
+                                # keep it after a restart: add it to the elements of the set in /etc/nftables.conf
+                                perl -0777 -pi -e 's/(set profile_hosting_tcp_ports \{[^}]*?elements = \{[^}]*?)\s*\}/$1, {{port}} }/' \
+                                  /etc/nftables.conf
+                              fi
                             else
                               if ! dpkg -s nftables >/dev/null 2>&1; then
                                 apt-get update

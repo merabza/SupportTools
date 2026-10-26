@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,12 +32,14 @@ public sealed class InstallServiceAction : ToolAction
     private readonly string _projectName;
     private readonly string? _serviceDescriptionSignature;
     private readonly string _serviceUserName;
+    private readonly IReadOnlyCollection<int> _portsToOpen;
 
     public InstallServiceAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
         string projectName, string environmentName, string serviceUserName, string appSettingsJsonFileName,
-        string? serviceDescriptionSignature, string? projectDescription, bool useConsole) : base(logger,
+        string? serviceDescriptionSignature, string? projectDescription, IReadOnlyCollection<int> portsToOpen,
+        bool useConsole) : base(logger,
         "Install service", null, null, useConsole)
     {
         _appName = appName;
@@ -54,6 +57,7 @@ public sealed class InstallServiceAction : ToolAction
         _appSettingsJsonFileName = appSettingsJsonFileName;
         _serviceDescriptionSignature = serviceDescriptionSignature;
         _projectDescription = projectDescription;
+        _portsToOpen = portsToOpen;
     }
 
     public string? InstallingProgramVersion { get; private set; }
@@ -82,7 +86,7 @@ public sealed class InstallServiceAction : ToolAction
         Result<string> installServiceResult = await projectManager.InstallService(_projectName, _environmentName,
             _serviceUserName, Path.GetFileName(_appSettingsJsonFileName), _programArchiveDateMask,
             _programArchiveExtension, _parametersFileDateMask, _parametersFileExtension, _serviceDescriptionSignature,
-            _projectDescription, cancellationToken);
+            _projectDescription, _portsToOpen, cancellationToken);
 
         if (installServiceResult.IsFailure)
         {

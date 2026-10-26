@@ -52,6 +52,11 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
 
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
+        if (project.ProjectType == EProjectType.IsService)
+        {
+            //პორტი App Settings Json Source File-იდან ჩანს, ამიტომ მის შემდეგაა
+            FieldEditors.Add(new OpenPortFieldEditor(nameof(ServerInfoModel.OpenPort)));
+        }
         //FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
         //    nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
         FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,

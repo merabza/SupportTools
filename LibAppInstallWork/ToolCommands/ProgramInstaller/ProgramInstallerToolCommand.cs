@@ -1,5 +1,6 @@
 //Created by ProjectMainClassCreator at 12/22/2020 19:46:54
 
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,6 +48,15 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
             return false;
         }
 
+        //OpenPort-ის ჩართვისას გასახსნელი პორტები
+        List<int>? portsToOpen = Parameters.IsService
+            ? KestrelPortsReader.GetPortsToOpen(Parameters.ServerInfo, Parameters.ProjectName)
+            : [];
+        if (portsToOpen is null)
+        {
+            return false;
+        }
+
         if (!Parameters.IsService)
         {
             //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
@@ -87,7 +97,7 @@ public sealed class ProgramInstallerToolCommand : ToolCommand
             Parameters.ParametersFileDateMask, Parameters.ParametersFileExtension, Parameters.FileStorageForExchange,
             projectName, Parameters.ServerInfo.EnvironmentName, Parameters.ServiceUserName,
             Parameters.EncodedJsonFileName, Parameters.ServiceDescriptionSignature, Parameters.ProjectDescription,
-            UseConsole);
+            portsToOpen, UseConsole);
         if (!await installServiceAction.Run(cancellationToken))
         {
             _logger.LogError("project {ProjectName}/{EnvironmentName} was not updated", projectName, environmentName);

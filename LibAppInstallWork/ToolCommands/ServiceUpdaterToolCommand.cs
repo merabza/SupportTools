@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -43,6 +44,14 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
         if (string.IsNullOrEmpty(environmentName))
         {
             _logger.LogError("Environment {EnvironmentName} is empty", environmentName);
+            return false;
+        }
+
+        //OpenPort-ის ჩართვისას გასახსნელი პორტები; შეცდომა პაკეტის აგებამდე ჩანს
+        List<int>? portsToOpen = KestrelPortsReader.GetPortsToOpen(
+            ProgramServiceUpdaterParameters.ProgramPublisherParameters.ServerInfo, projectName);
+        if (portsToOpen is null)
+        {
             return false;
         }
 
@@ -118,7 +127,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             ProgramServiceUpdaterParameters.FileStorageForDownload, projectName, environmentName,
             ProgramServiceUpdaterParameters.ServiceUserName, appSettingsFileName,
             ProgramServiceUpdaterParameters.ServiceDescriptionSignature,
-            ProgramServiceUpdaterParameters.ProjectDescription, UseConsole);
+            ProgramServiceUpdaterParameters.ProjectDescription, portsToOpen, UseConsole);
         if (!await installProgramAction.Run(cancellationToken))
         {
             _logger.LogError("project {ProjectName}/{EnvironmentName} was not updated", projectName, environmentName);
