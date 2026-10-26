@@ -16,6 +16,9 @@ public static partial class ServerInstallationFilesGenerator
     public const string GrubCfgFileName = "grub.cfg";
     public const string AutoinstallFileName = "autoinstall.yaml";
 
+    //.NET-ის ვერსია Ubuntu 26.04-ის საკუთარ feed-ში (dotnet-sdk-10.0, aspnetcore-runtime-10.0)
+    private const string DotnetVersion = "10.0";
+
     public static string GetFqdn(ServerInstallationModel installation)
     {
         return string.IsNullOrWhiteSpace(installation.DomainName)
@@ -303,6 +306,15 @@ public static partial class ServerInstallationFilesGenerator
             apps.Add("sqlcmd");
         }
 
+        if (installation.InstallDotnetSdk)
+        {
+            apps.Add($".NET SDK {DotnetVersion}");
+        }
+        else if (installation.InstallDotnetRuntime)
+        {
+            apps.Add($"ASP.NET Core Runtime {DotnetVersion}");
+        }
+
         return apps;
     }
 
@@ -364,8 +376,10 @@ public static partial class ServerInstallationFilesGenerator
         sb.Append("""
                   #!/bin/sh
                   set -e
+                  # curl downloads the installers and repository files below
 
                   """);
+        sb.Append(AptInstall("curl", "curl"));
 
         if (installation.InstallVirtualmin)
         {
@@ -508,6 +522,22 @@ public static partial class ServerInstallationFilesGenerator
 
                             """);
             }
+        }
+
+        //Ubuntu 26.04-ზე .NET Ubuntu-ს საკუთარ feed-შია, Microsoft-ის რეპოზიტორიაში (sqlcmd, SQL Server) კი
+        //.NET-ის პაკეტები არ უნდა აირჩეს: ორი წყაროს პაკეტების შერევა .NET-ს აფუჭებს
+        if (installation.InstallDotnetSdk || installation.InstallDotnetRuntime)
+        {
+            sb.Append("""
+                      # .NET only from Ubuntu's feed, never from the Microsoft repository
+                      printf 'Package: dotnet* aspnet* netstandard*\nPin: origin "packages.microsoft.com"\nPin-Priority: -10\n' \
+                        > /etc/apt/preferences.d/dotnet-not-from-microsoft
+
+                      """);
+            string dotnetPackage = installation.InstallDotnetSdk
+                ? $"dotnet-sdk-{DotnetVersion}"
+                : $"aspnetcore-runtime-{DotnetVersion}";
+            sb.Append(AptInstall(dotnetPackage, dotnetPackage));
         }
 
         sb.Append("echo \"All done.\"\n");

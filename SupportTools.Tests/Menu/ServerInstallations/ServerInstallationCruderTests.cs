@@ -93,7 +93,8 @@ public sealed class ServerInstallationCruderTests : IDisposable
             nameof(ServerInstallationModel.InstallPostgreSql), nameof(ServerInstallationModel.InstallMsSqlServer),
             nameof(ServerInstallationModel.SqlServerEdition), nameof(ServerInstallationModel.SqlServerSaPasswordHash),
             nameof(ServerInstallationModel.SqlServerPort), nameof(ServerInstallationModel.OpenSqlServerPort),
-            nameof(ServerInstallationModel.InstallSqlServerClient)
+            nameof(ServerInstallationModel.InstallSqlServerClient), nameof(ServerInstallationModel.InstallDotnetSdk),
+            nameof(ServerInstallationModel.InstallDotnetRuntime)
         ], fieldEditors.Select(x => x.PropertyName));
     }
 
@@ -269,6 +270,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Dictionary<string, bool> enabled = GetEnabledFields(sut);
         Assert.True(enabled[nameof(ServerInstallationModel.InstallWebmin)]);
         Assert.True(enabled[nameof(ServerInstallationModel.InstallSqlServerClient)]);
+        Assert.True(enabled[nameof(ServerInstallationModel.InstallDotnetRuntime)]);
         Assert.False(enabled[nameof(ServerInstallationModel.DnsPrimaryNameServer)]);
         Assert.False(enabled[nameof(ServerInstallationModel.EmailToAddress)]);
         Assert.False(enabled[nameof(ServerInstallationModel.MariaDbRootPasswordHash)]);
@@ -302,6 +304,21 @@ public sealed class ServerInstallationCruderTests : IDisposable
         Assert.True(enabled[nameof(ServerInstallationModel.SqlServerSaPasswordHash)]);
         Assert.True(enabled[nameof(ServerInstallationModel.SqlServerPort)]);
         Assert.True(enabled[nameof(ServerInstallationModel.OpenSqlServerPort)]);
+    }
+
+    //the SDK contains the runtime
+    [Fact]
+    public void GetItemMenu_WithDotnetSdk_HidesTheRuntime()
+    {
+        // Arrange
+        _installation.InstallDotnetSdk = true;
+        ServerInstallationCruder sut = CreateSut();
+
+        // Act
+        sut.GetItemMenu(InstallationKey);
+
+        // Assert
+        Assert.False(GetEnabledFields(sut)[nameof(ServerInstallationModel.InstallDotnetRuntime)]);
     }
 
     //"New Server Installation" gives the new record the default of every field editor before the input: the lists

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SupportTools.Menu.ServerInstallations;
@@ -601,8 +602,12 @@ public sealed class ServerInstallationFilesGeneratorTests
         string script = GetInstallAppsLateCommand(CreateOslo());
 
         // Assert
-        Assert.StartsWith("cat > /target/usr/local/sbin/install-apps <<'EOF'\n#!/bin/sh\nset -e\n# Skip the installer",
+        Assert.StartsWith("cat > /target/usr/local/sbin/install-apps <<'EOF'\n#!/bin/sh\nset -e\n" +
+                          "# curl downloads the installers and repository files below\n" +
+                          "if ! dpkg -s curl >/dev/null 2>&1; then\n  apt-get update\n" +
+                          "  DEBIAN_FRONTEND=noninteractive apt-get install -y curl\nfi\n# Skip the installer",
             script);
+        Assert.DoesNotContain("dotnet", script);
         Assert.Contains(
             "--hostname oslo.cyberia.ge \\\n    --bundle LEMP --extra postgresql,postgresql-client --include PostgreSQL\n",
             script);
@@ -777,6 +782,33 @@ public sealed class ServerInstallationFilesGeneratorTests
         Assert.DoesNotContain("postgresql", script);
         Assert.DoesNotContain("mssql-tools18", script);
         Assert.Equal("# Installs MariaDB", GetInstallAppsComment(installation));
+    }
+
+    //the SDK contains the runtime, and the Microsoft repository of sqlcmd must not supply .NET
+    [Theory]
+    [InlineData(true, false, "dotnet-sdk-10.0", ".NET SDK 10.0")]
+    [InlineData(true, true, "dotnet-sdk-10.0", ".NET SDK 10.0")]
+    [InlineData(false, true, "aspnetcore-runtime-10.0", "ASP.NET Core Runtime 10.0")]
+    public void CreateAutoinstallYaml_WithDotnet_InstallsItFromUbuntuFeed(bool installSdk, bool installRuntime,
+        string package, string appName)
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateMinimal();
+        installation.InstallDotnetSdk = installSdk;
+        installation.InstallDotnetRuntime = installRuntime;
+
+        // Act
+        string script = GetInstallAppsLateCommand(installation);
+
+        // Assert
+        Assert.Contains("printf 'Package: dotnet* aspnet* netstandard*\\nPin: origin \"packages.microsoft.com\"\\n" +
+                        "Pin-Priority: -10\\n' \\\n  > /etc/apt/preferences.d/dotnet-not-from-microsoft\n" +
+                        $"if ! dpkg -s {package} >/dev/null 2>&1; then\n  apt-get update\n" +
+                        $"  DEBIAN_FRONTEND=noninteractive apt-get install -y {package}\nfi\necho \"All done.\"\n",
+            script);
+        Assert.Equal(installSdk, script.Contains("dotnet-sdk-10.0", StringComparison.Ordinal));
+        Assert.Equal(!installSdk, script.Contains("aspnetcore-runtime-10.0", StringComparison.Ordinal));
+        Assert.Equal($"# Installs {appName}", GetInstallAppsComment(installation));
     }
 
     //the root hash is set only for an installed MariaDB and only when there is a hash

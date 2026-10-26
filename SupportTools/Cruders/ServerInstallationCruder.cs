@@ -65,9 +65,12 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
         FieldEditors.Add(new IntFieldEditor(nameof(ServerInstallationModel.SqlServerPort), 0, true));
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.OpenSqlServerPort)));
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallSqlServerClient)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallDotnetSdk)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ServerInstallationModel.InstallDotnetRuntime)));
     }
 
-    //ველი ჩანს მხოლოდ მაშინ, როცა მას რამე იყენებს: Virtualmin-ს Webmin თვითონ მოაქვს, SQL Server-ს კი sqlcmd
+    //ველი ჩანს მხოლოდ მაშინ, როცა მას რამე იყენებს: Virtualmin-ს Webmin თვითონ მოაქვს, SQL Server-ს sqlcmd,
+    //.NET SDK-ს კი Runtime
     protected override void CheckFieldsEnables(ItemData itemData, string? lastEditedFieldName = null)
     {
         var installation = (ServerInstallationModel)itemData;
@@ -80,6 +83,7 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
         EnableFieldByName(nameof(ServerInstallationModel.SqlServerPort), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.OpenSqlServerPort), installation.InstallMsSqlServer);
         EnableFieldByName(nameof(ServerInstallationModel.InstallSqlServerClient), !installation.InstallMsSqlServer);
+        EnableFieldByName(nameof(ServerInstallationModel.InstallDotnetRuntime), !installation.InstallDotnetSdk);
     }
 
     public override string? GetStatusFor(string name)

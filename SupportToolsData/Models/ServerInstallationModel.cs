@@ -81,4 +81,8 @@ public sealed class ServerInstallationModel : ItemData
 
     //SQL Server-ის პორტი firewall-ში იხსნება
     public bool OpenSqlServerPort { get; set; }
+
+    //.NET SDK (Runtime-ს შეიცავს). თუ SDK არ დგება, შეიძლება მხოლოდ ASP.NET Core Runtime დადგეს
+    public bool InstallDotnetSdk { get; set; }
+    public bool InstallDotnetRuntime { get; set; }
 }
