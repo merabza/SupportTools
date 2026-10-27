@@ -23,9 +23,12 @@ public static partial class KestrelPortsReader
             return [];
         }
 
-        return endpoints.Properties().Select(p => p.Value is JObject endpoint ? endpoint["Url"] : null)
-            .Select(url => url?.Type == JTokenType.String ? GetPort(url.Value<string>()) : null).OfType<int>()
-            .Distinct().ToList();
+        return
+        [
+            .. endpoints.Properties().Select(p => p.Value is JObject endpoint ? endpoint["Url"] : null)
+                .Select(url => url?.Type == JTokenType.String ? GetPort(url.Value<string>()) : null).OfType<int>()
+                .Distinct()
+        ];
     }
 
     //პორტები appsettings ფაილიდან. ფაილი თუ არ არის მითითებული, არ არსებობს ან json არ არის, აბრუნებს null-ს და
