@@ -31,6 +31,10 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
 
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInstallationModel.NetworkInterfaceName)));
         FieldEditors.Add(new SimpleNamesListFieldEditor<ServerInstallationListCruder>(
+            nameof(ServerInstallationModel.BondInterfaceNames),
+            x => new ServerInstallationListCruder(parametersManager, x, "Bond Interface", "Bond Interfaces")));
+        FieldEditors.Add(new TextFieldEditor(nameof(ServerInstallationModel.BondMode)));
+        FieldEditors.Add(new SimpleNamesListFieldEditor<ServerInstallationListCruder>(
             nameof(ServerInstallationModel.IpV4Addresses),
             x => new ServerInstallationListCruder(parametersManager, x, "IPv4 Address", "IPv4 Addresses")));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerInstallationModel.Gateway)));

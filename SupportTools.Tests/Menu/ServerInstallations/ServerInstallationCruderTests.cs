@@ -81,6 +81,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
             nameof(ServerInstallationModel.RealName), nameof(ServerInstallationModel.UserName),
             nameof(ServerInstallationModel.PasswordHash), nameof(ServerInstallationModel.SshAuthorizedKeys),
             nameof(ServerInstallationModel.SshAllowPassword), nameof(ServerInstallationModel.NetworkInterfaceName),
+            nameof(ServerInstallationModel.BondInterfaceNames), nameof(ServerInstallationModel.BondMode),
             nameof(ServerInstallationModel.IpV4Addresses), nameof(ServerInstallationModel.Gateway),
             nameof(ServerInstallationModel.NameServers), nameof(ServerInstallationModel.Timezone),
             nameof(ServerInstallationModel.Locale), nameof(ServerInstallationModel.KeyboardLayout),

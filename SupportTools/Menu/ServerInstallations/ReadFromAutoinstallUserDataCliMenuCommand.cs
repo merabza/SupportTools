@@ -12,8 +12,8 @@ using SystemTools.SystemToolsShared;
 
 namespace SupportTools.Menu.ServerInstallations;
 
-//AutoinstallUserDataFilePath-იდან InstallDiskSerial-სა და NetworkInterfaceName-ს ავსებს. რამდენიმე დისკის ან
-//ინტერფეისის შემთხვევაში არჩევას სთავაზობს
+//AutoinstallUserDataFilePath-იდან InstallDiskSerial-სა და NetworkInterfaceName-ს ავსებს (bond-ის შემთხვევაში
+//BondInterfaceNames-სა და BondMode-საც). რამდენიმე დისკის ან ინტერფეისის შემთხვევაში არჩევას სთავაზობს
 public sealed class ReadFromAutoinstallUserDataCliMenuCommand : CliMenuCommand
 {
     private readonly Func<string, string?, string?> _inputFilePath;
@@ -71,12 +71,19 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommand : CliMenuCommand
             Console.WriteLine($"{nameof(ServerInstallationModel.InstallDiskSerial)}: {installation.InstallDiskSerial}");
         }
 
-        string? interfaceName = Select("Network Interface", userData.EthernetNames,
-            installation.NetworkInterfaceName);
+        //bond-ი ერთ ინტერფეისად ითვლება, მისი წევრები ცალკე არ შემოითავაზება
+        List<string> interfaceNames =
+        [
+            .. userData.Bonds.Select(x => x.Name),
+            .. userData.EthernetNames.Where(x =>
+                !userData.Bonds.Any(y => y.InterfaceNames.Contains(x, StringComparer.Ordinal)))
+        ];
+        string? interfaceName = Select("Network Interface", interfaceNames, installation.NetworkInterfaceName);
         if (interfaceName is not null)
         {
             installation.NetworkInterfaceName = interfaceName;
             Console.WriteLine($"{nameof(ServerInstallationModel.NetworkInterfaceName)}: {interfaceName}");
+            SetBond(installation, userData.Bonds.Find(x => x.Name == interfaceName));
         }
 
         bool saved = await _parametersManager.Save(parameters, $"Server Installation {_installationName} updated",
@@ -89,6 +96,23 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommand : CliMenuCommand
     internal static string? InputFilePath(string fieldName, string? defaultValue)
     {
         return MenuInputer.InputFilePath(fieldName, defaultValue);
+    }
+
+    //ჩვეულებრივი ინტერფეისის არჩევისას bond-ის ძველი მონაცემები იშლება
+    private static void SetBond(ServerInstallationModel installation, AutoinstallUserDataBond? bond)
+    {
+        if (bond is null && installation.BondInterfaceNames.Count == 0 &&
+            string.IsNullOrWhiteSpace(installation.BondMode))
+        {
+            return;
+        }
+
+        installation.BondInterfaceNames.Clear();
+        installation.BondInterfaceNames.AddRange(bond?.InterfaceNames ?? []);
+        installation.BondMode = bond?.Mode;
+        Console.WriteLine(
+            $"{nameof(ServerInstallationModel.BondInterfaceNames)}: {string.Join(", ", installation.BondInterfaceNames)}");
+        Console.WriteLine($"{nameof(ServerInstallationModel.BondMode)}: {installation.BondMode}");
     }
 
     private string? Select(string fieldName, List<string> values, string? currentValue)

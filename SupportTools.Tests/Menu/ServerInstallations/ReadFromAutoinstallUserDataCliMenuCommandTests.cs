@@ -342,4 +342,74 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommandTests : IDisposable
         // Assert
         Assert.Contains("Enter AutoinstallUserDataFilePath: ", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
+
+    //a bond counts as one interface, its ethernets are not offered on their own
+    [Fact]
+    public async Task RunBody_WithBond_OffersTheBondAndTakesItsInterfacesAndMode()
+    {
+        // Arrange
+        _installation.AutoinstallUserDataFilePath = WriteUserData("""
+                                                                  autoinstall:
+                                                                    network:
+                                                                      bonds:
+                                                                        bond0:
+                                                                          interfaces:
+                                                                          - eno1
+                                                                          - eno2
+                                                                          parameters:
+                                                                            mode: balance-rr
+                                                                      ethernets:
+                                                                        eno1: {}
+                                                                        eno2: {}
+                                                                        eno5: {}
+                                                                  """);
+        _select = (_, names) => names[0];
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.True(result);
+        (string fieldName, List<string> names, _) = Assert.Single(_menus);
+        Assert.Equal("Network Interface", fieldName);
+        Assert.Equal(["bond0", "eno5"], names);
+        Assert.Equal("bond0", _installation.NetworkInterfaceName);
+        Assert.Equal(["eno1", "eno2"], _installation.BondInterfaceNames);
+        Assert.Equal("balance-rr", _installation.BondMode);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("BondInterfaceNames: eno1, eno2", output, StringComparison.Ordinal);
+        Assert.Contains("BondMode: balance-rr", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunBody_WithEthernetInsteadOfBond_ClearsTheBond()
+    {
+        // Arrange
+        _installation.AutoinstallUserDataFilePath = WriteUserData(OneDiskAndEthernet);
+        _installation.NetworkInterfaceName = "bond0";
+        _installation.BondInterfaceNames.AddRange(["eno1", "eno2"]);
+        _installation.BondMode = "balance-rr";
+
+        // Act
+        await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.Equal("enp3s0", _installation.NetworkInterfaceName);
+        Assert.Empty(_installation.BondInterfaceNames);
+        Assert.Null(_installation.BondMode);
+        Assert.Contains("BondInterfaceNames: ", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunBody_WithEthernetWithoutBond_WritesNothingAboutBonds()
+    {
+        // Arrange
+        _installation.AutoinstallUserDataFilePath = WriteUserData(OneDiskAndEthernet);
+
+        // Act
+        await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.DoesNotContain("Bond", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
 }

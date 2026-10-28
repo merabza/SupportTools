@@ -32,6 +32,13 @@ public sealed class ServerInstallationModel : ItemData
     //ქსელი. თუ მისამართები არ არის მითითებული, ინტერფეისი მისამართს DHCP-ით იღებს
     public string? NetworkInterfaceName { get; set; }
 
+    //თუ სია ცარიელი არ არის, NetworkInterfaceName არის bond (მაგალითად bond0), რომელშიც ეს ინტერფეისები
+    //(მაგალითად eno1-eno4) ერთიანდება, და მისამართებიც bond-ს ეძლევა
+    public List<string> BondInterfaceNames { get; init; } = [];
+
+    //bond-ის რეჟიმი (balance-rr, active-backup, 802.3ad, ...). თუ ცარიელია, netplan-ის ნაგულისხმევი (balance-rr)
+    public string? BondMode { get; set; }
+
     //მისამართები პრეფიქსით, მაგალითად 192.168.10.5/24
     public List<string> IpV4Addresses { get; init; } = [];
 

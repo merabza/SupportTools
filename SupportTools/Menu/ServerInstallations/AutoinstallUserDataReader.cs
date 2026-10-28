@@ -7,10 +7,16 @@ namespace SupportTools.Menu.ServerInstallations;
 
 public sealed record AutoinstallUserDataDisk(string Serial, string? Path);
 
-public sealed record AutoinstallUserData(List<AutoinstallUserDataDisk> Disks, List<string> EthernetNames);
+public sealed record AutoinstallUserDataBond(string Name, List<string> InterfaceNames, string? Mode);
+
+public sealed record AutoinstallUserData(
+    List<AutoinstallUserDataDisk> Disks,
+    List<string> EthernetNames,
+    List<AutoinstallUserDataBond> Bonds);
 
 //წინა ინსტალაციის /var/log/installer/autoinstall-user-data ფაილიდან იმ კომპიუტერის მონაცემები იკითხება, რომლებიც
-//ხელით ძნელი გასარკვევია: დისკების serial-ები (storage.config, type: disk) და ქსელის ინტერფეისების სახელები
+//ხელით ძნელი გასარკვევია: დისკების serial-ები (storage.config, type: disk), ქსელის ინტერფეისების სახელები და
+//bond-ები (მათი ინტერფეისები და რეჟიმი)
 public static class AutoinstallUserDataReader
 {
     public static AutoinstallUserData Read(string yamlText)
@@ -19,7 +25,7 @@ public static class AutoinstallUserDataReader
         yaml.Load(new StringReader(yamlText));
         if (yaml.Documents.Count == 0 || yaml.Documents[0].RootNode is not YamlMappingNode root)
         {
-            return new AutoinstallUserData([], []);
+            return new AutoinstallUserData([], [], []);
         }
 
         //ფაილი #cloud-config-ია და პარამეტრები autoinstall-შია. ძველ ფორმატში ისინი პირდაპირ ძირშია
@@ -40,7 +46,25 @@ public static class AutoinstallUserDataReader
             ? [.. ethernetsMapping.Children.Keys.OfType<YamlScalarNode>().Select(x => x.Value).OfType<string>()]
             : [];
 
-        return new AutoinstallUserData(disks, ethernetNames);
+        YamlNode? bonds = GetChild(network, "bonds") ?? GetChild(GetChild(network, "network"), "bonds");
+        List<AutoinstallUserDataBond> bondList = bonds is YamlMappingNode bondsMapping
+            ? [.. bondsMapping.Children.Select(x => ReadBond(x.Key, x.Value)).OfType<AutoinstallUserDataBond>()]
+            : [];
+
+        return new AutoinstallUserData(disks, ethernetNames, bondList);
+    }
+
+    private static AutoinstallUserDataBond? ReadBond(YamlNode key, YamlNode bond)
+    {
+        if (key is not YamlScalarNode { Value: { } name })
+        {
+            return null;
+        }
+
+        List<string> interfaceNames = GetChild(bond, "interfaces") is YamlSequenceNode interfaces
+            ? [.. interfaces.Children.OfType<YamlScalarNode>().Select(x => x.Value).OfType<string>()]
+            : [];
+        return new AutoinstallUserDataBond(name, interfaceNames, GetScalar(GetChild(bond, "parameters"), "mode"));
     }
 
     private static YamlNode? GetChild(YamlNode? node, string key)
@@ -51,7 +75,7 @@ public static class AutoinstallUserDataReader
             : null;
     }
 
-    private static string? GetScalar(YamlNode node, string key)
+    private static string? GetScalar(YamlNode? node, string key)
     {
         return (GetChild(node, key) as YamlScalarNode)?.Value;
     }

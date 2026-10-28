@@ -44,6 +44,19 @@ public sealed class ServerInstallationFilesGeneratorTests
         };
     }
 
+    //the network of riga (D:\1Work\riga\autoinstall-user-data): four ethernets in one bond
+    private static ServerInstallationModel CreateRiga()
+    {
+        ServerInstallationModel installation = CreateMinimal();
+        installation.NetworkInterfaceName = "bond0";
+        installation.BondInterfaceNames.AddRange(["eno1", "eno2", "eno3", "eno4"]);
+        installation.BondMode = "balance-rr";
+        installation.IpV4Addresses.Add("192.168.10.8/24");
+        installation.Gateway = "192.168.10.1";
+        installation.NameServers.AddRange(["77.74.44.44", "212.58.96.96"]);
+        return installation;
+    }
+
     //only the required values, no applications and an address from DHCP
     private static ServerInstallationModel CreateMinimal()
     {
@@ -526,6 +539,103 @@ public sealed class ServerInstallationFilesGeneratorTests
         Assert.Equal("default", Scalar(route, "to"));
         Assert.Equal("192.168.10.1", Scalar(route, "via"));
         Assert.Equal("2", Scalar(autoinstall, "network", "version"));
+    }
+
+    [Fact]
+    public void CreateAutoinstallYaml_WithBond_GivesTheAddressToTheBondOfTheEthernets()
+    {
+        // Act
+        YamlMappingNode autoinstall =
+            LoadAutoinstall(ServerInstallationFilesGenerator.CreateAutoinstallYaml(CreateRiga()));
+
+        // Assert
+        YamlNode bond = Get(autoinstall, "network", "bonds", "bond0");
+        Assert.Equal(["eno1", "eno2", "eno3", "eno4"], Scalars(bond, "interfaces"));
+        Assert.Equal(["192.168.10.8/24"], Scalars(bond, "addresses"));
+        Assert.Equal(["77.74.44.44", "212.58.96.96"], Scalars(bond, "nameservers", "addresses"));
+        YamlNode route = ((YamlSequenceNode)Get(bond, "routes")).Children[0];
+        Assert.Equal("default", Scalar(route, "to"));
+        Assert.Equal("192.168.10.1", Scalar(route, "via"));
+        Assert.Equal("balance-rr", Scalar(bond, "parameters", "mode"));
+        var ethernets = (YamlMappingNode)Get(autoinstall, "network", "ethernets");
+        Assert.Equal(["eno1", "eno2", "eno3", "eno4"],
+            ethernets.Children.Keys.Cast<YamlScalarNode>().Select(x => x.Value));
+        Assert.All(ethernets.Children.Values, x => Assert.Empty((YamlMappingNode)x));
+        Assert.Equal("2", Scalar(autoinstall, "network", "version"));
+    }
+
+    [Fact]
+    public void CreateAutoinstallYaml_WithBondWithoutModeAndAddress_LeavesThemToNetplan()
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateMinimal();
+        installation.NetworkInterfaceName = "bond0";
+        installation.BondInterfaceNames.AddRange(["eno1", "eno2"]);
+
+        // Act
+        string result = ServerInstallationFilesGenerator.CreateAutoinstallYaml(installation);
+
+        // Assert
+        Assert.Contains("""
+                          network:
+                            bonds:
+                              bond0:
+                                interfaces:
+                                - eno1
+                                - eno2
+                                dhcp4: true
+                            ethernets:
+                              eno1: {}
+                              eno2: {}
+                            version: 2
+
+                        """.ReplaceLineEndings("\n"), result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_ForRiga_ReturnsNoErrors()
+    {
+        // Act
+        List<string> result = ServerInstallationFilesGenerator.Validate(CreateRiga());
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Validate_WithInvalidBond_NamesEveryProblem()
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateRiga();
+        installation.BondInterfaceNames.AddRange(["eno 5", "ENO1", "Bond0"]);
+        installation.BondMode = "lacp";
+
+        // Act
+        List<string> result = ServerInstallationFilesGenerator.Validate(installation);
+
+        // Assert
+        Assert.Equal(
+        [
+            "Bond Interface has an invalid value: eno 5",
+            "NetworkInterfaceName bond0 is the bond, it cannot be one of its interfaces",
+            "Bond Interface eno1 is listed more than once",
+            "BondMode lacp must be one of balance-rr, active-backup, balance-xor, broadcast, 802.3ad, balance-tlb, balance-alb"
+        ], result);
+    }
+
+    //without bond interfaces the mode is not used, so it is not checked
+    [Fact]
+    public void Validate_WithModeWithoutBondInterfaces_IgnoresTheMode()
+    {
+        // Arrange
+        ServerInstallationModel installation = CreateMinimal();
+        installation.BondMode = "lacp";
+
+        // Act
+        List<string> result = ServerInstallationFilesGenerator.Validate(installation);
+
+        // Assert
+        Assert.Empty(result);
     }
 
     [Fact]

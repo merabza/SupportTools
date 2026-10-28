@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -19,6 +20,10 @@ public static partial class ServerInstallationFilesGenerator
 
     //.NET-ის ვერსია Ubuntu 26.04-ის საკუთარ feed-ში (dotnet-sdk-10.0, aspnetcore-runtime-10.0)
     private const string DotnetVersion = "10.0";
+
+    //netplan-ის bond-ის რეჟიმები
+    public static readonly IReadOnlyList<string> BondModes =
+        ["balance-rr", "active-backup", "balance-xor", "broadcast", "802.3ad", "balance-tlb", "balance-alb"];
 
     public static string GetFqdn(ServerInstallationModel installation)
     {
@@ -49,6 +54,7 @@ public static partial class ServerInstallationFilesGenerator
 
         CheckRequired(errors, nameof(installation.NetworkInterfaceName), installation.NetworkInterfaceName,
             InterfaceNameRegex());
+        CheckBond(errors, installation);
         foreach (string address in installation.IpV4Addresses.Where(x => !IsIpV4WithPrefix(x)))
         {
             errors.Add($"IPv4 Address {address} must look like 192.168.10.5/24");
@@ -208,11 +214,9 @@ public static partial class ServerInstallationFilesGenerator
         sb.Append(CultureInfo.InvariantCulture, $$"""
                       locale: {{Quote(installation.Locale)}}
                       network:
-                        ethernets:
-                          {{installation.NetworkInterfaceName}}:
 
                     """);
-        sb.Append(Indent(CreateInterfaceYaml(installation), 8));
+        sb.Append(Indent(CreateNetworkYaml(installation), 4));
         sb.Append(CultureInfo.InvariantCulture, $$"""
                         version: 2
                       oem:
@@ -309,6 +313,38 @@ public static partial class ServerInstallationFilesGenerator
         }
 
         return apps;
+    }
+
+    //netplan-ის bonds და ethernets. bond-ის წევრებს საკუთარი კონფიგურაცია არ აქვთ, მისამართები bond-ს ეძლევა
+    private static string CreateNetworkYaml(ServerInstallationModel installation)
+    {
+        var sb = new StringBuilder();
+        if (installation.BondInterfaceNames.Count == 0)
+        {
+            sb.Append("ethernets:\n  ").Append(installation.NetworkInterfaceName).Append(":\n");
+            sb.Append(Indent(CreateInterfaceYaml(installation), 4));
+            return sb.ToString();
+        }
+
+        sb.Append("bonds:\n  ").Append(installation.NetworkInterfaceName).Append(":\n    interfaces:\n");
+        foreach (string member in installation.BondInterfaceNames)
+        {
+            sb.Append("    - ").Append(member).Append('\n');
+        }
+
+        sb.Append(Indent(CreateInterfaceYaml(installation), 4));
+        if (!string.IsNullOrWhiteSpace(installation.BondMode))
+        {
+            sb.Append("    parameters:\n      mode: ").Append(installation.BondMode).Append('\n');
+        }
+
+        sb.Append("ethernets:\n");
+        foreach (string member in installation.BondInterfaceNames)
+        {
+            sb.Append("  ").Append(member).Append(": {}\n");
+        }
+
+        return sb.ToString();
     }
 
     private static string CreateInterfaceYaml(ServerInstallationModel installation)
@@ -642,6 +678,38 @@ public static partial class ServerInstallationFilesGenerator
     {
         return IsIpV4(value) || IPAddress.TryParse(value, out IPAddress? address) &&
             address.AddressFamily == AddressFamily.InterNetworkV6;
+    }
+
+    private static void CheckBond(List<string> errors, ServerInstallationModel installation)
+    {
+        if (installation.BondInterfaceNames.Count == 0)
+        {
+            return;
+        }
+
+        foreach (string member in installation.BondInterfaceNames)
+        {
+            CheckRequired(errors, "Bond Interface", member, InterfaceNameRegex());
+        }
+
+        if (installation.BondInterfaceNames.Contains(installation.NetworkInterfaceName,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            errors.Add(
+                $"{nameof(installation.NetworkInterfaceName)} {installation.NetworkInterfaceName} is the bond, it cannot be one of its interfaces");
+        }
+
+        foreach (string member in installation.BondInterfaceNames.GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
+                     .Where(x => x.Count() > 1).Select(x => x.Key))
+        {
+            errors.Add($"Bond Interface {member} is listed more than once");
+        }
+
+        if (!string.IsNullOrWhiteSpace(installation.BondMode) && !BondModes.Contains(installation.BondMode))
+        {
+            errors.Add(
+                $"{nameof(installation.BondMode)} {installation.BondMode} must be one of {string.Join(", ", BondModes)}");
+        }
     }
 
     private static void CheckRequired(List<string> errors, string fieldName, string? value, Regex regex)

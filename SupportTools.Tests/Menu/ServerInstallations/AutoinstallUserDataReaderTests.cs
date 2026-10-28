@@ -172,4 +172,54 @@ public sealed class AutoinstallUserDataReaderTests
         Assert.Empty(result.Disks);
         Assert.Empty(result.EthernetNames);
     }
+
+    //the network of riga's Ubuntu 20.04 installation
+    [Fact]
+    public void Read_WithBond_ReturnsTheBondWithItsInterfacesAndMode()
+    {
+        // Act
+        AutoinstallUserData result = AutoinstallUserDataReader.Read("""
+                                                                    autoinstall:
+                                                                      network:
+                                                                        bonds:
+                                                                          bond0:
+                                                                            addresses:
+                                                                            - 192.168.10.8/24
+                                                                            interfaces:
+                                                                            - eno1
+                                                                            - eno2
+                                                                            parameters:
+                                                                              mode: balance-rr
+                                                                        ethernets:
+                                                                          eno1: {}
+                                                                          eno2: {}
+                                                                        version: 2
+                                                                    """);
+
+        // Assert
+        Assert.Equal(["eno1", "eno2"], result.EthernetNames);
+        AutoinstallUserDataBond bond = Assert.Single(result.Bonds);
+        Assert.Equal("bond0", bond.Name);
+        Assert.Equal(["eno1", "eno2"], bond.InterfaceNames);
+        Assert.Equal("balance-rr", bond.Mode);
+    }
+
+    [Fact]
+    public void Read_WithNestedBondWithoutInterfacesAndParameters_ReturnsTheBondName()
+    {
+        // Act
+        AutoinstallUserData result = AutoinstallUserDataReader.Read("""
+                                                                    autoinstall:
+                                                                      network:
+                                                                        network:
+                                                                          bonds:
+                                                                            bond1: {}
+                                                                    """);
+
+        // Assert
+        AutoinstallUserDataBond bond = Assert.Single(result.Bonds);
+        Assert.Equal("bond1", bond.Name);
+        Assert.Empty(bond.InterfaceNames);
+        Assert.Null(bond.Mode);
+    }
 }
