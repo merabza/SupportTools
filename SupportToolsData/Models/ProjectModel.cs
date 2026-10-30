@@ -20,6 +20,11 @@ public sealed class ProjectModel : ItemData
     //პროექტი იყენებს ლოკალურ (საკუთარ) პაკეტებს. თუ გამორთულია, Distribute all packages და
     //Reverse Package Distribution ამ პროექტს არ ეხება
     public bool UseLocalPackages { get; set; }
+
+    //პროექტი მონაცემთა ბაზას იყენებს. გამორთულისას რედაქტორებში ბაზასთან დაკავშირებული პარამეტრები და ინსტრუმენტები
+    //იმალება. ნაგულისხმევად ჩართულია, რომ ძველ პარამეტრების ფაილში (ველის გარეშე) პროექტები ისევ ისე ჩანდეს
+    public bool UsesDatabase { get; set; } = true;
+
     public string? ProjectFolderName { get; init; }
     public string? SolutionFileName { get; init; }
 

@@ -20,6 +20,29 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
     private const string CsProjExtension = ".csproj";
     private const string EsProjExtension = ".esproj";
 
+    //მონაცემთა ბაზასთან დაკავშირებული ველები. UsesDatabase-გამორთულ პროექტში იმალება
+    private static readonly string[] DatabaseFieldNames =
+    [
+        nameof(ProjectModel.DevDatabaseParameters), nameof(ProjectModel.ProdCopyDatabaseParameters),
+        nameof(ProjectModel.DbContextName), nameof(ProjectModel.DataSeederRulesByTableStartupProjectFilePath),
+        nameof(ProjectModel.OldDataConvertorForDataSeeder), nameof(ProjectModel.MigrationStartupProjectFilePath),
+        nameof(ProjectModel.MigrationProjectFilePath), nameof(ProjectModel.PairedDbObjectsResultFileName)
+    ];
+
+    //აპლიკაციის (ვერსიის, გამოქვეყნების, API-ს, ფრონტის) ველები. IsDbTools ტიპის პროექტში იმალება; UsesDatabase-იც,
+    //რადგან ასეთი პროექტი ბაზას ყოველთვის იყენებს
+    private static readonly string[] ApplicationFieldNames =
+    [
+        nameof(ProjectModel.MajorVersion), nameof(ProjectModel.MinorVersion),
+        nameof(ProjectModel.UseAlternativeWebAgent), nameof(ProjectModel.ProgramArchiveDateMask),
+        nameof(ProjectModel.ProgramArchiveExtension), nameof(ProjectModel.ParametersFileDateMask),
+        nameof(ProjectModel.ParametersFileExtension), nameof(ProjectModel.ProjectSecurityFolderPath),
+        nameof(ProjectModel.MainProjectName), nameof(ProjectModel.ApiContractsProjectName),
+        nameof(ProjectModel.SpaProjectName), nameof(ProjectModel.AppSetEnKeysJsonFileName),
+        nameof(ProjectModel.KeyGuidPart), nameof(ProjectModel.UsesDatabase), nameof(ProjectModel.Endpoints),
+        nameof(ProjectModel.RouteClasses), nameof(ProjectModel.FrontNpmPackageNames)
+    ];
+
     public ProjectCruder(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
         IParametersManager parametersManager, Dictionary<string, ProjectModel> currentValuesDictionary) : base(
         parametersManager, currentValuesDictionary, "Project", "Projects")
@@ -49,6 +72,7 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
             gitProjectNamesParameterNames, EsProjExtension, parametersManager));
         FieldEditors.Add(new FilePathFieldEditor(nameof(ProjectModel.AppSetEnKeysJsonFileName)));
         FieldEditors.Add(new TextFieldEditor(nameof(ProjectModel.KeyGuidPart)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ProjectModel.UsesDatabase), true));
         FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
             nameof(ProjectModel.DevDatabaseParameters), parametersManager));
         FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
@@ -79,6 +103,23 @@ public sealed class ProjectCruder : ParCruder<ProjectModel>
     {
         var parameters = (SupportToolsParameters)parametersManager.Parameters;
         return new ProjectCruder(application, logger, httpClientFactory, parametersManager, parameters.Projects);
+    }
+
+    protected override void CheckFieldsEnables(ItemData itemData, string? lastEditedFieldName = null)
+    {
+        var project = (ProjectModel)itemData;
+        bool isDbTools = project.IsDbTools();
+        bool showsDatabase = project.ShowsDatabase();
+
+        foreach (string fieldName in ApplicationFieldNames)
+        {
+            EnableFieldByName(fieldName, !isDbTools);
+        }
+
+        foreach (string fieldName in DatabaseFieldNames)
+        {
+            EnableFieldByName(fieldName, showsDatabase);
+        }
     }
 
     public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)

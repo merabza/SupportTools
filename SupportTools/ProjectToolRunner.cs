@@ -48,7 +48,8 @@ public static class ProjectToolRunner
         }
 
         //მენიუშიც მხოლოდ ნებადართული ინსტრუმენტები ჩანს, ამიტომ აქაც იგივე შეზღუდვა უნდა მოქმედებდეს
-        List<EProjectTools> allowedTools = [.. Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)];
+        List<EProjectTools> allowedTools =
+            [.. Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList).Where(project.IsToolVisible)];
         if (!allowedTools.Contains(tool))
         {
             StShared.WriteErrorLine(
@@ -103,7 +104,10 @@ public static class ProjectToolRunner
         ServerInfoModel serverInfo = foundServers[0];
 
         List<EProjectServerTools> allowedTools =
-            [.. Enum.GetValues<EProjectServerTools>().Intersect(serverInfo.AllowToolsList ?? [])];
+            [
+                .. Enum.GetValues<EProjectServerTools>().Intersect(serverInfo.AllowToolsList ?? [])
+                    .Where(project.IsToolVisible)
+            ];
         if (!allowedTools.Contains(tool))
         {
             StShared.WriteErrorLine(

@@ -16,35 +16,47 @@ public sealed class SelectServerAllowToolsCliMenuCommand : CliMenuCommand
 {
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
+    private readonly Action<string, Dictionary<string, bool>> _selectTools;
     private readonly string _serverName;
 
-    // ReSharper disable once ConvertToPrimaryConstructor
     public SelectServerAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
-        string serverName) : base("Select Allow tools...", EMenuAction.Reload)
+        string serverName) : this(parametersManager, projectName, serverName,
+        (caption, checks) => MenuInputer.MultipleInputFromList(caption, checks))
+    {
+    }
+
+    //კონსოლიდან არჩევა პარამეტრადაა გამოტანილი, რომ ტესტებმა არჩევანი თვითონ მიაწოდონ (checks-ს ადგილზე ცვლის)
+    // ReSharper disable once ConvertToPrimaryConstructor
+    internal SelectServerAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
+        string serverName, Action<string, Dictionary<string, bool>> selectTools) : base("Select Allow tools...",
+        EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
         _serverName = serverName;
+        _selectTools = selectTools;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
     {
         //პროექტისა და სერვერისათვის შესაძლო ამოცანების ჩამონათვალი (გაშვების შესაძლებლობა)
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
+        ProjectModel? project = parameters.GetProject(_projectName);
         ServerInfoModel? server = parameters.GetServerByProject(_projectName, _serverName);
 
-        if (server is null)
+        if (project is null || server is null)
         {
             StShared.WriteErrorLine($"Server with name {_serverName} is not exists 2", true);
             return false;
         }
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        Dictionary<string, bool> checks = Enum.GetValues<EProjectServerTools>().ToDictionary(tool => tool.ToString(),
-            tool => server.AllowToolsList?.Contains(tool) ?? false);
+        //ჩანს მხოლოდ პროექტის ტიპისა და UsesDatabase-ის მიხედვით ხილული ინსტრუმენტები. დამალულის არჩევა არ იცვლება
+        Dictionary<string, bool> checks = Enum.GetValues<EProjectServerTools>().Where(project.IsToolVisible)
+            .ToDictionary(tool => tool.ToString(), tool => server.AllowToolsList?.Contains(tool) ?? false);
 
         //გამოვიდეს სიიდან ამრჩევი
-        MenuInputer.MultipleInputFromList("Select allow tools", checks);
+        _selectTools("Select allow tools", checks);
 
         server.AllowToolsList ??= [];
 

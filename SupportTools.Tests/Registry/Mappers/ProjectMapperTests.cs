@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LibSupportToolsServerWork.Registry.Mappers;
 using LibSupportToolsServerWork.Registry.Paths;
+using LibSupportToolsServerWork.Registry.Sync;
 using ParametersManagement.LibDatabaseParameters;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -50,6 +51,29 @@ public sealed class ProjectMapperTests
         Assert.Equal(("PAZISI", "Production"), (prod.ServerName, prod.EnvironmentName));
         Assert.Equal(["ProgramUpdater", "AppSettingsUpdater"], prod.AllowToolsList);
         Assert.Null(result.ServerInfos[1].CurrentDatabaseParameters);
+    }
+
+    //UsesDatabase is true by default: a project that uses the database keeps the hash it had before the field existed,
+    //and a project read from a server without the field uses the database
+    [Fact]
+    public void UsesDatabase_WhenTrue_IsLeftOutOfTheHashAndIsTheDefaultOfAMissingValue()
+    {
+        // Arrange
+        ProjectModel project = ProjectTestData.NewProject();
+        PathMapper pathMapper = MapperTestHelpers.WindowsPathMapper();
+        project.UsesDatabase = true;
+        StsProjectDataModel usesDatabase = ProjectMapper.ToContract(ProjectTestData.Name, project, pathMapper);
+        project.UsesDatabase = false;
+        StsProjectDataModel noDatabase = ProjectMapper.ToContract(ProjectTestData.Name, project, pathMapper);
+
+        // Act
+        string usesDatabaseJson = RegistryContractHasher.ToCanonicalJson(usesDatabase);
+        string noDatabaseJson = RegistryContractHasher.ToCanonicalJson(noDatabase);
+
+        // Assert
+        Assert.DoesNotContain("UsesDatabase", usesDatabaseJson, StringComparison.Ordinal);
+        Assert.Contains("\"UsesDatabase\":false", noDatabaseJson, StringComparison.Ordinal);
+        Assert.True(new StsProjectDataModel { Name = "A", ProjectType = "Standard" }.UsesDatabase);
     }
 
     //canonical (Windows) → Linux local → canonical gives the original contract

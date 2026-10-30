@@ -16,13 +16,21 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
 {
     private readonly IParametersManager _parametersManager;
     private readonly string _projectName;
+    private readonly Action<string, Dictionary<string, bool>> _selectTools;
 
+    public SelectProjectAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName) : this(
+        parametersManager, projectName, (caption, checks) => MenuInputer.MultipleInputFromList(caption, checks))
+    {
+    }
+
+    //კონსოლიდან არჩევა პარამეტრადაა გამოტანილი, რომ ტესტებმა არჩევანი თვითონ მიაწოდონ (checks-ს ადგილზე ცვლის)
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SelectProjectAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName) : base(
-        "Select Allow tools...", EMenuAction.Reload)
+    internal SelectProjectAllowToolsCliMenuCommand(IParametersManager parametersManager, string projectName,
+        Action<string, Dictionary<string, bool>> selectTools) : base("Select Allow tools...", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _projectName = projectName;
+        _selectTools = selectTools;
     }
 
     protected override async ValueTask<bool> RunBody(CancellationToken cancellationToken = default)
@@ -38,15 +46,18 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
             return false;
         }
 
-        //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        Dictionary<string, bool> checks = Enum.GetValues<EProjectTools>()
-            .ToDictionary(tool => tool.GetProjectToolName(), tool => project.AllowToolsList.Contains(tool));
+        //ჩანს მხოლოდ პროექტის ტიპისა და UsesDatabase-ის მიხედვით ხილული ინსტრუმენტები. დამალულის არჩევა არ იცვლება
+        List<EProjectTools> visibleTools = [.. Enum.GetValues<EProjectTools>().Where(project.IsToolVisible)];
 
-        Dictionary<string, EProjectTools> visibleNames = Enum.GetValues<EProjectTools>()
+        //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
+        Dictionary<string, bool> checks =
+            visibleTools.ToDictionary(tool => tool.GetProjectToolName(), tool => project.AllowToolsList.Contains(tool));
+
+        Dictionary<string, EProjectTools> visibleNames = visibleTools
             .ToDictionary(tool => tool.GetProjectToolName(), tool => tool);
 
         //გამოვიდეს სიიდან ამრჩევი
-        MenuInputer.MultipleInputFromList("Select allow tools", checks);
+        _selectTools("Select allow tools", checks);
 
         foreach (KeyValuePair<string, bool> kvp in checks)
         {

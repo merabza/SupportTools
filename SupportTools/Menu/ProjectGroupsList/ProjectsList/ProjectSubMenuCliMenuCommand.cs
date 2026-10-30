@@ -8,6 +8,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -44,6 +45,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(CheckPackageSolutionCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(BuildPackageCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
+        }
+
+        //ცხრილებისა და ველების წყვილები ბაზას ეხება: UsesDatabase-გამორთულ პროექტში არ ჩანს
+        if (project is null || !project.ShowsDatabase())
+        {
+            excludeList.Add(nameof(PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy));
         }
 
         if (!SystemStat.IsWindows() || string.IsNullOrWhiteSpace(project?.SolutionFileName))

@@ -11,6 +11,7 @@ using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 using SupportTools.FieldEditors;
+using SupportToolsData;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 using Xunit;
@@ -44,6 +45,7 @@ public sealed class ProjectCruderTests
         nameof(ProjectModel.SpaProjectName),
         nameof(ProjectModel.AppSetEnKeysJsonFileName),
         nameof(ProjectModel.KeyGuidPart),
+        nameof(ProjectModel.UsesDatabase),
         nameof(ProjectModel.DevDatabaseParameters),
         nameof(ProjectModel.ProdCopyDatabaseParameters),
         nameof(ProjectModel.DbContextName),
@@ -120,6 +122,23 @@ public sealed class ProjectCruderTests
         Assert.False(sut.ContainsRecordWithKey("AnotherProject"));
     }
 
+    //a new project uses local packages and the database unless the user turns them off
+    [Theory]
+    [InlineData(nameof(ProjectModel.UseLocalPackages))]
+    [InlineData(nameof(ProjectModel.UsesDatabase))]
+    public void SetDefault_WhenNewProjectIsCreated_TurnsBoolFieldOn(string propertyName)
+    {
+        // Arrange
+        var project = new ProjectModel { UseLocalPackages = false, UsesDatabase = false };
+        FieldEditor fieldEditor = GetFieldEditors(CreateSut()).Single(x => x.PropertyName == propertyName);
+
+        // Act
+        fieldEditor.SetDefault(project);
+
+        // Assert
+        Assert.True((bool)typeof(ProjectModel).GetProperty(propertyName)!.GetValue(project)!);
+    }
+
     [Fact]
     public void GetDetailsSubMenu_WhenCalled_ListsRecordNameAndFieldsFollowedByRedundantFileNames()
     {
@@ -141,6 +160,54 @@ public sealed class ProjectCruderTests
 
         // Assert
         AssertDetails([.. CliMenuTestAccess.GetMenuItems(detailsMenu).Select(x => x.CliMenuCommand)]);
+    }
+
+    [Fact]
+    public void GetDetailsSubMenu_WhenProjectDoesNotUseDatabase_HidesDatabaseFields()
+    {
+        // Arrange
+        _parameters.Projects[ProjectName].UsesDatabase = false;
+
+        // Act
+        List<string> names = [.. CreateSut().GetDetailsSubMenu(ProjectName).Select(x => x.Name)];
+
+        // Assert
+        Assert.Contains(nameof(ProjectModel.UsesDatabase).SplitWithSpacesCamelParts(), names);
+        Assert.Contains(nameof(ProjectModel.MainProjectName).SplitWithSpacesCamelParts(), names);
+        Assert.DoesNotContain(nameof(ProjectModel.DevDatabaseParameters).SplitWithSpacesCamelParts(), names);
+        Assert.DoesNotContain(nameof(ProjectModel.MigrationProjectFilePath).SplitWithSpacesCamelParts(), names);
+        Assert.DoesNotContain(nameof(ProjectModel.PairedDbObjectsResultFileName).SplitWithSpacesCamelParts(), names);
+    }
+
+    //IsDbTools keeps the general and the database fields; UsesDatabase is hidden and ignored
+    [Fact]
+    public void GetDetailsSubMenu_WhenProjectIsDbTools_ShowsGeneralAndDatabaseFieldsOnly()
+    {
+        // Arrange
+        _parameters.Projects[ProjectName] = new ProjectModel
+        {
+            ProjectType = EProjectType.IsDbTools, UsesDatabase = false, RedundantFileNames = { "*.tmp", "*.bak" }
+        };
+        string[] expected =
+        [
+            nameof(ProjectModel.ProjectType), nameof(ProjectModel.ProjectGroupName),
+            nameof(ProjectModel.ProjectDescription), nameof(ProjectModel.UseLocalPackages),
+            nameof(ProjectModel.ProjectFolderName), nameof(ProjectModel.SolutionFileName),
+            nameof(ProjectModel.EditorConfigPatternName), nameof(ProjectModel.DevDatabaseParameters),
+            nameof(ProjectModel.ProdCopyDatabaseParameters), nameof(ProjectModel.DbContextName),
+            nameof(ProjectModel.DataSeederRulesByTableStartupProjectFilePath),
+            nameof(ProjectModel.OldDataConvertorForDataSeeder),
+            nameof(ProjectModel.MigrationStartupProjectFilePath), nameof(ProjectModel.MigrationProjectFilePath),
+            nameof(ProjectModel.PairedDbObjectsResultFileName)
+        ];
+
+        // Act
+        List<CliMenuCommand> commands = CreateSut().GetDetailsSubMenu(ProjectName);
+
+        // Assert
+        Assert.Equal(expected.Select(x => x.SplitWithSpacesCamelParts()),
+            commands.Skip(1).Take(expected.Length).Select(x => x.Name));
+        Assert.Equal(1 + expected.Length + 3, commands.Count);
     }
 
     //"Record Name", then one editor per field, then the redundant file names part: the "new" command and the masks

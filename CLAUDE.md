@@ -245,6 +245,15 @@ After a registry sync every computer lists every project, but each is physically
 - Program Installer and Program Updater (service projects, `ServiceUpdaterToolCommand`): the ports go through `InstallServiceAction` → `IIProjectsManagerWithFileStorage.InstallService(…, portsToOpen)` → locally `ApplicationUpdater` / `InstallerBase.RunUpdateService`, remotely `ProjectsApiClient` (`UpdateServiceRequest.PortsToOpen`) → WebAgent's `UpdateServiceCommandHandler` (WebAgentShared). `InstallerBase` opens them before the service starts: `LinuxServiceInstaller` the same way as the script (`NftablesConf` edits the set's `elements` in `/etc/nftables.conf`), `WindowsServiceInstaller` with a `netsh advfirewall` rule `"{service} port {port}"`. An old WebAgent ignores `PortsToOpen`.
 - ToolsManagement.Installer consumes `WebAgentContracts.WebAgentProjectsApiContracts` as a BaGetter package, so a change of `ProjectsApiClient` builds only after the new WebAgentContracts package is distributed.
 
+## Database scope (IsDbTools, UsesDatabase)
+
+`EProjectType.IsDbTools` (3) is a project of database tools; `ProjectModel.UsesDatabase` (default true, so old files and new projects keep everything) turns the database part of a project off. The rules are in `SupportToolsData/ProjectDatabaseScope` (`IsDbTools`, `ShowsDatabase`, `IsToolVisible`, `IsDatabaseTool`, whose switches throw for an unclassified tool, so a new `EProjectTools` / `EProjectServerTools` member must be classified there).
+
+- IsDbTools: the project editor (`ProjectCruder.CheckFieldsEnables`) hides the application fields (versions, web agent, masks, security folder, main/api contracts/SPA project names, AppSetEnKeys, KeyGuidPart, UsesDatabase, endpoints, route classes, npm packages) and keeps the general and the database ones; the servers (`ServerInfoCruder`) show only the server, the environment and the database parameters; only the database tools are offered. `UsesDatabase` is ignored.
+- UsesDatabase off: the database fields of the project (`DevDatabaseParameters` … `PairedDbObjectsResultFileName`) and of its servers, the Paired Db Objects menu and the database tools are hidden.
+- Tools: "Select Allow tools..." (project and server) lists only the visible tools and leaves the choices of the hidden ones as they are; the tools lists and `--run` (`ProjectToolRunner`) offer only allowed tools that are also visible. Nothing is deleted from the parameters.
+- Registry: `StsProjectDataModel.UsesDatabase` is `[DefaultValue(true)]` with a `true` initializer, so the hash omits true (existing hashes stay) and a client or server that does not know the field reads true. Server: `Project.UsesDatabase`, column default and sentinel true, migration `AddProjectUsesDatabase` (SupportToolsServerDbTools).
+
 ## Conventions to match
 
 - Code comments are predominantly in Georgian — match the language of nearby comments rather than translating.

@@ -15,6 +15,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisCompute
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -49,6 +50,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
+            .AddTransient<IMenuCommandFactoryStrategy, PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy>()
             .BuildServiceProvider();
         Directory.CreateDirectory(_tempFolder);
     }
@@ -142,6 +144,24 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(OperatingSystem.IsWindows() ? 1 : 0, commands.OfType<OpenByVisualStudioCliMenuCommand>().Count());
+    }
+
+    //the paired db objects belong to the database: a project that does not use it does not show them
+    [Theory]
+    [InlineData(EProjectType.Standard, true, true)]
+    [InlineData(EProjectType.Standard, false, false)]
+    [InlineData(EProjectType.IsDbTools, false, true)]
+    public void GetSubMenu_WhenCalled_ShowsPairedDbObjectsOnlyForProjectThatShowsDatabase(EProjectType projectType,
+        bool usesDatabase, bool expected)
+    {
+        // Arrange
+        RegisterProject(new ProjectModel { ProjectType = projectType, UsesDatabase = usesDatabase });
+
+        // Act
+        List<CliMenuCommand> commands = GetSubMenuCommands();
+
+        // Assert
+        Assert.Equal(expected ? 1 : 0, commands.OfType<PairedDbObjectsSubMenuCliMenuCommand>().Count());
     }
 
     [Fact]

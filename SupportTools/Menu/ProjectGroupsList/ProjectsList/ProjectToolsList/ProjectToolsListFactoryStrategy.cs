@@ -25,7 +25,7 @@ public class ProjectToolsListFactoryStrategy(
         {
             return
             [
-                .. Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList)
+                .. Enum.GetValues<EProjectTools>().Intersect(project.AllowToolsList).Where(project.IsToolVisible)
                     .OrderBy(x => x.GetProjectToolName()).Select(tool =>
                         new ProjectToolTaskCliMenuCommand(serviceProvider, tool, menuParameters.ProjectName,
                             parametersManager))

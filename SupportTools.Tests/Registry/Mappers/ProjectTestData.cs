@@ -26,6 +26,7 @@ internal static class ProjectTestData
             MinorVersion = 7,
             UseAlternativeWebAgent = true,
             UseLocalPackages = true,
+            UsesDatabase = false,
             ProjectFolderName = Folder,
             SolutionFileName = $@"{Folder}\AppFake\AppFake.slnx",
             EditorConfigPatternName = "default",

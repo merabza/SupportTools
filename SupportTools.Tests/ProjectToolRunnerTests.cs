@@ -118,6 +118,40 @@ public sealed class ProjectToolRunnerTests : IDisposable
             StringComparison.Ordinal);
     }
 
+    //the menu hides the database tools of a project that does not use the database, so --run refuses them too
+    [Fact]
+    public async Task Run_WhenProjectDoesNotUseDatabase_RefusesAllowedDatabaseTool()
+    {
+        // Arrange
+        AddProject(EProjectTools.GenerateApiRoutes, EProjectTools.RecreateDevDatabase).UsesDatabase = false;
+
+        // Act
+        bool result = await ProjectToolRunner.Run(CreateServiceProvider(), _parametersManager.Object, ProjectName,
+            EProjectTools.RecreateDevDatabase);
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("Allowed tools are: GenerateApiRoutes", ConsoleText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RunOnServer_WhenProjectIsDbTools_RefusesAllowedNonDatabaseTool()
+    {
+        // Arrange
+        ProjectModel project = new() { ProjectType = EProjectType.IsDbTools };
+        _parameters.Projects.Add(ProjectName, project);
+        AddServerInfo(project, "key", ServerName, EnvironmentName, EProjectServerTools.ProgPublisher,
+            EProjectServerTools.DevBaseToServerCopier);
+
+        // Act
+        bool result = await ProjectToolRunner.RunOnServer(CreateServiceProvider(), _parametersManager.Object,
+            ProjectName, ServerName, EProjectServerTools.ProgPublisher);
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("Allowed tools are: DevBaseToServerCopier", ConsoleText(), StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task Run_WhenAllowToolsListHasUndefinedValue_DoesNotOfferItAsAllowed()
     {

@@ -50,8 +50,13 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));
         }
 
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
-        FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
+        //IsDbTools ტიპის პროექტის სერვერზე მხოლოდ ბაზის პარამეტრები ჩანს
+        if (!project.IsDbTools())
+        {
+            FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
+            FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
+        }
+
         if (project.ProjectType == EProjectType.IsService)
         {
             //პორტი App Settings Json Source File-იდან ჩანს, ამიტომ მის შემდეგაა
@@ -59,10 +64,14 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         }
         //FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
         //    nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
-            nameof(ServerInfoModel.CurrentDatabaseParameters), parametersManager));
-        FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
-            nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
+        //UsesDatabase-გამორთული პროექტის სერვერზე ბაზის პარამეტრები იმალება
+        if (project.ShowsDatabase())
+        {
+            FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
+                nameof(ServerInfoModel.CurrentDatabaseParameters), parametersManager));
+            FieldEditors.Add(new DatabaseParametersFieldEditor(application, logger, httpClientFactory,
+                nameof(ServerInfoModel.NewDatabaseParameters), parametersManager));
+        }
     }
 
     public static ServerInfoCruder Create(IApplication application, IServiceProvider serviceProvider, ILogger logger,
@@ -97,7 +106,7 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         }
 
         foreach (EProjectServerTools tool in Enum.GetValues<EProjectServerTools>()
-                     .Intersect(server.AllowToolsList ?? []))
+                     .Intersect(server.AllowToolsList ?? []).Where(project.IsToolVisible))
         {
             itemSubMenuSet.AddMenuItem(new ProjectServerToolTaskCliMenuCommand(tool, _projectName, server,
                 ParametersManager, _serviceProvider));
