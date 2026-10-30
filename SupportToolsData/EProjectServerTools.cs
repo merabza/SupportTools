@@ -42,5 +42,6 @@ public enum EProjectServerTools
     ProgRemover, //  RemoveProgram, //პროგრამის წაშლა
     ServiceStarter, //უკვე დაინსტალირებული სერვისის გაშვება სერვერის მხარეს.
     ServiceStopper, //გაშვებული სერვისის გაჩერება სერვერის მხარეს.
-    VersionChecker //გაშვებული სერვისის ვერსიის დადგენა. (ეს იმუშავებს მხოლოდ იმ შემთხვევაში, თუ სერვისში გამოყენებული იქნება იქნება TestTools.Controllers.TestController
+    VersionChecker, //გაშვებული სერვისის ვერსიის დადგენა. (ეს იმუშავებს მხოლოდ იმ შემთხვევაში, თუ სერვისში გამოყენებული იქნება იქნება TestTools.Controllers.TestController
+    ServerBaseToServerCopier //ამ სერვერის მიმდინარე ბაზის დაკოპირება არჩეული სერვერის ახალ ბაზაში.
 }
