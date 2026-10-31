@@ -43,5 +43,6 @@ public enum EProjectServerTools
     ServiceStarter, //უკვე დაინსტალირებული სერვისის გაშვება სერვერის მხარეს.
     ServiceStopper, //გაშვებული სერვისის გაჩერება სერვერის მხარეს.
     VersionChecker, //გაშვებული სერვისის ვერსიის დადგენა. (ეს იმუშავებს მხოლოდ იმ შემთხვევაში, თუ სერვისში გამოყენებული იქნება იქნება TestTools.Controllers.TestController
-    ServerBaseToServerCopier //ამ სერვერის მიმდინარე ბაზის დაკოპირება არჩეული სერვერის ახალ ბაზაში.
+    ServerBaseToServerCopier, //ამ სერვერის მიმდინარე ბაზის დაკოპირება არჩეული სერვერის ახალ ბაზაში.
+    RestoreDatabaseFromFileStorageToNewDatabase //ფაილსაცავიდან არჩეული ბექაპის ფაილის სერვერზე გადაგზავნა და მისი ახალ ბაზად აღდგენა.
 }

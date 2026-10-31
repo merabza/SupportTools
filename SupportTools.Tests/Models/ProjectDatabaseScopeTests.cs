@@ -62,7 +62,7 @@ public sealed class ProjectDatabaseScopeTests
         Assert.Equal(
             [
                 EProjectServerTools.DevBaseToServerCopier, EProjectServerTools.ServerBaseToProdCopyCopier,
-                EProjectServerTools.ServerBaseToServerCopier
+                EProjectServerTools.ServerBaseToServerCopier, EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase
             ], Enum.GetValues<EProjectServerTools>().Where(project.IsToolVisible));
     }
 
@@ -71,6 +71,6 @@ public sealed class ProjectDatabaseScopeTests
     public void IsDatabaseTool_ClassifiesEveryTool()
     {
         Assert.Equal(8, Enum.GetValues<EProjectTools>().Count(x => x.IsDatabaseTool()));
-        Assert.Equal(3, Enum.GetValues<EProjectServerTools>().Count(x => x.IsDatabaseTool()));
+        Assert.Equal(4, Enum.GetValues<EProjectServerTools>().Count(x => x.IsDatabaseTool()));
     }
 }

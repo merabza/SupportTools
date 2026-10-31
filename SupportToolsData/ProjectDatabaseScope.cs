@@ -46,7 +46,8 @@ public static class ProjectDatabaseScope
         return tool switch
         {
             EProjectServerTools.DevBaseToServerCopier or EProjectServerTools.ServerBaseToProdCopyCopier
-                or EProjectServerTools.ServerBaseToServerCopier => true,
+                or EProjectServerTools.ServerBaseToServerCopier
+                or EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase => true,
             EProjectServerTools.AppSettingsEncoder or EProjectServerTools.AppSettingsPreparer
                 or EProjectServerTools.AppSettingsInstaller or EProjectServerTools.AppSettingsUpdater
                 or EProjectServerTools.ServiceInstallScriptCreator or EProjectServerTools.ServiceRemoveScriptCreator

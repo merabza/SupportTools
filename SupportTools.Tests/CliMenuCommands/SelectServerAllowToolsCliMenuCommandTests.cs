@@ -123,7 +123,8 @@ public sealed class SelectServerAllowToolsCliMenuCommandTests : IDisposable
             [
                 nameof(EProjectServerTools.DevBaseToServerCopier),
                 nameof(EProjectServerTools.ServerBaseToProdCopyCopier),
-                nameof(EProjectServerTools.ServerBaseToServerCopier)
+                nameof(EProjectServerTools.ServerBaseToServerCopier),
+                nameof(EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase)
             ], offered!.Keys);
     }
 

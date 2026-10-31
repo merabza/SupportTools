@@ -41,6 +41,8 @@ public static class ToolNames
             EProjectServerTools.ServiceStopper => "Service Stopper",
             EProjectServerTools.VersionChecker => "Version Checker",
             EProjectServerTools.ServerBaseToServerCopier => "Server Base To Server Copier",
+            EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase =>
+                "Restore Database From File Storage to New Database",
             _ => throw new ArgumentOutOfRangeException(nameof(tool), tool, null)
         };
     }
