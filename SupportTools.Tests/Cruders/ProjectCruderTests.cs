@@ -139,6 +139,21 @@ public sealed class ProjectCruderTests
         Assert.True((bool)typeof(ProjectModel).GetProperty(propertyName)!.GetValue(project)!);
     }
 
+    //a new project gets UseLocalPackages on without a question; it can be changed after the project is created
+    [Theory]
+    [InlineData(nameof(ProjectModel.UseLocalPackages), false)]
+    [InlineData(nameof(ProjectModel.UseAlternativeWebAgent), true)]
+    [InlineData(nameof(ProjectModel.UsesDatabase), true)]
+    public void EnterFieldDataOnCreate_WhenNewProjectIsCreated_AsksAllBoolFieldsButUseLocalPackages(
+        string propertyName, bool expected)
+    {
+        // Act
+        FieldEditor fieldEditor = GetFieldEditors(CreateSut()).Single(x => x.PropertyName == propertyName);
+
+        // Assert
+        Assert.Equal(expected, fieldEditor.EnterFieldDataOnCreate);
+    }
+
     [Fact]
     public void GetDetailsSubMenu_WhenCalled_ListsRecordNameAndFieldsFollowedByRedundantFileNames()
     {
