@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using AppCliTools.LibDataInput;
 using LibDotnetWork;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibFileParameters.Models;
@@ -21,11 +24,13 @@ namespace LibAppInstallWork.ToolActions;
 
 public sealed class CreatePackageAndUpload : ToolAction
 {
+    private readonly Func<string, bool> _confirm;
     private readonly string _dateMask;
     private readonly FileStorageData _exchangeFileStorage;
     private readonly ILogger _logger;
     private readonly string _mainProjectFileName;
     private readonly string _projectName;
+    private readonly Func<string, string, string, string, bool> _publishRelease;
     private readonly List<string> _redundantFileNames;
     private readonly string _runtime;
     private readonly ServerInfoModel _serverInfo;
@@ -37,8 +42,23 @@ public sealed class CreatePackageAndUpload : ToolAction
     public CreatePackageAndUpload(ILogger logger, string projectName, string mainProjectFileName,
         ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
-        SmartSchema uploadSmartSchema) : base(logger, "Program Publisher", null, null)
+        SmartSchema uploadSmartSchema) : this(logger, projectName, mainProjectFileName, serverInfo, workFolder,
+        dateMask, runtime, redundantFileNames, uploadTempExtension, exchangeFileStorage, smartSchemaForLocal,
+        uploadSmartSchema, question => Inputer.InputBool(question, false, false),
+        (runtime, outputFolderPath, projectFileName, assemblyVersion) => new DotnetProcessor(logger, true)
+            .PublishRelease(runtime, outputFolderPath, projectFileName, assemblyVersion).IsSuccess)
     {
+    }
+
+    //მომხმარებლის კითხვა და dotnet publish პარამეტრადაა გამოტანილი, რომ ტესტებმა კონსოლი არ წაიკითხონ და dotnet არ გაუშვან
+    internal CreatePackageAndUpload(ILogger logger, string projectName, string mainProjectFileName,
+        ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
+        string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
+        SmartSchema uploadSmartSchema, Func<string, bool> confirm,
+        Func<string, string, string, string, bool> publishRelease) : base(logger, "Program Publisher", null, null)
+    {
+        _confirm = confirm;
+        _publishRelease = publishRelease;
         _logger = logger;
         _projectName = projectName;
         _mainProjectFileName = mainProjectFileName;
@@ -161,8 +181,6 @@ public sealed class CreatePackageAndUpload : ToolAction
             _logger.LogInformation("dotnet publishing with assemblyVersion {AssemblyVersion} ...", AssemblyVersion);
         }
 
-        var dotnetProcessor = new DotnetProcessor(_logger, true);
-
         _logger.LogInformation("Cleaning previous build outputs...");
 
         //წინა ბილდების ნაშთები იწმინდება, რომ პაკეტში ძველ რეფერენსებზე აწყობილი assembly-ები არ მოხვდეს.
@@ -175,11 +193,16 @@ public sealed class CreatePackageAndUpload : ToolAction
             return false;
         }
 
+        if (!StopProgramRunningFromBin(mainProjectFolderPath))
+        {
+            return false;
+        }
+
         FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "bin"));
         FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "obj"));
 
         //მთავარი პროექტის შექმნა
-        if (dotnetProcessor.PublishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion).IsFailure)
+        if (!_publishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion))
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return false;
@@ -272,5 +295,78 @@ public sealed class CreatePackageAndUpload : ToolAction
             archiveFileExtension, _smartSchemaForLocal);
 
         return true;
+    }
+
+    //თუ პროგრამა გაშვებულია პროექტის bin ფოლდერიდან (მაგალითად, დეველოპმენტისას), მისი ფაილები დაბლოკილია
+    //და bin ფოლდერის წაშლა ვერ მოხერხდება. ასეთ შემთხვევაში მომხმარებელს ვეკითხებით, გავაჩეროთ თუ არა პროცესი.
+    //უარის შემთხვევაში განახლება წყდება.
+    private bool StopProgramRunningFromBin(string projectFolderPath)
+    {
+        string processName = Path.GetFileNameWithoutExtension(_mainProjectFileName);
+        string binFolderPath = Path.Combine(projectFolderPath, "bin") + Path.DirectorySeparatorChar;
+        Process[] processes = Process.GetProcessesByName(processName);
+        try
+        {
+            Process[] runningFromBin = processes.Where(x => IsRunningFrom(x, binFolderPath)).ToArray();
+            if (runningFromBin.Length == 0)
+            {
+                return true;
+            }
+
+            string processIds = string.Join(", ", runningFromBin.Select(x => x.Id));
+            _logger.LogWarning("Program {ProcessName} (PID {ProcessIds}) is running from {BinFolderPath}",
+                processName, processIds, binFolderPath);
+
+            if (!_confirm($"Stop {processName} (PID {processIds}) to continue?"))
+            {
+                _logger.LogError("Update cancelled, because {ProcessName} is still running", processName);
+                return false;
+            }
+
+            foreach (Process process in runningFromBin)
+            {
+                process.Kill(true);
+                if (!process.WaitForExit(TimeSpan.FromSeconds(30)))
+                {
+                    if (_logger.IsEnabled(LogLevel.Error))
+                    {
+                        _logger.LogError("Cannot stop {ProcessName} (PID {ProcessId})", processName, process.Id);
+                    }
+
+                    return false;
+                }
+            }
+
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Program {ProcessName} stopped", processName);
+            }
+
+            return true;
+        }
+        finally
+        {
+            foreach (Process process in processes)
+            {
+                process.Dispose();
+            }
+        }
+    }
+
+    internal static bool IsRunningFrom(Process process, string folderPath)
+    {
+        try
+        {
+            string? fileName = process.MainModule?.FileName;
+            return fileName is not null && fileName.StartsWith(folderPath, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Win32Exception)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 }

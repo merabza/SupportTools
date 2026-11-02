@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\ToolsManagement\ToolsManagement.Installer\ToolsManagement.Installer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SupportTools.Tests" />
+  </ItemGroup>
+
 </Project>
