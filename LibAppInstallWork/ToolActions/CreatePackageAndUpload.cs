@@ -307,7 +307,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         Process[] processes = Process.GetProcessesByName(processName);
         try
         {
-            Process[] runningFromBin = processes.Where(x => IsRunningFrom(x, binFolderPath)).ToArray();
+            Process[] runningFromBin = [.. processes.Where(x => IsRunningFrom(x, binFolderPath))];
             if (runningFromBin.Length == 0)
             {
                 return true;
