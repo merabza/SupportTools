@@ -240,6 +240,9 @@ combination.
 * `AppSettingsJsonSourceFileName`, `AppSettingsEncodedJsonFileName` —
 appSettings input and output paths
 * `ServiceUserName` — service account on the target server
+* `SpaEnvMode` — Vite mode the React front is built with when the project
+is published for this server (`dotnet publish /p:SpaMode=<mode>`, so the
+front reads `.env.<mode>`); empty keeps the csproj default, `production`
 * `AllowToolsList` — which `EProjectServerTools` actions are enabled
 * `CurrentDatabaseParameters`, `NewDatabaseParameters` — database
 swap tracking during migrations

@@ -22,6 +22,11 @@ public sealed class ServerInfoModel : ItemData
     //ინსტალაციისა და საინსტალაციო სკრიპტის მიერ
     public bool OpenPort { get; set; }
 
+    //Vite-ის mode, რომლითაც publish-ის დროს ფრონტი იბილდება (dotnet publish-ს /p:SpaMode=... გადაეცემა და აპის
+    //csproj-ის PublishSpa target-ი მას npm run build -- --mode-ით უშვებს, ანუ ფრონტი .env.{mode} ფაილს იღებს).
+    //ცარიელი — არაფერი გადაეცემა და csproj-ის ნაგულისხმევი (production) მოქმედებს
+    public string? SpaEnvMode { get; set; }
+
     public List<EProjectServerTools>? AllowToolsList { get; set; }
 
     //public DatabasesExchangeParameters? DatabasesExchangeParameters { get; set; }

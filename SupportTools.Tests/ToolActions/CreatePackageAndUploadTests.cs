@@ -39,7 +39,7 @@ public sealed class CreatePackageAndUploadTests : IDisposable
     private readonly string _processName = $"PkgTest{Guid.NewGuid():N}"[..20];
     private readonly string _projectFileName;
     private readonly string _projectFolder;
-    private readonly List<string[]> _publishCalls = [];
+    private readonly List<string?[]> _publishCalls = [];
     private readonly List<Process> _startedProcesses = [];
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
     private readonly string _workFolder;
@@ -158,12 +158,13 @@ public sealed class CreatePackageAndUploadTests : IDisposable
 
         // Assert
         Assert.True(result);
-        string[] call = Assert.Single(_publishCalls);
+        string?[] call = Assert.Single(_publishCalls);
         Assert.Equal(Runtime, call[0]);
         Assert.Equal(_workFolder, Path.GetDirectoryName(call[1]));
         Assert.StartsWith(FilePrefix, Path.GetFileName(call[1]), StringComparison.Ordinal);
         Assert.Equal(_projectFileName, call[2]);
         Assert.Equal(sut.AssemblyVersion, call[3]);
+        Assert.Null(call[4]);
         string zipFile = Assert.Single(Directory.GetFiles(_exchangeFolder));
         Assert.Equal($"{Path.GetFileName(call[1])}.zip", Path.GetFileName(zipFile));
         Assert.Empty(Directory.GetFileSystemEntries(_workFolder));
@@ -196,13 +197,30 @@ public sealed class CreatePackageAndUploadTests : IDisposable
         Assert.Equal(expected, messages.Where(expected.Contains));
     }
 
+    //the server's SpaEnvMode chooses the front's .env file: it goes to the publish and is named in the log
+    [Fact]
+    public async Task Run_WhenServerInfoHasSpaEnvMode_PassesItToThePublish()
+    {
+        // Arrange
+        CreatePackageAndUpload sut = Create(spaEnvMode: "staging");
+
+        // Act
+        bool result = await sut.Run();
+
+        // Assert
+        Assert.True(result);
+        string?[] call = Assert.Single(_publishCalls);
+        Assert.Equal("staging", call[4]);
+        Assert.Contains((LogLevel.Information, "SPA env mode: staging"), _logger.Messages);
+    }
+
     [Fact]
     public async Task Run_WhenEverythingWorks_DeletesTheOldBinAndObjFoldersBeforePublishing()
     {
         // Arrange
         bool binExistedAtPublish = true;
         bool objExistedAtPublish = true;
-        CreatePackageAndUpload sut = Create(publishRelease: (_, output, _, _) =>
+        CreatePackageAndUpload sut = Create(publishRelease: (_, output, _, _, _) =>
         {
             binExistedAtPublish = Directory.Exists(_binFolder);
             objExistedAtPublish = Directory.Exists(_objFolder);
@@ -457,11 +475,11 @@ public sealed class CreatePackageAndUploadTests : IDisposable
     private CreatePackageAndUpload Create(string serverName = ServerName, string environmentName = EnvironmentName,
         string? projectFileName = null, string projectName = ProjectName, string? workFolder = null,
         string dateMask = DateMask, string? exchangeFolder = null, SmartSchema? localSmartSchema = null,
-        Func<string, string, string, string, bool>? publishRelease = null)
+        Func<string, string, string, string, string?, bool>? publishRelease = null, string? spaEnvMode = null)
     {
         //the exchange keeps the newest package, the work folder keeps none unless the test says otherwise
         return new CreatePackageAndUpload(_logger, projectName, projectFileName ?? _projectFileName,
-            new ServerInfoModel { ServerName = serverName, EnvironmentName = environmentName },
+            new ServerInfoModel { ServerName = serverName, EnvironmentName = environmentName, SpaEnvMode = spaEnvMode },
             workFolder ?? _workFolder, dateMask, Runtime, ["appsettings.Development.json", " "], "up",
             new FileStorageData { FileStoragePath = exchangeFolder ?? _exchangeFolder },
             localSmartSchema ?? new SmartSchema(), KeepNewestSmartSchema(),
@@ -485,9 +503,10 @@ public sealed class CreatePackageAndUploadTests : IDisposable
         Assert.Contains((level, message), _logger.Messages);
     }
 
-    private bool Publish(string runtime, string outputFolderPath, string projectFileName, string assemblyVersion)
+    private bool Publish(string runtime, string outputFolderPath, string projectFileName, string assemblyVersion,
+        string? spaMode)
     {
-        _publishCalls.Add([runtime, outputFolderPath, projectFileName, assemblyVersion]);
+        _publishCalls.Add([runtime, outputFolderPath, projectFileName, assemblyVersion, spaMode]);
         if (!_publishResult)
         {
             return false;

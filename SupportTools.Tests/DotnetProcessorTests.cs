@@ -1,4 +1,5 @@
-﻿using LibDotnetWork;
+﻿using System;
+using LibDotnetWork;
 using Xunit;
 
 namespace SupportTools.Tests;
@@ -53,6 +54,33 @@ public sealed class DotnetProcessorTests
         Assert.Equal(
             @"publish --configuration Release --runtime linux-x64 --self-contained --output C:\Publish\App App.csproj /p:Version=1.0.9792.31628",
             result);
+    }
+
+    //the app csproj's PublishSpa target gives SpaMode to npm run build as Vite's --mode, so the front takes .env.{mode}
+    [Fact]
+    public void CreatePublishArguments_WhenSpaModeIsSet_PassesItAsSpaModeProperty()
+    {
+        // Act
+        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
+            "1.0.9792.31628", "staging");
+
+        // Assert
+        Assert.EndsWith(" /p:Version=1.0.9792.31628 /p:SpaMode=staging", result, StringComparison.Ordinal);
+    }
+
+    //an empty mode is not passed: the csproj's own default (production) applies
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void CreatePublishArguments_WhenSpaModeIsEmpty_DoesNotPassIt(string? spaMode)
+    {
+        // Act
+        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
+            "1.0.9792.31628", spaMode);
+
+        // Assert
+        Assert.DoesNotContain("SpaMode", result, StringComparison.Ordinal);
     }
 
     [Fact]

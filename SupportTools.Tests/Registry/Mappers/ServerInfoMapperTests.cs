@@ -27,7 +27,7 @@ public sealed class ServerInfoMapperTests
         // Assert
         Assert.Equal(("PAZISI", "Production", "Pc1.WebAgent", 5050),
             (result.ServerName, result.EnvironmentName, result.WebAgentNameForCheck, result.ServerSidePort));
-        Assert.Equal(("v1", "appfake"), (result.ApiVersionId, result.ServiceUserName));
+        Assert.Equal(("v1", "appfake", "staging"), (result.ApiVersionId, result.ServiceUserName, result.SpaEnvMode));
         Assert.True(result.OpenPort);
         Assert.Equal(@"D:\1WorkDotnet\Security\AppFake\appsettings.Production.json",
             result.AppSettingsJsonSourceFileName);
@@ -246,6 +246,31 @@ public sealed class ServerInfoMapperTests
         Assert.Equal(("PAZISI", 5050), (replaced.ServerName, replaced.ServerSidePort));
     }
 
+    //SpaEnvMode comes from the contract, for a record updated in place and for a replaced one alike
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ApplyToLocal_WhenContractHasSpaEnvMode_AppliesIt(bool databaseParametersDisappear)
+    {
+        // Arrange
+        ServerInfoModel existing = ProjectTestData.NewProject().ServerInfos[ProjectTestData.ProdKey];
+        Dictionary<string, ServerInfoModel> serverInfos = new() { [GuidKey] = existing };
+        StsServerInfoDataModel contract = ServerInfoMapper.ToContract(existing, MapperTestHelpers.WindowsPathMapper());
+        contract.SpaEnvMode = "test";
+        if (databaseParametersDisappear)
+        {
+            contract.CurrentDatabaseParameters = null;
+        }
+
+        // Act
+        ServerInfoMapper.ApplyToLocal([contract], serverInfos, MapperTestHelpers.WindowsPathMapper());
+
+        // Assert
+        ServerInfoModel result = serverInfos[GuidKey];
+        Assert.Equal(databaseParametersDisappear, !ReferenceEquals(existing, result));
+        Assert.Equal("test", result.SpaEnvMode);
+    }
+
     [Fact]
     public void ApplyToLocal_WhenDatabaseParametersAppear_CreatesThem()
     {
@@ -327,6 +352,7 @@ public sealed class ServerInfoMapperTests
         empty.AppSettingsJsonSourceFileName = "";
         empty.AppSettingsEncodedJsonFileName = "";
         empty.ServiceUserName = "";
+        empty.SpaEnvMode = "";
 
         // Act
         StsServerInfoDataModel result = ServerInfoMapper.Normalize(empty);

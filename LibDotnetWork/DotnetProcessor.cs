@@ -25,21 +25,23 @@ public sealed class DotnetProcessor
     }
 
     public Result PublishRelease(string runtime, string outputFolderPath, string mainProjectFileName,
-        string assemblyVersion)
+        string assemblyVersion, string? spaMode = null)
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
-            CreatePublishArguments(runtime, outputFolderPath, mainProjectFileName, assemblyVersion));
+            CreatePublishArguments(runtime, outputFolderPath, mainProjectFileName, assemblyVersion, spaMode));
     }
 
     //ვერსია Version-ით გადაეცემა: AssemblyVersion მისგან იგივე გამოდის, Version კი restore-საც სწვდება. ამიტომ
     //ProjectReference-ით აგებული პროექტის ვერსია იგივე სახელის ძველ პაკეტისაზე (მაგალითად, WebSystemTools-ის
     //PackageReference-ით მოსული SystemTools-ისაზე) მაღალია და NuGet პროექტს ირჩევს. მხოლოდ AssemblyVersion-ით publish-ში
     //პაკეტის 1.0.0.0 DLL ხვდებოდა, აპის DLL-ები კი პროექტის ახალ ვერსიას ითხოვდნენ (FileNotFoundException გაშვებისას)
+    //spaMode (ServerInfo.SpaEnvMode) /p:SpaMode-ით მიდის: აპის csproj-ის PublishSpa target-ი მას Vite-ის --mode-ად
+    //აძლევს npm run build-ს, რომ ფრონტმა შესაბამისი .env.{mode} ფაილი აიღოს. ცარიელი არ გადაეცემა
     internal static string CreatePublishArguments(string runtime, string outputFolderPath, string mainProjectFileName,
-        string assemblyVersion)
+        string assemblyVersion, string? spaMode = null)
     {
         return
-            $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:Version={assemblyVersion}";
+            $"publish --configuration Release --runtime {runtime} --self-contained --output {outputFolderPath} {mainProjectFileName} /p:Version={assemblyVersion}{(string.IsNullOrWhiteSpace(spaMode) ? string.Empty : $" /p:SpaMode={spaMode}")}";
     }
 
     public Result CreateNewSolution(string solutionPath, string solutionName)

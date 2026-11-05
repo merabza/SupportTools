@@ -30,7 +30,7 @@ public sealed class CreatePackageAndUpload : ToolAction
     private readonly ILogger _logger;
     private readonly string _mainProjectFileName;
     private readonly string _projectName;
-    private readonly Func<string, string, string, string, bool> _publishRelease;
+    private readonly Func<string, string, string, string, string?, bool> _publishRelease;
     private readonly List<string> _redundantFileNames;
     private readonly string _runtime;
     private readonly ServerInfoModel _serverInfo;
@@ -45,8 +45,8 @@ public sealed class CreatePackageAndUpload : ToolAction
         SmartSchema uploadSmartSchema) : this(logger, projectName, mainProjectFileName, serverInfo, workFolder,
         dateMask, runtime, redundantFileNames, uploadTempExtension, exchangeFileStorage, smartSchemaForLocal,
         uploadSmartSchema, question => Inputer.InputBool(question, false, false),
-        (runtime, outputFolderPath, projectFileName, assemblyVersion) => new DotnetProcessor(logger, true)
-            .PublishRelease(runtime, outputFolderPath, projectFileName, assemblyVersion).IsSuccess)
+        (runtime, outputFolderPath, projectFileName, assemblyVersion, spaMode) => new DotnetProcessor(logger, true)
+            .PublishRelease(runtime, outputFolderPath, projectFileName, assemblyVersion, spaMode).IsSuccess)
     {
     }
 
@@ -55,7 +55,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
         SmartSchema uploadSmartSchema, Func<string, bool> confirm,
-        Func<string, string, string, string, bool> publishRelease) : base(logger, "Program Publisher", null, null)
+        Func<string, string, string, string, string?, bool> publishRelease) : base(logger, "Program Publisher", null, null)
     {
         _confirm = confirm;
         _publishRelease = publishRelease;
@@ -201,8 +201,14 @@ public sealed class CreatePackageAndUpload : ToolAction
         FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "bin"));
         FileStat.DeleteDirectoryIfExists(Path.Combine(mainProjectFolderPath, "obj"));
 
-        //მთავარი პროექტის შექმნა
-        if (!_publishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion))
+        //მთავარი პროექტის შექმნა. SpaEnvMode ფრონტის .env ფაილს ირჩევს (ServerInfoModel.SpaEnvMode)
+        if (!string.IsNullOrWhiteSpace(_serverInfo.SpaEnvMode) && _logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("SPA env mode: {SpaEnvMode}", _serverInfo.SpaEnvMode);
+        }
+
+        if (!_publishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion,
+                _serverInfo.SpaEnvMode))
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return false;

@@ -52,18 +52,18 @@ public sealed class ServerInfoCruderTests
     [InlineData(EProjectType.IsService, true, new[]
     {
         "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId", "ServiceUserName",
-        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "OpenPort", "CurrentDatabaseParameters",
-        "NewDatabaseParameters"
+        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode", "OpenPort",
+        "CurrentDatabaseParameters", "NewDatabaseParameters"
     })]
     [InlineData(EProjectType.Standard, true, new[]
     {
         "ServerName", "EnvironmentName", "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName",
-        "CurrentDatabaseParameters", "NewDatabaseParameters"
+        "SpaEnvMode", "CurrentDatabaseParameters", "NewDatabaseParameters"
     })]
     [InlineData(EProjectType.IsService, false, new[]
     {
         "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId", "ServiceUserName",
-        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "OpenPort"
+        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode", "OpenPort"
     })]
     [InlineData(EProjectType.IsDbTools, false, new[]
     {

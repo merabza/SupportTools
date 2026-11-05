@@ -246,6 +246,10 @@ server-name კომბინაციისთვის.
 * `AppSettingsJsonSourceFileName`, `AppSettingsEncodedJsonFileName` —
 appSettings input და output ბილიკები
 * `ServiceUserName` — სამიზნე სერვერის სერვისის ანგარიში
+* `SpaEnvMode` — Vite-ის mode, რომლითაც React-ის ფრონტი იბილდება ამ
+სერვერისთვის პუბლიკაციისას (`dotnet publish /p:SpaMode=<mode>`, ანუ
+ფრონტი `.env.<mode>` ფაილს კითხულობს); ცარიელი — csproj-ის ნაგულისხმევი,
+`production`
 * `AllowToolsList` — რომელი `EProjectServerTools` ქმედებებია ჩართული
 * `CurrentDatabaseParameters`, `NewDatabaseParameters` — ბაზის
 swap-ის თვალყურის დევნება მიგრაციების დროს

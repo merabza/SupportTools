@@ -28,6 +28,7 @@ public static class ServerInfoMapper
             AppSettingsEncodedJsonFileName = pathMapper.ToCanonical(serverInfo.AppSettingsEncodedJsonFileName),
             ServiceUserName = serverInfo.ServiceUserName,
             OpenPort = serverInfo.OpenPort,
+            SpaEnvMode = serverInfo.SpaEnvMode,
             AllowToolsList = [.. (serverInfo.AllowToolsList ?? []).Select(x => x.ToString())],
             CurrentDatabaseParameters = DatabaseParametersMapper.ToContract(serverInfo.CurrentDatabaseParameters),
             NewDatabaseParameters = DatabaseParametersMapper.ToContract(serverInfo.NewDatabaseParameters)
@@ -89,6 +90,7 @@ public static class ServerInfoMapper
             ContractNormalization.UpperDriveLetter(
                 ContractNormalization.EmptyToNull(contract.AppSettingsEncodedJsonFileName));
         contract.ServiceUserName = ContractNormalization.EmptyToNull(contract.ServiceUserName);
+        contract.SpaEnvMode = ContractNormalization.EmptyToNull(contract.SpaEnvMode);
         contract.AllowToolsList = ContractNormalization.OrderByName(
             contract.AllowToolsList.Select(ContractNormalization.EnumName<EProjectServerTools>), x => x);
         contract.CurrentDatabaseParameters = DatabaseParametersMapper.Normalize(contract.CurrentDatabaseParameters);
@@ -124,7 +126,7 @@ public static class ServerInfoMapper
 
     //CurrentDatabaseParameters და NewDatabaseParameters init-only-ა. DatabaseParametersMapper.ToLocal არსებულ
     //ეგზემპლარს ადგილზე ანახლებს, ამიტომ თუ ორივე იგივე ეგზემპლარია (ან ორივე აკლია), ჩანაწერი ადგილზე ახლდება; თუ
-    //რომელიმე ჩნდება ან ქრება, ჩანაწერი ახალი ობიექტით იცვლება. ServerInfoModel-ის ყველა ველი კონტრაქტშია
+    //რომელიმე ჩნდება ან ქრება, ჩანაწერი ახალი ობიექტით იცვლება
     private static ServerInfoModel ToLocal(StsServerInfoDataModel contract, ServerInfoModel? existing,
         PathMapper pathMapper)
     {
@@ -152,6 +154,7 @@ public static class ServerInfoMapper
         serverInfo.AppSettingsEncodedJsonFileName = pathMapper.ToLocal(contract.AppSettingsEncodedJsonFileName);
         serverInfo.ServiceUserName = contract.ServiceUserName;
         serverInfo.OpenPort = contract.OpenPort;
+        serverInfo.SpaEnvMode = contract.SpaEnvMode;
 
         //ცარიელი სია და სიის უქონლობა ერთია: ლოკალური null ცარიელი კონტრაქტით არ იცვლება
         if (serverInfo.AllowToolsList is null && contract.AllowToolsList.Count == 0)

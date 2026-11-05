@@ -55,6 +55,8 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         {
             FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsJsonSourceFileName)));
             FieldEditors.Add(new FilePathFieldEditor(nameof(ServerInfoModel.AppSettingsEncodedJsonFileName)));
+            //ფრონტის .env ფაილის არჩევა publish-ის დროს (Vite-ის mode); ცარიელი — csproj-ის ნაგულისხმევი
+            FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.SpaEnvMode)));
         }
 
         if (project.ProjectType == EProjectType.IsService)

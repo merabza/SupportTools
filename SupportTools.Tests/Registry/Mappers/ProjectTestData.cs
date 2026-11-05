@@ -89,6 +89,7 @@ internal static class ProjectTestData
                     AppSettingsEncodedJsonFileName = $@"{Folder}\Encoded\appsettings.Production.json",
                     ServiceUserName = "appfake",
                     OpenPort = true,
+                    SpaEnvMode = "staging",
                     AllowToolsList =
                         [EProjectServerTools.ProgramUpdater, EProjectServerTools.AppSettingsUpdater],
                     CurrentDatabaseParameters = NewDatabaseParameters("AppFake"),

@@ -194,6 +194,8 @@ public sealed class CopyServerInfoCliMenuCommandTests : IDisposable
     {
         // Arrange
         ServerInfoModel source = _parameters.Projects[ProjectName].ServerInfos[ServerInfoKey];
+        //SpaEnvMode is not in the registry contract, so the shared test data leaves it null; the copy must carry it too
+        source.SpaEnvMode = "staging";
         JObject expected = JObject.FromObject(source);
         expected[nameof(ServerInfoModel.ServerName)] = "Merinson";
         expected[nameof(ServerInfoModel.EnvironmentName)] = "Test";
