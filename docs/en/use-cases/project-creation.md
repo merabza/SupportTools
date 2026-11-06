@@ -124,16 +124,24 @@ When no project has a single one left, the repository used by the most
 remaining projects goes first (e.g. `SupportToolsServerShared`)
 * For each repository: syncs that project (V3, `Prepare`), runs
 `dotnet restore` on its solution (only when the folder holds exactly one
-`.sln`/`.slnx`) and then `dotnet outdated -r -u`, up to 3 attempts
+`.sln`/`.slnx`) and then `dotnet outdated -r -u -n`, up to 3 attempts
 without pausing, and syncs the project again (V3, `Update`) to commit and
 push the update. V3 leaves unchanged folders alone, so these syncs reach
 the Git server only for the folders that an earlier push made old or that
 the update changed
+* With `-n` the tool writes the new versions into `Directory.Packages.props`
+itself. Without it, it ran `dotnet add package`, each with a restore, for
+every project and package, which took minutes in the large repositories.
+The tool drops the file's BOM; the command puts it back. When the versions
+changed, one plain `dotnet restore` of the solution checks them in place of
+the restores that `-n` skips
 * If the sync before an update fails, that repository is skipped; if the
-sync after it fails, the update stays local. The others go on
+restore after the update fails, the update is still synced; if the sync
+after it fails, the update stays local. The others go on
 * At the end prints how long each phase took (the sync of all
 repositories, the syncs before and after the updates, the package
-updates) and the repositories whose sync or `dotnet outdated` failed
+updates) and the repositories whose sync, `dotnet outdated` or restore
+after the update failed
 
 The pre-restore uses the same MSBuild properties as `dotnet outdated`, so
 the tool's parallel per-project restores become no-ops and stop colliding

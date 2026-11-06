@@ -175,6 +175,26 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
             StringComparison.Ordinal);
     }
 
+    //the versions are written, so they are synced as after a failed dotnet outdated
+    [Fact]
+    public async Task Run_WhenTheRestoreAfterAnUpdateFails_StillSyncsTheProjectAndReportsTheGit()
+    {
+        // Arrange
+        _steps.RestoreFailingSteps.Add("update P1/GitA");
+
+        // Act
+        bool result = await Create(null, null, false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("sync P1: Update message Update", _steps.Steps);
+        Assert.Contains("update P2/GitB", _steps.Steps);
+        string output = _consoleOutput.ToString();
+        Assert.Contains("restore after the update failed for: GitA" + Environment.NewLine, output,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("dotnet outdated failed for", output, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task Run_WhenASyncAfterAnUpdateFails_ReportsTheGitAndGoesOn()
     {
@@ -191,23 +211,26 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
             StringComparison.Ordinal);
     }
 
+    //with the remote project the steps are P1/GitA, R1/GitC, P2/GitB
     [Fact]
     public async Task Run_WhenStepsOfEveryKindFail_ReportsThemTogether()
     {
         // Arrange
         _steps.FailingSteps.Add("sync P1: Update message Prepare");
+        _steps.RestoreFailingSteps.Add("update R1/GitC");
         _steps.FailingSteps.Add("update P2/GitB");
         _steps.FailingSteps.Add("sync P2: Update message Update");
 
         // Act
-        bool result = await Create(null, null, false).Run();
+        bool result = await Create(null, null, true).Run();
 
         // Assert
         Assert.False(result);
         Assert.Contains(
             "sync before the update failed for: GitA" + Environment.NewLine + "dotnet outdated failed for: GitB" +
-            Environment.NewLine + "sync after the update failed for: GitB" + Environment.NewLine,
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+            Environment.NewLine + "restore after the update failed for: GitC" + Environment.NewLine +
+            "sync after the update failed for: GitB" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -280,7 +303,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         // Assert
         Assert.Contains(string.Join(Environment.NewLine, "Times of Update Outdated Packages:",
             "  sync of all gits (Check): 00:03:00", "  2 syncs before an update (Prepare): 00:02:00",
-            "  2 package updates (restore, dotnet outdated): 01:21:00",
+            "  2 package updates (restore, dotnet outdated, check restore): 01:21:00",
             "  2 syncs after an update (Update): 00:02:30") + Environment.NewLine, _consoleOutput.ToString(),
             StringComparison.Ordinal);
     }
@@ -298,7 +321,8 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         // Assert
         string output = _consoleOutput.ToString();
         Assert.Contains("  2 syncs before an update (Prepare): ", output, StringComparison.Ordinal);
-        Assert.Contains("  1 package updates (restore, dotnet outdated): ", output, StringComparison.Ordinal);
+        Assert.Contains("  1 package updates (restore, dotnet outdated, check restore): ", output,
+            StringComparison.Ordinal);
         Assert.Contains("  1 syncs after an update (Update): ", output, StringComparison.Ordinal);
     }
 

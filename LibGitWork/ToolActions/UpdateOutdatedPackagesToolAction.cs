@@ -84,6 +84,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         //var updatedGitProjectNames = new List<string>();
         var notSyncedGitNames = new List<string>();
         var failedGitNames = new List<string>();
+        var notRestoredGitNames = new List<string>();
         var notPushedGitNames = new List<string>();
         foreach (OutdatedPackagesUpdateStep step in steps)
         {
@@ -98,10 +99,16 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
                 continue;
             }
 
-            if (!await Measure(packageUpdatesTime,
-                    () => Task.FromResult(_steps.UpdatePackages(step.ProjectName, step.GitName))))
+            //ვერსიები, რომლებითაც restore ჩავარდა, dotnet outdated-ის ჩავარდნის მსგავსად მაინც სინქრონდება
+            EPackageUpdateResult updateResult = await Measure(packageUpdatesTime,
+                () => Task.FromResult(_steps.UpdatePackages(step.ProjectName, step.GitName)));
+            if (updateResult == EPackageUpdateResult.OutdatedFailed)
             {
                 failedGitNames.Add(step.GitName);
+            }
+            else if (updateResult == EPackageUpdateResult.RestoreAfterUpdateFailed)
+            {
+                notRestoredGitNames.Add(step.GitName);
             }
 
             //ჩავარდნისას განახლება ლოკალურად რჩება
@@ -139,6 +146,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         List<string> errorLines = [];
         AddErrorLine(errorLines, "sync before the update failed for", notSyncedGitNames);
         AddErrorLine(errorLines, "dotnet outdated failed for", failedGitNames);
+        AddErrorLine(errorLines, "restore after the update failed for", notRestoredGitNames);
         AddErrorLine(errorLines, "sync after the update failed for", notPushedGitNames);
         if (errorLines.Count == 0)
         {
@@ -150,10 +158,10 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         return false;
     }
 
-    private async Task<bool> Measure(PhaseTime phaseTime, Func<Task<bool>> action)
+    private async Task<T> Measure<T>(PhaseTime phaseTime, Func<Task<T>> action)
     {
         long timestamp = _timeProvider.GetTimestamp();
-        bool result = await action();
+        T result = await action();
         phaseTime.Add(_timeProvider.GetElapsedTime(timestamp));
         return result;
     }
@@ -167,7 +175,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"  {syncsBeforeTime.Count} syncs before an update (Prepare): {FormatTime(syncsBeforeTime.Elapsed)}"));
         WriteLine(string.Create(CultureInfo.InvariantCulture,
-            $"  {packageUpdatesTime.Count} package updates (restore, dotnet outdated): {FormatTime(packageUpdatesTime.Elapsed)}"));
+            $"  {packageUpdatesTime.Count} package updates (restore, dotnet outdated, check restore): {FormatTime(packageUpdatesTime.Elapsed)}"));
         WriteLine(string.Create(CultureInfo.InvariantCulture,
             $"  {syncsAfterTime.Count} syncs after an update (Update): {FormatTime(syncsAfterTime.Elapsed)}"));
     }

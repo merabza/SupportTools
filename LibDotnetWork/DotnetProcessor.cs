@@ -132,8 +132,17 @@ public sealed class DotnetProcessor
 
     public Result<(string, int)> UpdateOutdatedPackagesForProjectFolder(string projectFolderName, bool useErrorLine)
     {
-        return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"outdated -r -u {projectFolderName}", null,
-            useErrorLine);
+        return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet,
+            CreateUpdateOutdatedPackagesArguments(projectFolderName), null, useErrorLine);
+    }
+
+    //-n (--no-restore): CPM-ის პროექტებში dotnet outdated ვერსიებს Directory.Packages.props-ში თავად წერს. მის გარეშე ის
+    //თითო პროექტსა და პაკეტზე dotnet add package-ს უშვებდა restore-ის შემოწმებით და restore-ით: SystemTools-ის 18
+    //ვერსიისთვის 147 გაშვება, 262 წამი 10-ის ნაცვლად, იგივე ვერსიებით. ფაილის BOM-ს შლის (PackageUpdaterToolAction
+    //აბრუნებს), ხოლო გამოტოვებულ restore-ს RestoreAfterOutdated ცვლის
+    internal static string CreateUpdateOutdatedPackagesArguments(string projectFolderName)
+    {
+        return $"outdated -r -u -n {projectFolderName}";
     }
 
     //dotnet outdated ანალიზისას თითო პროექტზე პარალელურად უშვებს "dotnet msbuild <proj> /p:NoWarn=NU1605
@@ -144,6 +153,14 @@ public sealed class DotnetProcessor
     {
         return StShared.RunProcess(_useConsole, _logger, Dotnet,
             $"restore {solutionFileFullName} -p:NoWarn=NU1605 -p:TreatWarningsAsErrors=false", null, false);
+    }
+
+    //dotnet outdated -n-ით ჩაწერილი ვერსიების შემოწმება: ჩვეულებრივი restore პროექტების საკუთარი თვისებებით, როგორც
+    //build-ისას. ცვლის -n-ით გამოტოვებულ dotnet add package-ის restore-ს, ოღონდ ერთხელ სოლუშენზე. useErrorLine=false -
+    //ჩავარდნისას პაუზა არ კეთდება
+    public Result RestoreAfterOutdated(string solutionFileFullName)
+    {
+        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {solutionFileFullName}", null, false);
     }
 
     public Result Restore(string projectFileFullName)

@@ -10,6 +10,6 @@ public interface IOutdatedPackagesUpdateSteps
     Task<bool> SyncGits(string? projectName, bool includeRemoteProjects, string commitMessage,
         CancellationToken cancellationToken);
 
-    //false: პროექტის ფოლდერში ამ git-ის პაკეტები ვერ განახლდა
-    bool UpdatePackages(string projectName, string gitName);
+    //პროექტის ფოლდერში ამ git-ის პაკეტების განახლების შედეგი
+    EPackageUpdateResult UpdatePackages(string projectName, string gitName);
 }

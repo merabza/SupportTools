@@ -32,10 +32,12 @@ public sealed class OutdatedPackagesUpdateSteps : IOutdatedPackagesUpdateSteps
         return syncMultipleProjectsGitsToolAction.Run(cancellationToken);
     }
 
-    public bool UpdatePackages(string projectName, string gitName)
+    public EPackageUpdateResult UpdatePackages(string projectName, string gitName)
     {
         var packageUpdaterToolAction =
             PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName, gitName, true);
-        return packageUpdaterToolAction is not null && packageUpdaterToolAction.RunPackageUpdate();
+        return packageUpdaterToolAction is null
+            ? EPackageUpdateResult.OutdatedFailed
+            : packageUpdaterToolAction.RunPackageUpdate();
     }
 }

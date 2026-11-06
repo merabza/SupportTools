@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitData.Models;
+using LibGitWork;
 using LibGitWork.OutdatedPackages;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -79,26 +80,27 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
 
     //only a C# git runs restore and dotnet outdated
     [Fact]
-    public void UpdatePackages_WhenTheGitIsNotACSharpGit_ReturnsTrue()
+    public void UpdatePackages_WhenTheGitIsNotACSharpGit_ReturnsSuccess()
     {
         // Arrange
         AddGit("GitR", "git@github.com:x/GitR.git");
 
         // Act
-        bool result = CreateSut().UpdatePackages("PR", "GitR");
+        EPackageUpdateResult result = CreateSut().UpdatePackages("PR", "GitR");
 
         // Assert
-        Assert.True(result);
+        Assert.Equal(EPackageUpdateResult.Success, result);
     }
 
+    //reported with the failures of dotnet outdated
     [Fact]
-    public void UpdatePackages_WhenTheGitIsNotInGits_ReturnsFalse()
+    public void UpdatePackages_WhenTheGitIsNotInGits_ReturnsOutdatedFailed()
     {
         // Act
-        bool result = CreateSut().UpdatePackages("PR", "GitR");
+        EPackageUpdateResult result = CreateSut().UpdatePackages("PR", "GitR");
 
         // Assert
-        Assert.False(result);
+        Assert.Equal(EPackageUpdateResult.OutdatedFailed, result);
         Assert.Contains("GitSyncParameters is not created", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 

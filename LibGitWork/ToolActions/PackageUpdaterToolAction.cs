@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LibDotnetWork;
+using LibGitWork.OutdatedPackages;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -19,17 +19,26 @@ public sealed class PackageUpdaterToolAction : ToolAction
 
     //dotnet outdated-ის შიდა race დროებითია, განმეორება თითქმის ყოველთვის გადის
     private const int MaxAttempts = 3;
+    private readonly IPackageUpdaterCommands _commands;
     private readonly string _gitIgnorePathName;
     private readonly ILogger? _logger;
     private readonly string _projectFolderName;
 
+    private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters) : this(logger,
+        Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName),
+        gitSyncParameters.GitData.GitIgnorePatternName, new DotnetPackageUpdaterCommands(logger))
+    {
+    }
+
+    //dotnet-ის ბრძანებები პარამეტრადაა გამოტანილი, რომ ტესტებმა restore და dotnet outdated არ გაუშვან
     // ReSharper disable once ConvertToPrimaryConstructor
-    private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters) : base(logger, "Git Sync",
-        null, null)
+    internal PackageUpdaterToolAction(ILogger? logger, string projectFolderName, string gitIgnorePathName,
+        IPackageUpdaterCommands commands) : base(logger, "Git Sync", null, null)
     {
         _logger = logger;
-        _projectFolderName = Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName);
-        _gitIgnorePathName = gitSyncParameters.GitData.GitIgnorePatternName;
+        _projectFolderName = projectFolderName;
+        _gitIgnorePathName = gitIgnorePathName;
+        _commands = commands;
     }
 
     public static PackageUpdaterToolAction? Create(ILogger? logger, IParametersManager parametersManager,
@@ -49,23 +58,45 @@ public sealed class PackageUpdaterToolAction : ToolAction
         return null;
     }
 
-    //აბრუნებს false-ს, თუ dotnet outdated ყველა ცდაზე ჩავარდა. პაუზა არ კეთდება, რომ დანარჩენი რეპოების დამუშავება
-    //არ შეფერხდეს - ჩავარდნილი რეპოების შეჯამებას UpdateOutdatedPackagesToolAction ბოლოს ბეჭდავს
-    public bool RunPackageUpdate()
+    //აბრუნებს OutdatedFailed-ს, თუ dotnet outdated ყველა ცდაზე ჩავარდა, და RestoreAfterUpdateFailed-ს, თუ ჩაწერილი
+    //ვერსიებით სოლუშენი ვერ აღდგა. პაუზა არ კეთდება, რომ დანარჩენი რეპოების დამუშავება არ შეფერხდეს - ჩავარდნილი
+    //რეპოების შეჯამებას UpdateOutdatedPackagesToolAction ბოლოს ბეჭდავს
+    public EPackageUpdateResult RunPackageUpdate()
     {
         if (_gitIgnorePathName != CSharp)
         {
-            return true;
+            return EPackageUpdateResult.Success;
         }
 
-        var dotnetProcessor = new DotnetProcessor(_logger, true);
+        string? solutionFileName = GetSolutionFileName();
+        RestoreBeforeOutdated(solutionFileName);
 
-        RestoreBeforeOutdated(dotnetProcessor);
+        string propsFileName = Path.Combine(_projectFolderName, CentralPackageVersionsFile.FileName);
+        byte[]? propsBytesBefore = CentralPackageVersionsFile.ReadBytes(propsFileName);
+        bool updated = RunOutdated();
+        CentralPackageVersionsFile.RestoreLostBom(propsFileName, propsBytesBefore);
+        if (!updated)
+        {
+            return EPackageUpdateResult.OutdatedFailed;
+        }
 
+        //dotnet outdated -n ვერსიებს restore-ის შემოწმების გარეშე წერს. შემოწმება ერთხელ, სოლუშენზე კეთდება და მხოლოდ
+        //მაშინ, როცა ვერსიები შეიცვალა
+        if (solutionFileName is null || !CentralPackageVersionsFile.HasChanged(propsFileName, propsBytesBefore) ||
+            _commands.RestoreAfterOutdated(solutionFileName).IsSuccess)
+        {
+            return EPackageUpdateResult.Success;
+        }
+
+        StShared.WriteWarningLine($"restore after the update failed for {solutionFileName}", true, _logger);
+        return EPackageUpdateResult.RestoreAfterUpdateFailed;
+    }
+
+    private bool RunOutdated()
+    {
         for (int attempt = 1; attempt <= MaxAttempts; attempt++)
         {
-            Result<(string, int)> localResult =
-                dotnetProcessor.UpdateOutdatedPackagesForProjectFolder(_projectFolderName, false);
+            Result<(string, int)> localResult = _commands.UpdateOutdatedPackages(_projectFolderName);
             if (localResult.IsSuccess)
             {
                 return true;
@@ -90,24 +121,25 @@ public sealed class PackageUpdaterToolAction : ToolAction
     //obj-ფაილებზე ერთმანეთს ეჯახება ("Cannot create a file when that file already exists"). წინასწარი restore ამ
     //გაშვებებს no-op-ად აქცევს. კეთდება მხოლოდ მაშინ, როცა ფოლდერში ზუსტად ერთი სოლუშენია; ჩავარდნა არ აჩერებს,
     //dotnet outdated მაინც გაეშვება
-    private void RestoreBeforeOutdated(DotnetProcessor dotnetProcessor)
+    private void RestoreBeforeOutdated(string? solutionFileName)
+    {
+        if (solutionFileName is not null && _commands.RestoreForOutdated(solutionFileName).IsFailure)
+        {
+            StShared.WriteWarningLine($"restore before dotnet outdated failed for {solutionFileName}, continuing", true,
+                _logger);
+        }
+    }
+
+    //ფოლდერის ერთადერთი სოლუშენი; null, თუ ფოლდერი არ არსებობს, ან მასში სოლუშენი არ არის ან ერთზე მეტია
+    private string? GetSolutionFileName()
     {
         if (!Directory.Exists(_projectFolderName))
         {
-            return;
+            return null;
         }
 
         List<string> solutionFiles = [.. Directory.EnumerateFiles(_projectFolderName).Where(IsSolutionFile)];
-        if (solutionFiles.Count != 1)
-        {
-            return;
-        }
-
-        if (dotnetProcessor.RestoreForOutdated(solutionFiles[0]).IsFailure)
-        {
-            StShared.WriteWarningLine($"restore before dotnet outdated failed for {solutionFiles[0]}, continuing", true,
-                _logger);
-        }
+        return solutionFiles.Count == 1 ? solutionFiles[0] : null;
     }
 
     private static bool IsSolutionFile(string fileName)

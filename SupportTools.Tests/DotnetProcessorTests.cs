@@ -83,6 +83,18 @@ public sealed class DotnetProcessorTests
         Assert.DoesNotContain("SpaMode", result, StringComparison.Ordinal);
     }
 
+    //-n: dotnet outdated writes the versions into Directory.Packages.props itself, without one dotnet add package (with
+    //a restore preview and a restore) per project and package
+    [Fact]
+    public void CreateUpdateOutdatedPackagesArguments_UpgradesWithoutARestorePerPackage()
+    {
+        // Act
+        string result = DotnetProcessor.CreateUpdateOutdatedPackagesArguments(@"C:\Work\GitA");
+
+        // Assert
+        Assert.Equal(@"outdated -r -u -n C:\Work\GitA", result);
+    }
+
     [Fact]
     public void CreateRestoreWithoutHttpCacheArguments_SkipsTheHttpCache()
     {
