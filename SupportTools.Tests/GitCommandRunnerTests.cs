@@ -114,7 +114,7 @@ public sealed class GitCommandRunnerTests : IDisposable
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
         _logger.Verify(
-            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((state, _) => state.ToString() == message),
+            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((state, _) => state!.ToString() == message),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
     }

@@ -364,7 +364,7 @@ public sealed class GitCruderTests : IDisposable
         Assert.False(result);
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((state, _) => state.ToString() == "Error occurred during git validation"),
+                It.Is<It.IsAnyType>((state, _) => state!.ToString() == "Error occurred during git validation"),
                 It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 

@@ -880,7 +880,7 @@ public sealed class GitStsCruderTests : IDisposable
         Assert.False(result);
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((state, _) => state.ToString() == "Error occurred while validating GitDataModel"),
+                It.Is<It.IsAnyType>((state, _) => state!.ToString() == "Error occurred while validating GitDataModel"),
                 It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 
@@ -927,7 +927,7 @@ public sealed class GitStsCruderTests : IDisposable
     {
         _logger.Verify(
             x => x.Log(LogLevel.Warning, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((state, _) => state.ToString() == message), It.IsAny<Exception?>(),
+                It.Is<It.IsAnyType>((state, _) => state!.ToString() == message), It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 

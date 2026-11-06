@@ -631,7 +631,7 @@ public sealed class DistributeAllPackagesCliMenuCommandTests : IDisposable
 #pragma warning disable CA1873
         _logger.Verify(
             x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+                It.Is<It.IsAnyType>((value, _) => value!.ToString() == message), It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }

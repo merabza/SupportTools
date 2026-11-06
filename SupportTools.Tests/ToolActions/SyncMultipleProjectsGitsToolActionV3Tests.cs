@@ -778,7 +778,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
 #pragma warning disable CA1873
         logger.Verify(
             x => x.Log(logLevel, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString()!.StartsWith(textStart, StringComparison.Ordinal)),
+                It.Is<It.IsAnyType>((value, _) => value!.ToString()!.StartsWith(textStart, StringComparison.Ordinal)),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }
@@ -788,7 +788,7 @@ public sealed class SyncMultipleProjectsGitsToolActionV3Tests : IDisposable
     {
 #pragma warning disable CA1873
         logger.Verify(
-            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((value, _) => value.ToString() == text),
+            x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((value, _) => value!.ToString() == text),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
 #pragma warning restore CA1873
     }

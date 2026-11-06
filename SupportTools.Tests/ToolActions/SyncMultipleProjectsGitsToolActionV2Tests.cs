@@ -215,8 +215,9 @@ public sealed class SyncMultipleProjectsGitsToolActionV2Tests : IDisposable
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) =>
-                    value.ToString() == "supportToolsParameters.WorkFolder does not specified"), It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), logGitWork ? Times.Once() : Times.Never());
+                    value!.ToString() == "supportToolsParameters.WorkFolder does not specified"),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            logGitWork ? Times.Once() : Times.Never());
 #pragma warning restore CA1873
     }
 

@@ -320,7 +320,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 #pragma warning disable CA1873
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString() == "dotnet outdated failed for: GitA"),
+                It.Is<It.IsAnyType>((value, _) => value!.ToString() == "dotnet outdated failed for: GitA"),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             logGitWork ? Times.Once() : Times.Never());
 #pragma warning restore CA1873

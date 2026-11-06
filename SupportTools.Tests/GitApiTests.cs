@@ -94,7 +94,7 @@ public sealed class GitApiTests : IDisposable
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((state, _) =>
-                    state.ToString()!.Contains("process was finished with errors", StringComparison.Ordinal)),
+                    state!.ToString()!.Contains("process was finished with errors", StringComparison.Ordinal)),
                 It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
     }
 

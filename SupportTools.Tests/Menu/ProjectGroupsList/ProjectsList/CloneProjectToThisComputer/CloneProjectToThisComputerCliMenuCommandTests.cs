@@ -403,7 +403,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommandTests : IDisposable
 #pragma warning disable CA1873
         logger.Verify(
             x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString() ==
+                It.Is<It.IsAnyType>((value, _) => value!.ToString() ==
                                                   $"Clone Project To This Computer App finished, success: {!cloneFails}"),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873

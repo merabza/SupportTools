@@ -38,7 +38,7 @@ public sealed class ProjectToolsListFactoryStrategyTests
 #pragma warning disable CA1873
         _logger.Verify(
             x => x.Log(LogLevel.Warning, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, _) => v.ToString() == $"Project not found: {ProjectName}"), null,
+                It.Is<It.IsAnyType>((v, _) => v!.ToString() == $"Project not found: {ProjectName}"), null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
     }

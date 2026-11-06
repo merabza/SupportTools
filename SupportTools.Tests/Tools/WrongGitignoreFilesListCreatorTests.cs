@@ -265,7 +265,7 @@ public sealed class WrongGitignoreFilesListCreatorTests : IDisposable
     {
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString() == message), It.IsAny<Exception?>(),
+                It.Is<It.IsAnyType>((value, _) => value!.ToString() == message), It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
     }
 }
