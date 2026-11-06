@@ -2,47 +2,51 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using LibGitData.Models;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
+using SupportTools.Tests.OutdatedPackages;
 using SupportToolsData.Models;
 using Xunit;
 
 namespace SupportTools.Tests.ToolActions;
 
-//no git and no dotnet outdated run: WorkFolder is not set (the syncs stop before git), the gits that exist are Node
-//gits (their package update returns at once), and a git that is not in Gits fails like a failed dotnet outdated.
-//G1: P1 [GitA], P2 [GitA, MissingB], P3 [MissingP3], P5 [MissingX, MissingY]; G2: R1 (remote) [MissingR1]
+//no git and no dotnet outdated run: the steps are FakeOutdatedPackagesUpdateSteps, the clock is a ManualTimeProvider.
+//G1: P1 [GitA], P2 [GitA, GitB, Front (a React git)]; G2: R1 (remote) [GitC]
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 {
+    private const string CheckSync = "sync all: Update message Check";
+    private const string ContinueQuestion = "Some gits were not synced (see above). Continue updating packages?";
+
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly List<(string FieldName, string DefaultValue)> _inputs = [];
     private readonly Mock<ILogger> _logger = new();
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
     private readonly Mock<IParametersManager> _parametersManager = new();
+    private readonly List<(string Question, bool DefaultValue)> _questions = [];
+    private readonly FakeOutdatedPackagesUpdateSteps _steps = new();
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
+    private readonly ManualTimeProvider _timeProvider = new();
+    private bool _answer;
 
     public UpdateOutdatedPackagesToolActionTests()
     {
         _originalConsoleOutput = Console.Out;
         Console.SetOut(_consoleOutput);
 
-        _parameters.Gits["GitA"] = new GitDataModel
-        {
-            GitProjectAddress = "git@github.com:x/GitA.git",
-            GitProjectFolderName = "GitA",
-            GitIgnorePatternName = "Node"
-        };
+        AddGit("GitA", "CSharp");
+        AddGit("GitB", "CSharp");
+        AddGit("GitC", "CSharp");
+        AddGit("Front", "React");
         AddProject("P1", "G1", true, "GitA");
-        AddProject("P2", "G1", true, "GitA", "MissingB");
-        AddProject("P3", "G1", true, "MissingP3");
-        AddProject("P5", "G1", true, "MissingX", "MissingY");
-        AddProject("R1", "G2", false, "MissingR1");
+        AddProject("P2", "G1", true, "GitA", "GitB", "Front");
+        AddProject("R1", "G2", false, "GitC");
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
     }
 
@@ -50,7 +54,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
     {
         Console.SetOut(_originalConsoleOutput);
         _consoleOutput.Dispose();
-        GitTestRepositories.DeleteFolder(_tempFolder);
+        Directory.Delete(_tempFolder, true);
     }
 
     [Fact]
@@ -65,148 +69,237 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         Assert.Matches("^Update Packages [0-9]{12}$", defaultValue);
     }
 
-    //the single-git projects go first; a git done for one project is removed from the others, so P2 waits for GitA
-    //and goes in the second round; P5 never gets down to one git and is not processed
+    //P2 waits for GitA of P1 and does not wait for its React git
     [Fact]
-    public async Task Run_WhenSomeGitsFail_ProcessesSingleGitProjectsRoundByRoundAndReportsTheFailures()
+    public async Task Run_WhenEveryStepSucceeds_SyncsAllGitsFirstAndEachProjectBeforeAndAfterItsUpdate()
     {
         // Act
         bool result = await Create(null, null, false).Run();
 
         // Assert
-        Assert.False(result);
-        string output = _consoleOutput.ToString();
-        Assert.Contains("dotnet outdated failed for: MissingP3, MissingB" + Environment.NewLine, output,
-            StringComparison.Ordinal);
-        //one check sync of every project first, then a sync before and after the update of each processed project
-        Assert.Equal(7, CountOccurrences(output, "Sync Multiple Projects Gits V2 Started"));
+        Assert.True(result);
+        Assert.Equal(
+        [
+            CheckSync, "sync P1: Update message Prepare", "update P1/GitA", "sync P1: Update message Update",
+            "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
+        ], _steps.Steps);
+        Assert.Empty(_questions);
+        Assert.All(_steps.IncludeRemoteProjectsValues, Assert.False);
     }
 
-    //the gits are read with the console by every sync and by the package update of a project
     [Fact]
-    public async Task Run_WhenAGitHasNoAddress_ReportsItOnTheConsoleForEverySyncAndTheUpdate()
+    public async Task Run_WhenTheCheckSyncFailsAndTheAnswerIsNo_StopsBeforeTheUpdates()
     {
         // Arrange
-        _parameters.Projects.Remove("P2");
-        _parameters.Projects.Remove("P3");
-        _parameters.Projects.Remove("P5");
-        _parameters.Gits["NoAddress"] =
-            new GitDataModel { GitProjectFolderName = "NoAddress", GitIgnorePatternName = "Node" };
+        _steps.FailingSteps.Add(CheckSync);
 
         // Act
-        await Create(null, null, false).Run();
+        bool result = await Create(null, null, false).Run();
 
         // Assert
-        Assert.Equal(4,
-            CountOccurrences(_consoleOutput.ToString(), "GitProjectAddress is empty for Git Repo with key NoAddress)"));
+        Assert.False(result);
+        Assert.Equal([(ContinueQuestion, false)], _questions);
+        Assert.Equal([CheckSync], _steps.Steps);
     }
 
-    //the check sync commits the local changes with the given message and the "Check" suffix (real git, local remote)
     [Fact]
-    public async Task Run_WhenAGitHasLocalChanges_TheCheckSyncCommitsThemWithTheCheckMessage()
+    public async Task Run_WhenTheCheckSyncFailsAndTheAnswerIsYes_UpdatesThePackages()
     {
         // Arrange
-        string remote = GitTestRepositories.CreateRemote(_tempFolder, "GitR",
-            new Dictionary<string, string> { [".gitignore"] = "bin/", ["Readme.txt"] = "GitR" });
-        _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.Gits["GitR"] = new GitDataModel
-        {
-            GitProjectAddress = remote, GitProjectFolderName = "GitR", GitIgnorePatternName = "Node"
-        };
-        _parameters.Projects.Clear();
-        AddProject("PR", "G1", true, "GitR");
-        string clone = Path.Combine(_tempFolder, "PR", "GitR");
-        GitTestRepositories.RunGit("clone", remote, clone);
-        GitTestRepositories.ConfigureRepository(clone);
-        await File.WriteAllTextAsync(Path.Combine(clone, "New.txt"), "new");
+        _steps.FailingSteps.Add(CheckSync);
+        _answer = true;
 
         // Act
         bool result = await Create(null, null, false).Run();
 
         // Assert
         Assert.True(result);
-        Assert.Equal("Update message Check", GitTestRepositories.RunGit("-C", remote, "log", "-1", "--format=%s"));
+        Assert.Equal([(ContinueQuestion, false)], _questions);
+        Assert.Contains("update P2/GitB", _steps.Steps);
+    }
+
+    //a cancelled sync answers false like a failed one; the cancellation stops the run without the question
+    [Fact]
+    public async Task Run_WhenCancelledDuringTheCheckSync_StopsWithoutAsking()
+    {
+        // Arrange
+        using var cancellationTokenSource = new CancellationTokenSource();
+        _steps.FailingSteps.Add(CheckSync);
+        _steps.OnStep = _ => cancellationTokenSource.Cancel();
+
+        // Act
+        bool result = await Create(null, null, false).Run(cancellationTokenSource.Token);
+
+        // Assert
+        Assert.False(result);
+        Assert.Empty(_questions);
+        Assert.Equal([CheckSync], _steps.Steps);
+        Assert.Contains("Operation Canceled", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //GitA is still done for the order, so P2 updates GitB
+    [Fact]
+    public async Task Run_WhenASyncBeforeAnUpdateFails_SkipsThatGitAndUpdatesTheOthers()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("sync P1: Update message Prepare");
+
+        // Act
+        bool result = await Create(null, null, false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal(
+        [
+            CheckSync, "sync P1: Update message Prepare", "sync P2: Update message Prepare", "update P2/GitB",
+            "sync P2: Update message Update"
+        ], _steps.Steps);
+        Assert.Contains("sync before the update failed for: GitA" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    //the files that dotnet outdated already changed are synced as before
+    [Fact]
+    public async Task Run_WhenAPackageUpdateFails_StillSyncsTheProjectAndReportsTheGit()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("update P1/GitA");
+
+        // Act
+        bool result = await Create(null, null, false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("sync P1: Update message Update", _steps.Steps);
+        Assert.Contains("dotnet outdated failed for: GitA" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task Run_WhenRemoteProjectsAreIncluded_ProcessesThemToo()
+    public async Task Run_WhenASyncAfterAnUpdateFails_ReportsTheGitAndGoesOn()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("sync P1: Update message Update");
+
+        // Act
+        bool result = await Create(null, null, false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains("update P2/GitB", _steps.Steps);
+        Assert.Contains("sync after the update failed for: GitA" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Run_WhenStepsOfEveryKindFail_ReportsThemTogether()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("sync P1: Update message Prepare");
+        _steps.FailingSteps.Add("update P2/GitB");
+        _steps.FailingSteps.Add("sync P2: Update message Update");
+
+        // Act
+        bool result = await Create(null, null, false).Run();
+
+        // Assert
+        Assert.False(result);
+        Assert.Contains(
+            "sync before the update failed for: GitA" + Environment.NewLine + "dotnet outdated failed for: GitB" +
+            Environment.NewLine + "sync after the update failed for: GitB" + Environment.NewLine,
+            _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Run_WhenRemoteProjectsAreIncluded_UpdatesThemToo()
     {
         // Act
         bool result = await Create(null, null, true).Run();
 
         // Assert
-        Assert.False(result);
-        Assert.Contains("dotnet outdated failed for: MissingP3, MissingR1, MissingB" + Environment.NewLine,
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.True(result);
+        Assert.Contains("update R1/GitC", _steps.Steps);
+        Assert.All(_steps.IncludeRemoteProjectsValues, Assert.True);
     }
 
     [Fact]
-    public async Task Run_WhenRemoteProjectsAreNotIncluded_TheFirstSyncSkipsThemToo()
+    public async Task Run_WhenRemoteProjectsAreNotIncluded_LeavesThemOut()
     {
         // Act
         await Create(null, null, false).Run();
 
         // Assert
-        Assert.DoesNotContain("Git Project with name MissingR1 does not exists in project R1",
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.DoesNotContain(_steps.Steps, x => x.Contains("R1", StringComparison.Ordinal));
     }
 
+    //the check sync still covers every project
     [Fact]
-    public async Task Run_WhenEveryPackageUpdateSucceeds_ReturnsTrue()
-    {
-        // Arrange
-        _parameters.Projects.Remove("P2");
-        _parameters.Projects.Remove("P3");
-
-        // Act
-        bool result = await Create(null, null, false).Run();
-
-        // Assert
-        Assert.True(result);
-        string output = _consoleOutput.ToString();
-        Assert.Contains("Update Outdated Packages Started", output, StringComparison.Ordinal);
-        Assert.DoesNotContain("dotnet outdated failed", output, StringComparison.Ordinal);
-    }
-
-    //a git done for one project leaves another single-git project of the same round with nothing to do
-    [Fact]
-    public async Task Run_WhenTwoSingleGitProjectsShareTheGit_UpdatesItOnce()
-    {
-        // Arrange
-        _parameters.Projects.Remove("P2");
-        _parameters.Projects.Remove("P3");
-        AddProject("P4", "G1", true, "GitA");
-
-        // Act
-        bool result = await Create(null, null, false).Run();
-
-        // Assert
-        Assert.True(result);
-        Assert.DoesNotContain("Error when run Tool Action", _consoleOutput.ToString(), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task Run_WhenGroupIsGiven_ProcessesOnlyItsProjects()
+    public async Task Run_WhenGroupIsGiven_UpdatesOnlyItsProjects()
     {
         // Act
         bool result = await Create("G2", null, true).Run();
 
         // Assert
-        Assert.False(result);
-        Assert.Contains("dotnet outdated failed for: MissingR1" + Environment.NewLine, _consoleOutput.ToString(),
-            StringComparison.Ordinal);
+        Assert.True(result);
+        Assert.Equal(
+            [CheckSync, "sync R1: Update message Prepare", "update R1/GitC", "sync R1: Update message Update"],
+            _steps.Steps);
+    }
+
+    //alone, P2 has two C# gits left: they are updated one after the other in its folder
+    [Fact]
+    public async Task Run_WhenProjectIsGiven_UpdatesEveryCSharpGitOfIt()
+    {
+        // Act
+        bool result = await Create(null, "P2", false).Run();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(
+        [
+            CheckSync, "sync P2: Update message Prepare", "update P2/GitA", "sync P2: Update message Update",
+            "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
+        ], _steps.Steps);
     }
 
     [Fact]
-    public async Task Run_WhenProjectIsGiven_ProcessesOnlyIt()
+    public async Task Run_WhenCalled_WritesTheTimeOfEveryPhase()
     {
+        // Arrange
+        _steps.OnStep = step => _timeProvider.Advance(step switch
+        {
+            CheckSync => TimeSpan.FromMinutes(3),
+            _ when step.EndsWith(" Prepare", StringComparison.Ordinal) => TimeSpan.FromMinutes(1),
+            _ when step.StartsWith("update ", StringComparison.Ordinal) => TimeSpan.FromSeconds(2430),
+            _ => TimeSpan.FromSeconds(75)
+        });
+
         // Act
-        bool result = await Create(null, "P3", false).Run();
+        await Create(null, null, false).Run();
 
         // Assert
-        Assert.False(result);
-        Assert.Contains("dotnet outdated failed for: MissingP3" + Environment.NewLine, _consoleOutput.ToString(),
+        Assert.Contains(string.Join(Environment.NewLine, "Times of Update Outdated Packages:",
+            "  sync of all gits (Check): 00:03:00", "  2 syncs before an update (Prepare): 00:02:00",
+            "  2 package updates (restore, dotnet outdated): 01:21:00",
+            "  2 syncs after an update (Update): 00:02:30") + Environment.NewLine, _consoleOutput.ToString(),
             StringComparison.Ordinal);
+    }
+
+    //a git whose folder was not synced is not updated, so only its sync before the update counts
+    [Fact]
+    public async Task Run_WhenASyncBeforeAnUpdateFails_CountsOnlyTheStepsThatRan()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("sync P1: Update message Prepare");
+
+        // Act
+        await Create(null, null, false).Run();
+
+        // Assert
+        string output = _consoleOutput.ToString();
+        Assert.Contains("  2 syncs before an update (Prepare): ", output, StringComparison.Ordinal);
+        Assert.Contains("  1 package updates (restore, dotnet outdated): ", output, StringComparison.Ordinal);
+        Assert.Contains("  1 syncs after an update (Update): ", output, StringComparison.Ordinal);
     }
 
     //the summary of the failures is logged with the logger of the action
@@ -217,16 +310,17 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
     {
         // Arrange
         _parameters.LogGitWork = logGitWork;
+        _steps.FailingSteps.Add("update P1/GitA");
 
         // Act
-        await Create(null, "P3", false).Run();
+        await Create(null, "P1", false).Run();
 
         // Assert
         //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
 #pragma warning disable CA1873
         _logger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((value, _) => value.ToString() == "dotnet outdated failed for: MissingP3"),
+                It.Is<It.IsAnyType>((value, _) => value.ToString() == "dotnet outdated failed for: GitA"),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             logGitWork ? Times.Once() : Times.Never());
 #pragma warning restore CA1873
@@ -235,17 +329,26 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
     private UpdateOutdatedPackagesToolAction Create(string? projectGroupName, string? projectName,
         bool includeRemoteProjects)
     {
-        return UpdateOutdatedPackagesToolAction.Create(_logger.Object, _parametersManager.Object, projectGroupName,
-            projectName, includeRemoteProjects, true, (fieldName, defaultValue) =>
+        return UpdateOutdatedPackagesToolAction.Create(_logger.Object, _parametersManager.Object, _steps,
+            projectGroupName, projectName, includeRemoteProjects, true, (fieldName, defaultValue) =>
             {
                 _inputs.Add((fieldName, defaultValue));
                 return "Update message";
-            });
+            }, (question, defaultValue) =>
+            {
+                _questions.Add((question, defaultValue));
+                return _answer;
+            }, _timeProvider);
     }
 
-    private static int CountOccurrences(string text, string value)
+    private void AddGit(string gitName, string gitIgnorePatternName)
     {
-        return text.Split(value).Length - 1;
+        _parameters.Gits[gitName] = new GitDataModel
+        {
+            GitProjectAddress = $"git@github.com:x/{gitName}.git",
+            GitProjectFolderName = gitName,
+            GitIgnorePatternName = gitIgnorePatternName
+        };
     }
 
     private void AddProject(string projectName, string groupName, bool isLocal, params string[] gitNames)

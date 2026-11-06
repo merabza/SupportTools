@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LibGitWork.OutdatedPackages;
 using LibGitWork.ToolCommandParameters;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -18,33 +19,42 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
     //false: მხოლოდ ამ კომპიუტერზე არსებული პროექტები მუშავდება და დანარჩენები არ იკლონება (D3)
     private readonly bool _includeRemoteProjects;
 
+    //კითხვა (ტექსტი, ნაგულისხმევი პასუხი). ბრძანება კონსოლს აწვდის, ტესტები - თავიანთ პასუხს
+    private readonly Func<string, bool, bool> _inputBool;
+
     //commit-ის შეტყობინების შეყვანა (ველის სახელი, ნაგულისხმევი მნიშვნელობა). ბრძანება კონსოლს აწვდის, ტესტები - თავიანთ პასუხს
     private readonly Func<string, string, string> _inputMessage;
     private readonly ILogger? _logger;
-    private readonly IParametersManager _parametersManager;
+    private readonly IOutdatedPackagesUpdateSteps _steps;
+    private readonly TimeProvider _timeProvider;
     private readonly UpdateOutdatedPackagesParameters _updateOutdatedPackagesParameters;
 
-    private UpdateOutdatedPackagesToolAction(ILogger? logger, IParametersManager parametersManager,
-        UpdateOutdatedPackagesParameters updateOutdatedPackagesParameters, bool includeRemoteProjects, bool useConsole,
-        Func<string, string, string> inputMessage) : base(logger, "Update Outdated Packages", null, null, useConsole)
+    private UpdateOutdatedPackagesToolAction(ILogger? logger,
+        UpdateOutdatedPackagesParameters updateOutdatedPackagesParameters, IOutdatedPackagesUpdateSteps steps,
+        bool includeRemoteProjects, bool useConsole, Func<string, string, string> inputMessage,
+        Func<string, bool, bool> inputBool, TimeProvider timeProvider) : base(logger, "Update Outdated Packages", null,
+        null, useConsole)
     {
         _logger = logger;
-        _parametersManager = parametersManager;
         _updateOutdatedPackagesParameters = updateOutdatedPackagesParameters;
+        _steps = steps;
         _includeRemoteProjects = includeRemoteProjects;
         _inputMessage = inputMessage;
+        _inputBool = inputBool;
+        _timeProvider = timeProvider;
     }
 
     public static UpdateOutdatedPackagesToolAction Create(ILogger logger, IParametersManager parametersManager,
-        string? projectGroupName, string? projectName, bool includeRemoteProjects, bool useConsole,
-        Func<string, string, string> inputMessage)
+        IOutdatedPackagesUpdateSteps steps, string? projectGroupName, string? projectName, bool includeRemoteProjects,
+        bool useConsole, Func<string, string, string> inputMessage, Func<string, bool, bool> inputBool,
+        TimeProvider timeProvider)
     {
         var supportToolsParameters = (SupportToolsParameters)parametersManager.Parameters;
         var updateOutdatedPackagesParameters =
             UpdateOutdatedPackagesParameters.Create(supportToolsParameters, projectGroupName, projectName);
         ILogger? loggerOrNull = supportToolsParameters.LogGitWork ? logger : null;
-        return new UpdateOutdatedPackagesToolAction(loggerOrNull, parametersManager, updateOutdatedPackagesParameters,
-            includeRemoteProjects, useConsole, inputMessage);
+        return new UpdateOutdatedPackagesToolAction(loggerOrNull, updateOutdatedPackagesParameters, steps,
+            includeRemoteProjects, useConsole, inputMessage, inputBool, timeProvider);
     }
 
     protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
@@ -52,64 +62,54 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         string useMessage = _inputMessage("Message", $"Update Packages {DateTime.Now.ToString("yyyyMMddHHmm",
             CultureInfo.InvariantCulture)}");
 
-        var syncOneProjectAllGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger, _parametersManager,
-            null, null, true, $"{useMessage} Check", _includeRemoteProjects);
-        await syncOneProjectAllGitsToolAction.Run(cancellationToken);
-
-        IEnumerable<KeyValuePair<string, ProjectModel>> projectsList =
-            ProjectPresence.Filter(GetProjectsList(), _includeRemoteProjects);
-
-        List<KeyValuePair<string, ProjectModel>> projectsListOrdered = [.. projectsList.OrderBy(o => o.Key)];
-
-        //var packageUpdaters = new Dictionary<string, PackageUpdater>();
-        var projectGitProjectNames = new Dictionary<string, List<string>>();
-        //var updatedGitProjectNames = new List<string>();
-        var failedGitProjectNames = new List<string>();
-
-        foreach ((string projectName, ProjectModel project) in projectsListOrdered)
+        var checkSyncTime = new PhaseTime();
+        bool checkSynced = await Measure(checkSyncTime,
+            () => _steps.SyncGits(null, _includeRemoteProjects, $"{useMessage} Check", cancellationToken));
+        cancellationToken.ThrowIfCancellationRequested();
+        //ჩავარდნილი ფოლდერები სინქრონიზაციის ანგარიშშია. გაგრძელებისას თითოეულ პროექტს განახლების წინ სინქრონიზაცია
+        //თავიდან სცდის (მომხმარებლის არჩევანი)
+        if (!checkSynced &&
+            !_inputBool("Some gits were not synced (see above). Continue updating packages?", false))
         {
-            projectGitProjectNames.Add(projectName, [.. project.GitProjectNames]);
+            return false;
         }
 
-        int lastProjectsCount = projectGitProjectNames.Count + 1;
-        while (projectGitProjectNames.Count > 0 && projectGitProjectNames.Count < lastProjectsCount)
+        List<OutdatedPackagesUpdateStep> steps = OutdatedPackagesUpdateOrder.Create(
+            ProjectPresence.Filter(GetProjectsList(), _includeRemoteProjects), _updateOutdatedPackagesParameters.Gits);
+
+        var syncsBeforeTime = new PhaseTime();
+        var packageUpdatesTime = new PhaseTime();
+        var syncsAfterTime = new PhaseTime();
+        //var packageUpdaters = new Dictionary<string, PackageUpdater>();
+        //var updatedGitProjectNames = new List<string>();
+        var notSyncedGitNames = new List<string>();
+        var failedGitNames = new List<string>();
+        var notPushedGitNames = new List<string>();
+        foreach (OutdatedPackagesUpdateStep step in steps)
         {
-            lastProjectsCount = projectGitProjectNames.Count;
-            foreach (KeyValuePair<string, List<string>> kvp in projectGitProjectNames.Where(x => x.Value.Count == 1)
-                         .ToList())
+            cancellationToken.ThrowIfCancellationRequested();
+
+            //დაუსინქრონებელ ფოლდერზე git არ ახლდება, დანარჩენები კი გრძელდება (მომხმარებლის არჩევანი)
+            if (!await Measure(syncsBeforeTime,
+                    () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Prepare",
+                        cancellationToken)))
             {
-                string projectName = kvp.Key;
+                notSyncedGitNames.Add(step.GitName);
+                continue;
+            }
 
-                var syncOneGroupAllProjectsGitsToolAction = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
-                    _parametersManager, null, projectName, true, $"{useMessage} Prepare");
-                await syncOneGroupAllProjectsGitsToolAction.Run(cancellationToken);
+            if (!await Measure(packageUpdatesTime,
+                    () => Task.FromResult(_steps.UpdatePackages(step.ProjectName, step.GitName))))
+            {
+                failedGitNames.Add(step.GitName);
+            }
 
-                if (kvp.Value.Count == 0)
-                {
-                    continue;
-                }
-
-                string gitProjectName = kvp.Value[0];
-
-                var packageUpdaterToolAction = PackageUpdaterToolAction.Create(_logger, _parametersManager, projectName,
-                    gitProjectName, true);
-                if (packageUpdaterToolAction is null || !packageUpdaterToolAction.RunPackageUpdate())
-                {
-                    failedGitProjectNames.Add(gitProjectName);
-                }
-
-                foreach (KeyValuePair<string, List<string>> pair in projectGitProjectNames)
-                {
-                    pair.Value.Remove(gitProjectName);
-                }
-
-                projectGitProjectNames.Remove(projectName);
-                projectGitProjectNames.Where(x => x.Value.Count == 0).ToList()
-                    .ForEach(x => projectGitProjectNames.Remove(x.Key));
-
-                var syncOneGroupAllProjectsGitsToolAction2 = SyncMultipleProjectsGitsToolActionV2.Create(_logger,
-                    _parametersManager, null, projectName, true, $"{useMessage} Update");
-                await syncOneGroupAllProjectsGitsToolAction2.Run(cancellationToken);
+            //ჩავარდნისას განახლება ლოკალურად რჩება
+            if (!await Measure(syncsAfterTime,
+                    () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Update",
+                        cancellationToken)))
+            {
+                notPushedGitNames.Add(step.GitName);
             }
         }
 
@@ -134,15 +134,65 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         //    packageUpdater.Run();
         //}
 
-        if (failedGitProjectNames.Count == 0)
+        WriteTimes(checkSyncTime, syncsBeforeTime, packageUpdatesTime, syncsAfterTime);
+
+        List<string> errorLines = [];
+        AddErrorLine(errorLines, "sync before the update failed for", notSyncedGitNames);
+        AddErrorLine(errorLines, "dotnet outdated failed for", failedGitNames);
+        AddErrorLine(errorLines, "sync after the update failed for", notPushedGitNames);
+        if (errorLines.Count == 0)
         {
             return true;
         }
 
         //ჩავარდნილი რეპოების შეჯამება ბოლოს, ერთი პაუზით
-        StShared.WriteErrorLine($"dotnet outdated failed for: {string.Join(", ", failedGitProjectNames)}", true,
-            _logger);
+        StShared.WriteErrorLine(string.Join(Environment.NewLine, errorLines), true, _logger);
         return false;
+    }
+
+    private async Task<bool> Measure(PhaseTime phaseTime, Func<Task<bool>> action)
+    {
+        long timestamp = _timeProvider.GetTimestamp();
+        bool result = await action();
+        phaseTime.Add(_timeProvider.GetElapsedTime(timestamp));
+        return result;
+    }
+
+    //ეტაპების ხანგრძლივობა: მისი მიხედვით გადაწყდება, ღირს თუ არა git-ის ან dotnet outdated-ის შემდგომი დაჩქარება
+    private void WriteTimes(PhaseTime checkSyncTime, PhaseTime syncsBeforeTime, PhaseTime packageUpdatesTime,
+        PhaseTime syncsAfterTime)
+    {
+        WriteLine("Times of Update Outdated Packages:");
+        WriteLine($"  sync of all gits (Check): {FormatTime(checkSyncTime.Elapsed)}");
+        WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"  {syncsBeforeTime.Count} syncs before an update (Prepare): {FormatTime(syncsBeforeTime.Elapsed)}"));
+        WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"  {packageUpdatesTime.Count} package updates (restore, dotnet outdated): {FormatTime(packageUpdatesTime.Elapsed)}"));
+        WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"  {syncsAfterTime.Count} syncs after an update (Update): {FormatTime(syncsAfterTime.Elapsed)}"));
+    }
+
+    private static string FormatTime(TimeSpan time)
+    {
+        return string.Create(CultureInfo.InvariantCulture,
+            $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}");
+    }
+
+    private void WriteLine(string text)
+    {
+        Console.WriteLine(text);
+        if (_logger is not null && _logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("{Text}", text);
+        }
+    }
+
+    private static void AddErrorLine(List<string> errorLines, string text, List<string> gitNames)
+    {
+        if (gitNames.Count > 0)
+        {
+            errorLines.Add($"{text}: {string.Join(", ", gitNames)}");
+        }
     }
 
     private IEnumerable<KeyValuePair<string, ProjectModel>> GetProjectsList()
@@ -162,5 +212,18 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
 
         return _updateOutdatedPackagesParameters.Projects.Where(x =>
             x.Key == _updateOutdatedPackagesParameters.ProjectName);
+    }
+
+    //ეტაპის გაშვებების რაოდენობა და ჯამური ხანგრძლივობა
+    private sealed class PhaseTime
+    {
+        public int Count { get; private set; }
+        public TimeSpan Elapsed { get; private set; }
+
+        public void Add(TimeSpan elapsed)
+        {
+            Count++;
+            Elapsed += elapsed;
+        }
     }
 }

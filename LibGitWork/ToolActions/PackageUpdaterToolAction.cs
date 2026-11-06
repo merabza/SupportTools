@@ -15,7 +15,7 @@ namespace LibGitWork.ToolActions;
 
 public sealed class PackageUpdaterToolAction : ToolAction
 {
-    private const string CSharp = "CSharp";
+    internal const string CSharp = "CSharp";
 
     //dotnet outdated-ის შიდა race დროებითია, განმეორება თითქმის ყოველთვის გადის
     private const int MaxAttempts = 3;

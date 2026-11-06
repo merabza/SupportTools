@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using LibGitData.Models;
@@ -9,22 +10,26 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.UpdateOutdatedPackages;
+using SupportTools.Tests.OutdatedPackages;
 using SupportToolsData.Models;
 using Xunit;
 
 namespace SupportTools.Tests.Menu.UpdateOutdatedPackages;
 
-//no git and no dotnet outdated run: WorkFolder is not set, Local1's git is a Node git (its update returns at once)
-//and Remote1's git is not in Gits, so including Remote1 makes the command fail
+//no git and no dotnet outdated run: the steps are FakeOutdatedPackagesUpdateSteps. Local1 [GitA] exists here,
+//Remote1 [MissingGit] does not
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
 {
+    private const string RemoteQuestion = "Include 1 remote-only projects (their gits will be cloned to this computer)?";
+
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly List<string> _messageFieldNames = [];
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
     private readonly Mock<IParametersManager> _parametersManager = new();
     private readonly List<(string Question, bool DefaultValue)> _questions = [];
+    private readonly FakeOutdatedPackagesUpdateSteps _steps = new();
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
     private bool _answer;
 
@@ -37,7 +42,7 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
         {
             GitProjectAddress = "git@github.com:x/GitA.git",
             GitProjectFolderName = "GitA",
-            GitIgnorePatternName = "Node"
+            GitIgnorePatternName = "CSharp"
         };
         _parameters.Projects["Local1"] =
             new ProjectModel { ProjectFolderName = _tempFolder, GitProjectNames = ["GitA"] };
@@ -59,7 +64,8 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
     public void Constructor_WhenCreated_AsksBeforeRunningAndReloadsTheMenu()
     {
         // Act
-        var sut = new UpdateOutdatedPackagesCliMenuCommand(new Mock<ILogger>().Object, _parametersManager.Object);
+        var sut = new UpdateOutdatedPackagesCliMenuCommand(new Mock<ILogger>().Object,
+            new Mock<IHttpClientFactory>().Object, _parametersManager.Object);
 
         // Assert
         Assert.Equal("Update Outdated Packages", sut.Name);
@@ -76,9 +82,14 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal([("Include 1 remote-only projects (their gits will be cloned to this computer)?", false)],
-            _questions);
+        Assert.Equal([(RemoteQuestion, false)], _questions);
         Assert.Equal(["Message"], _messageFieldNames);
+        Assert.Equal(
+        [
+            "sync all: Update message Check", "sync Local1: Update message Prepare", "update Local1/GitA",
+            "sync Local1: Update message Update"
+        ], _steps.Steps);
+        Assert.All(_steps.IncludeRemoteProjectsValues, Assert.False);
         Assert.Contains("Update Outdated Packages Finished", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
@@ -92,8 +103,9 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
         bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
 
         // Assert
-        Assert.False(result);
-        Assert.Contains("dotnet outdated failed for: MissingGit", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.True(result);
+        Assert.Contains("update Remote1/MissingGit", _steps.Steps);
+        Assert.All(_steps.IncludeRemoteProjectsValues, Assert.True);
     }
 
     [Fact]
@@ -110,9 +122,25 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
         Assert.Empty(_questions);
     }
 
+    //the question whether to go on after a failed sync of all gits is asked through the same input as the first one
+    [Fact]
+    public async Task RunBody_WhenTheCheckSyncFails_AsksWhetherToContinue()
+    {
+        // Arrange
+        _parameters.Projects.Remove("Remote1");
+        _steps.FailingSteps.Add("sync all: Update message Check");
+
+        // Act
+        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut());
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal([("Some gits were not synced (see above). Continue updating packages?", false)], _questions);
+    }
+
     private UpdateOutdatedPackagesCliMenuCommand CreateSut()
     {
-        return new UpdateOutdatedPackagesCliMenuCommand(new Mock<ILogger>().Object, _parametersManager.Object,
+        return new UpdateOutdatedPackagesCliMenuCommand(new Mock<ILogger>().Object, _parametersManager.Object, _steps,
             (question, defaultValue) =>
             {
                 _questions.Add((question, defaultValue));

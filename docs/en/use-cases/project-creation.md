@@ -113,12 +113,27 @@ Use during routine maintenance to bump dependencies.
 
 **What it does**
 
-* Syncs all Git repositories first (so updates land on current code)
-* Iterates over Git repositories; for each one runs `dotnet restore` on
-its solution (only when the folder holds exactly one `.sln`/`.slnx`) and
-then `dotnet outdated -r -u`, up to 3 attempts without pausing
-* Re-syncs after each repository's updates
-* Prints the repositories where `dotnet outdated` still failed at the end
+* Syncs all Git repositories first with the V3 sync (`Check`), so updates
+land on current code. If a folder fails, it asks
+`Continue updating packages?` (default `n`)
+* Updates the C# repositories one by one, each in the folder of a project
+that uses it and after the repositories it depends on: a repository's
+turn comes when it is the only one left in the list of some project
+(repositories of other types, e.g. React fronts, are not waited for).
+When no project has a single one left, the repository used by the most
+remaining projects goes first (e.g. `SupportToolsServerShared`)
+* For each repository: syncs that project (V3, `Prepare`), runs
+`dotnet restore` on its solution (only when the folder holds exactly one
+`.sln`/`.slnx`) and then `dotnet outdated -r -u`, up to 3 attempts
+without pausing, and syncs the project again (V3, `Update`) to commit and
+push the update. V3 leaves unchanged folders alone, so these syncs reach
+the Git server only for the folders that an earlier push made old or that
+the update changed
+* If the sync before an update fails, that repository is skipped; if the
+sync after it fails, the update stays local. The others go on
+* At the end prints how long each phase took (the sync of all
+repositories, the syncs before and after the updates, the package
+updates) and the repositories whose sync or `dotnet outdated` failed
 
 The pre-restore uses the same MSBuild properties as `dotnet outdated`, so
 the tool's parallel per-project restores become no-ops and stop colliding
