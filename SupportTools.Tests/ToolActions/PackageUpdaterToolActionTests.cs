@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using LibGitWork;
@@ -9,12 +8,13 @@ using Xunit;
 
 namespace SupportTools.Tests.ToolActions;
 
-//no restore and no dotnet outdated run: the commands are FakePackageUpdaterCommands. The git folder GitA holds GitA.slnx
-//and a Directory.Packages.props with a BOM; a dotnet outdated that writes versions rewrites the file without the BOM, as
-//the real one does with -n
-[Collection(ConsoleCaptureCollection.Name)]
+//no restore and no dotnet outdated run: the commands are FakePackageUpdaterCommands, the steps and lines are recorded
+//by FakePackageUpdateOutput. The git folder GitA holds GitA.slnx and a Directory.Packages.props with a BOM; a dotnet
+//outdated that writes versions rewrites the file without the BOM, as the real one does with -n
 public sealed class PackageUpdaterToolActionTests : IDisposable
 {
+    private const string FakeError = "the fake command failed";
+
     private const string OldText =
         "<Project>\r\n  <ItemGroup>\r\n    <PackageVersion Include=\"Polly\" Version=\"8.8.0\" />\r\n  </ItemGroup>\r\n</Project>\r\n";
 
@@ -22,18 +22,14 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
         "<Project>\r\n  <ItemGroup>\r\n    <PackageVersion Include=\"Polly\" Version=\"8.9.0\" />\r\n  </ItemGroup>\r\n</Project>\r\n";
 
     private readonly FakePackageUpdaterCommands _commands = new();
-    private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly string _gitFolder;
-    private readonly TextWriter _originalConsoleOutput;
+    private readonly FakePackageUpdateOutput _output = new();
     private readonly string _propsFile;
     private readonly string _solutionFile;
     private readonly string _tempFolder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
 
     public PackageUpdaterToolActionTests()
     {
-        _originalConsoleOutput = Console.Out;
-        Console.SetOut(_consoleOutput);
-
         _gitFolder = Path.Combine(_tempFolder, "GitA");
         Directory.CreateDirectory(_gitFolder);
         _solutionFile = Path.Combine(_gitFolder, "GitA.slnx");
@@ -44,8 +40,6 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
 
     public void Dispose()
     {
-        Console.SetOut(_originalConsoleOutput);
-        _consoleOutput.Dispose();
         Directory.Delete(_tempFolder, true);
     }
 
@@ -53,23 +47,26 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
     public void RunPackageUpdate_WhenTheGitIsNotACSharpGit_RunsNothing()
     {
         // Act
-        EPackageUpdateResult result = CreateSut("Node").RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut("Node").RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Empty(_commands.Commands);
+        Assert.Empty(_output.Statuses);
     }
 
-    //nothing was written, so there is nothing to check
+    //nothing was written, so there is nothing to check and nothing to report
     [Fact]
     public void RunPackageUpdate_WhenNothingIsOutdated_DoesNotRestoreAgain()
     {
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Equal(["restore for outdated GitA.slnx", "outdated GitA"], _commands.Commands);
+        Assert.Equal(["restore", "dotnet outdated"], _output.Statuses);
+        Assert.Empty(_output.Lines);
         Assert.Equal(WithBom(OldText), File.ReadAllBytes(_propsFile));
     }
 
@@ -77,50 +74,78 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
     public void RunPackageUpdate_WhenVersionsAreWritten_PutsTheBomBackAndRestoresTheSolution()
     {
         // Arrange
-        _commands.OnOutdated = WriteNewVersions;
+        _commands.OnOutdated = () => WriteProps(NewText);
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Equal(["restore for outdated GitA.slnx", "outdated GitA", "restore after outdated GitA.slnx"],
             _commands.Commands);
+        Assert.Equal(["restore", "dotnet outdated", "check restore"], _output.Statuses);
+        Assert.Equal(("1 package version updated", (ConsoleColor?)null), Assert.Single(_output.Lines));
         Assert.Equal(WithBom(NewText), File.ReadAllBytes(_propsFile));
     }
 
     [Fact]
-    public void RunPackageUpdate_WhenTheRestoreAfterTheUpdateFails_ReportsIt()
+    public void RunPackageUpdate_WhenSeveralVersionsAreWritten_CountsThem()
     {
         // Arrange
-        _commands.OnOutdated = WriteNewVersions;
+        const string versionsBefore =
+            "<PackageVersion Include=\"A\" Version=\"1.0.0\" />\r\n" +
+            "<PackageVersion Include=\"B\" Version=\"2.0.0\" />\r\n";
+        File.WriteAllBytes(_propsFile, WithBom(versionsBefore));
+        _commands.OnOutdated = () => WriteProps(versionsBefore.Replace("1.0.0", "1.0.1", StringComparison.Ordinal)
+            .Replace("2.0.0", "2.1.0", StringComparison.Ordinal));
+
+        // Act
+        CreateSut().RunPackageUpdate(_output);
+
+        // Assert
+        Assert.Equal(("2 package versions updated", (ConsoleColor?)null), Assert.Single(_output.Lines));
+    }
+
+    [Fact]
+    public void RunPackageUpdate_WhenTheRestoreAfterTheUpdateFails_ReportsItInRed()
+    {
+        // Arrange
+        _commands.OnOutdated = () => WriteProps(NewText);
         _commands.RestoreAfterOutdatedFails = true;
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.RestoreAfterUpdateFailed, result);
-        Assert.Contains($"restore after the update failed for {_solutionFile}", _consoleOutput.ToString(),
-            StringComparison.Ordinal);
+        (string text, ConsoleColor? color) = _output.Lines[^1];
+        Assert.Equal($"restore after the update failed for {_solutionFile}{Environment.NewLine}{FakeError}", text);
+        Assert.Equal(ConsoleColor.Red, color);
     }
 
-    //the versions written before the failure get the BOM back and are not checked
+    //the attempts before the last one are warnings; the versions written before the failure get the BOM back and are
+    //not checked
     [Fact]
-    public void RunPackageUpdate_WhenDotnetOutdatedFailsEveryTime_ReportsItWithoutTheCheck()
+    public void RunPackageUpdate_WhenDotnetOutdatedFailsEveryTime_ReportsTheLastAttemptInRed()
     {
         // Arrange
-        _commands.OnOutdated = WriteNewVersions;
+        _commands.OnOutdated = () => WriteProps(NewText);
         _commands.OutdatedFailures = 3;
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.OutdatedFailed, result);
         Assert.Equal(["restore for outdated GitA.slnx", "outdated GitA", "outdated GitA", "outdated GitA"],
             _commands.Commands);
-        Assert.Contains("(attempt 3 of 3)", _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Equal(
+            ["restore", "dotnet outdated", "dotnet outdated, attempt 2 of 3", "dotnet outdated, attempt 3 of 3"],
+            _output.Statuses);
+        Assert.Equal<ConsoleColor?>([ConsoleColor.Yellow, ConsoleColor.Yellow, ConsoleColor.Red],
+            _output.Lines.ConvertAll(x => x.Color));
+        Assert.Equal($"dotnet outdated failed for {_gitFolder} (attempt 3 of 3){Environment.NewLine}{FakeError}",
+            _output.Lines[^1].Text);
         Assert.Equal(WithBom(NewText), File.ReadAllBytes(_propsFile));
     }
 
@@ -131,28 +156,33 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
         _commands.OutdatedFailures = 1;
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Equal(["restore for outdated GitA.slnx", "outdated GitA", "outdated GitA"], _commands.Commands);
-        Assert.Contains("(attempt 1 of 3)", _consoleOutput.ToString(), StringComparison.Ordinal);
+        (string text, ConsoleColor? color) = Assert.Single(_output.Lines);
+        Assert.StartsWith($"dotnet outdated failed for {_gitFolder} (attempt 1 of 3)", text, StringComparison.Ordinal);
+        Assert.Equal(ConsoleColor.Yellow, color);
     }
 
     [Fact]
-    public void RunPackageUpdate_WhenTheRestoreBeforeOutdatedFails_GoesOn()
+    public void RunPackageUpdate_WhenTheRestoreBeforeOutdatedFails_WarnsAndGoesOn()
     {
         // Arrange
         _commands.RestoreForOutdatedFails = true;
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Equal(["restore for outdated GitA.slnx", "outdated GitA"], _commands.Commands);
-        Assert.Contains($"restore before dotnet outdated failed for {_solutionFile}, continuing",
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        (string text, ConsoleColor? color) = Assert.Single(_output.Lines);
+        Assert.Equal(
+            $"restore before dotnet outdated failed for {_solutionFile}, continuing{Environment.NewLine}{FakeError}",
+            text);
+        Assert.Equal(ConsoleColor.Yellow, color);
     }
 
     //without a single solution there is nothing to restore, before or after the update
@@ -168,14 +198,15 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
             File.WriteAllText(Path.Combine(_gitFolder, $"GitA{i}.sln"), string.Empty);
         }
 
-        _commands.OnOutdated = WriteNewVersions;
+        _commands.OnOutdated = () => WriteProps(NewText);
 
         // Act
-        EPackageUpdateResult result = CreateSut().RunPackageUpdate();
+        EPackageUpdateResult result = CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(EPackageUpdateResult.Success, result);
         Assert.Equal(["outdated GitA"], _commands.Commands);
+        Assert.Equal(["dotnet outdated"], _output.Statuses);
         Assert.Equal(WithBom(NewText), File.ReadAllBytes(_propsFile));
     }
 
@@ -186,7 +217,7 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
         Directory.Delete(_gitFolder, true);
 
         // Act
-        CreateSut().RunPackageUpdate();
+        CreateSut().RunPackageUpdate(_output);
 
         // Assert
         Assert.Equal(["outdated GitA"], _commands.Commands);
@@ -198,10 +229,9 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
     }
 
     //as dotnet outdated -n does: File.WriteAllText keeps the line breaks of the text and writes no BOM
-    private void WriteNewVersions()
+    private void WriteProps(string text)
     {
-        File.WriteAllText(_propsFile,
-            File.ReadAllText(_propsFile).Replace("8.8.0", "8.9.0", StringComparison.Ordinal));
+        File.WriteAllText(_propsFile, text);
     }
 
     private static byte[] WithBom(string text)

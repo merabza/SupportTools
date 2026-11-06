@@ -25,17 +25,17 @@ internal sealed class FakePackageUpdaterCommands : IPackageUpdaterCommands
         return RestoreForOutdatedFails ? Result.Failure(FakeError) : Result.Success();
     }
 
-    public Result<(string, int)> UpdateOutdatedPackages(string projectFolderName)
+    public Result UpdateOutdatedPackages(string projectFolderName)
     {
         Commands.Add($"outdated {Path.GetFileName(projectFolderName)}");
         OnOutdated?.Invoke();
         if (OutdatedFailures == 0)
         {
-            return Result.Success((string.Empty, 0));
+            return Result.Success();
         }
 
         OutdatedFailures--;
-        return Result.Failure<(string, int)>(FakeError);
+        return Result.Failure(FakeError);
     }
 
     public Result RestoreAfterOutdated(string solutionFileFullName)

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using LibGitWork.OutdatedPackages;
 using LibGitWork.ToolActions;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -40,7 +42,11 @@ public sealed class PackageUpdater
     {
         if (_packageUpdaterToolActionList.Count > 0)
         {
-            _packageUpdaterToolActionList[0].RunPackageUpdate();
+            new OutdatedPackagesParallelUpdater(_logger, null).Run(
+            [
+                new PackageUpdateJob(_gitProjectName, string.Empty,
+                    _packageUpdaterToolActionList[0].RunPackageUpdate)
+            ], CancellationToken.None);
         }
     }
 }

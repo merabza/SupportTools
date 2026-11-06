@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using LibGitWork.OutdatedPackages;
 using Xunit;
@@ -172,6 +173,78 @@ public sealed class CentralPackageVersionsFileTests : IDisposable
 
         // Assert
         Assert.True(result);
+    }
+
+    [Fact]
+    public void CountChangedVersions_WhenVersionsChanged_CountsOnlyThem()
+    {
+        // Arrange
+        byte[] bytesBefore = WithBom(Versions(("A", "1.0.0"), ("B", "2.0.0"), ("C", "3.0.0")));
+        byte[] bytesAfter = Encoding.UTF8.GetBytes(Versions(("A", "1.0.1"), ("B", "2.0.0"), ("C", "3.1.0")));
+
+        // Act
+        int result = CentralPackageVersionsFile.CountChangedVersions(bytesBefore, bytesAfter);
+
+        // Assert
+        Assert.Equal(2, result);
+    }
+
+    //NuGet compares package names without case
+    [Fact]
+    public void CountChangedVersions_WhenOnlyTheCaseOfANameDiffers_CountsNothing()
+    {
+        // Act
+        int result = CentralPackageVersionsFile.CountChangedVersions(
+            Encoding.UTF8.GetBytes(Versions(("Polly", "8.8.0"))), Encoding.UTF8.GetBytes(Versions(("polly", "8.8.0"))));
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+
+    //dotnet outdated -n writes these entries too
+    [Fact]
+    public void CountChangedVersions_WhenAGlobalPackageReferenceOrAnUpdateEntryChanged_CountsThem()
+    {
+        // Arrange
+        const string textBefore =
+            "<GlobalPackageReference Include=\"SonarAnalyzer.CSharp\" Version=\"10.34.0\" />\r\n" +
+            "<PackageVersion Update=\"Polly\" Version=\"8.8.0\" />\r\n";
+        string textAfter = textBefore.Replace("10.34.0", "10.35.0", StringComparison.Ordinal)
+            .Replace("8.8.0", "8.9.0", StringComparison.Ordinal);
+
+        // Act
+        int result = CentralPackageVersionsFile.CountChangedVersions(Encoding.UTF8.GetBytes(textBefore),
+            Encoding.UTF8.GetBytes(textAfter));
+
+        // Assert
+        Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public void CountChangedVersions_WhenTheFileDidNotExistBefore_CountsEveryVersion()
+    {
+        // Act
+        int result = CentralPackageVersionsFile.CountChangedVersions(null,
+            Encoding.UTF8.GetBytes(Versions(("A", "1.0.0"), ("B", "2.0.0"))));
+
+        // Assert
+        Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public void CountChangedVersions_WhenTheFileIsGone_CountsNothing()
+    {
+        // Act
+        int result = CentralPackageVersionsFile.CountChangedVersions(WithBom(Versions(("A", "1.0.0"))), null);
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+
+    private static string Versions(params (string Name, string Version)[] packages)
+    {
+        return string.Concat(packages.Select(x =>
+            $"    <PackageVersion Include=\"{x.Name}\" Version=\"{x.Version}\" />\r\n"));
     }
 
     private static byte[] WithBom(string text)

@@ -116,12 +116,21 @@ Use during routine maintenance to bump dependencies.
 * Syncs all Git repositories first with the V3 sync (`Check`), so updates
 land on current code. If a folder fails, it asks
 `Continue updating packages?` (default `n`)
-* Updates the C# repositories one by one, each in the folder of a project
-that uses it and after the repositories it depends on: a repository's
-turn comes when it is the only one left in the list of some project
-(repositories of other types, e.g. React fronts, are not waited for).
-When no project has a single one left, the repository used by the most
-remaining projects goes first (e.g. `SupportToolsServerShared`)
+* Updates the C# repositories level by level, each in the folder of a
+project that uses it and after the repositories it depends on: a
+repository's turn comes when it is the only one left in the list of some
+project (repositories of other types, e.g. React fronts, are not waited
+for). When no project has a single one left, the repository used by the
+most remaining projects goes first (e.g. `SupportToolsServerShared`)
+* The repositories that get their turn together form a level and do not
+depend on each other. Each project of the level is synced first
+(`Prepare`), then up to 8 of its repositories are updated at the same
+time, and then each project is synced again (`Update`). While they run,
+the bottom of the console shows one line per repository with its current
+step (`restore`, `dotnet outdated`, `check restore`), updated in place.
+The results stay above it: how many package versions were updated, and
+the errors in red with the tool's output. Repositories of projects that
+share a folder are updated one after the other
 * For each repository: syncs that project (V3, `Prepare`), runs
 `dotnet restore` on its solution (only when the folder holds exactly one
 `.sln`/`.slnx`) and then `dotnet outdated -r -u -n`, up to 3 attempts
@@ -146,8 +155,9 @@ after the update failed
 The pre-restore uses the same MSBuild properties as `dotnet outdated`, so
 the tool's parallel per-project restores become no-ops and stop colliding
 on shared `obj` files ("Cannot create a file when that file already
-exists"). When a run fails, the tool's own error text (its stderr) is
-shown with the error.
+exists"). The output of `dotnet restore` and `dotnet outdated` (stdout
+and stderr) is not printed while they run; when one fails, it is shown
+with the error.
 
 **Common pitfalls**
 

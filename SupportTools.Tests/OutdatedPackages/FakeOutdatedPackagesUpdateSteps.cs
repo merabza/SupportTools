@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LibGitWork;
@@ -7,9 +8,10 @@ using LibGitWork.OutdatedPackages;
 
 namespace SupportTools.Tests.OutdatedPackages;
 
-//records the steps as text ("sync all: <message>", "sync <project>: <message>", "update <project>/<git>"); a step in
-//FailingSteps fails (a sync answers false, an update OutdatedFailed), an update in RestoreFailingSteps answers
-//RestoreAfterUpdateFailed; OnStep runs before a step answers, so a test can move the clock or cancel there
+//records the steps as text: "sync all: <message>", "sync <project>: <message>", and one "update <project>/<git>, …" for
+//the gits that are updated together. A sync in FailingSteps answers false; an update "update <project>/<git>" in
+//FailingSteps answers OutdatedFailed for that git, one in RestoreFailingSteps RestoreAfterUpdateFailed. OnStep runs
+//before a step answers, so a test can move the clock or cancel there
 internal sealed class FakeOutdatedPackagesUpdateSteps : IOutdatedPackagesUpdateSteps
 {
     public List<string> Steps { get; } = [];
@@ -22,26 +24,33 @@ internal sealed class FakeOutdatedPackagesUpdateSteps : IOutdatedPackagesUpdateS
         CancellationToken cancellationToken)
     {
         IncludeRemoteProjectsValues.Add(includeRemoteProjects);
-        return Task.FromResult(Answer($"sync {projectName ?? "all"}: {commitMessage}"));
+        string step = $"sync {projectName ?? "all"}: {commitMessage}";
+        Record(step);
+        return Task.FromResult(!FailingSteps.Contains(step));
     }
 
-    public EPackageUpdateResult UpdatePackages(string projectName, string gitName)
+    public IReadOnlyList<EPackageUpdateResult> UpdatePackages(IReadOnlyList<OutdatedPackagesUpdateStep> steps,
+        CancellationToken cancellationToken)
     {
-        string step = $"update {projectName}/{gitName}";
-        if (!Answer(step))
+        Record($"update {string.Join(", ", steps.Select(x => $"{x.ProjectName}/{x.GitName}"))}");
+        return [.. steps.Select(x => Answer($"update {x.ProjectName}/{x.GitName}"))];
+    }
+
+    private EPackageUpdateResult Answer(string update)
+    {
+        if (FailingSteps.Contains(update))
         {
             return EPackageUpdateResult.OutdatedFailed;
         }
 
-        return RestoreFailingSteps.Contains(step)
+        return RestoreFailingSteps.Contains(update)
             ? EPackageUpdateResult.RestoreAfterUpdateFailed
             : EPackageUpdateResult.Success;
     }
 
-    private bool Answer(string step)
+    private void Record(string step)
     {
         Steps.Add(step);
         OnStep?.Invoke(step);
-        return !FailingSteps.Contains(step);
     }
 }

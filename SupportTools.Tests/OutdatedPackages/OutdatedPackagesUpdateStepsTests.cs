@@ -86,28 +86,35 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
         AddGit("GitR", "git@github.com:x/GitR.git");
 
         // Act
-        EPackageUpdateResult result = CreateSut().UpdatePackages("PR", "GitR");
+        IReadOnlyList<EPackageUpdateResult> results =
+            CreateSut().UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
 
         // Assert
-        Assert.Equal(EPackageUpdateResult.Success, result);
+        Assert.Equal([EPackageUpdateResult.Success], results);
     }
 
-    //reported with the failures of dotnet outdated
+    //reported with the failures of dotnet outdated; the other gits of the level are still updated
     [Fact]
-    public void UpdatePackages_WhenTheGitIsNotInGits_ReturnsOutdatedFailed()
+    public void UpdatePackages_WhenAGitIsNotInGits_ReturnsOutdatedFailedForIt()
     {
+        // Arrange
+        AddGit("GitR", "git@github.com:x/GitR.git");
+        _parameters.Projects["PR"].GitProjectNames.Add("GitMissing");
+
         // Act
-        EPackageUpdateResult result = CreateSut().UpdatePackages("PR", "GitR");
+        IReadOnlyList<EPackageUpdateResult> results = CreateSut().UpdatePackages(
+            [new OutdatedPackagesUpdateStep("PR", "GitMissing"), new OutdatedPackagesUpdateStep("PR", "GitR")],
+            CancellationToken.None);
 
         // Assert
-        Assert.Equal(EPackageUpdateResult.OutdatedFailed, result);
+        Assert.Equal([EPackageUpdateResult.OutdatedFailed, EPackageUpdateResult.Success], results);
         Assert.Contains("GitSyncParameters is not created", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
     private OutdatedPackagesUpdateSteps CreateSut()
     {
         return new OutdatedPackagesUpdateSteps(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
-            _parametersManager.Object);
+            _parametersManager.Object, null);
     }
 
     private string CreateRemoteAndClone()

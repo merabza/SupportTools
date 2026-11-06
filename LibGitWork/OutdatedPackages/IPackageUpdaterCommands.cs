@@ -8,7 +8,7 @@ internal interface IPackageUpdaterCommands
 {
     Result RestoreForOutdated(string solutionFileFullName);
 
-    Result<(string, int)> UpdateOutdatedPackages(string projectFolderName);
+    Result UpdateOutdatedPackages(string projectFolderName);
 
     Result RestoreAfterOutdated(string solutionFileFullName);
 }

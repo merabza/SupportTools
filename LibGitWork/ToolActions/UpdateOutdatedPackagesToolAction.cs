@@ -74,7 +74,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
             return false;
         }
 
-        List<OutdatedPackagesUpdateStep> steps = OutdatedPackagesUpdateOrder.Create(
+        List<List<OutdatedPackagesUpdateStep>> levels = OutdatedPackagesUpdateOrder.Create(
             ProjectPresence.Filter(GetProjectsList(), _includeRemoteProjects), _updateOutdatedPackagesParameters.Gits);
 
         var syncsBeforeTime = new PhaseTime();
@@ -86,37 +86,57 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         var failedGitNames = new List<string>();
         var notRestoredGitNames = new List<string>();
         var notPushedGitNames = new List<string>();
-        foreach (OutdatedPackagesUpdateStep step in steps)
+        foreach (List<OutdatedPackagesUpdateStep> level in levels)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            //დაუსინქრონებელ ფოლდერზე git არ ახლდება, დანარჩენები კი გრძელდება (მომხმარებლის არჩევანი)
-            if (!await Measure(syncsBeforeTime,
-                    () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Prepare",
-                        cancellationToken)))
+            List<OutdatedPackagesUpdateStep> preparedSteps = [];
+            foreach (OutdatedPackagesUpdateStep step in level)
             {
-                notSyncedGitNames.Add(step.GitName);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                //დაუსინქრონებელ ფოლდერზე git არ ახლდება, დანარჩენები კი გრძელდება (მომხმარებლის არჩევანი)
+                if (await Measure(syncsBeforeTime,
+                        () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Prepare",
+                            cancellationToken)))
+                {
+                    preparedSteps.Add(step);
+                }
+                else
+                {
+                    notSyncedGitNames.Add(step.GitName);
+                }
+            }
+
+            if (preparedSteps.Count == 0)
+            {
                 continue;
             }
 
+            //დონის git-ები ერთმანეთზე არ არის დამოკიდებული, ამიტომ ერთად, პარალელურად ახლდება; დრო დონის ხანგრძლივობაა.
             //ვერსიები, რომლებითაც restore ჩავარდა, dotnet outdated-ის ჩავარდნის მსგავსად მაინც სინქრონდება
-            EPackageUpdateResult updateResult = await Measure(packageUpdatesTime,
-                () => Task.FromResult(_steps.UpdatePackages(step.ProjectName, step.GitName)));
-            if (updateResult == EPackageUpdateResult.OutdatedFailed)
+            IReadOnlyList<EPackageUpdateResult> updateResults = await Measure(packageUpdatesTime,
+                () => Task.FromResult(_steps.UpdatePackages(preparedSteps, cancellationToken)), preparedSteps.Count);
+            for (int i = 0; i < preparedSteps.Count; i++)
             {
-                failedGitNames.Add(step.GitName);
-            }
-            else if (updateResult == EPackageUpdateResult.RestoreAfterUpdateFailed)
-            {
-                notRestoredGitNames.Add(step.GitName);
+                if (updateResults[i] == EPackageUpdateResult.OutdatedFailed)
+                {
+                    failedGitNames.Add(preparedSteps[i].GitName);
+                }
+                else if (updateResults[i] == EPackageUpdateResult.RestoreAfterUpdateFailed)
+                {
+                    notRestoredGitNames.Add(preparedSteps[i].GitName);
+                }
             }
 
+            //V3-ის სინქრონიზაციას თავისი დაფა აქვს, ამიტომ ეს სინქები ერთმანეთის მიყოლებით, განახლებების შემდეგ ეშვება.
             //ჩავარდნისას განახლება ლოკალურად რჩება
-            if (!await Measure(syncsAfterTime,
-                    () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Update",
-                        cancellationToken)))
+            foreach (OutdatedPackagesUpdateStep step in preparedSteps)
             {
-                notPushedGitNames.Add(step.GitName);
+                if (!await Measure(syncsAfterTime,
+                        () => _steps.SyncGits(step.ProjectName, _includeRemoteProjects, $"{useMessage} Update",
+                            cancellationToken)))
+                {
+                    notPushedGitNames.Add(step.GitName);
+                }
             }
         }
 
@@ -158,11 +178,12 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         return false;
     }
 
-    private async Task<T> Measure<T>(PhaseTime phaseTime, Func<Task<T>> action)
+    //count: ეტაპის რამდენი გაშვება შესრულდა ამ დროში (დონის პარალელური განახლება ყველა თავის git-ს ითვლის)
+    private async Task<T> Measure<T>(PhaseTime phaseTime, Func<Task<T>> action, int count = 1)
     {
         long timestamp = _timeProvider.GetTimestamp();
         T result = await action();
-        phaseTime.Add(_timeProvider.GetElapsedTime(timestamp));
+        phaseTime.Add(_timeProvider.GetElapsedTime(timestamp), count);
         return result;
     }
 
@@ -228,9 +249,9 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         public int Count { get; private set; }
         public TimeSpan Elapsed { get; private set; }
 
-        public void Add(TimeSpan elapsed)
+        public void Add(TimeSpan elapsed, int count)
         {
-            Count++;
+            Count += count;
             Elapsed += elapsed;
         }
     }

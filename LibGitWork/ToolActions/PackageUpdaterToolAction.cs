@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using LibGitWork.OutdatedPackages;
@@ -21,12 +22,11 @@ public sealed class PackageUpdaterToolAction : ToolAction
     private const int MaxAttempts = 3;
     private readonly IPackageUpdaterCommands _commands;
     private readonly string _gitIgnorePathName;
-    private readonly ILogger? _logger;
     private readonly string _projectFolderName;
 
     private PackageUpdaterToolAction(ILogger? logger, GitSyncParameters gitSyncParameters) : this(logger,
         Path.Combine(gitSyncParameters.GitsFolder, gitSyncParameters.GitData.GitProjectFolderName),
-        gitSyncParameters.GitData.GitIgnorePatternName, new DotnetPackageUpdaterCommands(logger))
+        gitSyncParameters.GitData.GitIgnorePatternName, new DotnetPackageUpdaterCommands())
     {
     }
 
@@ -35,7 +35,6 @@ public sealed class PackageUpdaterToolAction : ToolAction
     internal PackageUpdaterToolAction(ILogger? logger, string projectFolderName, string gitIgnorePathName,
         IPackageUpdaterCommands commands) : base(logger, "Git Sync", null, null)
     {
-        _logger = logger;
         _projectFolderName = projectFolderName;
         _gitIgnorePathName = gitIgnorePathName;
         _commands = commands;
@@ -59,9 +58,9 @@ public sealed class PackageUpdaterToolAction : ToolAction
     }
 
     //აბრუნებს OutdatedFailed-ს, თუ dotnet outdated ყველა ცდაზე ჩავარდა, და RestoreAfterUpdateFailed-ს, თუ ჩაწერილი
-    //ვერსიებით სოლუშენი ვერ აღდგა. პაუზა არ კეთდება, რომ დანარჩენი რეპოების დამუშავება არ შეფერხდეს - ჩავარდნილი
-    //რეპოების შეჯამებას UpdateOutdatedPackagesToolAction ბოლოს ბეჭდავს
-    public EPackageUpdateResult RunPackageUpdate()
+    //ვერსიებით სოლუშენი ვერ აღდგა. ნაბიჯები და შეტყობინებები output-ში იწერება: git-ები პარალელურად ახლდება, ამიტომ
+    //კონსოლზე პირდაპირ არაფერი გადის. ჩავარდნილი რეპოების შეჯამებას UpdateOutdatedPackagesToolAction ბოლოს ბეჭდავს
+    internal EPackageUpdateResult RunPackageUpdate(IPackageUpdateOutput output)
     {
         if (_gitIgnorePathName != CSharp)
         {
@@ -69,49 +68,64 @@ public sealed class PackageUpdaterToolAction : ToolAction
         }
 
         string? solutionFileName = GetSolutionFileName();
-        RestoreBeforeOutdated(solutionFileName);
+        RestoreBeforeOutdated(solutionFileName, output);
 
         string propsFileName = Path.Combine(_projectFolderName, CentralPackageVersionsFile.FileName);
         byte[]? propsBytesBefore = CentralPackageVersionsFile.ReadBytes(propsFileName);
-        bool updated = RunOutdated();
+        bool updated = RunOutdated(output);
         CentralPackageVersionsFile.RestoreLostBom(propsFileName, propsBytesBefore);
         if (!updated)
         {
             return EPackageUpdateResult.OutdatedFailed;
         }
 
-        //dotnet outdated -n ვერსიებს restore-ის შემოწმების გარეშე წერს. შემოწმება ერთხელ, სოლუშენზე კეთდება და მხოლოდ
-        //მაშინ, როცა ვერსიები შეიცვალა
-        if (solutionFileName is null || !CentralPackageVersionsFile.HasChanged(propsFileName, propsBytesBefore) ||
-            _commands.RestoreAfterOutdated(solutionFileName).IsSuccess)
+        if (!CentralPackageVersionsFile.HasChanged(propsFileName, propsBytesBefore))
         {
             return EPackageUpdateResult.Success;
         }
 
-        StShared.WriteWarningLine($"restore after the update failed for {solutionFileName}", true, _logger);
+        int changedVersionCount = CentralPackageVersionsFile.CountChangedVersions(propsBytesBefore,
+            CentralPackageVersionsFile.ReadBytes(propsFileName));
+        output.WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"{changedVersionCount} package {(changedVersionCount == 1 ? "version" : "versions")} updated"), null);
+
+        //dotnet outdated -n ვერსიებს restore-ის შემოწმების გარეშე წერს. შემოწმება ერთხელ, სოლუშენზე კეთდება და მხოლოდ
+        //მაშინ, როცა ვერსიები შეიცვალა
+        if (solutionFileName is null)
+        {
+            return EPackageUpdateResult.Success;
+        }
+
+        output.SetStatus("check restore");
+        Result restoreResult = _commands.RestoreAfterOutdated(solutionFileName);
+        if (restoreResult.IsSuccess)
+        {
+            return EPackageUpdateResult.Success;
+        }
+
+        output.WriteLine(
+            $"restore after the update failed for {solutionFileName}{Environment.NewLine}{restoreResult.Error.Description}",
+            ConsoleColor.Red);
         return EPackageUpdateResult.RestoreAfterUpdateFailed;
     }
 
-    private bool RunOutdated()
+    private bool RunOutdated(IPackageUpdateOutput output)
     {
         for (int attempt = 1; attempt <= MaxAttempts; attempt++)
         {
-            Result<(string, int)> localResult = _commands.UpdateOutdatedPackages(_projectFolderName);
-            if (localResult.IsSuccess)
+            output.SetStatus(attempt == 1
+                ? "dotnet outdated"
+                : string.Create(CultureInfo.InvariantCulture, $"dotnet outdated, attempt {attempt} of {MaxAttempts}"));
+            Result result = _commands.UpdateOutdatedPackages(_projectFolderName);
+            if (result.IsSuccess)
             {
                 return true;
             }
 
-            string message =
-                $"dotnet outdated failed for {_projectFolderName} (attempt {attempt} of {MaxAttempts}){Environment.NewLine}{localResult.Error.Description}";
-            if (attempt < MaxAttempts)
-            {
-                StShared.WriteWarningLine(message, true, _logger);
-            }
-            else
-            {
-                StShared.WriteErrorLine(message, true, _logger, false);
-            }
+            //ბოლო ცდამდე ეს გაფრთხილებაა: შემდეგი ცდა თითქმის ყოველთვის გადის
+            output.WriteLine(
+                $"dotnet outdated failed for {_projectFolderName} (attempt {attempt} of {MaxAttempts}){Environment.NewLine}{result.Error.Description}",
+                attempt < MaxAttempts ? ConsoleColor.Yellow : ConsoleColor.Red);
         }
 
         return false;
@@ -121,12 +135,20 @@ public sealed class PackageUpdaterToolAction : ToolAction
     //obj-ფაილებზე ერთმანეთს ეჯახება ("Cannot create a file when that file already exists"). წინასწარი restore ამ
     //გაშვებებს no-op-ად აქცევს. კეთდება მხოლოდ მაშინ, როცა ფოლდერში ზუსტად ერთი სოლუშენია; ჩავარდნა არ აჩერებს,
     //dotnet outdated მაინც გაეშვება
-    private void RestoreBeforeOutdated(string? solutionFileName)
+    private void RestoreBeforeOutdated(string? solutionFileName, IPackageUpdateOutput output)
     {
-        if (solutionFileName is not null && _commands.RestoreForOutdated(solutionFileName).IsFailure)
+        if (solutionFileName is null)
         {
-            StShared.WriteWarningLine($"restore before dotnet outdated failed for {solutionFileName}, continuing", true,
-                _logger);
+            return;
+        }
+
+        output.SetStatus("restore");
+        Result restoreResult = _commands.RestoreForOutdated(solutionFileName);
+        if (restoreResult.IsFailure)
+        {
+            output.WriteLine(
+                $"restore before dotnet outdated failed for {solutionFileName}, continuing{Environment.NewLine}{restoreResult.Error.Description}",
+                ConsoleColor.Yellow);
         }
     }
 

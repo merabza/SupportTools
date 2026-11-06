@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LibGitWork.OutdatedPackages;
@@ -10,6 +11,7 @@ public interface IOutdatedPackagesUpdateSteps
     Task<bool> SyncGits(string? projectName, bool includeRemoteProjects, string commitMessage,
         CancellationToken cancellationToken);
 
-    //პროექტის ფოლდერში ამ git-ის პაკეტების განახლების შედეგი
-    EPackageUpdateResult UpdatePackages(string projectName, string gitName);
+    //ერთი დონის git-ების პაკეტების განახლება, თითოეული თავისი პროექტის ფოლდერში, პარალელურად. შედეგები ნაბიჯების რიგით
+    IReadOnlyList<EPackageUpdateResult> UpdatePackages(IReadOnlyList<OutdatedPackagesUpdateStep> steps,
+        CancellationToken cancellationToken);
 }

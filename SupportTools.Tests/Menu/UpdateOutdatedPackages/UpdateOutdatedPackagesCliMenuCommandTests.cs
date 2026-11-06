@@ -104,7 +104,7 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains("update Remote1/MissingGit", _steps.Steps);
+        Assert.Contains("update Local1/GitA, Remote1/MissingGit", _steps.Steps);
         Assert.All(_steps.IncludeRemoteProjectsValues, Assert.True);
     }
 

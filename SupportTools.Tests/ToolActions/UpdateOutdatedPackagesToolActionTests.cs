@@ -233,6 +233,60 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
             StringComparison.Ordinal);
     }
 
+    //P1 and R1 have one git each, so they are one level: both are prepared, updated in one parallel run, then synced
+    [Fact]
+    public async Task Run_WhenALevelHasSeveralGits_UpdatesThemTogetherBetweenTheirSyncs()
+    {
+        // Act
+        bool result = await Create(null, null, true).Run();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(
+        [
+            CheckSync, "sync P1: Update message Prepare", "sync R1: Update message Prepare",
+            "update P1/GitA, R1/GitC", "sync P1: Update message Update", "sync R1: Update message Update",
+            "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
+        ], _steps.Steps);
+    }
+
+    //a git whose folder was not synced is left out of the parallel run of its level
+    [Fact]
+    public async Task Run_WhenASyncBeforeAnUpdateOfALevelFails_UpdatesTheOtherGitsOfTheLevel()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("sync P1: Update message Prepare");
+
+        // Act
+        await Create(null, null, true).Run();
+
+        // Assert
+        Assert.Equal(
+        [
+            CheckSync, "sync P1: Update message Prepare", "sync R1: Update message Prepare", "update R1/GitC",
+            "sync R1: Update message Update", "sync P2: Update message Prepare", "update P2/GitB",
+            "sync P2: Update message Update"
+        ], _steps.Steps);
+    }
+
+    //the time of a level is the time of its parallel run, and every git of the level is counted
+    [Fact]
+    public async Task Run_WhenALevelHasSeveralGits_CountsEveryGitAndTheTimeOfTheLevelOnce()
+    {
+        // Arrange
+        _steps.OnStep = step =>
+            _timeProvider.Advance(step.StartsWith("update ", StringComparison.Ordinal)
+                ? TimeSpan.FromMinutes(1)
+                : TimeSpan.Zero);
+
+        // Act
+        await Create(null, null, true).Run();
+
+        // Assert
+        Assert.Contains("  3 package updates (restore, dotnet outdated, check restore): 00:02:00",
+            _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task Run_WhenRemoteProjectsAreIncluded_UpdatesThemToo()
     {
@@ -241,7 +295,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Contains("update R1/GitC", _steps.Steps);
+        Assert.Contains("update P1/GitA, R1/GitC", _steps.Steps);
         Assert.All(_steps.IncludeRemoteProjectsValues, Assert.True);
     }
 

@@ -188,11 +188,56 @@ public sealed class OutdatedPackagesUpdateOrderTests
         Assert.Equal(["P/GitA"], steps);
     }
 
+    //a round is a level: its gits do not wait for each other, so they are updated in parallel
+    [Fact]
+    public void Create_WhenProjectsHaveOneGitLeft_PutsEveryRoundIntoALevel()
+    {
+        // Arrange
+        AddProject("C", "GitC");
+        AddProject("B", "GitA", "GitB");
+        AddProject("A", "GitA");
+
+        // Act
+        List<string> levels = CreateLevels();
+
+        // Assert
+        Assert.Equal(["A/GitA, C/GitC", "B/GitB"], levels);
+    }
+
+    //the most used git goes alone, then the projects that waited for it are one level
+    [Fact]
+    public void Create_WhenNoProjectHasOneGitLeft_PutsTheMostUsedGitIntoALevelOfItsOwn()
+    {
+        // Arrange
+        AddProject("SupportToolsServer", "SupportToolsServer", "SupportToolsServerShared");
+        AddProject("SupportTools", "SupportTools", "SupportToolsServerShared");
+
+        // Act
+        List<string> levels = CreateLevels();
+
+        // Assert
+        Assert.Equal(
+        [
+            "SupportTools/SupportToolsServerShared",
+            "SupportTools/SupportTools, SupportToolsServer/SupportToolsServer"
+        ], levels);
+    }
+
     private List<string> CreateSteps()
     {
         return
         [
-            .. OutdatedPackagesUpdateOrder.Create(_projects, _gits).Select(x => $"{x.ProjectName}/{x.GitName}")
+            .. OutdatedPackagesUpdateOrder.Create(_projects, _gits).SelectMany(x => x)
+                .Select(x => $"{x.ProjectName}/{x.GitName}")
+        ];
+    }
+
+    private List<string> CreateLevels()
+    {
+        return
+        [
+            .. OutdatedPackagesUpdateOrder.Create(_projects, _gits)
+                .Select(x => string.Join(", ", x.Select(y => $"{y.ProjectName}/{y.GitName}")))
         ];
     }
 
