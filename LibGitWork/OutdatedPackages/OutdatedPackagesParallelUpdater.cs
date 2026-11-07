@@ -35,35 +35,33 @@ internal sealed class OutdatedPackagesParallelUpdater
         var results = new EPackageUpdateResult[jobs.Count];
         List<int[]> folderGroups =
         [
-            .. Enumerable.Range(0, jobs.Count)
-                .GroupBy(x => jobs[x].WorkspaceFolder, StringComparer.OrdinalIgnoreCase).Select(x => x.ToArray())
+            .. Enumerable.Range(0, jobs.Count).GroupBy(x => jobs[x].WorkspaceFolder, StringComparer.OrdinalIgnoreCase)
+                .Select(x => x.ToArray())
         ];
         int doneCount = 0;
-        using (var board = new ParallelProgressBoard(_progressConsole))
-        {
-            board.SetHeader(Header(jobs.Count, 0));
-            Parallel.ForEach(folderGroups,
-                new ParallelOptions { MaxDegreeOfParallelism = MaxParallelism, CancellationToken = cancellationToken },
-                group =>
+        using var board = new ParallelProgressBoard(_progressConsole);
+        board.SetHeader(Header(jobs.Count, 0));
+        Parallel.ForEach(folderGroups,
+            new ParallelOptions { MaxDegreeOfParallelism = MaxParallelism, CancellationToken = cancellationToken },
+            group =>
+            {
+                foreach (int index in group)
                 {
-                    foreach (int index in group)
+                    //გაუქმებისას ფოლდერის დარჩენილი git-ები აღარ იწყება
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        //გაუქმებისას ფოლდერის დარჩენილი git-ები აღარ იწყება
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return;
-                        }
-
-                        PackageUpdateJob job = jobs[index];
-                        using (ProgressBoardLine line = board.StartLine($"{job.GitName}  start"))
-                        {
-                            results[index] = job.Run(new BoardOutput(board, line, job.GitName, _logger));
-                        }
-
-                        board.SetHeader(Header(jobs.Count, Interlocked.Increment(ref doneCount)));
+                        return;
                     }
-                });
-        }
+
+                    PackageUpdateJob job = jobs[index];
+                    using (ProgressBoardLine line = board.StartLine($"{job.GitName}  start"))
+                    {
+                        results[index] = job.Run(new BoardOutput(board, line, job.GitName, _logger));
+                    }
+
+                    board.SetHeader(Header(jobs.Count, Interlocked.Increment(ref doneCount)));
+                }
+            });
 
         //გაუქმებისას Parallel.ForEach თავად აგდებს OperationCanceledException-ს
         return results;
