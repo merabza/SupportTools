@@ -211,6 +211,33 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
     }
 
     [Fact]
+    public void RunPackageUpdate_WhenTheSolutionIsAnSlnFile_RestoresIt()
+    {
+        // Arrange
+        File.Move(_solutionFile, Path.Combine(_gitFolder, "GitA.sln"));
+
+        // Act
+        CreateSut().RunPackageUpdate(_output);
+
+        // Assert
+        Assert.Equal(["restore for outdated GitA.sln", "outdated GitA"], _commands.Commands);
+    }
+
+    //the extension of a solution is compared without case
+    [Fact]
+    public void RunPackageUpdate_WhenTheSolutionExtensionIsInUpperCase_RestoresIt()
+    {
+        // Arrange
+        File.Move(_solutionFile, Path.Combine(_gitFolder, "GitA.SLNX"));
+
+        // Act
+        CreateSut().RunPackageUpdate(_output);
+
+        // Assert
+        Assert.Equal(["restore for outdated GitA.SLNX", "outdated GitA"], _commands.Commands);
+    }
+
+    [Fact]
     public void RunPackageUpdate_WhenTheFolderIsMissing_RunsOnlyDotnetOutdated()
     {
         // Arrange

@@ -137,6 +137,53 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         Assert.Contains("Operation Canceled", _consoleOutput.ToString(), StringComparison.Ordinal);
     }
 
+    //the level of P1 still ends (its update and sync get the cancelled token), the next level is not prepared
+    [Fact]
+    public async Task Run_WhenCancelledDuringASyncBeforeAnUpdate_StopsBeforeTheNextLevel()
+    {
+        // Arrange
+        using var cancellationTokenSource = new CancellationTokenSource();
+        _steps.OnStep = step =>
+        {
+            if (step == "sync P1: Update message Prepare")
+            {
+                cancellationTokenSource.Cancel();
+            }
+        };
+
+        // Act
+        bool result = await Create(null, null, false).Run(cancellationTokenSource.Token);
+
+        // Assert
+        Assert.False(result);
+        Assert.DoesNotContain("sync P2: Update message Prepare", _steps.Steps);
+        Assert.Contains("Operation Canceled", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //the times are logged only when the information level is enabled
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Run_WhenGitWorkIsLogged_LogsTheTimesOnlyWhenInformationIsEnabled(bool informationEnabled)
+    {
+        // Arrange
+        _parameters.LogGitWork = true;
+        _logger.Setup(x => x.IsEnabled(LogLevel.Information)).Returns(informationEnabled);
+
+        // Act
+        await Create(null, "P1", false).Run();
+
+        // Assert
+        //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
+#pragma warning disable CA1873
+        _logger.Verify(
+            x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) => value!.ToString() == "Times of Update Outdated Packages:"),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            informationEnabled ? Times.Once() : Times.Never());
+#pragma warning restore CA1873
+    }
+
     //GitA is still done for the order, so P2 updates GitB
     [Fact]
     public async Task Run_WhenASyncBeforeAnUpdateFails_SkipsThatGitAndUpdatesTheOthers()
@@ -193,6 +240,21 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         Assert.Contains("restore after the update failed for: GitA" + Environment.NewLine, output,
             StringComparison.Ordinal);
         Assert.DoesNotContain("dotnet outdated failed for", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Run_WhenSeveralGitsFailTheSameWay_NamesThemInOneLine()
+    {
+        // Arrange
+        _steps.FailingSteps.Add("update P1/GitA");
+        _steps.FailingSteps.Add("update P2/GitB");
+
+        // Act
+        await Create(null, null, false).Run();
+
+        // Assert
+        Assert.Contains("dotnet outdated failed for: GitA, GitB" + Environment.NewLine, _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     [Fact]

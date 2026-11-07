@@ -55,7 +55,7 @@ public sealed class OutdatedPackagesParallelUpdaterTests : IDisposable
         ], results);
     }
 
-    //every job waits until eight run (or two seconds pass), so a ninth at once would be seen
+    //every job waits until a ninth one runs (or 300 ms pass), so more than eight at once would be seen
     [Fact]
     public void Run_WhenThereAreManyJobs_RunsEightAtOnce()
     {
@@ -68,8 +68,8 @@ public sealed class OutdatedPackagesParallelUpdaterTests : IDisposable
             {
                 int now = Interlocked.Increment(ref running);
                 InterlockedMax(ref maxRunning, now);
-                SpinWait.SpinUntil(() => Volatile.Read(ref running) >= OutdatedPackagesParallelUpdater.MaxParallelism,
-                    TimeSpan.FromSeconds(2));
+                SpinWait.SpinUntil(() => Volatile.Read(ref running) > OutdatedPackagesParallelUpdater.MaxParallelism,
+                    TimeSpan.FromMilliseconds(300));
                 Interlocked.Decrement(ref running);
                 return EPackageUpdateResult.Success;
             }))
@@ -139,6 +139,7 @@ public sealed class OutdatedPackagesParallelUpdaterTests : IDisposable
             console.Lines);
         Assert.Contains(console.Writes,
             x => x.Text.StartsWith("Updating packages of 1 gits: 0 done ", StringComparison.Ordinal));
+        Assert.Contains(console.Writes, x => x.Text.StartsWith("GitA  start ", StringComparison.Ordinal));
         Assert.Contains(console.Writes, x => x.Text.StartsWith("GitA  dotnet outdated ", StringComparison.Ordinal));
         Assert.Contains(console.Writes,
             x => x.Text == "GitA: restore after the update failed for A.slnx" && x.Color == ConsoleColor.Red);
@@ -185,6 +186,54 @@ public sealed class OutdatedPackagesParallelUpdaterTests : IDisposable
 
         // Assert
         Assert.False(started);
+    }
+
+    //the next job of the same folder does not start after a cancellation; the run ends with it
+    [Fact]
+    public void Run_WhenCancelledDuringAJob_StartsNoOtherJobOfItsFolder()
+    {
+        // Arrange
+        using var cancellationTokenSource = new CancellationTokenSource();
+        bool secondStarted = false;
+        PackageUpdateJob[] jobs =
+        [
+            new("GitA", "W1", _ =>
+            {
+                cancellationTokenSource.Cancel();
+                return EPackageUpdateResult.Success;
+            }),
+            new("GitB", "W1", _ =>
+            {
+                secondStarted = true;
+                return EPackageUpdateResult.Success;
+            })
+        ];
+
+        // Act
+        Assert.ThrowsAny<OperationCanceledException>(() =>
+            new OutdatedPackagesParallelUpdater(null, null).Run(jobs, cancellationTokenSource.Token));
+
+        // Assert
+        Assert.False(secondStarted);
+    }
+
+    [Fact]
+    public void Run_WhenTheLevelOfALineIsNotEnabled_DoesNotLogIt()
+    {
+        // Arrange
+        var logger = new Mock<ILogger>();
+        PackageUpdateJob job = new("GitA", "W1", output =>
+        {
+            output.WriteLine("text", ConsoleColor.Red);
+            return EPackageUpdateResult.Success;
+        });
+
+        // Act
+        new OutdatedPackagesParallelUpdater(logger.Object, null).Run([job], CancellationToken.None);
+
+        // Assert
+        logger.Verify(x => x.IsEnabled(LogLevel.Error), Times.Once);
+        Assert.Single(logger.Invocations);
     }
 
     //a red line is an error, a yellow one a warning, the others information

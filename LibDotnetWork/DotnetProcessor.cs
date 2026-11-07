@@ -15,19 +15,30 @@ public sealed class DotnetProcessor
     private const string WarningCountSuffix = " Warning(s)";
     private const string ErrorCountSuffix = " Error(s)";
     private readonly ILogger? _logger;
+    private readonly RunProcessFunc _runProcess;
+    private readonly RunProcessWithOutputFunc _runProcessWithOutput;
     private readonly bool _useConsole;
 
+    public DotnetProcessor(ILogger? logger, bool useConsole) : this(logger, useConsole, StShared.RunProcess,
+        StShared.RunProcessWithOutput)
+    {
+    }
+
+    //პროცესების გაშვება პარამეტრადაა გამოტანილი, რომ ტესტებმა dotnet არ გაუშვან
     // ReSharper disable once ConvertToPrimaryConstructor
-    public DotnetProcessor(ILogger? logger, bool useConsole)
+    internal DotnetProcessor(ILogger? logger, bool useConsole, RunProcessFunc runProcess,
+        RunProcessWithOutputFunc runProcessWithOutput)
     {
         _logger = logger;
         _useConsole = useConsole;
+        _runProcess = runProcess;
+        _runProcessWithOutput = runProcessWithOutput;
     }
 
     public Result PublishRelease(string runtime, string outputFolderPath, string mainProjectFileName,
         string assemblyVersion, string? spaMode = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             CreatePublishArguments(runtime, outputFolderPath, mainProjectFileName, assemblyVersion, spaMode));
     }
 
@@ -46,7 +57,7 @@ public sealed class DotnetProcessor
 
     public Result CreateNewSolution(string solutionPath, string solutionName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"new sln --output {solutionPath} --name {solutionName}");
     }
 
@@ -55,26 +66,26 @@ public sealed class DotnetProcessor
     {
         //dotnet new შაბლონის სახელის რეგისტრს არჩევს: CLASSLIB არ მუშაობს, classlib მუშაობს
 #pragma warning disable CA1308
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"new {dotnetProjectType.ToString().ToLowerInvariant()}{(string.IsNullOrWhiteSpace(projectCreateParameters) ? string.Empty : $" {projectCreateParameters}")} --output {projectFullPath} --name {projectName}");
 #pragma warning restore CA1308
     }
 
     public Result AddProjectToSolution(string solutionPath, string? solutionFolderName, string projectFileFullName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"sln {solutionPath} add {(solutionFolderName is null ? string.Empty : $"--solution-folder {solutionFolderName} ")}{projectFileFullName}");
     }
 
     public Result AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"add {projectFilePath} reference {referenceProjectFilePath}");
     }
 
     public Result AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             CreateAddPackageArguments(projectFilePath, packageName, packageVersion, false));
     }
 
@@ -82,7 +93,7 @@ public sealed class DotnetProcessor
     //დამოკიდებულებას ვერ ხედავს, ამიტომ პაკეტი restore-ის გარეშე ჩაიწერება და restore-ს RestoreWithoutHttpCache უშვებს
     public Result AddPackageToProjectWithoutRestore(string projectFilePath, string packageName, string packageVersion)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             CreateAddPackageArguments(projectFilePath, packageName, packageVersion, true));
     }
 
@@ -95,49 +106,49 @@ public sealed class DotnetProcessor
 
     public Result RemoveReferenceFromProject(string projectFilePath, string referenceProjectFilePath)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"remove {projectFilePath} reference {referenceProjectFilePath}");
     }
 
     public Result RemovePackageFromProject(string projectFilePath, string packageName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"remove {projectFilePath} package {packageName}");
+        return _runProcess(_useConsole, _logger, Dotnet, $"remove {projectFilePath} package {packageName}");
     }
 
     public Result InitUserSecrets(string projectFullPath)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"user-secrets init --project {projectFullPath}");
+        return _runProcess(_useConsole, _logger, Dotnet, $"user-secrets init --project {projectFullPath}");
     }
 
     public Result EfDropDatabase(string dbContextName, string migrationStartupProjectFilePath,
         string migrationProjectFileName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"ef database drop --force --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
     public Result EfAddDatabaseMigration(string migrationName, string dbContextName,
         string migrationStartupProjectFilePath, string migrationProjectFileName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"ef migrations add \"{migrationName}\" --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
     public Result EfUpdateDatabaseByMigration(string dbContextName, string migrationStartupProjectFilePath,
         string migrationProjectFileName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"ef database update --context {dbContextName} --startup-project {migrationStartupProjectFilePath} --project {migrationProjectFileName}");
     }
 
     public Result Restore(string projectFileFullName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
+        return _runProcess(_useConsole, _logger, Dotnet, $"restore {projectFileFullName}");
     }
 
     public Result RestoreWithoutHttpCache(string projectFileFullName)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             CreateRestoreWithoutHttpCacheArguments(projectFileFullName));
     }
 
@@ -160,7 +171,7 @@ public sealed class DotnetProcessor
         //წინა build-ის ლოგი არ უნდა წაიკითხოს, თუ MSBuild ამჯერად ფაილს ვერ შექმნის
         File.Delete(logFileName);
 
-        Result runResult = StShared.RunProcess(_useConsole, _logger, Dotnet,
+        Result runResult = _runProcess(_useConsole, _logger, Dotnet,
             CreateBuildArguments(solutionFileName, noIncremental, noHttpCache, logFileName), null, false);
         (int errorCount, int warningCount) = ReadBuildCounts(logFileName);
         return new DotnetBuildResult(runResult.IsSuccess, errorCount, warningCount);
@@ -204,25 +215,25 @@ public sealed class DotnetProcessor
 
     public Result Pack(string projectFileName, string outputFolderPath, string packageVersion)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"pack {projectFileName} --configuration Release --output {outputFolderPath} -p:PackageVersion={packageVersion}");
     }
 
     public Result NugetPush(string nupkgPath, string source, string? apiKey)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"nuget push {nupkgPath} --source {source} --skip-duplicate{(string.IsNullOrWhiteSpace(apiKey) ? string.Empty : $" --api-key {apiKey}")}");
     }
 
     public Result<(string, int)> SearchTool(string toolName)
     {
-        return StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"tool search {toolName} --take 1");
+        return _runProcessWithOutput(_useConsole, _logger, Dotnet, $"tool search {toolName} --take 1");
     }
 
     public Result<IEnumerable<string>> GetToolsRawList()
     {
         Result<(string, int)> processResult =
-            StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
+            _runProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
         if (processResult.IsFailure)
         {
             return processResult.Error;
@@ -237,7 +248,7 @@ public sealed class DotnetProcessor
     public Result<List<string>> GetSolutionProjectsList(string solutionFileName)
     {
         Result<(string, int)> processResult =
-            StShared.RunProcessWithOutput(_useConsole, _logger, Dotnet, $"sln {solutionFileName} list");
+            _runProcessWithOutput(_useConsole, _logger, Dotnet, $"sln {solutionFileName} list");
         if (processResult.IsFailure)
         {
             return processResult.Error;
@@ -268,13 +279,13 @@ public sealed class DotnetProcessor
 
     public Result InstallTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"tool install --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");
     }
 
     public Result UpdateTool(string packageId, string? version = null)
     {
-        return StShared.RunProcess(_useConsole, _logger, Dotnet,
+        return _runProcess(_useConsole, _logger, Dotnet,
             $"tool update --global {packageId}{(string.IsNullOrEmpty(version) ? "" : $" --version {version}")}");
     }
 

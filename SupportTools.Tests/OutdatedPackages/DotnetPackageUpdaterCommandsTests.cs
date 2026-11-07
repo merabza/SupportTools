@@ -64,6 +64,64 @@ public sealed class DotnetPackageUpdaterCommandsTests
         Assert.Equal("1", result.Environment["MSBUILDDISABLENODEREUSE"]);
     }
 
+    [Fact]
+    public void RestoreForOutdated_WhenTheSolutionIsMissing_ReturnsTheCommandAndTheOutputOfDotnetInTheError()
+    {
+        // Arrange
+        string solutionFile = Path.Combine(Path.GetTempPath(), $"SupportToolsTests_{Guid.NewGuid():N}", "Missing.slnx");
+
+        // Act
+        Result result = new DotnetPackageUpdaterCommands().RestoreForOutdated(solutionFile);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.StartsWith(
+            $"dotnet restore {solutionFile} -p:NoWarn=NU1605 -p:TreatWarningsAsErrors=false failed (ExitCode=1)",
+            result.Error.Description, StringComparison.Ordinal);
+        Assert.Contains("MSB1009", result.Error.Description, StringComparison.Ordinal);
+    }
+
+    //dotnet outdated (the global tool the command needs) writes why to stderr, and stderr is kept too
+    [Fact]
+    public void UpdateOutdatedPackages_WhenTheFolderIsMissing_ReturnsTheCommandAndItsErrorOutputInTheError()
+    {
+        // Arrange
+        string folder = Path.Combine(Path.GetTempPath(), $"SupportToolsTests_{Guid.NewGuid():N}");
+
+        // Act
+        Result result = new DotnetPackageUpdaterCommands().UpdateOutdatedPackages(folder);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("DotnetCommandFailed", result.Error.Code);
+        Assert.StartsWith($"dotnet outdated -r -u -n {folder} failed (ExitCode=1)", result.Error.Description,
+            StringComparison.Ordinal);
+        Assert.Contains($"'{folder}' does not exist", result.Error.Description, StringComparison.Ordinal);
+    }
+
+    //a solution without projects has nothing to restore, and the real restore succeeds
+    [Fact]
+    public void RestoreAfterOutdated_WhenTheSolutionHasNoProjects_Succeeds()
+    {
+        // Arrange
+        string folder = Directory.CreateTempSubdirectory("SupportToolsTests_").FullName;
+        string solutionFile = Path.Combine(folder, "Empty.slnx");
+        File.WriteAllText(solutionFile, "<Solution />");
+
+        try
+        {
+            // Act
+            Result result = new DotnetPackageUpdaterCommands().RestoreAfterOutdated(solutionFile);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
     //the real dotnet: its error (written to stdout) reaches the error text, with the command and its exit code
     [Fact]
     public void RestoreAfterOutdated_WhenTheSolutionIsMissing_ReturnsTheOutputOfDotnetInTheError()

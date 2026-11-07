@@ -66,7 +66,8 @@ public sealed class OutdatedPackagesUpdateSteps : IOutdatedPackagesUpdateSteps
             }
 
             jobIndexes.Add(i);
-            jobs.Add(new PackageUpdateJob(step.GitName, parameters.GetGitsFolder(step.ProjectName) ?? string.Empty,
+            //Create მხოლოდ მაშინ იქმნება, როცა პროექტს ფოლდერი აქვს
+            jobs.Add(new PackageUpdateJob(step.GitName, parameters.GetGitsFolder(step.ProjectName)!,
                 packageUpdaterToolAction.RunPackageUpdate));
         }
 

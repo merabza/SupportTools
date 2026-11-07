@@ -165,6 +165,20 @@ public sealed class CentralPackageVersionsFileTests : IDisposable
         Assert.True(result);
     }
 
+    //an empty file has the same bytes as no file, yet it was created
+    [Fact]
+    public void HasChanged_WhenAnEmptyFileWasCreated_ReturnsTrue()
+    {
+        // Arrange
+        File.WriteAllBytes(_filePath, []);
+
+        // Act
+        bool result = CentralPackageVersionsFile.HasChanged(_filePath, null);
+
+        // Assert
+        Assert.True(result);
+    }
+
     [Fact]
     public void HasChanged_WhenTheFileWasDeleted_ReturnsTrue()
     {

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibGitData.Models;
 using LibGitWork;
+using LibGitWork.Helpers;
 using LibGitWork.OutdatedPackages;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -109,6 +110,82 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
         // Assert
         Assert.Equal([EPackageUpdateResult.OutdatedFailed, EPackageUpdateResult.Success], results);
         Assert.Contains("GitSyncParameters is not created", _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //the git lives in the folder of the missing SPA project; why it is not updated is written before the parallel run
+    [Fact]
+    public void UpdatePackages_WhenTheSpaProjectIsMissing_WritesWhyTheGitIsNotUpdated()
+    {
+        // Arrange
+        _parameters.Projects["PR"] = new ProjectModel
+        {
+            ProjectFolderName = _projectFolder, GitProjectNames = ["GitR"], SpaProjectName = "AppFront"
+        };
+        _parameters.Gits["GitR"] = new GitDataModel
+        {
+            GitProjectAddress = "git@github.com:x/GitR.git",
+            GitProjectFolderName = $"{GitDataModel.SpaProjectFolderRelativePathName}/GitR",
+            GitIgnorePatternName = "CSharp"
+        };
+
+        // Act
+        IReadOnlyList<EPackageUpdateResult> results =
+            CreateSut().UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
+
+        // Assert
+        Assert.Equal([EPackageUpdateResult.OutdatedFailed], results);
+        Assert.Contains(SpaProjectFolderHelper.GetMissingSpaProjectMessage("PR", "AppFront"),
+            _consoleOutput.ToString(), StringComparison.Ordinal);
+    }
+
+    //the public constructor draws no board in the test host (its output is redirected)
+    [Fact]
+    public void UpdatePackages_WhenCreatedWithThePublicConstructor_UpdatesTheGits()
+    {
+        // Arrange
+        AddGit("GitR", "git@github.com:x/GitR.git");
+        var sut = new OutdatedPackagesUpdateSteps(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
+            _parametersManager.Object);
+
+        // Act
+        IReadOnlyList<EPackageUpdateResult> results =
+            sut.UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
+
+        // Assert
+        Assert.Equal([EPackageUpdateResult.Success], results);
+    }
+
+    //the real dotnet outdated fails on the folder of a git that is not cloned; its lines are logged only when the git
+    //work is logged
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UpdatePackages_WhenGitWorkIsLoggedOrNot_LogsTheLinesOfTheUpdateOnlyWhenLogged(bool logGitWork)
+    {
+        // Arrange
+        AddGit("GitR", "git@github.com:x/GitR.git");
+        _parameters.Gits["GitR"].GitIgnorePatternName = "CSharp";
+        _parameters.LogGitWork = logGitWork;
+        var logger = new Mock<ILogger>();
+        logger.Setup(x => x.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+        var sut = new OutdatedPackagesUpdateSteps(logger.Object, new Mock<IHttpClientFactory>().Object,
+            _parametersManager.Object, null);
+
+        // Act
+        IReadOnlyList<EPackageUpdateResult> results =
+            sut.UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
+
+        // Assert
+        Assert.Equal([EPackageUpdateResult.OutdatedFailed], results);
+        //a Moq expression: the arguments only describe the expected call, nothing is evaluated for logging
+#pragma warning disable CA1873
+        logger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((value, _) =>
+                    value!.ToString()!.StartsWith("GitR: dotnet outdated failed for ", StringComparison.Ordinal)),
+                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            logGitWork ? Times.Once() : Times.Never());
+#pragma warning restore CA1873
     }
 
     private OutdatedPackagesUpdateSteps CreateSut()

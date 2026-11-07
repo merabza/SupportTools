@@ -65,7 +65,7 @@ internal sealed class OutdatedPackagesParallelUpdater
                 });
         }
 
-        cancellationToken.ThrowIfCancellationRequested();
+        //გაუქმებისას Parallel.ForEach თავად აგდებს OperationCanceledException-ს
         return results;
     }
 

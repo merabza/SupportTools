@@ -84,6 +84,21 @@ public sealed class OutdatedPackagesUpdateOrderTests
         Assert.Equal(["App/App"], steps);
     }
 
+    //a project without a C# git takes no part in the order
+    [Fact]
+    public void Create_WhenAProjectHasOnlyGitsOfAnotherType_ReturnsNoLevel()
+    {
+        // Arrange
+        AddGit("AppFront", "React");
+        AddProject("Front", "AppFront");
+
+        // Act
+        List<string> levels = CreateLevels();
+
+        // Assert
+        Assert.Empty(levels);
+    }
+
     //their update fails, so the failure is reported instead of the git being left out silently
     [Fact]
     public void Create_WhenAGitIsNotInGitsOrHasNoType_KeepsItInTheOrder()

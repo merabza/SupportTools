@@ -107,16 +107,15 @@ internal sealed class DotnetPackageUpdaterCommands : IPackageUpdaterCommands
             $"{Dotnet} {string.Join(' ', arguments)} failed (ExitCode={process.ExitCode}){Environment.NewLine}{output.ToString().TrimEnd()}");
     }
 
+    //null ნაკადის ბოლოა
     private static void Append(StringBuilder output, Lock outputLock, string? line)
     {
-        if (line is null)
+        if (line is not null)
         {
-            return;
-        }
-
-        lock (outputLock)
-        {
-            output.AppendLine(line);
+            lock (outputLock)
+            {
+                output.AppendLine(line);
+            }
         }
     }
 }

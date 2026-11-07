@@ -42,15 +42,16 @@ internal static class OutdatedPackagesUpdateOrder
                     .SelectMany(x => x.GitNames.Select(y => (x.ProjectName, GitName: y)))
                     .First(x => string.Equals(x.GitName, sharedGitName, StringComparison.OrdinalIgnoreCase));
                 Take(remaining, level, projectName, gitName);
-                continue;
             }
-
-            foreach (ProjectGits project in singleGitProjects)
+            else
             {
-                //იმავე რაუნდის წინა პროექტმა ეს git შეიძლება უკვე განაახლა
-                if (project.GitNames.Count == 1)
+                foreach (ProjectGits project in singleGitProjects)
                 {
-                    Take(remaining, level, project.ProjectName, project.GitNames[0]);
+                    //იმავე რაუნდის წინა პროექტმა ეს git შეიძლება უკვე განაახლა
+                    if (project.GitNames.Count == 1)
+                    {
+                        Take(remaining, level, project.ProjectName, project.GitNames[0]);
+                    }
                 }
             }
         }

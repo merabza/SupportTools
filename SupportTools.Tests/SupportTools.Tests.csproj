@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LibAppInstallWork\LibAppInstallWork.csproj" />
     <ProjectReference Include="..\LibDatabaseWork\LibDatabaseWork.csproj" />
+    <ProjectReference Include="..\LibDotnetWork\LibDotnetWork.csproj" />
     <ProjectReference Include="..\LibGitWork\LibGitWork.csproj" />
     <ProjectReference Include="..\LibSupportToolsServerWork\LibSupportToolsServerWork.csproj" />
     <ProjectReference Include="..\LibTools\LibTools.csproj" />
