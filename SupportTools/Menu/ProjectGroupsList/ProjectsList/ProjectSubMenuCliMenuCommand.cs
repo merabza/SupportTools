@@ -9,6 +9,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisCompute
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -45,6 +46,12 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(CheckPackageSolutionCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(BuildPackageCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
+        }
+
+        //Reverse Package Distribution UseLocalPackages-გამორთულ პროექტს არ ეხება
+        if (project is null || !project.UseLocalPackages)
+        {
+            excludeList.Add(nameof(ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy));
         }
 
         //ცხრილებისა და ველების წყვილები ბაზას ეხება: UsesDatabase-გამორთულ პროექტში არ ჩანს

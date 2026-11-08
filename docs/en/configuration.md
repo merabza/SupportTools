@@ -217,7 +217,7 @@ The core of each registered project. Located at
 |Group|Fields|
 |-|-|
 |Identity|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (see [templates](#gitignore-and-editorconfig-templates))|
-|Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (off = the project keeps its external projects as project references and they are never turned into packages: `Package distribution`, `Distribute all packages` and `Reverse Package Distribution` skip the project. Off for the projects of the BaGetter and SupportTools groups, on for the rest. A new project gets it on without a question)|
+|Project type|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (off = the project keeps its external projects as project references and they are never turned into packages: `Package distribution`, `Distribute all packages`, `Reverse Package Distribution` and `Reverse Package Distribution In Group Projects` skip the project, and its menu does not show `Reverse Package Distribution In Project`. Off for the projects of the BaGetter and SupportTools groups, on for the rest. A new project gets it on without a question)|
 |Sub-project names|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextName`|
 |Migration|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`|
 |Encryption|`AppSetEnKeysJsonFileName`, `KeyGuidPart`|

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
@@ -11,7 +10,6 @@ using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu.ReversePackageDistribution;
 using SupportToolsData.Models;
-using SystemTools.SharedKernel;
 using Xunit;
 
 namespace SupportTools.Tests.Menu.ReversePackageDistribution;
@@ -350,30 +348,10 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         return new ReversePackageDistributionCliMenuCommand(_logger.Object, _parametersManager.Object, () => _editor);
     }
 
-    //another local project like App: {temp}\{name} with its main git {name} and {name}\{name}.Api\{name}.Api.csproj,
-    //which uses Lib.A; returns that csproj
+    //another local project like App, which uses Lib.A; returns its csproj
     private string AddProjectWithOwnPackage(string projectName)
     {
-        string projectFolder = Path.Combine(_tempFolder, projectName);
-        string apiFolder = Path.Combine(projectFolder, projectName, $"{projectName}.Api");
-        Directory.CreateDirectory(apiFolder);
-        string csprojFile = Path.Combine(apiFolder, $"{projectName}.Api.csproj");
-        File.WriteAllText(csprojFile,
-            """<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Include="Lib.A" /></ItemGroup></Project>""");
-        string libAFolder = Path.Combine(projectFolder, "Lib", "Lib.A");
-        Directory.CreateDirectory(libAFolder);
-        File.WriteAllText(Path.Combine(libAFolder, "Lib.A.csproj"), "<Project />");
-        _parameters.Projects[projectName] = new ProjectModel
-        {
-            UseLocalPackages = true, ProjectFolderName = projectFolder, GitProjectNames = [projectName]
-        };
-        _parameters.Gits[projectName] = new GitDataModel
-        {
-            GitProjectAddress = $"git@github.com:x/{projectName}.git",
-            GitProjectFolderName = projectName,
-            GitIgnorePatternName = "CSharp"
-        };
-        return csprojFile;
+        return ReversePackageDistributionTestProjects.AddProjectWithOwnPackage(_parameters, _tempFolder, projectName);
     }
 
     private void VerifyNotLogged(string messageStart)
@@ -396,36 +374,5 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
             x => x.Log(logLevel, It.IsAny<EventId>(), It.Is<It.IsAnyType>((value, _) => value!.ToString() == message),
                 It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 #pragma warning restore CA1873
-    }
-
-    private sealed class FakeProjectReferencesEditor : IProjectReferencesEditor
-    {
-        public List<string> Calls { get; } = [];
-        public bool FailingRemove { get; set; }
-        public bool FailingReference { get; set; }
-        public bool FailingPackage { get; set; }
-
-        public Result RemovePackageFromProject(string projectFilePath, string packageName)
-        {
-            Calls.Add($"remove {projectFilePath} {packageName}");
-            return CreateResult(FailingRemove);
-        }
-
-        public Result AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
-        {
-            Calls.Add($"reference {projectFilePath} {referenceProjectFilePath}");
-            return CreateResult(FailingReference);
-        }
-
-        public Result AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
-        {
-            Calls.Add($"package {projectFilePath} {packageName} {packageVersion}");
-            return CreateResult(FailingPackage);
-        }
-
-        private static Result CreateResult(bool failing)
-        {
-            return failing ? Result.Failure(Error.Failure("Failed", "failed")) : Result.Success();
-        }
     }
 }

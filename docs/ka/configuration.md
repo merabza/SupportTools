@@ -222,7 +222,7 @@ bootstrap API client-ი არასოდეს სინქრონიზდ
 |ჯგუფი|ველები|
 |-|-|
 |იდენტობა|`ProjectGroupName`, `ProjectName`, `ProjectDescription`, `ProjectFolderName`, `SolutionFileName`, `EditorConfigPatternName` (იხ. [შაბლონები](#gitignore-და-editorconfig-შაბლონები))|
-|პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (გამორთულ პროექტში გარე პროექტები გარე პროექტებად რჩება და პაკეტებად არ გადაიქცევა: მას `Package distribution`, `Distribute all packages` და `Reverse Package Distribution` გამოტოვებს. გამორთულია BaGetter და SupportTools ჯგუფების პროექტებში, ჩართულია დანარჩენებში. ახალ პროექტს ავტომატურად ერთვება, შეკითხვის გარეშე)|
+|პროექტის ტიპი|`ProjectType` (Standard/IsService/IsPackage), `UseAlternativeWebAgent`, `UseLocalPackages` (გამორთულ პროექტში გარე პროექტები გარე პროექტებად რჩება და პაკეტებად არ გადაიქცევა: მას `Package distribution`, `Distribute all packages`, `Reverse Package Distribution` და `Reverse Package Distribution In Group Projects` გამოტოვებს, მის მენიუში კი `Reverse Package Distribution In Project` არ ჩანს. გამორთულია BaGetter და SupportTools ჯგუფების პროექტებში, ჩართულია დანარჩენებში. ახალ პროექტს ავტომატურად ერთვება, შეკითხვის გარეშე)|
 |ქვე-პროექტების სახელები|`MainProjectName`, `ApiContractsProjectName`, `SpaProjectName`, `DbContextName`|
 |მიგრაცია|`MigrationStartupProjectFilePath`, `MigrationProjectFilePath`|
 |შიფვრა|`AppSetEnKeysJsonFileName`, `KeyGuidPart`|

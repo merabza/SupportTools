@@ -16,6 +16,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
@@ -48,6 +49,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             .AddTransient<IMenuCommandFactoryStrategy, CheckPackageSolutionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, BuildPackageCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
+            .AddTransient<IMenuCommandFactoryStrategy, ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy>()
@@ -133,6 +135,25 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         Assert.Empty(commands.OfType<PackageDistributionCliMenuCommand>());
     }
 
+    //Reverse Package Distribution does not touch a project that does not use local packages, whatever its type
+    [Theory]
+    [InlineData(EProjectType.Standard, true, true)]
+    [InlineData(EProjectType.IsPackage, true, true)]
+    [InlineData(EProjectType.Standard, false, false)]
+    [InlineData(EProjectType.IsPackage, false, false)]
+    public void GetSubMenu_WhenCalled_ShowsReversePackageDistributionOnlyForProjectThatUsesLocalPackages(
+        EProjectType projectType, bool useLocalPackages, bool expected)
+    {
+        // Arrange
+        RegisterProject(new ProjectModel { ProjectType = projectType, UseLocalPackages = useLocalPackages });
+
+        // Act
+        List<CliMenuCommand> commands = GetSubMenuCommands();
+
+        // Assert
+        Assert.Equal(expected ? 1 : 0, commands.OfType<ReversePackageDistributionInProjectCliMenuCommand>().Count());
+    }
+
     [Fact]
     public void GetSubMenu_WhenProjectHasSolutionFile_ShowsOpenByVisualStudioOnWindowsOnly()
     {
@@ -210,7 +231,10 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
     public void GetSubMenu_WhenAllConditionsAreMet_ListsCommandsInMenuDataOrder()
     {
         // Arrange
-        RegisterProject(new ProjectModel { ProjectType = EProjectType.IsPackage, SolutionFileName = SolutionFileName });
+        RegisterProject(new ProjectModel
+        {
+            ProjectType = EProjectType.IsPackage, UseLocalPackages = true, SolutionFileName = SolutionFileName
+        });
         List<Type> expected =
         [
             typeof(DeleteProjectCliMenuCommand),
@@ -218,6 +242,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             typeof(CheckPackageSolutionCliMenuCommand),
             typeof(BuildPackageCliMenuCommand),
             typeof(PackageDistributionCliMenuCommand),
+            typeof(ReversePackageDistributionInProjectCliMenuCommand),
             typeof(CloneProjectToThisComputerCliMenuCommand),
             typeof(SaveEditorConfigAsNewTemplateCliMenuCommand)
         ];

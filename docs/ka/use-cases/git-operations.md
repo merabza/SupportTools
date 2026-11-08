@@ -213,7 +213,8 @@ V3 ვერსიები, `Update Outdated Packages` და `Distribute all p
 სინქრონიზაცია მათ აქ დაკლონავს;
 * `Check all projects build`, `Check group projects build`,
 `Clear All Groups All Solutions All Projects`,
-`Reverse Package Distribution`, `Remove Unused Package Versions` და
+`Reverse Package Distribution`, `Reverse Package Distribution In Group Projects`,
+`Remove Unused Package Versions` და
 `Open all projects By Visual Studio` remote პროექტებს ყოველთვის
 ტოვებს და წერს, რამდენი გამოტოვა: ფაილების გარეშე ისინი მხოლოდ იმას
 დაწერდნენ, რომ ფოლდერები არ არსებობს.

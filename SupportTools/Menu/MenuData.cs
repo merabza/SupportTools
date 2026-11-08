@@ -25,10 +25,12 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectParametersList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ProjectToolsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SelectProjectAllowTools;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ServerInfosList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SyncOneProjectAllGits;
+using SupportTools.Menu.ProjectGroupsList.ReversePackageDistributionInGroup;
 using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Menu.RemoveUnusedPackageVersions;
 using SupportTools.Menu.ReversePackageDistribution;
@@ -89,6 +91,8 @@ public static class MenuData
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის გიტების სინქრონიზაცია V3
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV3FactoryStrategy),
+        //ჯგუფში შემავალი ყველა პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით
+        nameof(ReversePackageDistributionInGroupCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
         nameof(CheckGroupProjectsBuildCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის Visual Studio-ში გახსნა
@@ -113,6 +117,8 @@ public static class MenuData
         nameof(BuildPackageCliMenuCommandFactoryStrategy),
         //პაკეტის გავრცელება მომხმარებელ პროექტებში (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
         nameof(PackageDistributionCliMenuCommandFactoryStrategy),
+        //პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით (მხოლოდ UseLocalPackages-ჩართული პროექტებისთვის)
+        nameof(ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy),
         //პროექტის ამ კომპიუტერზე ჩამოტანა (მხოლოდ remote პროექტებისთვის)
         nameof(CloneProjectToThisComputerCliMenuCommandFactoryStrategy),
         //პროექტის გიტების სინქრონიზაცია

@@ -9,8 +9,13 @@ using Microsoft.Extensions.Options;
 using ParametersManagement.LibParameters;
 using SupportTools.AutoSync;
 using SupportTools.DependencyInjection;
+using SupportTools.Menu;
 using SupportTools.Menu.CheckAllProjectsBuild;
 using SupportTools.Menu.DistributeAllPackages;
+using SupportTools.Menu.ProjectGroupsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
+using SupportTools.Menu.ProjectGroupsList.ReversePackageDistributionInGroup;
 using SupportTools.Menu.RemoveUnusedPackageVersions;
 using SupportTools.Menu.ReversePackageDistribution;
 using SupportTools.Menu.SyncAllProjectsAllGits;
@@ -90,6 +95,34 @@ public sealed class SupportToolsServicesTests
         Assert.Contains(nameof(ReversePackageDistributionCliMenuCommand), commandTypeNames);
         Assert.Contains(nameof(RemoveUnusedPackageVersionsCliMenuCommand), commandTypeNames);
         Assert.Contains(nameof(CheckAllProjectsBuildCliMenuCommand), commandTypeNames);
+    }
+
+    //the group and project menus create their commands from DI too: the strategies are found by their names in MenuData
+    [Fact]
+    public async Task AddServices_WhenBuilt_BuildsTheGroupAndProjectMenusWithReversePackageDistribution()
+    {
+        // Arrange
+        var parameters = new SupportToolsParameters();
+        parameters.Projects["App"] = new ProjectModel { ProjectGroupName = "G1", UseLocalPackages = true };
+        var services = new ServiceCollection();
+        services.AddServices("SupportToolsTests", parameters, @"D:\Fake\SupportTools.json");
+        // ReSharper disable once using
+        await using ServiceProvider serviceProvider = services.BuildServiceProvider();
+        var parametersManager = serviceProvider.GetRequiredService<IParametersManager>();
+        var menuParameters = serviceProvider.GetRequiredService<SupportToolsMenuParameters>();
+
+        // Act
+        CliMenuSet? groupMenu =
+            new ProjectGroupSubMenuCliMenuCommand(serviceProvider, parametersManager, "G1", menuParameters)
+                .GetSubMenu();
+        CliMenuSet? projectMenu =
+            new ProjectSubMenuCliMenuCommand(serviceProvider, parametersManager, "App", menuParameters).GetSubMenu();
+
+        // Assert
+        Assert.Contains(CliMenuTestAccess.GetMenuItems(groupMenu!),
+            x => x.CliMenuCommand is ReversePackageDistributionInGroupCliMenuCommand);
+        Assert.Contains(CliMenuTestAccess.GetMenuItems(projectMenu!),
+            x => x.CliMenuCommand is ReversePackageDistributionInProjectCliMenuCommand);
     }
 
     //the recent commands of the menu take their file and count from the parameters
