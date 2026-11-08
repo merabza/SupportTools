@@ -4,9 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using AppCliTools.LibDataInput;
 using Newtonsoft.Json;
 using ParametersManagement.LibApiClientParameters;
+using ParametersManagement.LibDatabaseParameters;
+using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 using Xunit;
 
 namespace SupportTools.Tests;
@@ -18,6 +22,7 @@ namespace SupportTools.Tests;
 public sealed class ProgramTests : IDisposable
 {
     private const string ApiClientName = "SupportToolsServer";
+    private const string PairsFileContent = "{ \"PairedTables\": {} }";
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly TextWriter _originalConsoleOutput;
@@ -34,6 +39,8 @@ public sealed class ProgramTests : IDisposable
 
     public void Dispose()
     {
+        //--allyes stays on in this process after the run
+        Inputer.AnswerYesToAll = false;
         Console.SetOut(_originalConsoleOutput);
         _consoleOutput.Dispose();
         Directory.Delete(_tempFolder, true);
@@ -153,6 +160,104 @@ public sealed class ProgramTests : IDisposable
         Assert.Equal(7, result);
         Assert.Contains("[ERROR] Server with name Srv not found for project App. Existing servers are: ",
             ConsoleLines());
+    }
+
+    //--allyes answers the yes/no questions of the tool without the console: PairProdCopyAndDevDbObjects first asks
+    //whether its result file may be overwritten (default no) and then reads the databases, which refuse at once
+    [Fact]
+    public async Task Main_WhenAllYes_AnswersTheQuestionOfTheToolWithoutTheConsole()
+    {
+        // Arrange
+        string resultFileName = await WritePairingProject();
+
+        // Act
+        int result = await RunMain("--use", _parametersFileName, "--run", "PairProdCopyAndDevDbObjects", "--project",
+            "App", "--allyes");
+
+        // Assert
+        Assert.Equal(7, result);
+        Assert.Contains($"File {resultFileName} exists, overwrite? (y/n)[n]: Y (yes to all){Environment.NewLine}",
+            ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("[ERROR] Failed to read tables and columns from ProdCopy database", ConsoleLines());
+        Assert.Equal(PairsFileContent, await File.ReadAllTextAsync(resultFileName));
+    }
+
+    //without --allyes the same question waits for the console, which the test host does not have: the tool stops there
+    //and never reaches the databases
+    [Fact]
+    public async Task Main_WhenNotAllYes_AsksTheQuestionOfTheToolFromTheConsole()
+    {
+        // Arrange
+        string resultFileName = await WritePairingProject();
+
+        // Act
+        int result = await RunMain("--use", _parametersFileName, "--run", "PairProdCopyAndDevDbObjects", "--project",
+            "App");
+
+        // Assert
+        Assert.Equal(7, result);
+        Assert.Contains($"File {resultFileName} exists, overwrite? (y/n)[n]: ", ConsoleText(),
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("(yes to all)", ConsoleText(), StringComparison.Ordinal);
+        Assert.DoesNotContain("Failed to read tables and columns", ConsoleText(), StringComparison.Ordinal);
+        Assert.Equal(PairsFileContent, await File.ReadAllTextAsync(resultFileName));
+    }
+
+    //the parameters file is read before --allyes is turned on, so the offer to rewrite an invalid file still needs a
+    //console answer, and the file stays as it is
+    [Fact]
+    public async Task Main_WhenAllYesAndParametersFileIsNotValid_DoesNotAnswerTheRewriteQuestion()
+    {
+        // Arrange
+        const string invalidParameters = "{ not json";
+        await File.WriteAllTextAsync(_parametersFileName, invalidParameters);
+
+        // Act
+        int result = await RunMain("--use", _parametersFileName, "--run", "DropDevDatabase", "--project", "App",
+            "--allyes");
+
+        // Assert
+        Assert.Equal(4, result);
+        Assert.DoesNotContain("(yes to all)", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("[ERROR] InvalidOperationException thrown with message: ", ConsoleText(),
+            StringComparison.Ordinal);
+        Assert.Equal(invalidParameters, await File.ReadAllTextAsync(_parametersFileName));
+    }
+
+    //PairProdCopyAndDevDbObjects for project App, whose result file exists already. Both databases are on a MariaDB
+    //address where nothing listens
+    private async Task<string> WritePairingProject()
+    {
+        const string connectionName = "MariaDbNowhere";
+        string resultFileName = Path.Combine(_tempFolder, "PairedDbObjects.json");
+        await File.WriteAllTextAsync(resultFileName, PairsFileContent);
+        await WriteParameters(new SupportToolsParameters
+        {
+            DatabaseServerConnections =
+            {
+                [connectionName] = new DatabaseServerConnectionData
+                {
+                    DatabaseServerProvider = EDatabaseProvider.MariaDb,
+                    ServerAddress = "127.0.0.1:1",
+                    ServerUser = "root",
+                    ServerPass = "fake-password",
+                    ConnectionTimeOut = 5
+                }
+            },
+            Projects =
+            {
+                ["App"] = new ProjectModel
+                {
+                    AllowToolsList = [EProjectTools.PairProdCopyAndDevDbObjects],
+                    ProdCopyDatabaseParameters =
+                        new DatabaseParameters { DbConnectionName = connectionName, DatabaseName = "AppProdCopy" },
+                    DevDatabaseParameters =
+                        new DatabaseParameters { DbConnectionName = connectionName, DatabaseName = "AppDev" },
+                    PairedDbObjectsResultFileName = resultFileName
+                }
+            }
+        });
+        return resultFileName;
     }
 
     private static SupportToolsParameters CreateParametersWithServer(bool autoSync)

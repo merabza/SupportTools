@@ -10,6 +10,7 @@ namespace SupportTools;
 //პროგრამისთვის გადმოცემული ბრძანებათა სტრიქონის არგუმენტების გაანალიზება
 public sealed class ArgumentsAnalyzer
 {
+    private readonly Option<bool> _allYesOption;
     private readonly Option<string?> _projectOption;
     private readonly RootCommand _rootCommand;
     private readonly Option<string?> _runOption;
@@ -40,9 +41,15 @@ public sealed class ArgumentsAnalyzer
 
         _runOption.CompletionSources.Add(ProjectToolRunner.GetAllToolNames());
 
+        _allYesOption = new Option<bool>("--allyes", "-a")
+        {
+            Description =
+                "Answer yes to every yes/no question of the tool specified by --run, without waiting for input."
+        };
+
         _rootCommand = new RootCommand("SupportTools - support tools for .NET projects.")
         {
-            _useOption, _projectOption, _serverOption, _runOption
+            _useOption, _projectOption, _serverOption, _runOption, _allYesOption
         };
     }
 
@@ -51,6 +58,7 @@ public sealed class ArgumentsAnalyzer
     public string? ServerName { get; private set; }
     public EProjectTools? ProjectTool { get; private set; }
     public EProjectServerTools? ServerTool { get; private set; }
+    public bool AllYes { get; private set; }
     public int ExitCode { get; private set; }
 
     //აბრუნებს true-ს, თუ პროგრამის მუშაობა უნდა გაგრძელდეს.
@@ -71,6 +79,7 @@ public sealed class ArgumentsAnalyzer
         ParametersFileName = string.IsNullOrWhiteSpace(parametersFileName) ? null : parametersFileName;
         ProjectName = parseResult.GetValue(_projectOption);
         ServerName = parseResult.GetValue(_serverOption);
+        AllYes = parseResult.GetValue(_allYesOption);
 
         string? runToolName = parseResult.GetValue(_runOption);
 
@@ -136,6 +145,11 @@ public sealed class ArgumentsAnalyzer
         if (!string.IsNullOrWhiteSpace(ServerName))
         {
             StShared.WriteWarningLine("--server (-s) works only together with --run (-r), it will be ignored", true);
+        }
+
+        if (AllYes)
+        {
+            StShared.WriteWarningLine("--allyes (-a) works only together with --run (-r), it will be ignored", true);
         }
     }
 

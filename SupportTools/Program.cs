@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using AppCliTools.CliParameters;
 using AppCliTools.CliTools;
+using AppCliTools.LibDataInput;
 using LibSupportToolsServerWork.Registry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -71,6 +72,10 @@ try
             StShared.WriteErrorLine("parametersManager is null", true, logger, false);
             return 6;
         }
+
+        //--allyes: ინსტრუმენტის ყველა y/n შეკითხვას "yes" პასუხი ავტომატურად ეძლევა. პარამეტრების ფაილის ჩატვირთვის
+        //შემდეგ ირთვება, რომ არასწორი ფაილის გადაწერის შეკითხვაზე პასუხი ისევ მომხმარებელმა გასცეს
+        Inputer.AnswerYesToAll = argumentsAnalyzer.AllYes;
 
         bool runSuccess = argumentsAnalyzer.ServerTool is null
             ? await ProjectToolRunner.Run(serviceProvider, parametersManager, argumentsAnalyzer.ProjectName!,

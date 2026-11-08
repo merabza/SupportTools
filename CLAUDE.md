@@ -45,6 +45,14 @@ Five layers, bottom-up: (1) data models in `SupportToolsData`/`LibGitData`/`LibT
 
 **New per-project tool action:** add an enum value to [SupportToolsData/EProjectTools.cs](SupportToolsData/EProjectTools.cs) or [EProjectServerTools.cs](SupportToolsData/EProjectServerTools.cs) (with a Georgian-language comment matching existing style), implement a `*ToolAction` in the right `Lib*` library, and wire it via [SupportTools/ToolCommandFactory.cs](SupportTools/ToolCommandFactory.cs). The factory looks up strategies by `tool.ToString()`, so the strategy's `ToolCommandName` must equal the enum name.
 
+## Command line (--run, --allyes)
+
+`ArgumentsAnalyzer` (System.CommandLine) parses `--use` (-u), `--run` (-r) with `--project` (-p) and, for a server tool, `--server` (-s), and `--allyes` (-a). `--project`, `--server` and `--allyes` work only together with `--run`; without it they warn and are ignored. `--run` runs one tool through `ProjectToolRunner` and exits without the menu.
+
+- `--allyes`: `Program.cs` sets AppCliTools' `Inputer.AnswerYesToAll` right before the tool, after the parameters file is loaded, so the "File … is Invalid, Create, rewrite and use file with this name?" question of `ParametersService` is never answered by itself. Every `Inputer.InputBool` / `InputAnswer` then returns yes without reading the console and writes `<question> (y/n)[n]: Y (yes to all)`. Only the y/n questions (the user's choice): the file name of ServiceInstallScriptCreator / ServiceRemoveScriptCreator and the list choices of ServerBaseToServerCopier and RestoreDatabaseFromFileStorageToNewDatabase still ask.
+- The `press any key...` after an error (`StShared.Pause`) must not wait with `--allyes` either (the user's choice). SystemTools has `StShared.SkipPause` for it, but SupportTools gets SystemTools as a BaGetter package (through AppCliTools and the other siblings, not from the `../SystemTools` source), so `Program.cs` can set it only after a SystemTools package that has it is distributed. Until then `--allyes` still pauses after an error in a real console (redirected input never pauses).
+- Tests: `ArgumentsAnalyzerTests`; `ProgramTests` (`-a` answers the overwrite question of PairProdCopyAndDevDbObjects, whose databases are on a MariaDB address where nothing listens, and never the parameters file question); AppCliTools' `InputerTests` (in `AppCliTools.CliParameters.Tests`).
+
 ## State and config
 
 All registered projects, servers, git repos, templates, API clients, and connection strings live in one JSON file at a user-profile path supplied by the `--use` argument and loaded by `ParametersService<SupportToolsParameters>`. Top-level shape is `SupportToolsParameters` ([SupportToolsData/Models/SupportToolsParameters.cs](SupportToolsData/Models/SupportToolsParameters.cs)). `Newtonsoft.Json` is used so adding new fields to a model is safe — existing JSON loads fine.

@@ -48,6 +48,7 @@ public sealed class ArgumentsAnalyzerTests : IDisposable
         Assert.Null(_sut.ServerName);
         Assert.Null(_sut.ProjectTool);
         Assert.Null(_sut.ServerTool);
+        Assert.False(_sut.AllYes);
         Assert.Equal(0, _sut.ExitCode);
     }
 
@@ -127,6 +128,34 @@ public sealed class ArgumentsAnalyzerTests : IDisposable
         Assert.True(result);
         Assert.Equal(ServerName, _sut.ServerName);
         Assert.Contains("--server (-s) works only together with --run (-r), it will be ignored", ConsoleText(),
+            StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("--allyes")]
+    [InlineData("-a")]
+    public async Task Analysis_WhenAllYesIsSpecifiedWithRun_KeepsItWithoutWarning(string optionName)
+    {
+        // Act
+        bool result = await _sut.Analysis(["-p", ProjectName, "-r", "RecreateDevDatabase", optionName]);
+
+        // Assert
+        Assert.True(result);
+        Assert.True(_sut.AllYes);
+        Assert.Equal(EProjectTools.RecreateDevDatabase, _sut.ProjectTool);
+        Assert.DoesNotContain("--allyes (-a)", ConsoleText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Analysis_WhenAllYesIsSpecifiedWithoutRun_WarnsAndContinues()
+    {
+        // Act
+        bool result = await _sut.Analysis(["--allyes"]);
+
+        // Assert
+        Assert.True(result);
+        Assert.True(_sut.AllYes);
+        Assert.Contains("--allyes (-a) works only together with --run (-r), it will be ignored", ConsoleText(),
             StringComparison.Ordinal);
     }
 
@@ -251,6 +280,7 @@ public sealed class ArgumentsAnalyzerTests : IDisposable
         Assert.Contains("--use", ConsoleText(), StringComparison.Ordinal);
         Assert.Contains("--project", ConsoleText(), StringComparison.Ordinal);
         Assert.Contains("--server", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("--allyes", ConsoleText(), StringComparison.Ordinal);
         Assert.Contains(nameof(EProjectTools.RecreateDevDatabase), ConsoleText(), StringComparison.Ordinal);
         Assert.Contains(nameof(EProjectServerTools.ServiceStarter), ConsoleText(), StringComparison.Ordinal);
     }
@@ -270,6 +300,7 @@ public sealed class ArgumentsAnalyzerTests : IDisposable
         Assert.Contains("Project name, for which the tool must be run.", ConsoleText(), StringComparison.Ordinal);
         Assert.Contains("Server name or ServerName|EnvironmentName.", ConsoleText(), StringComparison.Ordinal);
         Assert.Contains("Run this project or server tool for the project", ConsoleText(), StringComparison.Ordinal);
+        Assert.Contains("Answer yes to every yes/no question", ConsoleText(), StringComparison.Ordinal);
     }
 
     private string ConsoleText()
