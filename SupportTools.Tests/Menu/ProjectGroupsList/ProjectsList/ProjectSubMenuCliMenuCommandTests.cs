@@ -13,6 +13,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DistributeAllPackagesInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
@@ -20,6 +21,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributio
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.SaveEditorConfigAsNewTemplate;
 using SupportToolsData;
 using SupportToolsData.Models;
+using SystemTools.SystemToolsShared;
 using Xunit;
 
 namespace SupportTools.Tests.Menu.ProjectGroupsList.ProjectsList;
@@ -43,12 +45,14 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         _parametersManager = new ParametersManager(null, _parameters);
 
         _serviceProvider = new ServiceCollection().AddLogging().AddSingleton(new Mock<IHttpClientFactory>().Object)
+            .AddSingleton(new Mock<IApplication>().Object)
             .AddSingleton(_menuParameters).AddSingleton<IParametersManager>(_parametersManager)
             .AddTransient<IMenuCommandFactoryStrategy, DeleteProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, OpenByVisualStudioCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CheckPackageSolutionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, BuildPackageCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
+            .AddTransient<IMenuCommandFactoryStrategy, DistributeAllPackagesInProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
@@ -135,13 +139,14 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         Assert.Empty(commands.OfType<PackageDistributionCliMenuCommand>());
     }
 
-    //Reverse Package Distribution does not touch a project that does not use local packages, whatever its type
+    //Distribute all packages and Reverse Package Distribution do not touch a project that does not use local packages,
+    //whatever its type
     [Theory]
     [InlineData(EProjectType.Standard, true, true)]
     [InlineData(EProjectType.IsPackage, true, true)]
     [InlineData(EProjectType.Standard, false, false)]
     [InlineData(EProjectType.IsPackage, false, false)]
-    public void GetSubMenu_WhenCalled_ShowsReversePackageDistributionOnlyForProjectThatUsesLocalPackages(
+    public void GetSubMenu_WhenCalled_ShowsPackageDistributionCommandsOnlyForProjectThatUsesLocalPackages(
         EProjectType projectType, bool useLocalPackages, bool expected)
     {
         // Arrange
@@ -151,6 +156,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         List<CliMenuCommand> commands = GetSubMenuCommands();
 
         // Assert
+        Assert.Equal(expected ? 1 : 0, commands.OfType<DistributeAllPackagesInProjectCliMenuCommand>().Count());
         Assert.Equal(expected ? 1 : 0, commands.OfType<ReversePackageDistributionInProjectCliMenuCommand>().Count());
     }
 
@@ -242,6 +248,7 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
             typeof(CheckPackageSolutionCliMenuCommand),
             typeof(BuildPackageCliMenuCommand),
             typeof(PackageDistributionCliMenuCommand),
+            typeof(DistributeAllPackagesInProjectCliMenuCommand),
             typeof(ReversePackageDistributionInProjectCliMenuCommand),
             typeof(CloneProjectToThisComputerCliMenuCommand),
             typeof(SaveEditorConfigAsNewTemplateCliMenuCommand)

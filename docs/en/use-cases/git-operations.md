@@ -200,7 +200,9 @@ and each group shows `local: N, remote: N`. `HideRemoteOnlyProjects` in
 The group commands work on the local projects by default:
 
 * `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`, their
-V3 versions, `Update Outdated Packages` and `Distribute all packages` ask whether to
+V3 versions, `Update Outdated Packages` and `Distribute all packages` (also
+`Distribute all packages in group projects` and `Distribute all packages in project`,
+for the packages they process) ask whether to
 include the remote projects too (default `n`), because their sync would
 clone them here;
 * `Check all projects build`, `Check group projects build`,

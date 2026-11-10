@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu;
+using SupportTools.Menu.ProjectGroupsList.DistributeAllPackagesInGroup;
 using SupportTools.Menu.ProjectGroupsList.ReversePackageDistributionInGroup;
-using SupportTools.Menu.ProjectGroupsList.SyncOneGroupAllProjectsGits;
 using SupportTools.Tests.Menu.ReversePackageDistribution;
 using SupportToolsData.Models;
 using Xunit;
@@ -182,9 +182,10 @@ public sealed class ReversePackageDistributionInGroupCliMenuCommandTests : IDisp
             StringComparison.Ordinal);
     }
 
-    //strategies are looked up by type name, so the group submenu shows the command only if its name is listed
+    //strategies are looked up by type name, so the group submenu shows the command only if its name is listed; it
+    //comes after Distribute all packages in group projects, as in the main menu
     [Fact]
-    public void ProjectGroupSubMenuCommandFactoryStrategyNames_ListTheStrategyRightAfterTheV3Sync()
+    public void ProjectGroupSubMenuCommandFactoryStrategyNames_ListTheStrategyRightAfterDistributeAllPackagesInGroup()
     {
         // Act
         List<string> strategyNames = MenuData.ProjectGroupSubMenuCommandFactoryStrategyNames;
@@ -192,7 +193,7 @@ public sealed class ReversePackageDistributionInGroupCliMenuCommandTests : IDisp
         // Assert
         int index = strategyNames.IndexOf(nameof(ReversePackageDistributionInGroupCliMenuCommandFactoryStrategy));
         Assert.True(index > 0);
-        Assert.Equal(nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV3FactoryStrategy), strategyNames[index - 1]);
+        Assert.Equal(nameof(DistributeAllPackagesInGroupCliMenuCommandFactoryStrategy), strategyNames[index - 1]);
     }
 
     private ReversePackageDistributionInGroupCliMenuCommand CreateSut(string projectGroupName = "G1")

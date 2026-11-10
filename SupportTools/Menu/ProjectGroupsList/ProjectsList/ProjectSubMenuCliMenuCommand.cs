@@ -6,6 +6,7 @@ using ParametersManagement.LibParameters;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DistributeAllPackagesInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.OpenByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
@@ -48,9 +49,10 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
             excludeList.Add(nameof(PackageDistributionCliMenuCommandFactoryStrategy));
         }
 
-        //Reverse Package Distribution UseLocalPackages-გამორთულ პროექტს არ ეხება
+        //Distribute all packages და Reverse Package Distribution UseLocalPackages-გამორთულ პროექტს არ ეხება
         if (project is null || !project.UseLocalPackages)
         {
+            excludeList.Add(nameof(DistributeAllPackagesInProjectCliMenuCommandFactoryStrategy));
             excludeList.Add(nameof(ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy));
         }
 

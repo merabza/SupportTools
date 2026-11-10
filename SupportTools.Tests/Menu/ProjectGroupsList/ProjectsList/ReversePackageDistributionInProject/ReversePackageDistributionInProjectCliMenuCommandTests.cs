@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Menu;
-using SupportTools.Menu.ProjectGroupsList.ProjectsList.PackageDistribution;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DistributeAllPackagesInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
 using SupportTools.Tests.Menu.ReversePackageDistribution;
 using SupportToolsData.Models;
@@ -177,9 +177,10 @@ public sealed class ReversePackageDistributionInProjectCliMenuCommandTests : IDi
         Assert.Equal("App", reverseCommand.ParentMenuName);
     }
 
-    //strategies are looked up by type name, so the project submenu shows the command only if its name is listed
+    //strategies are looked up by type name, so the project submenu shows the command only if its name is listed; it
+    //comes after Distribute all packages in project, as in the main menu
     [Fact]
-    public void ProjectSubMenuCommandFactoryStrategyNames_ListTheStrategyRightAfterPackageDistribution()
+    public void ProjectSubMenuCommandFactoryStrategyNames_ListTheStrategyRightAfterDistributeAllPackagesInProject()
     {
         // Act
         List<string> strategyNames = MenuData.ProjectSubMenuCommandFactoryStrategyNames;
@@ -187,7 +188,7 @@ public sealed class ReversePackageDistributionInProjectCliMenuCommandTests : IDi
         // Assert
         int index = strategyNames.IndexOf(nameof(ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy));
         Assert.True(index > 0);
-        Assert.Equal(nameof(PackageDistributionCliMenuCommandFactoryStrategy), strategyNames[index - 1]);
+        Assert.Equal(nameof(DistributeAllPackagesInProjectCliMenuCommandFactoryStrategy), strategyNames[index - 1]);
     }
 
     private ReversePackageDistributionInProjectCliMenuCommand CreateSut(string projectName = "App")

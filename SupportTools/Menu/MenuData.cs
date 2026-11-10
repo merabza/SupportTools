@@ -9,6 +9,7 @@ using SupportTools.Menu.DistributeAllPackages;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
+using SupportTools.Menu.ProjectGroupsList.DistributeAllPackagesInGroup;
 using SupportTools.Menu.ProjectGroupsList.OpenAllProjectsByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
@@ -17,6 +18,7 @@ using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.DeleteProject;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DistributeAllPackagesInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.EditItemAllFieldsInSequence;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ExportProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.GitSubMenu;
@@ -91,6 +93,9 @@ public static class MenuData
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV2FactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის გიტების სინქრონიზაცია V3
         nameof(SyncOneGroupAllProjectsGitsCliMenuCommandV3FactoryStrategy),
+        //ჯგუფში შემავალი პროექტების გიტების სიებში დასახელებული პაკეტის პროექტების სინქრონიზაცია, დაბილდვა, ატვირთვა და
+        //გავრცელება ჯგუფის პროექტებში, დამოკიდებულებების მიხედვით დალაგებული თანმიმდევრობით
+        nameof(DistributeAllPackagesInGroupCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით
         nameof(ReversePackageDistributionInGroupCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
@@ -117,6 +122,9 @@ public static class MenuData
         nameof(BuildPackageCliMenuCommandFactoryStrategy),
         //პაკეტის გავრცელება მომხმარებელ პროექტებში (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
         nameof(PackageDistributionCliMenuCommandFactoryStrategy),
+        //პროექტის გიტების სიაში დასახელებული პაკეტის პროექტების სინქრონიზაცია, დაბილდვა, ატვირთვა და გავრცელება ამ
+        //პროექტში, დამოკიდებულებების მიხედვით დალაგებული თანმიმდევრობით (მხოლოდ UseLocalPackages-ჩართული პროექტებისთვის)
+        nameof(DistributeAllPackagesInProjectCliMenuCommandFactoryStrategy),
         //პროექტის მთავარ რეპოზიტორიაში საკუთარი პაკეტების ჩანაცვლება პროექტის რეფერენსებით (მხოლოდ UseLocalPackages-ჩართული პროექტებისთვის)
         nameof(ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy),
         //პროექტის ამ კომპიუტერზე ჩამოტანა (მხოლოდ remote პროექტებისთვის)

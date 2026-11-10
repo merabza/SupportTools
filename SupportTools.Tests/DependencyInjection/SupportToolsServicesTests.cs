@@ -13,7 +13,9 @@ using SupportTools.Menu;
 using SupportTools.Menu.CheckAllProjectsBuild;
 using SupportTools.Menu.DistributeAllPackages;
 using SupportTools.Menu.ProjectGroupsList;
+using SupportTools.Menu.ProjectGroupsList.DistributeAllPackagesInGroup;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.DistributeAllPackagesInProject;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.ReversePackageDistributionInProject;
 using SupportTools.Menu.ProjectGroupsList.ReversePackageDistributionInGroup;
 using SupportTools.Menu.RemoveUnusedPackageVersions;
@@ -99,7 +101,7 @@ public sealed class SupportToolsServicesTests
 
     //the group and project menus create their commands from DI too: the strategies are found by their names in MenuData
     [Fact]
-    public async Task AddServices_WhenBuilt_BuildsTheGroupAndProjectMenusWithReversePackageDistribution()
+    public async Task AddServices_WhenBuilt_BuildsTheGroupAndProjectMenusWithTheirPackageDistributionCommands()
     {
         // Arrange
         var parameters = new SupportToolsParameters();
@@ -120,7 +122,11 @@ public sealed class SupportToolsServicesTests
 
         // Assert
         Assert.Contains(CliMenuTestAccess.GetMenuItems(groupMenu!),
+            x => x.CliMenuCommand is DistributeAllPackagesInGroupCliMenuCommand);
+        Assert.Contains(CliMenuTestAccess.GetMenuItems(groupMenu!),
             x => x.CliMenuCommand is ReversePackageDistributionInGroupCliMenuCommand);
+        Assert.Contains(CliMenuTestAccess.GetMenuItems(projectMenu!),
+            x => x.CliMenuCommand is DistributeAllPackagesInProjectCliMenuCommand);
         Assert.Contains(CliMenuTestAccess.GetMenuItems(projectMenu!),
             x => x.CliMenuCommand is ReversePackageDistributionInProjectCliMenuCommand);
     }

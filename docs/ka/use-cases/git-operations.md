@@ -208,7 +208,9 @@ git-ის შეცდომით სრულდება. გამოიყ
 ჯგუფური ბრძანებები ნაგულისხმევად ლოკალურ პროექტებზე მუშაობს:
 
 * `Sync All Projects All Gits V2`, `Sync One Group All Projects Gits V2`, მათი
-V3 ვერსიები, `Update Outdated Packages` და `Distribute all packages` გეკითხება,
+V3 ვერსიები, `Update Outdated Packages` და `Distribute all packages` (ასევე
+`Distribute all packages in group projects` და `Distribute all packages in project`
+იმ პაკეტებისთვის, რომლებსაც ისინი ამუშავებს) გეკითხება,
 ჩაირთოს თუ არა remote პროექტებიც (ნაგულისხმევად `n`), რადგან მათი
 სინქრონიზაცია მათ აქ დაკლონავს;
 * `Check all projects build`, `Check group projects build`,
