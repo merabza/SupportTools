@@ -71,8 +71,11 @@ public static class TableRowsAdjuster
         Dictionary<string, Dictionary<string, object?>> secondDict =
             listWithLessPriority.ToDictionary(KeySelector, v => v);
 
-        var retList = new List<Dictionary<string, object?>>(priorDict.Values);
-        retList.AddRange(secondDict.Where(kvp => !priorDict.ContainsKey(kvp.Key)).Select(kvp => kvp.Value));
+        List<Dictionary<string, object?>> retList =
+        [
+            .. priorDict.Values,
+            .. secondDict.Where(kvp => !priorDict.ContainsKey(kvp.Key)).Select(kvp => kvp.Value)
+        ];
         return retList;
     }
 }

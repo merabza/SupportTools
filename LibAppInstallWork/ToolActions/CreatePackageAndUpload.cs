@@ -155,8 +155,7 @@ public sealed class CreatePackageAndUpload : ToolAction
         versionId ??= "1.0.0";
 
         string[] verNumbers = versionId.Split('.');
-        var assemblyVersionNumbers = new List<string>();
-        assemblyVersionNumbers.AddRange(verNumbers.Take(2));
+        List<string> assemblyVersionNumbers = [.. verNumbers.Take(2)];
         if (assemblyVersionNumbers.Count == 0)
         {
             assemblyVersionNumbers.Add("1");
