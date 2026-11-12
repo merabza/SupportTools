@@ -13,6 +13,7 @@ using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
 using SupportTools.FieldEditors;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SupportToolsData.Models;
 using SystemTools.DatabaseToolsShared;
 using SystemTools.SystemToolsShared;
@@ -59,7 +60,8 @@ public sealed class PairedTableCruderTests
             nameof(PairedTable.ProdCopySchemaName), nameof(PairedTable.ProdCopyTableName),
             nameof(PairedTable.DevSchemaName), nameof(PairedTable.DevTableName), nameof(PairedTable.SeedDataType),
             nameof(PairedTable.UseOldDataConvertor), nameof(PairedTable.ProdCopyRowFilter),
-            nameof(PairedTable.KeyFieldNames), nameof(PairedTable.PairedFields)
+            nameof(PairedTable.KeyFieldNames), nameof(PairedTable.Locked),
+            nameof(PairedTable.PairedFields)
         ], fieldEditors.Select(x => x.PropertyName));
         Assert.IsType<SchemaNameFieldEditor>(fieldEditors[0]);
         Assert.IsType<TableNameFieldEditor>(fieldEditors[1]);
@@ -69,7 +71,8 @@ public sealed class PairedTableCruderTests
         Assert.IsType<BoolFieldEditor>(fieldEditors[5]);
         Assert.IsType<OptionalTextFieldEditor>(fieldEditors[6]);
         Assert.IsType<SimpleNamesListFieldEditor<KeyFieldNamesLisCruder>>(fieldEditors[7]);
-        Assert.IsType<PairedFieldsListFieldEditor>(fieldEditors[8]);
+        Assert.IsType<BoolFieldEditor>(fieldEditors[8]);
+        Assert.IsType<PairedFieldsListFieldEditor>(fieldEditors[9]);
     }
 
     //the schema and table names of each side are read from the database of that side
@@ -218,6 +221,24 @@ public sealed class PairedTableCruderTests
         // Assert
         Assert.Equal([CustomersKey, $"{CustomersKey} (2)"], _tables.Keys);
         Assert.Same(second, _tables[$"{CustomersKey} (2)"]);
+    }
+
+    //the backups of the pairs file sit next to it, so the restore command needs its name
+    [Theory]
+    [InlineData("PairedDbObjects.json", 1)]
+    [InlineData(null, 0)]
+    public void GetListMenu_WhenCalled_OffersTheRestoreOnlyWithAFileName(string? fileName, int expectedCount)
+    {
+        // Arrange
+        _parametersManager.SetupGet(x => x.ParametersFileName).Returns(fileName);
+
+        // Act
+        CliMenuSet listMenu = CreateSut().GetListMenu();
+
+        // Assert
+        Assert.Equal(expectedCount,
+            CliMenuTestAccess.GetMenuItems(listMenu).Select(x => x.CliMenuCommand)
+                .OfType<RestorePairedDbObjectsFromBackupCliMenuCommand>().Count());
     }
 
     [Fact]

@@ -8,7 +8,6 @@ using AppCliTools.CliParameters;
 using AppCliTools.LibDataInput;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using ParametersManagement.LibParameters;
 using SystemTools.SystemToolsShared;
 
@@ -96,44 +95,27 @@ public sealed class PairProdCopyAndDevDbObjectsToolCommand : ToolCommand
             devTables = DbSchemaQueryHelper.ReKeyDevTablesByTableNameOnly(devTables, _logger);
         }
 
-        var pairedTables = new Dictionary<string, PairedTable>();
-        foreach (((string SchemaLower, string TableLower) key, TableInfo prodCopyTable) in prodCopyTables)
-        {
-            if (!devTables.TryGetValue(key, out TableInfo? devTable))
-            {
-                continue;
-            }
-
-            Dictionary<string, string> devColumnLookup =
-                devTable.Columns.ToDictionary(c => c.ToUpperInvariant(), c => c);
-
-            var pairedFields = new Dictionary<string, PairedField>();
-            foreach (string prodColumn in prodCopyTable.Columns)
-            {
-                if (!devColumnLookup.TryGetValue(prodColumn.ToUpperInvariant(), out string? devColumn))
-                {
-                    continue;
-                }
-
-                var pairedField = new PairedField(prodColumn, devColumn);
-                pairedFields.Add(pairedField.GetItemKey(), pairedField);
-            }
-
-            var pairedTable = new PairedTable(prodCopyTable.SchemaName, prodCopyTable.TableName, devTable.SchemaName,
-                devTable.TableName, pairedFields);
-            pairedTables.Add(pairedTable.GetItemKey(), pairedTable);
-        }
+        //არსებული ფაილის დაკეტილი ცხრილები და ველები ახალ წყვილებში უცვლელად გადადის
+        PairedDbObjectsModel existing = PairedDbObjectsParametersManager.Load(Parameters.ResultFileName, _logger);
+        Dictionary<string, PairedTable> pairedTables = PairedDbObjectsPairer.Pair(prodCopyTables, devTables,
+            DbSchemaQueryHelper.UsesSchemas(Parameters.ProdCopyDataProvider), existing.PairedTables, _logger);
 
         var result = new PairedDbObjectsModel(pairedTables);
 
         try
         {
-            string json = JsonConvert.SerializeObject(result, Formatting.Indented);
-            await File.WriteAllTextAsync(Parameters.ResultFileName, json, cancellationToken);
+            //ParametersManager.Save ფაილის წინა ვერსიას ბექაპად ინახავს (<ფაილი>.yyyyMMdd-HHmmss-fff.bak, 10 უახლესი)
+            var parMan = new PairedDbObjectsParametersManager(Parameters.ResultFileName, result);
+            if (!await parMan.Save(result, null, null, cancellationToken))
+            {
+                return false;
+            }
+
             if (_logger.IsEnabled(LogLevel.Information))
             {
-                _logger.LogInformation("Paired DB objects saved to {ResultFileName}. Paired tables: {Count}",
-                    Parameters.ResultFileName, pairedTables.Count);
+                _logger.LogInformation(
+                    "Paired DB objects saved to {ResultFileName}. Paired tables: {Count}, locked tables: {LockedCount}",
+                    Parameters.ResultFileName, pairedTables.Count, pairedTables.Values.Count(x => x.Locked));
             }
         }
         catch (Exception ex)

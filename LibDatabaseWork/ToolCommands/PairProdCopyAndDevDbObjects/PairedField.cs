@@ -20,6 +20,9 @@ public sealed class PairedField : ItemData
     public string ProdCopyFieldName { get; set; }
     public string DevFieldName { get; set; }
 
+    //დაკეტილ ველს "Pair ProdCopy and Dev Db Objects" აღარ ცვლის
+    public bool Locked { get; set; }
+
     public override string GetItemKey()
     {
         return $"{ProdCopyFieldName} - {DevFieldName}";

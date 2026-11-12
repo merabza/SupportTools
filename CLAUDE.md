@@ -301,6 +301,17 @@ After a registry sync every computer lists every project, but each is physically
 - Tools: "Select Allow tools..." (project and server) lists only the visible tools and leaves the choices of the hidden ones as they are; the tools lists and `--run` (`ProjectToolRunner`) offer only allowed tools that are also visible. Nothing is deleted from the parameters.
 - Registry: `StsProjectDataModel.UsesDatabase` is `[DefaultValue(true)]` with a `true` initializer, so the hash omits true (existing hashes stay) and a client or server that does not know the field reads true. Server: `Project.UsesDatabase`, column default and sentinel true, migration `AddProjectUsesDatabase` (SupportToolsServerDbTools).
 
+## Paired Db Objects (Locked, backups)
+
+"Pair ProdCopy and Dev Db Objects" (`LibDatabaseWork/ToolCommands/PairProdCopyAndDevDbObjects/`) pairs the tables and the columns by name, ignoring case, through `PairedDbObjectsPairer` (a pure function; tests in `SupportTools.Tests/DatabaseWork/PairedDbObjectsPairerTests.cs`). It reads the existing pairs file first:
+
+- `PairedTable.Locked`: the table record stays as it is (names, SeedDataType, row filter, key fields, dictionary key). Its unlocked fields are paired again between its own ProdCopy and Dev tables. Its tables are not paired with anything else. When its tables are gone, it stays with only its locked fields (a warning).
+- `PairedField.Locked`: the field stays, in a locked or an unlocked table. Its two columns are not paired with anything else. A locked field whose column is gone still stays.
+- An unlocked table is created again with the defaults; only its locked fields carry over (matched by `GetItemKey`, ignoring case). An unlocked table that is not paired again disappears with its locked fields, with a warning that suggests locking the table.
+- The order follows the ProdCopy tables and columns, so the file diff stays small.
+
+The command saves through `PairedDbObjectsParametersManager.Save` (A4's `ParametersManager`), so the previous file is kept as `<file>.yyyyMMdd-HHmmss-fff.bak`. The 10 newest are kept, shared with the edits of the Paired Tables menu. "Restore Paired Db Objects From Backup..." (the last item of the Paired Tables list, `PairedTableCruder.FillListMenuAdditional`) lists them newest first (`PairedDbObjectsBackups`), asks for confirmation and saves the chosen one through the same `Save`, so the current file becomes a backup too.
+
 ## Conventions to match
 
 - Code comments are predominantly in Georgian — match the language of nearby comments rather than translating.

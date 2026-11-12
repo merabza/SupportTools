@@ -45,6 +45,9 @@ public sealed class PairedTable : ItemData
     //ცარიელი სიის შემთხვევაში გამოიყენება Dev ცხრილის პირველადი გასაღების სვეტები
     public List<string> KeyFieldNames { get; set; } = [];
 
+    //დაკეტილი ცხრილის პარამეტრებს "Pair ProdCopy and Dev Db Objects" აღარ ცვლის. მის დაუკეტავ ველებს თავიდან აწყვილებს
+    public bool Locked { get; set; }
+
     public override string GetItemKey()
     {
         return $"{ProdCopySchemaName}.{ProdCopyTableName} - {DevSchemaName}.{DevTableName}";

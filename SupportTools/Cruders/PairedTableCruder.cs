@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.PairedDbObjectsList;
 using SystemTools.DatabaseToolsShared;
 using SystemTools.SystemToolsShared;
 
@@ -15,7 +17,9 @@ namespace SupportTools.Cruders;
 
 public sealed class PairedTableCruder : ParCruder<PairedTable>
 {
+    private readonly ILogger _logger;
     private readonly Dictionary<string, PairedTable> _pairedTables;
+    private readonly string? _resultFileName;
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public PairedTableCruder(IParametersManager parametersManager,
@@ -24,6 +28,8 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
         parametersManager, currentValuesDictionary, "Paired Table", "Paired Tables", true)
     {
         _pairedTables = currentValuesDictionary;
+        _logger = logger;
+        _resultFileName = parametersManager.ParametersFileName;
         FieldEditors.Add(new SchemaNameFieldEditor(nameof(PairedTable.ProdCopySchemaName), logger, "ProdCopy",
             prodCopyDataProvider, prodCopyConnectionString));
         FieldEditors.Add(new TableNameFieldEditor(nameof(PairedTable.ProdCopyTableName), logger, "ProdCopy",
@@ -38,6 +44,7 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
         FieldEditors.Add(new OptionalTextFieldEditor(nameof(PairedTable.ProdCopyRowFilter)));
         FieldEditors.Add(new SimpleNamesListFieldEditor<KeyFieldNamesLisCruder>(nameof(PairedTable.KeyFieldNames),
             x => new KeyFieldNamesLisCruder(parametersManager, x)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(PairedTable.Locked)));
         FieldEditors.Add(new PairedFieldsListFieldEditor(nameof(PairedTable.PairedFields), logger, parametersManager,
             prodCopyDataProvider, prodCopyConnectionString, devDataProvider, devConnectionString));
     }
@@ -67,6 +74,14 @@ public sealed class PairedTableCruder : ParCruder<PairedTable>
 
             _pairedTables.Remove(kvp.Key);
             _pairedTables.Add(newKey, kvp.Value);
+        }
+    }
+
+    protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)
+    {
+        if (!string.IsNullOrWhiteSpace(_resultFileName))
+        {
+            cruderSubMenuSet.AddMenuItem(new RestorePairedDbObjectsFromBackupCliMenuCommand(_logger, _resultFileName));
         }
     }
 

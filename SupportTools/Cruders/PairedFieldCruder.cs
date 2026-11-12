@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliParameters;
+using AppCliTools.CliParameters.FieldEditors;
 using LibDatabaseWork.ToolCommands.PairProdCopyAndDevDbObjects;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
@@ -27,6 +28,7 @@ public sealed class PairedFieldCruder : ParCruder<PairedField>
             prodCopyDataProvider, prodCopyConnectionString, prodCopySchemaName, prodCopyTableName));
         FieldEditors.Add(new FieldNameFieldEditor(nameof(PairedField.DevFieldName), logger, "Dev", devDataProvider,
             devConnectionString, devSchemaName, devTableName));
+        FieldEditors.Add(new BoolFieldEditor(nameof(PairedField.Locked)));
     }
 
     protected override void BeforeGetListMenu()
