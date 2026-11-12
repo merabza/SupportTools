@@ -22,10 +22,11 @@ internal static class RegistryRecordDiff
     //არ უწყობს ხელს (C6: საიდუმლო ფაილის დიფში ჩანს მხოლოდ ზომა, Length, და ჰეშის დასაწყისი)
     private const int ShownHashLength = 8;
 
-    private static readonly HashSet<string> HashFieldNames = new(StringComparer.Ordinal)
-    {
+    private static readonly HashSet<string> HashFieldNames =
+    [
+        with(StringComparer.Ordinal),
         nameof(StoredFileContract.Sha256)
-    };
+    ];
 
     //ველის გზაში ჩადგმული ველის და სიის ელემენტის გამყოფები: ServerInfos[0].ServerName
     private static readonly char[] PathSeparators = ['.', '['];
@@ -33,8 +34,9 @@ internal static class RegistryRecordDiff
     //საიდუმლო ველები ნებისმიერ დონეზე: პაროლები და მომხმარებლები, API key, KeyGuidPart, MediatR-ის ლიცენზია და
     //ფაილების შიგთავსი (.gitignore და .editorconfig შაბლონები, საიდუმლო ფაილები). ფაილსაცავის UserName ბაზის
     //ServerUser-ის მსგავსი ანგარიშის სახელია. სერვერის FilesUserName და ServiceUserName OS-ის ანგარიშებია და ჩანს
-    private static readonly HashSet<string> SecretFieldNames = new(StringComparer.Ordinal)
-    {
+    private static readonly HashSet<string> SecretFieldNames =
+    [
+        with(StringComparer.Ordinal),
         nameof(StsFileStorageDataModel.Password),
         nameof(StsFileStorageDataModel.UserName),
         nameof(StsDatabaseServerConnectionDataModel.ServerPass),
@@ -43,7 +45,7 @@ internal static class RegistryRecordDiff
         nameof(StsProjectDataModel.KeyGuidPart),
         nameof(StsGlobalSettingsDataModel.MediatRLicenseKey),
         nameof(StsGitIgnoreFileTypeDataModel.Content)
-    };
+    ];
 
     private static readonly JsonSerializer FieldsSerializer = JsonSerializer.Create(new JsonSerializerSettings
     {

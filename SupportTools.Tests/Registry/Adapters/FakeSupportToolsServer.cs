@@ -39,8 +39,9 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
     private const string ApiBase = "/api/v1/";
     private const string VersionProperty = "Version";
 
-    private static readonly HashSet<string> RegistryAreas = new(StringComparer.Ordinal)
-    {
+    private static readonly HashSet<string> RegistryAreas =
+    [
+        with(StringComparer.Ordinal),
         "environments",
         "runtimes",
         "npmpackages",
@@ -53,7 +54,7 @@ internal sealed class FakeSupportToolsServer : HttpMessageHandler
         "servers",
         "projecttemplates",
         "projects"
-    };
+    ];
 
     private readonly Dictionary<string, Dictionary<string, JObject>> _areas = new(StringComparer.Ordinal);
 

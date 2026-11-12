@@ -55,7 +55,7 @@ public static class ServerInfoMapper
                 serverInfo);
         }
 
-        HashSet<string> usedKeys = new(serverInfos.Comparer);
+        HashSet<string> usedKeys = [with(serverInfos.Comparer)];
         List<(string? Key, StsServerInfoDataModel Contract, ServerInfoModel? Existing)> matches = [];
         foreach (StsServerInfoDataModel contract in contracts)
         {

@@ -224,14 +224,14 @@ public sealed class StoredFilesRegistrySyncAdapter : RegistrySyncAdapter<StoredF
     //მდგომარეობის. მხოლოდ რეგისტრით განსხვავებული გზები Windows-ზე ერთი ფაილია
     private List<string> GetCandidateKeys()
     {
-        HashSet<string> seenKeys = new(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> seenKeys = [with(StringComparer.OrdinalIgnoreCase)];
         return [.. GetReferencedKeys().Concat(ServerKeys).Concat(GetStateKeys()).Where(seenKeys.Add)];
     }
 
     //ფაილები, რომლებზეც რეესტრი მიუთითებს, კანონიკური გზით, რეგისტრის გარეშე უნიკალური
     private List<string> GetReferencedKeys()
     {
-        HashSet<string> seenKeys = new(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> seenKeys = [with(StringComparer.OrdinalIgnoreCase)];
         return
         [
             .. GetReferencedLocalPaths().OfType<string>().Where(x => !string.IsNullOrWhiteSpace(x)).Select(ToKey)

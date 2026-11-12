@@ -53,12 +53,12 @@ public static class RegistrySyncPlanner
             StringComparer.OrdinalIgnoreCase);
         Dictionary<string, RegistryRecordSyncStateModel> stateRecords = new(collectionState?.Records ?? [],
             StringComparer.OrdinalIgnoreCase);
-        HashSet<string> excludedKeys = new(collectionState?.ExcludedKeys ?? [], StringComparer.OrdinalIgnoreCase);
-        HashSet<string> missingLocalKeys = new(collection.MissingLocalKeys, StringComparer.OrdinalIgnoreCase);
+        HashSet<string> excludedKeys = [with(StringComparer.OrdinalIgnoreCase), .. collectionState?.ExcludedKeys ?? []];
+        HashSet<string> missingLocalKeys = [with(StringComparer.OrdinalIgnoreCase), .. collection.MissingLocalKeys];
 
         //ერთი ჩანაწერის გასაღები სამივე წყაროში შეიძლება სხვადასხვა რეგისტრით ეწეროს. გეგმაში რჩება პირველი: ლოკალური,
         //მერე სერვერის, მერე მდგომარეობის
-        HashSet<string> seenKeys = new(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> seenKeys = [with(StringComparer.OrdinalIgnoreCase)];
         return
         [
             .. localRecords.Keys.Concat(serverRecords.Keys).Concat(stateRecords.Keys).Where(seenKeys.Add)

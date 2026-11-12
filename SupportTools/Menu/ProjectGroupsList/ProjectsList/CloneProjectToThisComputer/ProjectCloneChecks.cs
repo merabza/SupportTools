@@ -18,8 +18,11 @@ internal static class ProjectCloneChecks
     public static List<string> GetGitsWithoutGitProjects(SupportToolsParameters parameters,
         IEnumerable<string> gitNames)
     {
-        HashSet<string> gitsWithProjects = new(parameters.GitProjects.Values.Select(x => x.GitName).OfType<string>(),
-            StringComparer.OrdinalIgnoreCase);
+        HashSet<string> gitsWithProjects =
+        [
+            with(StringComparer.OrdinalIgnoreCase),
+            .. parameters.GitProjects.Values.Select(x => x.GitName).OfType<string>()
+        ];
         return
         [
             .. gitNames.Distinct(StringComparer.OrdinalIgnoreCase)

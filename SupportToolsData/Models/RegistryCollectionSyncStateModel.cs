@@ -11,5 +11,5 @@ public sealed class RegistryCollectionSyncStateModel
 
     //სინქრონიზაციიდან გამორიცხული ჩანაწერების გასაღებები, მაგალითად Linux-ისთვის განსხვავებული DB კავშირი. ასეთი
     //ჩანაწერი არც სერვერზე მიდის და არც სერვერიდან ჩამოდის
-    public HashSet<string> ExcludedKeys { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public HashSet<string> ExcludedKeys { get; } = [with(StringComparer.OrdinalIgnoreCase)];
 }

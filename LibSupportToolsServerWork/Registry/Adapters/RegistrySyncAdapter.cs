@@ -19,11 +19,11 @@ namespace LibSupportToolsServerWork.Registry.Adapters;
 public abstract class RegistrySyncAdapter<TContract> : IRegistrySyncAdapter, IRegistryServerKeys where TContract : class
 {
     //ბოლოს წაკითხული სერვერის ყველა ჩანაწერის გასაღები, გამორიცხულების ჩათვლით (IRegistryServerKeys)
-    private readonly HashSet<string> _serverKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _serverKeys = [with(StringComparer.OrdinalIgnoreCase)];
 
     //სერვერის ჩანაწერები, რომლებიც ბოლო წაკითხვისას FindUnsupportedField-მა უარყო. ძრავა სერვერის ჩანაწერებს
     //ლოკალურზე ადრე კითხულობს, ამიტომ ლოკალური მხარეც მათ გამორიცხავს
-    private readonly HashSet<string> _unsupportedServerKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _unsupportedServerKeys = [with(StringComparer.OrdinalIgnoreCase)];
 
     protected RegistrySyncAdapter(RegistrySyncWarnings warnings)
     {

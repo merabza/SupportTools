@@ -18,10 +18,11 @@ namespace LibSupportToolsServerWork.Registry.Mappers;
 public static class ProjectMapper
 {
     //ScaffoldSeeder-ის მექანიზმთან ერთად წაშლილი ხელსაწყოები, რომელთა სახელები სერვერზე შეიძლება ჯერ კიდევ იყოს
-    private static readonly HashSet<string> RemovedProjectToolNames = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly HashSet<string> RemovedProjectToolNames =
+    [
+        with(StringComparer.OrdinalIgnoreCase),
         "JsonFromProjectDbProjectGetter", "ScaffoldSeederCreator", "SeedData", "PrepareProdCopyDatabase"
-    };
+    ];
 
     public static StsProjectDataModel ToContract(string name, ProjectModel project, PathMapper pathMapper)
     {

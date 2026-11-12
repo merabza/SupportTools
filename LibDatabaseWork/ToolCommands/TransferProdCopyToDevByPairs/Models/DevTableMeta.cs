@@ -7,8 +7,8 @@ public sealed class DevTableMeta
 {
     public DevTableMeta()
     {
-        IdentityColumns = new HashSet<string>(StringComparer.Ordinal);
-        ComputedColumns = new HashSet<string>(StringComparer.Ordinal);
+        IdentityColumns = [with(StringComparer.Ordinal)];
+        ComputedColumns = [with(StringComparer.Ordinal)];
         NotNullWithoutDefaultColumns = new Dictionary<string, string>(StringComparer.Ordinal);
         PrimaryKeyColumns = [];
         UniqueIndexes = [];

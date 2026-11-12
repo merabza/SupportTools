@@ -10,8 +10,9 @@ namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
 //რიცხვითი და bit სვეტები 0-ით ივსება, დანარჩენი ტიპების სვეტებს ავტომატური მნიშვნელობა არ აქვს
 internal static class UnpairedRequiredColumnsFinder
 {
-    private static readonly HashSet<string> ZeroFillableTypes = new(StringComparer.OrdinalIgnoreCase)
-    {
+    private static readonly HashSet<string> ZeroFillableTypes =
+    [
+        with(StringComparer.OrdinalIgnoreCase),
         "bit",
         "tinyint",
         "smallint",
@@ -23,7 +24,7 @@ internal static class UnpairedRequiredColumnsFinder
         "real",
         "money",
         "smallmoney"
-    };
+    ];
 
     public static (List<string> ZeroFilled, List<string> Unfillable) Find(PairedTable pt, DevTableMeta meta)
     {

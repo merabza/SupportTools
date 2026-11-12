@@ -23,7 +23,7 @@ internal sealed class FakeFileRegistrySyncAdapter : IRegistryFileSyncAdapter
     //both sides of the collection
     public FakeRegistrySyncAdapter Inner { get; }
 
-    public HashSet<string> MissingLocalKeys { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public HashSet<string> MissingLocalKeys { get; } = [with(StringComparer.OrdinalIgnoreCase)];
 
     //key → the error that its preparation answers
     public Dictionary<string, Error> PrepareErrors { get; } = new(StringComparer.OrdinalIgnoreCase);

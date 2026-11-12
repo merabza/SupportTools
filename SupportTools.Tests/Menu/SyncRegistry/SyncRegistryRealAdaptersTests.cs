@@ -52,7 +52,7 @@ public sealed class SyncRegistryRealAdaptersTests : IDisposable
     private readonly Mock<IParametersManager> _parametersManager = new();
 
     //the conflicts whose differences were shown; the second question about a conflict resolves it as Local
-    private readonly HashSet<string> _shownDifferences = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _shownDifferences = [with(StringComparer.Ordinal)];
 
     public SyncRegistryRealAdaptersTests()
     {

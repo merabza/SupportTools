@@ -303,7 +303,7 @@ internal sealed class AllPackagesDistributor
 
         foreach (string projectName in packageProjects.Keys)
         {
-            dependents[projectName] = new HashSet<string>(StringComparer.Ordinal);
+            dependents[projectName] = [with(StringComparer.Ordinal)];
             remainingDependencyCounts[projectName] = 0;
         }
 

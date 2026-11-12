@@ -96,9 +96,11 @@ public sealed class RegistrySyncEngine
                 collectionState = new RegistryCollectionSyncStateModel();
             }
 
-            HashSet<string> missingLocalKeys = new(
-                adapter is IRegistryFileSyncAdapter fileAdapter ? fileAdapter.GetMissingLocalKeys() : [],
-                StringComparer.OrdinalIgnoreCase);
+            HashSet<string> missingLocalKeys =
+            [
+                with(StringComparer.OrdinalIgnoreCase),
+                .. adapter is IRegistryFileSyncAdapter fileAdapter ? fileAdapter.GetMissingLocalKeys() : []
+            ];
             changes.AddRange(localRecords.Value
                 .Where(x =>
                     !collectionState.Records.TryGetValue(x.Key, out RegistryRecordSyncStateModel? recordState) ||

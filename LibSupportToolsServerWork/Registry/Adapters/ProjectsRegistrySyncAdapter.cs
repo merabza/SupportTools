@@ -172,7 +172,7 @@ public sealed class ProjectsRegistrySyncAdapter : DictionaryRegistrySyncAdapter<
 
     private static HashSet<string> KnownNames(IEnumerable<string> localNames, IRegistryServerKeys serverKeys)
     {
-        return new HashSet<string>(localNames.Concat(serverKeys.ServerKeys), StringComparer.OrdinalIgnoreCase);
+        return [with(StringComparer.OrdinalIgnoreCase), .. localNames.Concat(serverKeys.ServerKeys)];
     }
 
     private static IEnumerable<(string Field, string? Name)> GetDatabaseConnectionNames(StsProjectDataModel contract)
