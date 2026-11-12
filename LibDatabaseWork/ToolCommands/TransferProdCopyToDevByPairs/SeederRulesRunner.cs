@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -22,14 +21,7 @@ public static class SeederRulesRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --log-folder \"{LogFolder}\"";
-        Result<(string, int)> processResult = StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
-        if (processResult.IsFailure)
-        {
-            StShared.WriteErrorLine($"DataSeederRules process failed for table '{tableName}'", true, logger);
-            return null;
-        }
-
-        string stdout = processResult.Value.Item1;
-        return RunnerOutputParser.ParseRowsFromOutput(stdout, tableName, "DataSeederRules", logger);
+        return RunnerProcess.RunAndParseRows("DataSeederRules", projectFilePath, tableName, DotnetExecutable,
+            arguments, logger);
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using SystemTools.SharedKernel;
 using SystemTools.SystemToolsShared;
 
 namespace LibDatabaseWork.ToolCommands.TransferProdCopyToDevByPairs;
@@ -26,14 +25,7 @@ public static class OldDataConvertorRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --connection-string \"{prodCopyConnectionString}\" --log-folder \"{LogFolder}\"";
-        Result<(string, int)> processResult = StShared.RunProcessWithOutput(false, logger, DotnetExecutable, arguments);
-        if (processResult.IsFailure)
-        {
-            StShared.WriteErrorLine($"OldDataConvertor process failed for table '{tableName}'", true, logger);
-            return null;
-        }
-
-        string stdout = processResult.Value.Item1;
-        return RunnerOutputParser.ParseRowsFromOutput(stdout, tableName, "OldDataConvertor", logger);
+        return RunnerProcess.RunAndParseRows("OldDataConvertor", projectFilePath, tableName, DotnetExecutable,
+            arguments, logger);
     }
 }
