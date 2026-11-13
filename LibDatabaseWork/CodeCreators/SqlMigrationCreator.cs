@@ -6,13 +6,15 @@ namespace LibDatabaseWork.CodeCreators;
 
 public sealed class SqlMigrationCreator : CodeCreator
 {
+    private readonly string _className;
     private readonly string _projectNamespace;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public SqlMigrationCreator(ILogger logger, string placePath, string projectNamespace, string? codeFileName = null) :
-        base(logger, placePath, codeFileName)
+    public SqlMigrationCreator(ILogger logger, string placePath, string projectNamespace, string className,
+        string? codeFileName = null) : base(logger, placePath, codeFileName)
     {
         _projectNamespace = projectNamespace;
+        _className = className;
     }
 
     public override void CreateFileStructure()
@@ -21,7 +23,7 @@ public sealed class SqlMigrationCreator : CodeCreator
             new OneLineComment($"Created by {nameof(SqlMigrationCreator)} at {DateTime.Now}"),
             "using Microsoft.EntityFrameworkCore.Migrations", "using System", "using System.IO", "using System.Linq",
             "using System.Reflection", string.Empty, $"namespace {_projectNamespace}.Migrations", string.Empty,
-            new CodeBlock("public sealed partial class Sql : Migration", string.Empty,
+            new CodeBlock($"public sealed partial class {_className} : Migration", string.Empty,
                 new CodeBlock("protected override void Up(MigrationBuilder migrationBuilder)",
                     "var assembly = Assembly.GetExecutingAssembly()",
                     "var sqlFiles = assembly.GetManifestResourceNames().Where(file => file.EndsWith(\".sql\", StringComparison.Ordinal))",

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -11,7 +12,7 @@ using ParametersManagement.LibParameters;
 
 namespace LibDatabaseWork.ToolCommands.CreateDevDatabaseByMigration;
 
-public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationToolCommand
+public sealed partial class DatabaseMigrationCreatorMigrationToolCommand : MigrationToolCommand
 {
     private const string ActionName = "Database Migration Initial";
     private const string ActionDescription = "Database Migration Initial";
@@ -28,7 +29,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
 
     private DatabaseMigrationParameters DatabaseMigrationParameters => (DatabaseMigrationParameters)Par;
 
-    protected override ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
+    protected override async ValueTask<bool> RunAction(CancellationToken cancellationToken = default)
     {
         //მიგრაციის პროექტის ფაილი რომელ ფოლდერშიც არის, იმავეში უნდა იყოს Migrations ფოლდერი.
         //თუ ეს ფოლდერი აღმოჩენილი არ იქნება, გამოვიდეს შენიშვნა ამის შესახებ
@@ -41,7 +42,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         {
             _logger.LogError("Object for Migration project file {MigrationProjectFileName} does not exists",
                 migrationProjectFileName);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         DirectoryInfo? migrationsFolder =
@@ -66,7 +67,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         {
             _logger.LogError("Object for Migration startup project file {MigrationStartupProjectFile} does not exists",
                 migrationStartupProjectFile);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //var solutionFileNameWithMigrationProject = DatabaseMigrationParameters.SolutionFileNameWithMigrationProject;
@@ -76,7 +77,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         //    _logger.LogError(
         //        "Object for Migration startup project file {solutionFileNameWithMigrationProject} does not exists",
         //        solutionFileNameWithMigrationProject);
-        //    return ValueTask.FromResult(false);
+        //    return false;
         //}
 
         XElement projectXml = XElement.Load(migrationStartupProjectFilePath);
@@ -88,7 +89,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
             _logger.LogError(
                 "migrationStartupProjectFile.DirectoryName for Migration project file {MigrationProjectFileName} does not exists",
                 migrationProjectFileName);
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         bool migrationProjectFileExistsInStartupProjectReferences = false;
@@ -115,7 +116,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         if (dotnetProcessor.EfAddDatabaseMigration("Initial", dbContextName, migrationStartupProjectFilePath,
                 migrationProjectFileName).IsFailure)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         _logger.LogInformation("Update Database for Initial");
@@ -123,7 +124,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         if (dotnetProcessor.EfUpdateDatabaseByMigration(dbContextName,
                 migrationStartupProjectFilePath, migrationProjectFileName).IsFailure)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         //იმისათვის, რომ ამ კოდმა იმუშავოს, საჭიროა შემდეგი:
@@ -141,7 +142,7 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
         DirectoryInfo? sqlFolder = migrationProjectFile.Directory?.GetDirectories("Sql").SingleOrDefault();
         if (sqlFolder == null)
         {
-            return ValueTask.FromResult(true);
+            return true;
         }
 
         _logger.LogInformation("Create sql Migration");
@@ -150,32 +151,46 @@ public sealed class DatabaseMigrationCreatorMigrationToolCommand : MigrationTool
             .EfAddDatabaseMigration("Sql", dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
             .IsFailure)
         {
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         FileInfo? sqlMigrationFile = migrationsFolder?.GetFiles("??????????????_Sql.cs").SingleOrDefault();
         if (sqlMigrationFile == null)
         {
             _logger.LogError("sql Migration File Not found");
-            return ValueTask.FromResult(false);
+            return false;
         }
 
         migrationsFolder = migrationProjectFile.Directory?.GetDirectories("Migrations").SingleOrDefault();
         if (migrationsFolder is null)
         {
             _logger.LogError("Migrations Folder Not found");
-            return ValueTask.FromResult(false);
+            return false;
+        }
+
+        //კლასის სახელი ისეთივე უნდა იყოს, როგორიც EF-მა Designer ფაილში დაწერა
+        //(EF Core 11-მდე Sql, 11-დან _<დრო>_Sql), ამიტომ მას EF-ის მიერ შექმნილი ფაილიდან ვიღებთ
+        Match classMatch = MigrationClassRegex()
+            .Match(await File.ReadAllTextAsync(sqlMigrationFile.FullName, cancellationToken));
+        if (!classMatch.Success)
+        {
+            _logger.LogError("sql Migration class name Not found in {FileName}", sqlMigrationFile.Name);
+            return false;
         }
 
         var sqlMigrationCreator = new SqlMigrationCreator(_logger, migrationsFolder.FullName,
-            Path.GetFileNameWithoutExtension(migrationProjectFileName), sqlMigrationFile.Name);
+            Path.GetFileNameWithoutExtension(migrationProjectFileName), classMatch.Groups[1].Value,
+            sqlMigrationFile.Name);
 
         sqlMigrationCreator.CreateFileStructure();
 
         _logger.LogInformation("Update Database for sql Migration");
         //ბაზის განახლება
-        return ValueTask.FromResult(dotnetProcessor
+        return dotnetProcessor
             .EfUpdateDatabaseByMigration(dbContextName, migrationStartupProjectFilePath, migrationProjectFileName)
-            .IsSuccess);
+            .IsSuccess;
     }
+
+    [GeneratedRegex(@"partial class (\w+) : Migration")]
+    private static partial Regex MigrationClassRegex();
 }
