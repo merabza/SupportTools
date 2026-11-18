@@ -109,6 +109,7 @@ public sealed class DatabaseServerConnectionMapperTests
             TrustServerCertificate = true,
             ConnectionTimeOut = 30,
             Encrypt = true,
+            DatabaseName = "DevDb",
             DatabaseFoldersSets =
             [
                 new StsDatabaseFoldersSetDataModel
@@ -144,6 +145,7 @@ public sealed class DatabaseServerConnectionMapperTests
             ServerAddress = "",
             ServerUser = "",
             ServerPass = "",
+            DatabaseName = "",
             DatabaseFoldersSets =
             [
                 new StsDatabaseFoldersSetDataModel { Name = "Default", Backup = "", Data = "", DataLog = "" }
@@ -194,6 +196,7 @@ public sealed class DatabaseServerConnectionMapperTests
             ServerPass = "fake-password",
             TrustServerCertificate = true,
             ConnectionTimeOut = 30,
+            DatabaseName = "DevDb",
             DatabaseFoldersSets = new Dictionary<string, DatabaseFoldersSet>
             {
                 ["Default"] = new() { Backup = @"D:\Backup", Data = @"D:\Data", DataLog = @"D:\Log" },

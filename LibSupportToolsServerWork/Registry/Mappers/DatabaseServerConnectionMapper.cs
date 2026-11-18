@@ -27,6 +27,7 @@ public static class DatabaseServerConnectionMapper
             TrustServerCertificate = connection.TrustServerCertificate,
             ConnectionTimeOut = connection.ConnectionTimeOut,
             Encrypt = connection.Encrypt,
+            DatabaseName = connection.DatabaseName,
             DatabaseFoldersSets =
             [
                 .. (connection.DatabaseFoldersSets ?? []).Select(x => new StsDatabaseFoldersSetDataModel
@@ -52,6 +53,7 @@ public static class DatabaseServerConnectionMapper
         connection.TrustServerCertificate = contract.TrustServerCertificate;
         connection.ConnectionTimeOut = contract.ConnectionTimeOut;
         connection.Encrypt = contract.Encrypt;
+        connection.DatabaseName = contract.DatabaseName;
 
         connection.DatabaseFoldersSets ??= [];
         connection.DatabaseFoldersSets.Clear();
@@ -73,6 +75,7 @@ public static class DatabaseServerConnectionMapper
         contract.ServerAddress = ContractNormalization.EmptyToNull(contract.ServerAddress);
         contract.ServerUser = ContractNormalization.EmptyToNull(contract.ServerUser);
         contract.ServerPass = ContractNormalization.EmptyToNull(contract.ServerPass);
+        contract.DatabaseName = ContractNormalization.EmptyToNull(contract.DatabaseName);
         foreach (StsDatabaseFoldersSetDataModel foldersSet in contract.DatabaseFoldersSets)
         {
             foldersSet.Backup = ContractNormalization.EmptyToNull(foldersSet.Backup);
