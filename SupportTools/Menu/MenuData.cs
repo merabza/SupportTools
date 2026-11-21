@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AppCliTools.CliTools.Menu.RecentCommandsList;
 using SupportTools.Menu.BaGetter;
 using SupportTools.Menu.CheckAllProjectsBuild;
+using SupportTools.Menu.CheckAllProjectsSolutions;
 using SupportTools.Menu.ClearAllGroupsAllSolutionsAllProjects;
 using SupportTools.Menu.CreateNewProject;
 using SupportTools.Menu.CreateProject;
@@ -9,11 +10,13 @@ using SupportTools.Menu.DistributeAllPackages;
 using SupportTools.Menu.ImportProject;
 using SupportTools.Menu.ProjectGroupsList;
 using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsBuild;
+using SupportTools.Menu.ProjectGroupsList.CheckGroupProjectsSolutions;
 using SupportTools.Menu.ProjectGroupsList.DistributeAllPackagesInGroup;
 using SupportTools.Menu.ProjectGroupsList.OpenAllProjectsByVisualStudio;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.BuildPackage;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectBuild;
+using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckOneProjectSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CheckPackageSolution;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CloneProjectToThisComputer;
 using SupportTools.Menu.ProjectGroupsList.ProjectsList.CreateNewServerInfo;
@@ -77,6 +80,8 @@ public static class MenuData
         nameof(ClearAllGroupsAllSolutionsAllProjectsCliMenuCommandFactoryStrategy),
         //ყველა პროექტის build-ის შემოწმება
         nameof(CheckAllProjectsBuildCliMenuCommandFactoryStrategy),
+        //ყველა პროექტის სოლუშენის შემოწმება: რეფერენსები სოლუშენის ფოლდერის შიგნითაა, პაკეტებზე დასაბრუნებელია თუ შორია
+        nameof(CheckAllProjectsSolutionsCliMenuCommandFactoryStrategy),
         //BaGetter პაკეტების სერვერზე პაკეტების ჩამონათვალი და მართვა
         nameof(BaGetterSubMenuCliMenuCommandFactoryStrategy),
         //Ubuntu Server-ის ავტომატური ინსტალაციები: grub.cfg და autoinstall.yaml საინსტალაციო ფლეშკისთვის
@@ -100,6 +105,8 @@ public static class MenuData
         nameof(ReversePackageDistributionInGroupCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის build-ის შემოწმება
         nameof(CheckGroupProjectsBuildCliMenuCommandFactoryStrategy),
+        //ჯგუფში შემავალი ყველა პროექტის სოლუშენის შემოწმება
+        nameof(CheckGroupProjectsSolutionsCliMenuCommandFactoryStrategy),
         //ჯგუფში შემავალი ყველა პროექტის Visual Studio-ში გახსნა
         nameof(OpenAllProjectsByVisualStudioCliMenuCommandFactoryStrategy),
         //პროექტების ჩამონავთვალი
@@ -116,6 +123,8 @@ public static class MenuData
         nameof(OpenByVisualStudioCliMenuCommandFactoryStrategy),
         //პროექტის build-ის შემოწმება
         nameof(CheckOneProjectBuildCliMenuCommandFactoryStrategy),
+        //პროექტის სოლუშენის შემოწმება
+        nameof(CheckOneProjectSolutionCliMenuCommandFactoryStrategy),
         //პაკეტის სოლუშენის შემოწმება (მხოლოდ პაკეტის ტიპის პროექტებისთვის)
         nameof(CheckPackageSolutionCliMenuCommandFactoryStrategy),
         //პაკეტის დაბილდვა და ატვირთვა package manager-ზე (მხოლოდ პაკეტის ტიპის პროექტებისთვის)

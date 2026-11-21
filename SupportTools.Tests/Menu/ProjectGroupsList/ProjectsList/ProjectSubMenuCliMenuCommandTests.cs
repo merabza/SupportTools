@@ -374,6 +374,41 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         Assert.Equal("remote", sut.StatusString);
     }
 
+    [Fact]
+    public void CountStatus_WhenSolutionWasChecked_ShowsItsStatusAfterTheBuildResult()
+    {
+        // Arrange
+        _menuParameters.ProjectBuildCheckResults[ProjectName] =
+            new ProjectBuildCheckResult(EProjectBuildCheckStatus.Success);
+        _menuParameters.ProjectSolutionCheckResults[ProjectName] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.NeedsDistributePackages, ["Pkg"]);
+        ProjectSubMenuCliMenuCommand sut = CreateSut();
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("remote, Success, Needs Distribute Packages", sut.StatusString);
+        Assert.Equal([ConsoleColor.DarkGray, ConsoleColor.Green, ConsoleColor.Blue],
+            sut.StatusColorParts?.Select(x => x.Color));
+    }
+
+    [Fact]
+    public void CountStatus_WhenOnlySolutionWasChecked_ShowsPresenceAndSolutionStatus()
+    {
+        // Arrange
+        _menuParameters.ProjectSolutionCheckResults[ProjectName] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.Ok, []);
+        ProjectSubMenuCliMenuCommand sut = CreateSut();
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("remote, OK", sut.StatusString);
+        Assert.Equal(ConsoleColor.Green, sut.StatusColorParts![1].Color);
+    }
+
     private ProjectSubMenuCliMenuCommand CreateSut()
     {
         return new ProjectSubMenuCliMenuCommand(_serviceProvider, _parametersManager, ProjectName, _menuParameters);

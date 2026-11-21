@@ -206,6 +206,7 @@ for the packages they process) ask whether to
 include the remote projects too (default `n`), because their sync would
 clone them here;
 * `Check all projects build`, `Check group projects build`,
+`Check Solutions` (main menu and group),
 `Clear All Groups All Solutions All Projects`,
 `Reverse Package Distribution`, `Reverse Package Distribution In Group Projects`,
 `Remove Unused Package Versions` and

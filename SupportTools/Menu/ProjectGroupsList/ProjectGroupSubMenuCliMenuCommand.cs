@@ -44,8 +44,9 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         return BuildStatusParts();
     }
 
-    //ჯგუფის სტატუსის ნაწილები: ჯერ local/remote რაოდენობები (D3), მერე, თუ ჯგუფის რომელიმე პროექტი უკვე შემოწმდა,
-    //სტატუსების რაოდენობები და შემოწმებული პროექტების შეცდომების/გაფრთხილებების ჯამი.
+    //ჯგუფის სტატუსის ნაწილები: ჯერ local/remote რაოდენობები (D3), მერე, თუ ჯგუფის რომელიმე პროექტის build უკვე
+    //შემოწმდა, build-ის სტატუსების რაოდენობები და შემოწმებული პროექტების შეცდომების/გაფრთხილებების ჯამი, ბოლოს
+    //სოლუშენების შემოწმებული პროექტების სტატუსების რაოდენობები.
     //GetStatus-ის ტექსტი ზუსტად ამ ნაწილების ტექსტია (მენიუ ნაწილებს ", "-ით აერთებს)
     private List<StatusColorPart> BuildStatusParts()
     {
@@ -53,20 +54,22 @@ public sealed class ProjectGroupSubMenuCliMenuCommand : CliMenuCommand
         List<StatusColorPart> parts = ProjectPresenceView.CreateCountParts(groupProjects.Select(x => x.Value));
 
         List<string> projectNames = [.. groupProjects.Select(x => x.Key)];
-        if (!projectNames.Any(IsProjectChecked))
+        if (projectNames.Any(IsProjectChecked))
         {
-            return parts;
+            parts.AddRange([
+                .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
+                    $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
+                    ProjectBuildCheckStatusView.GetColor(b.Status)))
+            ]);
+
+            int errorCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.ErrorCount ?? 0);
+            int warningCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.WarningCount ?? 0);
+            ProjectBuildCheckStatusView.AddCountParts(parts, errorCount, warningCount);
         }
 
-        parts.AddRange([
-            .. BuildBreakdown(projectNames).Select(b => new StatusColorPart(
-                $"{ProjectBuildCheckStatusView.GetName(b.Status)}: {b.Count.ToString(CultureInfo.InvariantCulture)}",
-                ProjectBuildCheckStatusView.GetColor(b.Status)))
-        ]);
-
-        int errorCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.ErrorCount ?? 0);
-        int warningCount = projectNames.Sum(projectName => GetProjectResult(projectName)?.WarningCount ?? 0);
-        ProjectBuildCheckStatusView.AddCountParts(parts, errorCount, warningCount);
+        parts.AddRange(ProjectSolutionCheckStatusView.CreateCountParts(projectNames
+            .Select(projectName => _menuParameters.ProjectSolutionCheckResults.GetValueOrDefault(projectName))
+            .OfType<ProjectSolutionCheckResult>()));
         return parts;
     }
 

@@ -10,6 +10,7 @@ configurations, and keep dependencies up to date.
 |`Create New Project` (template)|Generate a new solution from a template|
 |`Import Project`|Register a previously exported project into local state|
 |`Update Outdated Packages`|Sync repos and update NuGet packages across projects|
+|`Check Solutions` / `Check Solution`|Show which projects still build from the sources of other repositories|
 |`Clear All Groups All Solutions All Projects`|Wipe local working directories for all projects|
 
 \---
@@ -169,6 +170,52 @@ fails. Use Git to revert if needed.
 * **Re-sync between projects.** If you have local uncommitted changes
 in a repo, the post-update sync will try to commit them with the same
 batch message — verify the working tree is clean before starting.
+
+\---
+
+## If you need to see which projects still build from other repositories' sources
+
+Use after you switched a package to a project reference for a change, and
+after `Distribute all packages`, to see what is left.
+
+**Steps**
+
+1. `Main Menu` → `Check Solutions` (every local project), or
+`Main Menu` → `Project Groups List` → (group) → `Check Solutions`, or
+(group) → `Projects List` → (project) → `Check Solution`
+
+**What it does**
+
+* Reads the solution file (`.slnx` or `.sln`) and the direct
+`ProjectReference`s of the solution's own projects (the ones inside the
+solution folder). The projects of other repositories in the solution list
+do not count: they are kept there so that a switch from a package back to
+a project reference lands on them.
+* Judges each reference. Inside the solution folder it is fine. Inside the
+parent folder of the solution folder it is `Needs Distribute Packages`
+(blue) when `Distribute all packages` will switch it back to the package:
+the project has `UseLocalPackages` on and the reference goes into the clone
+of a package project of its gits list. It is fine when the project has
+`UseLocalPackages` off or the git is no package (a front, code that only
+this project uses), and `Needs attention` (red) otherwise. A reference
+outside the parent folder is `Needs attention` (a far reference).
+* A solution with none of these is `OK` (green). A missing or unreadable
+solution, or a missing or unreadable own project, is `Needs attention` too.
+* Prints one line per project with the status and its reasons, e.g.
+`App: Needs Distribute Packages (Pkg)`. The project item then shows the
+status after its build result (`local, Success, OK`), and the group item
+the counts (`Needs attention: 1, Needs Distribute Packages: 3, OK: 8`).
+* The results stay in memory only, like the build check results, until
+SupportTools restarts. The main menu command clears the old results first;
+the group and project commands replace only their own. Remote projects are
+skipped, and a project without a solution file gets no status.
+
+**Common pitfalls**
+
+* **A far reference survives the distribution.** `Distribute all packages`
+switches back only the references into the clones in the project folder.
+When you switch a package to a project reference, take the clone next to
+the solution, not a clone in another workspace.
 
 \---
 

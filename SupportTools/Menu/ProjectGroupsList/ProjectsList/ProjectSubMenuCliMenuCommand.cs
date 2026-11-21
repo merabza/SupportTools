@@ -96,7 +96,7 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         return BuildStatusParts();
     }
 
-    //სტატუსი: local ან remote (D3), მერე build-ის შედეგი, თუ ეს პროექტი უკვე შემოწმდა
+    //სტატუსი: local ან remote (D3), მერე build-ის შედეგი და სოლუშენის შემოწმების შედეგი, თუ ეს პროექტი უკვე შემოწმდა
     private List<StatusColorPart> BuildStatusParts()
     {
         List<StatusColorPart> parts = [ProjectPresenceView.CreatePart(IsLocal())];
@@ -105,6 +105,13 @@ public sealed class ProjectSubMenuCliMenuCommand : CliMenuCommand
         if (result is not null)
         {
             parts.AddRange(ProjectBuildCheckStatusView.BuildParts(result));
+        }
+
+        ProjectSolutionCheckResult? solutionResult =
+            _menuParameters.ProjectSolutionCheckResults.GetValueOrDefault(_projectName);
+        if (solutionResult is not null)
+        {
+            parts.Add(ProjectSolutionCheckStatusView.CreatePart(solutionResult));
         }
 
         return parts;

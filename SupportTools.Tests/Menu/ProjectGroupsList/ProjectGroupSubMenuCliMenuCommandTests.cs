@@ -149,6 +149,47 @@ public sealed class ProjectGroupSubMenuCliMenuCommandTests : IDisposable
         Assert.Equal("local: 2, remote: 1", sut.StatusString);
     }
 
+    //the solution counts come after the build breakdown, in the order of EProjectSolutionCheckStatus; LocalD is in G3
+    [Fact]
+    public void CountStatus_WhenSolutionsWereChecked_ShowsTheirCountsAfterTheBuildBreakdown()
+    {
+        // Arrange
+        _menuParameters.ProjectBuildCheckResults["LocalA"] =
+            new ProjectBuildCheckResult(EProjectBuildCheckStatus.Success);
+        _menuParameters.ProjectSolutionCheckResults["LocalA"] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.Ok, []);
+        _menuParameters.ProjectSolutionCheckResults["LocalB"] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.NeedsAttention, ["far reference X"]);
+        _menuParameters.ProjectSolutionCheckResults["LocalD"] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.NeedsAttention, ["far reference Y"]);
+        ProjectGroupSubMenuCliMenuCommand sut = CreateSut("G1");
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("local: 2, remote: 1, NotChecked: 2, Success: 1, Needs attention: 1, OK: 1", sut.StatusString);
+        Assert.Equal([ConsoleColor.Red, ConsoleColor.Green], sut.StatusColorParts!.Skip(4).Select(x => x.Color));
+    }
+
+    [Fact]
+    public void CountStatus_WhenOnlySolutionsWereChecked_ShowsOnlyTheirCounts()
+    {
+        // Arrange
+        _menuParameters.ProjectSolutionCheckResults["LocalA"] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.NeedsDistributePackages, ["Pkg"]);
+        _menuParameters.ProjectSolutionCheckResults["LocalB"] =
+            new ProjectSolutionCheckResult(EProjectSolutionCheckStatus.NeedsDistributePackages, ["Pkg"]);
+        ProjectGroupSubMenuCliMenuCommand sut = CreateSut("G1");
+
+        // Act
+        sut.CountStatus();
+
+        // Assert
+        Assert.Equal("local: 2, remote: 1, Needs Distribute Packages: 2", sut.StatusString);
+        Assert.Equal(ConsoleColor.Blue, sut.StatusColorParts![2].Color);
+    }
+
     [Fact]
     public void CountStatus_WhenRemoteOnlyProjectsAreHidden_CountsOnlyLocalProjects()
     {

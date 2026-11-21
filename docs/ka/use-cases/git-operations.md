@@ -214,6 +214,7 @@ V3 ვერსიები, `Update Outdated Packages` და `Distribute all p
 ჩაირთოს თუ არა remote პროექტებიც (ნაგულისხმევად `n`), რადგან მათი
 სინქრონიზაცია მათ აქ დაკლონავს;
 * `Check all projects build`, `Check group projects build`,
+`Check Solutions` (მთავარი მენიუ და ჯგუფი),
 `Clear All Groups All Solutions All Projects`,
 `Reverse Package Distribution`, `Reverse Package Distribution In Group Projects`,
 `Remove Unused Package Versions` და
