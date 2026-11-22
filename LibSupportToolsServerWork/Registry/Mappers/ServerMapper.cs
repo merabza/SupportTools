@@ -5,7 +5,8 @@ namespace LibSupportToolsServerWork.Registry.Mappers;
 
 //სერვერი: ServerDataModel ↔ StsServerDataModel. IsLocal ამ კომპიუტერისაა (G6, MachineLocalFields.Server): კონტრაქტში
 //არ მიდის და ApplyToLocal მას არ ეხება. ServerSideDownloadFolder და ServerSideDeployFolder სამიზნე სერვერის გზებია და
-//არ გარდაიქმნება (README §4.4)
+//არ გარდაიქმნება (README §4.4). IsDecommissioned ორივე მიმართულებით გადაიცემა; მისი false ჰეშში არ შედის, ამიტომ
+//გამოყენებაში მყოფი სერვერების შენახული ჰეშები ველის დამატებამ არ შეცვალა
 public static class ServerMapper
 {
     public static StsServerDataModel ToContract(string name, ServerDataModel server)
@@ -19,7 +20,8 @@ public static class ServerMapper
             FilesUsersGroupName = server.FilesUsersGroupName,
             Runtime = server.Runtime,
             ServerSideDownloadFolder = server.ServerSideDownloadFolder,
-            ServerSideDeployFolder = server.ServerSideDeployFolder
+            ServerSideDeployFolder = server.ServerSideDeployFolder,
+            IsDecommissioned = server.IsDecommissioned
         };
     }
 
@@ -32,6 +34,7 @@ public static class ServerMapper
         server.Runtime = contract.Runtime;
         server.ServerSideDownloadFolder = contract.ServerSideDownloadFolder;
         server.ServerSideDeployFolder = contract.ServerSideDeployFolder;
+        server.IsDecommissioned = contract.IsDecommissioned;
     }
 
     public static StsServerDataModel Normalize(StsServerDataModel contract)

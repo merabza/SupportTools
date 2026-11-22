@@ -257,6 +257,10 @@ the `ApiClients` dictionary
 * `FilesUserName`, `FilesUsersGroupName` — OS-level account
 * `Runtime` — target .NET runtime
 * `ServerSideDownloadFolder`, `ServerSideDeployFolder` — remote paths
+* `IsDecommissioned` — the server is no longer used (reinstalled or
+renamed); its record stays as a sample of the old configuration. The
+`Servers` list and the server choices show `Decommissioned` next to it;
+nothing else changes
 
 \---
 

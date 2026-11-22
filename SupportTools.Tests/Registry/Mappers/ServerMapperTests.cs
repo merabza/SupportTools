@@ -1,4 +1,6 @@
-﻿using LibSupportToolsServerWork.Registry.Mappers;
+﻿using System;
+using LibSupportToolsServerWork.Registry.Mappers;
+using LibSupportToolsServerWork.Registry.Sync;
 using SupportToolsData.Models;
 using SupportToolsServerApiContracts.Models;
 using Xunit;
@@ -7,14 +9,14 @@ namespace SupportTools.Tests.Registry.Mappers;
 
 public sealed class ServerMapperTests
 {
-    //IsLocal belongs to the computer: the local record keeps it
+    //IsLocal belongs to the computer: the local record keeps it. IsDecommissioned travels both ways
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ApplyToLocal_WhenContractComesFromLocalRecord_RestoresTheOriginal(bool isLocal)
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void ApplyToLocal_WhenContractComesFromLocalRecord_RestoresTheOriginal(bool isLocal, bool isDecommissioned)
     {
         // Arrange
-        ServerDataModel original = NewServer(isLocal);
+        ServerDataModel original = NewServer(isLocal, isDecommissioned);
         StsServerDataModel contract = ServerMapper.ToContract("dl360", original);
         var restored = new ServerDataModel { IsLocal = isLocal };
 
@@ -62,11 +64,29 @@ public sealed class ServerMapperTests
         Assert.Equal(missingHash, emptyHash);
     }
 
-    private static ServerDataModel NewServer(bool isLocal)
+    //false is a default value, which the hash leaves out: a server in use keeps the hash it had before the field existed
+    [Fact]
+    public void IsDecommissioned_WhenFalse_IsLeftOutOfTheHash()
+    {
+        // Arrange
+        StsServerDataModel inUse = ServerMapper.ToContract("dl360", NewServer(true, false));
+        StsServerDataModel decommissioned = ServerMapper.ToContract("dl360", NewServer(true, true));
+
+        // Act
+        string inUseJson = RegistryContractHasher.ToCanonicalJson(inUse);
+        string decommissionedJson = RegistryContractHasher.ToCanonicalJson(decommissioned);
+
+        // Assert
+        Assert.DoesNotContain(nameof(StsServerDataModel.IsDecommissioned), inUseJson, StringComparison.Ordinal);
+        Assert.Contains("\"IsDecommissioned\":true", decommissionedJson, StringComparison.Ordinal);
+    }
+
+    private static ServerDataModel NewServer(bool isLocal, bool isDecommissioned = false)
     {
         return new ServerDataModel
         {
             IsLocal = isLocal,
+            IsDecommissioned = isDecommissioned,
             WebAgentName = "Dl360.WebAgent",
             WebAgentInstallerName = "Dl360.Installer",
             FilesUserName = "appuser",

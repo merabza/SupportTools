@@ -12,4 +12,7 @@ public sealed class ServerDataModel : ItemData
     public string? Runtime { get; set; }
     public string? ServerSideDownloadFolder { get; set; }
     public string? ServerSideDeployFolder { get; set; }
+
+    //სერვერი გაუქმებულია (გადაინსტალირდა ან სახელი შეეცვალა): ჩანაწერი ძველი კონფიგურაციის ნიმუშად რჩება
+    public bool IsDecommissioned { get; set; }
 }

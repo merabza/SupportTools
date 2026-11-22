@@ -1,9 +1,15 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
@@ -13,9 +19,13 @@ using Xunit;
 
 namespace SupportTools.Tests.Cruders;
 
-public sealed class ServerDataCruderTests
+[Collection(ConsoleCaptureCollection.Name)]
+public sealed class ServerDataCruderTests : IDisposable
 {
     private const string IsLocalFieldName = "Is Local";
+
+    private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+    private readonly TextWriter _originalConsoleOutput;
 
     private readonly SupportToolsParameters _parameters = new()
     {
@@ -33,6 +43,15 @@ public sealed class ServerDataCruderTests
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
         _parametersManager.Setup(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
             It.IsAny<CancellationToken>())).ReturnsAsync(true);
+
+        _originalConsoleOutput = Console.Out;
+        Console.SetOut(_consoleOutput);
+    }
+
+    public void Dispose()
+    {
+        Console.SetOut(_originalConsoleOutput);
+        _consoleOutput.Dispose();
     }
 
     [Fact]
@@ -56,7 +75,8 @@ public sealed class ServerDataCruderTests
             nameof(ServerDataModel.IsLocal), nameof(ServerDataModel.WebAgentName),
             nameof(ServerDataModel.WebAgentInstallerName), nameof(ServerDataModel.FilesUserName),
             nameof(ServerDataModel.FilesUsersGroupName), nameof(ServerDataModel.Runtime),
-            nameof(ServerDataModel.ServerSideDownloadFolder), nameof(ServerDataModel.ServerSideDeployFolder)
+            nameof(ServerDataModel.ServerSideDownloadFolder), nameof(ServerDataModel.ServerSideDeployFolder),
+            nameof(ServerDataModel.IsDecommissioned)
         ];
 
         // Act
@@ -64,6 +84,24 @@ public sealed class ServerDataCruderTests
 
         // Assert
         Assert.Equal(expected, CliMenuTestAccess.GetFieldEditors(sut).Select(x => x.PropertyName));
+    }
+
+    //a server may have no web agent and no installer (a local computer), so both editors offer the (None) choice
+    [Fact]
+    public void Constructor_WhenCreated_OffersNoneForBothWebAgents()
+    {
+        // Arrange
+        string[] expected = [nameof(ServerDataModel.WebAgentName), nameof(ServerDataModel.WebAgentInstallerName)];
+        FieldInfo useNoneField =
+            typeof(ApiClientNameFieldEditor).GetField("_useNone", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        // Act
+        List<FieldEditor> fieldEditors = CliMenuTestAccess.GetFieldEditors(CreateSut());
+
+        // Assert
+        Assert.Equal(expected,
+            fieldEditors.OfType<ApiClientNameFieldEditor>().Where(x => (bool)useNoneField.GetValue(x)!)
+                .Select(x => x.PropertyName));
     }
 
     [Fact]
@@ -185,6 +223,42 @@ public sealed class ServerDataCruderTests
         // Assert
         Assert.True(newServer.IsLocal);
         Assert.True(_parameters.Servers["PAZISI"].IsLocal);
+    }
+
+    //a decommissioned server stays as a sample of its old configuration: the Servers list and the server choices mark it
+    [Fact]
+    public void GetStatusFor_WhenServerIsDecommissioned_MarksIt()
+    {
+        // Arrange
+        _parameters.Servers["dl360"] = new ServerDataModel { IsDecommissioned = true };
+
+        // Act
+        string? status = CreateSut().GetStatusFor("dl360");
+
+        // Assert
+        Assert.Equal("Decommissioned", status);
+    }
+
+    [Fact]
+    public void GetStatusFor_WhenServerIsInUse_ReturnsNoStatus()
+    {
+        // Act
+        string? status = CreateSut().GetStatusFor("PAZISI");
+
+        // Assert
+        Assert.Null(status);
+    }
+
+    //the Servers list and the server choices ask only for listed names: an unknown name is no error either
+    [Fact]
+    public void GetStatusFor_WhenServerIsMissing_ReturnsNoStatusAndWritesNoError()
+    {
+        // Act
+        string? status = CreateSut().GetStatusFor("Missing");
+
+        // Assert
+        Assert.Null(status);
+        Assert.Equal(string.Empty, _consoleOutput.ToString());
     }
 
     private ServerDataCruder CreateSut()

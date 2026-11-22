@@ -32,6 +32,7 @@ public sealed class ServerDataCruder : ParCruder<ServerDataModel>
         FieldEditors.Add(new RunTimeNameFieldEditor(nameof(ServerDataModel.Runtime), ParametersManager));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.ServerSideDownloadFolder)));
         FieldEditors.Add(new TextFieldEditor(nameof(ServerDataModel.ServerSideDeployFolder)));
+        FieldEditors.Add(new BoolFieldEditor(nameof(ServerDataModel.IsDecommissioned)));
 
         //ახალი ჩანაწერის შექმნისას ველები CheckFieldsEnables-ის პირველ გამოძახებამდე იკითხება
         EnableIsLocalEditor();
@@ -51,6 +52,12 @@ public sealed class ServerDataCruder : ParCruder<ServerDataModel>
     {
         await base.AddRecordWithKey(recordKey, newRecord, cancellationToken);
         ServersIsLocalCalculator.Recalculate((SupportToolsParameters)ParametersManager.Parameters);
+    }
+
+    //გაუქმებული სერვერი სერვერების სიაშიც და სერვერის არჩევისასაც ჩანს
+    public override string? GetStatusFor(string name)
+    {
+        return GetItemByName(name, false) is ServerDataModel { IsDecommissioned: true } ? "Decommissioned" : null;
     }
 
     private void EnableIsLocalEditor()
