@@ -20,6 +20,7 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
 {
     private const string ActionName = "Update App";
     private const string ActionDescription = "Update App";
+    private const string AppSettingsFileName = "appsettings.json";
     private readonly string _appName;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -71,11 +72,9 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             return false;
         }
 
-        string appSettingsFileName = "appsettings.json";
+        string appSettingsFileName = AppSettingsFileName;
 
         //2. დავშიფროთ პარამეტრების ფაილი და ავტვირთოთ ფაილსაცავში
-        AppSettingsEncoderParameters appSettingsEncoderParameters =
-            ProgramServiceUpdaterParameters.AppSettingsEncoderParameters;
         AppSettingsPreparerParameters appSettingsPreparerParameters =
             ProgramServiceUpdaterParameters.AppSettingsPreparerParameters;
         string? appSettingsVersion = null;
@@ -83,38 +82,15 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
             !string.IsNullOrWhiteSpace(appSettingsPreparerParameters.AppSettingsJsonSourceFileName);
         if (installParameters)
         {
-            if (appSettingsEncoderParameters is not null)
+            UploadedAppSettings? uploadedAppSettings = await UploadAppSettings(_logger, appSettingsPreparerParameters,
+                ProgramServiceUpdaterParameters.AppSettingsEncoderParameters, cancellationToken);
+            if (uploadedAppSettings is null)
             {
-                var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(_logger,
-                    appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
-                    appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
-                    appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
-                    appSettingsEncoderParameters.KeyPart2, appSettingsPreparerParameters.ProjectName,
-                    appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
-                    appSettingsPreparerParameters.ParametersFileExtension,
-                    appSettingsPreparerParameters.FileStorageForExchange,
-                    appSettingsPreparerParameters.ExchangeSmartSchema);
-                if (!await encodeParametersAndUploadAction.Run(cancellationToken))
-                {
-                    return false;
-                }
+                return false;
+            }
 
-                appSettingsFileName = Path.GetFileName(appSettingsEncoderParameters.AppSettingsEncodedJsonFileName);
-                appSettingsVersion = encodeParametersAndUploadAction.AppSettingsVersion;
-            }
-            else
-            {
-                var prepareParametersAndUploadAction = new PrepareParametersAndUploadAction(_logger,
-                    appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
-                    appSettingsPreparerParameters.ProjectName, appSettingsPreparerParameters.ServerInfo,
-                    appSettingsPreparerParameters.DateMask, appSettingsPreparerParameters.ParametersFileExtension,
-                    appSettingsPreparerParameters.FileStorageForExchange,
-                    appSettingsPreparerParameters.ExchangeSmartSchema);
-                if (!await prepareParametersAndUploadAction.Run(cancellationToken))
-                {
-                    return false;
-                }
-            }
+            appSettingsFileName = uploadedAppSettings.FileName;
+            appSettingsVersion = uploadedAppSettings.Version;
         }
 
         //3. გავუშვათ ინსტალაციის პროცესი, ამ პროცესის დასრულების შემდეგ უნდა მივიღოთ დაინსტალირებისას დადგენილი პროგრამის ვერსია.
@@ -164,5 +140,45 @@ public sealed class ServiceUpdaterToolCommand : ToolCommand
         _logger.LogError("project {ProjectName}/{EnvironmentName} parameters file check failed", projectName,
             environmentName);
         return false;
+    }
+
+    //პარამეტრების ფაილის დაშიფვრა ან მომზადება და ფაილსაცავში ატვირთვა. აბრუნებს სერვისისთვის გადასაცემი ფაილის
+    //სახელს და ატვირთულ ფაილში ჩაწერილ ვერსიას, რომელსაც პარამეტრების შემოწმება ადარებს; შეცდომისას null
+    internal static async ValueTask<UploadedAppSettings?> UploadAppSettings(ILogger logger,
+        AppSettingsPreparerParameters appSettingsPreparerParameters,
+        AppSettingsEncoderParameters? appSettingsEncoderParameters, CancellationToken cancellationToken = default)
+    {
+        if (appSettingsEncoderParameters is not null)
+        {
+            var encodeParametersAndUploadAction = new EncodeParametersAndUploadAction(logger,
+                appSettingsEncoderParameters.AppSetEnKeysJsonFileName,
+                appSettingsPreparerParameters.AppSettingsJsonSourceFileName,
+                appSettingsEncoderParameters.AppSettingsEncodedJsonFileName, appSettingsEncoderParameters.KeyPart1,
+                appSettingsEncoderParameters.KeyPart2, appSettingsPreparerParameters.ProjectName,
+                appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
+                appSettingsPreparerParameters.ParametersFileExtension,
+                appSettingsPreparerParameters.FileStorageForExchange,
+                appSettingsPreparerParameters.ExchangeSmartSchema);
+            if (!await encodeParametersAndUploadAction.Run(cancellationToken))
+            {
+                return null;
+            }
+
+            return new UploadedAppSettings(
+                Path.GetFileName(appSettingsEncoderParameters.AppSettingsEncodedJsonFileName),
+                encodeParametersAndUploadAction.AppSettingsVersion);
+        }
+
+        var prepareParametersAndUploadAction = new PrepareParametersAndUploadAction(logger,
+            appSettingsPreparerParameters.AppSettingsJsonSourceFileName, appSettingsPreparerParameters.ProjectName,
+            appSettingsPreparerParameters.ServerInfo, appSettingsPreparerParameters.DateMask,
+            appSettingsPreparerParameters.ParametersFileExtension, appSettingsPreparerParameters.FileStorageForExchange,
+            appSettingsPreparerParameters.ExchangeSmartSchema);
+        if (!await prepareParametersAndUploadAction.Run(cancellationToken))
+        {
+            return null;
+        }
+
+        return new UploadedAppSettings(AppSettingsFileName, prepareParametersAndUploadAction.AppSettingsVersion);
     }
 }
