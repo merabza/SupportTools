@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,9 +23,17 @@ public static class CopyBaseParametersFactory
         DatabaseParameters toDatabaseParameters, SupportToolsParameters supportToolsParameters,
         CancellationToken cancellationToken = default)
     {
+        //CreateBaseBackupParameters ორივე მხარეს ამოწმებს, მაგრამ შეცდომაში მხარეს არ წერს (მიზანსაც
+        //fromDatabaseParameters-ს უწოდებს), ამიტომ აქ, მანამდე ვამოწმებთ და ორივე მხარის ყველა ნაკლს ერთად ვწერთ
+        bool sourceIsValid = CheckDatabaseParameters(logger, fromDatabaseParameters, "source");
+        bool destinationIsValid = CheckDatabaseParameters(logger, toDatabaseParameters, "destination");
+        if (!sourceIsValid || !destinationIsValid)
+        {
+            return null;
+        }
+
         DatabasesBackupFilesExchangeParameters? databasesBackupFilesExchangeParameters =
             supportToolsParameters.DatabasesBackupFilesExchangeParameters;
-        string? localPath = databasesBackupFilesExchangeParameters?.LocalPath;
         string? exchangeFileStorageName = databasesBackupFilesExchangeParameters?.ExchangeFileStorageName;
 
         var databaseServerConnections = new DatabaseServerConnections(supportToolsParameters.DatabaseServerConnections);
@@ -60,22 +67,11 @@ public static class CopyBaseParametersFactory
             return null;
         }
 
-        if (string.IsNullOrWhiteSpace(localPath))
-        {
-            StShared.WriteErrorLine("localPath does not specified in databasesBackupFilesExchangeParameters", true);
-            return null;
-        }
-
-        //1. თუ ლოკალური ფოლდერი არ არსებობს, შეიქმნას
-        if (!Directory.Exists(localPath))
-        {
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation("Creating local folder {LocalPath}", localPath);
-            }
-
-            Directory.CreateDirectory(localPath);
-        }
+        //CreateBaseBackupParameters-მა ორივე მხარის ბაზის მენეჯერი, ფაილსაცავი და ლოკალური ფოლდერი უკვე შექმნა და
+        //შეამოწმა, ამიტომ ლოკალური ფოლდერი და მიზნის ფაილსაცავი იქიდან აიღება
+        BaseBackupParameters sourceBackupParameters = createSourceBaseBackupParametersResult.Value;
+        BaseBackupParameters destinationBackupParameters = createDestinationBaseBackupParametersResult.Value;
+        string localPath = sourceBackupParameters.LocalPath;
 
         string? sourceDbConnectionName = fromDatabaseParameters.DbConnectionName;
         string? backupBaseName = fromDatabaseParameters.DatabaseName;
@@ -98,93 +94,13 @@ public static class CopyBaseParametersFactory
             await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath,
                 exchangeFileStorageName, fileStorages, null, null, cancellationToken);
 
-        //წყაროს ფაილსაცავი
         string? sourceFileStorageName = fromDatabaseParameters.FileStorageName;
-
-        (FileStorageData? sourceFileStorage, FileManager? sourceFileManager) =
-            await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath, sourceFileStorageName,
-                fileStorages, null, null, cancellationToken);
-
-        if (sourceFileManager == null)
-        {
-            logger.LogError("sourceFileManager does Not Created");
-            return null;
-        }
-
-        if (sourceFileStorage == null)
-        {
-            logger.LogError("sourceFileStorage does Not Created");
-            return null;
-        }
 
         //მიზნის ფაილსაცავი
         string? destinationFileStorageName = toDatabaseParameters.FileStorageName;
+        FileStorageData destinationFileStorage = destinationBackupParameters.BackupRestoreParameters.FileStorage;
 
-        Console.Write($" destinationFileStorage - {destinationFileStorageName}");
-        (FileStorageData? destinationFileStorage, FileManager? destinationFileManager) =
-            await FileManagersFactoryExt.CreateFileStorageAndFileManager(true, logger, localPath,
-                destinationFileStorageName, fileStorages, null, null, cancellationToken);
-
-        if (destinationFileStorage == null)
-        {
-            logger.LogError("destinationFileStorage does Not Created");
-            return null;
-        }
-
-        if (destinationFileManager == null)
-        {
-            logger.LogError("destinationFileManager Not Created");
-            return null;
-        }
-
-        Console.WriteLine();
-
-        FileManager? localFileManager = FileManagersFactory.CreateFileManager(true, logger, localPath);
-
-        if (localFileManager == null)
-        {
-            logger.LogError("localFileManager does not created");
-            return null;
-        }
-
-        //პარამეტრების მიხედვით ბაზის სარეზერვო ასლის დამზადება და მოქაჩვა
-        //წყაროს სერვერის აგენტის შექმნა
-        Result<IDatabaseManager> createDatabaseManagerResultForSource =
-            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, sourceDbConnectionName,
-                databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
-
-        if (createDatabaseManagerResultForSource.IsFailure)
-        {
-            createDatabaseManagerResultForSource.Error.PrintErrorsOnConsole();
-            logger.LogError("Can not create client for source Database server");
-            return null;
-        }
-
-        Result<IDatabaseManager> createDatabaseManagerResultForDestination =
-            await DatabaseManagersFactory.CreateDatabaseManager(appName, logger, true, destinationDbConnectionName,
-                databaseServerConnections, apiClients, httpClientFactory, null, null, cancellationToken);
-
-        if (createDatabaseManagerResultForDestination.IsFailure)
-        {
-            createDatabaseManagerResultForDestination.Error.PrintErrorsOnConsole();
-            logger.LogError("Can not create client for destination Database server");
-            return null;
-        }
-
-        string? sourceDatabaseName = fromDatabaseParameters.DatabaseName;
-        if (string.IsNullOrWhiteSpace(sourceDatabaseName))
-        {
-            logger.LogError("sourceDatabaseName does not detected");
-            return null;
-        }
-
-        string? destinationDatabaseName = toDatabaseParameters.DatabaseName;
-
-        if (string.IsNullOrWhiteSpace(destinationDatabaseName))
-        {
-            logger.LogError("destinationDatabaseName does not detected");
-            return null;
-        }
+        Console.WriteLine($" destinationFileStorage - {destinationFileStorageName}");
 
         bool needUploadToDestination = !FileStorageData.IsSameToLocal(destinationFileStorage, localPath) &&
                                        sourceFileStorageName != destinationFileStorageName;
@@ -195,27 +111,41 @@ public static class CopyBaseParametersFactory
 
         string? exchangeSmartSchemaName = databasesBackupFilesExchangeParameters?.ExchangeSmartSchemaName;
 
-        SmartSchema? exchangeSmartSchema = string.IsNullOrWhiteSpace(exchangeSmartSchemaName)
-            ? null
-            : smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
+        //GetSmartSchemaByKey ცარიელ სახელზე null-ს აბრუნებს
+        SmartSchema? exchangeSmartSchema = smartSchemas.GetSmartSchemaByKey(exchangeSmartSchemaName);
 
-        if (string.IsNullOrWhiteSpace(fromDatabaseParameters.DbServerFoldersSetName))
-        {
-            logger.LogError("fromDatabaseParameters.DbServerFoldersSetName is not specified");
-            return null;
-        }
-
-        if (string.IsNullOrWhiteSpace(toDatabaseParameters.DbServerFoldersSetName))
-        {
-            logger.LogError("toDatabaseParameters.DbServerFoldersSetName is not specified");
-            return null;
-        }
-
-        return new CopyBaseParameters(createSourceBaseBackupParametersResult.Value,
-            createDestinationBaseBackupParametersResult.Value, exchangeFileManager, needUploadToDestination,
-            needDownloadFromExchange, exchangeSmartSchema,
+        return new CopyBaseParameters(sourceBackupParameters, destinationBackupParameters, exchangeFileManager,
+            needUploadToDestination, needDownloadFromExchange, exchangeSmartSchema,
             string.IsNullOrWhiteSpace(databasesBackupFilesExchangeParameters?.UploadTempExtension)
                 ? "up!"
                 : databasesBackupFilesExchangeParameters.UploadTempExtension);
+    }
+
+    //CreateBaseBackupParameters-ის სავალდებულო ველები. შეცდომაში მხარე და, თუ ცნობილია, ბაზის სახელი იწერება
+    private static bool CheckDatabaseParameters(ILogger logger, DatabaseParameters databaseParameters, string side)
+    {
+        string database = string.IsNullOrWhiteSpace(databaseParameters.DatabaseName)
+            ? string.Empty
+            : $" (database {databaseParameters.DatabaseName})";
+
+        //ყველა ველი მოწმდება, რომ ყველა ნაკლი ერთად ჩანდეს
+        bool isValid = true;
+        CheckField(nameof(DatabaseParameters.DbConnectionName), databaseParameters.DbConnectionName);
+        CheckField(nameof(DatabaseParameters.DatabaseName), databaseParameters.DatabaseName);
+        CheckField(nameof(DatabaseParameters.DbServerFoldersSetName), databaseParameters.DbServerFoldersSetName);
+        CheckField(nameof(DatabaseParameters.FileStorageName), databaseParameters.FileStorageName);
+        return isValid;
+
+        void CheckField(string fieldName, string? value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            logger.LogError("{FieldName} is not specified in {Side} database parameters{Database}", fieldName, side,
+                database);
+            isValid = false;
+        }
     }
 }
