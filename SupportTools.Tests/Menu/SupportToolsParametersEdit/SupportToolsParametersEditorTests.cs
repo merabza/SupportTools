@@ -6,8 +6,10 @@ using System.Reflection;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.CliTools.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
 using SupportTools.Menu.SupportToolsParametersEdit;
@@ -167,6 +169,37 @@ public sealed class SupportToolsParametersEditorTests
         // Assert
         Assert.IsType<BoolFieldEditor>(editor);
         Assert.Equal(bool.FalseString, status);
+    }
+
+    //the list shows how many places use every connection, the record menu lists them as menu links
+    [Fact]
+    public void DatabaseServerConnectionsEditor_WhenSubMenuRequested_ShowsTheUsagesOfEveryConnection()
+    {
+        // Arrange
+        _parameters.DatabaseServerConnections["Conn"] = new DatabaseServerConnectionData
+        {
+            DatabaseServerProvider = EDatabaseProvider.SqlServer, ServerAddress = "TestSqlServer"
+        };
+        _parameters.Projects["App"] = new ProjectModel
+        {
+            ProjectGroupName = "G1", DevDatabaseParameters = new DatabaseParameters { DbConnectionName = "Conn" }
+        };
+        FieldEditor connectionsEditor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.DatabaseServerConnections));
+
+        // Act
+        CliMenuSet listMenu = connectionsEditor.GetSubMenu(_parameters)!;
+        CliMenuCommand connectionCommand = CliMenuTestAccess.GetMenuItems(listMenu)
+            .Single(x => x.MenuItemName == "Conn").CliMenuCommand;
+        connectionCommand.CountStatus();
+        CliMenuSet connectionMenu = connectionCommand.GetSubMenu()!;
+
+        // Assert
+        Assert.Equal("SqlServer: TestSqlServer, Usage count: 1", connectionCommand.StatusString);
+        InfoCliMenuCommand place = Assert.Single(CliMenuTestAccess.GetMenuItems(connectionMenu)
+            .Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>());
+        Assert.Equal("G1/App/Dev Database Parameters", place.Name);
+        Assert.Equal("G1/App/Dev Database Parameters", place.GetMenuLinkToGo());
     }
 
     [Fact]

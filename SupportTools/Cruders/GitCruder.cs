@@ -199,11 +199,17 @@ public sealed class GitCruder : ParCruder<GitDataModel>
         //Main Menu/
         foreach (InfoCliMenuCommand itemSubMenuCommand in projects
                      .Where(projectKvp => projectKvp.Value.GitProjectNames.Contains(itemName)).Select(projectKvp =>
-                         new InfoCliMenuCommand(projectKvp.Key,
-                             $"{projectKvp.Value.ProjectGroupName}/{projectKvp.Key}")).OrderBy(x => x.Name))
+                         new InfoCliMenuCommand(projectKvp.Key, ProjectMenuLink(projectKvp.Key, projectKvp.Value)))
+                     .OrderBy(x => x.Name))
         {
             itemSubMenuSet.AddMenuItem(itemSubMenuCommand);
         }
+    }
+
+    //ჯგუფის გარეშე პროექტი ჯგუფების სიაში __No Group__ ჯგუფშია (ProjectGroupsListFactoryStrategy)
+    private static string ProjectMenuLink(string projectName, ProjectModel project)
+    {
+        return $"{SupportToolsParameters.FixProjectGroupName(project.ProjectGroupName)}/{projectName}";
     }
 
     protected override void FillListMenuAdditional(CliMenuSet cruderSubMenuSet)

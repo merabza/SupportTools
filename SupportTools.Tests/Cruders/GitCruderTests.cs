@@ -433,6 +433,26 @@ public sealed class GitCruderTests : IDisposable
         Assert.Equal(7, commands.Count);
     }
 
+    //the projects list shows a project without a group in the __No Group__ group; the link used to start with "/"
+    [Theory]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public void FillDetailsSubMenu_WhenTheProjectHasNoGroup_LinksThroughTheNoGroupMenu(string? projectGroupName)
+    {
+        // Arrange
+        _parameters.Projects["Solo"] =
+            new ProjectModel { ProjectGroupName = projectGroupName, GitProjectNames = ["RepoA"] };
+        var detailsMenu = new CliMenuSet("Details");
+
+        // Act
+        CreateLocalSut().FillDetailsSubMenu(detailsMenu, "RepoA");
+
+        // Assert
+        InfoCliMenuCommand projectLink = Assert.Single(CliMenuTestAccess.GetMenuItems(detailsMenu)
+            .Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>());
+        Assert.Equal("__No Group__/Solo", projectLink.GetMenuLinkToGo());
+    }
+
     [Fact]
     public void FillDetailsSubMenu_WhenNoProjectUsesTheGit_AddsOnlyTheEditorsAndTheUpdateCommand()
     {

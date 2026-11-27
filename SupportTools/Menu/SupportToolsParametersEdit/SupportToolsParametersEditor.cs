@@ -21,9 +21,11 @@ namespace SupportTools.Menu.SupportToolsParametersEdit;
 
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
+    //რედაქტორის სახელი მთავარი მენიუს ჩანაწერის სახელიცაა. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages)
+    public const string MenuName = "Support Tools Parameters Editor";
+
     public SupportToolsParametersEditor(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
-        IParameters parameters, IParametersManager parametersManager) : base("Support Tools Parameters Editor",
-        parameters, parametersManager)
+        IParameters parameters, IParametersManager parametersManager) : base(MenuName, parameters, parametersManager)
     {
         //კომპიუტერის პროფილი: ეს ველები ამ კომპიუტერისაა და სინქრონიზაციით არ გადადის
         FieldEditors.Add(new MachineNameFieldEditor(nameof(SupportToolsParameters.MachineName)));
@@ -102,9 +104,13 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new DictionaryFieldEditor<FileStorageCruder, FileStorageData>(
             nameof(SupportToolsParameters.FileStorages), x => new FileStorageCruder(logger, parametersManager, x)));
 
+        //კავშირების სიის სტატუსში გამოყენების რაოდენობაა, კავშირის მენიუში კი გამოყენების ადგილები
         FieldEditors.Add(new DictionaryFieldEditor<DatabaseServerConnectionCruder, DatabaseServerConnectionData>(
             nameof(SupportToolsParameters.DatabaseServerConnections),
-            x => new DatabaseServerConnectionCruder(application, logger, httpClientFactory, parametersManager, x)));
+            x => new DatabaseServerConnectionCruder(application, logger, httpClientFactory, parametersManager, x,
+                connectionName =>
+                    DatabaseServerConnectionUsages.Find((SupportToolsParameters)parametersManager.Parameters,
+                        connectionName))));
 
         FieldEditors.Add(new DictionaryFieldEditor<SmartSchemaCruder, SmartSchema>(
             nameof(SupportToolsParameters.SmartSchemas), x => new SmartSchemaCruder(parametersManager, x)));

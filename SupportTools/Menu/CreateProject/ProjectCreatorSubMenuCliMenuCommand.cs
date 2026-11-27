@@ -15,6 +15,9 @@ namespace SupportTools.Menu.CreateProject;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
+    //მთავარი მენიუს ჩანაწერის სახელი. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages)
+    public const string MenuName = "Project Creator";
+
     private readonly IApplication _application;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger _logger;
@@ -22,7 +25,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
     // ReSharper disable once ConvertToPrimaryConstructor
     public ProjectCreatorSubMenuCliMenuCommand(IApplication application, ILogger logger,
-        IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base("Project Creator",
+        IHttpClientFactory httpClientFactory, IParametersManager parametersManager) : base(MenuName,
         EMenuAction.LoadSubMenu)
     {
         _application = application;
@@ -33,7 +36,7 @@ public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 
     public override CliMenuSet GetSubMenu()
     {
-        var projectCreatorSubMenuSet = new CliMenuSet("Project Creator");
+        var projectCreatorSubMenuSet = new CliMenuSet(MenuName);
 
         var parameters = (SupportToolsParameters)_parametersManager.Parameters;
         AppProjectCreatorAllParameters? appProjectCreatorAllParameters = parameters.AppProjectCreatorAllParameters;
