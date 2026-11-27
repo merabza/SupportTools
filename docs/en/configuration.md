@@ -236,7 +236,10 @@ combination.
 
 * `EnvironmentName`, `ServerName` (composite key)
 * `ServerSidePort`, `ApiVersionId` — required together for health checks
-* `WebAgentNameForCheck` — which API client to use for version probes
+* `WebAgentNameForCheck` — which API client to use for version probes;
+`(None)` in its choice list clears it, and the server's install, update,
+start/stop, remove and version check tools then report that it is not
+specified
 * `AppSettingsJsonSourceFileName`, `AppSettingsEncodedJsonFileName` —
 appSettings input and output paths
 * `ServiceUserName` — service account on the target server

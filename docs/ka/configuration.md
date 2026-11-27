@@ -242,7 +242,9 @@ server-name კომბინაციისთვის.
 * `EnvironmentName`, `ServerName` (composite key)
 * `ServerSidePort`, `ApiVersionId` — საჭიროა ერთად health check-ისთვის
 * `WebAgentNameForCheck` — რომელი API client გამოვიყენო ვერსიის
-შესამოწმებლად
+შესამოწმებლად; არჩევანის სიაში `(None)` მას ასუფთავებს, ამის შემდეგ კი
+სერვერის ინსტალაციის, განახლების, გაშვება-გაჩერების, წაშლისა და ვერსიის
+შემოწმების ინსტრუმენტები წერენ, რომ ის მითითებული არ არის
 * `AppSettingsJsonSourceFileName`, `AppSettingsEncodedJsonFileName` —
 appSettings input და output ბილიკები
 * `ServiceUserName` — სამიზნე სერვერის სერვისის ანგარიში

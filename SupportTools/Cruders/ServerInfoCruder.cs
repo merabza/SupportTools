@@ -43,8 +43,9 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
         FieldEditors.Add(new EnvironmentNameFieldEditor(nameof(ServerInfoModel.EnvironmentName), ParametersManager));
         if (project.ProjectType == EProjectType.IsService)
         {
+            //სიაში (None)-იც არის, რომელიც მნიშვნელობას ასუფთავებს
             FieldEditors.Add(new ApiClientNameFieldEditor(nameof(ServerInfoModel.WebAgentNameForCheck), logger,
-                httpClientFactory, ParametersManager));
+                httpClientFactory, ParametersManager, true));
             FieldEditors.Add(new IntFieldEditor(nameof(ServerInfoModel.ServerSidePort)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ApiVersionId)));
             FieldEditors.Add(new TextFieldEditor(nameof(ServerInfoModel.ServiceUserName)));

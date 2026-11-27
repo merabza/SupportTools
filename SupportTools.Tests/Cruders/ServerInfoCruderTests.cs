@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.FieldEditors;
+using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
@@ -86,6 +88,24 @@ public sealed class ServerInfoCruderTests
 
         // Assert
         Assert.Equal(expected, fieldEditors.Select(x => x.PropertyName));
+    }
+
+    //the check agent can be cleared, so its editor offers the (None) choice, like the web agents of a server
+    [Fact]
+    public void Create_WhenProjectIsService_OffersNoneForWebAgentNameForCheck()
+    {
+        // Arrange
+        _parameters.Projects[ProjectTestData.Name] = new ProjectModel { ProjectType = EProjectType.IsService };
+        FieldInfo useNoneField =
+            typeof(ApiClientNameFieldEditor).GetField("_useNone", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        // Act
+        List<FieldEditor> fieldEditors = CliMenuTestAccess.GetFieldEditors(CreateSut());
+
+        // Assert
+        ApiClientNameFieldEditor editor = Assert.Single(fieldEditors.OfType<ApiClientNameFieldEditor>());
+        Assert.Equal(nameof(ServerInfoModel.WebAgentNameForCheck), editor.PropertyName);
+        Assert.True((bool)useNoneField.GetValue(editor)!);
     }
 
     [Fact]
