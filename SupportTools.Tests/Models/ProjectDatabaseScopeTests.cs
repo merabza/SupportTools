@@ -59,11 +59,11 @@ public sealed class ProjectDatabaseScopeTests
 
         Assert.Equal(Enum.GetValues<EProjectTools>().Where(x => x.IsDatabaseTool()),
             Enum.GetValues<EProjectTools>().Where(project.IsToolVisible));
-        Assert.Equal(
-            [
-                EProjectServerTools.DevBaseToServerCopier, EProjectServerTools.ServerBaseToProdCopyCopier,
-                EProjectServerTools.ServerBaseToServerCopier, EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase
-            ], Enum.GetValues<EProjectServerTools>().Where(project.IsToolVisible));
+        Assert.Equal([
+            EProjectServerTools.DevBaseToServerCopier, EProjectServerTools.ServerBaseToProdCopyCopier,
+            EProjectServerTools.ServerBaseToServerCopier,
+            EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase
+        ], Enum.GetValues<EProjectServerTools>().Where(project.IsToolVisible));
     }
 
     //every tool must be classified; an unclassified one throws

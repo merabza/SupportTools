@@ -86,8 +86,9 @@ public sealed class PackageUpdaterToolAction : ToolAction
 
         int changedVersionCount = CentralPackageVersionsFile.CountChangedVersions(propsBytesBefore,
             CentralPackageVersionsFile.ReadBytes(propsFileName));
-        output.WriteLine(string.Create(CultureInfo.InvariantCulture,
-            $"{changedVersionCount} package {(changedVersionCount == 1 ? "version" : "versions")} updated"), null);
+        output.WriteLine(
+            string.Create(CultureInfo.InvariantCulture,
+                $"{changedVersionCount} package {(changedVersionCount == 1 ? "version" : "versions")} updated"), null);
 
         //dotnet outdated -n ვერსიებს restore-ის შემოწმების გარეშე წერს. შემოწმება ერთხელ, სოლუშენზე კეთდება და მხოლოდ
         //მაშინ, როცა ვერსიები შეიცვალა

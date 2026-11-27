@@ -17,110 +17,6 @@ public sealed class DotnetProcessorTests
     private readonly ILogger _logger = new Mock<ILogger>().Object;
     private readonly FakeDotnetRunner _runner = new();
 
-    [Theory]
-    [InlineData(false, false, "build App.slnx \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
-    [InlineData(true, false,
-        "build App.slnx --no-incremental \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
-    [InlineData(false, true,
-        "build App.slnx -p:RestoreNoHttpCache=true \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
-    [InlineData(true, true,
-        "build App.slnx --no-incremental -p:RestoreNoHttpCache=true \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
-    public void CreateBuildArguments_AddsTheSwitchesThatAreAskedFor(bool noIncremental, bool noHttpCache,
-        string expected)
-    {
-        // Act
-        string result =
-            DotnetProcessor.CreateBuildArguments("App.slnx", noIncremental, noHttpCache, @"C:\Temp\LastBuild.log");
-
-        // Assert
-        Assert.Equal(expected, result);
-    }
-
-    [Theory]
-    [InlineData(null, false, "add App.csproj package Lib.A")]
-    [InlineData("1.0.1", false, "add App.csproj package Lib.A --version 1.0.1")]
-    [InlineData("1.0.1", true, "add App.csproj package Lib.A --version 1.0.1 --no-restore")]
-    public void CreateAddPackageArguments_AddsTheSwitchesThatAreAskedFor(string? packageVersion, bool noRestore,
-        string expected)
-    {
-        // Act
-        string result = DotnetProcessor.CreateAddPackageArguments("App.csproj", "Lib.A", packageVersion, noRestore);
-
-        // Assert
-        Assert.Equal(expected, result);
-    }
-
-    //Version, not AssemblyVersion: it also reaches the restore, so a project built from source wins over an older package
-    //of the same name (WebSystemTools refers to SystemTools by packages) and the publish holds the DLLs the app references
-    [Fact]
-    public void CreatePublishArguments_SetsTheVersionOfEveryProject()
-    {
-        // Act
-        string result =
-            DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj", "1.0.9792.31628");
-
-        // Assert
-        Assert.Equal(
-            @"publish --configuration Release --runtime linux-x64 --self-contained --output C:\Publish\App App.csproj /p:Version=1.0.9792.31628",
-            result);
-    }
-
-    //the app csproj's PublishSpa target gives SpaMode to npm run build as Vite's --mode, so the front takes .env.{mode}
-    [Fact]
-    public void CreatePublishArguments_WhenSpaModeIsSet_PassesItAsSpaModeProperty()
-    {
-        // Act
-        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
-            "1.0.9792.31628", "staging");
-
-        // Assert
-        Assert.EndsWith(" /p:Version=1.0.9792.31628 /p:SpaMode=staging", result, StringComparison.Ordinal);
-    }
-
-    //an empty mode is not passed: the csproj's own default (production) applies
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    public void CreatePublishArguments_WhenSpaModeIsEmpty_DoesNotPassIt(string? spaMode)
-    {
-        // Act
-        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
-            "1.0.9792.31628", spaMode);
-
-        // Assert
-        Assert.DoesNotContain("SpaMode", result, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void CreateRestoreWithoutHttpCacheArguments_SkipsTheHttpCache()
-    {
-        // Act
-        string result = DotnetProcessor.CreateRestoreWithoutHttpCacheArguments("App.csproj");
-
-        // Assert
-        Assert.Equal("restore App.csproj --no-http-cache", result);
-    }
-
-    //every command runs dotnet with the console flag and the logger of the processor and StShared's defaults, and
-    //returns what the run returned
-    [Theory]
-    [MemberData(nameof(Commands))]
-    public void Command_WhenCalled_RunsDotnetWithItsArguments(string command, Func<DotnetProcessor, Result> run,
-        string expectedArguments)
-    {
-        // Arrange
-        _runner.Result = Result.Failure(Error.Failure("Fake", command));
-
-        // Act
-        Result result = run(CreateSut());
-
-        // Assert
-        Assert.Equal(new FakeDotnetRun(false, _logger, "dotnet", expectedArguments, null, true, Timeout.Infinite),
-            Assert.Single(_runner.Runs));
-        Assert.Same(_runner.Result, result);
-    }
-
     public static TheoryData<string, Func<DotnetProcessor, Result>, string> Commands =>
         new()
         {
@@ -227,6 +123,113 @@ public sealed class DotnetProcessorTests
             }
         };
 
+    private static string BuildLogFile =>
+        Path.Combine(Path.GetTempPath(), "SupportTools", "BuildLogs", "LastBuild.log");
+
+    [Theory]
+    [InlineData(false, false, "build App.slnx \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
+    [InlineData(true, false,
+        "build App.slnx --no-incremental \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
+    [InlineData(false, true,
+        "build App.slnx -p:RestoreNoHttpCache=true \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
+    [InlineData(true, true,
+        "build App.slnx --no-incremental -p:RestoreNoHttpCache=true \"-flp:LogFile=C:\\Temp\\LastBuild.log;Verbosity=quiet;Summary\"")]
+    public void CreateBuildArguments_AddsTheSwitchesThatAreAskedFor(bool noIncremental, bool noHttpCache,
+        string expected)
+    {
+        // Act
+        string result =
+            DotnetProcessor.CreateBuildArguments("App.slnx", noIncremental, noHttpCache, @"C:\Temp\LastBuild.log");
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(null, false, "add App.csproj package Lib.A")]
+    [InlineData("1.0.1", false, "add App.csproj package Lib.A --version 1.0.1")]
+    [InlineData("1.0.1", true, "add App.csproj package Lib.A --version 1.0.1 --no-restore")]
+    public void CreateAddPackageArguments_AddsTheSwitchesThatAreAskedFor(string? packageVersion, bool noRestore,
+        string expected)
+    {
+        // Act
+        string result = DotnetProcessor.CreateAddPackageArguments("App.csproj", "Lib.A", packageVersion, noRestore);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    //Version, not AssemblyVersion: it also reaches the restore, so a project built from source wins over an older package
+    //of the same name (WebSystemTools refers to SystemTools by packages) and the publish holds the DLLs the app references
+    [Fact]
+    public void CreatePublishArguments_SetsTheVersionOfEveryProject()
+    {
+        // Act
+        string result =
+            DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj", "1.0.9792.31628");
+
+        // Assert
+        Assert.Equal(
+            @"publish --configuration Release --runtime linux-x64 --self-contained --output C:\Publish\App App.csproj /p:Version=1.0.9792.31628",
+            result);
+    }
+
+    //the app csproj's PublishSpa target gives SpaMode to npm run build as Vite's --mode, so the front takes .env.{mode}
+    [Fact]
+    public void CreatePublishArguments_WhenSpaModeIsSet_PassesItAsSpaModeProperty()
+    {
+        // Act
+        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
+            "1.0.9792.31628", "staging");
+
+        // Assert
+        Assert.EndsWith(" /p:Version=1.0.9792.31628 /p:SpaMode=staging", result, StringComparison.Ordinal);
+    }
+
+    //an empty mode is not passed: the csproj's own default (production) applies
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void CreatePublishArguments_WhenSpaModeIsEmpty_DoesNotPassIt(string? spaMode)
+    {
+        // Act
+        string result = DotnetProcessor.CreatePublishArguments("linux-x64", @"C:\Publish\App", "App.csproj",
+            "1.0.9792.31628", spaMode);
+
+        // Assert
+        Assert.DoesNotContain("SpaMode", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CreateRestoreWithoutHttpCacheArguments_SkipsTheHttpCache()
+    {
+        // Act
+        string result = DotnetProcessor.CreateRestoreWithoutHttpCacheArguments("App.csproj");
+
+        // Assert
+        Assert.Equal("restore App.csproj --no-http-cache", result);
+    }
+
+    //every command runs dotnet with the console flag and the logger of the processor and StShared's defaults, and
+    //returns what the run returned
+    [Theory]
+    [MemberData(nameof(Commands))]
+    public void Command_WhenCalled_RunsDotnetWithItsArguments(string command, Func<DotnetProcessor, Result> run,
+        string expectedArguments)
+    {
+        // Arrange
+        _runner.Result = Result.Failure(Error.Failure("Fake", command));
+
+        // Act
+        Result result = run(CreateSut());
+
+        // Assert
+        Assert.Equal(new FakeDotnetRun(false, _logger, "dotnet", expectedArguments, null, true, Timeout.Infinite),
+            Assert.Single(_runner.Runs));
+        Assert.Same(_runner.Result, result);
+    }
+
     [Fact]
     public void SearchTool_WhenCalled_ReturnsTheOutputOfTheSearch()
     {
@@ -274,8 +277,9 @@ public sealed class DotnetProcessorTests
     public void GetSolutionProjectsList_WhenTheCommandSucceeds_ReturnsTheProjectsAfterTheHeader()
     {
         // Arrange
-        _runner.Output = Result.Success((string.Join(Environment.NewLine, "Project(s)", "----------", @"App\App.csproj",
-            string.Empty, @"  Lib\Lib.csproj  ", string.Empty), 0));
+        _runner.Output = Result.Success((
+            string.Join(Environment.NewLine, "Project(s)", "----------", @"App\App.csproj", string.Empty,
+                @"  Lib\Lib.csproj  ", string.Empty), 0));
 
         // Act
         Result<List<string>> result = CreateSut().GetSolutionProjectsList("App.slnx");
@@ -290,8 +294,8 @@ public sealed class DotnetProcessorTests
     public void GetSolutionProjectsList_WhenAHeaderLineHasADash_KeepsReadingTheHeader()
     {
         // Arrange
-        _runner.Output = Result.Success((string.Join(Environment.NewLine, "Project-Paths", "-------------",
-            @"App\App.csproj"), 0));
+        _runner.Output = Result.Success((
+            string.Join(Environment.NewLine, "Project-Paths", "-------------", @"App\App.csproj"), 0));
 
         // Act
         Result<List<string>> result = CreateSut().GetSolutionProjectsList("App.slnx");
@@ -363,8 +367,7 @@ public sealed class DotnetProcessorTests
     public void Build_WhenTheLogHasSeveralSummaries_ReturnsTheLastCounts()
     {
         // Arrange
-        _runner.OnRun = _ => File.WriteAllLines(BuildLogFile,
-        [
+        _runner.OnRun = _ => File.WriteAllLines(BuildLogFile, [
             "    5 Warning(s)", "    3 Error(s)", "    12 Warning(s)", "    4 Error(s)", "    x Warning(s)",
             "  -1 Error(s)"
         ]);
@@ -424,9 +427,6 @@ public sealed class DotnetProcessorTests
         // Assert
         Assert.True(Directory.Exists(logFolder));
     }
-
-    private static string BuildLogFile =>
-        Path.Combine(Path.GetTempPath(), "SupportTools", "BuildLogs", "LastBuild.log");
 
     private DotnetProcessor CreateSut()
     {

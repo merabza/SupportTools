@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DatabaseTools.DbTools;
 using LibDatabaseWork.Models;
 using LibDatabaseWork.ToolCommands.RestoreDatabaseFromFileStorageToNewDatabase;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -27,8 +26,10 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseCreateToolCommand
     private readonly TextWriter _originalOut = Console.Out;
     private readonly SupportToolsParameters _parameters;
     private readonly List<(string Caption, List<string> Items, string? Default)> _questions = [];
+
     private readonly string _rootFolder =
         Path.Combine(Path.GetTempPath(), $"RestoreFromFileStorageCreateTests_{Guid.NewGuid():N}");
+
     private readonly ServerInfoModel _serverInfo;
     private readonly string _sourceFolder;
 
@@ -40,10 +41,11 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseCreateToolCommand
 
         _parameters = new SupportToolsParameters
         {
-            DatabasesBackupFilesExchangeParameters = new DatabasesBackupFilesExchangeParameters
-            {
-                LocalPath = _localFolder, ExchangeFileStorageName = "Exchange"
-            },
+            DatabasesBackupFilesExchangeParameters =
+                new DatabasesBackupFilesExchangeParameters
+                {
+                    LocalPath = _localFolder, ExchangeFileStorageName = "Exchange"
+                },
             FileStorages =
             {
                 ["Source"] = new FileStorageData { FileStoragePath = _sourceFolder },
@@ -308,8 +310,7 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseCreateToolCommand
         Assert.Contains("Select Restore database from which file storage? [Local]: ", output, StringComparison.Ordinal);
     }
 
-    private async Task<RestoreFromFileStorageParameters?> CreateParameters(string? fileStorageName,
-        string? fileName)
+    private async Task<RestoreFromFileStorageParameters?> CreateParameters(string? fileStorageName, string? fileName)
     {
         var parametersManager = new Mock<IParametersManager>();
         parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);

@@ -18,7 +18,7 @@ public sealed class CheckAllProjectsSolutionsCliMenuCommand : CliMenuCommand
     //შემოწმება მხოლოდ ფაილებს კითხულობს და სწრაფია, ამიტომ გაშვებამდე არაფერს ეკითხება
     // ReSharper disable once ConvertToPrimaryConstructor
     public CheckAllProjectsSolutionsCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        SupportToolsMenuParameters menuParameters) : base(MenuCommandName, EMenuAction.Reload, EMenuAction.Reload)
+        SupportToolsMenuParameters menuParameters) : base(MenuCommandName, EMenuAction.Reload)
     {
         _logger = logger;
         _parametersManager = parametersManager;

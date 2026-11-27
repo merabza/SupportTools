@@ -8,8 +8,6 @@ using SupportToolsData.Models;
 
 namespace SupportTools.Menu.ServerInstallations;
 
-public sealed record InstallationUsbDrive(string RootPath, string Description);
-
 //Ubuntu Server-ის საინსტალაციო ფლეშკა (Rufus, "ISO Image mode", FAT32): grub.cfg იწერება boot\grub-ში,
 //autoinstall.yaml კი ძირში, სადაც ინსტალერი მას თვითონ პოულობს
 public static class InstallationUsb

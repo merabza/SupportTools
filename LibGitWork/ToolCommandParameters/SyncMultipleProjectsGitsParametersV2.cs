@@ -30,7 +30,7 @@ public sealed class SyncMultipleProjectsGitsParametersV2 : IParameters
     public static SyncMultipleProjectsGitsParametersV2 Create(SupportToolsParameters supportToolsParameters,
         string? projectGroupName, string? projectName, bool includeRemoteProjects)
     {
-        return new SyncMultipleProjectsGitsParametersV2(supportToolsParameters.Projects, projectGroupName,
-            projectName, includeRemoteProjects);
+        return new SyncMultipleProjectsGitsParametersV2(supportToolsParameters.Projects, projectGroupName, projectName,
+            includeRemoteProjects);
     }
 }

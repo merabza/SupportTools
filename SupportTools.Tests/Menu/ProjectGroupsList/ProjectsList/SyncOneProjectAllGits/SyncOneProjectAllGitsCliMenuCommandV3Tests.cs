@@ -39,7 +39,8 @@ public sealed class SyncOneProjectAllGitsCliMenuCommandV3Tests : IDisposable
         AddGit("RepoS");
         _parameters.Projects["Remote1"] = new ProjectModel
         {
-            ProjectFolderName = Path.Combine(_tempFolder, "Projects", "Remote1"), GitProjectNames = ["RepoA", "RepoS"]
+            ProjectFolderName = Path.Combine(_tempFolder, "Projects", "Remote1"),
+            GitProjectNames = ["RepoA", "RepoS"]
         };
         _parameters.Projects["Local1"] = new ProjectModel
         {

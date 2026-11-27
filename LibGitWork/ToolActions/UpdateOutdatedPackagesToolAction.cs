@@ -68,8 +68,7 @@ public sealed class UpdateOutdatedPackagesToolAction : ToolAction
         cancellationToken.ThrowIfCancellationRequested();
         //ჩავარდნილი ფოლდერები სინქრონიზაციის ანგარიშშია. გაგრძელებისას თითოეულ პროექტს განახლების წინ სინქრონიზაცია
         //თავიდან სცდის (მომხმარებლის არჩევანი)
-        if (!checkSynced &&
-            !_inputBool("Some gits were not synced (see above). Continue updating packages?", false))
+        if (!checkSynced && !_inputBool("Some gits were not synced (see above). Continue updating packages?", false))
         {
             return false;
         }

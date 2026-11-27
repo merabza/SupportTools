@@ -22,10 +22,10 @@ public sealed class RestorePairedDbObjectsFromBackupCliMenuCommandTests : IDispo
 
     private readonly List<string> _boolPrompts = [];
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+    private readonly List<List<string>> _offeredBackups = [];
     private readonly TextWriter _originalConsoleOutput;
     private readonly string _resultFileName;
     private readonly string _rootFolder;
-    private readonly List<List<string>> _offeredBackups = [];
     private bool _confirm = true;
     private string? _selectedBackup = OldBackupName;
 
@@ -167,8 +167,7 @@ public sealed class RestorePairedDbObjectsFromBackupCliMenuCommandTests : IDispo
     private void WriteModel(string fileName, string tableKey)
     {
         var model = new PairedDbObjectsModel(new Dictionary<string, PairedTable> { [tableKey] = new() });
-        File.WriteAllText(Path.Combine(_rootFolder, fileName),
-            JsonConvert.SerializeObject(model, Formatting.Indented));
+        File.WriteAllText(Path.Combine(_rootFolder, fileName), JsonConvert.SerializeObject(model, Formatting.Indented));
     }
 
     private static PairedDbObjectsModel ReadModel(string filePath)

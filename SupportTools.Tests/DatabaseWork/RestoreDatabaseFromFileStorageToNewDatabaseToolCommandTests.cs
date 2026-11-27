@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,8 +33,10 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests 
     private readonly string _exchangeFolder;
     private readonly string _localFolder;
     private readonly RecordingLogger _logger = new();
+
     private readonly string _rootFolder =
         Path.Combine(Path.GetTempPath(), $"RestoreFromFileStorageTests_{Guid.NewGuid():N}");
+
     private readonly string _sourceFolder;
 
     public RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests()
@@ -48,8 +49,7 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests 
         _databaseManager.Setup(x => x.IsDatabaseExists(DatabaseName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success(false));
         _databaseManager.Setup(x => x.RestoreDatabaseFromBackup(It.IsAny<BackupFileParameters>(), DatabaseName,
-                FoldersSetName, It.IsAny<EDatabaseRecoveryModel>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>()))
+                FoldersSetName, It.IsAny<EDatabaseRecoveryModel>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success());
     }
 
@@ -198,8 +198,7 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests 
     {
         // Arrange
         _databaseManager.Setup(x => x.RestoreDatabaseFromBackup(It.IsAny<BackupFileParameters>(), DatabaseName,
-                FoldersSetName, It.IsAny<EDatabaseRecoveryModel>(), It.IsAny<string?>(),
-                It.IsAny<CancellationToken>()))
+                FoldersSetName, It.IsAny<EDatabaseRecoveryModel>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Failure(Error.Failure("Restore", "Restore failed")));
         RestoreDatabaseFromFileStorageToNewDatabaseToolCommand command = CreateCommand(CreateBackupFile(), false,
             false, false, true);
@@ -268,6 +267,13 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests 
         return folder;
     }
 
+    private void VerifyRestored(Times times)
+    {
+        _databaseManager.Verify(
+            x => x.RestoreDatabaseFromBackup(It.IsAny<BackupFileParameters>(), DatabaseName, FoldersSetName,
+                EDatabaseRecoveryModel.Simple, _localFolder, It.IsAny<CancellationToken>()), times);
+    }
+
     //ყველა დონე ჩართულია და შეტყობინებები ფორმატირებული სახით ინახება
     private sealed class RecordingLogger : ILogger
     {
@@ -288,12 +294,5 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommandTests 
         {
             Messages.Add((logLevel, formatter(state, exception)));
         }
-    }
-
-    private void VerifyRestored(Times times)
-    {
-        _databaseManager.Verify(
-            x => x.RestoreDatabaseFromBackup(It.IsAny<BackupFileParameters>(), DatabaseName, FoldersSetName,
-                EDatabaseRecoveryModel.Simple, _localFolder, It.IsAny<CancellationToken>()), times);
     }
 }

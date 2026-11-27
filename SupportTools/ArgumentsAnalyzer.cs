@@ -49,7 +49,11 @@ public sealed class ArgumentsAnalyzer
 
         _rootCommand = new RootCommand("SupportTools - support tools for .NET projects.")
         {
-            _useOption, _projectOption, _serverOption, _runOption, _allYesOption
+            _useOption,
+            _projectOption,
+            _serverOption,
+            _runOption,
+            _allYesOption
         };
     }
 

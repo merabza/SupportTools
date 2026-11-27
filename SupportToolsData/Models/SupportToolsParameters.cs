@@ -86,15 +86,13 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
     public List<string> GitIgnorePatterns { get; init; } = [];
     public List<string> EditorConfigPatterns { get; init; } = [];
     public Dictionary<string, DotnetToolData> DotnetTools { get; init; } = [];
-    public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
-    public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
 
     //Ubuntu Server-ის ავტომატური ინსტალაციები (grub.cfg და autoinstall.yaml საინსტალაციო ფლეშკისთვის)
     public Dictionary<string, ServerInstallationModel> ServerInstallations { get; init; } = [];
-
-    public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
     public Dictionary<string, ApiClientSettings> ApiClients { get; init; } = [];
+    public Dictionary<string, ArchiverData> Archivers { get; init; } = [];
     public Dictionary<string, DatabaseServerConnectionData> DatabaseServerConnections { get; init; } = [];
+    public Dictionary<string, FileStorageData> FileStorages { get; init; } = [];
 
     public bool CheckBeforeSave()
     {
@@ -103,6 +101,8 @@ public sealed class SupportToolsParameters : IParametersWithFileStorages, IParam
 
     public string? RecentCommandsFileName { get; set; }
     public int RecentCommandsCount { get; set; }
+
+    public Dictionary<string, SmartSchema> SmartSchemas { get; init; } = [];
 
     public SupportToolsServerApiClient? GetSupportToolsServerApiClient(ILogger? logger,
         IHttpClientFactory httpClientFactory)

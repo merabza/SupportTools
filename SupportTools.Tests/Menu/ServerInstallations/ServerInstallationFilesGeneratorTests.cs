@@ -171,8 +171,7 @@ public sealed class ServerInstallationFilesGeneratorTests
         List<string> result = ServerInstallationFilesGenerator.Validate(new ServerInstallationModel());
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "Hostname is required", "UserName is required", "PasswordHash is required",
             "NetworkInterfaceName is required", "InstallDiskSerial is required"
         ], result);
@@ -211,8 +210,7 @@ public sealed class ServerInstallationFilesGeneratorTests
         List<string> result = ServerInstallationFilesGenerator.Validate(installation);
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "Hostname has an invalid value: oslo;rm",
             "DomainName is required for Virtualmin (it needs a full host name)",
             "PasswordHash is required",
@@ -614,8 +612,7 @@ public sealed class ServerInstallationFilesGeneratorTests
         List<string> result = ServerInstallationFilesGenerator.Validate(installation);
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "Bond Interface has an invalid value: eno 5",
             "NetworkInterfaceName bond0 is the bond, it cannot be one of its interfaces",
             "Bond Interface eno1 is listed more than once",
@@ -713,11 +710,11 @@ public sealed class ServerInstallationFilesGeneratorTests
         string script = GetInstallAppsLateCommand(CreateOslo());
 
         // Assert
-        Assert.StartsWith("cat > /target/usr/local/sbin/install-apps <<'EOF'\n#!/bin/sh\nset -e\n" +
-                          "# curl downloads the installers and repository files below\n" +
-                          "if ! dpkg -s curl >/dev/null 2>&1; then\n  apt-get update\n" +
-                          "  DEBIAN_FRONTEND=noninteractive apt-get install -y curl\nfi\n# Skip the installer",
-            script);
+        Assert.StartsWith(
+            "cat > /target/usr/local/sbin/install-apps <<'EOF'\n#!/bin/sh\nset -e\n" +
+            "# curl downloads the installers and repository files below\n" +
+            "if ! dpkg -s curl >/dev/null 2>&1; then\n  apt-get update\n" +
+            "  DEBIAN_FRONTEND=noninteractive apt-get install -y curl\nfi\n# Skip the installer", script);
         Assert.DoesNotContain("dotnet", script);
         Assert.Contains(
             "--hostname oslo.cyberia.ge \\\n    --bundle LEMP --extra postgresql,postgresql-client --include PostgreSQL\n",
@@ -742,10 +739,12 @@ public sealed class ServerInstallationFilesGeneratorTests
         Assert.Contains("require './virtual-server-lib.pl';\n\nmy %answers = (\n", script);
         Assert.Contains("'db'     => { 'mysql' => 1, 'postgres' => 1 },", script);
         Assert.Contains("'prins' => 'oslo.cyberia.ge', 'prins_skip' => 1,", script);
-        Assert.Contains("'email'  => { 'from_addr_def' => 1, 'to_addr_def' => 0,\n" +
-                        "                  'to_addr' => 'admin@example.com' },", script);
-        Assert.EndsWith("&save_module_config_keys({ 'wizard_run' => 1 });\n" +
-                        "EOF\nchmod 700 /target/usr/local/sbin/virtualmin-wizard.pl\n", script);
+        Assert.Contains(
+            "'email'  => { 'from_addr_def' => 1, 'to_addr_def' => 0,\n" +
+            "                  'to_addr' => 'admin@example.com' },", script);
+        Assert.EndsWith(
+            "&save_module_config_keys({ 'wizard_run' => 1 });\n" +
+            "EOF\nchmod 700 /target/usr/local/sbin/virtualmin-wizard.pl\n", script);
     }
 
     [Fact]
@@ -780,10 +779,10 @@ public sealed class ServerInstallationFilesGeneratorTests
         string script = GetInstallAppsLateCommand(installation);
 
         // Assert
-        Assert.Contains("if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*2433[[:space:]]*$' \\\n" +
-                        "  /var/opt/mssql/mssql.conf 2>/dev/null; then\n" +
-                        "  /opt/mssql/bin/mssql-conf set network.tcpport 2433\n  systemctl restart mssql-server\nfi\n",
-            script);
+        Assert.Contains(
+            "if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*2433[[:space:]]*$' \\\n" +
+            "  /var/opt/mssql/mssql.conf 2>/dev/null; then\n" +
+            "  /opt/mssql/bin/mssql-conf set network.tcpport 2433\n  systemctl restart mssql-server\nfi\n", script);
         Assert.DoesNotContain("firewall-cmd", script);
         Assert.DoesNotContain("nftables", script);
     }
@@ -821,11 +820,10 @@ public sealed class ServerInstallationFilesGeneratorTests
 
         // Assert
         Assert.Contains($"firewall-cmd --permanent --add-port={opened}/tcp\n", script);
-        Assert.Contains(
-            $"  nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{{ {opened} }}'\n", script);
-        Assert.Contains($"elements = \\{{[^}}]*?)\\s*\\}}/$1, {opened} }}/' \\\n", script);
-        Assert.Contains($"echo 'add rule inet filter input tcp dport {opened} accept' >> /etc/nftables.conf\n",
+        Assert.Contains($"  nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{{ {opened} }}'\n",
             script);
+        Assert.Contains($"elements = \\{{[^}}]*?)\\s*\\}}/$1, {opened} }}/' \\\n", script);
+        Assert.Contains($"echo 'add rule inet filter input tcp dport {opened} accept' >> /etc/nftables.conf\n", script);
     }
 
     [Fact]
@@ -869,9 +867,9 @@ public sealed class ServerInstallationFilesGeneratorTests
 
         // Assert
         Assert.Contains("  sh /tmp/webmin-setup-repo.sh --force\n", script);
-        Assert.Contains("if ! dpkg -s postgresql >/dev/null 2>&1; then\n  apt-get update\n" +
-                        "  DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-client\nfi\n",
-            script);
+        Assert.Contains(
+            "if ! dpkg -s postgresql >/dev/null 2>&1; then\n  apt-get update\n" +
+            "  DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-client\nfi\n", script);
         Assert.Contains("apt-get install -y mssql-tools18 unixodbc-dev\n", script);
         Assert.DoesNotContain("virtualmin", script);
         Assert.DoesNotContain("mariadb", script);
@@ -933,11 +931,11 @@ public sealed class ServerInstallationFilesGeneratorTests
         string script = GetInstallAppsLateCommand(installation);
 
         // Assert
-        Assert.Contains("printf 'Package: dotnet* aspnet* netstandard*\\nPin: origin \"packages.microsoft.com\"\\n" +
-                        "Pin-Priority: -10\\n' \\\n  > /etc/apt/preferences.d/dotnet-not-from-microsoft\n" +
-                        $"if ! dpkg -s {package} >/dev/null 2>&1; then\n  apt-get update\n" +
-                        $"  DEBIAN_FRONTEND=noninteractive apt-get install -y {package}\nfi\necho \"All done.\"\n",
-            script);
+        Assert.Contains(
+            "printf 'Package: dotnet* aspnet* netstandard*\\nPin: origin \"packages.microsoft.com\"\\n" +
+            "Pin-Priority: -10\\n' \\\n  > /etc/apt/preferences.d/dotnet-not-from-microsoft\n" +
+            $"if ! dpkg -s {package} >/dev/null 2>&1; then\n  apt-get update\n" +
+            $"  DEBIAN_FRONTEND=noninteractive apt-get install -y {package}\nfi\necho \"All done.\"\n", script);
         Assert.Equal(installSdk, script.Contains("dotnet-sdk-10.0", StringComparison.Ordinal));
         Assert.Equal(!installSdk, script.Contains("aspnetcore-runtime-10.0", StringComparison.Ordinal));
         Assert.Equal($"# Installs {appName}", GetInstallAppsComment(installation));
@@ -947,8 +945,7 @@ public sealed class ServerInstallationFilesGeneratorTests
     [Theory]
     [InlineData(true, null)]
     [InlineData(false, MariaDbHash)]
-    public void CreateAutoinstallYaml_WithoutVirtualminOrHash_SetsNoRootPassword(bool installVirtualmin,
-        string? hash)
+    public void CreateAutoinstallYaml_WithoutVirtualminOrHash_SetsNoRootPassword(bool installVirtualmin, string? hash)
     {
         // Arrange
         ServerInstallationModel installation = CreateOslo();

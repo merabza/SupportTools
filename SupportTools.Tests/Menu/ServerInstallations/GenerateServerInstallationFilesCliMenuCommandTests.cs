@@ -17,8 +17,10 @@ public sealed class GenerateServerInstallationFilesCliMenuCommandTests : IDispos
     private const string InstallationName = "oslo";
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
+
     private readonly string _folder =
         Path.Combine(Path.GetTempPath(), $"GenerateServerInstallationFilesTests-{Guid.NewGuid():N}");
+
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
     private readonly Mock<IParametersManager> _parametersManager = new();

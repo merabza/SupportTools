@@ -21,7 +21,8 @@ namespace SupportTools.Tests.Menu.UpdateOutdatedPackages;
 [Collection(ConsoleCaptureCollection.Name)]
 public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
 {
-    private const string RemoteQuestion = "Include 1 remote-only projects (their gits will be cloned to this computer)?";
+    private const string RemoteQuestion =
+        "Include 1 remote-only projects (their gits will be cloned to this computer)?";
 
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly List<string> _messageFieldNames = [];
@@ -84,8 +85,7 @@ public sealed class UpdateOutdatedPackagesCliMenuCommandTests : IDisposable
         Assert.True(result);
         Assert.Equal([(RemoteQuestion, false)], _questions);
         Assert.Equal(["Message"], _messageFieldNames);
-        Assert.Equal(
-        [
+        Assert.Equal([
             "sync all: Update message Check", "sync Local1: Update message Prepare", "update Local1/GitA",
             "sync Local1: Update message Update"
         ], _steps.Steps);

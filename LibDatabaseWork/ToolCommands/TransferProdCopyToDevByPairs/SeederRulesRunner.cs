@@ -21,7 +21,7 @@ public static class SeederRulesRunner
 
         string arguments =
             $"run --project \"{projectFilePath}\" -- --table-name {tableName} --log-folder \"{LogFolder}\"";
-        return RunnerProcess.RunAndParseRows("DataSeederRules", projectFilePath, tableName, DotnetExecutable,
-            arguments, logger);
+        return RunnerProcess.RunAndParseRows("DataSeederRules", projectFilePath, tableName, DotnetExecutable, arguments,
+            logger);
     }
 }

@@ -100,8 +100,9 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommandTests : IDisposable
 
     private void VerifyNothingSaved()
     {
-        _parametersManager.Verify(x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+        _parametersManager.Verify(
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -149,8 +150,9 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommandTests : IDisposable
         string output = _consoleOutput.ToString();
         Assert.Contains("InstallDiskSerial: SERIAL1", output, StringComparison.Ordinal);
         Assert.Contains("NetworkInterfaceName: enp3s0", output, StringComparison.Ordinal);
-        _parametersManager.Verify(x => x.Save(_parameters, "Server Installation oslo updated", It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _parametersManager.Verify(
+            x => x.Save(_parameters, "Server Installation oslo updated", It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

@@ -35,4 +35,3 @@ internal sealed class FakeDotnetRunner
         OnRun?.Invoke(run.Arguments);
     }
 }
-

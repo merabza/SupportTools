@@ -41,7 +41,10 @@ public sealed class GitProjectNameFieldEditorTests : IDisposable
             ["WebAgentFront"] =
                 new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "WebAgentFront.esproj" },
             ["LibWebAgentRepositories"] =
-                new GitProjectDataModel { GitName = "WebAgent", ProjectFileName = "LibWebAgentRepositories.csproj" },
+                new GitProjectDataModel
+                {
+                    GitName = "WebAgent", ProjectFileName = "LibWebAgentRepositories.csproj"
+                },
             ["OtherApp"] =
                 new GitProjectDataModel { GitName = "OtherApp", ProjectFileName = "OtherApp.csproj" },
             ["NoGitApp"] = new GitProjectDataModel { ProjectFileName = "NoGitApp.csproj" }

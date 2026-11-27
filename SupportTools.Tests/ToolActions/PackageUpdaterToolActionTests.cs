@@ -92,9 +92,8 @@ public sealed class PackageUpdaterToolActionTests : IDisposable
     public void RunPackageUpdate_WhenSeveralVersionsAreWritten_CountsThem()
     {
         // Arrange
-        const string versionsBefore =
-            "<PackageVersion Include=\"A\" Version=\"1.0.0\" />\r\n" +
-            "<PackageVersion Include=\"B\" Version=\"2.0.0\" />\r\n";
+        const string versionsBefore = "<PackageVersion Include=\"A\" Version=\"1.0.0\" />\r\n" +
+                                      "<PackageVersion Include=\"B\" Version=\"2.0.0\" />\r\n";
         File.WriteAllBytes(_propsFile, WithBom(versionsBefore));
         _commands.OnOutdated = () => WriteProps(versionsBefore.Replace("1.0.0", "1.0.1", StringComparison.Ordinal)
             .Replace("2.0.0", "2.1.0", StringComparison.Ordinal));

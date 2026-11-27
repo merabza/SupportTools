@@ -42,10 +42,8 @@ public sealed class PackageUpdater
     {
         if (_packageUpdaterToolActionList.Count > 0)
         {
-            new OutdatedPackagesParallelUpdater(_logger, null).Run(
-            [
-                new PackageUpdateJob(_gitProjectName, string.Empty,
-                    _packageUpdaterToolActionList[0].RunPackageUpdate)
+            new OutdatedPackagesParallelUpdater(_logger, null).Run([
+                new PackageUpdateJob(_gitProjectName, string.Empty, _packageUpdaterToolActionList[0].RunPackageUpdate)
             ], CancellationToken.None);
         }
     }

@@ -39,8 +39,8 @@ internal static class OutdatedPackagesUpdateOrder
                 string sharedGitName = ChooseSharedGit(remaining);
                 //პროექტის სიაში ჩაწერილი სახელით, რადგან GitSyncParameters git-ს ამ სიაში რეგისტრის გათვალისწინებით ეძებს
                 (string projectName, string gitName) = remaining
-                    .SelectMany(x => x.GitNames.Select(y => (x.ProjectName, GitName: y)))
-                    .First(x => string.Equals(x.GitName, sharedGitName, StringComparison.OrdinalIgnoreCase));
+                    .SelectMany(x => x.GitNames.Select(y => (x.ProjectName, GitName: y))).First(x =>
+                        string.Equals(x.GitName, sharedGitName, StringComparison.OrdinalIgnoreCase));
                 Take(remaining, level, projectName, gitName);
             }
             else

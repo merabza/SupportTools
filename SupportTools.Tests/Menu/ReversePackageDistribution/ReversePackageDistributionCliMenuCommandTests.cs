@@ -361,8 +361,8 @@ public sealed class ReversePackageDistributionCliMenuCommandTests : IDisposable
         _logger.Verify(
             x => x.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((value, _) =>
-                    value!.ToString()!.StartsWith(messageStart, StringComparison.Ordinal)),
-                It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
+                    value!.ToString()!.StartsWith(messageStart, StringComparison.Ordinal)), It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Never);
 #pragma warning restore CA1873
     }
 

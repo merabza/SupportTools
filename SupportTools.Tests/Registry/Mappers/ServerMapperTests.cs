@@ -69,7 +69,7 @@ public sealed class ServerMapperTests
     public void IsDecommissioned_WhenFalse_IsLeftOutOfTheHash()
     {
         // Arrange
-        StsServerDataModel inUse = ServerMapper.ToContract("dl360", NewServer(true, false));
+        StsServerDataModel inUse = ServerMapper.ToContract("dl360", NewServer(true));
         StsServerDataModel decommissioned = ServerMapper.ToContract("dl360", NewServer(true, true));
 
         // Act

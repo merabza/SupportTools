@@ -42,8 +42,8 @@ public sealed class OpenPortFieldEditor : FieldEditor<bool>
 
     internal static string GetPortsText(object? record)
     {
-        List<int>? ports =
-            KestrelPortsReader.ReadFile((record as ServerInfoModel)?.AppSettingsJsonSourceFileName, out string? error);
+        List<int>? ports = KestrelPortsReader.ReadFile((record as ServerInfoModel)?.AppSettingsJsonSourceFileName,
+            out string? error);
         if (ports is null)
         {
             return error ?? string.Empty;

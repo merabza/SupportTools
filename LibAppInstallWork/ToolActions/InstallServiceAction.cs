@@ -26,21 +26,20 @@ public sealed class InstallServiceAction : ToolAction
     private readonly ILogger _logger;
     private readonly string _parametersFileDateMask;
     private readonly string _parametersFileExtension;
+    private readonly IReadOnlyCollection<int> _portsToOpen;
     private readonly string _programArchiveDateMask;
     private readonly string _programArchiveExtension;
     private readonly string? _projectDescription;
     private readonly string _projectName;
     private readonly string? _serviceDescriptionSignature;
     private readonly string _serviceUserName;
-    private readonly IReadOnlyCollection<int> _portsToOpen;
 
     public InstallServiceAction(string appName, ILogger logger, IHttpClientFactory httpClientFactory,
         InstallerBaseParameters installerBaseParameters, string programArchiveDateMask, string programArchiveExtension,
         string parametersFileDateMask, string parametersFileExtension, FileStorageData fileStorageForDownload,
         string projectName, string environmentName, string serviceUserName, string appSettingsJsonFileName,
         string? serviceDescriptionSignature, string? projectDescription, IReadOnlyCollection<int> portsToOpen,
-        bool useConsole) : base(logger,
-        "Install service", null, null, useConsole)
+        bool useConsole) : base(logger, "Install service", null, null, useConsole)
     {
         _appName = appName;
         _logger = logger;

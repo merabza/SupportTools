@@ -42,7 +42,8 @@ public sealed class ProjectSolutionCheckerTests : IDisposable
             UseLocalPackages = true,
             GitProjectNames = ["App", "Pkg", "Front", "ReactAppCarcass"]
         };
-        _parameters.Projects["Pkg"] = new ProjectModel { ProjectType = EProjectType.IsPackage, UseLocalPackages = true };
+        _parameters.Projects["Pkg"] =
+            new ProjectModel { ProjectType = EProjectType.IsPackage, UseLocalPackages = true };
         _parameters.Gits["App"] = new GitDataModel { GitProjectFolderName = "App" };
         _parameters.Gits["Pkg"] = new GitDataModel { GitProjectFolderName = "Pkg" };
         _parameters.Gits["Front"] = new GitDataModel { GitProjectFolderName = "Front" };
@@ -371,7 +372,8 @@ public sealed class ProjectSolutionCheckerTests : IDisposable
         string projectFile = Path.GetFullPath(Path.Combine(_solutionFolder, pathFromSolutionFolder));
         Directory.CreateDirectory(Path.GetDirectoryName(projectFile)!);
         string items = string.Concat(references.Select(reference => $"""<ProjectReference Include="{reference}" />"""));
-        File.WriteAllText(projectFile, $"""<Project Sdk="Microsoft.NET.Sdk"><ItemGroup>{items}</ItemGroup></Project>""");
+        File.WriteAllText(projectFile,
+            $"""<Project Sdk="Microsoft.NET.Sdk"><ItemGroup>{items}</ItemGroup></Project>""");
         return projectFile;
     }
 

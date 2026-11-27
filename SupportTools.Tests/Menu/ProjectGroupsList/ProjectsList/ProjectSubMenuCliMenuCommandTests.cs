@@ -45,15 +45,16 @@ public sealed class ProjectSubMenuCliMenuCommandTests : IDisposable
         _parametersManager = new ParametersManager(null, _parameters);
 
         _serviceProvider = new ServiceCollection().AddLogging().AddSingleton(new Mock<IHttpClientFactory>().Object)
-            .AddSingleton(new Mock<IApplication>().Object)
-            .AddSingleton(_menuParameters).AddSingleton<IParametersManager>(_parametersManager)
+            .AddSingleton(new Mock<IApplication>().Object).AddSingleton(_menuParameters)
+            .AddSingleton<IParametersManager>(_parametersManager)
             .AddTransient<IMenuCommandFactoryStrategy, DeleteProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, OpenByVisualStudioCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CheckPackageSolutionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, BuildPackageCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PackageDistributionCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, DistributeAllPackagesInProjectCliMenuCommandFactoryStrategy>()
-            .AddTransient<IMenuCommandFactoryStrategy, ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy>()
+            .AddTransient<IMenuCommandFactoryStrategy,
+                ReversePackageDistributionInProjectCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, SaveEditorConfigAsNewTemplateCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, CloneProjectToThisComputerCliMenuCommandFactoryStrategy>()
             .AddTransient<IMenuCommandFactoryStrategy, PairedDbObjectsSubMenuCliMenuCommandFactoryStrategy>()

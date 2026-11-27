@@ -113,8 +113,7 @@ public sealed class ServiceUpdaterToolCommandTests : IDisposable
             ServerName = "Srv", EnvironmentName = "Test", AppSettingsJsonSourceFileName = _sourceFileName
         };
 
-        AppSettingsPreparerParameters? preparerParameters =
-            AppSettingsPreparerParameters.Create(parameters, ProjectName, serverInfo);
+        var preparerParameters = AppSettingsPreparerParameters.Create(parameters, ProjectName, serverInfo);
         Assert.NotNull(preparerParameters);
         return preparerParameters;
     }

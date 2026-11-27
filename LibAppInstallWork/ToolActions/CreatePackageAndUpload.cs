@@ -55,7 +55,8 @@ public sealed class CreatePackageAndUpload : ToolAction
         ServerInfoModel serverInfo, string workFolder, string dateMask, string runtime, List<string> redundantFileNames,
         string uploadTempExtension, FileStorageData exchangeFileStorage, SmartSchema smartSchemaForLocal,
         SmartSchema uploadSmartSchema, Func<string, bool> confirm,
-        Func<string, string, string, string, string?, bool> publishRelease) : base(logger, "Program Publisher", null, null)
+        Func<string, string, string, string, string?, bool> publishRelease) : base(logger, "Program Publisher", null,
+        null)
     {
         _confirm = confirm;
         _publishRelease = publishRelease;
@@ -206,8 +207,7 @@ public sealed class CreatePackageAndUpload : ToolAction
             _logger.LogInformation("SPA env mode: {SpaEnvMode}", _serverInfo.SpaEnvMode);
         }
 
-        if (!_publishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion,
-                _serverInfo.SpaEnvMode))
+        if (!_publishRelease(_runtime, outputFolderPath, _mainProjectFileName, AssemblyVersion, _serverInfo.SpaEnvMode))
         {
             _logger.LogError("Cannot publish project {_projectName}", _projectName);
             return false;
@@ -319,8 +319,8 @@ public sealed class CreatePackageAndUpload : ToolAction
             }
 
             string processIds = string.Join(", ", runningFromBin.Select(x => x.Id));
-            _logger.LogWarning("Program {ProcessName} (PID {ProcessIds}) is running from {BinFolderPath}",
-                processName, processIds, binFolderPath);
+            _logger.LogWarning("Program {ProcessName} (PID {ProcessIds}) is running from {BinFolderPath}", processName,
+                processIds, binFolderPath);
 
             if (!_confirm($"Stop {processName} (PID {processIds}) to continue?"))
             {

@@ -63,8 +63,8 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseToolCommand : Too
         }
 
         //ფაილის ატვირთვა გაცვლის ფაილსაცავში, საიდანაც მას მოშორებული სერვერის აგენტი მოქაჩავს
-        if (RestoreParameters.NeedUploadToExchange &&
-            destinationBackupParameters.ExchangeFileManager is { } exchangeFileManager)
+        if (RestoreParameters.NeedUploadToExchange && destinationBackupParameters.ExchangeFileManager is
+                { } exchangeFileManager)
         {
             if (_logger.IsEnabled(LogLevel.Information))
             {

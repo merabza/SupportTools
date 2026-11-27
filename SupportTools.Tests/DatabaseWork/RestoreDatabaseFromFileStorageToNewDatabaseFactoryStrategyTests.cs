@@ -52,12 +52,11 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategyTe
             RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy.GetBackupFiles(fileNames, DateMask);
 
         // Assert
-        Assert.Equal(
-            [
-                "README", "notes.txt", "dl360_model_Backup_TrLog_2026_10_27_163034_6837776.trn",
-                "dl360_model_Backup_TrLog_2026_10_27_103020_6045521.trn",
-                "dl360_GeoModelProd_Backup_Full_2026_10_27_020000_1234567.BAK"
-            ], result.Select(x => x.Name));
+        Assert.Equal([
+            "README", "notes.txt", "dl360_model_Backup_TrLog_2026_10_27_163034_6837776.trn",
+            "dl360_model_Backup_TrLog_2026_10_27_103020_6045521.trn",
+            "dl360_GeoModelProd_Backup_Full_2026_10_27_020000_1234567.BAK"
+        ], result.Select(x => x.Name));
     }
 
     [Fact]
@@ -173,8 +172,9 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategyTe
     public void SelectBackupFile_ReturnsChosenFile()
     {
         // Arrange
-        List<BackupFileParameters> backupFiles = RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy
-            .GetBackupFiles(["A_20261001120000.bak", "A_20261015080000.bak"], DateMask);
+        List<BackupFileParameters> backupFiles =
+            RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy.GetBackupFiles(
+                ["A_20261001120000.bak", "A_20261015080000.bak"], DateMask);
         string? question = null;
         List<string>? offered = null;
         RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy strategy = CreateStrategy((caption, items, _) =>
@@ -197,8 +197,9 @@ public sealed class RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategyTe
     public void SelectBackupFile_InputEscaped_ReturnsNull()
     {
         // Arrange
-        List<BackupFileParameters> backupFiles = RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy
-            .GetBackupFiles(["A_20261001120000.bak"], DateMask);
+        List<BackupFileParameters> backupFiles =
+            RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy.GetBackupFiles(["A_20261001120000.bak"],
+                DateMask);
         RestoreDatabaseFromFileStorageToNewDatabaseFactoryStrategy strategy =
             CreateStrategy((_, _, _) => throw new DataInputException("Escaped"));
 

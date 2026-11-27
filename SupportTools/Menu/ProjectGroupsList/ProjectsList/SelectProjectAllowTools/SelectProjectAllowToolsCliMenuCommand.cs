@@ -50,11 +50,11 @@ public sealed class SelectProjectAllowToolsCliMenuCommand : CliMenuCommand
         List<EProjectTools> visibleTools = [.. Enum.GetValues<EProjectTools>().Where(project.IsToolVisible)];
 
         //დადგინდეს ამ ფოლდერებიდან რომელიმე არის თუ არა დასაბექაპებელ სიაში. და თუ არის მისთვის ჩაირთოს ჭეშმარიტი
-        Dictionary<string, bool> checks =
-            visibleTools.ToDictionary(tool => tool.GetProjectToolName(), tool => project.AllowToolsList.Contains(tool));
+        Dictionary<string, bool> checks = visibleTools.ToDictionary(tool => tool.GetProjectToolName(),
+            tool => project.AllowToolsList.Contains(tool));
 
-        Dictionary<string, EProjectTools> visibleNames = visibleTools
-            .ToDictionary(tool => tool.GetProjectToolName(), tool => tool);
+        Dictionary<string, EProjectTools> visibleNames =
+            visibleTools.ToDictionary(tool => tool.GetProjectToolName(), tool => tool);
 
         //გამოვიდეს სიიდან ამრჩევი
         _selectTools("Select allow tools", checks);

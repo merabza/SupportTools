@@ -173,8 +173,8 @@ public static class ProjectSolutionChecker
             string? gitName = FindCloneGitName(referenceFullPath);
             if (gitName is null)
             {
-                string repositoryFolderName =
-                    Path.GetRelativePath(_parentFolder, referenceFullPath).Split(Path.DirectorySeparatorChar)[0];
+                string repositoryFolderName = Path.GetRelativePath(_parentFolder, referenceFullPath)
+                    .Split(Path.DirectorySeparatorChar)[0];
                 _problems.Add($"{repositoryFolderName} is not in the gits list");
                 return;
             }

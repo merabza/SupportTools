@@ -64,6 +64,7 @@ public sealed class ServerInfoCruder : ParCruder<ServerInfoModel>
             //პორტი App Settings Json Source File-იდან ჩანს, ამიტომ მის შემდეგაა
             FieldEditors.Add(new OpenPortFieldEditor(nameof(ServerInfoModel.OpenPort)));
         }
+
         //FieldEditors.Add(new DatabasesExchangeParametersFieldEditor(_logger, httpClientFactory,
         //    nameof(ServerInfoModel.DatabasesExchangeParameters), parametersManager));
         //UsesDatabase-გამორთული პროექტის სერვერზე ბაზის პარამეტრები იმალება

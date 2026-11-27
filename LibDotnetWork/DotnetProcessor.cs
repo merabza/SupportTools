@@ -57,8 +57,7 @@ public sealed class DotnetProcessor
 
     public Result CreateNewSolution(string solutionPath, string solutionName)
     {
-        return _runProcess(_useConsole, _logger, Dotnet,
-            $"new sln --output {solutionPath} --name {solutionName}");
+        return _runProcess(_useConsole, _logger, Dotnet, $"new sln --output {solutionPath} --name {solutionName}");
     }
 
     public Result CreateNewProject(EDotnetProjectType dotnetProjectType, string? projectCreateParameters,
@@ -79,8 +78,7 @@ public sealed class DotnetProcessor
 
     public Result AddReferenceToProject(string projectFilePath, string referenceProjectFilePath)
     {
-        return _runProcess(_useConsole, _logger, Dotnet,
-            $"add {projectFilePath} reference {referenceProjectFilePath}");
+        return _runProcess(_useConsole, _logger, Dotnet, $"add {projectFilePath} reference {referenceProjectFilePath}");
     }
 
     public Result AddPackageToProject(string projectFilePath, string packageName, string? packageVersion)
@@ -148,8 +146,7 @@ public sealed class DotnetProcessor
 
     public Result RestoreWithoutHttpCache(string projectFileFullName)
     {
-        return _runProcess(_useConsole, _logger, Dotnet,
-            CreateRestoreWithoutHttpCacheArguments(projectFileFullName));
+        return _runProcess(_useConsole, _logger, Dotnet, CreateRestoreWithoutHttpCacheArguments(projectFileFullName));
     }
 
     internal static string CreateRestoreWithoutHttpCacheArguments(string projectFileFullName)
@@ -232,8 +229,7 @@ public sealed class DotnetProcessor
 
     public Result<IEnumerable<string>> GetToolsRawList()
     {
-        Result<(string, int)> processResult =
-            _runProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
+        Result<(string, int)> processResult = _runProcessWithOutput(_useConsole, _logger, Dotnet, "tool list --global");
         if (processResult.IsFailure)
         {
             return processResult.Error;

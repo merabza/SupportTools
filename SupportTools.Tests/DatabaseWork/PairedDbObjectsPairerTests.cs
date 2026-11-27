@@ -45,10 +45,7 @@ public sealed class PairedDbObjectsPairerTests
             {
                 ["Name - ClientName"] = new("Name", "ClientName") { Locked = true },
                 ["Code - Name"] = new("Code", "Name")
-            })
-        {
-            SeedDataType = ESeedDataType.OnlySeederRules, KeyFieldNames = ["Code"]
-        };
+            }) { SeedDataType = ESeedDataType.OnlySeederRules, KeyFieldNames = ["Code"] };
         _existing[old.GetItemKey()] = old;
 
         // Act
@@ -75,12 +72,8 @@ public sealed class PairedDbObjectsPairerTests
         var locked = new PairedTable("dbo", "Customers", "dbo", "Clients",
             new Dictionary<string, PairedField>
             {
-                ["Name - Title"] = new("Name", "Title") { Locked = true },
-                ["Id - Code"] = new("Id", "Code")
-            })
-        {
-            Locked = true, SeedDataType = ESeedDataType.OnlySeederRules, ProdCopyRowFilter = "[Id] > 0"
-        };
+                ["Name - Title"] = new("Name", "Title") { Locked = true }, ["Id - Code"] = new("Id", "Code")
+            }) { Locked = true, SeedDataType = ESeedDataType.OnlySeederRules, ProdCopyRowFilter = "[Id] > 0" };
         _existing["OldKey"] = locked;
 
         // Act
@@ -176,8 +169,8 @@ public sealed class PairedDbObjectsPairerTests
         return PairedDbObjectsPairer.Pair(_prodCopyTables, _devTables, prodCopyUsesSchemas, _existing, null);
     }
 
-    private static void AddTable(Dictionary<(string, string), TableInfo> tables, string schemaName,
-        string tableName, params string[] columns)
+    private static void AddTable(Dictionary<(string, string), TableInfo> tables, string schemaName, string tableName,
+        params string[] columns)
     {
         tables[(schemaName.ToUpperInvariant(), tableName.ToUpperInvariant())] =
             CreateTable(schemaName, tableName, columns);

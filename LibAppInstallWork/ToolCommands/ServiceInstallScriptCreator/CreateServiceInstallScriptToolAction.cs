@@ -33,8 +33,7 @@ public sealed class CreateServiceInstallScriptToolAction : ToolAction
         string ftpSiteAddress, string ftpSiteUserName, string ftpSiteDirectory, string projectName,
         string? serviceDescriptionSignature, string? projectDescription, string runTime, string environmentName,
         string serverSideDownloadFolder, string serverSideDeployFolder, string settingsFileName,
-        string serverSideServiceUserName) : base(logger,
-        nameof(ServiceInstallScriptCreatorToolCommand), null, null)
+        string serverSideServiceUserName) : base(logger, nameof(ServiceInstallScriptCreatorToolCommand), null, null)
     {
         _logger = logger;
         _scriptFileName = scriptFileName;

@@ -182,8 +182,7 @@ public sealed class CloneProjectToThisComputerCliMenuCommand : CliMenuCommand
     }
 
     //დაკლონილად ითვლება git, რომლის ფოლდერიც სინქრონიზაციის შემდეგ არსებობს
-    private static bool ReportClonedGits(List<string> gits, Dictionary<string, string?> gitFolders,
-        List<string> report)
+    private static bool ReportClonedGits(List<string> gits, Dictionary<string, string?> gitFolders, List<string> report)
     {
         List<string> notClonedGitNames =
         [

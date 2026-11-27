@@ -51,7 +51,8 @@ public sealed class ProjectCloneGitActionsTests : IDisposable
         };
         _projectFolder = Path.Combine(_tempFolder, "Projects", "App");
         Directory.CreateDirectory(_projectFolder);
-        _parameters.Projects["App"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["RepoA"] };
+        _parameters.Projects["App"] =
+            new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["RepoA"] };
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
     }
 

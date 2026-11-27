@@ -182,11 +182,11 @@ public sealed class ServiceInstallScriptCreatorToolCommand : ToolCommand
             return false;
         }
 
-        var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave,
-            ports, ftpSiteAddress, userName, startPath, _par.ProjectName,
-            _par.ServiceDescriptionSignature, _par.Project.ProjectDescription, serverData.Runtime,
-            _par.ServerInfo.EnvironmentName, serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder,
-            sf.Name, _par.ServerInfo.ServiceUserName);
+        var createInstallScript = new CreateServiceInstallScriptToolAction(_logger, scriptFileNameForSave, ports,
+            ftpSiteAddress, userName, startPath, _par.ProjectName, _par.ServiceDescriptionSignature,
+            _par.Project.ProjectDescription, serverData.Runtime, _par.ServerInfo.EnvironmentName,
+            serverData.ServerSideDownloadFolder, serverData.ServerSideDeployFolder, sf.Name,
+            _par.ServerInfo.ServiceUserName);
         return await createInstallScript.Run(cancellationToken);
     }
 }

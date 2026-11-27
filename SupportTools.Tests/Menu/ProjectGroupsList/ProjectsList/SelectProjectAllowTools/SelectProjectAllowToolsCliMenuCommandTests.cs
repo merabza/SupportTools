@@ -102,8 +102,7 @@ public sealed class SelectProjectAllowToolsCliMenuCommandTests : IDisposable
         await CliMenuTestAccess.InvokeRunBody(sut);
 
         // Assert
-        Assert.Equal(
-            Enum.GetValues<EProjectTools>().Where(x => x.IsDatabaseTool()).Select(x => x.GetProjectToolName()),
+        Assert.Equal(Enum.GetValues<EProjectTools>().Where(x => x.IsDatabaseTool()).Select(x => x.GetProjectToolName()),
             offered!.Keys);
     }
 
@@ -139,7 +138,8 @@ public sealed class SelectProjectAllowToolsCliMenuCommandTests : IDisposable
         // Arrange
         ProjectModel project = AddProject(new ProjectModel
         {
-            UsesDatabase = false, AllowToolsList = [EProjectTools.RecreateDevDatabase, EProjectTools.GenerateApiRoutes]
+            UsesDatabase = false,
+            AllowToolsList = [EProjectTools.RecreateDevDatabase, EProjectTools.GenerateApiRoutes]
         });
         Dictionary<string, bool>? offered = null;
         var sut = CreateSut((_, checks) =>
@@ -153,8 +153,10 @@ public sealed class SelectProjectAllowToolsCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.Equal(
-            [EProjectTools.JetBrainsCleanupCode.GetProjectToolName(), EProjectTools.GenerateApiRoutes.GetProjectToolName()],
-            offered!.Keys);
+        [
+            EProjectTools.JetBrainsCleanupCode.GetProjectToolName(),
+            EProjectTools.GenerateApiRoutes.GetProjectToolName()
+        ], offered!.Keys);
         Assert.Equal([EProjectTools.RecreateDevDatabase], project.AllowToolsList);
     }
 

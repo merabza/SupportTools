@@ -250,9 +250,15 @@ public sealed class ProgramTests : IDisposable
                 {
                     AllowToolsList = [EProjectTools.PairProdCopyAndDevDbObjects],
                     ProdCopyDatabaseParameters =
-                        new DatabaseParameters { DbConnectionName = connectionName, DatabaseName = "AppProdCopy" },
+                        new DatabaseParameters
+                        {
+                            DbConnectionName = connectionName, DatabaseName = "AppProdCopy"
+                        },
                     DevDatabaseParameters =
-                        new DatabaseParameters { DbConnectionName = connectionName, DatabaseName = "AppDev" },
+                        new DatabaseParameters
+                        {
+                            DbConnectionName = connectionName, DatabaseName = "AppDev"
+                        },
                     PairedDbObjectsResultFileName = resultFileName
                 }
             }

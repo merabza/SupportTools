@@ -81,8 +81,8 @@ public static class PasswordHashers
         var result = new StringBuilder("$6$").Append(salt).Append('$');
         for (int i = 0; i < CryptByteOrder.Length; i += 3)
         {
-            AppendCryptBase64(result, (c[CryptByteOrder[i]] << 16) | (c[CryptByteOrder[i + 1]] << 8) |
-                                      c[CryptByteOrder[i + 2]], 4);
+            AppendCryptBase64(result,
+                (c[CryptByteOrder[i]] << 16) | (c[CryptByteOrder[i + 1]] << 8) | c[CryptByteOrder[i + 2]], 4);
         }
 
         AppendCryptBase64(result, c[63], 2);

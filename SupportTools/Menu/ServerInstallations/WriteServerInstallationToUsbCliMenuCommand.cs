@@ -20,18 +20,16 @@ public sealed class WriteServerInstallationToUsbCliMenuCommand : CliMenuCommand
     private readonly string _installationName;
     private readonly IParametersManager _parametersManager;
 
-    public WriteServerInstallationToUsbCliMenuCommand(IParametersManager parametersManager,
-        string installationName) : this(parametersManager, installationName, InstallationUsb.FindDrives,
-        MenuInputer.InputFromMenuList, Confirm)
+    public WriteServerInstallationToUsbCliMenuCommand(IParametersManager parametersManager, string installationName) :
+        this(parametersManager, installationName, InstallationUsb.FindDrives, MenuInputer.InputFromMenuList, Confirm)
     {
     }
 
     //დისკების ძებნა და კონსოლიდან შეყვანა პარამეტრადაა გამოტანილი, რომ ტესტებმა ისინი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
-    internal WriteServerInstallationToUsbCliMenuCommand(IParametersManager parametersManager,
-        string installationName, Func<List<InstallationUsbDrive>> findDrives,
-        Func<string, CliMenuSet, string?, string?> inputFromMenuList, Func<string, bool> confirm) : base(
-        "Write To Installation USB...", EMenuAction.Reload)
+    internal WriteServerInstallationToUsbCliMenuCommand(IParametersManager parametersManager, string installationName,
+        Func<List<InstallationUsbDrive>> findDrives, Func<string, CliMenuSet, string?, string?> inputFromMenuList,
+        Func<string, bool> confirm) : base("Write To Installation USB...", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _installationName = installationName;

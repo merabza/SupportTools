@@ -16,7 +16,7 @@ public class DistributeAllPackagesInGroupCliMenuCommandFactoryStrategy(
 {
     public CliMenuCommand CreateMenuCommand()
     {
-        return new DistributeAllPackagesInGroupCliMenuCommand(logger, app.AppName, httpClientFactory,
-            parametersManager, menuParameters, menuParameters.ProjectGroupName);
+        return new DistributeAllPackagesInGroupCliMenuCommand(logger, app.AppName, httpClientFactory, parametersManager,
+            menuParameters, menuParameters.ProjectGroupName);
     }
 }

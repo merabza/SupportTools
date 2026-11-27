@@ -5,15 +5,6 @@ using YamlDotNet.RepresentationModel;
 
 namespace SupportTools.Menu.ServerInstallations;
 
-public sealed record AutoinstallUserDataDisk(string Serial, string? Path);
-
-public sealed record AutoinstallUserDataBond(string Name, List<string> InterfaceNames, string? Mode);
-
-public sealed record AutoinstallUserData(
-    List<AutoinstallUserDataDisk> Disks,
-    List<string> EthernetNames,
-    List<AutoinstallUserDataBond> Bonds);
-
 //წინა ინსტალაციის /var/log/installer/autoinstall-user-data ფაილიდან იმ კომპიუტერის მონაცემები იკითხება, რომლებიც
 //ხელით ძნელი გასარკვევია: დისკების serial-ები (storage.config, type: disk), ქსელის ინტერფეისების სახელები და
 //bond-ები (მათი ინტერფეისები და რეჟიმი)

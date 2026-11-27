@@ -25,6 +25,7 @@ public sealed class WriteServerInstallationToUsbCliMenuCommandTests : IDisposabl
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly List<InstallationUsbDrive> _drives;
     private readonly string _firstRoot;
+
     private readonly ServerInstallationModel _installation = new()
     {
         Hostname = "oslo",
@@ -33,6 +34,7 @@ public sealed class WriteServerInstallationToUsbCliMenuCommandTests : IDisposabl
         NetworkInterfaceName = "enp3s0",
         InstallDiskSerial = "SERIAL"
     };
+
     private readonly TextWriter _originalConsoleOutput;
     private readonly SupportToolsParameters _parameters = new();
     private readonly Mock<IParametersManager> _parametersManager = new();

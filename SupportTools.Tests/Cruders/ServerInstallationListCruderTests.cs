@@ -77,7 +77,8 @@ public sealed class ServerInstallationListCruderTests
 
         // Assert
         Assert.True(result);
-        _parametersManager.Verify(x => x.Save(_parameters, "IPv4 Address added", It.IsAny<string?>(),
-            It.IsAny<CancellationToken>()), Times.Once);
+        _parametersManager.Verify(
+            x => x.Save(_parameters, "IPv4 Address added", It.IsAny<string?>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }

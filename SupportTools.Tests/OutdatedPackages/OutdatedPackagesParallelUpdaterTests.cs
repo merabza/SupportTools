@@ -48,8 +48,7 @@ public sealed class OutdatedPackagesParallelUpdaterTests : IDisposable
             new OutdatedPackagesParallelUpdater(null, null).Run(jobs, CancellationToken.None);
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             EPackageUpdateResult.Success, EPackageUpdateResult.OutdatedFailed,
             EPackageUpdateResult.RestoreAfterUpdateFailed
         ], results);

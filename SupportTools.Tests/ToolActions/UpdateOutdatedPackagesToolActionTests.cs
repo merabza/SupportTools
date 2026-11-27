@@ -78,8 +78,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             CheckSync, "sync P1: Update message Prepare", "update P1/GitA", "sync P1: Update message Update",
             "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
         ], _steps.Steps);
@@ -196,8 +195,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.False(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             CheckSync, "sync P1: Update message Prepare", "sync P2: Update message Prepare", "update P2/GitB",
             "sync P2: Update message Update"
         ], _steps.Steps);
@@ -304,8 +302,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             CheckSync, "sync P1: Update message Prepare", "sync R1: Update message Prepare",
             "update P1/GitA, R1/GitC", "sync P1: Update message Update", "sync R1: Update message Update",
             "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
@@ -323,8 +320,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         await Create(null, null, true).Run();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             CheckSync, "sync P1: Update message Prepare", "sync R1: Update message Prepare", "update R1/GitC",
             "sync R1: Update message Update", "sync P2: Update message Prepare", "update P2/GitB",
             "sync P2: Update message Update"
@@ -380,8 +376,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-            [CheckSync, "sync R1: Update message Prepare", "update R1/GitC", "sync R1: Update message Update"],
+        Assert.Equal([CheckSync, "sync R1: Update message Prepare", "update R1/GitC", "sync R1: Update message Update"],
             _steps.Steps);
     }
 
@@ -394,8 +389,7 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal(
-        [
+        Assert.Equal([
             CheckSync, "sync P2: Update message Prepare", "update P2/GitA", "sync P2: Update message Update",
             "sync P2: Update message Prepare", "update P2/GitB", "sync P2: Update message Update"
         ], _steps.Steps);
@@ -417,10 +411,11 @@ public sealed class UpdateOutdatedPackagesToolActionTests : IDisposable
         await Create(null, null, false).Run();
 
         // Assert
-        Assert.Contains(string.Join(Environment.NewLine, "Times of Update Outdated Packages:",
-            "  sync of all gits (Check): 00:03:00", "  2 syncs before an update (Prepare): 00:02:00",
-            "  2 package updates (restore, dotnet outdated, check restore): 01:21:00",
-            "  2 syncs after an update (Update): 00:02:30") + Environment.NewLine, _consoleOutput.ToString(),
+        Assert.Contains(
+            string.Join(Environment.NewLine, "Times of Update Outdated Packages:",
+                "  sync of all gits (Check): 00:03:00", "  2 syncs before an update (Prepare): 00:02:00",
+                "  2 package updates (restore, dotnet outdated, check restore): 01:21:00",
+                "  2 syncs after an update (Update): 00:02:30") + Environment.NewLine, _consoleOutput.ToString(),
             StringComparison.Ordinal);
     }
 

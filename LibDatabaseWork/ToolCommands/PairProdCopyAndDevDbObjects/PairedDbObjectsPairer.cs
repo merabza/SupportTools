@@ -165,8 +165,7 @@ public static class PairedDbObjectsPairer
         }
 
         //დაკეტილი ველები, რომელთა ProdCopy სვეტი აღარ არსებობს, მაინც რჩება
-        foreach (KeyValuePair<string, PairedField> lockedField in lockedFields.Where(x =>
-                     !result.ContainsKey(x.Key)))
+        foreach (KeyValuePair<string, PairedField> lockedField in lockedFields.Where(x => !result.ContainsKey(x.Key)))
         {
             result.Add(lockedField.Key, lockedField.Value);
         }
@@ -179,8 +178,8 @@ public static class PairedDbObjectsPairer
     {
         foreach (KeyValuePair<(string SchemaLower, string TableLower), TableInfo> kvp in tables)
         {
-            if (string.Equals(kvp.Value.TableName, tableName, StringComparison.OrdinalIgnoreCase) &&
-                (!compareSchemas || string.Equals(kvp.Value.SchemaName, schemaName, StringComparison.OrdinalIgnoreCase)))
+            if (string.Equals(kvp.Value.TableName, tableName, StringComparison.OrdinalIgnoreCase) && (!compareSchemas ||
+                    string.Equals(kvp.Value.SchemaName, schemaName, StringComparison.OrdinalIgnoreCase)))
             {
                 return kvp.Key;
             }

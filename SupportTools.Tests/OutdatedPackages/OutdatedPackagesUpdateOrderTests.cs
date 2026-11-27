@@ -127,8 +127,7 @@ public sealed class OutdatedPackagesUpdateOrderTests
         List<string> steps = CreateSteps();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "SupportTools/SupportToolsServerShared", "SupportTools/SupportTools",
             "SupportToolsServer/SupportToolsServer"
         ], steps);
@@ -231,8 +230,7 @@ public sealed class OutdatedPackagesUpdateOrderTests
         List<string> levels = CreateLevels();
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             "SupportTools/SupportToolsServerShared",
             "SupportTools/SupportTools, SupportToolsServer/SupportToolsServer"
         ], levels);

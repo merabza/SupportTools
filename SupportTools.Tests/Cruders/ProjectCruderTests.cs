@@ -144,8 +144,8 @@ public sealed class ProjectCruderTests
     [InlineData(nameof(ProjectModel.UseLocalPackages), false)]
     [InlineData(nameof(ProjectModel.UseAlternativeWebAgent), true)]
     [InlineData(nameof(ProjectModel.UsesDatabase), true)]
-    public void EnterFieldDataOnCreate_WhenNewProjectIsCreated_AsksAllBoolFieldsButUseLocalPackages(
-        string propertyName, bool expected)
+    public void EnterFieldDataOnCreate_WhenNewProjectIsCreated_AsksAllBoolFieldsButUseLocalPackages(string propertyName,
+        bool expected)
     {
         // Act
         FieldEditor fieldEditor = GetFieldEditors(CreateSut()).Single(x => x.PropertyName == propertyName);

@@ -119,13 +119,12 @@ public sealed class SelectServerAllowToolsCliMenuCommandTests : IDisposable
         await CliMenuTestAccess.InvokeRunBody(sut);
 
         // Assert
-        Assert.Equal(
-            [
-                nameof(EProjectServerTools.DevBaseToServerCopier),
-                nameof(EProjectServerTools.ServerBaseToProdCopyCopier),
-                nameof(EProjectServerTools.ServerBaseToServerCopier),
-                nameof(EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase)
-            ], offered!.Keys);
+        Assert.Equal([
+            nameof(EProjectServerTools.DevBaseToServerCopier),
+            nameof(EProjectServerTools.ServerBaseToProdCopyCopier),
+            nameof(EProjectServerTools.ServerBaseToServerCopier),
+            nameof(EProjectServerTools.RestoreDatabaseFromFileStorageToNewDatabase)
+        ], offered!.Keys);
     }
 
     [Fact]
@@ -145,8 +144,7 @@ public sealed class SelectServerAllowToolsCliMenuCommandTests : IDisposable
 
         // Assert
         Assert.True(result);
-        Assert.Equal([EProjectServerTools.ProgramUpdater, EProjectServerTools.VersionChecker],
-            server.AllowToolsList);
+        Assert.Equal([EProjectServerTools.ProgramUpdater, EProjectServerTools.VersionChecker], server.AllowToolsList);
         _parametersManager.Verify(x => x.Save(_parameters, "Changes saved", null, It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -217,8 +215,7 @@ public sealed class SelectServerAllowToolsCliMenuCommandTests : IDisposable
 
     private SelectServerAllowToolsCliMenuCommand CreateSut(Action<string, Dictionary<string, bool>> selectTools)
     {
-        return new SelectServerAllowToolsCliMenuCommand(_parametersManager.Object, ProjectName, ServerKey,
-            selectTools);
+        return new SelectServerAllowToolsCliMenuCommand(_parametersManager.Object, ProjectName, ServerKey, selectTools);
     }
 
     private ServerInfoModel AddServer(ProjectModel project, List<EProjectServerTools>? allowedTools)
@@ -235,7 +232,7 @@ public sealed class SelectServerAllowToolsCliMenuCommandTests : IDisposable
     private void VerifyNotSaved()
     {
         _parametersManager.Verify(
-            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+            x => x.Save(It.IsAny<IParameters>(), It.IsAny<string>(), It.IsAny<string?>(),
+                It.IsAny<CancellationToken>()), Times.Never);
     }
 }

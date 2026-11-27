@@ -108,7 +108,8 @@ public sealed class RunnerProcessTests : IDisposable
     {
         // Arrange: Email-ის შემდეგ მძიმე აკლია
         string outputFile =
-            WriteOutputFile($$"""[{"Email":"{{Email}}" "PasswordHash":"{{PasswordHash}}","FirstName":"{{FirstName}}"}]""");
+            WriteOutputFile(
+                $$"""[{"Email":"{{Email}}" "PasswordHash":"{{PasswordHash}}","FirstName":"{{FirstName}}"}]""");
 
         // Act
         List<Dictionary<string, object?>>? rows = RunProcess(outputFile, 0);

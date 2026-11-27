@@ -17,8 +17,8 @@ public sealed class GenerateServerInstallationFilesCliMenuCommand : CliMenuComma
     private readonly IParametersManager _parametersManager;
 
     // ReSharper disable once ConvertToPrimaryConstructor
-    public GenerateServerInstallationFilesCliMenuCommand(IParametersManager parametersManager,
-        string installationName) : base("Generate grub.cfg And autoinstall.yaml", EMenuAction.Reload)
+    public GenerateServerInstallationFilesCliMenuCommand(IParametersManager parametersManager, string installationName)
+        : base("Generate grub.cfg And autoinstall.yaml", EMenuAction.Reload)
     {
         _parametersManager = parametersManager;
         _installationName = installationName;

@@ -22,9 +22,9 @@ internal static class TableDataTransferrer
     public static async Task<long> TransferAsync(EDatabaseProvider prodCopyDataProvider,
         string prodCopyConnectionString, string devConnectionString, PairedTable pt,
         IReadOnlyList<PairedField> insertableFields, IReadOnlyList<string> zeroFilledColumns,
-        IReadOnlySet<string> identityColumns, int commandTimeOut, IReadOnlyList<string> primaryKeyColumns, IReadOnlyList<UniqueIndexMeta> uniqueIndexes,
-        string? dataSeederRulesByTableStartupProjectFilePath, string? oldDataConvertorProjectFilePath, ILogger logger,
-        CancellationToken cancellationToken)
+        IReadOnlySet<string> identityColumns, int commandTimeOut, IReadOnlyList<string> primaryKeyColumns,
+        IReadOnlyList<UniqueIndexMeta> uniqueIndexes, string? dataSeederRulesByTableStartupProjectFilePath,
+        string? oldDataConvertorProjectFilePath, ILogger logger, CancellationToken cancellationToken)
     {
         //None — ცხრილი საერთოდ არ კოპირდება
         if (pt.SeedDataType == ESeedDataType.None)
@@ -176,10 +176,9 @@ internal static class TableDataTransferrer
             }
         }
 
-        List<PairedField> mergedFields =
-            [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
-        long mergedCount = await BulkInsertRowsAsync(devConnectionString, pt, mergedFields, hasIdentity,
-            commandTimeOut, dataToInsert, cancellationToken);
+        List<PairedField> mergedFields = [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
+        long mergedCount = await BulkInsertRowsAsync(devConnectionString, pt, mergedFields, hasIdentity, commandTimeOut,
+            dataToInsert, cancellationToken);
         await SeederRulesReferenceResolver.ApplySelfReferencesAsync(devConnectionString, pt, selfReferences,
             dataToInsert, commandTimeOut, logger, cancellationToken);
         return mergedCount;
@@ -206,8 +205,7 @@ internal static class TableDataTransferrer
         await devConn.OpenAsync(cancellationToken);
 
         //SELECT-ი ProdCopy-ში არარსებულ სვეტებს 0-ით აბრუნებს Dev-ის სახელით
-        List<PairedField> mappedFields =
-            [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
+        List<PairedField> mappedFields = [.. insertableFields, .. zeroFilledColumns.Select(c => new PairedField(c, c))];
         // ReSharper disable once using
         using var bulkCopy = CreateBulkCopy(devConn, pt, mappedFields, hasIdentity, commandTimeOut,
             f => f.ProdCopyFieldName);

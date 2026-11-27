@@ -104,10 +104,10 @@ public static class ProjectToolRunner
         ServerInfoModel serverInfo = foundServers[0];
 
         List<EProjectServerTools> allowedTools =
-            [
-                .. Enum.GetValues<EProjectServerTools>().Intersect(serverInfo.AllowToolsList ?? [])
-                    .Where(project.IsToolVisible)
-            ];
+        [
+            .. Enum.GetValues<EProjectServerTools>().Intersect(serverInfo.AllowToolsList ?? [])
+                .Where(project.IsToolVisible)
+        ];
         if (!allowedTools.Contains(tool))
         {
             StShared.WriteErrorLine(

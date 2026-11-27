@@ -31,9 +31,9 @@ public sealed class CreatePackageAndUploadTests : IDisposable
 
     private readonly string _binFolder;
     private readonly List<string> _confirmQuestions = [];
-    private readonly RecordingLogger _logger = new();
     private readonly StringWriter _consoleOutput = new(CultureInfo.InvariantCulture);
     private readonly string _exchangeFolder;
+    private readonly RecordingLogger _logger = new();
     private readonly string _objFolder;
     private readonly TextWriter _originalConsoleOutput;
     private readonly string _processName = $"PkgTest{Guid.NewGuid():N}"[..20];
@@ -463,7 +463,7 @@ public sealed class CreatePackageAndUploadTests : IDisposable
     public void IsRunningFrom_WhenTheModuleCannotBeRead_ReturnsFalse()
     {
         // Arrange
-        using Process systemProcess = Process.GetProcessById(4);
+        using var systemProcess = Process.GetProcessById(4);
 
         // Act
         bool result = CreatePackageAndUpload.IsRunningFrom(systemProcess, @"C:\");
@@ -482,8 +482,7 @@ public sealed class CreatePackageAndUploadTests : IDisposable
             new ServerInfoModel { ServerName = serverName, EnvironmentName = environmentName, SpaEnvMode = spaEnvMode },
             workFolder ?? _workFolder, dateMask, Runtime, ["appsettings.Development.json", " "], "up",
             new FileStorageData { FileStoragePath = exchangeFolder ?? _exchangeFolder },
-            localSmartSchema ?? new SmartSchema(), KeepNewestSmartSchema(),
-            question =>
+            localSmartSchema ?? new SmartSchema(), KeepNewestSmartSchema(), question =>
             {
                 _confirmQuestions.Add(question);
                 return _confirmAnswer;
@@ -494,7 +493,8 @@ public sealed class CreatePackageAndUploadTests : IDisposable
     {
         return new SmartSchema
         {
-            LastPreserveCount = 1, Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Day, PreserveCount = 1 }]
+            LastPreserveCount = 1,
+            Details = [new SmartSchemaDetail { PeriodType = EPeriodType.Day, PreserveCount = 1 }]
         };
     }
 

@@ -209,7 +209,8 @@ public sealed class DistributeAllPackagesInGroupCliMenuCommandTests : IDisposabl
         AddProject("App", "G1", EProjectType.Standard, true, "App", "Util");
 
         // Act
-        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut(SupportToolsParameters.FixProjectGroupName(null)));
+        bool result =
+            await CliMenuTestAccess.InvokeRunBody(CreateSut(SupportToolsParameters.FixProjectGroupName(null)));
 
         // Assert
         Assert.True(result);

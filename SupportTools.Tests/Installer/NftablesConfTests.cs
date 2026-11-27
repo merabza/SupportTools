@@ -1,4 +1,5 @@
-﻿using ToolsManagement.Installer.ServiceInstaller;
+﻿using System;
+using ToolsManagement.Installer.ServiceInstaller;
 using Xunit;
 
 namespace SupportTools.Tests.Installer;
@@ -28,8 +29,7 @@ public sealed class NftablesConfTests
     {
         string? result = NftablesConf.AddPortToSetElements(WebminConf, Set, 5031);
 
-        Assert.Equal(WebminConf.Replace("49152-65535 }", "49152-65535, 5031 }", System.StringComparison.Ordinal),
-            result);
+        Assert.Equal(WebminConf.Replace("49152-65535 }", "49152-65535, 5031 }", StringComparison.Ordinal), result);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class NftablesConfTests
         //only a separate element counts; the installer edits the file only when nft says the set lacks the port
         string? result = NftablesConf.AddPortToSetElements(WebminConf, Set, 10000);
 
-        Assert.Contains("49152-65535, 10000 }", result, System.StringComparison.Ordinal);
+        Assert.Contains("49152-65535, 10000 }", result, StringComparison.Ordinal);
     }
 
     [Fact]

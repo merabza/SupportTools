@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -77,8 +77,8 @@ public sealed class ServerBaseToServerCopierFactoryStrategy : BaseCopierFactoryS
 
         Dictionary<string, DatabaseParameters> destinations = project.ServerInfos.Values
             .Where(x => x.NewDatabaseParameters is not null)
-            .GroupBy(x => x.GetItemKey(), StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.First().NewDatabaseParameters!, StringComparer.OrdinalIgnoreCase);
+            .GroupBy(x => x.GetItemKey(), StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key,
+                g => g.First().NewDatabaseParameters!, StringComparer.OrdinalIgnoreCase);
 
         if (destinations.Count == 0)
         {

@@ -47,8 +47,7 @@ public sealed class PackageUpdaterToolActionCreateTests : IDisposable
     public void Create_WhenTheGitIsNotInGits_WritesWhyAndReturnsNull()
     {
         // Act
-        PackageUpdaterToolAction? result =
-            PackageUpdaterToolAction.Create(null, _parametersManager.Object, "PR", "GitR", true);
+        var result = PackageUpdaterToolAction.Create(null, _parametersManager.Object, "PR", "GitR", true);
 
         // Assert
         Assert.Null(result);

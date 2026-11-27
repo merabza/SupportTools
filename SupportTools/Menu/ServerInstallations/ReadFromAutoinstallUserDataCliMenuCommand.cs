@@ -86,8 +86,8 @@ public sealed class ReadFromAutoinstallUserDataCliMenuCommand : CliMenuCommand
             SetBond(installation, userData.Bonds.Find(x => x.Name == interfaceName));
         }
 
-        bool saved = await _parametersManager.Save(parameters, $"Server Installation {_installationName} updated",
-            null, cancellationToken);
+        bool saved = await _parametersManager.Save(parameters, $"Server Installation {_installationName} updated", null,
+            cancellationToken);
         StShared.Pause();
         return saved;
     }

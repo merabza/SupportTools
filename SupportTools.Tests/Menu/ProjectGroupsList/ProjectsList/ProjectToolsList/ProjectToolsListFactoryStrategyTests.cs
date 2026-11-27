@@ -70,7 +70,8 @@ public sealed class ProjectToolsListFactoryStrategyTests
         // Arrange
         _parameters.Projects[ProjectName] = new ProjectModel
         {
-            UsesDatabase = false, AllowToolsList = [EProjectTools.RecreateDevDatabase, EProjectTools.GenerateApiRoutes]
+            UsesDatabase = false,
+            AllowToolsList = [EProjectTools.RecreateDevDatabase, EProjectTools.GenerateApiRoutes]
         };
 
         // Act

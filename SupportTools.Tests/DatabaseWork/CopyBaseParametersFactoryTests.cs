@@ -25,14 +25,18 @@ public sealed class CopyBaseParametersFactoryTests : IDisposable
         $"[ERROR] FileStorage and sourceFileManager is Not Created{Environment.NewLine}";
 
     private readonly StringWriter _consoleOutput = new();
+
     private readonly DatabaseParameters _destination =
         CreateDatabaseParameters("Pazisi", "DestinationDb", "Destination");
+
     private readonly string _localFolder;
     private readonly RecordingLogger _logger = new();
     private readonly TextWriter _originalOut = Console.Out;
     private readonly SupportToolsParameters _parameters;
+
     private readonly string _rootFolder =
         Path.Combine(Path.GetTempPath(), $"CopyBaseParametersFactoryTests_{Guid.NewGuid():N}");
+
     private readonly SmartSchema _smartSchema = new() { LastPreserveCount = 3 };
     private readonly DatabaseParameters _source = CreateDatabaseParameters("Riga", "SourceDb", "Source");
 
@@ -43,13 +47,14 @@ public sealed class CopyBaseParametersFactoryTests : IDisposable
 
         _parameters = new SupportToolsParameters
         {
-            DatabasesBackupFilesExchangeParameters = new DatabasesBackupFilesExchangeParameters
-            {
-                LocalPath = _localFolder,
-                ExchangeFileStorageName = "Exchange",
-                ExchangeSmartSchemaName = "Reduce",
-                UploadTempExtension = ".up!"
-            },
+            DatabasesBackupFilesExchangeParameters =
+                new DatabasesBackupFilesExchangeParameters
+                {
+                    LocalPath = _localFolder,
+                    ExchangeFileStorageName = "Exchange",
+                    ExchangeSmartSchemaName = "Reduce",
+                    UploadTempExtension = ".up!"
+                },
             FileStorages =
             {
                 ["Source"] = new FileStorageData { FileStoragePath = CreateFolder("source") },
@@ -156,12 +161,10 @@ public sealed class CopyBaseParametersFactoryTests : IDisposable
     public async Task CreateCopyBaseParameters_EverythingMissing_ListsEveryMissingFieldOfBothSides()
     {
         // Act
-        CopyBaseParameters? result =
-            await CreateCopyBaseParameters(new DatabaseParameters(), new DatabaseParameters());
+        CopyBaseParameters? result = await CreateCopyBaseParameters(new DatabaseParameters(), new DatabaseParameters());
 
         // Assert
-        AssertOnlyErrors(result,
-            "DbConnectionName is not specified in source database parameters",
+        AssertOnlyErrors(result, "DbConnectionName is not specified in source database parameters",
             "DatabaseName is not specified in source database parameters",
             "DbServerFoldersSetName is not specified in source database parameters",
             "FileStorageName is not specified in source database parameters",

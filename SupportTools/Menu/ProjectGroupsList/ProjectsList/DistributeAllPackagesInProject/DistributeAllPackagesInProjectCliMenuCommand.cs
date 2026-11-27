@@ -35,8 +35,8 @@ public sealed class DistributeAllPackagesInProjectCliMenuCommand : CliMenuComman
     //რომ ტესტებმა ისინი თვითონ მიაწოდონ
     // ReSharper disable once ConvertToPrimaryConstructor
     internal DistributeAllPackagesInProjectCliMenuCommand(ILogger logger, IParametersManager parametersManager,
-        string projectName, Func<string, bool, bool> inputBool, IPackageDistributionSteps steps) : base(
-        MenuCommandName, EMenuAction.Reload, EMenuAction.Reload, projectName, true)
+        string projectName, Func<string, bool, bool> inputBool, IPackageDistributionSteps steps) : base(MenuCommandName,
+        EMenuAction.Reload, EMenuAction.Reload, projectName, true)
     {
         _logger = logger;
         _parametersManager = parametersManager;

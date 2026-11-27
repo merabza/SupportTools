@@ -37,7 +37,8 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
         _projectFolder = Path.Combine(_tempFolder, "PR");
         Directory.CreateDirectory(_projectFolder);
         _parameters.WorkFolder = Path.Combine(_tempFolder, "Work");
-        _parameters.Projects["PR"] = new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["GitR"] };
+        _parameters.Projects["PR"] =
+            new ProjectModel { ProjectFolderName = _projectFolder, GitProjectNames = ["GitR"] };
         _parametersManager.SetupGet(x => x.Parameters).Returns(_parameters);
     }
 
@@ -87,8 +88,8 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
         AddGit("GitR", "git@github.com:x/GitR.git");
 
         // Act
-        IReadOnlyList<EPackageUpdateResult> results =
-            CreateSut().UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
+        IReadOnlyList<EPackageUpdateResult> results = CreateSut()
+            .UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
 
         // Assert
         Assert.Equal([EPackageUpdateResult.Success], results);
@@ -129,13 +130,13 @@ public sealed class OutdatedPackagesUpdateStepsTests : IDisposable
         };
 
         // Act
-        IReadOnlyList<EPackageUpdateResult> results =
-            CreateSut().UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
+        IReadOnlyList<EPackageUpdateResult> results = CreateSut()
+            .UpdatePackages([new OutdatedPackagesUpdateStep("PR", "GitR")], CancellationToken.None);
 
         // Assert
         Assert.Equal([EPackageUpdateResult.OutdatedFailed], results);
-        Assert.Contains(SpaProjectFolderHelper.GetMissingSpaProjectMessage("PR", "AppFront"),
-            _consoleOutput.ToString(), StringComparison.Ordinal);
+        Assert.Contains(SpaProjectFolderHelper.GetMissingSpaProjectMessage("PR", "AppFront"), _consoleOutput.ToString(),
+            StringComparison.Ordinal);
     }
 
     //the public constructor draws no board in the test host (its output is redirected)

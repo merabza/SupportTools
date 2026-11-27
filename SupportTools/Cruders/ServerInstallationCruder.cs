@@ -105,8 +105,7 @@ public sealed class ServerInstallationCruder : ParCruder<ServerInstallationModel
     {
         base.FillDetailsSubMenu(itemSubMenuSet, itemName);
 
-        itemSubMenuSet.AddMenuItem(
-            new ReadFromAutoinstallUserDataCliMenuCommand(ParametersManager, itemName));
+        itemSubMenuSet.AddMenuItem(new ReadFromAutoinstallUserDataCliMenuCommand(ParametersManager, itemName));
         itemSubMenuSet.AddMenuItem(new GenerateServerInstallationFilesCliMenuCommand(ParametersManager, itemName));
         itemSubMenuSet.AddMenuItem(new WriteServerInstallationToUsbCliMenuCommand(ParametersManager, itemName));
     }

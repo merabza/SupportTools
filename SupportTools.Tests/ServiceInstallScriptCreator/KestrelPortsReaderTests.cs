@@ -10,6 +10,8 @@ namespace SupportTools.Tests.ServiceInstallScriptCreator;
 
 public sealed class KestrelPortsReaderTests
 {
+    private const string KestrelJson = """{ "Kestrel": { "Endpoints": { "Http": { "Url": "http://*:5031" } } } }""";
+
     [Fact]
     public void Read_WithHttpEndpoint_ReturnsItsPort()
     {
@@ -121,8 +123,6 @@ public sealed class KestrelPortsReaderTests
 
         Assert.Equal([5031], KestrelPortsReader.GetPortsToOpen(serverInfo, "App"));
     }
-
-    private const string KestrelJson = """{ "Kestrel": { "Endpoints": { "Http": { "Url": "http://*:5031" } } } }""";
 
     private sealed class TempJsonFile : IDisposable
     {

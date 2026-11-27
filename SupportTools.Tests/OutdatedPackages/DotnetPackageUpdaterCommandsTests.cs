@@ -17,8 +17,8 @@ public sealed class DotnetPackageUpdaterCommandsTests
         string[] result = DotnetPackageUpdaterCommands.CreateRestoreForOutdatedArguments(@"C:\Work\GitA\GitA.slnx");
 
         // Assert
-        Assert.Equal(
-            ["restore", @"C:\Work\GitA\GitA.slnx", "-p:NoWarn=NU1605", "-p:TreatWarningsAsErrors=false"], result);
+        Assert.Equal(["restore", @"C:\Work\GitA\GitA.slnx", "-p:NoWarn=NU1605", "-p:TreatWarningsAsErrors=false"],
+            result);
     }
 
     //-n: dotnet outdated writes the versions into Directory.Packages.props itself, without one dotnet add package (with

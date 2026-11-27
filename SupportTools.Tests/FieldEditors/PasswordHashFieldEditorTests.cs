@@ -35,16 +35,15 @@ public sealed class PasswordHashFieldEditorTests : IDisposable
 
     private PasswordHashFieldEditor CreateSut()
     {
-        return new PasswordHashFieldEditor(nameof(ServerInstallationModel.PasswordHash), x => $"hash of {x}",
-            prompt =>
-            {
-                _prompts.Add(prompt);
-                return _answers.Dequeue();
-            }, question =>
-            {
-                _confirmQuestions.Add(question);
-                return _confirmAnswer;
-            });
+        return new PasswordHashFieldEditor(nameof(ServerInstallationModel.PasswordHash), x => $"hash of {x}", prompt =>
+        {
+            _prompts.Add(prompt);
+            return _answers.Dequeue();
+        }, question =>
+        {
+            _confirmQuestions.Add(question);
+            return _confirmAnswer;
+        });
     }
 
     //the password is set while the installation is created, so a new installation is never left without it

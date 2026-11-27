@@ -63,8 +63,8 @@ public sealed class ServerInstallationCruderTests : IDisposable
     //the field editor keeps the hash function of its field in a private field
     private static Func<string, string> GetHashPassword(FieldEditor fieldEditor)
     {
-        return (Func<string, string>)typeof(PasswordHashFieldEditor)
-            .GetField("_hashPassword", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fieldEditor)!;
+        return (Func<string, string>)typeof(PasswordHashFieldEditor).GetField("_hashPassword",
+            BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fieldEditor)!;
     }
 
     //New asks for the fields in this order, and the item menu lists them in the same order
@@ -75,8 +75,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         List<FieldEditor> fieldEditors = CliMenuTestAccess.GetFieldEditors(CreateSut());
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             nameof(ServerInstallationModel.Hostname), nameof(ServerInstallationModel.DomainName),
             nameof(ServerInstallationModel.RealName), nameof(ServerInstallationModel.UserName),
             nameof(ServerInstallationModel.PasswordHash), nameof(ServerInstallationModel.SshAuthorizedKeys),
@@ -352,8 +351,7 @@ public sealed class ServerInstallationCruderTests : IDisposable
         List<FieldEditor> fieldEditors = CliMenuTestAccess.GetFieldEditors(CreateSut());
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             nameof(ServerInstallationModel.PasswordHash), nameof(ServerInstallationModel.MariaDbRootPasswordHash),
             nameof(ServerInstallationModel.SqlServerSaPasswordHash)
         ], fieldEditors.OfType<PasswordHashFieldEditor>().Select(x => x.PropertyName));

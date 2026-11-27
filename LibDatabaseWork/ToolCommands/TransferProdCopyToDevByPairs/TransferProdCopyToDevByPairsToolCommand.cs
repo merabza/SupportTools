@@ -259,9 +259,9 @@ public sealed class TransferProdCopyToDevByPairsToolCommand : ToolCommand
             {
                 rows = await TableDataTransferrer.TransferAsync(Parameters.ProdCopyDataProvider,
                     Parameters.ProdCopyConnectionString, Parameters.DevConnectionString, pt, insertable,
-                    zeroFilledColumns.GetValueOrDefault(node, []), meta.IdentityColumns, Parameters.CommandTimeOut, meta.PrimaryKeyColumns, meta.UniqueIndexes,
-                    Parameters.DataSeederRulesByTableStartupProjectFilePath, Parameters.OldDataConvertorForDataSeeder,
-                    _logger, cancellationToken);
+                    zeroFilledColumns.GetValueOrDefault(node, []), meta.IdentityColumns, Parameters.CommandTimeOut,
+                    meta.PrimaryKeyColumns, meta.UniqueIndexes, Parameters.DataSeederRulesByTableStartupProjectFilePath,
+                    Parameters.OldDataConvertorForDataSeeder, _logger, cancellationToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

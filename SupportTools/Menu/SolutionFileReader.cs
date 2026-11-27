@@ -35,9 +35,10 @@ public static partial class SolutionFileReader
 
         return
         [
-            .. File.ReadLines(solutionFileName).Select(line => SlnProjectLineRegex().Match(line))
-                .Where(match => match.Success && !match.Groups["type"].Value.Equals(SolutionFolderTypeGuid,
-                    StringComparison.OrdinalIgnoreCase)).Select(match => match.Groups["path"].Value)
+            .. File.ReadLines(solutionFileName).Select(line => SlnProjectLineRegex().Match(line)).Where(match =>
+                    match.Success && !match.Groups["type"].Value
+                        .Equals(SolutionFolderTypeGuid, StringComparison.OrdinalIgnoreCase))
+                .Select(match => match.Groups["path"].Value)
         ];
     }
 

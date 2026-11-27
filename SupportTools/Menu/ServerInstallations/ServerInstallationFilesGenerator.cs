@@ -86,8 +86,8 @@ public static partial class ServerInstallationFilesGenerator
             CheckOptional(errors, nameof(installation.DnsPrimaryNameServer), installation.DnsPrimaryNameServer,
                 DomainRegex());
             CheckOptional(errors, nameof(installation.EmailToAddress), installation.EmailToAddress, EmailRegex());
-            CheckOptional(errors, nameof(installation.MariaDbRootPasswordHash),
-                installation.MariaDbRootPasswordHash, MariaDbHashRegex());
+            CheckOptional(errors, nameof(installation.MariaDbRootPasswordHash), installation.MariaDbRootPasswordHash,
+                MariaDbHashRegex());
         }
 
         if (installation.InstallMsSqlServer)
@@ -139,65 +139,65 @@ public static partial class ServerInstallationFilesGenerator
     {
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture, $$"""
-                    #cloud-config
-                    # See the autoinstall documentation at:
-                    # https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
-                    autoinstall:
-                      apt:
-                        disable_components: []
-                        fallback: offline-install
-                        geoip: true
-                        mirror-selection:
-                          primary:
-                          - country-mirror
-                          - arches:
-                            - amd64
-                            - arm64
-                            - i386
-                            uri: http://archive.ubuntu.com/ubuntu/
-                          - arches:
-                            - armhf
-                            - powerpc
-                            - ppc64el
-                            - riscv64
-                            - s390x
-                            uri: http://ports.ubuntu.com/ubuntu-ports
-                        preserve_sources_list: false
-                        security:
-                        - arches:
-                          - amd64
-                          - arm64
-                          - i386
-                          uri: http://security.ubuntu.com/ubuntu/
-                        - arches:
-                          - armhf
-                          - powerpc
-                          - ppc64el
-                          - riscv64
-                          - s390x
-                          uri: http://ports.ubuntu.com/ubuntu-ports
-                      codecs:
-                        install: false
-                      drivers:
-                        install: false
-                      identity:
-                        hostname: {{Quote(installation.Hostname)}}
-                        password: {{Quote(installation.PasswordHash)}}
-                        realname: {{Quote(installation.RealName)}}
-                        username: {{Quote(installation.UserName)}}
-                      kernel:
-                        package: linux-generic
-                      keyboard:
-                        layout: {{Quote(installation.KeyboardLayout)}}
-                        toggle: null
-                        variant: ''
-                      late-commands:
-                      # Next boot only: start the freshly installed "ubuntu" UEFI entry, not the USB
-                      - |
-                        n=$(efibootmgr | sed -n 's/^Boot\([0-9A-Fa-f]\{4\}\)\* ubuntu.*/\1/p' | head -n1)
-                        [ -n "$n" ] && efibootmgr -n "$n" || true
+                                                  #cloud-config
+                                                  # See the autoinstall documentation at:
+                                                  # https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
+                                                  autoinstall:
+                                                    apt:
+                                                      disable_components: []
+                                                      fallback: offline-install
+                                                      geoip: true
+                                                      mirror-selection:
+                                                        primary:
+                                                        - country-mirror
+                                                        - arches:
+                                                          - amd64
+                                                          - arm64
+                                                          - i386
+                                                          uri: http://archive.ubuntu.com/ubuntu/
+                                                        - arches:
+                                                          - armhf
+                                                          - powerpc
+                                                          - ppc64el
+                                                          - riscv64
+                                                          - s390x
+                                                          uri: http://ports.ubuntu.com/ubuntu-ports
+                                                      preserve_sources_list: false
+                                                      security:
+                                                      - arches:
+                                                        - amd64
+                                                        - arm64
+                                                        - i386
+                                                        uri: http://security.ubuntu.com/ubuntu/
+                                                      - arches:
+                                                        - armhf
+                                                        - powerpc
+                                                        - ppc64el
+                                                        - riscv64
+                                                        - s390x
+                                                        uri: http://ports.ubuntu.com/ubuntu-ports
+                                                    codecs:
+                                                      install: false
+                                                    drivers:
+                                                      install: false
+                                                    identity:
+                                                      hostname: {{Quote(installation.Hostname)}}
+                                                      password: {{Quote(installation.PasswordHash)}}
+                                                      realname: {{Quote(installation.RealName)}}
+                                                      username: {{Quote(installation.UserName)}}
+                                                    kernel:
+                                                      package: linux-generic
+                                                    keyboard:
+                                                      layout: {{Quote(installation.KeyboardLayout)}}
+                                                      toggle: null
+                                                      variant: ''
+                                                    late-commands:
+                                                    # Next boot only: start the freshly installed "ubuntu" UEFI entry, not the USB
+                                                    - |
+                                                      n=$(efibootmgr | sed -n 's/^Boot\([0-9A-Fa-f]\{4\}\)\* ubuntu.*/\1/p' | head -n1)
+                                                      [ -n "$n" ] && efibootmgr -n "$n" || true
 
-                    """);
+                                                  """);
 
         List<string> apps = GetAppNames(installation);
         if (apps.Count > 0)
@@ -212,23 +212,23 @@ public static partial class ServerInstallationFilesGenerator
         }
 
         sb.Append(CultureInfo.InvariantCulture, $$"""
-                      locale: {{Quote(installation.Locale)}}
-                      network:
+                                                    locale: {{Quote(installation.Locale)}}
+                                                    network:
 
-                    """);
+                                                  """);
         sb.Append(Indent(CreateNetworkYaml(installation), 4));
         sb.Append(CultureInfo.InvariantCulture, $$"""
-                        version: 2
-                      oem:
-                        install: auto
-                      shutdown: reboot
-                      source:
-                        id: ubuntu-server
-                        search_drivers: false
-                      ssh:
-                        allow-pw: {{(installation.SshAllowPassword ? "true" : "false")}}
+                                                      version: 2
+                                                    oem:
+                                                      install: auto
+                                                    shutdown: reboot
+                                                    source:
+                                                      id: ubuntu-server
+                                                      search_drivers: false
+                                                    ssh:
+                                                      allow-pw: {{(installation.SshAllowPassword ? "true" : "false")}}
 
-                    """);
+                                                  """);
         if (installation.SshAuthorizedKeys.Count == 0)
         {
             sb.Append("    authorized-keys: []\n");
@@ -244,31 +244,31 @@ public static partial class ServerInstallationFilesGenerator
 
         //დისკი serial-ით: სხვა კომპიუტერზე ის არ მოიძებნება და ინსტალაცია რამის წაშლამდე გაჩერდება
         sb.Append(CultureInfo.InvariantCulture, $$"""
-                        install-server: true
-                      storage:
-                        layout:
-                          name: direct
-                          match:
-                            serial: {{Quote(installation.InstallDiskSerial)}}
-                      timezone: {{Quote(installation.Timezone)}}
-                      updates: all
+                                                      install-server: true
+                                                    storage:
+                                                      layout:
+                                                        name: direct
+                                                        match:
+                                                          serial: {{Quote(installation.InstallDiskSerial)}}
+                                                    timezone: {{Quote(installation.Timezone)}}
+                                                    updates: all
 
-                    """);
+                                                  """);
         if (apps.Count > 0)
         {
             sb.Append(CultureInfo.InvariantCulture, $$"""
-                          user-data:
-                            write_files:
-                            - path: /home/{{installation.UserName}}/install-apps.sh
-                              owner: {{installation.UserName}}:{{installation.UserName}}
-                              permissions: '0755'
-                              defer: true
-                              content: |
-                                #!/bin/sh
-                                # Installs {{string.Join(", ", apps)}}
-                                exec sudo /usr/local/sbin/install-apps "$@"
+                                                        user-data:
+                                                          write_files:
+                                                          - path: /home/{{installation.UserName}}/install-apps.sh
+                                                            owner: {{installation.UserName}}:{{installation.UserName}}
+                                                            permissions: '0755'
+                                                            defer: true
+                                                            content: |
+                                                              #!/bin/sh
+                                                              # Installs {{string.Join(", ", apps)}}
+                                                              exec sudo /usr/local/sbin/install-apps "$@"
 
-                        """);
+                                                      """);
         }
 
         sb.Append("  version: 1\n");
@@ -416,26 +416,26 @@ public static partial class ServerInstallationFilesGenerator
                 ? " --extra postgresql,postgresql-client --include PostgreSQL"
                 : string.Empty;
             sb.Append(CultureInfo.InvariantCulture, $$"""
-                        # Skip the installer on a retry if it already finished
-                        if [ ! -e /etc/webmin/virtual-server/installed-auto ]; then
-                          script=$(curl -fsSL --retry 10 --retry-connrefused https://download.virtualmin.com/virtualmin-install)
-                          sh -c "$script" -- --force --hostname {{GetFqdn(installation)}} \
-                            --bundle {{GetBundleName(installation.Bundle)}}{{postgreSql}}
-                        fi
-                        if [ -e /usr/local/sbin/virtualmin-wizard.pl ]; then
-                          perl /usr/local/sbin/virtualmin-wizard.pl
-                          rm -f /usr/local/sbin/virtualmin-wizard.pl
-                        fi
+                                                      # Skip the installer on a retry if it already finished
+                                                      if [ ! -e /etc/webmin/virtual-server/installed-auto ]; then
+                                                        script=$(curl -fsSL --retry 10 --retry-connrefused https://download.virtualmin.com/virtualmin-install)
+                                                        sh -c "$script" -- --force --hostname {{GetFqdn(installation)}} \
+                                                          --bundle {{GetBundleName(installation.Bundle)}}{{postgreSql}}
+                                                      fi
+                                                      if [ -e /usr/local/sbin/virtualmin-wizard.pl ]; then
+                                                        perl /usr/local/sbin/virtualmin-wizard.pl
+                                                        rm -f /usr/local/sbin/virtualmin-wizard.pl
+                                                      fi
 
-                        """);
+                                                      """);
             if (!string.IsNullOrWhiteSpace(installation.MariaDbRootPasswordHash))
             {
                 sb.Append(CultureInfo.InvariantCulture, $$"""
-                            # root keeps socket login (used by Webmin) and also gets a password,
-                            # given here only as its mysql_native_password hash
-                            mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '{{installation.MariaDbRootPasswordHash}}'"
+                                                          # root keeps socket login (used by Webmin) and also gets a password,
+                                                          # given here only as its mysql_native_password hash
+                                                          mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '{{installation.MariaDbRootPasswordHash}}'"
 
-                            """);
+                                                          """);
             }
         }
         else
@@ -481,31 +481,31 @@ public static partial class ServerInstallationFilesGenerator
         if (installation.InstallMsSqlServer)
         {
             sb.Append(CultureInfo.InvariantCulture, $$"""
-                        # SQL Server 2025 (Microsoft only publishes its repo for Ubuntu 24.04).
-                        # Setup gets a throwaway password, then sa is switched to the given hash.
-                        if [ ! -e /var/lib/mssql-sa-hashed ]; then
-                          curl -fsSL --retry 10 -o /etc/apt/sources.list.d/mssql-server-2025.list \
-                            https://packages.microsoft.com/config/ubuntu/24.04/mssql-server-2025.list
-                          apt-get update
-                          DEBIAN_FRONTEND=noninteractive apt-get install -y mssql-server
-                          # setup refuses to run while SQL Server is up (matters on a re-run)
-                          systemctl stop mssql-server 2>/dev/null || true
-                          tmp="$(openssl rand -hex 16)Aa1!"
-                          ACCEPT_EULA=Y MSSQL_PID={{installation.SqlServerEdition}} MSSQL_SA_PASSWORD="$tmp" \
-                            /opt/mssql/bin/mssql-conf -n setup
-                          ok=
-                          for i in $(seq 30); do
-                            if /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$tmp" -C -b -Q \
-                              "ALTER LOGIN sa WITH CHECK_POLICY = OFF; ALTER LOGIN sa WITH PASSWORD = {{installation.SqlServerSaPasswordHash}} HASHED"; then
-                              ok=1; break
-                            fi
-                            sleep 2
-                          done
-                          [ -n "$ok" ]
-                          touch /var/lib/mssql-sa-hashed
-                        fi
+                                                      # SQL Server 2025 (Microsoft only publishes its repo for Ubuntu 24.04).
+                                                      # Setup gets a throwaway password, then sa is switched to the given hash.
+                                                      if [ ! -e /var/lib/mssql-sa-hashed ]; then
+                                                        curl -fsSL --retry 10 -o /etc/apt/sources.list.d/mssql-server-2025.list \
+                                                          https://packages.microsoft.com/config/ubuntu/24.04/mssql-server-2025.list
+                                                        apt-get update
+                                                        DEBIAN_FRONTEND=noninteractive apt-get install -y mssql-server
+                                                        # setup refuses to run while SQL Server is up (matters on a re-run)
+                                                        systemctl stop mssql-server 2>/dev/null || true
+                                                        tmp="$(openssl rand -hex 16)Aa1!"
+                                                        ACCEPT_EULA=Y MSSQL_PID={{installation.SqlServerEdition}} MSSQL_SA_PASSWORD="$tmp" \
+                                                          /opt/mssql/bin/mssql-conf -n setup
+                                                        ok=
+                                                        for i in $(seq 30); do
+                                                          if /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$tmp" -C -b -Q \
+                                                            "ALTER LOGIN sa WITH CHECK_POLICY = OFF; ALTER LOGIN sa WITH PASSWORD = {{installation.SqlServerSaPasswordHash}} HASHED"; then
+                                                            ok=1; break
+                                                          fi
+                                                          sleep 2
+                                                        done
+                                                        [ -n "$ok" ]
+                                                        touch /var/lib/mssql-sa-hashed
+                                                      fi
 
-                        """);
+                                                      """);
 
             //0 და ნაგულისხმევი პორტი არაფერს ცვლის: mssql-conf გამოყენებულ პორტს არ იღებს
             int sqlServerPort = installation.SqlServerPort == 0
@@ -515,46 +515,46 @@ public static partial class ServerInstallationFilesGenerator
             if (sqlServerPort != ServerInstallationModel.DefaultSqlServerPort)
             {
                 sb.Append(CultureInfo.InvariantCulture, $$"""
-                            # SQL Server listens on port {{port}} (mssql-conf refuses a port in use, so not again)
-                            if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*{{port}}[[:space:]]*$' \
-                              /var/opt/mssql/mssql.conf 2>/dev/null; then
-                              /opt/mssql/bin/mssql-conf set network.tcpport {{port}}
-                              systemctl restart mssql-server
-                            fi
+                                                          # SQL Server listens on port {{port}} (mssql-conf refuses a port in use, so not again)
+                                                          if ! grep -Eq '^[[:space:]]*tcpport[[:space:]]*=[[:space:]]*{{port}}[[:space:]]*$' \
+                                                            /var/opt/mssql/mssql.conf 2>/dev/null; then
+                                                            /opt/mssql/bin/mssql-conf set network.tcpport {{port}}
+                                                            systemctl restart mssql-server
+                                                          fi
 
-                            """);
+                                                          """);
             }
 
             if (installation.OpenSqlServerPort)
             {
                 sb.Append(CultureInfo.InvariantCulture, $$"""
-                            # Open SQL Server's port {{port}}: in firewalld if it runs (Virtualmin sets it up), else in the tcp ports
-                            # set of Webmin's nftables table (it drops every port that is not in the set, so a rule in
-                            # another table would not help), in nftables otherwise
-                            if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
-                              firewall-cmd --permanent --add-port={{port}}/tcp
-                              firewall-cmd --reload
-                            elif command -v nft >/dev/null 2>&1 &&
-                              nft list set inet webmin_profile_hosting profile_hosting_tcp_ports >/dev/null 2>&1; then
-                              # a port that the set already holds may be inside a range of the file, so the file only when it is new
-                              if ! nft get element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }' >/dev/null 2>&1; then
-                                nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }'
-                                # keep it after a restart: add it to the elements of the set in /etc/nftables.conf
-                                perl -0777 -pi -e 's/(set profile_hosting_tcp_ports \{[^}]*?elements = \{[^}]*?)\s*\}/$1, {{port}} }/' \
-                                  /etc/nftables.conf
-                              fi
-                            else
-                              if ! dpkg -s nftables >/dev/null 2>&1; then
-                                apt-get update
-                                DEBIAN_FRONTEND=noninteractive apt-get install -y nftables
-                              fi
-                              grep -q 'tcp dport {{port}} accept' /etc/nftables.conf ||
-                                echo 'add rule inet filter input tcp dport {{port}} accept' >> /etc/nftables.conf
-                              systemctl enable nftables
-                              systemctl restart nftables
-                            fi
+                                                          # Open SQL Server's port {{port}}: in firewalld if it runs (Virtualmin sets it up), else in the tcp ports
+                                                          # set of Webmin's nftables table (it drops every port that is not in the set, so a rule in
+                                                          # another table would not help), in nftables otherwise
+                                                          if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
+                                                            firewall-cmd --permanent --add-port={{port}}/tcp
+                                                            firewall-cmd --reload
+                                                          elif command -v nft >/dev/null 2>&1 &&
+                                                            nft list set inet webmin_profile_hosting profile_hosting_tcp_ports >/dev/null 2>&1; then
+                                                            # a port that the set already holds may be inside a range of the file, so the file only when it is new
+                                                            if ! nft get element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }' >/dev/null 2>&1; then
+                                                              nft add element inet webmin_profile_hosting profile_hosting_tcp_ports '{ {{port}} }'
+                                                              # keep it after a restart: add it to the elements of the set in /etc/nftables.conf
+                                                              perl -0777 -pi -e 's/(set profile_hosting_tcp_ports \{[^}]*?elements = \{[^}]*?)\s*\}/$1, {{port}} }/' \
+                                                                /etc/nftables.conf
+                                                            fi
+                                                          else
+                                                            if ! dpkg -s nftables >/dev/null 2>&1; then
+                                                              apt-get update
+                                                              DEBIAN_FRONTEND=noninteractive apt-get install -y nftables
+                                                            fi
+                                                            grep -q 'tcp dport {{port}} accept' /etc/nftables.conf ||
+                                                              echo 'add rule inet filter input tcp dport {{port}} accept' >> /etc/nftables.conf
+                                                            systemctl enable nftables
+                                                            systemctl restart nftables
+                                                          fi
 
-                            """);
+                                                          """);
             }
         }
 

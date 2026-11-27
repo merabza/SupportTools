@@ -48,27 +48,30 @@ public sealed class ServerInfoCruderTests
         Assert.Equal(expected, menuItems.Take(3).Select(x => x.MenuItemName));
         Assert.IsType<CopyServerInfoCliMenuCommand>(menuItems[2].CliMenuCommand);
     }
+
     [Theory]
-    [InlineData(EProjectType.IsService, true, new[]
-    {
-        "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId", "ServiceUserName",
-        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode", "OpenPort",
-        "CurrentDatabaseParameters", "NewDatabaseParameters"
-    })]
-    [InlineData(EProjectType.Standard, true, new[]
-    {
-        "ServerName", "EnvironmentName", "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName",
-        "SpaEnvMode", "CurrentDatabaseParameters", "NewDatabaseParameters"
-    })]
-    [InlineData(EProjectType.IsService, false, new[]
-    {
-        "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId", "ServiceUserName",
-        "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode", "OpenPort"
-    })]
-    [InlineData(EProjectType.IsDbTools, false, new[]
-    {
-        "ServerName", "EnvironmentName", "CurrentDatabaseParameters", "NewDatabaseParameters"
-    })]
+    [InlineData(EProjectType.IsService, true,
+        new[]
+        {
+            "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId",
+            "ServiceUserName", "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode",
+            "OpenPort", "CurrentDatabaseParameters", "NewDatabaseParameters"
+        })]
+    [InlineData(EProjectType.Standard, true,
+        new[]
+        {
+            "ServerName", "EnvironmentName", "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName",
+            "SpaEnvMode", "CurrentDatabaseParameters", "NewDatabaseParameters"
+        })]
+    [InlineData(EProjectType.IsService, false,
+        new[]
+        {
+            "ServerName", "EnvironmentName", "WebAgentNameForCheck", "ServerSidePort", "ApiVersionId",
+            "ServiceUserName", "AppSettingsJsonSourceFileName", "AppSettingsEncodedJsonFileName", "SpaEnvMode",
+            "OpenPort"
+        })]
+    [InlineData(EProjectType.IsDbTools, false,
+        new[] { "ServerName", "EnvironmentName", "CurrentDatabaseParameters", "NewDatabaseParameters" })]
     public void Create_WhenCalled_RegistersFieldEditorsByProjectTypeAndUsesDatabase(EProjectType projectType,
         bool usesDatabase, string[] expected)
     {

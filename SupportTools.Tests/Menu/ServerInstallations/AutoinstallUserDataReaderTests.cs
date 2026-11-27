@@ -42,8 +42,7 @@ public sealed class AutoinstallUserDataReaderTests
         AutoinstallUserData result = AutoinstallUserDataReader.Read(UserData);
 
         // Assert
-        Assert.Equal(
-        [
+        Assert.Equal([
             new AutoinstallUserDataDisk("CT500P3PSSD8_2331E865DB19_1", "/dev/nvme0n1"),
             new AutoinstallUserDataDisk("WDC_WD10EZEX", null)
         ], result.Disks);

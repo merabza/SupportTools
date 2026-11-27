@@ -128,7 +128,8 @@ public sealed class ReversePackageDistributionInGroupCliMenuCommandTests : IDisp
         string noGroupCsproj = AddProject("NoGroup", null);
 
         // Act
-        bool result = await CliMenuTestAccess.InvokeRunBody(CreateSut(SupportToolsParameters.FixProjectGroupName(null)));
+        bool result =
+            await CliMenuTestAccess.InvokeRunBody(CreateSut(SupportToolsParameters.FixProjectGroupName(null)));
 
         // Assert
         Assert.True(result);
