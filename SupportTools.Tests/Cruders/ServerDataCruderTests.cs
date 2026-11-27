@@ -10,10 +10,12 @@ using System.Threading.Tasks;
 using AppCliTools.CliMenu;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
+using AppCliTools.CliTools.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using Moq;
 using ParametersManagement.LibParameters;
 using SupportTools.Cruders;
+using SupportTools.Models;
 using SupportToolsData.Models;
 using Xunit;
 
@@ -261,10 +263,68 @@ public sealed class ServerDataCruderTests : IDisposable
         Assert.Equal(string.Empty, _consoleOutput.ToString());
     }
 
-    private ServerDataCruder CreateSut()
+    //the Servers list of the parameters editor also counts the places that use a server (ServerUsages)
+    [Theory]
+    [InlineData(false, 0, "Usage count: 0")]
+    [InlineData(false, 2, "Usage count: 2")]
+    [InlineData(true, 2, "Decommissioned, Usage count: 2")]
+    public void GetStatusFor_WhenUsagesAreGiven_AddsTheUsageCount(bool isDecommissioned, int usageCount,
+        string expected)
+    {
+        // Arrange
+        _parameters.Servers["PAZISI"].IsDecommissioned = isDecommissioned;
+        ServerDataCruder sut = CreateSut(name =>
+            name == "PAZISI"
+                ? [.. Enumerable.Range(1, usageCount).Select(x => new ServerUsage($"P{x}", $"P{x}"))]
+                : [new ServerUsage("Wrong", "Wrong")]);
+
+        // Act
+        string? status = sut.GetStatusFor("PAZISI");
+
+        // Assert
+        Assert.Equal(expected, status);
+    }
+
+    //the places come right after the fields; choosing one goes to its menu
+    [Fact]
+    public void GetItemMenu_WhenUsagesAreGiven_ListsThePlacesAsMenuLinksAfterTheFields()
+    {
+        // Arrange
+        const string hiddenPlace = "G1/Remote/PAZISI|Prod (Hide Remote Only Projects is on)";
+        ServerDataCruder sut = CreateSut(name =>
+            name == "PAZISI"
+                ?
+                [
+                    new ServerUsage("G1/App/PAZISI|Prod", "G1/App/PAZISI|Prod"),
+                    new ServerUsage(hiddenPlace, "Support Tools Parameters Editor")
+                ]
+                : []);
+
+        // Act
+        List<CliMenuItem> menuItems = CliMenuTestAccess.GetMenuItems(sut.GetItemMenu("PAZISI"));
+
+        // Assert
+        Assert.Equal(["Is Decommissioned", "G1/App/PAZISI|Prod", hiddenPlace, "Exit to Servers menu"],
+            menuItems.Select(x => x.MenuItemName).TakeLast(4));
+        Assert.Equal(["G1/App/PAZISI|Prod", "Support Tools Parameters Editor"],
+            menuItems.Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>().Select(x => x.GetMenuLinkToGo()));
+    }
+
+    //the server choices (ServerDataNameFieldEditor) create the cruder without the places
+    [Fact]
+    public void GetItemMenu_WithoutUsages_ListsNoPlaces()
+    {
+        // Act
+        CliMenuSet itemMenu = CreateSut().GetItemMenu("PAZISI");
+
+        // Assert
+        Assert.DoesNotContain(CliMenuTestAccess.GetMenuItems(itemMenu), x => x.CliMenuCommand is InfoCliMenuCommand);
+    }
+
+    private ServerDataCruder CreateSut(Func<string, IReadOnlyList<ServerUsage>>? getUsages = null)
     {
         return new ServerDataCruder(new Mock<ILogger>().Object, new Mock<IHttpClientFactory>().Object,
-            _parametersManager.Object, _parameters.Servers);
+            _parametersManager.Object, _parameters.Servers, getUsages);
     }
 
     private static FieldEditor GetIsLocalEditor(ServerDataCruder cruder)

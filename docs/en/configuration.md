@@ -262,6 +262,16 @@ renamed); its record stays as a sample of the old configuration. The
 `Servers` list and the server choices show `Decommissioned` next to it;
 nothing else changes
 
+The `Servers` list of the Support Tools Parameters Editor also shows how
+many places use each server (`PAZISI (Usage count: 17)`,
+`dl360 (Decommissioned, Usage count: 6)`), and the menu of a server lists
+them after its fields: `Current Machine Server Name` (Support Tools
+Parameters Editor), the `Production Server Name` of the Project Creator and
+the project servers (`{group}/{project}/{ServerName}|{EnvironmentName}`).
+Choosing a place goes to its menu. A place of a remote project hidden by
+`HideRemoteOnlyProjects` is marked `(Hide Remote Only Projects is on)` and
+goes to the Support Tools Parameters Editor.
+
 \---
 
 ## `GitDataModel` and `GitProjectDataModel`
@@ -356,6 +366,23 @@ Most fields are editable through the in-app menu:
 SupportToolsServer: `GitIgnore File Types`, `EditorConfig File Types`
 and `Gits from SupportToolsServer`
 * Per-project menus — project-specific fields, server infos, git lists
+
+The `Api Clients` list of the Support Tools Parameters Editor shows how
+many places use each API client, after its server
+(`guria.WebAgent (https://…, Usage count: 16)`), and the menu of an API
+client lists them after its fields. A place is the menu path and the
+field: `Support Tools Server Web Api Client Name` and
+`Local Package Manager Web Api Client Name` (Support Tools Parameters
+Editor), the `Db Web Agent Name` of a database server connection, the
+`Web Agent Name` and `Web Agent Installer Name` of a server and the
+`Web Agent Name For Check` of a project server
+(`{group}/{project}/{ServerName}|{EnvironmentName}/Web Agent Name For Check`).
+Choosing a place goes to the menu that holds the field. A field that its
+menu does not show is marked with the parameter that hides it, and
+choosing it goes to the menu of that parameter:
+`(Database Server Provider is SqlServer)` (the field shows only for the
+`WebAgent` provider), `(Project Type is IsDbTools)` (only for services)
+or `(Hide Remote Only Projects is on)` (Support Tools Parameters Editor).
 
 `Support Tools Server Editor` reads and writes the server directly, for
 looking at the server records or fixing one. Before every write it reads

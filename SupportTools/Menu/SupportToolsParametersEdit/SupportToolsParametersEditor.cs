@@ -21,7 +21,8 @@ namespace SupportTools.Menu.SupportToolsParametersEdit;
 
 public sealed class SupportToolsParametersEditor : ParametersEditor
 {
-    //რედაქტორის სახელი მთავარი მენიუს ჩანაწერის სახელიცაა. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages)
+    //რედაქტორის სახელი მთავარი მენიუს ჩანაწერის სახელიცაა. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages,
+    //ServerUsages, ApiClientUsages)
     public const string MenuName = "Support Tools Parameters Editor";
 
     public SupportToolsParametersEditor(IApplication application, ILogger logger, IHttpClientFactory httpClientFactory,
@@ -87,9 +88,12 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new DatabasesBackupFilesExchangeParametersFieldEditor(
             nameof(SupportToolsParameters.DatabasesBackupFilesExchangeParameters), logger, parametersManager));
 
+        //Api კლიენტების სიის სტატუსში გამოყენების რაოდენობაა, კლიენტის მენიუში კი გამოყენების ადგილები
         FieldEditors.Add(new DictionaryFieldEditor<ApiClientCruder, ApiClientSettings>(
             nameof(SupportToolsParameters.ApiClients),
-            x => new ApiClientCruder(logger, httpClientFactory, parametersManager, x)));
+            x => new ApiClientCruder(logger, httpClientFactory, parametersManager, x,
+                apiClientName => ApiClientUsages.Find((SupportToolsParameters)parametersManager.Parameters,
+                    apiClientName))));
 
         FieldEditors.Add(new DictionaryFieldEditor<GitCruder, GitDataModel>(nameof(SupportToolsParameters.Gits),
             x => new GitCruder(logger, httpClientFactory, parametersManager, x)));
@@ -121,9 +125,11 @@ public sealed class SupportToolsParametersEditor : ParametersEditor
         FieldEditors.Add(new DictionaryFieldEditor<ProjectCruder, ProjectModel>(nameof(SupportToolsParameters.Projects),
             x => new ProjectCruder(application, logger, httpClientFactory, parametersManager, x)));
 
+        //სერვერების სიის სტატუსში გამოყენების რაოდენობაა, სერვერის მენიუში კი გამოყენების ადგილები
         FieldEditors.Add(new DictionaryFieldEditor<ServerDataCruder, ServerDataModel>(
             nameof(SupportToolsParameters.Servers),
-            x => new ServerDataCruder(logger, httpClientFactory, parametersManager, x)));
+            x => new ServerDataCruder(logger, httpClientFactory, parametersManager, x,
+                serverName => ServerUsages.Find((SupportToolsParameters)parametersManager.Parameters, serverName))));
 
         FieldEditors.Add(new SimpleNamesWithDescriptionsFieldEditor<RunTimeCruder>(
             nameof(SupportToolsParameters.RunTimes), x => new RunTimeCruder(parametersManager, x)));

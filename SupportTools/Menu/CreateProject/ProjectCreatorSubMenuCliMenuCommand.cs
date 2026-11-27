@@ -15,7 +15,7 @@ namespace SupportTools.Menu.CreateProject;
 
 public sealed class ProjectCreatorSubMenuCliMenuCommand : CliMenuCommand
 {
-    //მთავარი მენიუს ჩანაწერის სახელი. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages)
+    //მთავარი მენიუს ჩანაწერის სახელი. მას მენიუს ბმულებიც იყენებს (DatabaseServerConnectionUsages, ServerUsages)
     public const string MenuName = "Project Creator";
 
     private readonly IApplication _application;

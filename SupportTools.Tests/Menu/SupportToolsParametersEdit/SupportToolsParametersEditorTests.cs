@@ -9,6 +9,7 @@ using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliTools.CliMenuCommands;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ParametersManagement.LibApiClientParameters;
 using ParametersManagement.LibDatabaseParameters;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
@@ -200,6 +201,60 @@ public sealed class SupportToolsParametersEditorTests
             .Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>());
         Assert.Equal("G1/App/Dev Database Parameters", place.Name);
         Assert.Equal("G1/App/Dev Database Parameters", place.GetMenuLinkToGo());
+    }
+
+    //the list shows how many places use every server, the record menu lists them as menu links
+    [Fact]
+    public void ServersEditor_WhenSubMenuRequested_ShowsTheUsagesOfEveryServer()
+    {
+        // Arrange
+        _parameters.Servers["Srv"] = new ServerDataModel { IsDecommissioned = true };
+        _parameters.Projects["App"] = new ProjectModel
+        {
+            ProjectGroupName = "G1",
+            ServerInfos = { ["k"] = new ServerInfoModel { ServerName = "Srv", EnvironmentName = "Prod" } }
+        };
+        FieldEditor serversEditor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.Servers));
+
+        // Act
+        CliMenuSet listMenu = serversEditor.GetSubMenu(_parameters)!;
+        CliMenuCommand serverCommand = CliMenuTestAccess.GetMenuItems(listMenu)
+            .Single(x => x.MenuItemName == "Srv").CliMenuCommand;
+        serverCommand.CountStatus();
+        CliMenuSet serverMenu = serverCommand.GetSubMenu()!;
+
+        // Assert
+        Assert.Equal("Decommissioned, Usage count: 1", serverCommand.StatusString);
+        InfoCliMenuCommand place = Assert.Single(CliMenuTestAccess.GetMenuItems(serverMenu)
+            .Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>());
+        Assert.Equal("G1/App/Srv|Prod", place.Name);
+        Assert.Equal("G1/App/Srv|Prod", place.GetMenuLinkToGo());
+    }
+
+    //the list shows how many places use every api client, the record menu lists them as menu links
+    [Fact]
+    public void ApiClientsEditor_WhenSubMenuRequested_ShowsTheUsagesOfEveryApiClient()
+    {
+        // Arrange
+        _parameters.ApiClients["Client"] = new ApiClientSettings { Server = "http://127.0.0.1:0/" };
+        _parameters.Servers["Srv"] = new ServerDataModel { WebAgentInstallerName = "Client" };
+        FieldEditor apiClientsEditor = GetFieldEditors(CreateSut())
+            .Single(x => x.PropertyName == nameof(SupportToolsParameters.ApiClients));
+
+        // Act
+        CliMenuSet listMenu = apiClientsEditor.GetSubMenu(_parameters)!;
+        CliMenuCommand apiClientCommand = CliMenuTestAccess.GetMenuItems(listMenu)
+            .Single(x => x.MenuItemName == "Client").CliMenuCommand;
+        apiClientCommand.CountStatus();
+        CliMenuSet apiClientMenu = apiClientCommand.GetSubMenu()!;
+
+        // Assert
+        Assert.Equal("http://127.0.0.1:0/, Usage count: 1", apiClientCommand.StatusString);
+        InfoCliMenuCommand place = Assert.Single(CliMenuTestAccess.GetMenuItems(apiClientMenu)
+            .Select(x => x.CliMenuCommand).OfType<InfoCliMenuCommand>());
+        Assert.Equal("Support Tools Parameters Editor/Servers/Srv/Web Agent Installer Name", place.Name);
+        Assert.Equal("Support Tools Parameters Editor/Servers/Srv", place.GetMenuLinkToGo());
     }
 
     [Fact]

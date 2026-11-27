@@ -270,6 +270,16 @@ swap-ის თვალყურის დევნება მიგრაც
 სიაში და სერვერის არჩევისას მის გვერდით `Decommissioned` ჩანს; სხვა
 არაფერი იცვლება
 
+Support Tools Parameters Editor-ის `Servers`-ის სიაში ისიც ჩანს, რამდენ
+ადგილას გამოიყენება თითოეული სერვერი (`PAZISI (Usage count: 17)`,
+`dl360 (Decommissioned, Usage count: 6)`), სერვერის მენიუში კი ველების
+შემდეგ ეს ადგილებია ჩამოთვლილი: `Current Machine Server Name` (Support
+Tools Parameters Editor), Project Creator-ის `Production Server Name` და
+პროექტების სერვერები (`{group}/{project}/{ServerName}|{EnvironmentName}`).
+ადგილის არჩევისას პროგრამა მის მენიუში გადადის. `HideRemoteOnlyProjects`-ით
+დამალული remote პროექტის ადგილს `(Hide Remote Only Projects is on)` აწერია,
+მისი არჩევისას კი პროგრამა Support Tools Parameters Editor-ში გადადის.
+
 \---
 
 ## `GitDataModel` და `GitProjectDataModel`
@@ -367,6 +377,23 @@ SupportToolsServer-ზეც ღიად ინახავს (იხ.
 `Gits from SupportToolsServer`
 * პერ-პროექტი მენიუები — პროექტ-სპეციფიური ველები, server info-ები,
 git სიები
+
+Support Tools Parameters Editor-ის `Api Clients`-ის სიაში თითოეული API
+კლიენტის სერვერის შემდეგ ისიც ჩანს, რამდენ ადგილას გამოიყენება ის
+(`guria.WebAgent (https://…, Usage count: 16)`), კლიენტის მენიუში კი
+ველების შემდეგ ეს ადგილებია ჩამოთვლილი. ადგილი მენიუს გზა და ველია:
+`Support Tools Server Web Api Client Name` და
+`Local Package Manager Web Api Client Name` (Support Tools Parameters
+Editor), მონაცემთა ბაზასთან კავშირის `Db Web Agent Name`, სერვერის
+`Web Agent Name` და `Web Agent Installer Name`, ასევე პროექტის სერვერის
+`Web Agent Name For Check`
+(`{group}/{project}/{ServerName}|{EnvironmentName}/Web Agent Name For Check`).
+ადგილის არჩევისას პროგრამა იმ მენიუში გადადის, რომელშიც ეს ველია. თუ
+მენიუ ველს არ აჩვენებს, ადგილს დამმალავი პარამეტრი აწერია, მისი არჩევისას
+კი პროგრამა ამ პარამეტრის მენიუში გადადის:
+`(Database Server Provider is SqlServer)` (ველი მხოლოდ `WebAgent`
+პროვაიდერს აქვს), `(Project Type is IsDbTools)` (მხოლოდ სერვისს) ან
+`(Hide Remote Only Projects is on)` (Support Tools Parameters Editor).
 
 `Support Tools Server Editor` სერვერს პირდაპირ კითხულობს და წერს, სერვერის
 ჩანაწერების დასათვალიერებლად ან ცალკეულის გასასწორებლად. ყოველ ჩაწერამდე

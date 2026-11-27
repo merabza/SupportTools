@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AppCliTools.CliMenu;
 using AppCliTools.CliParameters;
 using AppCliTools.CliParameters.FieldEditors;
 using AppCliTools.CliParametersApiClientsEdit.FieldEditors;
+using AppCliTools.CliTools.CliMenuCommands;
 using LibSupportToolsServerWork.Registry;
 using Microsoft.Extensions.Logging;
 using ParametersManagement.LibParameters;
 using SupportTools.FieldEditors;
+using SupportTools.Models;
 using SupportToolsData.Models;
 using SystemTools.SystemToolsShared;
 
@@ -16,12 +20,18 @@ namespace SupportTools.Cruders;
 
 public sealed class ServerDataCruder : ParCruder<ServerDataModel>
 {
+    //სერვერის გამოყენების ადგილები სერვერის სახელით (ServerUsages). null — რაოდენობა სტატუსში არ ჩანს და ადგილების
+    //სია მენიუში არ არის (სერვერის არჩევა)
+    private readonly Func<string, IReadOnlyList<ServerUsage>>? _getUsages;
+
     //public კონსტრუქტორი საჭიროა. გამოიყენება რეფლექსიით DictionaryFieldEditor-ში
     // ReSharper disable once MemberCanBePrivate.Global
     public ServerDataCruder(ILogger logger, IHttpClientFactory httpClientFactory, IParametersManager parametersManager,
-        Dictionary<string, ServerDataModel> currentValuesDictionary) : base(parametersManager, currentValuesDictionary,
-        "Server", "Servers")
+        Dictionary<string, ServerDataModel> currentValuesDictionary,
+        Func<string, IReadOnlyList<ServerUsage>>? getUsages = null) : base(parametersManager,
+        currentValuesDictionary, "Server", "Servers")
     {
+        _getUsages = getUsages;
         FieldEditors.Add(new BoolFieldEditor(nameof(ServerDataModel.IsLocal), true));
         FieldEditors.Add(new ApiClientNameFieldEditor(nameof(ServerDataModel.WebAgentName), logger, httpClientFactory,
             ParametersManager, true));
@@ -54,10 +64,35 @@ public sealed class ServerDataCruder : ParCruder<ServerDataModel>
         ServersIsLocalCalculator.Recalculate((SupportToolsParameters)ParametersManager.Parameters);
     }
 
-    //გაუქმებული სერვერი სერვერების სიაშიც და სერვერის არჩევისასაც ჩანს
+    //გაუქმებული სერვერი სერვერების სიაშიც და სერვერის არჩევისასაც ჩანს, გამოყენების რაოდენობა კი მხოლოდ სერვერების
+    //სიაში
     public override string? GetStatusFor(string name)
     {
-        return GetItemByName(name, false) is ServerDataModel { IsDecommissioned: true } ? "Decommissioned" : null;
+        string? status =
+            GetItemByName(name, false) is ServerDataModel { IsDecommissioned: true } ? "Decommissioned" : null;
+        if (_getUsages is null)
+        {
+            return status;
+        }
+
+        string usageCount = $"Usage count: {_getUsages(name).Count}";
+        return status is null ? usageCount : $"{status}, {usageCount}";
+    }
+
+    public override void FillDetailsSubMenu(CliMenuSet itemSubMenuSet, string itemName)
+    {
+        base.FillDetailsSubMenu(itemSubMenuSet, itemName);
+
+        if (_getUsages is null)
+        {
+            return;
+        }
+
+        //სერვერის გამოყენების ადგილები ველების შემდეგ: არჩევისას პროგრამა ადგილის მენიუში გადადის
+        foreach (ServerUsage usage in _getUsages(itemName))
+        {
+            itemSubMenuSet.AddMenuItem(new InfoCliMenuCommand(usage.Name, usage.MenuLink));
+        }
     }
 
     private void EnableIsLocalEditor()
